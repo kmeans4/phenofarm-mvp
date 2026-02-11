@@ -1,7 +1,6 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
 
 export default async function AdminUsersPage() {
   const session = await getServerSession(authOptions);
@@ -15,7 +14,7 @@ export default async function AdminUsersPage() {
       id: 1, 
       name: 'Admin User', 
       email: 'admin@phenofarm.com', 
-      role: 'Admin', 
+      role: 'ADMIN', 
       status: 'Active',
       joined: 'Jan 1, 2024' 
     },
@@ -23,7 +22,7 @@ export default async function AdminUsersPage() {
       id: 2,
       name: 'John Green',
       email: 'grower@vtnurseries.com',
-      role: 'Grower',
+      role: 'GROWER',
       status: 'Active',
       joined: 'Jan 10, 2024'
     },
@@ -31,7 +30,7 @@ export default async function AdminUsersPage() {
       id: 3,
       name: 'Jane Dispensary',
       email: 'dispensary@greenvermont.com',
-      role: 'Dispensary',
+      role: 'DISPENSARY',
       status: 'Active',
       joined: 'Jan 15, 2024'
     },
@@ -39,7 +38,7 @@ export default async function AdminUsersPage() {
       id: 4,
       name: 'Pending Grower',
       email: 'pending@grower.com',
-      role: 'Grower',
+      role: 'GROWER',
       status: 'Pending Verification',
       joined: 'Feb 5, 2024'
     },
@@ -47,7 +46,7 @@ export default async function AdminUsersPage() {
       id: 5,
       name: 'Suspended User',
       email: 'suspended@user.com',
-      role: 'Dispensary',
+      role: 'DISPENSARY',
       status: 'Suspended',
       joined: 'Dec 1, 2023'
     }
@@ -77,13 +76,13 @@ export default async function AdminUsersPage() {
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <p className="text-sm text-gray-600">Growers</p>
           <p className="text-2xl font-bold text-blue-600">
-            {users.filter(u => u.role === 'Grower').length}
+            {users.filter(u => u.role === 'GROWER').length}
           </p>
         </div>
         <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
           <p className="text-sm text-gray-600">Dispensaries</p>
           <p className="text-2xl font-bold text-purple-600">
-            {users.filter(u => u.role === 'Dispensary').length}
+            {users.filter(u => u.role === 'DISPENSARY').length}
           </p>
         </div>
       </div>
@@ -97,9 +96,9 @@ export default async function AdminUsersPage() {
         />
         <select className="rounded-lg border border-gray-300 px-4 py-2">
           <option>All Roles</option>
-          <option>Admin</option>
-          <option>Grower</option>
-          <option>Dispensary</option>
+          <option>ADMIN</option>
+          <option>GROWER</option>
+          <option>DISPENSARY</option>
         </select>
         <select className="rounded-lg border border-gray-300 px-4 py-2">
           <option>All Status</option>
@@ -142,8 +141,8 @@ export default async function AdminUsersPage() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.role === 'Admin' ? 'bg-gray-100 text-gray-800' :
-                      user.role === 'Grower' ? 'bg-green-100 text-green-800' :
+                      user.role === 'ADMIN' ? 'bg-gray-100 text-gray-800' :
+                      user.role === 'GROWER' ? 'bg-green-100 text-green-800' :
                       'bg-purple-100 text-purple-800'
                     }`}>
                       {user.role}

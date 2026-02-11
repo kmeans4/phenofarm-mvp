@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
+import { db } from "lib/db";
 
 export default async function GrowerDashboardPage() {
   const session = await getServerSession(authOptions);
