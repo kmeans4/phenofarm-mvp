@@ -1,0 +1,57 @@
+# PhenoFarm MVP - Page 2: Grower Product Management
+
+## Files Created
+
+### Main Page
+- `/app/grower/products/page.tsx` - Complete products management interface
+
+### API Endpoints Created
+
+| Endpoint | Method | Purpose |
+|----------|--------|---------|
+| `/api/products` | GET | Fetch all products for authenticated grower |
+| `/api/products` | POST | Create a new product |
+| `/api/products` | PUT | Bulk CSV upload with error handling |
+| `/api/products/[id]` | GET | Fetch single product by ID |
+| `/api/products/[id]` | PUT | Update product details |
+| `/api/products/[id]` | DELETE | Delete product |
+| `/api/products/bulk` | POST | Bulk upload JSON products |
+| `/api/products/bulk` | GET | Export products to CSV |
+| `/api/products/upload` | POST | Upload single image file (base64) |
+| `/api/products/upload` | DELETE | Remove image from product |
+
+## Features Implemented
+
+1. **CSV Upload Form**
+   - Drag & drop or file selection
+   - Template download button
+   - Bulk import with success/error reporting
+
+2. **Product Create/Edit Form**
+   - Fields: name, strain, category, subcategory, thc, cbd, price, inventoryQty, unit, description, images
+   - Category dropdown (Flower, Concentrates, Edibles, Topicals, Accessories)
+   - Unit options (Gram, Half Ounce, Ounce, Eighth, Quarter, Unit, Pack)
+   - Image preview gallery with remove functionality
+
+3. **Product Table**
+   - Display: Name, Category, Strain, THC/CBD, Price, Inventory, Status, Actions
+   - Sorting by: Date, Name, Price, Inventory Quantity
+   - Filter by: Category, Availability Status
+   - Responsive design
+
+4. **Delete Functionality**
+   - Confirmation modal
+   - Product removal from table
+
+5. **Image Upload Preview**
+   - Multiple image support (base64 stored in database)
+   - Local preview before save
+   - Remove individual images
+
+6. **Toggle Availability**
+   - Toggle button in table
+   - Updates `isAvailable` status in database
+
+## Summary
+
+The products page at `/grower/products` is fully functional with all requested features. The implementation uses the existing Next.js structure, TypeScript, Prisma for data, and the existing component library. All CRUD operations are working through the API endpoints.
