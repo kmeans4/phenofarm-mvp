@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { Prisma } from '@prisma/client';
 
 // Bulk upload products endpoint
 export async function POST(request: NextRequest) {
