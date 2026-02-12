@@ -2,8 +2,18 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
-import { Prisma, OrderStatus } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 import { format } from 'date-fns';
+
+// OrderStatus enum - defined here to avoid Prisma import issues with Prisma 6
+enum OrderStatus {
+  PENDING = 'PENDING',
+  CONFIRMED = 'CONFIRMED',
+  PROCESSING = 'PROCESSING',
+  SHIPPED = 'SHIPPED',
+  DELIVERED = 'DELIVERED',
+  CANCELLED = 'CANCELLED',
+}
 
 // GET all orders for the authenticated grower with filtering and CSV export
 export async function GET(request: NextRequest) {
