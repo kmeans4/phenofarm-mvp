@@ -188,3 +188,70 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+// PUT update order status
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const user = session.user as any;
+    
+    if (user.role !== 'GROWER') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { orderId, status } = body;
+
+    // Validate required fields
+    if (!orderId || !status) {
+      return NextResponse.json(
+        { error: 'Missing required fields: orderId, status' },
+        { status: 400 }
+      );
+    }
+
+    // Validate status
+    if (!Object.values(OrderStatus).includes(status)) {
+      return NextResponse.json(
+        { error: `Invalid status. Must be one of: ${Object.values(OrderStatus).join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Find the order and verify it belongs to this grower
+    const order = await db.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    }
+
+    if (order.growerId !== user.growerId) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Update order status
+    const updatedOrder = await db.order.update({
+      where: { id: orderId },
+      data: { status },
+      include: {
+        dispensary: {
+          select: {
+            businessName: true,
+          },
+        },
+      },
+    });
+
+    return NextResponse.json(updatedOrder, { status: 200 });
+  } catch (error) {
+    console.error('Error updating order:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
