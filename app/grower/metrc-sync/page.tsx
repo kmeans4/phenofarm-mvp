@@ -47,7 +47,7 @@ export default async function GrowerMetrcSyncPage() {
     status: latestSync ? (latestSync.success ? 'connected' : 'error') : 'not_configured',
     pendingItems: 0,
     errorCount: failedSyncCount,
-    previousRecords: totalSynced || 0,
+    previousRecords: (totalSynced as any)?._sum?.recordsSynced || 0,
   };
 
   const handleManualSync = async () => {
@@ -134,7 +134,7 @@ export default async function GrowerMetrcSyncPage() {
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Synced Items</p>
                 <p className="text-lg font-bold text-gray-900">
-                  {totalSynced || 0}
+                  {(totalSynced as any)?._sum?.recordsSynced || 0}
                 </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">

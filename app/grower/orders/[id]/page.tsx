@@ -36,6 +36,7 @@ interface OrderItem {
   unitPrice: number;
   totalPrice: number;
   createdAt: Date;
+  product?: Product;
 }
 
 interface Product {
@@ -72,6 +73,7 @@ interface Order {
   shippedAt: Date | null;
   deliveredAt: Date | null;
   createdAt: Date;
+  product?: Product;
   updatedAt: Date;
   items: OrderItem[];
   payments: any[];
@@ -85,6 +87,7 @@ interface User {
   growerId: string | null;
   dispensaryId: string | null;
   createdAt: Date;
+  product?: Product;
   updatedAt: Date;
 }
 
@@ -100,6 +103,7 @@ interface OrderDetail {
   shippedAt: Date | null;
   deliveredAt: Date | null;
   createdAt: Date;
+  product?: Product;
   updatedAt: Date;
   growerId: string;
   dispensaryId: string;
@@ -108,7 +112,7 @@ interface OrderDetail {
 }
 
 async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | null> {
-  return await db.order.findUnique({
+  const order = await db.order.findUnique({
     where: { id, growerId },
     include: {
       dispensary: true,
@@ -119,6 +123,22 @@ async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | n
       },
     },
   });
+  
+  if (!order) return null;
+  
+  // Convert Decimal to number for JSON serialization
+  return {
+    ...order,
+    totalAmount: Number(order.totalAmount),
+    subtotal: Number(order.subtotal),
+    tax: Number(order.tax),
+    shippingFee: Number(order.shippingFee),
+    items: order.items.map(item => ({
+      ...item,
+      unitPrice: Number(item.unitPrice),
+      totalPrice: Number(item.totalPrice),
+    })),
+  } as unknown as OrderDetail;
 }
 
 function formatCurrency(amount: number) {

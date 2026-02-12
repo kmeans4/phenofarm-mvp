@@ -22,7 +22,7 @@ export default async function DashboardPage() {
   };
 
   if (user.role === 'GROWER') {
-    stats = await db.$queryRaw<{ totalProducts:bigint; totalOrders:bigint; pendingOrders:bigint; totalRevenue:bigint }[]>`
+    stats = await db.$queryRaw<any>`
       SELECT 
         COALESCE(COUNT(DISTINCT p.id), 0) as totalProducts,
         COALESCE(COUNT(DISTINCT o.id), 0) as totalOrders,
@@ -34,7 +34,7 @@ export default async function DashboardPage() {
       WHERE p."sellerId" = ${user.id}
     `;
   } else if (user.role === 'DISPENSARY') {
-    stats = await db.$queryRaw<{ totalProducts:bigint; totalOrders:bigint; pendingOrders:bigint; totalRevenue:bigint }[]>`
+    stats = await db.$queryRaw<any>`
       SELECT 
         COALESCE(COUNT(DISTINCT oi."productId"), 0) as totalProducts,
         COALESCE(COUNT(DISTINCT o.id), 0) as totalOrders,
