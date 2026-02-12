@@ -1,7 +1,7 @@
-import 'server-only'
-import { PrismaClient } from '@prisma/client'
+// lib/db.ts - Prisma client for server-side only
+import { PrismaClient } from '@prisma/client';
 
-const globalForPrisma = global as unknown as { prisma: PrismaClient }
+const globalForPrisma = global as unknown as { prisma?: PrismaClient };
 
 export const db = globalForPrisma.prisma || new PrismaClient({
   datasources: {
@@ -9,6 +9,6 @@ export const db = globalForPrisma.prisma || new PrismaClient({
       url: process.env.DATABASE_URL!,
     },
   },
-})
+});
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db;
