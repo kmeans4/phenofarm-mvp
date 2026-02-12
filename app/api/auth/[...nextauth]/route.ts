@@ -1,6 +1,7 @@
 import NextAuth, { DefaultSession, Session, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 declare module 'next-auth' {
   interface User {
@@ -87,6 +88,6 @@ export const authOptions = {
   secret: process.env.AUTH_SECRET,
 };
 
-const handler = NextAuth(authOptions);
+const { handler, signIn, signOut, auth } = NextAuth(authOptions);
 
 export { handler as GET, handler as POST, signIn, signOut, auth };

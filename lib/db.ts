@@ -1,12 +1,8 @@
-// lib/db.ts - Fixed for Vercel deployment
+// lib/db.ts - Prisma client for Vercel deployment
 import { PrismaClient } from '@prisma/client'
 
-const globalForPrisma = global || (typeof window !== 'undefined' ? window : {})
+const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
-export const prisma =
-  globalForPrisma.prisma ||
-  new PrismaClient({
-    log: globalForPrisma.env === 'development' ? ['query', 'error', 'warn'] : ['query', 'error'],
-  })
+export const db = globalForPrisma.prisma || new PrismaClient()
 
-if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
+if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = db

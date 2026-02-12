@@ -1,9 +1,9 @@
-import { prisma } from '@/lib';
+import { db } from '@/lib';
 
 export async function seedDatabase() {
   try {
     // Create sample grower
-    const grower = await prisma.grower.upsert({
+    const grower = await db.grower.upsert({
       where: { userId: 'grower-001' },
       update: {},
       create: {
@@ -22,7 +22,7 @@ export async function seedDatabase() {
     });
 
     // Create grower user
-    await prisma.user.upsert({
+    await db.user.upsert({
       where: { email: 'grower@vtnurseries.com' },
       update: {
         growerId: grower.id,
@@ -37,7 +37,7 @@ export async function seedDatabase() {
     });
 
     // Create sample dispensary
-    const dispensary = await prisma.dispensary.upsert({
+    const dispensary = await db.dispensary.upsert({
       where: { userId: 'dispensary-001' },
       update: {},
       create: {
@@ -56,7 +56,7 @@ export async function seedDatabase() {
     });
 
     // Create dispensary user
-    await prisma.user.upsert({
+    await db.user.upsert({
       where: { email: 'dispensary@greenvermont.com' },
       update: {
         dispensaryId: dispensary.id,
@@ -71,7 +71,7 @@ export async function seedDatabase() {
     });
 
     // Create sample products
-    const product1 = await prisma.product.upsert({
+    const product1 = await db.product.upsert({
       where: { id: 'product-001' },
       update: {},
       create: {
@@ -91,7 +91,7 @@ export async function seedDatabase() {
       },
     });
 
-    const product2 = await prisma.product.upsert({
+    const product2 = await db.product.upsert({
       where: { id: 'product-002' },
       update: {},
       create: {
@@ -111,7 +111,7 @@ export async function seedDatabase() {
       },
     });
 
-    const product3 = await prisma.product.upsert({
+    const product3 = await db.product.upsert({
       where: { id: 'product-003' },
       update: {},
       create: {
@@ -137,7 +137,7 @@ export async function seedDatabase() {
     const fiveDaysAgo = new Date(now.setDate(now.getDate() - 3));
     const tenDaysAgo = new Date(now.setDate(now.getDate() - 5));
 
-    const order1 = await prisma.order.upsert({
+    const order1 = await db.order.upsert({
       where: { id: 'order-001' },
       update: {},
       create: {
@@ -154,7 +154,7 @@ export async function seedDatabase() {
       },
     });
 
-    await prisma.orderItem.upsert({
+    await db.orderItem.upsert({
       where: { id: 'order-item-001' },
       update: {},
       create: {
@@ -168,7 +168,7 @@ export async function seedDatabase() {
       },
     });
 
-    const order2 = await prisma.order.upsert({
+    const order2 = await db.order.upsert({
       where: { id: 'order-002' },
       update: {},
       create: {
@@ -185,7 +185,7 @@ export async function seedDatabase() {
       },
     });
 
-    await prisma.orderItem.upsert({
+    await db.orderItem.upsert({
       where: { id: 'order-item-002' },
       update: {},
       create: {
@@ -199,7 +199,7 @@ export async function seedDatabase() {
       },
     });
 
-    const order3 = await prisma.order.upsert({
+    const order3 = await db.order.upsert({
       where: { id: 'order-003' },
       update: {},
       create: {
@@ -216,7 +216,7 @@ export async function seedDatabase() {
       },
     });
 
-    await prisma.orderItem.upsert({
+    await db.orderItem.upsert({
       where: { id: 'order-item-003' },
       update: {},
       create: {
@@ -231,7 +231,7 @@ export async function seedDatabase() {
     });
 
     // Create sample Metrc sync logs
-    await prisma.metrcSyncLog.create({
+    await db.metrcSyncLog.create({
       data: {
         id: 'metrc-log-001',
         growerId: grower.id,

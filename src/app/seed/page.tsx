@@ -92,7 +92,7 @@ Users created and ready to use.`);
 
   useEffect(() => {
     // Check if data already exists
-    db.user.count().then((count) => {
+    db.user.count().then((count: number) => {
       if (count > 0) {
         setStatus('success');
         setMessage(`✅ Database already has ${count} users.`);

@@ -1,2 +1,2 @@
-export { prisma } from './db';
-export { PrismaClient } from '@prisma/client';
+export { db } from './db';
+export { cn } from './utils';
