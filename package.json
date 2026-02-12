@@ -2,9 +2,12 @@
   "name": "phenofarm-mvp",
   "version": "0.1.0",
   "private": true,
+  "prisma": {
+    "schema": "prisma/schema.prisma"
+  },
   "scripts": {
     "dev": "next dev",
-    "build": "SKIP_PRISMA_GENERATE=true next build",
+    "build": "next build",
     "start": "next start",
     "lint": "eslint",
     "prisma:migrate": "prisma migrate deploy",
