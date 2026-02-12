@@ -2,7 +2,26 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { Product } from '@prisma/client';
+
+interface Product {
+  id: string;
+  growerId: string;
+  name: string;
+  strain: string | null;
+  category: string | null;
+  subcategory: string | null;
+  thc: number | null;
+  cbd: number | null;
+  price: number;
+  inventoryQty: number;
+  unit: string;
+  description: string | null;
+  images: string[];
+  isAvailable: boolean;
+  createdAt: Date;
+  updatedAt: Date;
+  lastSyncedAt: Date | null;
+}
 
 // GET a single product by ID
 export async function GET(

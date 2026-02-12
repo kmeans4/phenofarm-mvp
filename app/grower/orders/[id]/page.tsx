@@ -6,8 +6,87 @@ import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
 import { Badge } from '@/app/components/ui/Badge';
-import { Order, OrderItem, Product, User, Dispensary } from '@prisma/client';
 import Link from 'next/link';
+
+// Define types locally for Prisma 6 compatibility
+interface Dispensary {
+  id: string;
+  userId: string;
+  businessName: string;
+  licenseNumber: string | null;
+  phone: string | null;
+  address: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
+  website: string | null;
+  description: string | null;
+  logo: string | null;
+  orders: any[];
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string;
+  growerId: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+  createdAt: Date;
+}
+
+interface Product {
+  id: string;
+  growerId: string;
+  name: string;
+  strain: string | null;
+  category: string | null;
+  subcategory: string | null;
+  thc: number | null;
+  cbd: number | null;
+  price: number;
+  inventoryQty: number;
+  unit: string;
+  isAvailable: boolean;
+  description: string | null;
+  images: string[];
+  createdAt: Date;
+  updatedAt: Date;
+  lastSyncedAt: Date | null;
+}
+
+interface Order {
+  id: string;
+  orderId: string;
+  growerId: string;
+  dispensaryId: string;
+  status: string;
+  totalAmount: number;
+  subtotal: number;
+  tax: number;
+  shippingFee: number;
+  notes: string | null;
+  shippedAt: Date | null;
+  deliveredAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+  items: OrderItem[];
+  payments: any[];
+}
+
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+  role: string;
+  growerId: string | null;
+  dispensaryId: string | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
 
 interface OrderDetail {
   id: string;
@@ -49,8 +128,8 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-function getStatusBadge(status: string) {
-  const statusColors = {
+function StatusBadge({ status }: { status: string }) {
+  const statusColors: Record<string, string> = {
     PENDING: 'bg-yellow-100 text-yellow-800',
     CONFIRMED: 'bg-blue-100 text-blue-800',
     PROCESSING: 'bg-purple-100 text-purple-800',
@@ -59,176 +138,138 @@ function getStatusBadge(status: string) {
     CANCELLED: 'bg-red-100 text-red-800',
   };
 
-  const statusLabels = {
-    PENDING: 'Pending',
-    CONFIRMED: 'Confirmed',
-    PROCESSING: 'Processing',
-    SHIPPED: 'Shipped',
-    DELIVERED: 'Delivered',
-    CANCELLED: 'Cancelled',
-  };
-
   return (
-    <span className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[status as keyof typeof statusColors]}`}>
-      {statusLabels[status as keyof typeof statusLabels]}
-    </span>
+    <Badge className={statusColors[status] || 'bg-gray-100 text-gray-800'}>
+      {status}
+    </Badge>
   );
 }
 
-export default async function OrderDetailPage({ params }: { params: { id: string } }) {
+export default async function OrderDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
   const session = await getServerSession(authOptions);
-  
+
   if (!session) {
     redirect('/auth/sign_in');
   }
 
   const user = session.user as any;
-  
+
   if (user.role !== 'GROWER') {
-    redirect('/dashboard');
+    redirect('/auth/sign_in');
   }
 
-  const order = await fetchOrder(params.id, user.growerId);
+  const { id } = await params;
+  const order = await fetchOrder(id, user.growerId);
 
   if (!order) {
-    redirect('/grower/orders');
+    return (
+      <div className="p-6">
+        <h1 className="text-2xl font-bold">Order Not Found</h1>
+        <p className="mt-2 text-gray-600">The requested order could not be found.</p>
+        <Link href="/grower/orders" className="mt-4 inline-block text-green-600 hover:underline">
+          Back to Orders
+        </Link>
+      </div>
+    );
   }
 
-  const itemsTotal = order.items.reduce((sum, item) => sum + Number(item.totalPrice), 0);
-  const taxAmount = Number(order.tax);
-  const shippingAmount = Number(order.shippingFee);
-  const grandTotal = Number(order.totalAmount);
-
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Order #{order.orderId}</h1>
-          <p className="text-gray-600 mt-1">
-            {order.dispensary.businessName} • {format(order.createdAt, 'MMM d, yyyy')}
-          </p>
+    <div className="container mx-auto p-6 max-w-4xl">
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold text-gray-900">Order #{order.orderId}</h1>
+        <StatusBadge status={order.status} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm text-gray-600">Order Date</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-semibold">{format(order.createdAt, 'MMM dd, yyyy')}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm text-gray-600">Total Amount</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-2xl font-semibold">{formatCurrency(order.totalAmount)}</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-sm text-gray-600">Dispensary</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-xl font-semibold">{order.dispensary.businessName}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
         </div>
-        <div className="flex gap-3">
-          <Button variant="secondary" className="bg-white border-gray-300 hover:bg-gray-50">
-            Print Invoice
-          </Button>
-          <Button variant="primary" className="bg-green-600 hover:bg-green-700 text-white">
-            Mark as Shipped
-          </Button>
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-200">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {order.items.map((item) => (
+                <tr key={item.id}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {item.product?.name || 'Product Deleted'}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity}</td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {formatCurrency(item.unitPrice)}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                    {formatCurrency(item.totalPrice)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="px-6 py-4 bg-gray-50 rounded-b-lg space-y-2">
+          <div className="flex justify-end">
+            <span className="text-sm text-gray-600">Subtotal:</span>
+            <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.subtotal)}</span>
+          </div>
+          <div className="flex justify-end">
+            <span className="text-sm text-gray-600">Tax:</span>
+            <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.tax)}</span>
+          </div>
+          <div className="flex justify-end">
+            <span className="text-sm text-gray-600">Shipping:</span>
+            <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.shippingFee)}</span>
+          </div>
+          <div className="flex justify-end border-t pt-2">
+            <span className="text-sm font-semibold text-gray-900">Total:</span>
+            <span className="ml-2 text-sm font-bold text-green-600">{formatCurrency(order.totalAmount)}</span>
+          </div>
         </div>
       </div>
 
-      {/* Order Status */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-lg font-semibold text-gray-900">Order Status</CardTitle>
-            {getStatusBadge(order.status)}
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Created:</span>
-            <span className="text-gray-900">{format(order.createdAt, 'MMM d, yyyy h:mm a')}</span>
-          </div>
-          {order.shippedAt && (
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Shipped:</span>
-              <span className="text-gray-900">{format(order.shippedAt, 'MMM d, yyyy h:mm a')}</span>
-            </div>
-          )}
-          {order.deliveredAt && (
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Delivered:</span>
-              <span className="text-gray-900">{format(order.deliveredAt, 'MMM d, yyyy h:mm a')}</span>
-            </div>
-          )}
-          {order.notes && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <span className="text-sm font-medium text-gray-900">Notes:</span>
-              <p className="text-sm text-gray-600 mt-1">{order.notes}</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Dispensary Info */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">Dispensary Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Business Name:</span>
-            <span className="text-gray-900 font-medium">{order.dispensary.businessName}</span>
-          </div>
-          {order.dispensary.phone && (
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Phone:</span>
-              <span className="text-gray-900">{order.dispensary.phone}</span>
-            </div>
-          )}
-          {order.dispensary.address && (
-            <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Address:</span>
-              <span className="text-gray-900">{order.dispensary.address}</span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Order Items */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">Order Items</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {order.items.map((item) => (
-              <div key={item.id} className="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900">{item.product?.name || 'Product deleted'}</h4>
-                  {item.product?.strain && (
-                    <p className="text-sm text-gray-600">{item.product.strain}</p>
-                  )}
-                  <p className="text-sm text-gray-500">
-                    SKU: {item.product?.id} • {item.quantity} × {formatCurrency(Number(item.unitPrice))}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="font-bold text-gray-900">{formatCurrency(Number(item.totalPrice))}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Order Summary */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">Order Summary</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Subtotal:</span>
-            <span className="text-gray-900">{formatCurrency(itemsTotal)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Tax:</span>
-            <span className="text-gray-900">{formatCurrency(taxAmount)}</span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-gray-600">Shipping:</span>
-            <span className="text-gray-900">{formatCurrency(shippingAmount)}</span>
-          </div>
-          <div className="pt-3 border-t border-gray-200 flex justify-between text-lg font-bold">
-            <span className="text-gray-900">Total:</span>
-            <span className="text-gray-900">{formatCurrency(grandTotal)}</span>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex gap-4">
+        <Button variant="outline" asChild>
+          <Link href="/grower/orders">Back to Orders</Link>
+        </Button>
+      </div>
     </div>
   );
 }
