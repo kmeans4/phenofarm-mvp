@@ -2,9 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -98,7 +95,7 @@ export async function POST(request: NextRequest) {
       images: record.images ? record.images.split(',') : [],
     }));
 
-    const createdProducts = await prisma.product.createMany({
+    const createdProducts = await db.product.createMany({
       data: products,
     });
 
