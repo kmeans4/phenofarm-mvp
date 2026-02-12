@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
-import { Prisma } from '@prisma/client';
 
 // GET all products for the authenticated grower with filtering and sorting
 export async function GET(request: NextRequest) {
@@ -26,7 +25,7 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
-    const where: Prisma.ProductWhereInput = {
+    const where: any = {
       growerId: user.growerId,
       ...(category && { category }),
       ...(isAvailable !== null && { isAvailable: isAvailable === 'true' }),

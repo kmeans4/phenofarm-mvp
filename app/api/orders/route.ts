@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
-import { Prisma } from '@prisma/client';
 import { format } from 'date-fns';
 
 // OrderStatus enum - defined here to avoid Prisma import issues with Prisma 6
@@ -37,7 +36,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'desc';
     const exportFormat = searchParams.get('export');
 
-    const where: Prisma.OrderWhereInput = {
+    const where: any = {
       growerId: user.growerId,
       ...(status && { status: { equals: status } }),
       ...(search && {

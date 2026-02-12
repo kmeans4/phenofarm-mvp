@@ -7,7 +7,8 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "eslint",
     "prisma:generate": "prisma generate",
@@ -27,6 +28,7 @@
     "prisma": "6.5.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "server-only": "^1.0.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
