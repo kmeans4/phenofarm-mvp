@@ -28,11 +28,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Header />
         <main className="min-h-screen">{children}</main>
-        <footer className="bg-gray-100 py-4 text-center text-sm text-gray-500">
-          © 2026 PhenoFarm. All rights reserved.
-        </footer>
       </body>
     </html>
   );
