@@ -10,7 +10,7 @@ export default async function GrowerInventoryPage() {
     redirect('/auth/sign_in');
   }
 
-  const inventory = [];
+  const inventory: any[] = [];
 
   return (
     <div className="space-y-6">

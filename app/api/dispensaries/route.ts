@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         city: true,
         state: true,
         address: true,
-      },
+      } as any,
     });
 
     return NextResponse.json(dispensaries, { status: 200 });

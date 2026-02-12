@@ -10,7 +10,7 @@ interface DeleteButtonProps {
 export function DeleteButton({ onClick, disabled }: DeleteButtonProps) {
   return (
     <Button 
-      variant="danger" 
+      variant="destructive" 
       onClick={onClick} 
       disabled={disabled}
       className="text-sm"

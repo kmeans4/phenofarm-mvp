@@ -10,7 +10,7 @@ export default async function GrowerOrdersHistoryPage() {
     redirect('/auth/sign_in');
   }
 
-  const orders = [];
+  const orders: any[] = [];
 
   return (
     <div className="space-y-6">

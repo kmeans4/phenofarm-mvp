@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { Prisma } from '@prisma/client';
 
 // Bulk upload products endpoint
 export async function POST(request: NextRequest) {
@@ -18,20 +19,51 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { products } = body;
+    const formData = await request.formData();
+    const csvFile = formData.get('file') as File;
 
-    if (!products || !Array.isArray(products)) {
-      return NextResponse.json({ error: 'No products data provided' }, { status: 400 });
+    if (!csvFile) {
+      return NextResponse.json({ error: 'No CSV file provided' }, { status: 400 });
+    }
+
+    const csvContent = await csvFile.text();
+    const lines = csvContent.split('\n').filter(line => line.trim());
+
+    if (lines.length <= 1) {
+      return NextResponse.json({ error: 'CSV file is empty or has no data rows' }, { status: 400 });
+    }
+
+    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+    
+    // Expected columns
+    const requiredHeaders = ['name', 'price', 'inventoryqty', 'unit'];
+    const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
+    
+    if (missingHeaders.length > 0) {
+      return NextResponse.json({ 
+        error: `Missing required headers: ${missingHeaders.join(', ')}` 
+      }, { status: 400 });
     }
 
     let successCount = 0;
     let errorCount = 0;
     const errors: string[] = [];
-    const createdProducts: any[] = [];
 
-    for (const productData of products) {
+    for (let i = 1; i < lines.length; i++) {
+      const values = lines[i].split(',').map(v => v.trim());
+      
+      if (values.length < headers.length) {
+        errors.push(`Row ${i + 1}: Missing values`);
+        errorCount++;
+        continue;
+      }
+
       try {
+        const productData: Record<string, any> = {};
+        headers.forEach((header, index) => {
+          productData[header] = values[index] || null;
+        });
+
         const product = await db.product.create({
           data: {
             growerId: user.growerId,
@@ -39,51 +71,84 @@ export async function POST(request: NextRequest) {
             strain: productData.strain || null,
             category: productData.category || null,
             subcategory: productData.subcategory || null,
-            thc: productData.thc !== undefined && productData.thc !== null ? parseFloat(productData.thc) : null,
-            cbd: productData.cbd !== undefined && productData.cbd !== null ? parseFloat(productData.cbd) : null,
+            thc: productData.thc ? parseFloat(productData.thc) : null,
+            cbd: productData.cbd ? parseFloat(productData.cbd) : null,
             price: parseFloat(productData.price),
             inventoryQty: parseInt(productData.inventoryQty),
             unit: productData.unit,
             description: productData.description || null,
-            images: productData.images || [],
-            isAvailable: productData.isAvailable !== undefined ? productData.isAvailable : true,
+            images: productData.images ? productData.images.split(';') : [],
+            isAvailable: productData.isavailable !== 'false',
           },
         });
         
         successCount++;
-        createdProducts.push(product);
       } catch (err: any) {
-        errors.push(`Product "${productData.name}": ${err.message}`);
+        errors.push(`Row ${i + 1}: ${err.message}`);
         errorCount++;
       }
     }
 
     return NextResponse.json({
       success: true,
-      totalRows: products.length,
+      totalRows: lines.length - 1,
       successCount,
       errorCount,
       errors: errors.length > 0 ? errors : undefined,
-      createdProducts,
     }, { status: 200 });
   } catch (error) {
-    console.error('Error in bulk upload:', error);
+    console.error('Error uploading CSV:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-// Export products for download
+// Export products for download (CSV) or template
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
+    const { searchParams } = new URL(request.url);
+    const template = searchParams.get('template');
 
-    if (!session) {
+    // Allow template download without auth for convenience
+    if (!session && !template) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    // Return template if requested
+    if (template === 'true') {
+      const templateHeaders = ['name', 'strain', 'category', 'subcategory', 'thc', 'cbd', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images'];
+      const sampleRow = [
+        'Blue Dream',
+        'Blue Dream x Haze',
+        'Flower',
+        'Sativa',
+        '18.5',
+        '0.2',
+        '45.00',
+        '100',
+        'Ounce',
+        'Premium sativa flower with berry aroma',
+        'true',
+        'https://example.com/image1.jpg;https://example.com/image2.jpg'
+      ];
+      
+      const csvContent = [
+        templateHeaders.join(','),
+        sampleRow.join(','),
+        '"Northern Lights","Northern Lights x Afghan","Flower","Indica","22.0","0.1","50.00","75","Ounce","Potent indica for relaxation","true",""'
+      ].join('\n');
+
+      return new Response(csvContent, {
+        headers: {
+          'Content-Type': 'text/csv',
+          'Content-Disposition': 'attachment; filename="products-template.csv"',
+        },
+      });
+    }
+
+    const user = session?.user as any;
     
-    if (user.role !== 'GROWER') {
+    if (user?.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -113,13 +178,12 @@ export async function GET(request: NextRequest) {
       ].join(','))
     ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    
-    return NextResponse.json({
-      downloadUrl: url,
-      rowCount: products.length,
-    }, { status: 200 });
+    return new Response(csvContent, {
+      headers: {
+        'Content-Type': 'text/csv',
+        'Content-Disposition': 'attachment; filename="products-export.csv"',
+      },
+    });
   } catch (error) {
     console.error('Error exporting products:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

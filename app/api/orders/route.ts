@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { db } from '@/lib/db';
+import { Prisma, OrderStatus } from '@prisma/client';
+import { format } from 'date-fns';
 
-// GET all orders for the authenticated grower
+// GET all orders for the authenticated grower with filtering and CSV export
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -19,43 +21,62 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const skip = (page - 1) * limit;
+    const status = searchParams.get('status') as OrderStatus | null;
+    const search = searchParams.get('search');
+    const sortBy = searchParams.get('sortBy') || 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') || 'desc';
+    const exportFormat = searchParams.get('export');
 
-    const where: any = { growerId: user.growerId };
-    
-    if (status) {
-      where.status = status;
-    }
+    const where: Prisma.OrderWhereInput = {
+      growerId: user.growerId,
+      ...(status && { status: { equals: status } }),
+      ...(search && {
+        OR: [
+          { orderId: { contains: search, mode: 'insensitive' } },
+          { dispensary: { businessName: { contains: search, mode: 'insensitive' } } },
+        ],
+      }),
+    };
 
     const orders = await db.order.findMany({
       where,
-      take: limit,
-      skip,
-      orderBy: { createdAt: 'desc' },
       include: {
-        dispensary: true,
-        items: {
-          include: {
-            product: true,
+        dispensary: {
+          select: {
+            businessName: true,
           },
         },
       },
-    });
-
-    const total = await db.order.count({ where });
-
-    return NextResponse.json({
-      orders,
-      pagination: {
-        page,
-        limit,
-        total,
-        totalPages: Math.ceil(total / limit),
+      orderBy: {
+        [sortBy]: sortOrder,
       },
-    }, { status: 200 });
+    } as any);
+
+    // Handle CSV export request
+    if (exportFormat === 'csv') {
+      const headers = ['Order ID', 'Dispensary', 'Status', 'Total Amount', 'Created At'];
+      const rows = orders.map((order: any) => [
+        `"${order.orderId}"`,
+        `"${order.dispensary.businessName}"`,
+        `"${order.status}"`,
+        `"${order.totalAmount.toString()}"`,
+        `"${format(order.createdAt, 'yyyy-MM-dd HH:mm:ss')}"`,
+      ]);
+      
+      const csvContent = [
+        headers.join(','),
+        ...rows.map((row: any[]) => row.join(','))
+      ].join('\n');
+      
+      return new NextResponse(csvContent, {
+        headers: {
+          'Content-Type': 'text/csv',
+          'Content-Disposition': `attachment; filename=orders_${format(new Date(), 'yyyyMMdd_HHmmss')}.csv`,
+        },
+      });
+    }
+
+    return NextResponse.json(orders, { status: 200 });
   } catch (error) {
     console.error('Error fetching orders:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -81,83 +102,85 @@ export async function POST(request: NextRequest) {
     const { dispensaryId, items, notes, shippingFee } = body;
 
     // Validate required fields
-    if (!dispensaryId || !items || !Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: 'Missing required fields: dispensaryId and items array' }, { status: 400 });
+    if (!dispensaryId || !Array.isArray(items) || items.length === 0) {
+      return NextResponse.json(
+        { error: 'Missing required fields: dispensaryId, items (array)' },
+        { status: 400 }
+      );
     }
 
-    // Calculate totals
+    // Verify dispensary belongs to another user (not this grower)
+    const dispensary = await db.dispensary.findUnique({
+      where: { id: dispensaryId },
+    });
+
+    if (!dispensary) {
+      return NextResponse.json({ error: 'Invalid dispensary' }, { status: 400 });
+    }
+
+    // Calculate subtotal and validate inventory
     let subtotal = 0;
-    const orderItems = [];
-
     for (const item of items) {
-      if (!item.productId || !item.quantity || !item.unitPrice) {
-        return NextResponse.json({ error: `Invalid item: ${JSON.stringify(item)}` }, { status: 400 });
-      }
-
       const product = await db.product.findUnique({
-        where: { id: item.productId, growerId: user.growerId },
+        where: { id: item.productId },
       });
 
       if (!product) {
-        return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 404 });
+        return NextResponse.json({ error: `Product not found: ${item.productId}` }, { status: 400 });
       }
 
       if (product.inventoryQty < item.quantity) {
-        return NextResponse.json({ error: `Insufficient inventory for ${product.name}` }, { status: 400 });
+        return NextResponse.json(
+          { error: `Insufficient inventory for ${product.name}. Available: ${product.inventoryQty}` },
+          { status: 400 }
+        );
       }
 
-      const itemTotal = parseFloat(item.unitPrice) * item.quantity;
-      subtotal += itemTotal;
-
-      orderItems.push({
-        orderId: '', // Will be set after order creation
-        productId: item.productId,
-        growerId: user.growerId,
-        quantity: item.quantity,
-        unitPrice: parseFloat(item.unitPrice),
-        totalPrice: itemTotal,
+      // Deduct inventory
+      await db.product.update({
+        where: { id: item.productId },
+        data: { inventoryQty: { decrement: item.quantity } },
       });
+
+      // Calculate item total
+      const itemTotal = item.quantity * item.unitPrice;
+      subtotal += itemTotal;
     }
 
-    const tax = (subtotal * 0.06); // 6% tax rate
-    const totalAmount = subtotal + tax + (shippingFee ? parseFloat(shippingFee) : 0);
+    // Calculate tax (6% for Vermont)
+    const tax = subtotal * 0.06;
 
     // Create the order
     const order = await db.order.create({
       data: {
         growerId: user.growerId,
         dispensaryId,
+        orderId: `ORD-${Date.now()}`,
         status: 'PENDING',
-        totalAmount,
+        totalAmount: subtotal + tax + (shippingFee || 0),
         subtotal,
         tax,
-        shippingFee: shippingFee ? parseFloat(shippingFee) : 0,
+        shippingFee: shippingFee || 0,
         notes: notes || null,
         items: {
-          create: orderItems,
+          create: items.map((item: any) => ({
+            productId: item.productId,
+            growerId: user.growerId,
+            quantity: item.quantity,
+            unitPrice: item.unitPrice,
+            totalPrice: item.quantity * item.unitPrice,
+          })),
         },
       },
       include: {
-        dispensary: true,
-        items: {
-          include: {
-            product: true,
+        dispensary: {
+          select: {
+            businessName: true,
           },
         },
+        items: true,
       },
     });
-
-    // Update inventory
-    for (const item of items) {
-      await db.product.update({
-        where: { id: item.productId, growerId: user.growerId },
-        data: {
-          inventoryQty: {
-            decrement: item.quantity,
-          },
-        },
-      });
-    }
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { db } from '@/lib/db';
 
-// Handles single file uploads with base64 encoding
+// Handles file uploads with base64 encoding
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);

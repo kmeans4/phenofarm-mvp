@@ -10,7 +10,7 @@ export default async function GrowerMarketplacePage() {
     redirect('/auth/sign_in');
   }
 
-  const products = [];
+  const products: any[] = [];
   const categories = ['Flower', 'Concentrates', 'Edibles', 'Topicals', 'Vapes', 'Raw Materials'];
 
   return (

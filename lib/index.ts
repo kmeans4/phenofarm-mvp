@@ -1,1 +1,2 @@
-export { default as prisma } from './db';
+export { db as prisma, db } from './db';
+export { PrismaClient } from '@prisma/client';

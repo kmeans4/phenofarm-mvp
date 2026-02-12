@@ -174,8 +174,15 @@ async function fetchDispensaryDashboardData(dispensaryId: string) {
         orderId: 'ORD-2024-005',
         growerName: 'Sunshine Agriculture',
         totalAmount: 6700.00,
-        status: 'PENDING' as const,
+        status: 'CANCELLED' as const,
         createdAt: new Date(Date.now() - 3600000 * 48),
+      },
+      {
+        orderId: 'ORD-2024-006',
+        growerName: 'Coastal Cultivation',
+        totalAmount: 1800.00,
+        status: 'SHIPPED' as const,
+        createdAt: new Date(Date.now() - 3600000 * 72),
       },
     ],
     customers: [
@@ -295,7 +302,7 @@ export default async function DispensaryDashboardPage() {
         <StatCard
           title="Pending Orders"
           value={pendingOrders}
-          icon={<Badge variant="outline">awaiting</Badge>}
+          icon={<Badge variant="info">awaiting</Badge>}
         />
         <StatCard
           title="Active Growers"
@@ -387,11 +394,12 @@ export default async function DispensaryDashboardPage() {
                   <td className="px-6 py-4 whitespace-nowrap">
                     <Badge variant={
                       order.status === 'DELIVERED' ? 'success' :
-                      order.status === 'CANCELLED' ? 'danger' :
+                      order.status === 'CANCELLED' ? 'error' :
+                      order.status === 'CONFIRMED' ? 'default' :
                       order.status === 'PENDING' ? 'warning' :
                       order.status === 'PROCESSING' ? 'info' :
                       order.status === 'SHIPPED' ? 'warning' :
-                      'outline'
+                      'default'
                     }>
                       {order.status}
                     </Badge>

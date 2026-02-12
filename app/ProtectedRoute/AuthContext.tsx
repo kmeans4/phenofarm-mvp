@@ -29,5 +29,13 @@ interface AuthProviderProps {
 
 export function AuthProvider({ children }: AuthProviderProps) {
   // This will be implemented with actual auth logic
-  return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>;
+  return <AuthContext.Provider value={{
+    user: null,
+    isLoading: true,
+    login: async () => false,
+    logout: () => {},
+    isAdmin: false,
+    isGrower: false,
+    isDispensary: false,
+  }}>{children}</AuthContext.Provider>;
 }

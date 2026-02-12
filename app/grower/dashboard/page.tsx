@@ -2,11 +2,14 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
+import { PrismaClient } from '@prisma/client';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
 import { Badge } from '@/app/components/ui/Badge';
+
+const prisma = new PrismaClient();
 
 interface StatCardProps {
   title: string;
@@ -151,7 +154,7 @@ export default async function GrowerDashboardPage() {
   // Fetch grower dashboard data
   const [recentOrders, recentCustomers, activeProducts, syncStatus] = await Promise.all([
     // Recent orders (last 5)
-    db.$queryRaw<{ orderId: string; dispensaryName: string; totalAmount: number; status: string; createdAt: Date }[]>`
+    prisma.$queryRaw<{ orderId: string; dispensaryName: string; totalAmount: number; status: string; createdAt: Date }[]>`
       SELECT 
         o."orderId",
         d."businessName" as dispensaryName,
@@ -166,7 +169,7 @@ export default async function GrowerDashboardPage() {
     `,
     
     // Recent customers (from orders)
-    db.$queryRaw<{ customerId: string; dispensaryName: string; lastOrder: Date; orderCount: number }[]>`
+    prisma.$queryRaw<{ customerId: string; dispensaryName: string; lastOrder: Date; orderCount: number }[]>`
       SELECT 
         d.id as customerId,
         d."businessName",
@@ -181,14 +184,14 @@ export default async function GrowerDashboardPage() {
     `,
 
     // Active products count
-    db.$queryRaw<{ count: number }[]>`
+    prisma.$queryRaw<{ count: number }[]>`
       SELECT COUNT(*)::int as count
       FROM "products"
       WHERE "growerId" = ${user.growerId}
     `,
 
     // Latest sync status
-    db.$queryRaw<{ success: boolean; recordsSynced: number; errorMessage: string | null; createdAt: Date }[]>`
+    prisma.$queryRaw<{ success: boolean; recordsSynced: number; errorMessage: string | null; createdAt: Date }[]>`
       SELECT "success", "recordsSynced", "errorMessage", "createdAt"
       FROM "metrc_sync_logs"
       WHERE "growerId" = ${user.growerId}
@@ -198,7 +201,7 @@ export default async function GrowerDashboardPage() {
   ]);
 
   // Fetch revenue for last 7 days
-  const revenueData = await db.$queryRaw<{ date: string; revenue: number }[]>`
+  const revenueData = await prisma.$queryRaw<{ date: string; revenue: number }[]>`
     SELECT 
       TO_CHAR("createdAt", 'YYYY-MM-DD') as date,
       SUM("totalAmount"::numeric) as revenue
@@ -292,7 +295,7 @@ export default async function GrowerDashboardPage() {
         <StatCard
           title="Pending Orders"
           value={stats.pendingOrders}
-          icon={<Badge variant="outline">awaiting</Badge>}
+          icon={<Badge variant="info">awaiting</Badge>}
         />
       </div>
 
@@ -379,7 +382,7 @@ export default async function GrowerDashboardPage() {
         <div className="px-6 pb-6">
           {recentOrders.length > 0 ? (
             <div className="space-y-0">
-              {recentOrders.map((order) => (
+              {recentOrders.map((order: any) => (
                 <ActivityItem
                   key={order.orderId}
                   type="order"
