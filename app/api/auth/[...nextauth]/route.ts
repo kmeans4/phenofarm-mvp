@@ -3,6 +3,13 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not configured');
+}
+if (!process.env.AUTH_SECRET) {
+  throw new Error('AUTH_SECRET is not configured');
+}
+
 declare module 'next-auth' {
   interface User {
     role?: string;
@@ -15,6 +22,7 @@ declare module 'next-auth' {
 }
 
 export const authOptions = {
+  debug: true,
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -23,7 +31,10 @@ export const authOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
+        console.log('Auth attempt:', credentials?.email);
+        
         if (!credentials?.email || !credentials?.password) {
+          console.log('Missing credentials');
           return null;
         }
 
@@ -32,16 +43,20 @@ export const authOptions = {
             where: { email: credentials.email },
           });
 
+          console.log('User found:', user ? 'YES' : 'NO');
+          console.log('Has passwordHash:', user?.passwordHash ? 'YES' : 'NO');
+          
           if (!user) {
             return null;
           }
 
-          // In production, properly hash and compare passwords
-          // Verify password using bcrypt
-          if (!user || !user.passwordHash) {
+          if (!user.passwordHash) {
+            console.log('No password hash stored');
             return null;
           }
+          
           const isValidPassword = await bcrypt.compare(credentials.password, user.passwordHash);
+          console.log('Password valid:', isValidPassword);
 
           if (!isValidPassword) {
             return null;
@@ -66,7 +81,7 @@ export const authOptions = {
   },
   session: {
     strategy: 'jwt' as const,
-    maxAge: 30 * 24 * 60 * 60, // 30 days
+    maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
     async jwt({ token, user }: { token: any; user?: User }) {

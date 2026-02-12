@@ -37,8 +37,11 @@ export const authOptions = {
           }
 
           // In production, properly hash and compare passwords
-          // For now, using a simple check (replace with bcrypt.compare in production)
-          // Verify password using bcrypt\n          if (!user.passwordHash) {\n            return null;\n          }\n          const isValidPassword = await bcrypt.compare(credentials.password, user.passwordHash);
+          // Verify password using bcrypt
+          if (!user || !user.passwordHash) {
+            return null;
+          }
+          const isValidPassword = await bcrypt.compare(credentials.password, user.passwordHash);
 
           if (!isValidPassword) {
             return null;
@@ -88,6 +91,6 @@ export const authOptions = {
   secret: process.env.AUTH_SECRET,
 };
 
-const { handler, signIn, signOut, auth } = NextAuth(authOptions);
+const handler = NextAuth(authOptions);
 
-export { handler as GET, handler as POST, signIn, signOut, auth };
+export { handler as GET, handler as POST };
