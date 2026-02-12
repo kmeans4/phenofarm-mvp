@@ -10,6 +10,11 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/auth/sign_in');
   }
 
+  const user = session.user as any;
+  if (user.role !== 'ADMIN') {
+    redirect('/dashboard');
+  }
+
   const navLinks = [
     { name: 'Users', href: '/admin/users' },
     { name: 'Growers', href: '/admin/growers' },

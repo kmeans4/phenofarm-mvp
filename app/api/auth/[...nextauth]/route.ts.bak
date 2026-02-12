@@ -37,11 +37,8 @@ export const authOptions = {
           }
 
           // In production, properly hash and compare passwords
-          // Verify password using bcrypt
-          if (!user || !user.passwordHash) {
-            return null;
-          }
-          const isValidPassword = await bcrypt.compare(credentials.password, user.passwordHash);
+          // For now, using a simple check (replace with bcrypt.compare in production)
+          // Verify password using bcrypt\n          if (!user.passwordHash) {\n            return null;\n          }\n          const isValidPassword = await bcrypt.compare(credentials.password, user.passwordHash);
 
           if (!isValidPassword) {
             return null;

@@ -20,7 +20,7 @@ export default async function GrowerMetrcSyncPage() {
   }
 
   // Fetch sync data from database
-  const [latestSync, successSyncCount, failedSyncCount, totalSynced] = await Promise.all([
+  const [latestSync, successSyncCount, failedSyncCount, totalSyncedRaw] = await Promise.all([
     db.metrcSyncLog.findFirst({
       where: { growerId: user.growerId },
       orderBy: { createdAt: 'desc' },
@@ -42,12 +42,14 @@ export default async function GrowerMetrcSyncPage() {
     }),
   ]);
 
+  const totalSynced = totalSyncedRaw?._sum?.recordsSynced ?? 0;
+
   const syncStatus = {
     lastSync: latestSync?.createdAt,
     status: latestSync ? (latestSync.success ? 'connected' : 'error') : 'not_configured',
     pendingItems: 0,
     errorCount: failedSyncCount,
-    previousRecords: (totalSynced as any)?._sum?.recordsSynced || 0,
+    previousRecords: totalSynced,
   };
 
   const handleManualSync = async () => {
@@ -134,7 +136,7 @@ export default async function GrowerMetrcSyncPage() {
               <div className="bg-gray-50 p-4 rounded-lg">
                 <p className="text-sm text-gray-600">Synced Items</p>
                 <p className="text-lg font-bold text-gray-900">
-                  {(totalSynced as any)?._sum?.recordsSynced || 0}
+                  {totalSynced}
                 </p>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg">
