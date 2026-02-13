@@ -24,6 +24,8 @@ interface StatusLabelMap {
   [key: string]: string;
 }
 
+type BadgeVariant = 'info' | 'error' | 'default' | 'success' | 'secondary' | 'warning' | 'danger' | null;
+
 export default async function GrowerOrdersPage() {
   const session = await getServerSession(authOptions);
   
@@ -93,7 +95,7 @@ export default async function GrowerOrdersPage() {
   };
 
   // Helper to get badge variant safely
-  const getBadgeVariant = (status: string): "success" | "error" | "warning" | "default" => {
+  const getBadgeVariant = (status: string): BadgeVariant => {
     if (status === 'DELIVERED') return 'success';
     if (status === 'CANCELLED') return 'error';
     if (status === 'SHIPPED') return 'warning';
