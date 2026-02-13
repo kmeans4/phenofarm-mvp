@@ -4,34 +4,27 @@ import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/app/components/ui/Card';
-import { Button } from '@/app/components/ui/Button';
-import { Badge } from '@/app/components/ui/Badge';
-
 
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon?: React.ReactNode;
   trend?: string;
   trendUp?: boolean;
 }
 
-function StatCard({ title, value, icon, trend, trendUp }: StatCardProps) {
+function StatCard({ title, value, trend, trendUp }: StatCardProps) {
   return (
-    <Card className="bg-white shadow-sm border border-gray-200">
-      <CardContent className="p-6">
-        <p className="text-sm text-gray-600 mb-1">{title}</p>
-        <div className="flex items-baseline gap-2">
-          <p className="text-3xl font-bold text-gray-900">{value}</p>
-          {trend && (
-            <span className={`text-sm font-medium ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
-              {trend}
-            </span>
-          )}
-        </div>
-      </CardContent>
-    </Card>
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+      <p className="text-sm text-gray-600">{title}</p>
+      <div className="flex items-baseline gap-2 mt-1">
+        <p className="text-2xl font-bold text-gray-900">{value}</p>
+        {trend && (
+          <span className={`text-sm font-medium ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
+            {trend}
+          </span>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -92,40 +85,17 @@ interface QuickActionProps {
 }
 
 function QuickAction({ title, href, icon, description, color }: QuickActionProps) {
-  const colorMap: Record<string, { bg: string; border: string; text: string; hoverBg: string }> = {
-    blue: {
-      bg: 'bg-blue-100',
-      border: 'border-blue-200',
-      text: 'text-blue-600',
-      hoverBg: 'hover:bg-blue-50',
-    },
-    green: {
-      bg: 'bg-green-100',
-      border: 'border-green-200',
-      text: 'text-green-600',
-      hoverBg: 'hover:bg-green-50',
-    },
-    yellow: {
-      bg: 'bg-yellow-100',
-      border: 'border-yellow-200',
-      text: 'text-yellow-600',
-      hoverBg: 'hover:bg-yellow-50',
-    },
-    red: {
-      bg: 'bg-red-100',
-      border: 'border-red-200',
-      text: 'text-red-600',
-      hoverBg: 'hover:bg-red-50',
-    },
+  const colorMap: Record<string, { bg: string; text: string; hoverBg: string }> = {
+    blue: { bg: 'bg-blue-100', text: 'text-blue-600', hoverBg: 'hover:bg-blue-50' },
+    green: { bg: 'bg-green-100', text: 'text-green-600', hoverBg: 'hover:bg-green-50' },
+    yellow: { bg: 'bg-yellow-100', text: 'text-yellow-600', hoverBg: 'hover:bg-yellow-50' },
+    red: { bg: 'bg-red-100', text: 'text-red-600', hoverBg: 'hover:bg-red-50' },
   };
 
   const colors = colorMap[color] || colorMap.blue;
 
   return (
-    <Link
-      href={href}
-      className={`group block p-5 rounded-xl border-2 border-transparent transition-all ${colors.hoverBg}`}
-    >
+    <Link href={href} className={`group block p-5 rounded-xl border-2 border-transparent hover:border-gray-200 ${colors.hoverBg} transition-all`}>
       <div className="flex items-start gap-4">
         <div className={`p-3 rounded-lg ${colors.bg} ${colors.text} group-hover:bg-opacity-75`}>
           {icon}
@@ -264,40 +234,26 @@ export default async function GrowerDashboardPage() {
           <p className="text-gray-600 mt-1">Welcome back! Here's your overview.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="secondary" className="bg-white border-gray-300 hover:bg-gray-50">
+          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium">
             Download Report
-          </Button>
-          <Button variant="primary" className="bg-green-600 hover:bg-green-700 text-white">
+          </button>
+          <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
             + New Product
-          </Button>
+          </Link>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Total Orders"
-          value={stats.totalOrders}
-          trend="+12%"
-          trendUp={true}
-        />
-        <StatCard
-          title="Total Revenue"
-          value={`$${Number(stats.totalRevenue).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+        <StatCard title="Total Orders" value={stats.totalOrders} trend="+12%" trendUp={true} />
+        <StatCard 
+          title="Total Revenue" 
+          value={`\u0024${Number(stats.totalRevenue).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
           trend="+8.5%"
           trendUp={true}
         />
-        <StatCard
-          title="Active Customers"
-          value={stats.activeCustomers}
-          trend="+3"
-          trendUp={true}
-        />
-        <StatCard
-          title="Pending Orders"
-          value={stats.pendingOrders}
-          icon={<Badge variant="info">awaiting</Badge>}
-        />
+        <StatCard title="Active Customers" value={stats.activeCustomers} trend="+3" trendUp={true} />
+        <StatCard title="Pending Orders" value={stats.pendingOrders} />
       </div>
 
       {/* Quick Actions */}
@@ -338,48 +294,40 @@ export default async function GrowerDashboardPage() {
       </div>
 
       {/* Revenue Chart */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">Revenue Overview (Last 7 Days)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-64 flex items-end justify-between gap-2 px-4">
-            {chartData.map((day, index) => (
-              <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                <div className="w-full flex flex-col gap-1">
-                  <div 
-                    className={`w-full rounded-t-lg ${
-                      day.revenue > 0 
-                        ? 'bg-green-500 hover:bg-green-600' 
-                        : 'bg-gray-200'
-                    }`}
-                    style={{ height: `${Math.min((day.revenue / Math.max(...chartData.map(d => d.revenue)) * 100), 100)}%` }}
-                  />
-                </div>
-                <span className="text-xs text-gray-500">
-                  {format(new Date(day.date), 'EEE')}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue Overview (Last 7 Days)</h2>
+        <div className="h-64 flex items-end justify-between gap-2 px-4">
+          {chartData.map((day, index) => (
+            <div key={index} className="flex-1 flex flex-col items-center gap-2">
+              <div 
+                className={`w-full rounded-t-lg ${
+                  day.revenue > 0 
+                    ? 'bg-green-500 hover:bg-green-600' 
+                    : 'bg-gray-200'
+                }`}
+                style={{ height: `${Math.min((day.revenue / Math.max(...chartData.map(d => d.revenue)) * 100), 100)}%` }}
+              />
+              <span className="text-xs text-gray-500">
+                {format(new Date(day.date), 'EEE')}
+              </span>
+              {day.revenue > 0 && (
+                <span className="text-xs font-medium text-gray-700">
+                  ${day.revenue.toLocaleString()}
                 </span>
-                {day.revenue > 0 && (
-                  <span className="text-xs font-medium text-gray-700">
-                    ${day.revenue.toLocaleString()}
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Recent Activity */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardHeader>
-          <div className="flex justify-between items-center">
-            <CardTitle className="text-lg font-semibold text-gray-900">Recent Activity</CardTitle>
-            <Link href="/grower/orders" className="text-sm text-green-600 hover:text-green-700 font-medium">
-              View All
-            </Link>
-          </div>
-        </CardHeader>
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+          <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+          <Link href="/grower/orders" className="text-sm text-green-600 hover:text-green-700 font-medium">
+            View All
+          </Link>
+        </div>
         <div className="px-6 pb-6">
           {recentOrders.length > 0 ? (
             <div className="space-y-0">
@@ -402,7 +350,7 @@ export default async function GrowerDashboardPage() {
             </div>
           )}
         </div>
-      </Card>
+      </div>
     </div>
   );
 }

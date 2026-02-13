@@ -122,32 +122,24 @@ export default async function GrowerOrdersPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Orders</p>
-            <p className="text-3xl font-bold text-gray-900">{totalOrders}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Active Orders</p>
-            <p className="text-3xl font-bold text-blue-600">{activeCount}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Pending</p>
-            <p className="text-3xl font-bold text-yellow-600">{pendingCount}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-            <p className="text-3xl font-bold text-green-600">
-              ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Total Orders</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Active Orders</p>
+          <p className="text-2xl font-bold text-blue-600 mt-1">{activeCount}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Pending</p>
+          <p className="text-2xl font-bold text-yellow-600 mt-1">{pendingCount}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Total Revenue</p>
+          <p className="text-2xl font-bold text-green-600 mt-1">
+            ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          </p>
+        </div>
       </div>
 
       {/* Filters */}

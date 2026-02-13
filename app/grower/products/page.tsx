@@ -210,26 +210,20 @@ export default function GrowerProductsPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Products</p>
-            <p className="text-3xl font-bold text-gray-900">{totalProducts}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Value</p>
-            <p className="text-3xl font-bold text-gray-900">
-              ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Available</p>
-            <p className="text-3xl font-bold text-green-600">{availableCount}</p>
-          </CardContent>
-        </Card>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Total Products</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{totalProducts}</p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Total Value</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">
+            ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-sm text-gray-600">Available</p>
+          <p className="text-2xl font-bold text-green-600 mt-1">{availableCount}</p>
+        </div>
       </div>
 
       {/* Filters */}
