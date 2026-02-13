@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,18 +14,10 @@ export async function GET(req: NextRequest) {
 
     // Get query params
     const { searchParams } = new URL(req.url);
-    const status = searchParams.get('status'); // 'pending' or 'verified'
     const search = searchParams.get('search');
 
-    // Build where clause
+    // Build where clause - don't filter by isVerified (column may not exist in prod yet)
     const where: any = {};
-    
-    // Filter by verification status
-    if (status === 'pending') {
-      where.isVerified = false;
-    } else if (status === 'verified') {
-      where.isVerified = true;
-    }
     
     if (search) {
       where.OR = [
@@ -68,7 +60,7 @@ export async function GET(req: NextRequest) {
       phone: grower.phone,
       website: grower.website,
       description: grower.description,
-      isVerified: grower.isVerified,
+      isVerified: grower.isVerified ?? false,
       createdAt: grower.createdAt,
       updatedAt: grower.updatedAt,
       user: grower.user,
