@@ -1,8 +1,9 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { SignOutButton } from "@/app/components/SignOutButton";
+import { ClientNav } from "./components/ClientNav";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -33,38 +34,20 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             <SignOutButton />
           </div>
           <nav className="mt-3 flex gap-2 overflow-x-auto pb-2">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.href}
-                href={link.href}
-                className="px-3 py-1 text-sm text-gray-700 rounded-full bg-gray-100 hover:bg-green-50 hover:text-green-600 whitespace-nowrap"
-              >
-                {link.name}
-              </Link>
-            ))}
+            <ClientNav links={navLinks} mobile />
           </nav>
         </div>
       </div>
 
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:block flex-shrink-0">
+        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:flex flex-col flex-shrink-0 min-h-screen">
           <div className="p-4 border-b border-gray-200">
             <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
             <p className="text-sm text-gray-500">Admin Panel</p>
           </div>
           
-          <nav className="p-4 space-y-1">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.href}
-                href={link.href}
-                className="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-green-50 hover:text-green-600 transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
+          <ClientNav links={navLinks} />
           
           <div className="p-4 border-t border-gray-200 mt-auto">
             <SignOutButton variant="sidebar" />
