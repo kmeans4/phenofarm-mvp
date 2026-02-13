@@ -4,25 +4,16 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { Button } from '@/app/components/ui/Button';
-import { Badge } from '@/app/components/ui/Badge';
-import { format, isValid, parseISO } from 'date-fns';
 
 interface Product {
   id: string;
   name: string;
   strain: string | null;
   category: string | null;
-  subcategory: string | null;
-  thc: number | null;
-  cbd: number | null;
   price: number;
   inventoryQty: number;
   unit: string;
   isAvailable: boolean;
-  description: string | null;
-  images: string[];
   createdAt: string;
 }
 
@@ -32,12 +23,9 @@ export default function GrowerProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterAvailability, setFilterAvailability] = useState<string>('all');
+  const [filterCategory, setFilterCategory] = useState('all');
+  const [filterAvailability, setFilterAvailability] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
-  const [csvFile, setCsvFile] = useState<File | null>(null);
-  const [csvUploadLoading, setCsvUploadLoading] = useState(false);
-  const [csvUploadMessage, setCsvUploadMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -76,40 +64,8 @@ export default function GrowerProductsPage() {
     }
   };
 
-  const handleCsvChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      setCsvFile(e.target.files[0]);
-      setCsvUploadMessage(null);
-    }
-  };
-
-  const handleCsvUpload = async () => {
-    if (!csvFile) return;
-    setCsvUploadLoading(true);
-    setCsvUploadMessage(null);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', csvFile);
-      const response = await fetch('/api/products/bulk', { method: 'POST', body: formData });
-      if (response.ok) {
-        const data = await response.json();
-        setCsvUploadMessage({ type: 'success', text: `Successfully uploaded ${data.successCount} products!` });
-        fetchProducts();
-        setCsvFile(null);
-      } else {
-        const errorData = await response.json();
-        setCsvUploadMessage({ type: 'error', text: errorData.error || 'Failed to upload CSV' });
-      }
-    } catch (error) {
-      setCsvUploadMessage({ type: 'error', text: 'An error occurred during upload' });
-    } finally {
-      setCsvUploadLoading(false);
-    }
-  };
-
   const deleteProduct = async (productId: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) return;
+    if (!confirm('Are you sure?')) return;
     try {
       const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
       if (response.ok) {
@@ -130,30 +86,16 @@ export default function GrowerProductsPage() {
         body: JSON.stringify({ isAvailable: !currentStatus }),
       });
       if (response.ok) {
-        const updatedProduct = await response.json();
-        setProducts(products.map(p => p.id === productId ? { ...p, isAvailable: updatedProduct.isAvailable } : p));
+        const updated = await response.json();
+        setProducts(products.map(p => p.id === productId ? { ...p, isAvailable: updated.isAvailable } : p));
       }
     } catch (error) {
       console.error('Error updating availability:', error);
     }
   };
 
-  // Safe date formatter
-  const formatDate = (dateString: string) => {
-    if (!dateString) return 'N/A';
-    try {
-      const date = parseISO(dateString);
-      return isValid(date) ? format(date, 'MMM d, yyyy') : 'N/A';
-    } catch {
-      return 'N/A';
-    }
-  };
-
-  const categories = [...new Set(products.map(p => p.category).filter((c): c is string => !!c))];
-  const totalProducts = products.length;
-  const totalValue = products.reduce((sum, p) => sum + p.price * p.inventoryQty, 0);
-  const availableCount = products.filter(p => p.isAvailable).length;
-
+  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
+  
   const filteredProducts = products.filter(product => {
     const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
     const matchesAvailability = filterAvailability === 'all' || 
@@ -164,6 +106,10 @@ export default function GrowerProductsPage() {
       (product.strain && product.strain.toLowerCase().includes(searchTerm.toLowerCase()));
     return matchesCategory && matchesAvailability && matchesSearch;
   });
+
+  const totalProducts = products.length;
+  const totalValue = products.reduce((sum, p) => sum + p.price * p.inventoryQty, 0);
+  const availableCount = products.filter(p => p.isAvailable).length;
 
   if (loading) {
     return (
@@ -178,33 +124,27 @@ export default function GrowerProductsPage() {
 
   if (error) {
     return (
-      <div className="space-y-6">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-            <p className="text-gray-600 mt-1">Manage your cannabis product catalog</p>
-          </div>
-          <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ Add Product</Link>
+      <div className="space-y-6 p-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
+          <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg">+ Add Product</Link>
         </div>
         <div className="p-6 bg-red-50 border border-red-200 rounded-lg text-center">
           <p className="text-red-600 mb-4">{error}</p>
-          <button onClick={fetchProducts} className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300">Retry</button>
+          <button onClick={fetchProducts} className="px-4 py-2 bg-gray-200 rounded-lg">Retry</button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
           <p className="text-gray-600 mt-1">Manage your cannabis product catalog</p>
         </div>
-        <div className="flex gap-3">
-          <Link href="/api/products/bulk?template=true" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Download Template</Link>
-          <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ Add Product</Link>
-        </div>
+        <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg">+ Add Product</Link>
       </div>
 
       {/* Stats */}
@@ -225,65 +165,61 @@ export default function GrowerProductsPage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
-        <input type="text" placeholder="Search products..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} className="flex-1 rounded-lg border border-gray-300 px-4 py-2" />
-        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="rounded-lg border border-gray-300 px-4 py-2">
+        <input 
+          type="text" 
+          placeholder="Search..." 
+          value={searchTerm} 
+          onChange={(e) => setSearchTerm(e.target.value)} 
+          className="flex-1 rounded-lg border border-gray-300 px-4 py-2" 
+        />
+        <select 
+          value={filterCategory || ""} 
+          onChange={(e) => setFilterCategory(e.target.value)} 
+          className="rounded-lg border border-gray-300 px-4 py-2"
+        >
           <option value="all">All Categories</option>
-          {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+          {categories.filter((c): c is string => !!c).map((cat: string) => <option key={cat} value={cat}>{cat}</option>)}
         </select>
-        <select value={filterAvailability} onChange={(e) => setFilterAvailability(e.target.value)} className="rounded-lg border border-gray-300 px-4 py-2">
-          <option value="all">All Availability</option>
+        <select 
+          value={filterAvailability || ""} 
+          onChange={(e) => setFilterAvailability(e.target.value)} 
+          className="rounded-lg border border-gray-300 px-4 py-2"
+        >
+          <option value="all">All</option>
           <option value="available">Available</option>
           <option value="unavailable">Unavailable</option>
         </select>
       </div>
 
-      {/* CSV Upload */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Bulk Upload</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {csvUploadMessage && (
-            <div className={`p-3 rounded-lg mb-4 ${csvUploadMessage.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`}>
-              {csvUploadMessage.text}
-            </div>
-          )}
-          <div className="flex gap-4">
-            <input type="file" accept=".csv" onChange={handleCsvChange} className="flex-1" />
-            <Button onClick={handleCsvUpload} disabled={!csvFile || csvUploadLoading}>{csvUploadLoading ? 'Uploading...' : 'Upload'}</Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Products Grid */}
+      {/* Products */}
       {filteredProducts.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredProducts.map((product) => (
-            <Card key={product.id}>
-              <CardContent className="p-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <p className="font-semibold text-gray-900">{product.name}</p>
-                    {product.strain && <p className="text-sm text-gray-600">{product.strain}</p>}
-                  </div>
-                  <Badge variant={product.isAvailable ? 'success' : 'error'}>{product.isAvailable ? 'Available' : 'Unavailable'}</Badge>
+            <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="font-semibold text-gray-900">{product.name}</p>
+                  {product.strain && <p className="text-sm text-gray-600">{product.strain}</p>}
                 </div>
-                <p className="text-lg font-bold text-gray-900 mt-2">${product.price.toFixed(2)}</p>
-                <p className="text-sm text-gray-600">Inventory: {product.inventoryQty} {product.unit}</p>
-                <p className="text-xs text-gray-500">Added: {formatDate(product.createdAt)}</p>
-                <div className="flex gap-2 mt-4">
-                  <a href={`/grower/products/${product.id}/edit`} className="text-sm text-blue-600 hover:underline">Edit</a>
-                  <button onClick={() => toggleAvailability(product.id, product.isAvailable)} className="text-sm text-gray-600 hover:underline">{product.isAvailable ? 'Disable' : 'Enable'}</button>
-                  <button onClick={() => deleteProduct(product.id)} className="text-sm text-red-600 hover:underline">Delete</button>
-                </div>
-              </CardContent>
-            </Card>
+                <span className={`px-2 py-1 rounded-full text-xs ${product.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {product.isAvailable ? 'Available' : 'Unavailable'}
+                </span>
+              </div>
+              <p className="text-lg font-bold text-gray-900 mt-2">${product.price.toFixed(2)}</p>
+              <p className="text-sm text-gray-600">Stock: {product.inventoryQty} {product.unit}</p>
+              <div className="flex gap-3 mt-4">
+                <button onClick={() => toggleAvailability(product.id, product.isAvailable)} className="text-sm text-blue-600 hover:underline">
+                  {product.isAvailable ? 'Disable' : 'Enable'}
+                </button>
+                <button onClick={() => deleteProduct(product.id)} className="text-sm text-red-600 hover:underline">Delete</button>
+              </div>
+            </div>
           ))}
         </div>
       ) : (
         <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl">
           <p className="text-gray-600 mb-4">No products found</p>
-          <Link href="/grower/products/add" className="text-green-600 hover:text-green-700">Add your first product</Link>
+          <Link href="/grower/products/add" className="text-green-600 hover:underline">Add your first product</Link>
         </div>
       )}
     </div>
