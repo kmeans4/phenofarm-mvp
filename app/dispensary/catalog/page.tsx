@@ -158,6 +158,7 @@ export default async function DispensaryCatalogPage() {
                           strain: product.strain,
                           unit: product.unit,
                           thc: product.thc,
+                          inventoryQty: product.inventoryQty,
                         }}
                         growerName={group.growerName}
                         growerId={group.growerId}
