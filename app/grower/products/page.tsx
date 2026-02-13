@@ -23,9 +23,6 @@ export default function GrowerProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filterCategory, setFilterCategory] = useState('all');
-  const [filterAvailability, setFilterAvailability] = useState('all');
-  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -51,14 +48,19 @@ export default function GrowerProductsPage() {
       const response = await fetch('/api/products');
       if (response.ok) {
         const data = await response.json();
-        setProducts(data);
+        // Validate data is array
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          setProducts([]);
+        }
       } else {
-        const errData = await response.json();
-        setError(errData.error || 'Failed to fetch products');
+        const errData = await response.json().catch(() => ({}));
+        setError(errData.error || `Failed to fetch products (${response.status})`);
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-      setError('Failed to fetch products');
+      setError('Network error - please check your connection');
     } finally {
       setLoading(false);
     }
@@ -74,7 +76,7 @@ export default function GrowerProductsPage() {
         alert('Failed to delete product');
       }
     } catch (error) {
-      console.error('Error deleting product:', error);
+      console.error('Error:', error);
     }
   };
 
@@ -86,30 +88,22 @@ export default function GrowerProductsPage() {
         body: JSON.stringify({ isAvailable: !currentStatus }),
       });
       if (response.ok) {
-        const updated = await response.json();
-        setProducts(products.map(p => p.id === productId ? { ...p, isAvailable: updated.isAvailable } : p));
+        const updated = await response.json().catch(() => ({}));
+        setProducts(products.map(p => p.id === productId ? { ...p, isAvailable: !!updated?.isAvailable } : p));
       }
     } catch (error) {
-      console.error('Error updating availability:', error);
+      console.error('Error:', error);
     }
   };
 
-  const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
-  
-  const filteredProducts = products.filter(product => {
-    const matchesCategory = filterCategory === 'all' || product.category === filterCategory;
-    const matchesAvailability = filterAvailability === 'all' || 
-      (filterAvailability === 'available' && product.isAvailable) ||
-      (filterAvailability === 'unavailable' && !product.isAvailable);
-    const matchesSearch = searchTerm === '' || 
-      product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (product.strain && product.strain.toLowerCase().includes(searchTerm.toLowerCase()));
-    return matchesCategory && matchesAvailability && matchesSearch;
-  });
-
-  const totalProducts = products.length;
-  const totalValue = products.reduce((sum, p) => sum + p.price * p.inventoryQty, 0);
-  const availableCount = products.filter(p => p.isAvailable).length;
+  // Safe calculations
+  const totalProducts = products?.length || 0;
+  const totalValue = products?.reduce((sum, p) => {
+    const price = typeof p?.price === 'number' ? p.price : 0;
+    const qty = typeof p?.inventoryQty === 'number' ? p.inventoryQty : 0;
+    return sum + (price * qty);
+  }, 0) || 0;
+  const availableCount = products?.filter(p => !!p?.isAvailable)?.length || 0;
 
   if (loading) {
     return (
@@ -117,21 +111,6 @@ export default function GrowerProductsPage() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading products...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="space-y-6 p-4">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-          <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg">+ Add Product</Link>
-        </div>
-        <div className="p-6 bg-red-50 border border-red-200 rounded-lg text-center">
-          <p className="text-red-600 mb-4">{error}</p>
-          <button onClick={fetchProducts} className="px-4 py-2 bg-gray-200 rounded-lg">Retry</button>
         </div>
       </div>
     );
@@ -163,55 +142,52 @@ export default function GrowerProductsPage() {
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <input 
-          type="text" 
-          placeholder="Search..." 
-          value={searchTerm} 
-          onChange={(e) => setSearchTerm(e.target.value)} 
-          className="flex-1 rounded-lg border border-gray-300 px-4 py-2" 
-        />
-        <select 
-          value={filterCategory || ""} 
-          onChange={(e) => setFilterCategory(e.target.value)} 
-          className="rounded-lg border border-gray-300 px-4 py-2"
-        >
-          <option value="all">All Categories</option>
-          {categories.filter((c): c is string => !!c).map((cat: string) => <option key={cat} value={cat}>{cat}</option>)}
-        </select>
-        <select 
-          value={filterAvailability || ""} 
-          onChange={(e) => setFilterAvailability(e.target.value)} 
-          className="rounded-lg border border-gray-300 px-4 py-2"
-        >
-          <option value="all">All</option>
-          <option value="available">Available</option>
-          <option value="unavailable">Unavailable</option>
-        </select>
-      </div>
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p className="text-red-600">{error}</p>
+          <button onClick={fetchProducts} className="mt-2 px-4 py-2 bg-gray-200 rounded-lg">Retry</button>
+        </div>
+      )}
 
       {/* Products */}
-      {filteredProducts.length > 0 ? (
+      {products?.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredProducts.map((product) => (
-            <div key={product.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          {products.map((product) => (
+            <div key={product?.id || Math.random()} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
               <div className="flex justify-between items-start">
-                <div>
-                  <p className="font-semibold text-gray-900">{product.name}</p>
-                  {product.strain && <p className="text-sm text-gray-600">{product.strain}</p>}
+                <div className="min-w-0">
+                  <p className="font-semibold text-gray-900 truncate">{product?.name || 'Unnamed Product'}</p>
+                  {product?.strain && <p className="text-sm text-gray-600 truncate">{product.strain}</p>}
                 </div>
-                <span className={`px-2 py-1 rounded-full text-xs ${product.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                  {product.isAvailable ? 'Available' : 'Unavailable'}
+                <span className={`px-2 py-1 rounded-full text-xs flex-shrink-0 ${product?.isAvailable ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                  {product?.isAvailable ? 'Available' : 'Unavailable'}
                 </span>
               </div>
-              <p className="text-lg font-bold text-gray-900 mt-2">${product.price.toFixed(2)}</p>
-              <p className="text-sm text-gray-600">Stock: {product.inventoryQty} {product.unit}</p>
+              <p className="text-lg font-bold text-gray-900 mt-2">
+                ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
+              </p>
+              <p className="text-sm text-gray-600">
+                Stock: {typeof product?.inventoryQty === 'number' ? product.inventoryQty : 0} {product?.unit || ''}
+              </p>
               <div className="flex gap-3 mt-4">
-                <button onClick={() => toggleAvailability(product.id, product.isAvailable)} className="text-sm text-blue-600 hover:underline">
-                  {product.isAvailable ? 'Disable' : 'Enable'}
+                <a 
+                  href={`/grower/products/${product?.id}/edit`}
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Edit
+                </a>
+                <button 
+                  onClick={() => toggleAvailability(product?.id, product?.isAvailable)} 
+                  className="text-sm text-gray-600 hover:underline"
+                >
+                  {product?.isAvailable ? 'Disable' : 'Enable'}
                 </button>
-                <button onClick={() => deleteProduct(product.id)} className="text-sm text-red-600 hover:underline">Delete</button>
+                <button 
+                  onClick={() => deleteProduct(product?.id)} 
+                  className="text-sm text-red-600 hover:underline"
+                >
+                  Delete
+                </button>
               </div>
             </div>
           ))}
