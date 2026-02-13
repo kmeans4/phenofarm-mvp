@@ -19,14 +19,20 @@ export default async function AdminUsersPage() {
     redirect('/dashboard');
   }
 
-  // Fetch real users from database
-  const users = await db.user.findMany({
-    include: {
-      grower: true,
-      dispensary: true,
-    },
-    orderBy: { createdAt: 'desc' }
-  });
+  // Fetch real users from database with error handling
+  let users: any[] = [];
+  
+  try {
+    users = await db.user.findMany({
+      include: {
+        grower: true,
+        dispensary: true,
+      },
+      orderBy: { createdAt: 'desc' }
+    }) || [];
+  } catch (error) {
+    console.error('Admin users fetch error:', error);
+  }
 
   // Calculate stats
   const totalUsers = users.length;

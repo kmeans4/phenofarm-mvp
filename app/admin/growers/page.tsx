@@ -19,28 +19,38 @@ export default async function AdminGrowersPage() {
     redirect('/dashboard');
   }
 
-  // Fetch real growers from database
-  const growers = await db.grower.findMany({
-    include: {
-      user: {
-        select: {
-          id: true,
-          email: true,
-          name: true,
-          createdAt: true
+  // Fetch real growers from database with error handling
+  let growers: any[] = [];
+  let pendingGrowers: any[] = [];
+  let verifiedGrowers: any[] = [];
+
+  try {
+    growers = await db.grower.findMany({
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            createdAt: true
+          }
+        },
+        _count: {
+          select: {
+            products: true
+          }
         }
       },
-      _count: {
-        select: {
-          products: true
-        }
-      }
-    },
-    orderBy: { createdAt: 'desc' }
-  });
+      orderBy: { createdAt: 'desc' }
+    }) || [];
 
-  const pendingGrowers = growers.filter(g => !g.isVerified);
-  const verifiedGrowers = growers.filter(g => g.isVerified);
+    // Filter based on isVerified if available, otherwise treat all as verified
+    pendingGrowers = growers.filter(g => g.isVerified === false);
+    verifiedGrowers = growers.filter(g => g.isVerified !== false);
+  } catch (error) {
+    console.error('Admin growers fetch error:', error);
+    // Return empty arrays on error
+  }
 
   // Format date helper
   const formatDate = (date: Date) => {
@@ -90,16 +100,6 @@ export default async function AdminGrowersPage() {
                   )}
                 </div>
                 <div className="flex gap-2">
-                  <form action="/api/admin/growers/verify" method="POST" className="contents">
-                    <input type="hidden" name="growerId" value={grower.id} />
-                    <input type="hidden" name="isVerified" value="true" />
-                    <button 
-                      type="submit"
-                      className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"
-                    >
-                      Verify
-                    </button>
-                  </form>
                   <a 
                     href={`mailto:${grower.user?.email}`}
                     className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
@@ -131,8 +131,7 @@ export default async function AdminGrowersPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Grower</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">License</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Verified</th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -155,23 +154,11 @@ export default async function AdminGrowersPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                        {grower._count.products} products
+                        {grower._count?.products || 0} products
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      <span className="text-green-600">✓ Verified</span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <form action="/api/admin/growers/verify" method="POST" className="contents">
-                        <input type="hidden" name="growerId" value={grower.id} />
-                        <input type="hidden" name="isVerified" value="false" />
-                        <button 
-                          type="submit"
-                          className="text-yellow-600 hover:text-yellow-900"
-                        >
-                          Unverify
-                        </button>
-                      </form>
+                      {formatDate(grower.createdAt)}
                     </td>
                   </tr>
                 ))}
