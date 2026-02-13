@@ -167,7 +167,7 @@ export default function DispensaryCartPage() {
                                 max={item.maxQty}
                                 value={item.quantity}
                                 onChange={(e) => setExactQuantity(item.id, parseInt(e.target.value) || 1)}
-                                className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm"
+                                className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm [appearance:textfield] [className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm"::-webkit-outer-spin-button]:appearance-none [className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm"::-webkit-inner-spin-button]:appearance-none"
                               />
                               <button 
                                 onClick={() => updateQuantity(item.id, 1)}

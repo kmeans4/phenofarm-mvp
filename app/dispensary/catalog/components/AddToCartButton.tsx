@@ -125,7 +125,7 @@ export default function AddToCartButton({
             max={product.inventoryQty}
             value={quantity}
             onChange={(e) => setQuantity(Math.max(1, Math.min(product.inventoryQty, parseInt(e.target.value) || 1)))}
-            className="w-12 text-center text-sm py-1 border-x border-gray-300 focus:outline-none"
+            className="w-12 text-center text-sm py-1 border-x border-gray-300 focus:outline-none [appearance:textfield] [className="w-12 text-center text-sm py-1 border-x border-gray-300 focus:outline-none"::-webkit-outer-spin-button]:appearance-none [className="w-12 text-center text-sm py-1 border-x border-gray-300 focus:outline-none"::-webkit-inner-spin-button]:appearance-none"
           />
           <button 
             onClick={() => setQuantity(Math.min(product.inventoryQty, quantity + 1))}
