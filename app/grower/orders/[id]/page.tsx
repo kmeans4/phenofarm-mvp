@@ -8,89 +8,6 @@ import { Button } from '@/app/components/ui/Button';
 import { Badge } from '@/app/components/ui/Badge';
 import Link from 'next/link';
 
-// Define types locally for Prisma 6 compatibility
-interface Dispensary {
-  id: string;
-  userId: string;
-  businessName: string;
-  licenseNumber: string | null;
-  phone: string | null;
-  address: string | null;
-  city: string | null;
-  state: string | null;
-  zip: string | null;
-  website: string | null;
-  description: string | null;
-  logo: string | null;
-  orders: any[];
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-interface OrderItem {
-  id: string;
-  orderId: string;
-  productId: string;
-  growerId: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  createdAt: Date;
-  product?: Product;
-}
-
-interface Product {
-  id: string;
-  growerId: string;
-  name: string;
-  strain: string | null;
-  category: string | null;
-  subcategory: string | null;
-  thc: number | null;
-  cbd: number | null;
-  price: number;
-  inventoryQty: number;
-  unit: string;
-  isAvailable: boolean;
-  description: string | null;
-  images: string[];
-  createdAt: Date;
-  updatedAt: Date;
-  lastSyncedAt: Date | null;
-}
-
-interface Order {
-  id: string;
-  orderId: string;
-  growerId: string;
-  dispensaryId: string;
-  status: string;
-  totalAmount: number;
-  subtotal: number;
-  tax: number;
-  shippingFee: number;
-  notes: string | null;
-  shippedAt: Date | null;
-  deliveredAt: Date | null;
-  createdAt: Date;
-  product?: Product;
-  updatedAt: Date;
-  items: OrderItem[];
-  payments: any[];
-}
-
-interface User {
-  id: string;
-  email: string;
-  name: string | null;
-  role: string;
-  growerId: string | null;
-  dispensaryId: string | null;
-  createdAt: Date;
-  product?: Product;
-  updatedAt: Date;
-}
-
 interface OrderDetail {
   id: string;
   orderId: string;
@@ -103,12 +20,16 @@ interface OrderDetail {
   shippedAt: Date | null;
   deliveredAt: Date | null;
   createdAt: Date;
-  product?: Product;
-  updatedAt: Date;
-  growerId: string;
-  dispensaryId: string;
-  dispensary: Dispensary;
-  items: OrderItem[];
+  dispensary: {
+    businessName: string;
+  };
+  items: Array<{
+    id: string;
+    quantity: number;
+    unitPrice: number;
+    totalPrice: number;
+    product?: { name: string; strain: string | null; unit: string };
+  }>;
 }
 
 async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | null> {
@@ -116,29 +37,24 @@ async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | n
     where: { id, growerId },
     include: {
       dispensary: true,
-      items: {
-        include: {
-          product: true,
-        },
-      },
+      items: { include: { product: true } },
     },
   });
   
   if (!order) return null;
   
-  // Convert Decimal to number for JSON serialization
   return {
     ...order,
     totalAmount: Number(order.totalAmount),
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
     shippingFee: Number(order.shippingFee),
-    items: order.items.map(item => ({
+    items: order.items.map((item: any) => ({
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
     })),
-  } as unknown as OrderDetail;
+  } as OrderDetail;
 }
 
 function formatCurrency(amount: number) {
@@ -201,7 +117,15 @@ export default async function OrderDetailPage({
     <div className="container mx-auto p-6 max-w-4xl">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Order #{order.orderId}</h1>
-        <StatusBadge status={order.status} />
+        <div className="flex items-center gap-3">
+          <StatusBadge status={order.status} />
+          <Link
+            href={`/grower/orders/${order.id}/edit`}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+          >
+            Edit Order
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -241,25 +165,22 @@ export default async function OrderDetailPage({
           <table className="min-w-full divide-y divide-gray-200">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Price</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {order.items.map((item) => (
                 <tr key={item.id}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
                     {item.product?.name || 'Product Deleted'}
+                    {item.product?.strain && <span className="text-gray-500"> ({item.product.strain})</span>}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{item.quantity}</td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {formatCurrency(item.unitPrice)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                    {formatCurrency(item.totalPrice)}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{item.quantity}</td>
+                  <td className="px-6 py-4 text-sm text-gray-500">{formatCurrency(item.unitPrice)}</td>
+                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</td>
                 </tr>
               ))}
             </tbody>
@@ -284,6 +205,13 @@ export default async function OrderDetailPage({
           </div>
         </div>
       </div>
+
+      {order.notes && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <h3 className="text-sm font-medium text-yellow-900 mb-2">Order Notes</h3>
+          <p className="text-sm text-yellow-800">{order.notes}</p>
+        </div>
+      )}
 
       <div className="flex gap-4">
         <Button variant="outline" asChild>
