@@ -3,52 +3,19 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { Button } from '@/app/components/ui/Button';
-
-interface Dispensary {
-  id: string;
-  businessName: string;
-  city: string;
-  state: string;
-  address?: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  strain: string | null;
-  price: number;
-  inventoryQty: number;
-  unit: string;
-}
-
-interface OrderItem {
-  productId: string;
-  quantity: number;
-  unitPrice: number;
-}
-
-interface OrderFormData {
-  dispensaryId: string;
-  items: OrderItem[];
-  notes: string;
-  shippingFee: string;
-}
+import Link from 'next/link';
 
 export default function AddOrderPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  
-  const [dispensaries, setDispensaries] = useState<Dispensary[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [formData, setFormData] = useState<OrderFormData>({
+  const [dispensaries, setDispensaries] = useState<any[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
+  const [formData, setFormData] = useState<any>({
     dispensaryId: '',
-    items: [],
+    items: [] as any[],
     notes: '',
     shippingFee: '0',
   });
-  const [selectedDispensary, setSelectedDispensary] = useState<Dispensary | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -56,18 +23,15 @@ export default function AddOrderPage() {
 
   useEffect(() => {
     if (status === 'loading') return;
-    
     if (!session) {
       router.push('/auth/sign_in');
       return;
     }
-
-    const user = session.user as any;
-    if (user.role !== 'GROWER') {
+    const user = session?.user;
+    if (user?.role !== 'GROWER') {
       router.push('/dashboard');
       return;
     }
-
     loadData();
   }, [status, session, router]);
 
@@ -77,18 +41,18 @@ export default function AddOrderPage() {
         fetch('/api/dispensaries'),
         fetch('/api/products')
       ]);
-      
       if (dispRes.ok) {
         const dispData = await dispRes.json();
-        setDispensaries(dispData);
+        setDispensaries(Array.isArray(dispData) ? dispData : []);
       }
-      
       if (prodRes.ok) {
         const prodData = await prodRes.json();
-        setProducts(prodData.filter((p: Product) => p.inventoryQty > 0));
+        if (Array.isArray(prodData)) {
+          setProducts(prodData.filter((p: any) => (p?.inventoryQty || 0) > 0));
+        }
       }
     } catch (err) {
-      console.error('Error loading data:', err);
+      console.error('Error:', err);
     } finally {
       setLoading(false);
     }
@@ -96,36 +60,46 @@ export default function AddOrderPage() {
 
   const handleAddItem = () => {
     if (products.length === 0) return;
-    const newItem: OrderItem = {
-      productId: products[0].id,
+    const firstProduct = products[0];
+    const newItem = {
+      productId: firstProduct?.id || '',
       quantity: 1,
-      unitPrice: products[0].price,
+      unitPrice: typeof firstProduct?.price === 'number' ? firstProduct.price : 0,
     };
-    setFormData(prev => ({ ...prev, items: [...prev.items, newItem] }));
+    setFormData((prev: any) => ({ ...prev, items: [...prev.items, newItem] }));
   };
 
   const handleRemoveItem = (index: number) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      items: prev.items.filter((_, i) => i !== index),
+      items: prev.items.filter((_: any, i: number) => i !== index),
     }));
   };
 
-  const handleItemChange = (index: number, field: keyof OrderItem, value: string | number) => {
-    setFormData(prev => {
+  const handleItemChange = (index: number, field: string, value: any) => {
+    setFormData((prev: any) => {
       const newItems = [...prev.items];
       newItems[index] = { ...newItems[index], [field]: value };
       if (field === 'productId') {
-        const product = products.find(p => p.id === value);
-        if (product) newItems[index].unitPrice = product.price;
+        const product = products.find((p: any) => p?.id === value);
+        if (product) {
+          newItems[index].unitPrice = typeof product?.price === 'number' ? product.price : 0;
+        }
       }
       return { ...prev, items: newItems };
     });
   };
 
-  const calculateSubtotal = () => formData.items.reduce((total, item) => total + (item.quantity * item.unitPrice), 0);
+  const calculateSubtotal = () =>
+    formData.items.reduce((total: number, item: any) => {
+      const qty = typeof item?.quantity === 'number' ? item.quantity : 0;
+      const price = typeof item?.unitPrice === 'number' ? item.unitPrice : 0;
+      return total + (qty * price);
+    }, 0);
+
   const calculateTax = () => calculateSubtotal() * 0.06;
-  const calculateTotal = () => calculateSubtotal() + calculateTax() + (parseFloat(formData.shippingFee) || 0);
+  const shippingFee = parseFloat(formData?.shippingFee || '0') || 0;
+  const calculateTotal = () => calculateSubtotal() + calculateTax() + shippingFee;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,7 +125,7 @@ export default function AddOrderPage() {
           dispensaryId: formData.dispensaryId,
           items: formData.items,
           notes: formData.notes || null,
-          shippingFee: parseFloat(formData.shippingFee) || 0,
+          shippingFee: shippingFee,
         }),
       });
 
@@ -159,11 +133,11 @@ export default function AddOrderPage() {
         setSuccess(true);
         setTimeout(() => router.push('/grower/orders'), 2000);
       } else {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({}));
         setError(errorData.message || 'Failed to create order');
       }
     } catch (err) {
-      setError('Failed to create order. Please try again.');
+      setError('Failed to create order');
     } finally {
       setIsSubmitting(false);
     }
@@ -197,17 +171,17 @@ export default function AddOrderPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Create New Order</h1>
           <p className="text-gray-600 mt-1">Add items to fulfill a dispensary order</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" onClick={() => router.push('/grower/orders')}>Cancel</Button>
-          <Button variant="primary" onClick={handleSubmit} disabled={isSubmitting}>
+          <Link href="/grower/orders" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
+          <button onClick={handleSubmit} disabled={isSubmitting} className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50">
             {isSubmitting ? 'Creating...' : 'Create Order'}
-          </Button>
+          </button>
         </div>
       </div>
 
@@ -218,76 +192,61 @@ export default function AddOrderPage() {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>Order Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="font-semibold text-gray-900">Order Details</h2>
+          </div>
+          <div className="p-4 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Select Dispensary *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Dispensary *</label>
               <select
                 value={formData.dispensaryId}
-                onChange={(e) => {
-                  const selected = dispensaries.find(d => d.id === e.target.value);
-                  setSelectedDispensary(selected || null);
-                  setFormData(prev => ({ ...prev, dispensaryId: e.target.value }));
-                }}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, dispensaryId: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 required
               >
-                <option value="">Select a dispensary</option>
-                {dispensaries.map(d => (
-                  <option key={d.id} value={d.id}>
-                    {d.businessName} - {d.city}, {d.state}
-                  </option>
+                <option value="">Select...</option>
+                {dispensaries.map((d: any) => (
+                  <option key={d.id} value={d.id}>{d.businessName} - {d.city}, {d.state}</option>
                 ))}
               </select>
             </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
               <textarea
                 value={formData.notes}
-                onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, notes: e.target.value }))}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                placeholder="Special instructions..."
               />
             </div>
-
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Fee ($)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Shipping ($)</label>
               <input
                 type="number"
                 min="0"
                 step="0.01"
                 value={formData.shippingFee}
-                onChange={(e) => setFormData(prev => ({ ...prev, shippingFee: e.target.value }))}
+                onChange={(e) => setFormData((prev: any) => ({ ...prev, shippingFee: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card>
-          <CardHeader>
-            <div className="flex justify-between items-center">
-              <CardTitle>Order Items</CardTitle>
-              <Button variant="outline" size="sm" onClick={handleAddItem} type="button">+ Add Product</Button>
-            </div>
-          </CardHeader>
-          <CardContent>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 border-b border-gray-200 flex justify-between">
+            <h2 className="font-semibold text-gray-900">Items</h2>
+            <button type="button" onClick={handleAddItem} className="px-3 py-1 border rounded hover:bg-gray-50">+ Add</button>
+          </div>
+          <div className="p-4">
             {products.length === 0 ? (
-              <div className="text-center py-8 bg-gray-50 rounded-lg">
-                <p className="text-gray-600">No products available.</p>
-              </div>
+              <p className="text-gray-600 text-center py-8">No products available.</p>
             ) : formData.items.length === 0 ? (
-              <div className="text-center py-8">
-                <p className="text-gray-600">No items added. Click "Add Product" to start.</p>
-              </div>
+              <p className="text-gray-600 text-center py-8">No items. Click "Add" to start.</p>
             ) : (
               <div className="space-y-4">
-                {formData.items.map((item, index) => (
+                {formData.items.map((item: any, index: number) => (
                   <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-lg border">
                     <div className="flex-1">
                       <label className="block text-xs text-gray-500 mb-1">Product</label>
@@ -296,9 +255,9 @@ export default function AddOrderPage() {
                         onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       >
-                        {products.map(p => (
+                        {products.map((p: any) => (
                           <option key={p.id} value={p.id}>
-                            {p.name} - ${p.price.toFixed(2)}
+                            {p.name} - ${typeof p.price === 'number' ? p.price.toFixed(2) : '0.00'}
                           </option>
                         ))}
                       </select>
@@ -309,7 +268,7 @@ export default function AddOrderPage() {
                         type="number"
                         min="1"
                         value={item.quantity}
-                        onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value))}
+                        onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       />
                     </div>
@@ -320,44 +279,26 @@ export default function AddOrderPage() {
                         min="0"
                         step="0.01"
                         value={item.unitPrice}
-                        onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value))}
+                        onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       />
                     </div>
-                    <div className="flex items-end pb-2">
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveItem(index)}
-                        className="text-red-600 hover:text-red-800"
-                      >
-                        Remove
-                      </button>
+                    <div className="flex items-end">
+                      <button type="button" onClick={() => handleRemoveItem(index)} className="text-red-600">Remove</button>
                     </div>
                   </div>
                 ))}
 
                 <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-                  <div className="flex justify-between">
-                    <span>Subtotal:</span>
-                    <span>${calculateSubtotal().toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Tax (6%):</span>
-                    <span>${calculateTax().toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Shipping:</span>
-                    <span>${(parseFloat(formData.shippingFee) || 0).toFixed(2)}</span>
-                  </div>
-                  <div className="flex justify-between pt-2 border-t">
-                    <span className="font-bold">Total:</span>
-                    <span className="font-bold text-green-600">${calculateTotal().toFixed(2)}</span>
-                  </div>
+                  <div className="flex justify-between"><span>Subtotal:</span><span>${calculateSubtotal().toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Tax (6%):</span><span>${calculateTax().toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Shipping:</span><span>${shippingFee.toFixed(2)}</span></div>
+                  <div className="flex justify-between pt-2 border-t font-bold"><span>Total:</span><span className="text-green-600">${calculateTotal().toFixed(2)}</span></div>
                 </div>
               </div>
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </form>
     </div>
   );
