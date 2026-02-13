@@ -36,3 +36,8 @@ Thumbs.db
 # Docker
 Dockerfile
 .vercel
+
+# NEVER commit these
+.env.local
+.env.production
+.env.vercel
