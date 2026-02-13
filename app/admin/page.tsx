@@ -1,9 +1,41 @@
-'use client';
-
+import { getServerSession } from "next-auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { redirect } from "next/navigation";
+import { db } from "@/lib/db";
 import Link from 'next/link';
 import { Card, CardHeader, CardTitle, CardContent } from '@/app/components/ui/Card';
 
-export default function AdminPage() {
+export default async function AdminPage() {
+  // Auth check
+  const session = await getServerSession(authOptions);
+  
+  if (!session) {
+    redirect('/auth/sign_in');
+  }
+
+  const user = session.user as any;
+  
+  if (user.role !== 'ADMIN') {
+    redirect('/dashboard');
+  }
+
+  // Fetch real stats
+  const [
+    totalUsers,
+    activeGrowers,
+    activeDispensaries,
+    pendingGrowers,
+    totalProducts,
+    totalOrders
+  ] = await Promise.all([
+    db.user.count(),
+    db.grower.count({ where: { isVerified: true } }),
+    db.dispensary.count({ where: { isVerified: true } }),
+    db.grower.count({ where: { isVerified: false } }),
+    db.product.count(),
+    db.order.count()
+  ]);
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -16,25 +48,47 @@ export default function AdminPage() {
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-600">Total Users</p>
-            <p className="text-2xl font-bold text-gray-900">0</p>
+            <p className="text-2xl font-bold text-gray-900">{totalUsers}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-600">Active Growers</p>
-            <p className="text-2xl font-bold text-green-600">0</p>
+            <p className="text-2xl font-bold text-green-600">{activeGrowers}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-600">Active Dispensaries</p>
-            <p className="text-2xl font-bold text-blue-600">0</p>
+            <p className="text-2xl font-bold text-blue-600">{activeDispensaries}</p>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="pt-6">
             <p className="text-sm text-gray-600">Pending Growers</p>
-            <p className="text-2xl font-bold text-yellow-600">0</p>
+            <p className="text-2xl font-bold text-yellow-600">{pendingGrowers}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-600">Total Products</p>
+            <p className="text-2xl font-bold text-purple-600">{totalProducts}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-600">Total Orders</p>
+            <p className="text-2xl font-bold text-orange-600">{totalOrders}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-sm text-gray-600">Platform Status</p>
+            <p className="text-lg font-bold text-green-600">✓ Operational</p>
           </CardContent>
         </Card>
       </div>
@@ -48,7 +102,7 @@ export default function AdminPage() {
             </svg>
           </div>
           <h3 className="font-medium text-gray-900">Manage Users</h3>
-          <p className="text-sm text-gray-500 mt-1">View and manage all users</p>
+          <p className="text-sm text-gray-500 mt-1">View and manage all {totalUsers} users</p>
         </Link>
 
         <Link href="/admin/growers" className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow block">
@@ -58,7 +112,7 @@ export default function AdminPage() {
             </svg>
           </div>
           <h3 className="font-medium text-gray-900">Grower Management</h3>
-          <p className="text-sm text-gray-500 mt-1">Verify and manage grower accounts</p>
+          <p className="text-sm text-gray-500 mt-1">Verify and manage grower accounts ({pendingGrowers} pending)</p>
         </Link>
       </div>
 
