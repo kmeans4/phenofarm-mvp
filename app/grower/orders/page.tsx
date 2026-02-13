@@ -143,9 +143,7 @@ export default async function GrowerOrdersPage() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
             <input
               type="text"
               placeholder="Search orders..."
@@ -158,9 +156,7 @@ export default async function GrowerOrdersPage() {
               <option value="processing">Processing</option>
               <option value="shipped">Shipped</option>
             </select>
-          </div>
-        </CardContent>
-      </Card>
+      </div>
 
       {/* Active Orders List */}
       <Card className="bg-white shadow-sm border border-gray-200">

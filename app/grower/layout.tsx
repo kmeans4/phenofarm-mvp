@@ -1,8 +1,8 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { MobileNav } from "./components/MobileNav";
+import { ClientNav } from "./components/ClientNav";
 import { SignOutButton } from "@/app/components/SignOutButton";
 
 export default async function GrowerLayout({ children }: { children: React.ReactNode }) {
@@ -30,7 +30,7 @@ export default async function GrowerLayout({ children }: { children: React.React
 
   return (
     <div className="min-h-screen bg-gray-50 w-full">
-      {/* Mobile Header with Sign Out */}
+      {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
@@ -49,17 +49,7 @@ export default async function GrowerLayout({ children }: { children: React.React
             <p className="text-sm text-gray-500">Grower Portal</p>
           </div>
           
-          <nav className="p-4 space-y-1 flex-1">
-            {navLinks.map((link) => (
-              <Link 
-                key={link.href}
-                href={link.href}
-                className="flex items-center px-4 py-3 text-gray-700 rounded-lg hover:bg-green-50 hover:text-green-600 transition-colors"
-              >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
+          <ClientNav links={navLinks} />
           
           <div className="p-4 border-t border-gray-200">
             <div className="bg-green-50 rounded-lg p-4 mb-3">

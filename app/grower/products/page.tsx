@@ -227,9 +227,7 @@ export default function GrowerProductsPage() {
       </div>
 
       {/* Filters */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardContent className="p-4">
-          <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-4">
             <input
               type="text"
               placeholder="Search products..."
@@ -256,9 +254,7 @@ export default function GrowerProductsPage() {
               <option value="available">Available</option>
               <option value="unavailable">Unavailable</option>
             </select>
-          </div>
-        </CardContent>
-      </Card>
+      </div>
 
       {/* CSV Upload */}
       <Card className="bg-white shadow-sm border border-gray-200">
