@@ -13,7 +13,6 @@ export default async function GrowerCustomersPage() {
 
   const user = session.user as any;
   
-  // Fetch all dispensaries (customers)
   const customers = await db.dispensary.findMany({
     include: {
       user: {
@@ -73,6 +72,7 @@ export default async function GrowerCustomersPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -86,6 +86,14 @@ export default async function GrowerCustomersPage() {
                     <td className="px-6 py-4 text-sm text-gray-600">{customer.user?.email || '-'}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{customer.phone || '-'}</td>
                     <td className="px-6 py-4 text-sm text-gray-600">{customer.city}, {customer.state}</td>
+                    <td className="px-6 py-4">
+                      <Link
+                        href={`/grower/customers/${customer.id}/edit`}
+                        className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                      >
+                        Edit
+                      </Link>
+                    </td>
                   </tr>
                 ))}
               </tbody>
