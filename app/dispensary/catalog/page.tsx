@@ -5,22 +5,8 @@ import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/Card";
 import { Badge } from "@/app/components/ui/Badge";
-
-interface ProductWithGrower {
-  id: string;
-  name: string;
-  strain: string | null;
-  category: string | null;
-  thc: number | null;
-  price: number;
-  inventoryQty: number;
-  unit: string;
-  isAvailable: boolean;
-  grower: {
-    id: string;
-    businessName: string;
-  };
-}
+import AddToCartButton from "./components/AddToCartButton";
+import CartBadge from "./components/CartBadge";
 
 export default async function DispensaryCatalogPage() {
   const session = await getServerSession(authOptions);
@@ -75,7 +61,7 @@ export default async function DispensaryCatalogPage() {
   const categories = ['All', 'Flower', 'Concentrates', 'Edibles', 'Topicals', 'Vapes', 'Pre-rolls', 'Other'];
 
   return (
-    <div className="space-y-6">
+    <div className="p-4 space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -90,12 +76,13 @@ export default async function DispensaryCatalogPage() {
           />
           <Link
             href="/dispensary/cart"
-            className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+            className="relative px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center gap-2"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
             Cart
+            <CartBadge />
           </Link>
         </div>
       </div>
@@ -137,7 +124,7 @@ export default async function DispensaryCatalogPage() {
             <div className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {group.products.map((product: any) => (
-                  <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                  <div key={product.id} className="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow bg-white">
                     <div className="h-48 bg-gray-100 flex items-center justify-center">
                       <span className="text-gray-400 text-sm">{product.category || 'Product'}</span>
                     </div>
@@ -163,19 +150,18 @@ export default async function DispensaryCatalogPage() {
                           <span>THC: {product.thc}%</span>
                         </div>
                       )}
-                      <form action="/api/cart/add" method="POST" className="w-full">
-                        <input type="hidden" name="productId" value={product.id} />
-                        <input type="hidden" name="quantity" value="1" />
-                        <button 
-                          type="submit"
-                          className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 flex items-center justify-center gap-2"
-                        >
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                          </svg>
-                          Add to Cart
-                        </button>
-                      </form>
+                      <AddToCartButton 
+                        product={{
+                          id: product.id,
+                          name: product.name,
+                          price: Number(product.price),
+                          strain: product.strain,
+                          unit: product.unit,
+                          thc: product.thc,
+                        }}
+                        growerName={group.growerName}
+                        growerId={group.growerId}
+                      />
                     </div>
                   </div>
                 ))}
