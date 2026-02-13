@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { Button } from '@/app/components/ui/Button';
+import Link from 'next/link';
 
 export default function AddCustomerPage() {
   const { data: session, status } = useSession();
@@ -25,7 +24,11 @@ export default function AddCustomerPage() {
   });
 
   if (status === 'loading') {
-    return <div className="flex justify-center p-8">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
   }
 
   if (!session) {
@@ -46,7 +49,6 @@ export default function AddCustomerPage() {
       });
 
       if (response.ok) {
-        alert('Customer added successfully!');
         router.push('/grower/customers');
       } else {
         const data = await response.json();
@@ -60,7 +62,7 @@ export default function AddCustomerPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Add New Customer</h1>
         <p className="text-gray-600 mt-1">Add a new dispensary customer</p>
@@ -70,12 +72,12 @@ export default function AddCustomerPage() {
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">{error}</div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Customer Information</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="font-semibold text-gray-900">Customer Information</h2>
+          </div>
+          <div className="p-4 space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Business Name *</label>
@@ -169,14 +171,18 @@ export default function AddCustomerPage() {
                 placeholder="VT-DISP-XXXXX"
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <div className="flex gap-4">
-          <Button variant="outline" onClick={() => router.push('/grower/customers')}>Cancel</Button>
-          <Button variant="primary" type="submit" disabled={isSubmitting}>
+          <Link href="/grower/customers" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
+          <button 
+            type="submit" 
+            disabled={isSubmitting}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
+          >
             {isSubmitting ? 'Adding...' : 'Add Customer'}
-          </Button>
+          </button>
         </div>
       </form>
     </div>

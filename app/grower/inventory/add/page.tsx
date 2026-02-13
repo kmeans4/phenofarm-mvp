@@ -3,23 +3,14 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { Button } from '@/app/components/ui/Button';
-
-interface Product {
-  id: string;
-  name: string;
-  strain: string | null;
-  category: string;
-  unit: string;
-}
+import Link from 'next/link';
 
 export default function AddToInventoryPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   
   const [formData, setFormData] = useState({
@@ -47,20 +38,14 @@ export default function AddToInventoryPage() {
       const response = await fetch('/api/products');
       if (response.ok) {
         const data = await response.json();
-        setProducts(data);
+        setProducts(Array.isArray(data) ? data : []);
       }
     } catch (err) {
-      console.error('Error loading products:', err);
+      console.error('Error:', err);
     } finally {
       setLoading(false);
     }
   };
-
-  if (status === 'loading' || loading) {
-    return <div className="flex justify-center p-8">Loading...</div>;
-  }
-
-  if (!session) return null;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +60,6 @@ export default function AddToInventoryPage() {
       });
 
       if (response.ok) {
-        alert('Inventory item added successfully!');
         router.push('/grower/inventory');
       } else {
         const data = await response.json();
@@ -88,8 +72,16 @@ export default function AddToInventoryPage() {
     }
   };
 
+  if (status === 'loading' || loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 p-4">
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Add to Inventory</h1>
         <p className="text-gray-600 mt-1">Add stock to existing product inventory</p>
@@ -99,12 +91,12 @@ export default function AddToInventoryPage() {
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">{error}</div>
       )}
 
-      <form onSubmit={handleSubmit}>
-        <Card>
-          <CardHeader>
-            <CardTitle>Inventory Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+          <div className="p-4 border-b border-gray-200">
+            <h2 className="font-semibold text-gray-900">Inventory Details</h2>
+          </div>
+          <div className="p-4 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Select Product *</label>
               <select
@@ -114,9 +106,9 @@ export default function AddToInventoryPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               >
                 <option value="">Choose a product...</option>
-                {products.map(p => (
-                  <option key={p.id} value={p.id}>
-                    {p.name} {p.strain && `(${p.strain})`} - {p.category}
+                {products.map((p: any) => (
+                  <option key={p?.id} value={p?.id}>
+                    {p?.name} {p?.strain && `(${p.strain})`} - {p?.category}
                   </option>
                 ))}
               </select>
@@ -201,14 +193,18 @@ export default function AddToInventoryPage() {
                 placeholder="Additional notes..."
               />
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
         <div className="flex gap-4">
-          <Button variant="outline" onClick={() => router.push('/grower/inventory')}>Cancel</Button>
-          <Button variant="primary" type="submit" disabled={isSubmitting || !formData.productId}>
+          <Link href="/grower/inventory" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
+          <button 
+            type="submit" 
+            disabled={isSubmitting || !formData.productId}
+            className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
+          >
             {isSubmitting ? 'Adding...' : 'Add to Inventory'}
-          </Button>
+          </button>
         </div>
       </form>
     </div>
