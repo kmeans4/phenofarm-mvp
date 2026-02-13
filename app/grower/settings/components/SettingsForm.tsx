@@ -10,9 +10,6 @@ export function SettingsForm() {
     email: 'contact@greenvalleynurseries.com',
     phone: '(802) 555-0123',
     address: '123 Green Valley Road, Montpelier, VT 05602',
-    city: 'Montpelier',
-    state: 'VT',
-    zip: '05602',
   });
 
   const handleAddressSelect = (address: {
@@ -25,9 +22,6 @@ export function SettingsForm() {
     setFormData(prev => ({
       ...prev,
       address: address.fullAddress,
-      city: address.city,
-      state: address.state,
-      zip: address.zip,
     }));
   };
 
@@ -86,7 +80,7 @@ export function SettingsForm() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Street Address <span className="text-green-600 text-xs font-medium">(Autocomplete)</span>
+                Business Address <span className="text-green-600 text-xs font-medium">(Autocomplete)</span>
               </label>
               <AddressAutocomplete
                 value={formData.address}
@@ -94,43 +88,7 @@ export function SettingsForm() {
                 onSelect={handleAddressSelect}
                 placeholder="Type your address..."
               />
-              <p className="text-xs text-gray-500 mt-1">Start typing to see suggestions</p>
-            </div>
-            <div className="grid grid-cols-3 gap-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City
-                </label>
-                <input 
-                  type="text" 
-                  value={formData.city}
-                  onChange={(e) => setFormData({...formData, city: e.target.value})}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State
-                </label>
-                <input 
-                  type="text" 
-                  value={formData.state}
-                  maxLength={2}
-                  onChange={(e) => setFormData({...formData, state: e.target.value.toUpperCase()})}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ZIP
-                </label>
-                <input 
-                  type="text" 
-                  value={formData.zip}
-                  onChange={(e) => setFormData({...formData, zip: e.target.value})}
-                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                />
-              </div>
+              <p className="text-xs text-gray-500 mt-1">Type 3+ characters to see suggestions (includes city, state, ZIP)</p>
             </div>
           </div>
         </div>
