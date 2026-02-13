@@ -3,6 +3,17 @@ import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
+// Helper to serialize product from Prisma
+function serializeProduct(product: any) {
+  if (!product) return product;
+  return {
+    ...product,
+    price: product.price ? parseFloat(product.price) : 0,
+    thc: product.thc ? parseFloat(product.thc) : null,
+    cbd: product.cbd ? parseFloat(product.cbd) : null,
+  };
+}
+
 // GET a single product by ID
 export async function GET(
   request: NextRequest,
@@ -31,7 +42,7 @@ export async function GET(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    return NextResponse.json(product, { status: 200 });
+    return NextResponse.json(serializeProduct(product), { status: 200 });
   } catch (error) {
     console.error('Error fetching product:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -57,7 +68,6 @@ export async function PUT(
 
     const productId = (await context.params).id;
 
-    // Check if product exists and belongs to grower
     const existingProduct = await db.product.findFirst({
       where: { id: productId, growerId: user.growerId },
     });
@@ -68,7 +78,6 @@ export async function PUT(
 
     const body = await request.json();
     
-    // Build update data dynamically - only update fields that are provided
     const updateData: any = {};
     
     if (body.name !== undefined) updateData.name = body.name;
@@ -84,18 +93,16 @@ export async function PUT(
     if (body.images !== undefined) updateData.images = body.images;
     if (body.isAvailable !== undefined) updateData.isAvailable = body.isAvailable;
 
-    // If no valid fields to update
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
     }
 
-    // Update the product
     const updatedProduct = await db.product.update({
       where: { id: productId },
       data: updateData,
     });
 
-    return NextResponse.json(updatedProduct, { status: 200 });
+    return NextResponse.json(serializeProduct(updatedProduct), { status: 200 });
   } catch (error) {
     console.error('Error updating product:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -45,7 +45,15 @@ export async function GET(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(products, { status: 200 });
+    // Convert Decimal prices to numbers for JSON serialization
+    const serializedProducts = products.map((p: any) => ({
+      ...p,
+      price: p.price ? parseFloat(p.price) : 0,
+      thc: p.thc ? parseFloat(p.thc) : null,
+      cbd: p.cbd ? parseFloat(p.cbd) : null,
+    }));
+
+    return NextResponse.json(serializedProducts, { status: 200 });
   } catch (error) {
     console.error('Error fetching products:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -84,7 +92,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Validate required fields
-    if (!name || !price || !inventoryQty || !unit) {
+    if (!name || price === undefined || inventoryQty === undefined || !unit) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -107,7 +115,15 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(product, { status: 201 });
+    // Convert Decimal to number for response
+    const serializedProduct = {
+      ...product,
+      price: product.price ? parseFloat(product.price as any) : 0,
+      thc: product.thc ? parseFloat(product.thc as any) : null,
+      cbd: product.cbd ? parseFloat(product.cbd as any) : null,
+    };
+
+    return NextResponse.json(serializedProduct, { status: 201 });
   } catch (error) {
     console.error('Error creating product:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
