@@ -58,14 +58,8 @@ export default function DispensaryCartPage() {
       const items = prev.items.map(item => {
         if (item.id === id) {
           const newQty = item.quantity + delta;
-          // Check max limit
-          if (delta > 0 && newQty > item.maxQty) {
-            return item; // Don't exceed max
-          }
-          // Check min limit
-          if (newQty < 1) {
-            return item;
-          }
+          if (delta > 0 && newQty > item.maxQty) return item;
+          if (newQty < 1) return item;
           return { ...item, quantity: newQty };
         }
         return item;
@@ -167,7 +161,8 @@ export default function DispensaryCartPage() {
                                 max={item.maxQty}
                                 value={item.quantity}
                                 onChange={(e) => setExactQuantity(item.id, parseInt(e.target.value) || 1)}
-                                className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm [appearance:textfield] [className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm"::-webkit-outer-spin-button]:appearance-none [className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm"::-webkit-inner-spin-button]:appearance-none"
+                                className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm"
+                                style={{ appearance: 'textfield', MozAppearance: 'textfield' }}
                               />
                               <button 
                                 onClick={() => updateQuantity(item.id, 1)}
