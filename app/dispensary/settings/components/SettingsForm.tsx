@@ -43,7 +43,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         {/* Business Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-semibold">Business Information</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Business Information</h2>
           </div>
           <div className="p-6 space-y-4">
             <div>
@@ -52,7 +52,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 type="text" 
                 value={formData.businessName}
                 onChange={(e) => setFormData({...formData, businessName: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
               />
             </div>
             <div>
@@ -61,7 +61,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 type="text" 
                 value={formData.licenseNumber}
                 onChange={(e) => setFormData({...formData, licenseNumber: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
               />
             </div>
             <div>
@@ -70,7 +70,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 type="email" 
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
               />
             </div>
             <div>
@@ -79,7 +79,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 type="tel" 
                 value={formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
               />
             </div>
             <div>
@@ -101,7 +101,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                   type="text" 
                   value={formData.city}
                   onChange={(e) => setFormData({...formData, city: e.target.value})}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
                 />
               </div>
               <div>
@@ -111,7 +111,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                   value={formData.state}
                   maxLength={2}
                   onChange={(e) => setFormData({...formData, state: e.target.value.toUpperCase()})}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
                 />
               </div>
               <div>
@@ -120,7 +120,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                   type="text" 
                   value={formData.zip}
                   onChange={(e) => setFormData({...formData, zip: e.target.value})}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                  className="w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
                 />
               </div>
             </div>
@@ -130,7 +130,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 type="url" 
                 value={formData.website}
                 onChange={(e) => setFormData({...formData, website: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
               />
             </div>
             <div>
@@ -139,7 +139,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 rows={3} 
                 value={formData.description}
                 onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
               />
             </div>
           </div>
@@ -148,25 +148,25 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         {/* Banking & Payment */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-semibold">Banking Information</h2>
+            <h2 className="text-lg font-semibold text-gray-900">Banking Information</h2>
           </div>
           <div className="p-6 space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Business Bank Name</label>
-              <input type="text" placeholder="Bank name" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" />
+              <input type="text" placeholder="Bank name" className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500" />
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Account Holder Name</label>
-              <input type="text" placeholder="Account holder name" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" />
+              <input type="text" placeholder="Account holder name" className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Routing Number</label>
-                <input type="text" placeholder="Routing #" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" />
+                <input type="text" placeholder="Routing #" className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500" />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
-                <input type="text" placeholder="Account #" className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-green-500 focus:ring-1 focus:ring-green-500" />
+                <input type="text" placeholder="Account #" className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500" />
               </div>
             </div>
             <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
