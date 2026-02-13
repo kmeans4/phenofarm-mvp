@@ -14,10 +14,18 @@ export default async function GrowerInventoryPage() {
   const sessionUser = session.user as any;
   
   // Fetch products for this grower
-  const products = await db.product.findMany({
+  const rawProducts = await db.product.findMany({
     where: { growerId: sessionUser.growerId },
     orderBy: { createdAt: 'desc' },
   });
+
+  // Convert Decimal prices to numbers
+  const products = rawProducts.map((p: any) => ({
+    ...p,
+    price: p.price ? parseFloat(p.price) : 0,
+    thc: p.thc ? parseFloat(p.thc) : null,
+    cbd: p.cbd ? parseFloat(p.cbd) : null,
+  }));
 
   const totalValue = products?.reduce((sum: number, p: any) => sum + ((p?.price || 0) * (p?.inventoryQty || 0)), 0) || 0;
   const lowStockCount = products?.filter((p: any) => (p?.inventoryQty || 0) <= 10)?.length || 0;
@@ -78,7 +86,7 @@ export default async function GrowerInventoryPage() {
                       {product?.strain && <div className="text-xs text-gray-500">{product.strain}</div>}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{product?.category || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}/{product?.unit || 'unit'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">${product?.price?.toFixed(2) || '0.00'}/{product?.unit || 'unit'}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={(product?.inventoryQty || 0) <= 10 ? 'text-red-600 font-medium' : 'text-gray-900'}>
                         {product?.inventoryQty || 0} {product?.unit || 'unit'}
