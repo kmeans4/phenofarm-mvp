@@ -6,16 +6,23 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Badge } from '@/app/components/ui/Badge';
-import { Button } from '@/app/components/ui/Button';
 
-const statusLabels = {
-  PENDING: 'Pending',
-  CONFIRMED: 'Confirmed',
-  PROCESSING: 'Processing',
-  SHIPPED: 'Shipped',
-  DELIVERED: 'Delivered',
-  CANCELLED: 'Cancelled',
-};
+interface Order {
+  id: string;
+  orderId: string;
+  growerId: string;
+  dispensaryId: string;
+  status: string;
+  totalAmount: number;
+  createdAt: Date;
+  dispensary: {
+    businessName: string;
+  };
+}
+
+interface StatusLabelMap {
+  [key: string]: string;
+}
 
 export default async function GrowerOrdersPage() {
   const session = await getServerSession(authOptions);
@@ -69,6 +76,29 @@ export default async function GrowerOrdersPage() {
   const activeCount = activeOrders.length;
   const pendingCount = allOrders.filter(o => o.status === 'PENDING').length;
   const totalRevenue = allOrders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
+
+  // Status label map
+  const statusLabels: StatusLabelMap = {
+    PENDING: 'Pending',
+    CONFIRMED: 'Confirmed',
+    PROCESSING: 'Processing',
+    SHIPPED: 'Shipped',
+    DELIVERED: 'Delivered',
+    CANCELLED: 'Cancelled',
+  };
+
+  // Helper to get status label safely
+  const getStatusLabel = (status: string): string => {
+    return statusLabels[status] || status;
+  };
+
+  // Helper to get badge variant safely
+  const getBadgeVariant = (status: string): "success" | "error" | "warning" | "default" => {
+    if (status === 'DELIVERED') return 'success';
+    if (status === 'CANCELLED') return 'error';
+    if (status === 'SHIPPED') return 'warning';
+    return 'default';
+  };
 
   return (
     <div className="space-y-6">
@@ -163,7 +193,7 @@ export default async function GrowerOrdersPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {activeOrders.map((order: any) => (
+                  {activeOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">#{order.orderId}</div>
@@ -178,8 +208,8 @@ export default async function GrowerOrdersPage() {
                         ${Number(order.totalAmount).toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant={order.status === 'DELIVERED' ? 'success' : order.status === 'CANCELLED' ? 'error' : order.status === 'SHIPPED' ? 'warning' : 'default'}>
-                          {statusLabels[order.status] || order.status}
+                        <Badge variant={getBadgeVariant(order.status)}>
+                          {getStatusLabel(order.status)}
                         </Badge>
                       </td>
                       <td className="px-4 py-3">
