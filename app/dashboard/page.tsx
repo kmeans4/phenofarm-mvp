@@ -27,7 +27,7 @@ export default async function DashboardPage() {
         COALESCE(COUNT(DISTINCT p.id), 0) as totalProducts,
         COALESCE(COUNT(DISTINCT o.id), 0) as totalOrders,
         COALESCE(COUNT(DISTINCT CASE WHEN o.status = 'PENDING' THEN o.id END), 0) as pendingOrders,
-        COALESCE(SUM(oi.total), 0) as totalRevenue
+        COALESCE(SUM(oi."totalPrice"), 0) as totalRevenue
       FROM "products" p
       LEFT JOIN "order_items" oi ON p.id = oi."productId"
       LEFT JOIN "orders" o ON oi."orderId" = o.id
@@ -39,7 +39,7 @@ export default async function DashboardPage() {
         COALESCE(COUNT(DISTINCT oi."productId"), 0) as totalProducts,
         COALESCE(COUNT(DISTINCT o.id), 0) as totalOrders,
         COALESCE(COUNT(DISTINCT CASE WHEN o.status = 'PENDING' THEN o.id END), 0) as pendingOrders,
-        COALESCE(SUM(oi.total), 0) as totalRevenue
+        COALESCE(SUM(oi."totalPrice"), 0) as totalRevenue
       FROM "order_items" oi
       JOIN "orders" o ON oi."orderId" = o.id
       WHERE o."customerId" = (
