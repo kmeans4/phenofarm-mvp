@@ -1,131 +1,167 @@
-import Link from "next/link";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
-import { redirect } from "next/navigation";
+'use client';
 
-export default async function DispensaryCartPage() {
-  const session = await getServerSession(authOptions);
-  
-  if (!session) {
-    redirect('/auth/sign_in');
-  }
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 
-  const cartItems = [
-    { id: 1, name: 'Blue Dream Flower', grower: 'Green Valley Nurseries', price: 45, quantity: 2, strain: 'Indica' },
-    { id: 2, name: 'Sativa Concentrate', grower: 'Vermont Green Works', price: 85, quantity: 1, strain: 'Sativa' },
-    { id: 3, name: 'EDM Edibles', grower: 'Green Mountain Growers', price: 35, quantity: 3, strain: 'Hybrid' },
-  ];
+interface CartItem {
+  id: string;
+  name: string;
+  grower: string;
+  growerId: string;
+  price: number;
+  quantity: number;
+  strain?: string;
+  unit?: string;
+  thc?: number;
+}
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * 0.1;
-  const total = subtotal + tax;
+interface Cart {
+  items: CartItem[];
+  subtotal: number;
+  tax: number;
+  total: number;
+}
+
+export default function DispensaryCartPage() {
+  const [cart, setCart] = useState<Cart>({ items: [], subtotal: 0, tax: 0, total: 0 });
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const saved = localStorage.getItem('phenofarm-cart');
+    if (saved) {
+      try {
+        setCart(JSON.parse(saved));
+      } catch {
+        setCart({ items: [], subtotal: 0, tax: 0, total: 0 });
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mounted) {
+      localStorage.setItem('phenofarm-cart', JSON.stringify(cart));
+    }
+  }, [cart, mounted]);
+
+  const calculateTotals = (items: CartItem[]) => {
+    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const tax = subtotal * 0.1;
+    const total = subtotal + tax;
+    return { subtotal, tax, total };
+  };
+
+  const updateQuantity = (id: string, delta: number) => {
+    setCart(prev => {
+      const items = prev.items.map(item => {
+        if (item.id === id) {
+          const newQty = Math.max(1, item.quantity + delta);
+          return { ...item, quantity: newQty };
+        }
+        return item;
+      });
+      return { items, ...calculateTotals(items) };
+    });
+  };
+
+  const removeItem = (id: string) => {
+    setCart(prev => {
+      const items = prev.items.filter(item => item.id !== id);
+      return { items, ...calculateTotals(items) };
+    });
+  };
+
+  const clearCart = () => {
+    if (confirm('Clear cart?')) {
+      setCart({ items: [], subtotal: 0, tax: 0, total: 0 });
+    }
+  };
+
+  if (!mounted) return <div className="p-6">Loading...</div>;
+
+  const isEmpty = cart.items.length === 0;
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
-        <div className="flex gap-4">
-          <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+    <div className="p-4 max-w-5xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Shopping Cart</h1>
+          <p className="text-gray-600 mt-1">
+            {isEmpty ? 'Your cart is empty' : `${cart.items.reduce((s, i) => s + i.quantity, 0)} items`}
+          </p>
+        </div>
+        <div className="flex gap-3">
+          <Link href="/dispensary/catalog" className="px-4 py-2 border rounded-lg hover:bg-gray-50 font-medium">
             Continue Shopping
-          </button>
-          <button className="px-4 py-2 text-red-600 hover:text-red-900">
-            Clear Cart
-          </button>
+          </Link>
+          {!isEmpty && (
+            <button onClick={clearCart} className="px-4 py-2 text-red-600 hover:text-red-900">
+              Clear Cart
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Cart Items */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">{cartItems.length} Items in Cart</h2>
-        </div>
-        
-        <div className="divide-y divide-gray-200">
-          {cartItems.map((item) => (
-            <div key={item.id} className="px-6 py-4 flex flex-col md:flex-row md:items-center gap-4">
-              <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <span className="text-gray-400">[Image]</span>
-              </div>
-              
-              <div className="flex-1">
-                <h3 className="font-medium text-gray-900">{item.name}</h3>
-                <p className="text-sm text-gray-500">{item.strain} • {item.grower}</p>
-              </div>
-              
-              <div className="flex items-center gap-4">
-                <div className="flex items-center border border-gray-300 rounded-lg">
-                  <button className="px-3 py-1 hover:bg-gray-100 text-gray-600">-</button>
-                  <span className="px-3 py-1 text-sm font-medium">{item.quantity}</span>
-                  <button className="px-3 py-1 hover:bg-gray-100 text-gray-600">+</button>
+      {isEmpty ? (
+        <Card className="p-12">
+          <div className="text-center">
+            <div>🛒</div>
+            <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
+            <p className="text-gray-600 mb-6">Browse our catalogs</p>
+            <Link href="/dispensary/catalog" className="bg-green-600 text-white px-6 py-3 rounded-lg">
+              Browse
+            </Link>
+          </div>
+        </Card>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 space-y-4">
+            <Card>
+              <CardContent className="p-0">
+                <div className="divide-y">
+                  {cart.items.map(item => (
+                    <div key={item.id} className="p-4 flex gap-4">
+                      <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">🌿</div>
+                      <div className="flex-1">
+                        <p className="font-semibold">{item.name}</p>
+                        <p className="text-sm text-gray-500">{item.strain} • {item.grower}</p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <div className="flex items-center border rounded-lg">
+                          <button onClick={() => updateQuantity(item.id, -1)} className="px-3 py-1 hover:bg-gray-100">-</button>
+                          <span className="px-3">{item.quantity}</span>
+                          <button onClick={() => updateQuantity(item.id, 1)} className="px-3 py-1 hover:bg-gray-100">+</button>
+                        </div>
+                        <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
+                        <button onClick={() => removeItem(item.id)} className="text-red-600">🗑️</button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                
-                <span className="font-bold text-gray-900">${(item.price * item.quantity).toFixed(2)}</span>
-                
-                <button className="text-red-600 hover:text-red-900 ml-2">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                  </svg>
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+              </CardContent>
+            </Card>
+          </div>
 
-      {/* Order Summary */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden max-w-md ml-auto">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">Order Summary</h2>
-        </div>
-        
-        <div className="p-6space-y-4">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Subtotal</span>
-            <span className="font-medium">${subtotal.toFixed(2)}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Tax (10%)</span>
-            <span className="font-medium">${tax.toFixed(2)}</span>
-          </div>
-          <div className="border-t border-gray-200 pt-4 flex justify-between">
-            <span className="text-lg font-bold text-gray-900">Total</span>
-            <span className="text-lg font-bold text-green-600">${total.toFixed(2)}</span>
-          </div>
-        </div>
-
-        <div className="px-6 py-4 bg-gray-50 space-y-3">
-          <button className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium">
-            Checkout Now
-          </button>
-          
-          <div className="flex items-center gap-2">
-            <div className="flex-1 h-px bg-gray-300"></div>
-            <span className="text-sm text-gray-500">or</span>
-            <div className="flex-1 h-px bg-gray-300"></div>
-          </div>
-          
-          <button className="w-full border border-gray-300 text-gray-700 py-3 rounded-lg hover:bg-gray-50 font-medium">
-            Save Cart
-          </button>
-        </div>
-      </div>
-
-      {/* Savings Info */}
-      <div className="bg-green-50 rounded-lg p-4 border border-green-200 max-w-md">
-        <div className="flex items-start gap-3">
-          <div className="text-green-600 mt-1">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
           <div>
-            <h3 className="font-medium text-green-900">Free Shipping!</h3>
-            <p className="text-sm text-green-700 mt-1">
-              You're $150 away from free shipping on orders over $500
-            </p>
+            <Card className="sticky top-4">
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="flex justify-between"><span>Subtotal</span><span>${cart.subtotal.toFixed(2)}</span></div>
+                <div className="flex justify-between"><span>Tax</span><span>${cart.tax.toFixed(2)}</span></div>
+                <div className="border-t pt-4 flex justify-between font-bold">
+                  <span>Total</span><span className="text-green-600">${cart.total.toFixed(2)}</span>
+                </div>
+                <button className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700">
+                  Checkout
+                </button>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
