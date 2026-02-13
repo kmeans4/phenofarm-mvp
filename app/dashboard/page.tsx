@@ -31,7 +31,7 @@ export default async function DashboardPage() {
       FROM "products" p
       LEFT JOIN "order_items" oi ON p.id = oi."productId"
       LEFT JOIN "orders" o ON oi."orderId" = o.id
-      WHERE p."sellerId" = ${user.id}
+      WHERE p."growerId" = ${user.id}
     `;
   } else if (user.role === 'DISPENSARY') {
     stats = await db.$queryRaw<any>`
