@@ -189,7 +189,7 @@ export default function GrowerProductsPage() {
                   </span>
                 </div>
 
-                {/* Action Buttons - Redesigned */}
+                {/* Action Buttons */}
                 <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
                   <Link
                     href={`/grower/products/${product?.id}/edit`}
