@@ -34,7 +34,6 @@ export default function AddProductPage() {
         throw new Error(data.error || 'Failed to create product');
       }
 
-      // Show success message
       alert('Product created successfully!');
       router.push('/grower/products');
     } catch (err: any) {
@@ -42,5 +41,15 @@ export default function AddProductPage() {
     }
   };
 
-  return <ProductForm onSubmit={handleSubmit} onCancel={() => router.push('/grower/products')} />;
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
+          <p className="text-gray-600 mt-1">Create a new cannabis product listing</p>
+        </div>
+      </div>
+      <ProductForm onSubmit={handleSubmit} onCancel={() => router.push('/grower/products')} />
+    </div>
+  );
 }
