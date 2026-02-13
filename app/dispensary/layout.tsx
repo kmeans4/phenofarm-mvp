@@ -41,7 +41,7 @@ export default async function DispensaryLayout({ children }: { children: React.R
 
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:block sticky top-0 h-screen flex flex-col">
+        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:block flex-shrink-0">
           <div className="p-4 border-b border-gray-200">
             <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
             <p className="text-sm text-gray-500">Dispensary Portal</p>
@@ -59,8 +59,8 @@ export default async function DispensaryLayout({ children }: { children: React.R
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 lg:ml-64 pt-20 lg:pt-0 w-full">
-          <div className="p-4 lg:p-8 mx-auto">
+        <main className="flex-1 pt-20 lg:pt-0 w-full min-w-0">
+          <div className="p-4 lg:p-6">
             {children}
           </div>
         </main>
