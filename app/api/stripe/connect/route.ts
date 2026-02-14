@@ -4,10 +4,6 @@ import { authOptions } from '@/lib/auth';
 import { stripe, STRIPE_CONFIG } from '@/lib/stripe';
 import { db } from '@/lib/db';
 
-/**
- * POST /api/stripe/connect
- * Create a Stripe Connect account and return onboarding URL
- */
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -22,7 +18,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user || !user.growerId) {
-      return NextResponse.json({ error: 'Grower profile not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Grower not found' }, { status: 404 });
     }
 
     const grower = await db.grower.findUnique({
@@ -30,44 +26,35 @@ export async function POST(req: NextRequest) {
     });
 
     if (!grower) {
-      return NextResponse.json({ error: 'Grower record not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Grower not found' }, { status: 404 });
     }
 
-    // Check if account already exists
     if (grower.stripeAccountId) {
       return NextResponse.json(
-        { error: 'Account already connected', stripeAccountId: grower.stripeAccountId },
+        { error: 'Already connected', stripeAccountId: grower.stripeAccountId },
         { status: 400 }
       );
     }
 
     // Create Stripe Connect account
     const account = await stripe.accounts.create({
-      type: 'standard', // or 'express' for a more streamlined experience
-      email: user.email,
+      type: 'standard',
+      email: user.email || undefined,
       business_type: 'company',
       business_profile: {
         name: grower.businessName,
-        url: grower.website || 'https://phenofarm.app',
+        url: grower.website || undefined,
       },
       capabilities: {
         card_payments: { requested: true },
         transfers: { requested: true },
       },
-      settings: {
-        payouts: {
-          schedule: {
-            interval: 'weekly',
-            weekly_anchor: 'monday',
-          },
-          metadata: {
-            minimum_payment_amount: 1000,
-          },
-        },
+      metadata: {
+        growerId: grower.id,
+        platform: 'phenofarm',
       },
     });
 
-    // Update grower record with Stripe account ID
     await db.grower.update({
       where: { id: grower.id },
       data: {
@@ -76,7 +63,6 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create account link for onboarding
     const accountLink = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: STRIPE_CONFIG.getConnectRefreshUrl(),
@@ -91,16 +77,8 @@ export async function POST(req: NextRequest) {
     });
   } catch (error) {
     console.error('Stripe Connect error:', error);
-    
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: 'Failed to create Stripe account', message: error.message },
-        { status: 500 }
-      );
-    }
-    
     return NextResponse.json(
-      { error: 'Failed to create Stripe account' },
+      { error: 'Failed to create account' },
       { status: 500 }
     );
   }
