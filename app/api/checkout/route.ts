@@ -14,11 +14,15 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session || (session.user as any).role !== 'DISPENSARY') {
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const user = session.user as any;
+    if (user.role !== 'DISPENSARY') {
+      return NextResponse.json({ error: 'Only dispensaries can checkout' }, { status: 403 });
+    }
+
     const { items, notes } = await request.json();
 
     if (!items?.length) {
@@ -32,12 +36,12 @@ export async function POST(request: NextRequest) {
       byGrower[item.growerId].push(item);
     });
 
-    const orders = [];
+    const orders: any[] = [];
     const errors: string[] = [];
 
     for (const [growerId, growerItems] of Object.entries(byGrower)) {
       let subtotal = 0;
-      const orderItems = [];
+      const orderItems: any[] = [];
 
       for (const item of growerItems) {
         const product = await db.product.findUnique({ where: { id: item.id } });
@@ -64,7 +68,7 @@ export async function POST(request: NextRequest) {
         });
       }
 
-      if (orderItems.length) {
+      if (orderItems.length > 0) {
         const tax = subtotal * 0.06;
         const order = await db.order.create({
           data: {
@@ -83,7 +87,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    return NextResponse.json({ success: true, orders, orderCount: orders.length, errors: errors.length > 0 ? errors : undefined });
+    return NextResponse.json({ 
+      success: true, 
+      orders, 
+      orderCount: orders.length,
+      ...(errors.length > 0 && { errors })
+    });
   } catch (error) {
     console.error('Checkout error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
