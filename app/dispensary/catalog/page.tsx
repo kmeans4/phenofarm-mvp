@@ -11,7 +11,7 @@ export default async function DispensaryCatalogPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as unknown;
   
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');
@@ -38,7 +38,7 @@ export default async function DispensaryCatalogPage() {
   });
 
   // Group products by grower
-  const growerGroups = products.reduce((groups: any[], product) => {
+  const growerGroups = products.reduce((groups: unknown[], product) => {
     const existingGroup = groups.find(g => g.growerId === product.grower.id);
     
     if (existingGroup) {

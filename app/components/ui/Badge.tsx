@@ -32,7 +32,7 @@ export function Badge({ className, variant, children }: BadgeProps) {
   const variantStr = variant as string;
   const mappedVariant = variantStr === 'danger' ? 'error' : variantStr;
   return (
-    <div className={`${badgeVariants({ variant: mappedVariant as any, className })}`}>
+    <div className={`${badgeVariants({ variant: mappedVariant as "default" | "secondary" | "error" | "success" | "warning" | "info" | "danger", className })}`}>
       {children}
     </div>
   );

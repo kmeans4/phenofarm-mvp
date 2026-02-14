@@ -51,9 +51,9 @@ export function AddressAutocomplete({
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Debounce search
-  const debounce = (func: Function, wait: number) => {
+  const debounce = (func: (...args: unknown[]) => void, wait: number) => {
     let timeout: NodeJS.Timeout;
-    return (...args: any[]) => {
+    return (...args: unknown[]) => {
       clearTimeout(timeout);
       timeout = setTimeout(() => func(...args), wait);
     };
@@ -121,7 +121,7 @@ export function AddressAutocomplete({
 
     if (onSelect) {
       onSelect({
-        fullAddress: result.display_name,
+        _fullAddress: result.display_name,
         street,
         city,
         state,

@@ -25,7 +25,7 @@ async function fetchOrder(id: string, growerId: string) {
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
     shippingFee: Number(order.shippingFee),
-    items: order.items.map((item: any) => ({
+    items: order.items.map((item: unknown) => ({
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),

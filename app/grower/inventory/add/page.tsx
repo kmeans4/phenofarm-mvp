@@ -106,7 +106,7 @@ export default function AddToInventoryPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               >
                 <option value="">Choose a product...</option>
-                {products.map((p: any) => (
+                {products.map((p: unknown) => (
                   <option key={p?.id} value={p?.id}>
                     {p?.name} {p?.strain && `(${p.strain})`} - {p?.category}
                   </option>

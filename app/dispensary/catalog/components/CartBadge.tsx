@@ -6,6 +6,21 @@ export default function CartBadge() {
   const [count, setCount] = useState(0);
   const [mounted, setMounted] = useState(false);
 
+  const updateCount = () => {
+    const saved = localStorage.getItem('phenofarm-cart');
+    if (saved) {
+      try {
+        const cart = JSON.parse(saved);
+        const totalItems = cart.items?.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 0), 0) || 0;
+        setCount(totalItems);
+      } catch {
+        setCount(0);
+      }
+    } else {
+      setCount(0);
+    }
+  };
+
   useEffect(() => {
     setMounted(true);
     updateCount();
@@ -19,21 +34,6 @@ export default function CartBadge() {
       window.removeEventListener('storage', updateCount);
     };
   }, []);
-
-  const updateCount = () => {
-    const saved = localStorage.getItem('phenofarm-cart');
-    if (saved) {
-      try {
-        const cart = JSON.parse(saved);
-        const totalItems = cart.items?.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0) || 0;
-        setCount(totalItems);
-      } catch {
-        setCount(0);
-      }
-    } else {
-      setCount(0);
-    }
-  };
 
   if (!mounted || count === 0) return null;
 

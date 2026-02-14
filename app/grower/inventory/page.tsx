@@ -11,7 +11,7 @@ export default async function GrowerInventoryPage() {
     redirect('/auth/sign_in');
   }
 
-  const sessionUser = session.user as any;
+  const sessionUser = session.user as { growerId?: string };
   
   // Fetch products for this grower
   const rawProducts = await db.product.findMany({
@@ -20,15 +20,15 @@ export default async function GrowerInventoryPage() {
   });
 
   // Convert Decimal prices to numbers
-  const products = rawProducts.map((p: any) => ({
+  const products = rawProducts.map((p: unknown) => ({
     ...p,
     price: p.price ? parseFloat(p.price) : 0,
     thc: p.thc ? parseFloat(p.thc) : null,
     cbd: p.cbd ? parseFloat(p.cbd) : null,
   }));
 
-  const totalValue = products?.reduce((sum: number, p: any) => sum + ((p?.price || 0) * (p?.inventoryQty || 0)), 0) || 0;
-  const lowStockCount = products?.filter((p: any) => (p?.inventoryQty || 0) <= 10)?.length || 0;
+  const totalValue = products?.reduce((sum: number, p: unknown) => sum + ((p?.price || 0) * (p?.inventoryQty || 0)), 0) || 0;
+  const lowStockCount = products?.filter((p: unknown) => (p?.inventoryQty || 0) <= 10)?.length || 0;
 
   return (
     <div className="space-y-6 p-4">
@@ -79,7 +79,7 @@ export default async function GrowerInventoryPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {products.map((product: any) => (
+                {products.map((product: unknown) => (
                   <tr key={product?.id}>
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>

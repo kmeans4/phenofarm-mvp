@@ -12,7 +12,7 @@ export default async function GrowerLayout({ children }: { children: React.React
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as unknown;
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');

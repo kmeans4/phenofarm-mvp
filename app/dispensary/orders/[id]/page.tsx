@@ -48,7 +48,7 @@ async function fetchOrder(id: string, dispensaryId: string): Promise<OrderDetail
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
     shippingFee: Number(order.shippingFee),
-    items: order.items.map((item: any) => ({
+    items: order.items.map((item: unknown) => ({
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
@@ -87,7 +87,7 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as unknown;
 
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');

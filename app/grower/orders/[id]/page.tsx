@@ -51,7 +51,7 @@ async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | n
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
     shippingFee: Number(order.shippingFee),
-    items: order.items.map((item: any) => ({
+    items: order.items.map((item: unknown) => ({
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
@@ -94,7 +94,7 @@ export default async function OrderDetailPage({
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as unknown;
 
   if (user.role !== 'GROWER') {
     redirect('/auth/sign_in');

@@ -116,7 +116,7 @@ export default async function GrowerDashboardPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as unknown;
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');
@@ -331,7 +331,7 @@ export default async function GrowerDashboardPage() {
         <div className="px-6 pb-6">
           {recentOrders.length > 0 ? (
             <div className="space-y-0">
-              {recentOrders.map((order: any) => (
+              {recentOrders.map((order: unknown) => (
                 <ActivityItem
                   key={order.orderId}
                   type="order"

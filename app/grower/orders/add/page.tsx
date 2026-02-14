@@ -48,7 +48,7 @@ export default function AddOrderPage() {
       if (prodRes.ok) {
         const prodData = await prodRes.json();
         if (Array.isArray(prodData)) {
-          setProducts(prodData.filter((p: any) => (p?.inventoryQty || 0) > 0));
+          setProducts(prodData.filter((p: unknown) => (p?.inventoryQty || 0) > 0));
         }
       }
     } catch (err) {
@@ -66,22 +66,22 @@ export default function AddOrderPage() {
       quantity: 1,
       unitPrice: typeof firstProduct?.price === 'number' ? firstProduct.price : 0,
     };
-    setFormData((prev: any) => ({ ...prev, items: [...prev.items, newItem] }));
+    setFormData((prev: unknown) => ({ ...prev, items: [...prev.items, newItem] }));
   };
 
   const handleRemoveItem = (index: number) => {
-    setFormData((prev: any) => ({
+    setFormData((prev: unknown) => ({
       ...prev,
-      items: prev.items.filter((_: any, i: number) => i !== index),
+      items: prev.items.filter((_: unknown, i: number) => i !== index),
     }));
   };
 
-  const handleItemChange = (index: number, field: string, value: any) => {
-    setFormData((prev: any) => {
+  const handleItemChange = (index: number, field: string, value: unknown) => {
+    setFormData((prev: unknown) => {
       const newItems = [...prev.items];
       newItems[index] = { ...newItems[index], [field]: value };
       if (field === 'productId') {
-        const product = products.find((p: any) => p?.id === value);
+        const product = products.find((p: unknown) => p?.id === value);
         if (product) {
           newItems[index].unitPrice = typeof product?.price === 'number' ? product.price : 0;
         }
@@ -91,7 +91,7 @@ export default function AddOrderPage() {
   };
 
   const calculateSubtotal = () =>
-    formData.items.reduce((total: number, item: any) => {
+    formData.items.reduce((total: number, item: unknown) => {
       const qty = typeof item?.quantity === 'number' ? item.quantity : 0;
       const price = typeof item?.unitPrice === 'number' ? item.unitPrice : 0;
       return total + (qty * price);
@@ -201,12 +201,12 @@ export default function AddOrderPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Dispensary *</label>
               <select
                 value={formData.dispensaryId}
-                onChange={(e) => setFormData((prev: any) => ({ ...prev, dispensaryId: e.target.value }))}
+                onChange={(e) => setFormData((prev: unknown) => ({ ...prev, dispensaryId: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 required
               >
                 <option value="">Select...</option>
-                {dispensaries.map((d: any) => (
+                {dispensaries.map((d: unknown) => (
                   <option key={d.id} value={d.id}>{d.businessName} - {d.city}, {d.state}</option>
                 ))}
               </select>
@@ -215,7 +215,7 @@ export default function AddOrderPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
               <textarea
                 value={formData.notes}
-                onChange={(e) => setFormData((prev: any) => ({ ...prev, notes: e.target.value }))}
+                onChange={(e) => setFormData((prev: unknown) => ({ ...prev, notes: e.target.value }))}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
@@ -227,7 +227,7 @@ export default function AddOrderPage() {
                 min="0"
                 step="0.01"
                 value={formData.shippingFee}
-                onChange={(e) => setFormData((prev: any) => ({ ...prev, shippingFee: e.target.value }))}
+                onChange={(e) => setFormData((prev: unknown) => ({ ...prev, shippingFee: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>
@@ -246,7 +246,7 @@ export default function AddOrderPage() {
               <p className="text-gray-600 text-center py-8">No items. Click "Add" to start.</p>
             ) : (
               <div className="space-y-4">
-                {formData.items.map((item: any, index: number) => (
+                {formData.items.map((item: unknown, index: number) => (
                   <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-lg border">
                     <div className="flex-1">
                       <label className="block text-xs text-gray-500 mb-1">Product</label>
@@ -255,7 +255,7 @@ export default function AddOrderPage() {
                         onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       >
-                        {products.map((p: any) => (
+                        {products.map((p: unknown) => (
                           <option key={p.id} value={p.id}>
                             {p.name} - ${typeof p.price === 'number' ? p.price.toFixed(2) : '0.00'}
                           </option>

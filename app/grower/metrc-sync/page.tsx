@@ -13,7 +13,7 @@ export default async function GrowerMetrcSyncPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as unknown;
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');

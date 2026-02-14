@@ -70,7 +70,7 @@ const statusLabels: Record<string, string> = {
 export default async function DispensaryDashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect('/auth/sign_in');
-  const user = session.user as any;
+  const user = session.user as unknown;
   if (user.role !== 'DISPENSARY') redirect('/dashboard');
 
   const data = await fetchDispensaryDashboardData(user.dispensaryId);
@@ -171,7 +171,7 @@ export default async function DispensaryDashboardPage() {
                 data.orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#{order.orderId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{(order as any).grower?.businessName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{(order as unknown).grower?.businessName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{format(new Date(order.createdAt), 'M/d/yyyy')}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${Number(order.totalAmount).toFixed(2)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">

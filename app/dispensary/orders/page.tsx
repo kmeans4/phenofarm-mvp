@@ -20,7 +20,7 @@ export default async function DispensaryOrdersPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as unknown;
   
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');
@@ -50,7 +50,7 @@ export default async function DispensaryOrdersPage() {
   );
   const activeCount = activeOrders.length;
   const pendingCount = orders.filter(o => o.status === 'PENDING').length;
-  const totalSpent = orders.reduce((sum: number, o: any) => sum + Number(o.totalAmount), 0);
+  const totalSpent = orders.reduce((sum: number, o: unknown) => sum + Number(o.totalAmount), 0);
 
   // Status label map
   const statusLabels: StatusLabelMap = {
@@ -165,7 +165,7 @@ export default async function DispensaryOrdersPage() {
                         <div className="font-medium text-gray-900">#{order.orderId}</div>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {(order as any).grower?.businessName || 'Unknown'}
+                        {(order as unknown).grower?.businessName || 'Unknown'}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
                         {format(order.createdAt, 'MMM d, yyyy')}
