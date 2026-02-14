@@ -10,6 +10,19 @@ interface CartItem {
   quantity: number;
 }
 
+interface OrderItemData {
+  productId: string;
+  growerId: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+interface SessionUser {
+  role: string;
+  dispensaryId?: string;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -18,7 +31,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     if (user.role !== 'DISPENSARY') {
       return NextResponse.json({ error: 'Only dispensaries can checkout' }, { status: 403 });
     }
@@ -36,12 +49,12 @@ export async function POST(request: NextRequest) {
       byGrower[item.growerId].push(item);
     });
 
-    const orders: any[] = [];
+    const orders: { id: string; orderId: string }[] = [];
     const errors: string[] = [];
 
     for (const [growerId, growerItems] of Object.entries(byGrower)) {
       let subtotal = 0;
-      const orderItems: any[] = [];
+      const orderItems: OrderItemData[] = [];
 
       for (const item of growerItems) {
         const product = await db.product.findUnique({ where: { id: item.id } });
@@ -83,7 +96,7 @@ export async function POST(request: NextRequest) {
             items: { create: orderItems }
           }
         });
-        orders.push(order);
+        orders.push({ id: order.id, orderId: order.orderId });
       }
     }
 

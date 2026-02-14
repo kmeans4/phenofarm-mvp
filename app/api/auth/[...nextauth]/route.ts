@@ -1,4 +1,4 @@
-import NextAuth, { DefaultSession, Session, User } from 'next-auth';
+import NextAuth, { DefaultSession, Session, User, JWT } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
@@ -84,7 +84,7 @@ export const authOptions = {
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
-    async jwt({ token, user }: { token: any; user?: User }) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -93,7 +93,7 @@ export const authOptions = {
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: any }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;

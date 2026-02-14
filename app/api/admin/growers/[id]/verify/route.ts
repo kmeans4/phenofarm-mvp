@@ -11,7 +11,7 @@ export async function PATCH(
   try {
     // Verify admin
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user as { role: string }).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import Link from "next/link";
+
 import { SignOutButton } from "@/app/components/SignOutButton";
 import { ClientNav } from "./components/ClientNav";
 
@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as { role: string };
   if (user.role !== 'ADMIN') {
     redirect('/dashboard');
   }

@@ -1,9 +1,9 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { Card, CardContent } from '@/app/components/ui/Card';
 import { Badge } from '@/app/components/ui/Badge';
 import { Button } from '@/app/components/ui/Button';
-import Link from 'next/link';
+
 import { format } from 'date-fns';
 
 interface ProductCardProps {

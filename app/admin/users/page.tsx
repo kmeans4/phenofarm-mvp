@@ -2,14 +2,23 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { UserRole } from "@prisma/client";
+
+interface UserWithBusiness {
+  id: string;
+  email: string;
+  role: UserRole;
+  createdAt: Date;
+  grower: { businessName: string } | null;
+  dispensary: { businessName: string } | null;
+}
 
 export default async function AdminUsersPage() {
   let session;
   
   try {
     session = await getServerSession(authOptions);
-  } catch (e) {
-    console.error('Auth error:', e);
+  } catch {
     redirect('/auth/sign_in');
   }
   
@@ -17,14 +26,14 @@ export default async function AdminUsersPage() {
     redirect('/auth/sign_in');
   }
 
-  const userRole = (session.user as any).role;
+  const userRole = (session.user as { role: string }).role;
   
   if (userRole !== 'ADMIN') {
     redirect('/dashboard');
   }
 
   // Fetch users with error handling
-  let users: any[] = [];
+  let users: UserWithBusiness[] = [];
   try {
     users = await db.user.findMany({
       include: {
@@ -34,8 +43,7 @@ export default async function AdminUsersPage() {
       orderBy: { createdAt: 'desc' },
       take: 100
     });
-  } catch (e) {
-    console.error('Database error:', e);
+  } catch {
     users = [];
   }
 

@@ -4,16 +4,23 @@ import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 
+interface SeedResults {
+  checked: { users: number; growers: number; dispensaries: number };
+  created: string[];
+  errors: string[];
+  final?: { users: number; growers: number; dispensaries: number };
+}
+
 // GET /api/admin/seed - Check and create demo data
 export async function GET() {
   try {
     // Verify admin
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user as { role: string }).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const results: any = { checked: [], created: [], errors: [] };
+    const results: SeedResults = { checked: { users: 0, growers: 0, dispensaries: 0 }, created: [], errors: [] };
 
     // Check existing data
     const userCount = await db.user.count();
@@ -51,8 +58,9 @@ export async function GET() {
         });
 
         results.created.push('grower@vtnurseries.com');
-      } catch (e: any) {
-        results.errors.push(`Grower creation failed: ${e.message}`);
+      } catch (e) {
+        const err = e as Error;
+        results.errors.push(`Grower creation failed: ${err.message}`);
       }
     }
 
@@ -85,8 +93,9 @@ export async function GET() {
         });
 
         results.created.push('dispensary@greenvermont.com');
-      } catch (e: any) {
-        results.errors.push(`Dispensary creation failed: ${e.message}`);
+      } catch (e) {
+        const err = e as Error;
+        results.errors.push(`Dispensary creation failed: ${err.message}`);
       }
     }
 
@@ -102,8 +111,9 @@ export async function GET() {
     };
 
     return NextResponse.json(results);
-  } catch (error: any) {
-    console.error('Seed API error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    const err = error as Error;
+    console.error('Seed API error:', err);
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

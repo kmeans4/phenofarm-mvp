@@ -1,25 +1,59 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSession } from 'next-auth/react';
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
 
-interface SettingsFormProps {
-  defaultValues: {
-    businessName: string;
-    licenseNumber: string;
-    email: string;
-    phone: string;
-    address: string;
-    city: string;
-    state: string;
-    zip: string;
-    website: string;
-    description: string;
-  };
+interface SettingsData {
+  businessName: string;
+  licenseNumber: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip: string;
+  website: string;
+  description: string;
 }
 
-export function SettingsForm({ defaultValues }: SettingsFormProps) {
-  const [formData, setFormData] = useState(defaultValues);
+export function SettingsForm({ defaultValues }: { defaultValues: SettingsData }) {
+  const { data: session } = useSession();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState('');
+  
+  const [formData, setFormData] = useState<SettingsData>(defaultValues);
+
+  // Fetch settings on mount
+  useEffect(() => {
+    async function fetchSettings() {
+      try {
+        const res = await fetch('/api/dispensary/settings');
+        if (res.ok) {
+          const data = await res.json();
+          setFormData({
+            businessName: data.businessName || '',
+            licenseNumber: data.licenseNumber || '',
+            email: data.email || '',
+            phone: data.phone || '',
+            address: data.address || '',
+            city: data.city || '',
+            state: data.state || 'VT',
+            zip: data.zip || '',
+            website: data.website || '',
+            description: data.description || '',
+          });
+        }
+      } catch (err) {
+        console.error('Failed to load settings:', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSettings();
+  }, []);
 
   const handleAddressSelect = (address: {
     fullAddress: string;
@@ -31,11 +65,60 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     setFormData(prev => ({
       ...prev,
       address: address.fullAddress,
+      city: address.city,
+      state: address.state,
+      zip: address.zip,
     }));
   };
 
+  const handleSave = async () => {
+    setSaving(true);
+    setError('');
+    setSaved(false);
+
+    try {
+      const res = await fetch('/api/dispensary/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || 'Failed to save');
+      }
+
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save settings');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+          {error}
+        </div>
+      )}
+      
+      {saved && (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-600">
+          Settings saved successfully!
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Business Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -145,8 +228,12 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
 
       {/* Save Button */}
       <div className="flex justify-end pt-4">
-        <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition">
-          Save Changes
+        <button 
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition disabled:opacity-50"
+        >
+          {saving ? 'Saving...' : 'Save Changes'}
         </button>
       </div>
     </div>

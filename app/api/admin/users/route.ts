@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { Prisma, UserRole } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
 
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
   try {
     // Verify admin
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user as { role: string }).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -18,11 +19,11 @@ export async function GET(req: NextRequest) {
     const role = searchParams.get('role');
     const search = searchParams.get('search');
 
-    // Build where clause
-    const where: any = {};
+    // Build where clause with proper Prisma type
+    const where: Prisma.UserWhereInput = {};
     
     if (role && role !== 'ALL') {
-      where.role = role;
+      where.role = role as UserRole;
     }
     
     if (search) {
@@ -76,7 +77,7 @@ export async function POST(req: NextRequest) {
   try {
     // Verify admin
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user as { role: string }).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

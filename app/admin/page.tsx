@@ -10,7 +10,7 @@ export default async function AdminPage() {
   
   try {
     session = await getServerSession(authOptions);
-  } catch (e) {
+  } catch {
     redirect('/auth/sign_in');
   }
   
@@ -18,7 +18,7 @@ export default async function AdminPage() {
     redirect('/auth/sign_in');
   }
 
-  const userRole = (session.user as any).role;
+  const userRole = (session.user as { role: string }).role;
   
   if (userRole !== 'ADMIN') {
     redirect('/dashboard');
@@ -33,8 +33,8 @@ export default async function AdminPage() {
       db.dispensary.count()
     ]);
     stats = { users, growers, dispensaries };
-  } catch (e) {
-    console.error('Stats error:', e);
+  } catch {
+    // Keep default stats on error
   }
 
   const needsSeeding = stats.growers === 0 && stats.dispensaries === 0;

@@ -1,6 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 
 // GET /api/admin/growers - List all growers
@@ -8,7 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     // Verify admin
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as any).role !== 'ADMIN') {
+    if (!session || (session.user as { role: string }).role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -16,8 +17,8 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const search = searchParams.get('search');
 
-    // Build where clause - don't filter by isVerified (column may not exist in prod yet)
-    const where: any = {};
+    // Build where clause with proper Prisma type
+    const where: Prisma.GrowerWhereInput = {};
     
     if (search) {
       where.OR = [

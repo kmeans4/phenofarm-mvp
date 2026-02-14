@@ -4,8 +4,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import bcrypt from 'bcryptjs';
 
+interface SessionUser {
+  role: string;
+}
+
 // GET all dispensaries (customers)
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
@@ -13,7 +17,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -43,7 +47,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userSession = session.user as any;
+    const userSession = session.user as SessionUser;
     
     if (userSession.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

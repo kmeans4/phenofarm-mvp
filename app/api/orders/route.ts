@@ -3,9 +3,15 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
+import { Prisma, OrderStatus } from '@prisma/client';
 
-// OrderStatus enum - defined here to avoid Prisma import issues with Prisma 6
-enum OrderStatus {
+interface SessionUser {
+  role: string;
+  growerId?: string;
+}
+
+// OrderStatus enum
+enum OrderStatusEnum {
   PENDING = 'PENDING',
   CONFIRMED = 'CONFIRMED',
   PROCESSING = 'PROCESSING',
@@ -23,7 +29,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -36,7 +42,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'desc';
     const exportFormat = searchParams.get('export');
 
-    const where: any = {
+    const where: Prisma.OrderWhereInput = {
       growerId: user.growerId,
       ...(status && { status: { equals: status } }),
       ...(search && {
@@ -59,12 +65,12 @@ export async function GET(request: NextRequest) {
       orderBy: {
         [sortBy]: sortOrder,
       },
-    } as any);
+    });
 
     // Handle CSV export request
     if (exportFormat === 'csv') {
       const headers = ['Order ID', 'Dispensary', 'Status', 'Total Amount', 'Created At'];
-      const rows = orders.map((order: any) => [
+      const rows = orders.map((order) => [
         `"${order.orderId}"`,
         `"${order.dispensary.businessName}"`,
         `"${order.status}"`,
@@ -74,7 +80,7 @@ export async function GET(request: NextRequest) {
       
       const csvContent = [
         headers.join(','),
-        ...rows.map((row: any[]) => row.join(','))
+        ...rows.map((row) => row.join(','))
       ].join('\n');
       
       return new NextResponse(csvContent, {
@@ -101,7 +107,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -172,7 +178,7 @@ export async function POST(request: NextRequest) {
         shippingFee: shippingFee || 0,
         notes: notes || null,
         items: {
-          create: items.map((item: any) => ({
+          create: items.map((item) => ({
             productId: item.productId,
             growerId: user.growerId,
             quantity: item.quantity,
@@ -207,7 +213,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -225,9 +231,9 @@ export async function PUT(request: NextRequest) {
     }
 
     // Validate status
-    if (!Object.values(OrderStatus).includes(status)) {
+    if (!Object.values(OrderStatusEnum).includes(status)) {
       return NextResponse.json(
-        { error: `Invalid status. Must be one of: ${Object.values(OrderStatus).join(', ')}` },
+        { error: `Invalid status. Must be one of: ${Object.values(OrderStatusEnum).join(', ')}` },
         { status: 400 }
       );
     }
