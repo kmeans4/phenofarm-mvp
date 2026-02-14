@@ -110,8 +110,9 @@ export default function DispensaryCartPage() {
       setCart({ items: [], subtotal: 0, tax: 0, total: 0 });
       setCheckoutSuccess(true);
       setTimeout(() => router.push('/dispensary/orders'), 2000);
-    } catch (err: unknown) {
-      setCheckoutError(err.message);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Checkout failed';
+      setCheckoutError(message);
     } finally {
       setCheckingOut(false);
     }

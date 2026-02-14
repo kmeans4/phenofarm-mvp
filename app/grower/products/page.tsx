@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { ExtendedUser } from '@/types';
 
 interface Product {
   id: string;
@@ -32,7 +33,7 @@ export default function GrowerProductsPage() {
       return;
     }
 
-    const user = session.user as any;
+    const user = session.user as ExtendedUser;
     if (user.role !== 'GROWER') {
       router.push('/dashboard');
       return;
@@ -55,7 +56,7 @@ export default function GrowerProductsPage() {
         const errData = await response.json().catch(() => ({}));
         setError(errData.error || `Failed to fetch products (${response.status})`);
       }
-    } catch (error) {
+    } catch (_error) {
       setError('Network error - please check your connection');
     } finally {
       setLoading(false);
@@ -71,7 +72,7 @@ export default function GrowerProductsPage() {
       } else {
         alert('Failed to delete product');
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error:', error);
     }
   };
@@ -89,7 +90,7 @@ export default function GrowerProductsPage() {
       } else {
         alert('Failed to update product');
       }
-    } catch (error) {
+    } catch (_error) {
       console.error('Error:', error);
     }
   };

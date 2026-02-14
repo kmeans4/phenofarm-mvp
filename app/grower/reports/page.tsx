@@ -21,9 +21,7 @@ export default async function GrowerReportsPage() {
   const [
     totalOrders,
     activeOrders,
-    pendingOrders,
     allOrders,
-    products,
     dispensaries,
   ] = await Promise.all([
     db.order.count({ where: { growerId: user.growerId } }),
@@ -33,16 +31,12 @@ export default async function GrowerReportsPage() {
         status: { in: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'] },
       } 
     }),
-    db.order.count({ 
-      where: { growerId: user.growerId, status: 'PENDING' } 
-    }),
     db.order.findMany({
       where: { growerId: user.growerId },
       include: { dispensary: { select: { businessName: true } } },
       orderBy: { createdAt: 'desc' },
       take: 10,
     }),
-    db.product.count({ where: { growerId: user.growerId } }),
     db.dispensary.count(),
   ]);
 
@@ -98,13 +92,6 @@ export default async function GrowerReportsPage() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
           {['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'].map((status) => {
             const count = allOrders.filter(o => o.status === status).length;
-            const colors: Record<string, string> = {
-              PENDING: 'bg-yellow-100 text-yellow-800',
-              CONFIRMED: 'bg-blue-100 text-blue-800',
-              PROCESSING: 'bg-purple-100 text-purple-800',
-              SHIPPED: 'bg-orange-100 text-orange-800',
-              DELIVERED: 'bg-green-100 text-green-800',
-            };
             return (
               <div key={status} className="text-center p-4 rounded-lg bg-gray-50">
                 <p className="text-2xl font-bold text-gray-900">{count}</p>

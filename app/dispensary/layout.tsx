@@ -1,9 +1,13 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { MobileNav } from "@/app/grower/components/MobileNav";
 import { ClientNav } from "@/app/grower/components/ClientNav";
 import { SignOutButton } from "@/app/components/SignOutButton";
+
+interface SessionUser {
+  role?: string;
+}
 
 export default async function DispensaryLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -12,7 +16,7 @@ export default async function DispensaryLayout({ children }: { children: React.R
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as unknown;
+  const user = session.user as SessionUser;
   
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');

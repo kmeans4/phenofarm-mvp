@@ -18,18 +18,20 @@ interface AddressResult {
   lon: string;
 }
 
+interface SelectedAddress {
+  fullAddress: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  lat: number;
+  lon: number;
+}
+
 interface AddressAutocompleteProps {
   value: string;
   onChange: (value: string) => void;
-  onSelect?: (address: {
-    fullAddress: string;
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-    lat: number;
-    lon: number;
-  }) => void;
+  onSelect?: (address: SelectedAddress) => void;
   placeholder?: string;
   className?: string;
   disabled?: boolean;
@@ -49,56 +51,64 @@ export function AddressAutocomplete({
   const [highlightedIndex, setHighlightedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Debounce search
-  const debounce = (func: (...args: unknown[]) => void, wait: number) => {
-    let timeout: NodeJS.Timeout;
-    return (...args: unknown[]) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(() => func(...args), wait);
-    };
-  };
+  const searchAddresses = useCallback(async (query: string) => {
+    if (query.length < 3) {
+      setSuggestions([]);
+      return;
+    }
 
-  const searchAddresses = useCallback(
-    debounce(async (query: string) => {
-      if (query.length < 3) {
-        setSuggestions([]);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        // Use Nominatim (OpenStreetMap) - free, no API key required
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
-            query + ', USA'
-          )}&addressdetails=1&limit=5`,
-          {
-            headers: {
-              'Accept-Language': 'en-US',
-            },
-          }
-        );
-
-        if (response.ok) {
-          const data = await response.json();
-          setSuggestions(data);
-          setHighlightedIndex(0);
-          setIsOpen(true);
+    setIsLoading(true);
+    try {
+      // Use Nominatim (OpenStreetMap) - free, no API key required
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(
+          query + ', USA'
+        )}&addressdetails=1&limit=5`,
+        {
+          headers: {
+            'Accept-Language': 'en-US',
+          },
         }
-      } catch (error) {
-        console.error('Address search error:', error);
-      } finally {
-        setIsLoading(false);
+      );
+
+      if (response.ok) {
+        const data = await response.json() as AddressResult[];
+        setSuggestions(data);
+        setHighlightedIndex(0);
+        setIsOpen(true);
       }
-    }, 400),
-    []
-  );
+    } catch (error) {
+      console.error('Address search error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  // Debounced search
+  const debouncedSearch = useCallback((query: string) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    timeoutRef.current = setTimeout(() => {
+      searchAddresses(query);
+    }, 400);
+  }, [searchAddresses]);
+
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     onChange(newValue);
-    searchAddresses(newValue);
+    debouncedSearch(newValue);
   };
 
   const handleSelect = (result: AddressResult) => {
@@ -113,15 +123,13 @@ export function AddressAutocomplete({
     const state = addr.state || '';
     const zip = addr.postcode || '';
     
-    const fullAddress = [street, city, state, zip].filter(Boolean).join(', ');
-    
     onChange(result.display_name);
     setIsOpen(false);
     setSuggestions([]);
 
     if (onSelect) {
       onSelect({
-        _fullAddress: result.display_name,
+        fullAddress: result.display_name,
         street,
         city,
         state,

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
+import { ExtendedUser } from '@/types';
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -10,13 +11,15 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const user = session.user as any;
+  const user = session.user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 
   try {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const _request = request;
     const template = `name,strain,category,subcategory,thc,cbd,price,inventoryQty,unit,isAvailable,description,images
 Sample Product,Indica dominant,Flower,,25,1,50.00,100,gram,true,High quality flower,
 Sample Product 2,Sativa dominant,Flower,,18,0.5,45.00,50,gram,true,Lighter effects,
@@ -45,7 +48,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const user = session.user as any;
+  const user = session.user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -79,7 +82,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Process records
-    const products = records.map((record: any) => ({
+    const products = records.map((record: Record<string, string>) => ({
       growerId: user.growerId,
       name: record.name,
       strain: record.strain || null,
@@ -103,10 +106,10 @@ export async function POST(request: NextRequest) {
       success: true,
       count: createdProducts.count,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('CSV Upload Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process CSV file', details: error.message },
+      { error: 'Failed to process CSV file', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
@@ -119,7 +122,7 @@ function parseCSV(csv: string) {
 
   return lines.slice(1).map((line) => {
     const values = line.split(',').map((v) => v.trim());
-    const obj: any = {};
+    const obj: Record<string, string> = {};
     headers.forEach((header, index) => {
       obj[header] = values[index] || '';
     });

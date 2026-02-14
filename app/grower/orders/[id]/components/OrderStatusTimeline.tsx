@@ -36,12 +36,6 @@ export default function OrderStatusTimeline({
   
   const currentIndex = STATUS_FLOW.findIndex(s => s.status === currentStatus);
   
-  const getStatusColor = (index: number) => {
-    if (index < currentIndex) return 'bg-green-500';
-    if (index === currentIndex) return 'bg-green-600 animate-pulse';
-    return 'bg-gray-300';
-  };
-  
   const getStatusTextColor = (index: number) => {
     if (index <= currentIndex) return 'text-green-700';
     return 'text-gray-400';

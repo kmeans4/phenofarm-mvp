@@ -5,8 +5,20 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/app/components/ui/Button';
 
 interface ProductFormProps {
-  initialData?: any;
-  onSubmit: (data: any) => void;
+  initialData?: {
+    name?: string;
+    strain?: string;
+    category?: string;
+    subcategory?: string;
+    thc?: string;
+    cbd?: string;
+    price?: string;
+    inventoryQty?: string;
+    unit?: string;
+    description?: string;
+    isAvailable?: boolean;
+  };
+  onSubmit: (data: FormData) => void;
   onCancel: () => void;
 }
 

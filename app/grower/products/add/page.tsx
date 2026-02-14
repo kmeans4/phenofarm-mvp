@@ -6,7 +6,7 @@ import { ProductForm } from './components/ProductForm';
 export default function AddProductPage() {
   const router = useRouter();
 
-  const handleSubmit = async (formData: any) => {
+  const handleSubmit = async (formData: FormData) => {
     try {
       const productData = {
         name: formData.name,
@@ -36,8 +36,8 @@ export default function AddProductPage() {
 
       alert('Product created successfully!');
       router.push('/grower/products');
-    } catch (err: any) {
-      alert(err.message || 'An error occurred');
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'An error occurred');
     }
   };
 
