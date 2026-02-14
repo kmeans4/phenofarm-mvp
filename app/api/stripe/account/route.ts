@@ -4,10 +4,6 @@ import { authOptions } from '@/lib/auth';
 import { stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
 
-/**
- * GET /api/stripe/account
- * Check if grower has connected Stripe account and its status
- */
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -22,69 +18,36 @@ export async function GET(req: NextRequest) {
     });
 
     if (!user || !user.growerId) {
-      return NextResponse.json({ error: 'Grower profile not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Grower not found' }, { status: 404 });
     }
 
     const grower = await db.grower.findUnique({
       where: { id: user.growerId },
       select: {
+        id: true,
+        businessName: true,
         stripeAccountId: true,
         stripeAccountStatus: true,
         connectOnboardedAt: true,
-        businessName: true,
       },
     });
 
     if (!grower?.stripeAccountId) {
-      return NextResponse.json({
-        connected: false,
-        stripeAccountId: null,
-        detailsSubmitted: false,
-        chargesEnabled: false,
-        payoutsEnabled: false,
-      });
+      return NextResponse.json({ connected: false });
     }
 
-    // Fetch account details from Stripe
+    // Check Stripe account status
     const account = await stripe.accounts.retrieve(grower.stripeAccountId);
-
-    const detailsSubmitted = account.details_submitted;
-    const chargesEnabled = account.charges_enabled;
-    const payoutsEnabled = account.payouts_enabled;
-
-    // Update local status if different
-    if (grower.stripeAccountStatus !== 'active' && detailsSubmitted && chargesEnabled && payoutsEnabled) {
-      await db.grower.update({
-        where: { id: grower.id },
-        data: {
-          stripeAccountStatus: 'active',
-          connectOnboardedAt: new Date(),
-        },
-      });
-    }
-
+    
     return NextResponse.json({
       connected: true,
-      stripeAccountId: grower.stripeAccountId,
-      detailsSubmitted,
-      chargesEnabled,
-      payoutsEnabled,
-      businessName: grower.businessName,
       status: grower.stripeAccountStatus,
+      chargesEnabled: account.charges_enabled,
+      payoutsEnabled: account.payouts_enabled,
     });
+
   } catch (error) {
-    console.error('Stripe account status error:', error);
-    
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { error: 'Failed to fetch account status', message: error.message },
-        { status: 500 }
-      );
-    }
-    
-    return NextResponse.json(
-      { error: 'Failed to fetch account status' },
-      { status: 500 }
-    );
+    console.error('Stripe account check error:', error);
+    return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
