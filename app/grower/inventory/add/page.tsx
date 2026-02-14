@@ -41,7 +41,7 @@ export default function AddToInventoryPage() {
         const data = await response.json();
         setProducts(Array.isArray(data) ? data : []);
       }
-    } catch (err) {
+    } catch (_err) {
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -66,7 +66,7 @@ export default function AddToInventoryPage() {
         const data = await response.json();
         setError(data.error || 'Failed to add inventory');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('An error occurred');
     } finally {
       setIsSubmitting(false);

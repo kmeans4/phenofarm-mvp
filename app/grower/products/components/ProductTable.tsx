@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Badge } from '@/app/components/ui/Badge';
 import { Button } from '@/app/components/ui/Button';
-import { format } from 'date-fns';
+
 
 interface ProductTableProps {
   products: {
@@ -55,7 +55,7 @@ export function ProductTable({
   }, [products]);
 
   const handleSort = (key: string) => {
-    const _currentSortOrder = sortBy === key && sortOrder === 'asc' ? 'desc' : 'asc';
+    void sortBy; void sortOrder;
     onSort(key);
     // Note: The actual sorting is handled in the parent component
   };

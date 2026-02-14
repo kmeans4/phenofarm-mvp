@@ -12,8 +12,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as { role: string };
-  if (user.role !== 'ADMIN') {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const user = (session as any)?.user as { role: string } | undefined;
+  if (!user || user.role !== 'ADMIN') {
     redirect('/dashboard');
   }
 
@@ -21,6 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { name: 'Dashboard', href: '/admin' },
     { name: 'Users', href: '/admin/users' },
     { name: 'Growers', href: '/admin/growers' },
+    { name: 'Dispensaries', href: '/admin/dispensaries' },
     { name: 'Settings', href: '/admin/settings' },
   ];
 

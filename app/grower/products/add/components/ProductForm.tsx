@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useRouter } from 'next/navigation';
+
 import { Button } from '@/app/components/ui/Button';
 
 interface ProductFormProps {
@@ -23,7 +23,7 @@ interface ProductFormProps {
 }
 
 export function ProductForm({ initialData, onSubmit, onCancel }: ProductFormProps) {
-  const router = useRouter();
+  
   const [name, setName] = React.useState(initialData?.name || '');
   const [strain, setStrain] = React.useState(initialData?.strain || '');
   const [category, setCategory] = React.useState(initialData?.category || '');

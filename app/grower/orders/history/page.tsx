@@ -96,7 +96,7 @@ export default async function GrowerOrdersHistoryPage() {
           <CardContent className="p-6">
             <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
             <p className="text-3xl font-bold text-gray-900">
-              ${orders.reduce((sum: number, order: any) => sum + Number(order.totalAmount), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              ${orders.reduce((sum: number, order: Order) => sum + Number(order.totalAmount), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
           </CardContent>
         </Card>

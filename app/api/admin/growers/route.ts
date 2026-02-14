@@ -9,7 +9,8 @@ export async function GET(req: NextRequest) {
   try {
     // Verify admin
     const session = await getServerSession(authOptions);
-    if (!session || (session.user as { role: string }).role !== 'ADMIN') {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    if (!session || (session as any)?.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

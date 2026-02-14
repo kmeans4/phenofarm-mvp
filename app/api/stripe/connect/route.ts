@@ -4,7 +4,7 @@ import { authOptions } from '@/lib/auth';
 import { stripe, STRIPE_CONFIG } from '@/lib/stripe';
 import { db } from '@/lib/db';
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     

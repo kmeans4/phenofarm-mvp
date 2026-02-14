@@ -18,7 +18,6 @@ interface SettingsData {
 }
 
 export function SettingsForm() {
-  const { data: session } = useSession();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);

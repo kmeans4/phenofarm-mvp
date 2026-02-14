@@ -16,7 +16,7 @@ interface EditProductFormProps {
     description?: string | null;
     isAvailable: boolean;
   };
-  product: any;
+  
 }
 
 export default function EditProductForm({ product }: EditProductFormProps) {

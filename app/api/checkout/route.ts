@@ -36,6 +36,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Only dispensaries can checkout' }, { status: 403 });
     }
 
+    if (!user.dispensaryId) {
+      return NextResponse.json({ error: 'Dispensary profile not found' }, { status: 400 });
+    }
+
+    const dispensaryId = user.dispensaryId;
+
     const { items, notes } = await request.json();
 
     if (!items?.length) {
@@ -86,7 +92,7 @@ export async function POST(request: NextRequest) {
         const order = await db.order.create({
           data: {
             growerId,
-            dispensaryId: user.dispensaryId,
+            dispensaryId,
             orderId: `ORD-${Date.now()}-${orders.length + 1}`,
             status: 'PENDING',
             totalAmount: subtotal + tax,

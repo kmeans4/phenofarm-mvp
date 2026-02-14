@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 
-interface GrowerWithUser {
+interface DispensaryWithUser {
   id: string;
   businessName: string;
   licenseNumber: string | null;
@@ -15,7 +15,7 @@ interface GrowerWithUser {
   };
 }
 
-export default async function AdminGrowersPage() {
+export default async function AdminDispensariesPage() {
   let session;
   
   try {
@@ -36,10 +36,10 @@ export default async function AdminGrowersPage() {
     redirect('/dashboard');
   }
 
-  // Fetch growers with error handling
-  let growers: GrowerWithUser[] = [];
+  // Fetch dispensaries with error handling
+  let dispensaries: DispensaryWithUser[] = [];
   try {
-    growers = await db.grower.findMany({
+    dispensaries = await db.dispensary.findMany({
       include: {
         user: { select: { email: true, name: true } }
       },
@@ -47,20 +47,20 @@ export default async function AdminGrowersPage() {
       take: 100
     });
   } catch {
-    growers = [];
+    dispensaries = [];
   }
 
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Grower Management</h1>
-        <p className="text-gray-500">{growers.length} growers found</p>
+        <h1 className="text-3xl font-bold text-gray-900">Dispensary Management</h1>
+        <p className="text-gray-500">{dispensaries.length} dispensaries found</p>
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        {growers.length === 0 ? (
+        {dispensaries.length === 0 ? (
           <div className="p-8 text-center text-gray-500">
-            No growers found or database error
+            No dispensaries found or database error
           </div>
         ) : (
           <div className="overflow-x-auto">
@@ -76,36 +76,36 @@ export default async function AdminGrowersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {growers.map((g) => (
-                  <tr key={g.id} className="hover:bg-gray-50">
+                {dispensaries.map((d) => (
+                  <tr key={d.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
-                      <span className="font-medium text-gray-900">{g.businessName}</span>
+                      <span className="font-medium text-gray-900">{d.businessName}</span>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{g.user?.email || '-'}</td>
-                    <td className="px-4 py-3 text-gray-600">{g.licenseNumber || '-'}</td>
+                    <td className="px-4 py-3 text-gray-600">{d.user?.email || '-'}</td>
+                    <td className="px-4 py-3 text-gray-600">{d.licenseNumber || '-'}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${
-                        g.isVerified 
+                        d.isVerified 
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-yellow-100 text-yellow-800'
                       }`}>
-                        {g.isVerified ? 'Verified' : 'Pending'}
+                        {d.isVerified ? 'Verified' : 'Pending'}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-500">
-                      {new Date(g.createdAt).toLocaleDateString()}
+                      {new Date(d.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-right">
-                      <form action={`/admin/growers/${g.id}/verify`} method="POST">
+                      <form action={`/admin/dispensaries/${d.id}/verify`} method="POST">
                         <button
                           type="submit"
                           className={`inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                            g.isVerified
+                            d.isVerified
                               ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                               : 'bg-green-600 text-white hover:bg-green-700'
                           }`}
                         >
-                          {g.isVerified ? 'Unverify' : 'Verify'}
+                          {d.isVerified ? 'Unverify' : 'Verify'}
                         </button>
                       </form>
                     </td>

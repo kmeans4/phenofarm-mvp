@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { format } from 'date-fns';
+
 
 interface OrderItem {
   id: string;
@@ -122,7 +122,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
         const data = await response.json();
         setError(data.error || 'Failed to update order');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('An error occurred while updating');
     } finally {
       setIsSubmitting(false);

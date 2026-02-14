@@ -20,7 +20,7 @@ export default async function GrowerMetrcSyncPage() {
   }
 
   // Fetch sync data from database
-  const [latestSync, successSyncCount, failedSyncCount, totalSyncedRaw] = await Promise.all([
+  const [latestSync, , failedSyncCount, totalSyncedRaw] = await Promise.all([
     db.metrcSyncLog.findFirst({
       where: { growerId: user.growerId },
       orderBy: { createdAt: 'desc' },
