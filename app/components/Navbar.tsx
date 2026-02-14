@@ -1,6 +1,14 @@
 import Link from 'next/link';
 
-export default function Navbar({ user }: { user?: any }) {
+interface User {
+  businessName?: string;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  role?: string;
+}
+
+export default function Navbar({ user }: { user?: User }) {
   return (
     <nav className="bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -19,27 +27,21 @@ export default function Navbar({ user }: { user?: any }) {
                 <span className="text-sm text-gray-700">
                   {user.businessName || `${user.firstName} ${user.lastName}`}
                 </span>
-                <span className="text-sm px-3 py-1 bg-green-100 text-green-800 rounded-full">
-                  {user.role}
-                </span>
                 <Link
-                  href="/api/auth/signout"
-                  className="text-sm text-gray-600 hover:text-gray-900"
+                  href={user.role === 'GROWER' ? '/grower/dashboard' : '/dispensary/dashboard'}
+                  className="text-sm text-green-600 hover:text-green-700"
                 >
-                  Sign Out
+                  Dashboard
                 </Link>
               </>
             ) : (
               <>
-                <Link
-                  href="/auth/sign_in"
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900"
-                >
+                <Link href="/auth/sign_in" className="text-sm text-gray-700 hover:text-gray-900">
                   Sign In
                 </Link>
                 <Link
                   href="/auth/sign_up"
-                  className="text-sm font-medium text-green-600 hover:text-green-700"
+                  className="text-sm bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700"
                 >
                   Get Started
                 </Link>

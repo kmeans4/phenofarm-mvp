@@ -3,6 +3,11 @@ import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
+interface SessionUser {
+  role: string;
+  growerId?: string;
+}
+
 // POST - Trigger METRC sync for grower
 export async function POST(request: NextRequest) {
   try {
@@ -12,14 +17,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as { role: string; growerId?: string };
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = await request.json();
-    const { manualTrigger = false } = body;
+    const body = await request.json() as { manualTrigger?: boolean };
+    const manualTrigger = body.manualTrigger ?? false;
+    console.log('Manual trigger:', manualTrigger);
 
     // Check if grower has METRC credentials
     const grower = await db.grower.findUnique({
@@ -34,7 +40,7 @@ export async function POST(request: NextRequest) {
     // Create sync log entry
     const syncLog = await db.metrcSyncLog.create({
       data: {
-        growerId: user.growerId,
+        growerId: user.growerId!,
         recordsSynced: 0,
         success: true,
         errorMessage: null,
@@ -52,7 +58,7 @@ export async function POST(request: NextRequest) {
     // In production, this would:
     // 1. Connect to METRC API with grower credentials
     // 2. Fetch products, orders, inventory data
-    // 3. Update本地 database
+    // 3. Update local database
     // 4. Return actual sync results
 
     return NextResponse.json({
@@ -66,11 +72,11 @@ export async function POST(request: NextRequest) {
     
     // Log error to database
     try {
-      const user = (await getServerSession(authOptions))?.user as any;
-      if (user?.growerId) {
+      const sessionUser = (await getServerSession(authOptions))?.user as SessionUser | undefined;
+      if (sessionUser?.growerId) {
         await db.metrcSyncLog.create({
           data: {
-            growerId: user.growerId,
+            growerId: sessionUser.growerId,
             recordsSynced: 0,
             success: false,
             errorMessage: error instanceof Error ? error.message : 'Unknown error',
@@ -89,7 +95,7 @@ export async function POST(request: NextRequest) {
 }
 
 // GET - Get sync status for grower
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
@@ -97,7 +103,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as { role: string; growerId?: string };
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

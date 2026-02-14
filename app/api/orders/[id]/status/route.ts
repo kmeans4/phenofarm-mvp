@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
+import { Order } from '@prisma/client';
 
 const ALLOWED_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 const VALID_TRANSITIONS: Record<string, string[]> = {
@@ -12,6 +13,11 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   DELIVERED: [],
   CANCELLED: []
 };
+
+interface SessionUser {
+  role: string;
+  growerId?: string;
+}
 
 export async function PATCH(
   request: NextRequest,
@@ -24,9 +30,9 @@ export async function PATCH(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     const { id: orderId } = await params;
-    const { status: newStatus } = await request.json();
+    const { status: newStatus } = await request.json() as { status: string };
     
     if (!ALLOWED_STATUSES.includes(newStatus)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
@@ -54,7 +60,7 @@ export async function PATCH(
       }, { status: 400 });
     }
     
-    const updateData: any = { status: newStatus };
+    const updateData: Partial<Order> = { status: newStatus as Order['status'] };
     
     if (newStatus === 'SHIPPED' && !order.shippedAt) {
       updateData.shippedAt = new Date();

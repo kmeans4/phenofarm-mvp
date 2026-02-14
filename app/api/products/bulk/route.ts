@@ -3,6 +3,11 @@ import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 
+interface SessionUser {
+  role: string;
+  growerId: string;
+}
+
 // Bulk upload products endpoint
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -58,12 +63,12 @@ export async function POST(request: NextRequest) {
       }
 
       try {
-        const productData: Record<string, any> = {};
+        const productData: Record<string, string | null> = {};
         headers.forEach((header, index) => {
           productData[header] = values[index] || null;
         });
 
-        const product = await db.product.create({
+        await db.product.create({
           data: {
             growerId: user.growerId,
             name: productData.name,
@@ -72,9 +77,9 @@ export async function POST(request: NextRequest) {
             subcategory: productData.subcategory || null,
             thc: productData.thc ? parseFloat(productData.thc) : null,
             cbd: productData.cbd ? parseFloat(productData.cbd) : null,
-            price: parseFloat(productData.price),
-            inventoryQty: parseInt(productData.inventoryQty),
-            unit: productData.unit,
+            price: parseFloat(productData.price || '0'),
+            inventoryQty: parseInt(productData.inventoryQty || '0'),
+            unit: productData.unit || 'Unit',
             description: productData.description || null,
             images: productData.images ? productData.images.split(';') : [],
             isAvailable: productData.isavailable !== 'false',
@@ -82,8 +87,9 @@ export async function POST(request: NextRequest) {
         });
         
         successCount++;
-      } catch (err: any) {
-        errors.push(`Row ${i + 1}: ${err.message}`);
+      } catch (err) {
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
+        errors.push(`Row ${i + 1}: ${errorMessage}`);
         errorCount++;
       }
     }
@@ -145,7 +151,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const user = session?.user as any;
+    const user = session?.user as SessionUser | undefined;
     
     if (user?.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -157,11 +163,11 @@ export async function GET(request: NextRequest) {
     });
 
     // Convert to CSV format
-    const headers = ['name', 'strain', 'category', 'subcategory', 'thc', 'cbd', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images'];
+    const csvHeaders = ['name', 'strain', 'category', 'subcategory', 'thc', 'cbd', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images'];
     
     const csvContent = [
-      headers.join(','),
-      ...products.map((p: any) => [
+      csvHeaders.join(','),
+      ...products.map((p) => [
         `"${p.name.replace(/"/g, '""')}"`,
         `"${(p.strain || '').replace(/"/g, '""')}"`,
         `"${(p.category || '').replace(/"/g, '""')}"`,

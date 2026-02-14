@@ -3,6 +3,11 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
 
+interface SessionUser {
+  role: string;
+  growerId: string;
+}
+
 // Handles file uploads with base64 encoding
 export async function POST(request: NextRequest) {
   try {
@@ -12,7 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -31,7 +36,6 @@ export async function POST(request: NextRequest) {
     const base64 = Buffer.from(bytes).toString('base64');
     
     // Determine file type
-    const mimeType = file.type;
     const extension = file.name.split('.').pop()?.toLowerCase();
     const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
     
@@ -69,13 +73,13 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const { productId, imageIndex } = await request.json();
+    const { productId, imageIndex } = await request.json() as { productId: string; imageIndex: number };
 
     if (imageIndex === undefined) {
       return NextResponse.json({ error: 'Image index required' }, { status: 400 });
@@ -89,7 +93,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    const newImages = product.images.filter((_: any, i: number) => i !== imageIndex);
+    const newImages = product.images.filter((_: string, i: number) => i !== imageIndex);
 
     await db.product.update({
       where: { id: productId },

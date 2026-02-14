@@ -22,7 +22,7 @@ export function SeedDataButton() {
         setStatus('error');
         setMessage(`❌ Error: ${data.error || 'Failed to seed data'}`);
       }
-    } catch (error) {
+    } catch {
       setStatus('error');
       setMessage('❌ Network error. Please try again.');
     }

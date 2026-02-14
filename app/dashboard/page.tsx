@@ -2,6 +2,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 
+interface SessionUser {
+  role: string;
+}
+
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   
@@ -9,7 +13,7 @@ export default async function DashboardPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as SessionUser;
   
   // Redirect to role-specific dashboard
   if (user.role === 'GROWER') {

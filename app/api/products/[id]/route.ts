@@ -2,16 +2,22 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { Product } from '@prisma/client';
 
 // Helper to serialize product from Prisma
-function serializeProduct(product: any) {
+function serializeProduct(product: Product | null) {
   if (!product) return product;
   return {
     ...product,
-    price: product.price ? parseFloat(product.price) : 0,
-    thc: product.thc ? parseFloat(product.thc) : null,
-    cbd: product.cbd ? parseFloat(product.cbd) : null,
+    price: product.price ? parseFloat(product.price.toString()) : 0,
+    thc: product.thc ? parseFloat(product.thc.toString()) : null,
+    cbd: product.cbd ? parseFloat(product.cbd.toString()) : null,
   };
+}
+
+interface SessionUser {
+  role: string;
+  growerId: string;
 }
 
 // GET a single product by ID
@@ -26,7 +32,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -61,7 +67,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -76,9 +82,22 @@ export async function PUT(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    const body = await request.json();
+    const body = await request.json() as {
+      name?: string;
+      strain?: string | null;
+      category?: string | null;
+      subcategory?: string | null;
+      thc?: string | null;
+      cbd?: string | null;
+      price?: string;
+      inventoryQty?: string;
+      unit?: string;
+      description?: string | null;
+      images?: string[];
+      isAvailable?: boolean;
+    };
     
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     
     if (body.name !== undefined) updateData.name = body.name;
     if (body.strain !== undefined) updateData.strain = body.strain || null;
@@ -121,7 +140,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
