@@ -1,9 +1,9 @@
-'use client';
+&apos;use client&apos;;
 
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { Button } from '@/app/components/ui/Button';
-import Link from 'next/link';
+import { useState, useEffect } from &apos;react&apos;;
+import { Card, CardContent, CardHeader, CardTitle } from &apos;@/app/components/ui/Card&apos;;
+import { Button } from &apos;@/app/components/ui/Button&apos;;
+import Link from &apos;next/link&apos;;
 
 interface StripeStatus {
   connected: boolean;
@@ -27,7 +27,7 @@ export function StripeConnect() {
 
   const checkStripeStatus = async () => {
     try {
-      const res = await fetch('/api/stripe/account');
+      const res = await fetch(&apos;/api/stripe/account&apos;);
       if (res.ok) {
         const data = await res.json();
         setStatus(data);
@@ -36,8 +36,8 @@ export function StripeConnect() {
         setStatus({ connected: false });
       }
     } catch (err) {
-      console.error('Failed to check Stripe status:', err);
-      setError('Failed to load Stripe status');
+      console.error(&apos;Failed to check Stripe status:&apos;, err);
+      setError(&apos;Failed to load Stripe status&apos;);
     } finally {
       setLoading(false);
     }
@@ -48,7 +48,7 @@ export function StripeConnect() {
     setError(null);
 
     try {
-      const res = await fetch('/api/stripe/connect', { method: 'POST' });
+      const res = await fetch(&apos;/api/stripe/connect&apos;, { method: &apos;POST&apos; });
       
       if (res.ok) {
         const data = await res.json();
@@ -56,11 +56,11 @@ export function StripeConnect() {
         window.location.href = data.url;
       } else {
         const errorData = await res.json();
-        setError(errorData.error || 'Failed to connect with Stripe');
+        setError(errorData.error || &apos;Failed to connect with Stripe&apos;);
       }
     } catch (err) {
-      console.error('Failed to connect:', err);
-      setError('Connection failed. Please try again.');
+      console.error(&apos;Failed to connect:&apos;, err);
+      setError(&apos;Connection failed. Please try again.&apos;);
     } finally {
       setConnecting(false);
     }
@@ -114,7 +114,7 @@ export function StripeConnect() {
             disabled={connecting}
             className="w-full bg-green-600 hover:bg-green-700"
           >
-            {connecting ? 'Connecting...' : 'Connect with Stripe'}
+            {connecting ? &apos;Connecting...&apos; : &apos;Connect with Stripe&apos;}
           </Button>
           <p className="text-xs text-gray-500 text-center mt-2">
             You will be redirected to Stripe to complete onboarding
@@ -136,22 +136,22 @@ export function StripeConnect() {
       <CardContent className="space-y-6">
         {/* Status Summary */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className={`p-4 rounded-lg ${status.chargesEnabled ? 'bg-green-50' : 'bg-yellow-50'}`}>
+          <div className={`p-4 rounded-lg ${status.chargesEnabled ? &apos;bg-green-50&apos; : &apos;bg-yellow-50&apos;}`}>
             <div className="text-sm text-gray-600 mb-1">Charges</div>
-            <div className={`text-lg font-semibold ${status.chargesEnabled ? 'text-green-600' : 'text-yellow-600'}`}>
-              {status.chargesEnabled ? 'Enabled' : 'Pending'}
+            <div className={`text-lg font-semibold ${status.chargesEnabled ? &apos;text-green-600&apos; : &apos;text-yellow-600&apos;}`}>
+              {status.chargesEnabled ? &apos;Enabled&apos; : &apos;Pending&apos;}
             </div>
           </div>
-          <div className={`p-4 rounded-lg ${status.payoutsEnabled ? 'bg-green-50' : 'bg-yellow-50'}`}>
+          <div className={`p-4 rounded-lg ${status.payoutsEnabled ? &apos;bg-green-50&apos; : &apos;bg-yellow-50&apos;}`}>
             <div className="text-sm text-gray-600 mb-1">Payouts</div>
-            <div className={`text-lg font-semibold ${status.payoutsEnabled ? 'text-green-600' : 'text-yellow-600'}`}>
-              {status.payoutsEnabled ? 'Enabled' : 'Pending'}
+            <div className={`text-lg font-semibold ${status.payoutsEnabled ? &apos;text-green-600&apos; : &apos;text-yellow-600&apos;}`}>
+              {status.payoutsEnabled ? &apos;Enabled&apos; : &apos;Pending&apos;}
             </div>
           </div>
           <div className="p-4 rounded-lg bg-blue-50">
             <div className="text-sm text-gray-600 mb-1">Status</div>
             <div className="text-lg font-semibold text-blue-600">
-              {status.status === 'active' ? 'Fully Active' : 'Onboarding'}
+              {status.status === &apos;active&apos; ? &apos;Fully Active&apos; : &apos;Onboarding&apos;}
             </div>
           </div>
         </div>
@@ -192,7 +192,7 @@ export function StripeConnect() {
 
         {status.chargesEnabled && status.payoutsEnabled && (
           <div className="bg-green-100 text-green-800 p-4 rounded-lg text-sm">
-            <strong>✓ Your account is fully active!</strong> You're now receiving payments from dispensaries.
+            <strong>✓ Your account is fully active!</strong> You&apos;re now receiving payments from dispensaries.
           </div>
         )}
       </CardContent>

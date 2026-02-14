@@ -2,6 +2,14 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 
+interface SessionUser {
+  role: string;
+  growerId?: string;
+  dispensaryId?: string;
+  id?: string;
+  email?: string;
+}
+
 export async function requireAuth() {
   const session = await getServerSession(authOptions);
   
@@ -19,7 +27,7 @@ export async function requireGrowerRole() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as SessionUser;
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');
@@ -35,7 +43,7 @@ export async function requireDispensaryRole() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as SessionUser;
   
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');

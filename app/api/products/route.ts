@@ -2,6 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { Prisma } from '@prisma/client';
+
+interface SessionUser {
+  role: string;
+  growerId?: string;
+}
 
 // GET all products for the authenticated grower with filtering and sorting
 export async function GET(request: NextRequest) {
@@ -12,7 +18,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -25,7 +31,7 @@ export async function GET(request: NextRequest) {
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       growerId: user.growerId,
       ...(category && { category }),
       ...(isAvailable !== null && { isAvailable: isAvailable === 'true' }),
@@ -46,11 +52,11 @@ export async function GET(request: NextRequest) {
     });
 
     // Convert Decimal prices to numbers for JSON serialization
-    const serializedProducts = products.map((p: any) => ({
+    const serializedProducts = products.map((p) => ({
       ...p,
-      price: p.price ? parseFloat(p.price) : 0,
-      thc: p.thc ? parseFloat(p.thc) : null,
-      cbd: p.cbd ? parseFloat(p.cbd) : null,
+      price: p.price ? parseFloat(String(p.price)) : 0,
+      thc: p.thc ? parseFloat(String(p.thc)) : null,
+      cbd: p.cbd ? parseFloat(String(p.cbd)) : null,
     }));
 
     return NextResponse.json(serializedProducts, { status: 200 });
@@ -69,7 +75,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as any;
+    const user = session.user as SessionUser;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -118,9 +124,9 @@ export async function POST(request: NextRequest) {
     // Convert Decimal to number for response
     const serializedProduct = {
       ...product,
-      price: product.price ? parseFloat(product.price as any) : 0,
-      thc: product.thc ? parseFloat(product.thc as any) : null,
-      cbd: product.cbd ? parseFloat(product.cbd as any) : null,
+      price: product.price ? parseFloat(String(product.price)) : 0,
+      thc: product.thc ? parseFloat(String(product.thc)) : null,
+      cbd: product.cbd ? parseFloat(String(product.cbd)) : null,
     };
 
     return NextResponse.json(serializedProduct, { status: 201 });

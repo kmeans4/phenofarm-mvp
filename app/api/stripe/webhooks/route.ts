@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
   // Handle payment_intent.succeeded - when customer pays
   if (event.type === 'payment_intent.succeeded') {
-    const paymentIntent = event.data.object as any;
+    const paymentIntent = event.data.object as Stripe.Payout;
     
     try {
       // Find the order by payment metadata
@@ -89,7 +89,7 @@ export async function POST(req: NextRequest) {
 
   // Handle payout.paid - Stripe payout completed
   if (event.type === 'payout.paid') {
-    const payout = event.data.object as any;
+    const payout = event.data.object as Stripe.Payout;
     
     try {
       console.log(`Payout ${payout.id} of $${payout.amount / 100} completed`);

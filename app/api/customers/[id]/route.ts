@@ -2,6 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { Prisma } from '@prisma/client';
+
+interface SessionUser {
+  role: string;
+}
 
 // GET single customer
 export async function GET(
@@ -15,7 +20,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userSession = session.user as any;
+    const userSession = session.user as SessionUser;
     
     if (userSession.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -59,7 +64,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userSession = session.user as any;
+    const userSession = session.user as SessionUser;
     
     if (userSession.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -79,7 +84,7 @@ export async function PUT(
     const body = await request.json();
     const { businessName, contactName, email, phone, address, city, state, zipCode, licenseNumber, website, description } = body;
 
-    const updateData: any = {};
+    const updateData: Prisma.DispensaryUpdateInput = {};
     if (businessName !== undefined) updateData.businessName = businessName;
     if (phone !== undefined) updateData.phone = phone;
     if (address !== undefined) updateData.address = address;
@@ -90,13 +95,13 @@ export async function PUT(
     if (website !== undefined) updateData.website = website;
     if (description !== undefined) updateData.description = description;
 
-    const updatedDispensary = await db.dispensary.update({
+    await db.dispensary.update({
       where: { id: customerId },
       data: updateData,
     });
 
     if (email !== undefined || contactName !== undefined) {
-      const userUpdateData: any = {};
+      const userUpdateData: Prisma.UserUpdateInput = {};
       if (email !== undefined) userUpdateData.email = email;
       if (contactName !== undefined) userUpdateData.name = contactName;
       
@@ -136,7 +141,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const userSession = session.user as any;
+    const userSession = session.user as SessionUser;
     
     if (userSession.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

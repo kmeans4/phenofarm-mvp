@@ -3,9 +3,17 @@ import Stripe from 'stripe';
 const apiKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_TEST_SECRET_KEY;
 
 // Lazy initialization or mock for build
-export const stripe = apiKey 
+export const stripe: Stripe | {
+  accounts: { create: () => Promise<unknown>; retrieve: () => Promise<unknown> };
+  accountLinks: { create: () => Promise<unknown> };
+  webhooks: { constructEvent: () => null };
+} = apiKey 
   ? new Stripe(apiKey, { apiVersion: '2025-12-30.basil' as Stripe.LatestApiVersion })
-  : { accounts: { create: () => {}, retrieve: () => {} }, accountLinks: { create: () => {} }, webhooks: { constructEvent: () => null } } as any;
+  : { 
+      accounts: { create: async () => ({}), retrieve: async () => ({}) }, 
+      accountLinks: { create: async () => ({}) }, 
+      webhooks: { constructEvent: () => null } 
+    };
 
 export const STRIPE_CONFIG = {
   platformFeePercent: 2.9,
