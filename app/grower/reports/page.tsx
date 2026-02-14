@@ -62,50 +62,82 @@ export default async function GrowerReportsPage() {
   const sixMonthsAgo = new Date();
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
   
-  const monthlyRevenue = await db.$queryRaw<{ month: string; revenue: number }[]>`
-    SELECT 
-      TO_CHAR("createdAt", 'YYYY-MM') as month,
-      SUM("totalAmount"::numeric) as revenue
-    FROM "orders"
-    WHERE "growerId" = ${user.growerId}
-      AND status = 'DELIVERED'
-      AND "createdAt" >= ${sixMonthsAgo}
-    GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
-    ORDER BY month
-  `;
+  let monthlyRevenue: { month: string; revenue: number }[] = [];
+  try {
+    const rawRevenue = await db.$queryRaw<{ month: string; revenue: number }[]>`
+      SELECT 
+        TO_CHAR("createdAt", 'YYYY-MM') as month,
+        SUM("totalAmount"::numeric) as revenue
+      FROM "orders"
+      WHERE "growerId" = ${user.growerId}
+        AND status = 'DELIVERED'
+        AND "createdAt" >= ${sixMonthsAgo}
+      GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
+      ORDER BY month
+    `;
+    // Filter out any null months from raw SQL results
+    monthlyRevenue = (rawRevenue || []).filter(m => m && m.month);
+  } catch (e) {
+    console.error('Error fetching monthly revenue:', e);
+    monthlyRevenue = [];
+  }
 
   // Get top products by orders
-  const topProducts = await db.$queryRaw<{ productName: string; quantity: number; revenue: number }[]>`
-    SELECT 
-      p.name as "productName",
-      SUM(oi.quantity)::int as quantity,
-      SUM(oi."totalPrice"::numeric)::numeric as revenue
-    FROM "orderItems" oi
-    JOIN "orders" o ON oi."orderId" = o.id
-    JOIN "products" p ON oi."productId" = p.id
-    WHERE o."growerId" = ${user.growerId}
-      AND o.status = 'DELIVERED'
-    GROUP BY p.name
-    ORDER BY revenue DESC
-    LIMIT 5
-  `;
+  let topProducts: { productName: string; quantity: number; revenue: number }[] = [];
+  try {
+    const rawProducts = await db.$queryRaw<{ productName: string; quantity: number; revenue: number }[]>`
+      SELECT 
+        p.name as "productName",
+        SUM(oi.quantity)::int as quantity,
+        SUM(oi."totalPrice"::numeric)::numeric as revenue
+      FROM "orderItems" oi
+      JOIN "orders" o ON oi."orderId" = o.id
+      JOIN "products" p ON oi."productId" = p.id
+      WHERE o."growerId" = ${user.growerId}
+        AND o.status = 'DELIVERED'
+      GROUP BY p.name
+      ORDER BY revenue DESC
+      LIMIT 5
+    `;
+    topProducts = (rawProducts || []).filter(p => p && p.productName);
+  } catch (e) {
+    console.error('Error fetching top products:', e);
+    topProducts = [];
+  }
 
   // Get top customers
-  const topCustomers = await db.$queryRaw<{ dispensaryName: string; orderCount: number; revenue: number }[]>`
-    SELECT 
-      d."businessName" as "dispensaryName",
-      COUNT(o.id)::int as "orderCount",
-      SUM(o."totalAmount"::numeric)::numeric as revenue
-    FROM "orders" o
-    JOIN "dispensaries" d ON o."dispensaryId" = d.id
-    WHERE o."growerId" = ${user.growerId}
-      AND o.status = 'DELIVERED'
-    GROUP BY d."businessName"
-    ORDER BY revenue DESC
-    LIMIT 5
-  `;
+  let topCustomers: { dispensaryName: string; orderCount: number; revenue: number }[] = [];
+  try {
+    const rawCustomers = await db.$queryRaw<{ dispensaryName: string; orderCount: number; revenue: number }[]>`
+      SELECT 
+        d."businessName" as "dispensaryName",
+        COUNT(o.id)::int as "orderCount",
+        SUM(o."totalAmount"::numeric)::numeric as revenue
+      FROM "orders" o
+      JOIN "dispensaries" d ON o."dispensaryId" = d.id
+      WHERE o."growerId" = ${user.growerId}
+        AND o.status = 'DELIVERED'
+      GROUP BY d."businessName"
+      ORDER BY revenue DESC
+      LIMIT 5
+    `;
+    topCustomers = (rawCustomers || []).filter(c => c && c.dispensaryName);
+  } catch (e) {
+    console.error('Error fetching top customers:', e);
+    topCustomers = [];
+  }
 
   const recentOrders = allOrders.slice(0, 10);
+
+  // Helper function for safe date formatting
+  const formatMonth = (monthStr: string | null | undefined): string => {
+    if (!monthStr) return '';
+    try {
+      return format(new Date(monthStr + '-01'), 'MMM');
+    } catch {
+      return '';
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -165,6 +197,8 @@ export default async function GrowerReportsPage() {
               {monthlyRevenue.map((month, idx) => {
                 const maxRevenue = Math.max(...monthlyRevenue.map(m => Number(m.revenue)));
                 const height = maxRevenue > 0 ? (Number(month.revenue) / maxRevenue) * 100 : 0;
+                const monthLabel = formatMonth(month.month);
+                if (!monthLabel) return null;
                 return (
                   <div key={idx} className="flex-1 flex flex-col items-center gap-2">
                     <div 
@@ -173,7 +207,7 @@ export default async function GrowerReportsPage() {
                       title={`$${Number(month.revenue).toLocaleString()}`}
                     />
                     <span className="text-xs text-gray-500">
-                      {format(new Date(month.month + '-01'), 'MMM')}
+                      {monthLabel}
                     </span>
                   </div>
                 );
