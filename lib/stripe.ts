@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 const apiKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_TEST_SECRET_KEY;
 
 // Lazy initialization or mock for build
-export const stripe: Stripe | {
+const stripeInstance: Stripe | {
   accounts: { create: () => Promise<unknown>; retrieve: () => Promise<unknown> };
   accountLinks: { create: () => Promise<unknown> };
   webhooks: { constructEvent: () => null };
@@ -14,6 +14,8 @@ export const stripe: Stripe | {
       accountLinks: { create: async () => ({}) }, 
       webhooks: { constructEvent: () => null } 
     };
+
+export const stripe = stripeInstance;
 
 export const STRIPE_CONFIG = {
   platformFeePercent: 2.9,
