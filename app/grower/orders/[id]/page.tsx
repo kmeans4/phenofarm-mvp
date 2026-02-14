@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Ca
 import { Button } from '@/app/components/ui/Button';
 import { Badge } from '@/app/components/ui/Badge';
 import Link from 'next/link';
+import OrderStatusTimeline from './components/OrderStatusTimeline';
+import QuickStatusUpdate from './components/QuickStatusUpdate';
 
 interface OrderDetail {
   id: string;
@@ -114,9 +116,15 @@ export default async function OrderDetailPage({
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-4xl">
-      <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Order #{order.orderId}</h1>
+    <div className="container mx-auto p-6 max-w-5xl">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+        <div>
+          <Link href="/grower/orders" className="text-sm text-gray-500 hover:text-gray-700">
+            ← Back to Orders
+          </Link>
+          <h1 className="text-3xl font-bold text-gray-900 mt-2">Order #{order.orderId}</h1>
+        </div>
         <div className="flex items-center gap-3">
           <StatusBadge status={order.status} />
           <Link
@@ -128,95 +136,137 @@ export default async function OrderDetailPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-600">Order Date</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-semibold">{format(order.createdAt, 'MMM dd, yyyy')}</p>
-          </CardContent>
-        </Card>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column - Status & Timeline */}
+        <div className="lg:col-span-1 space-y-6">
+          {/* Status Timeline */}
+          <OrderStatusTimeline 
+            currentStatus={order.status}
+            orderId={order.orderId}
+            shippedAt={order.shippedAt}
+            deliveredAt={order.deliveredAt}
+          />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-600">Total Amount</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-2xl font-semibold">{formatCurrency(order.totalAmount)}</p>
-          </CardContent>
-        </Card>
+          {/* Quick Status Update */}
+          <QuickStatusUpdate 
+            orderId={order.id}
+            currentStatus={order.status}
+          />
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm text-gray-600">Dispensary</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-semibold">{order.dispensary.businessName}</p>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Order Info Cards */}
+          <div className="grid grid-cols-1 gap-4">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm text-gray-600">Order Date</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold">{format(order.createdAt, 'MMM dd, yyyy')}</p>
+                <p className="text-sm text-gray-500">{format(order.createdAt, 'h:mm a')}</p>
+              </CardContent>
+            </Card>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 mb-8">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Price</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {order.items.map((item) => (
-                <tr key={item.id}>
-                  <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                    {item.product?.name || 'Product Deleted'}
-                    {item.product?.strain && <span className="text-gray-500"> ({item.product.strain})</span>}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{item.quantity}</td>
-                  <td className="px-6 py-4 text-sm text-gray-500">{formatCurrency(item.unitPrice)}</td>
-                  <td className="px-6 py-4 text-sm font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="px-6 py-4 bg-gray-50 rounded-b-lg space-y-2">
-          <div className="flex justify-end">
-            <span className="text-sm text-gray-600">Subtotal:</span>
-            <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.subtotal)}</span>
-          </div>
-          <div className="flex justify-end">
-            <span className="text-sm text-gray-600">Tax:</span>
-            <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.tax)}</span>
-          </div>
-          <div className="flex justify-end">
-            <span className="text-sm text-gray-600">Shipping:</span>
-            <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.shippingFee)}</span>
-          </div>
-          <div className="flex justify-end border-t pt-2">
-            <span className="text-sm font-semibold text-gray-900">Total:</span>
-            <span className="ml-2 text-sm font-bold text-green-600">{formatCurrency(order.totalAmount)}</span>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm text-gray-600">Total Amount</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-2xl font-semibold text-green-600">{formatCurrency(order.totalAmount)}</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm text-gray-600">Dispensary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-xl font-semibold">{order.dispensary.businessName}</p>
+              </CardContent>
+            </Card>
           </div>
         </div>
-      </div>
 
-      {order.notes && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
-          <h3 className="text-sm font-medium text-yellow-900 mb-2">Order Notes</h3>
-          <p className="text-sm text-yellow-800">{order.notes}</p>
+        {/* Right Column - Items & Details */}
+        <div className="lg:col-span-2 space-y-6">
+          {/* Order Items */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Price</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {order.items.map((item) => (
+                    <tr key={item.id}>
+                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                        {item.product?.name || 'Product Deleted'}
+                        {item.product?.strain && <span className="text-gray-500"> ({item.product.strain})</span>}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{item.quantity}</td>
+                      <td className="px-6 py-4 text-sm text-gray-500">{formatCurrency(item.unitPrice)}</td>
+                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-6 py-4 bg-gray-50 rounded-b-lg space-y-2">
+              <div className="flex justify-end">
+                <span className="text-sm text-gray-600">Subtotal:</span>
+                <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.subtotal)}</span>
+              </div>
+              <div className="flex justify-end">
+                <span className="text-sm text-gray-600">Tax:</span>
+                <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.tax)}</span>
+              </div>
+              <div className="flex justify-end">
+                <span className="text-sm text-gray-600">Shipping:</span>
+                <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.shippingFee)}</span>
+              </div>
+              <div className="flex justify-end border-t pt-2">
+                <span className="text-sm font-semibold text-gray-900">Total:</span>
+                <span className="ml-2 text-sm font-bold text-green-600">{formatCurrency(order.totalAmount)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Notes */}
+          {order.notes && (
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-yellow-900 mb-2">Order Notes</h3>
+              <p className="text-sm text-yellow-800">{order.notes}</p>
+            </div>
+          )}
+
+          {/* Shipping Info if shipped */}
+          {order.status === 'SHIPPED' && order.shippedAt && (
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-orange-900 mb-2">Shipping Information</h3>
+              <p className="text-sm text-orange-800">
+                📦 Shipped on {new Date(order.shippedAt).toLocaleDateString()} at {' '}
+                {new Date(order.shippedAt).toLocaleTimeString()}
+              </p>
+            </div>
+          )}
+
+          {/* Delivery Info if delivered */}
+          {order.status === 'DELIVERED' && order.deliveredAt && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <h3 className="text-sm font-medium text-green-900 mb-2">Delivery Information</h3>
+              <p className="text-sm text-green-800">
+                ✅ Delivered on {new Date(order.deliveredAt).toLocaleDateString()} at {' '}
+                {new Date(order.deliveredAt).toLocaleTimeString()}
+              </p>
+            </div>
+          )}
         </div>
-      )}
-
-      <div className="flex gap-4">
-        <Button variant="outline" asChild>
-          <Link href="/grower/orders">Back to Orders</Link>
-        </Button>
       </div>
     </div>
   );
