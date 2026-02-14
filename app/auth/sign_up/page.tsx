@@ -41,7 +41,7 @@ export default function SignUpPage() {
       
       // Auto sign in after sign up
       router.push('/auth/sign_in');
-    } catch (_err) {
+    } catch {
       setError('Failed to create account. Please try again.');
       setLoading(false);
     }

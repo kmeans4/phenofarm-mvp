@@ -122,7 +122,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
         const data = await response.json();
         setError(data.error || 'Failed to update order');
       }
-    } catch (_err) {
+    } catch {
       setError('An error occurred while updating');
     } finally {
       setIsSubmitting(false);

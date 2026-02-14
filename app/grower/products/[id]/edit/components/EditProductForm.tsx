@@ -63,7 +63,7 @@ export default function EditProductForm({ product }: EditProductFormProps) {
         const data = await response.json();
         setError(data.error || 'Failed to update product');
       }
-    } catch (_err) {
+    } catch {
       setError('An error occurred');
     } finally {
       setIsSubmitting(false);

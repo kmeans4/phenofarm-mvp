@@ -52,7 +52,7 @@ export default function AddOrderPage() {
           setProducts(prodData.filter((p) => (p?.inventoryQty || 0) > 0));
         }
       }
-    } catch (_err) {
+    } catch {
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -137,7 +137,7 @@ export default function AddOrderPage() {
         const errorData = await response.json().catch(() => ({}));
         setError(errorData.message || 'Failed to create order');
       }
-    } catch (_err) {
+    } catch {
       setError('Failed to create order');
     } finally {
       setIsSubmitting(false);

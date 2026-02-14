@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
+
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
 
 interface SettingsData {
@@ -18,7 +18,7 @@ interface SettingsData {
 }
 
 export function SettingsForm({ defaultValues }: { defaultValues: SettingsData }) {
-  const { data: _session } = useSession();
+  
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);

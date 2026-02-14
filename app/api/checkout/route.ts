@@ -18,20 +18,24 @@ interface OrderItemData {
   totalPrice: number;
 }
 
-interface SessionUser {
-  role: string;
-  dispensaryId?: string;
+interface SessionWithUser {
+  user?: {
+    id: string;
+    email: string;
+    role: string;
+    dispensaryId?: string;
+  };
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getServerSession(authOptions) as SessionWithUser | null;
     
-    if (!session) {
+    if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as SessionUser;
+    const user = session.user;
     if (user.role !== 'DISPENSARY') {
       return NextResponse.json({ error: 'Only dispensaries can checkout' }, { status: 403 });
     }

@@ -1,4 +1,4 @@
-import { UserRole, OrderStatus, PaymentStatus } from '@prisma/client';
+import { UserRole, OrderStatus } from '@prisma/client';
 
 export type ExtendedUser = {
   id: string;

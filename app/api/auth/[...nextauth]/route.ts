@@ -14,6 +14,7 @@ declare module 'next-auth' {
   interface User {
     role?: string;
     growerId?: string;
+    dispensaryId?: string;
   }
   
   interface Session {
@@ -68,6 +69,7 @@ export const authOptions: any = {
             email: user.email,
             role: user.role,
             growerId: user.growerId || undefined,
+            dispensaryId: user.dispensaryId || undefined,
           };
         } catch (error) {
           console.error('Auth error:', error);
@@ -91,6 +93,7 @@ export const authOptions: any = {
         token.role = user.role;
         token.email = user.email;
         token.growerId = user.growerId;
+        token.dispensaryId = user.dispensaryId;
       }
       return token;
     },
@@ -100,6 +103,7 @@ export const authOptions: any = {
         session.user.role = token.role as string;
         session.user.email = token.email as string;
         session.user.growerId = token.growerId as string;
+        session.user.dispensaryId = token.dispensaryId as string;
       }
       return session;
     },

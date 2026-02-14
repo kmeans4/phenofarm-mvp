@@ -57,7 +57,7 @@ export default function GrowerProductsPage() {
         const errData = await response.json().catch(() => ({}));
         setError(errData.error || `Failed to fetch products (${response.status})`);
       }
-    } catch (_error) {
+    } catch {
       setError('Network error - please check your connection');
     } finally {
       setLoading(false);
@@ -73,7 +73,7 @@ export default function GrowerProductsPage() {
       } else {
         alert('Failed to delete product');
       }
-    } catch (_error) {
+    } catch {
       console.error('Error:', error);
     }
   };
@@ -91,7 +91,7 @@ export default function GrowerProductsPage() {
       } else {
         alert('Failed to update product');
       }
-    } catch (_error) {
+    } catch {
       console.error('Error:', error);
     }
   };

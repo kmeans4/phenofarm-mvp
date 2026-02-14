@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
 
@@ -344,7 +345,7 @@ export function ProductForm({
                 <div className="flex flex-wrap gap-2 mt-2">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative group">
-                      <img
+                      <Image
                         src={preview}
                         alt={`Preview ${index}`}
                         className="w-20 h-20 object-cover rounded-lg border border-gray-200"

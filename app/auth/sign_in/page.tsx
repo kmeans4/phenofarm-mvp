@@ -33,7 +33,7 @@ export default function SignInSection() {
       // Redirect after successful login
       router.push('/dashboard');
       router.refresh();
-    } catch (_err) {
+    } catch {
       setError('An error occurred during login. Please try again.');
       setLoading(false);
     }
