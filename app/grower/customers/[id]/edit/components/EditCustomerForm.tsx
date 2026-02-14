@@ -89,7 +89,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
         const data = await response.json();
         setError(data.error || 'Failed to update customer');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('An error occurred while updating');
     } finally {
       setIsSubmitting(false);
@@ -111,7 +111,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
         const data = await response.json();
         setError(data.error || 'Failed to delete customer');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('An error occurred while deleting');
     }
   };

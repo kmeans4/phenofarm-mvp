@@ -54,7 +54,7 @@ export default function AddCustomerPage() {
         const data = await response.json();
         setError(data.error || 'Failed to add customer');
       }
-    } catch (err) {
+    } catch (_err) {
       setError('An error occurred');
     } finally {
       setIsSubmitting(false);

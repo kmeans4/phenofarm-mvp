@@ -42,9 +42,6 @@ export default async function GrowerOrdersHistoryPage() {
     },
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _statusColors = {
-
   const statusLabels = {
     PENDING: 'Pending',
     CONFIRMED: 'Confirmed',

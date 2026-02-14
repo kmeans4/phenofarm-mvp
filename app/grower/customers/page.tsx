@@ -11,7 +11,6 @@ export default async function GrowerCustomersPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as unknown;
   
   const customers = await db.dispensary.findMany({
     include: {

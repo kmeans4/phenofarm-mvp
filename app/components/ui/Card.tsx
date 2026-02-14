@@ -67,10 +67,12 @@ export function CardFooter({ className, children }: CardFooterProps) {
   );
 }
 
-export default {
+const ui = {
   Card,
   CardHeader,
   CardTitle,
   CardContent,
   CardFooter,
 };
+
+export default ui;

@@ -55,7 +55,7 @@ export function ProductTable({
   }, [products]);
 
   const handleSort = (key: string) => {
-    const currentSortOrder = sortBy === key && sortOrder === 'asc' ? 'desc' : 'asc';
+    const _currentSortOrder = sortBy === key && sortOrder === 'asc' ? 'desc' : 'asc';
     onSort(key);
     // Note: The actual sorting is handled in the parent component
   };

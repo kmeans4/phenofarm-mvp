@@ -38,7 +38,9 @@ export function Badge({ className, variant, children }: BadgeProps) {
   );
 }
 
-export default {
+const ui = {
   Badge,
   badgeVariants,
 };
+
+export default ui;
