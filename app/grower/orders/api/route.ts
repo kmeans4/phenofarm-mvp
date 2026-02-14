@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
+import { ExtendedUser } from '@/types';
 
 const validStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const user = session.user as any;
+  const user = session.user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('skip') || '0');
 
-    const where: any = { growerId: user.growerId };
+    const where = { growerId: user.growerId } as const;
 
     if (status && validStatuses.includes(status)) {
       where.status = status;
@@ -85,7 +86,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const user = session.user as any;
+  const user = session.user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

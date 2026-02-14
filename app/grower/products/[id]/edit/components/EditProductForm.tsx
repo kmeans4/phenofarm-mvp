@@ -5,6 +5,17 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
 interface EditProductFormProps {
+  product: {
+    id: string;
+    name: string;
+    strain?: string | null;
+    category?: string | null;
+    price: number;
+    inventoryQty: number;
+    unit: string;
+    description?: string | null;
+    isAvailable: boolean;
+  };
   product: any;
 }
 

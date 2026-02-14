@@ -6,19 +6,7 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Badge } from '@/app/components/ui/Badge';
-
-interface Order {
-  id: string;
-  orderId: string;
-  growerId: string;
-  dispensaryId: string;
-  status: string;
-  totalAmount: number;
-  createdAt: Date;
-  dispensary: {
-    businessName: string;
-  };
-}
+import { ExtendedUser } from '@/types';
 
 interface StatusLabelMap {
   [key: string]: string;
@@ -33,7 +21,7 @@ export default async function GrowerOrdersPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as ExtendedUser;
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');

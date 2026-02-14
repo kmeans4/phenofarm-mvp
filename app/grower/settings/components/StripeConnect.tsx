@@ -192,7 +192,7 @@ export function StripeConnect() {
 
         {status.chargesEnabled && status.payoutsEnabled && (
           <div className="bg-green-100 text-green-800 p-4 rounded-lg text-sm">
-            <strong>✓ Your account is fully active!</strong> You're now receiving payments from dispensaries.
+            <strong>✓ Your account is fully active!</strong> You&apos;re now receiving payments from dispensaries.
           </div>
         )}
       </CardContent>

@@ -2,13 +2,12 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
+import { ExtendedUser } from '@/types';
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Badge } from '@/app/components/ui/Badge';
 import { Button } from '@/app/components/ui/Button';
 import Link from 'next/link';
-
-const validStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
 export default async function GrowerOrdersHistoryPage() {
   const session = await getServerSession(authOptions);
@@ -17,7 +16,7 @@ export default async function GrowerOrdersHistoryPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as ExtendedUser;
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');
@@ -43,14 +42,8 @@ export default async function GrowerOrdersHistoryPage() {
     },
   });
 
-  const statusColors = {
-    PENDING: 'bg-yellow-100 text-yellow-800',
-    CONFIRMED: 'bg-blue-100 text-blue-800',
-    PROCESSING: 'bg-purple-100 text-purple-800',
-    SHIPPED: 'bg-orange-100 text-orange-800',
-    DELIVERED: 'bg-green-100 text-green-800',
-    CANCELLED: 'bg-red-100 text-red-800',
-  };
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _statusColors = {
 
   const statusLabels = {
     PENDING: 'Pending',
@@ -90,7 +83,7 @@ export default async function GrowerOrdersHistoryPage() {
           <CardContent className="p-6">
             <p className="text-sm text-gray-600 mb-1">Pending</p>
             <p className="text-3xl font-bold text-yellow-600">
-              {orders.filter((o: any) => o.status === 'PENDING').length}
+              {orders.filter((o) => o.status === 'PENDING').length}
             </p>
           </CardContent>
         </Card>
@@ -98,7 +91,7 @@ export default async function GrowerOrdersHistoryPage() {
           <CardContent className="p-6">
             <p className="text-sm text-gray-600 mb-1">Shipped</p>
             <p className="text-3xl font-bold text-orange-600">
-              {orders.filter((o: any) => o.status === 'SHIPPED').length}
+              {orders.filter((o) => o.status === 'SHIPPED').length}
             </p>
           </CardContent>
         </Card>
@@ -136,7 +129,7 @@ export default async function GrowerOrdersHistoryPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {orders.map((order: any) => (
+                  {orders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">#{order.orderId}</div>

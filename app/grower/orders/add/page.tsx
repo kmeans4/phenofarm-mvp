@@ -4,15 +4,16 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import { Product } from '@/types';
 
 export default function AddOrderPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [dispensaries, setDispensaries] = useState<any[]>([]);
-  const [products, setProducts] = useState<any[]>([]);
-  const [formData, setFormData] = useState<any>({
+  const [dispensaries, setDispensaries] = useState<{id: string; businessName: string; city: string; state: string}[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [formData, setFormData] = useState<{dispensaryId: string; items: {productId: string; quantity: number; unitPrice: number}[]; notes: string; shippingFee: string}>({
     dispensaryId: '',
-    items: [] as any[],
+    items: [] as {productId: string; quantity: number; unitPrice: number}[],
     notes: '',
     shippingFee: '0',
   });
@@ -48,7 +49,7 @@ export default function AddOrderPage() {
       if (prodRes.ok) {
         const prodData = await prodRes.json();
         if (Array.isArray(prodData)) {
-          setProducts(prodData.filter((p: unknown) => (p?.inventoryQty || 0) > 0));
+          setProducts(prodData.filter((p) => (p?.inventoryQty || 0) > 0));
         }
       }
     } catch (err) {
@@ -81,7 +82,7 @@ export default function AddOrderPage() {
       const newItems = [...prev.items];
       newItems[index] = { ...newItems[index], [field]: value };
       if (field === 'productId') {
-        const product = products.find((p: unknown) => p?.id === value);
+        const product = products.find((p) => p?.id === value);
         if (product) {
           newItems[index].unitPrice = typeof product?.price === 'number' ? product.price : 0;
         }
@@ -91,7 +92,7 @@ export default function AddOrderPage() {
   };
 
   const calculateSubtotal = () =>
-    formData.items.reduce((total: number, item: unknown) => {
+    formData.items.reduce((total: number, item) => {
       const qty = typeof item?.quantity === 'number' ? item.quantity : 0;
       const price = typeof item?.unitPrice === 'number' ? item.unitPrice : 0;
       return total + (qty * price);
@@ -206,7 +207,7 @@ export default function AddOrderPage() {
                 required
               >
                 <option value="">Select...</option>
-                {dispensaries.map((d: unknown) => (
+                {dispensaries.map((d) => (
                   <option key={d.id} value={d.id}>{d.businessName} - {d.city}, {d.state}</option>
                 ))}
               </select>
@@ -243,10 +244,10 @@ export default function AddOrderPage() {
             {products.length === 0 ? (
               <p className="text-gray-600 text-center py-8">No products available.</p>
             ) : formData.items.length === 0 ? (
-              <p className="text-gray-600 text-center py-8">No items. Click "Add" to start.</p>
+              <p className="text-gray-600 text-center py-8">No items. Click &quot;Add&quot; to start.</p>
             ) : (
               <div className="space-y-4">
-                {formData.items.map((item: unknown, index: number) => (
+                {formData.items.map((item, index: number) => (
                   <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-lg border">
                     <div className="flex-1">
                       <label className="block text-xs text-gray-500 mb-1">Product</label>
@@ -255,7 +256,7 @@ export default function AddOrderPage() {
                         onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       >
-                        {products.map((p: unknown) => (
+                        {products.map((p) => (
                           <option key={p.id} value={p.id}>
                             {p.name} - ${typeof p.price === 'number' ? p.price.toFixed(2) : '0.00'}
                           </option>

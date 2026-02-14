@@ -81,7 +81,7 @@ export default async function DispensaryDashboardPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dispensary Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here's your overview.</p>
+          <p className="text-gray-600 mt-1">Welcome back! Here&apos;s your overview.</p>
         </div>
         <Link href="/dispensary/catalog" className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 h-10 px-4 py-2">
           Browse Catalog

@@ -41,7 +41,7 @@ export default function LandingPage() {
                 <span className="text-2xl">💰</span>
               </div>
               <h3 className="text-xl font-semibold mb-2">Affordable Pricing</h3>
-              <p className="text-gray-600">Only $249/month vs APEX Trading's $600/month. Save 60% while getting better features.</p>
+              <p className="text-gray-600">Only $249/month vs APEX Trading&apos;s $600/month. Save 60% while getting better features.</p>
             </div>
             
             <div className="p-6 bg-gray-50 rounded-lg">

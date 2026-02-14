@@ -44,7 +44,7 @@ export default async function EditOrderPage({ params }: PageProps) {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     redirect('/dashboard');

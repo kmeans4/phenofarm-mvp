@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
+import { ExtendedUser } from "@/types";
 import EditProductForm from "./components/EditProductForm";
 
 interface PageProps {
@@ -15,7 +16,7 @@ export default async function EditProductPage({ params }: PageProps) {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as any;
+  const user = session.user as ExtendedUser;
   if (user.role !== 'GROWER') {
     redirect('/dashboard');
   }
