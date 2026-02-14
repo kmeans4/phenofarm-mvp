@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 
@@ -25,8 +26,12 @@ interface Cart {
 }
 
 export default function DispensaryCartPage() {
+  const router = useRouter();
   const [cart, setCart] = useState<Cart>({ items: [], subtotal: 0, tax: 0, total: 0 });
   const [mounted, setMounted] = useState(false);
+  const [checkingOut, setCheckingOut] = useState(false);
+  const [checkoutError, setCheckoutError] = useState('');
+  const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -48,7 +53,7 @@ export default function DispensaryCartPage() {
 
   const calculateTotals = (items: CartItem[]) => {
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const tax = subtotal * 0.1;
+    const tax = subtotal * 0.06;
     const total = subtotal + tax;
     return { subtotal, tax, total };
   };
@@ -94,9 +99,56 @@ export default function DispensaryCartPage() {
     }
   };
 
+  const handleCheckout = async () => {
+    if (!confirm('Place order? This will create orders and deduct inventory.')) return;
+    
+    setCheckingOut(true);
+    setCheckoutError('');
+
+    try {
+      const response = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: cart.items, notes: '' }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Checkout failed');
+      }
+
+      // Clear cart on success
+      localStorage.removeItem('phenofarm-cart');
+      setCart({ items: [], subtotal: 0, tax: 0, total: 0 });
+      setCheckoutSuccess(true);
+      
+      // Redirect to orders page after 2 seconds
+      setTimeout(() => {
+        router.push('/dispensary/orders');
+      }, 2000);
+
+    } catch (err: any) {
+      setCheckoutError(err.message || 'Checkout failed');
+    } finally {
+      setCheckingOut(false);
+    }
+  };
+
   if (!mounted) return <div className="p-6">Loading...</div>;
 
   const isEmpty = cart.items.length === 0;
+
+  if (checkoutSuccess) {
+    return (
+      <div className="p-6 max-w-2xl mx-auto text-center">
+        <div className="text-6xl mb-4">✅</div>
+        <h1 className="text-2xl font-bold mb-2">Order Placed!</h1>
+        <p className="text-gray-600 mb-4">Your orders have been created and inventory deducted.</p>
+        <p className="text-gray-500">Redirecting to orders...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="p-4 max-w-5xl mx-auto">
@@ -119,12 +171,18 @@ export default function DispensaryCartPage() {
         </div>
       </div>
 
+      {checkoutError && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">
+          {checkoutError}
+        </div>
+      )}
+
       {isEmpty ? (
         <Card className="p-12">
           <div className="text-center">
             <div className="text-6xl mb-4">🛒</div>
             <h2 className="text-xl font-semibold mb-2">Your cart is empty</h2>
-            <p className="text-gray-600 mb-6">Browse our catalogs</p>
+            <p className="text-gray-600 mb-6">Browse products to add items.</p>
             <Link href="/dispensary/catalog" className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
               Browse Products
             </Link>
@@ -132,7 +190,8 @@ export default function DispensaryCartPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 space-y-4">
+          {<>items.map()}>
+          <div className="lg:col-span-2">
             <Card>
               <CardContent className="p-0">
                 <div className="divide-y">
@@ -149,25 +208,19 @@ export default function DispensaryCartPage() {
                         <div className="flex items-center gap-4">
                           <div className="flex flex-col items-end">
                             <div className="flex items-center border rounded-lg">
-                              <button 
-                                onClick={() => updateQuantity(item.id, -1)}
-                                className="px-3 py-1 hover:bg-gray-100 text-gray-600"
-                              >
-                                -
-                              </button>
+                              <button onClick={() => updateQuantity(item.id, -1)} className="px-3 py-1 hover:bg-gray-100">-</button>
                               <input
                                 type="number"
                                 min={1}
                                 max={item.maxQty}
                                 value={item.quantity}
                                 onChange={(e) => setExactQuantity(item.id, parseInt(e.target.value) || 1)}
-                                className="w-12 text-center py-1 border-x border-gray-300 focus:outline-none text-sm"
-                                style={{ appearance: 'textfield', MozAppearance: 'textfield' }}
+                                className="w-12 text-center py-1 border-x border-gray-300 text-sm"
                               />
                               <button 
                                 onClick={() => updateQuantity(item.id, 1)}
                                 disabled={atMax}
-                                className={`px-3 py-1 text-gray-600 ${atMax ? 'opacity-30 cursor-not-allowed' : 'hover:bg-gray-100'}`}
+                                className={`px-3 py-1 ${atMax ? 'opacity-30' : 'hover:bg-gray-100'}`}
                               >
                                 +
                               </button>
@@ -176,15 +229,9 @@ export default function DispensaryCartPage() {
                               {item.quantity} / {item.maxQty} max
                             </p>
                           </div>
-                          <p className="font-bold text-gray-900 min-w-[70px] text-right">${(item.price * item.quantity).toFixed(2)}</p>
-                          <button 
-                            onClick={() => removeItem(item.id)}
-                            className="p-2 text-red-600 hover:text-red-800"
-                            title="Remove"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
+                          <p className="font-bold min-w-[70px] text-right">${(item.price * item.quantity).toFixed(2)}</p>
+                          <button onClick={() => removeItem(item.id)} className="p-2 text-red-600">
+                            🗑️
                           </button>
                         </div>
                       </div>
@@ -206,15 +253,19 @@ export default function DispensaryCartPage() {
                   <span>${cart.subtotal.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-gray-600">Tax (10%)</span>
+                  <span className="text-gray-600">Tax (6%)</span>
                   <span>${cart.tax.toFixed(2)}</span>
                 </div>
                 <div className="border-t pt-4 flex justify-between font-bold">
                   <span>Total</span>
                   <span className="text-green-600">${cart.total.toFixed(2)}</span>
                 </div>
-                <button className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium">
-                  Checkout
+                <button 
+                  onClick={handleCheckout}
+                  disabled={checkingOut}
+                  className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 font-medium disabled:opacity-50"
+                >
+                  {checkingOut ? 'Processing...' : 'Place Order'}
                 </button>
               </CardContent>
             </Card>
