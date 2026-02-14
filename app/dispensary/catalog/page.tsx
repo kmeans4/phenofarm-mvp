@@ -11,7 +11,7 @@ export default async function DispensaryCatalogPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as unknown;
+  const user = (session as any).user as { role: string; growerId?: string; dispensaryId?: string };
   
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');
@@ -38,16 +38,16 @@ export default async function DispensaryCatalogPage() {
   });
 
   // Group products by grower
-  const growerGroups = products.reduce((groups: unknown[], product) => {
+  const growerGroups = products.reduce((groups: { growerId: string; growerName: string; products: { id: string; name: string; price: number; strain: string | null; unit: string | null; thc: number | null; inventoryQty: number; category: string | null; grower: { id: string; businessName: string } }[] }[], product) => {
     const existingGroup = groups.find(g => g.growerId === product.grower.id);
     
     if (existingGroup) {
-      existingGroup.products.push(product);
+      existingGroup.products.push({ ...product, price: Number(product.price) });
     } else {
       groups.push({
         growerId: product.grower.id,
         growerName: product.grower.businessName,
-        products: [product],
+        products: [{ ...product, price: Number(product.price) }],
       });
     }
     

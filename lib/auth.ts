@@ -1,4 +1,4 @@
-import NextAuth, { DefaultSession, Session, User } from 'next-auth';
+import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
@@ -10,18 +10,8 @@ if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET is not configured');
 }
 
-declare module 'next-auth' {
-  interface User {
-    role?: string;
-    growerId?: string;
-  }
-  
-  interface Session {
-    user?: User & DefaultSession['user'];
-  }
-}
+// Note: User type extensions are in types/next-auth.d.ts
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const authOptions: any = {
   debug: true,
   providers: [
@@ -85,7 +75,7 @@ export const authOptions: any = {
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
-    async jwt({ token, user }: { token: Record<string, unknown>; user?: User }) {
+    async jwt({ token, user }: { token: Record<string, unknown>; user?: any }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -94,7 +84,7 @@ export const authOptions: any = {
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: Record<string, unknown> }) {
+    async session({ session, token }: { session: any; token: Record<string, unknown> }) {
       if (session.user) {
         session.user.id = token.id as string;
         session.user.role = token.role as string;

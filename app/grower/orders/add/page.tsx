@@ -52,7 +52,7 @@ export default function AddOrderPage() {
           setProducts(prodData.filter((p) => (p?.inventoryQty || 0) > 0));
         }
       }
-    } catch {
+    } catch (err) {
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -67,18 +67,18 @@ export default function AddOrderPage() {
       quantity: 1,
       unitPrice: typeof firstProduct?.price === 'number' ? firstProduct.price : 0,
     };
-    setFormData((prev: unknown) => ({ ...prev, items: [...prev.items, newItem] }));
+    setFormData((prev) => ({ ...prev, items: [...prev.items, newItem] }));
   };
 
   const handleRemoveItem = (index: number) => {
-    setFormData((prev: unknown) => ({
+    setFormData((prev) => ({
       ...prev,
-      items: prev.items.filter((_: unknown, i: number) => i !== index),
+      items: prev.items.filter((_, i: number) => i !== index),
     }));
   };
 
-  const handleItemChange = (index: number, field: string, value: unknown) => {
-    setFormData((prev: unknown) => {
+  const handleItemChange = (index: number, field: string, value: any) => {
+    setFormData((prev) => {
       const newItems = [...prev.items];
       newItems[index] = { ...newItems[index], [field]: value };
       if (field === 'productId') {
@@ -137,7 +137,7 @@ export default function AddOrderPage() {
         const errorData = await response.json().catch(() => ({}));
         setError(errorData.message || 'Failed to create order');
       }
-    } catch {
+    } catch (err) {
       setError('Failed to create order');
     } finally {
       setIsSubmitting(false);
@@ -202,7 +202,7 @@ export default function AddOrderPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Dispensary *</label>
               <select
                 value={formData.dispensaryId}
-                onChange={(e) => setFormData((prev: unknown) => ({ ...prev, dispensaryId: e.target.value }))}
+                onChange={(e) => setFormData((prev) => ({ ...prev, dispensaryId: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 required
               >
@@ -216,7 +216,7 @@ export default function AddOrderPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
               <textarea
                 value={formData.notes}
-                onChange={(e) => setFormData((prev: unknown) => ({ ...prev, notes: e.target.value }))}
+                onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
                 rows={3}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
@@ -228,7 +228,7 @@ export default function AddOrderPage() {
                 min="0"
                 step="0.01"
                 value={formData.shippingFee}
-                onChange={(e) => setFormData((prev: unknown) => ({ ...prev, shippingFee: e.target.value }))}
+                onChange={(e) => setFormData((prev) => ({ ...prev, shippingFee: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>

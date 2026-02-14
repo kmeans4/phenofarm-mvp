@@ -1,28 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { Prisma } from '@prisma/client';
-
-interface SessionUser {
-  role: string;
-  growerId?: string;
-}
 
 // GET all products for the authenticated grower with filtering and sorting
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as SessionUser;
+    const user = (session as any).user;
     
-    if (user.role !== 'GROWER') {
+    if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    const growerId = user.growerId;
 
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
@@ -32,7 +28,7 @@ export async function GET(request: NextRequest) {
     const sortOrder = searchParams.get('sortOrder') || 'desc';
 
     const where: Prisma.ProductWhereInput = {
-      growerId: user.growerId,
+      growerId,
       ...(category && { category }),
       ...(isAvailable !== null && { isAvailable: isAvailable === 'true' }),
       ...(search && {
@@ -46,12 +42,9 @@ export async function GET(request: NextRequest) {
 
     const products = await db.product.findMany({
       where,
-      orderBy: {
-        [sortBy]: sortOrder,
-      },
+      orderBy: { [sortBy]: sortOrder },
     });
 
-    // Convert Decimal prices to numbers for JSON serialization
     const serializedProducts = products.map((p) => ({
       ...p,
       price: p.price ? parseFloat(String(p.price)) : 0,
@@ -69,17 +62,19 @@ export async function GET(request: NextRequest) {
 // POST create a new product
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as SessionUser;
+    const user = (session as any).user;
     
-    if (user.role !== 'GROWER') {
+    if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    const growerId = user.growerId;
 
     const body = await request.json();
     const {
@@ -97,15 +92,13 @@ export async function POST(request: NextRequest) {
       isAvailable = true,
     } = body;
 
-    // Validate required fields
     if (!name || price === undefined || inventoryQty === undefined || !unit) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Create the product
     const product = await db.product.create({
       data: {
-        growerId: user.growerId,
+        growerId,
         name,
         strain: strain || null,
         category: category || null,
@@ -121,7 +114,6 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Convert Decimal to number for response
     const serializedProduct = {
       ...product,
       price: product.price ? parseFloat(String(product.price)) : 0,

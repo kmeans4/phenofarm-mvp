@@ -16,7 +16,7 @@ export default async function GrowerOrdersHistoryPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as ExtendedUser;
+  const user = (session as any).user as ExtendedUser;
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');
@@ -96,7 +96,7 @@ export default async function GrowerOrdersHistoryPage() {
           <CardContent className="p-6">
             <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
             <p className="text-3xl font-bold text-gray-900">
-              ${orders.reduce((sum: number, order: Order) => sum + Number(order.totalAmount), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              ${orders.reduce((sum: number, order: any) => sum + Number(order.totalAmount), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
           </CardContent>
         </Card>

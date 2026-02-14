@@ -1,12 +1,28 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { MobileNav } from "@/app/grower/components/MobileNav";
+import { MobileNav } from "@/app/dispensary/_components/MobileNav";
 import { ClientNav } from "@/app/grower/components/ClientNav";
 import { SignOutButton } from "@/app/components/SignOutButton";
+import { db } from "@/lib/db";
 
 interface SessionUser {
   role?: string;
+  dispensaryId?: string;
+}
+
+// Fetch pending orders count for notification badge
+async function getPendingOrdersCount(dispensaryId: string): Promise<number> {
+  try {
+    return await db.order.count({
+      where: {
+        dispensaryId,
+        status: 'PENDING',
+      },
+    });
+  } catch {
+    return 0;
+  }
 }
 
 export default async function DispensaryLayout({ children }: { children: React.ReactNode }) {
@@ -16,23 +32,26 @@ export default async function DispensaryLayout({ children }: { children: React.R
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as SessionUser;
+  const user = (session as any).user as SessionUser;
   
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');
   }
 
+  // Get pending orders count for badge
+  const pendingOrdersCount = user.dispensaryId ? await getPendingOrdersCount(user.dispensaryId) : 0;
+
   const navLinks = [
-    { name: 'Dashboard', href: '/dispensary/dashboard' },
-    { name: 'Catalog', href: '/dispensary/catalog' },
-    { name: 'Orders', href: '/dispensary/orders' },
-    { name: 'Cart', href: '/dispensary/cart' },
-    { name: 'Settings', href: '/dispensary/settings' },
+    { name: 'Dashboard', href: '/dispensary/dashboard', badge: null },
+    { name: 'Catalog', href: '/dispensary/catalog', badge: null },
+    { name: 'Orders', href: '/dispensary/orders', badge: pendingOrdersCount > 0 ? pendingOrdersCount : null },
+    { name: 'Cart', href: '/dispensary/cart', badge: null },
+    { name: 'Settings', href: '/dispensary/settings', badge: null },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50 w-full">
-      {/* Mobile Header */}
+      {/* Mobile Header with Hamburger Menu */}
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">

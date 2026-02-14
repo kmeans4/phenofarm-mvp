@@ -9,7 +9,7 @@ interface EditButtonProps {
 export function EditButton({ onClick }: EditButtonProps) {
   return (
     <Button 
-      variant="secondary" 
+      variant="default" 
       onClick={onClick}
       className="text-sm"
     >

@@ -13,7 +13,7 @@ export async function POST() {
     }
 
     const user = await db.user.findUnique({
-      where: { id: session.user?.id },
+      where: { id: (session as any).user?.id },
       select: { growerId: true, email: true, name: true },
     });
 
@@ -37,7 +37,7 @@ export async function POST() {
     }
 
     // Create Stripe Connect account
-    const account = await stripe.accounts.create({
+    const account: any = await stripe.accounts.create({
       type: 'standard',
       email: user.email || undefined,
       business_type: 'company',
@@ -63,7 +63,7 @@ export async function POST() {
       },
     });
 
-    const accountLink = await stripe.accountLinks.create({
+    const accountLink: any = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: STRIPE_CONFIG.getConnectRefreshUrl(),
       return_url: STRIPE_CONFIG.getConnectReturnUrl(),

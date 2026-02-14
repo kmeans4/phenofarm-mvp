@@ -32,7 +32,7 @@ interface ActivityItemProps {
   type: 'order' | 'customer' | 'product' | 'sync';
   title: string;
   subtitle: string;
-  timestamp: Date;
+  timestamp: Date | string;
   status?: 'success' | 'pending' | 'error';
 }
 
@@ -116,7 +116,7 @@ export default async function GrowerDashboardPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as unknown;
+  const user = (session as any).user as { role: string; growerId?: string; dispensaryId?: string };
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');
@@ -237,7 +237,7 @@ export default async function GrowerDashboardPage() {
           <p className="text-gray-600 mt-1">Welcome back! Here&apos;s your overview.</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors">
+                    <button className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-sm font-medium transition-colors">
             Download Report
           </button>
           <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors">
@@ -334,7 +334,7 @@ export default async function GrowerDashboardPage() {
         <div className="px-6 pb-6">
           {recentOrders.length > 0 ? (
             <div className="space-y-0">
-              {recentOrders.map((order: unknown) => (
+              {recentOrders.map((order: { orderId: string; dispensaryName: string; totalAmount: unknown; status: string; createdAt: Date }) => (
                 <ActivityItem
                   key={order.orderId}
                   type="order"

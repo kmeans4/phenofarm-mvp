@@ -34,7 +34,7 @@ export default function GrowerProductsPage() {
       return;
     }
 
-    const user = session.user as ExtendedUser;
+    const user = (session as any).user as ExtendedUser;
     if (user.role !== 'GROWER') {
       router.push('/dashboard');
       return;
@@ -55,7 +55,7 @@ export default function GrowerProductsPage() {
         }
       } else {
         const errData = await response.json().catch(() => ({}));
-        setError(errData.error || `Failed to fetch products (${response.status})`);
+        setError(errData.error || 'Failed to fetch products (' + response.status + ')');
       }
     } catch {
       setError('Network error - please check your connection');
@@ -67,7 +67,7 @@ export default function GrowerProductsPage() {
   const deleteProduct = async (productId: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     try {
-      const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+      const response = await fetch('/api/products/' + productId, { method: 'DELETE' });
       if (response.ok) {
         setProducts(products.filter(p => p.id !== productId));
       } else {
@@ -80,7 +80,7 @@ export default function GrowerProductsPage() {
 
   const toggleAvailability = async (productId: string, currentStatus: boolean) => {
     try {
-      const response = await fetch(`/api/products/${productId}`, {
+      const response = await fetch('/api/products/' + productId, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ isAvailable: !currentStatus }),
@@ -174,11 +174,11 @@ export default function GrowerProductsPage() {
                     )}
                   </div>
                   <span 
-                    className={`px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ${
+                    className={'px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ' + (
                       product?.isAvailable 
                         ? 'bg-green-100 text-green-700 border border-green-200' 
                         : 'bg-gray-100 text-gray-700 border border-gray-200'
-                    }`}
+                    )}
                   >
                     {product?.isAvailable ? 'Available' : 'Unavailable'}
                   </span>
@@ -206,7 +206,7 @@ export default function GrowerProductsPage() {
                 {/* Action Buttons */}
                 <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
                   <Button variant="outline" size="sm" asChild className="flex-1">
-                    <Link href={`/grower/products/${product?.id}/edit`}>
+                    <Link href={'/grower/products/' + product?.id + '/edit'}>
                       <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
@@ -238,10 +238,23 @@ export default function GrowerProductsPage() {
           ))}
         </div>
       ) : (
-        <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl">
-          <p className="text-gray-600 mb-4">No products found</p>
+        <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+            <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No products yet</h3>
+          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+            Start building your product catalog by adding your first cannabis product.
+          </p>
           <Button variant="primary" asChild>
-            <Link href="/grower/products/add">Add your first product</Link>
+            <Link href="/grower/products/add">
+              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add your first product
+            </Link>
           </Button>
         </div>
       )}

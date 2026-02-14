@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
 
 interface DispensarySettingsBody {
@@ -16,13 +15,13 @@ interface DispensarySettingsBody {
 // GET - Fetch dispensary settings
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as { role: string; dispensaryId?: string };
+    const user = (session as any).user;
 
     if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -69,13 +68,13 @@ export async function GET() {
 // PUT - Update dispensary settings
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as { role: string; dispensaryId?: string; email?: string };
+    const user = (session as any).user;
 
     if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -125,7 +124,7 @@ export async function PUT(request: NextRequest) {
     // Update email if changed and provided
     if (email && email !== user.email) {
       await db.user.update({
-        where: { id: session.user.id },
+        where: { id: user.id },
         data: { email },
       });
     }

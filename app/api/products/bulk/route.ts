@@ -1,25 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getAuthSession } from '@/lib/auth-helpers';
 
-interface SessionUser {
-  role: string;
-  growerId: string;
-}
-
-// Bulk upload products endpoint
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user as SessionUser;
+    const user = (session as any).user;
     
-    if (user.role !== 'GROWER') {
+    if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -39,13 +32,12 @@ export async function POST(request: NextRequest) {
 
     const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
     
-    // Expected columns
     const requiredHeaders = ['name', 'price', 'inventoryqty', 'unit'];
     const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
     
     if (missingHeaders.length > 0) {
       return NextResponse.json({ 
-        error: `Missing required headers: ${missingHeaders.join(', ')}` 
+        error: `Missing required columns: ${missingHeaders.join(', ')}` 
       }, { status: 400 });
     }
 
@@ -68,10 +60,12 @@ export async function POST(request: NextRequest) {
           productData[header] = values[index] || null;
         });
 
+        const growerId = user.growerId!;
+
         await db.product.create({
           data: {
-            growerId: user.growerId,
-            name: productData.name,
+            growerId,
+            name: productData.name || '',
             strain: productData.strain || null,
             category: productData.category || null,
             subcategory: productData.subcategory || null,
@@ -107,40 +101,28 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Export products for download (CSV) or template
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     const { searchParams } = new URL(request.url);
     const template = searchParams.get('template');
 
-    // Allow template download without auth for convenience
     if (!session && !template) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Return template if requested
     if (template === 'true') {
       const templateHeaders = ['name', 'strain', 'category', 'subcategory', 'thc', 'cbd', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images'];
       const sampleRow = [
-        'Blue Dream',
-        'Blue Dream x Haze',
-        'Flower',
-        'Sativa',
-        '18.5',
-        '0.2',
-        '45.00',
-        '100',
-        'Ounce',
-        'Premium sativa flower with berry aroma',
-        'true',
+        'Blue Dream', 'Blue Dream x Haze', 'Flower', 'Sativa',
+        '18.5', '0.2', '45.00', '100', 'Ounce',
+        'Premium sativa flower with berry aroma', 'true',
         'https://example.com/image1.jpg;https://example.com/image2.jpg'
       ];
       
       const csvContent = [
         templateHeaders.join(','),
         sampleRow.join(','),
-        '"Northern Lights","Northern Lights x Afghan","Flower","Indica","22.0","0.1","50.00","75","Ounce","Potent indica for relaxation","true",""'
       ].join('\n');
 
       return new Response(csvContent, {
@@ -151,36 +133,41 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const user = session?.user as SessionUser | undefined;
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const user = (session as any).user;
     
-    if (user?.role !== 'GROWER') {
+    if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const products = await db.product.findMany({
       where: { growerId: user.growerId },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { name: 'asc' },
     });
 
-    // Convert to CSV format
-    const csvHeaders = ['name', 'strain', 'category', 'subcategory', 'thc', 'cbd', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images'];
+    const headers = ['name', 'strain', 'category', 'subcategory', 'thc', 'cbd', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images'];
     
+    const rows = products.map(p => [
+      p.name,
+      p.strain || '',
+      p.category || '',
+      p.subcategory || '',
+      p.thc?.toString() || '',
+      p.cbd?.toString() || '',
+      p.price.toString(),
+      p.inventoryQty.toString(),
+      p.unit,
+      p.description || '',
+      p.isAvailable.toString(),
+      p.images.join(';'),
+    ]);
+
     const csvContent = [
-      csvHeaders.join(','),
-      ...products.map((p) => [
-        `"${p.name.replace(/"/g, '""')}"`,
-        `"${(p.strain || '').replace(/"/g, '""')}"`,
-        `"${(p.category || '').replace(/"/g, '""')}"`,
-        `"${(p.subcategory || '').replace(/"/g, '""')}"`,
-        p.thc ?? '',
-        p.cbd ?? '',
-        p.price.toString(),
-        p.inventoryQty.toString(),
-        p.unit,
-        `"${(p.description || '').replace(/"/g, '""')}"`,
-        p.isAvailable.toString(),
-        `"${(p.images || []).join(';').replace(/"/g, '""')}"`,
-      ].join(','))
+      headers.join(','),
+      ...rows.map(row => row.map(v => `"${v.replace(/"/g, '""')}"`).join(',')),
     ].join('\n');
 
     return new Response(csvContent, {

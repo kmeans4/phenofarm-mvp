@@ -2,24 +2,13 @@ import NextAuth, { DefaultSession, Session, User } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import { UserRole } from '@prisma/client';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not configured');
 }
 if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET is not configured');
-}
-
-declare module 'next-auth' {
-  interface User {
-    role?: string;
-    growerId?: string;
-    dispensaryId?: string;
-  }
-  
-  interface Session {
-    user?: User & DefaultSession['user'];
-  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -100,7 +89,7 @@ export const authOptions: any = {
     async session({ session, token }: { session: Session; token: Record<string, unknown> }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = token.role as string;
+        session.user.role = token.role as UserRole;
         session.user.email = token.email as string;
         session.user.growerId = token.growerId as string;
         session.user.dispensaryId = token.dispensaryId as string;

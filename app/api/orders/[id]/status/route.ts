@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
 import { Order } from '@prisma/client';
 
@@ -14,23 +13,18 @@ const VALID_TRANSITIONS: Record<string, string[]> = {
   CANCELLED: []
 };
 
-interface SessionUser {
-  role: string;
-  growerId?: string;
-}
-
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
-    const user = session.user as SessionUser;
+    const user = (session as any).user;
     const { id: orderId } = await params;
     const { status: newStatus } = await request.json() as { status: string };
     

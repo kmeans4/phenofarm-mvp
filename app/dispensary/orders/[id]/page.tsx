@@ -47,12 +47,12 @@ async function fetchOrder(id: string, dispensaryId: string): Promise<OrderDetail
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
     shippingFee: Number(order.shippingFee),
-    items: order.items.map((item: unknown) => ({
+    items: order.items.map((item: Record<string, unknown>) => ({
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
     })),
-  } as OrderDetail;
+  } as unknown as OrderDetail;
 }
 
 function formatCurrency(amount: number) {
@@ -86,14 +86,14 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as unknown;
+  const user = (session as any).user as { role: string; growerId?: string; dispensaryId?: string };
 
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');
   }
 
   const { id } = await params;
-  const order = await fetchOrder(id, user.dispensaryId);
+  const order = await fetchOrder(id, user.dispensaryId!);
 
   if (!order) {
     return (

@@ -2,19 +2,21 @@
 
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { Badge } from '@/app/components/ui/Badge';
 
 interface NavLink {
   name: string;
   href: string;
+  badge?: number | null;
 }
 
 export function ClientNav({ links }: { links: NavLink[] }) {
   const pathname = usePathname() || '';
   
   const isActive = (href: string): boolean => {
-    // Exact match for dashboard, starts with for others
-    if (href === '/grower/dashboard') {
-      return pathname === href || pathname === '/grower' || pathname === '/grower/';
+    // Handle both grower and dispensary paths
+    if (href.includes('/dashboard')) {
+      return pathname === href || pathname === href.replace('/dashboard', '') || pathname === href.replace('/dispensary/dashboard', '/dispensary');
     }
     return pathname === href || pathname.startsWith(`${href}/`);
   };
@@ -27,13 +29,16 @@ export function ClientNav({ links }: { links: NavLink[] }) {
           <Link 
             key={link.href}
             href={link.href}
-            className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
+            className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
               active 
                 ? 'bg-green-100 text-green-700 font-medium border-l-4 border-green-600' 
                 : 'text-gray-700 hover:bg-green-50 hover:text-green-600'
             }`}
           >
-            {link.name}
+            <span>{link.name}</span>
+            {link.badge && link.badge > 0 && (
+              <Badge variant="warning" className="ml-2">{link.badge}</Badge>
+            )}
           </Link>
         );
       })}

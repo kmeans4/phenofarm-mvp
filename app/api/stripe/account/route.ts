@@ -13,7 +13,7 @@ export async function GET() {
     }
 
     const user = await db.user.findUnique({
-      where: { id: session.user?.id },
+      where: { id: (session as any).user?.id },
       select: { growerId: true },
     });
 
@@ -37,7 +37,7 @@ export async function GET() {
     }
 
     // Check Stripe account status
-    const account = await stripe.accounts.retrieve(grower.stripeAccountId);
+    const account: any = await stripe.accounts.retrieve(grower.stripeAccountId);
     
     return NextResponse.json({
       connected: true,

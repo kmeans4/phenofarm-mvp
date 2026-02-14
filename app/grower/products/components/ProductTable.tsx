@@ -139,7 +139,7 @@ export function ProductTable({
                   <td className="px-4 py-3">
                     <div className="flex gap-2">
                       <Button
-                        variant="outline"
+                        variant="default"
                         className="text-xs py-1"
                         onClick={() => onEdit(product.id)}
                       >

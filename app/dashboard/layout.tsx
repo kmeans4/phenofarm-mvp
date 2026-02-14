@@ -14,7 +14,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as { role: string };
+  const user = (session as any).user as { role: string; businessName?: string; firstName?: string; lastName?: string };
   const role = user.role as string;
 
   // Determine role-based navigation

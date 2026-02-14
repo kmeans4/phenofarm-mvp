@@ -25,7 +25,7 @@ async function fetchOrder(id: string, growerId: string) {
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
     shippingFee: Number(order.shippingFee),
-    items: order.items.map((item: unknown) => ({
+    items: order.items.map((item) => ({
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
@@ -33,6 +33,11 @@ async function fetchOrder(id: string, growerId: string) {
   };
 }
 
+interface ExtendedUser {
+  role: string;
+  growerId?: string;
+  dispensaryId?: string;
+}
 interface PageProps {
   params: Promise<{ id: string }>;
 }
@@ -44,14 +49,14 @@ export default async function EditOrderPage({ params }: PageProps) {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as ExtendedUser;
+  const user = (session as any).user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     redirect('/dashboard');
   }
 
   const { id } = await params;
-  const order = await fetchOrder(id, user.growerId);
+  const order = await fetchOrder(id, user.growerId!);
 
   if (!order) {
     redirect('/grower/orders');

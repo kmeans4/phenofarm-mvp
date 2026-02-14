@@ -7,7 +7,25 @@ import { Badge } from '@/app/components/ui/Badge';
 import Link from 'next/link';
 import { format, subDays, startOfDay } from 'date-fns';
 
-async function fetchDispensaryDashboardData(dispensaryId: string) {
+interface DashboardOrder {
+  id: string;
+  orderId: string;
+  status: string;
+  createdAt: Date;
+  totalAmount: unknown;
+  growerId: string;
+  grower: { businessName: string } | null;
+}
+
+async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
+  orders: DashboardOrder[];
+  activeGrowers: number;
+  totalSpent: number;
+  pendingOrders: number;
+  activeOrders: number;
+  last7Days: { day: string; revenue: number }[];
+  featuredProducts: { productId: string; name: string; category: string; pricePerUnit: number; quantity: number; grower: string }[];
+}> {
   const orders = await db.order.findMany({
     where: { dispensaryId },
     include: {
@@ -70,10 +88,10 @@ const statusLabels: Record<string, string> = {
 export default async function DispensaryDashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect('/auth/sign_in');
-  const user = session.user as unknown;
+  const user = (session as any).user as { role: string; growerId?: string; dispensaryId?: string };
   if (user.role !== 'DISPENSARY') redirect('/dashboard');
 
-  const data = await fetchDispensaryDashboardData(user.dispensaryId);
+  const data = await fetchDispensaryDashboardData(user.dispensaryId!);
 
   return (
     <div className="space-y-6 p-4">
@@ -171,7 +189,7 @@ export default async function DispensaryDashboardPage() {
                 data.orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#{order.orderId}</td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{(order as unknown).grower?.businessName}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{order.grower?.businessName}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{format(new Date(order.createdAt), 'M/d/yyyy')}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${Number(order.totalAmount).toFixed(2)}</td>
                     <td className="px-6 py-4 whitespace-nowrap">

@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { ExtendedUser } from "@/types";
 import EditProductForm from "./components/EditProductForm";
 
 interface PageProps {
@@ -16,14 +15,13 @@ export default async function EditProductPage({ params }: PageProps) {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as ExtendedUser;
-  if (user.role !== 'GROWER') {
+  const user = (session as any).user;
+  if (user?.role !== 'GROWER') {
     redirect('/dashboard');
   }
 
   const { id } = await params;
 
-  // Fetch product server-side
   const product = await db.product.findFirst({
     where: { id, growerId: user.growerId },
   });
@@ -32,6 +30,14 @@ export default async function EditProductPage({ params }: PageProps) {
     redirect('/grower/products');
   }
 
+  // Serialize Decimal fields
+  const serializedProduct = {
+    ...product,
+    price: Number(product.price),
+    thc: product.thc ? Number(product.thc) : null,
+    cbd: product.cbd ? Number(product.cbd) : null,
+  };
+
   return (
     <div className="space-y-6 p-4 max-w-3xl mx-auto">
       <div>
@@ -39,7 +45,7 @@ export default async function EditProductPage({ params }: PageProps) {
         <p className="text-gray-600 mt-1">Update your product details</p>
       </div>
       
-      <EditProductForm product={product} />
+      <EditProductForm product={serializedProduct} />
     </div>
   );
 }

@@ -41,7 +41,7 @@ export default function AddToInventoryPage() {
         const data = await response.json();
         setProducts(Array.isArray(data) ? data : []);
       }
-    } catch {
+    } catch (err) {
       console.error('Error:', err);
     } finally {
       setLoading(false);
@@ -66,7 +66,7 @@ export default function AddToInventoryPage() {
         const data = await response.json();
         setError(data.error || 'Failed to add inventory');
       }
-    } catch {
+    } catch (err) {
       setError('An error occurred');
     } finally {
       setIsSubmitting(false);
@@ -107,7 +107,7 @@ export default function AddToInventoryPage() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               >
                 <option value="">Choose a product...</option>
-                {products.map((p: unknown) => (
+                {products.map((p: Product) => (
                   <option key={p?.id} value={p?.id}>
                     {p?.name} {p?.strain && `(${p.strain})`} - {p?.category}
                   </option>

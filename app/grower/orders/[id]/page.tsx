@@ -51,7 +51,7 @@ async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | n
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
     shippingFee: Number(order.shippingFee),
-    items: order.items.map((item: unknown) => ({
+    items: order.items.map((item) => ({
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
@@ -94,14 +94,14 @@ export default async function OrderDetailPage({
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as unknown;
+  const user = (session as any).user as { role: string; growerId?: string; dispensaryId?: string };
 
   if (user.role !== 'GROWER') {
     redirect('/auth/sign_in');
   }
 
   const { id } = await params;
-  const order = await fetchOrder(id, user.growerId);
+  const order = await fetchOrder(id, user.growerId!);
 
   if (!order) {
     return (

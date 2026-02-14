@@ -3,10 +3,24 @@
 import { useRouter } from 'next/navigation';
 import { ProductForm } from './components/ProductForm';
 
+interface ProductFormData {
+  name: string;
+  strain: string;
+  category: string;
+  subcategory: string;
+  thc: string;
+  cbd: string;
+  price: string;
+  inventoryQty: string;
+  unit: string;
+  description: string;
+  isAvailable: boolean;
+}
+
 export default function AddProductPage() {
   const router = useRouter();
 
-  const handleSubmit = async (formData: FormData) => {
+  const handleSubmit = async (formData: ProductFormData) => {
     try {
       const productData = {
         name: formData.name,

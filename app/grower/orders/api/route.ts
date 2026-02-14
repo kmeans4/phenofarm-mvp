@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const user = session.user as ExtendedUser;
+  const user = (session as any).user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('skip') || '0');
 
-    const where = { growerId: user.growerId } as const;
+    const where: any = { growerId: user.growerId };
 
     if (status && validStatuses.includes(status)) {
       where.status = status;
@@ -86,7 +86,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  const user = session.user as ExtendedUser;
+  const user = (session as any).user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

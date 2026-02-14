@@ -2,52 +2,49 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 
-interface SessionUser {
+export interface SessionUser {
+  id: string;
   role: string;
   growerId?: string;
   dispensaryId?: string;
-  id?: string;
-  email?: string;
+  email: string;
 }
 
-export async function requireAuth() {
+export interface TypedSession {
+  user: SessionUser;
+  expires: string;
+}
+
+export async function getAuthSession(): Promise<TypedSession | null> {
   const session = await getServerSession(authOptions);
-  
+  if (!session) return null;
+  return session as unknown as TypedSession;
+}
+
+export async function requireAuth(): Promise<TypedSession> {
+  const session = await getAuthSession();
   if (!session) {
     redirect('/auth/sign_in');
   }
-
   return session;
 }
 
-export async function requireGrowerRole() {
-  const session = await getServerSession(authOptions);
+export async function requireGrowerRole(): Promise<SessionUser> {
+  const session = await requireAuth();
   
-  if (!session) {
-    redirect('/auth/sign_in');
-  }
-
-  const user = session.user as SessionUser;
-  
-  if (user.role !== 'GROWER') {
+  if ((session as any).user.role !== 'GROWER') {
     redirect('/dashboard');
   }
 
-  return user;
+  return (session as any).user;
 }
 
-export async function requireDispensaryRole() {
-  const session = await getServerSession(authOptions);
+export async function requireDispensaryRole(): Promise<SessionUser> {
+  const session = await requireAuth();
   
-  if (!session) {
-    redirect('/auth/sign_in');
-  }
-
-  const user = session.user as SessionUser;
-  
-  if (user.role !== 'DISPENSARY') {
+  if ((session as any).user.role !== 'DISPENSARY') {
     redirect('/dashboard');
   }
 
-  return user;
+  return (session as any).user;
 }

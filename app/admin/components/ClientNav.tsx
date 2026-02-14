@@ -17,9 +17,13 @@ export function ClientNav({ links, mobile = false }: ClientNavProps) {
   const pathname = usePathname() || '';
   
   const isActive = (href: string): boolean => {
-    // Exact match for /admin, starts with for others
+    // Handle /admin/dashboard specially (exact match like grower/dispensary)
+    if (href === '/admin/dashboard') {
+      return pathname === href || pathname === '/admin/dashboard/';
+    }
+    // Exact match for root /admin
     if (href === '/admin') {
-      return pathname === href || pathname === '/admin/';
+      return pathname === href || pathname === '/admin/' || pathname === '/admin';
     }
     return pathname === href || pathname.startsWith(`${href}/`);
   };

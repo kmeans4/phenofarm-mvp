@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
 
 interface CartItem {
@@ -18,24 +17,15 @@ interface OrderItemData {
   totalPrice: number;
 }
 
-interface SessionWithUser {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    dispensaryId?: string;
-  };
-}
-
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions) as SessionWithUser | null;
+    const session = await getAuthSession();
     
-    if (!session?.user) {
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user;
+    const user = (session as any).user;
     if (user.role !== 'DISPENSARY') {
       return NextResponse.json({ error: 'Only dispensaries can checkout' }, { status: 403 });
     }

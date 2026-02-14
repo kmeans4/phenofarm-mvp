@@ -6,7 +6,7 @@ import { Button } from '@/app/components/ui/Button';
 
 interface ProductFormProps {
   initialData?: {
-    name?: string;
+    id?: string; name?: string;
     strain?: string;
     category?: string;
     subcategory?: string;
@@ -18,7 +18,7 @@ interface ProductFormProps {
     description?: string;
     isAvailable?: boolean;
   };
-  onSubmit: (data: FormData) => void;
+  onSubmit: (data: { name: string; strain: string; category: string; subcategory: string; thc: string; cbd: string; price: string; inventoryQty: string; unit: string; description: string; isAvailable: boolean; }) => void;
   onCancel: () => void;
 }
 
