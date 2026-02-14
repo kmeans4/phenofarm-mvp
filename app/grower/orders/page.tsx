@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Badge } from '@/app/components/ui/Badge';
+import { Button } from '@/app/components/ui/Button';
 import { ExtendedUser } from '@/types';
 
 interface StatusLabelMap {
@@ -99,30 +100,30 @@ export default async function GrowerOrdersPage() {
           <p className="text-gray-600 mt-1">Manage and process customer orders</p>
         </div>
         <div className="flex gap-3">
-          <Link href="/grower/orders/history" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-200 bg-white hover:bg-gray-100 hover:text-gray-900 h-10 px-4 py-2">
-            View History
-          </Link>
-          <Link href="/grower/orders/add" className="inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-green-600 text-gray-50 hover:bg-green-700 h-10 px-4 py-2">
-            + New Order
-          </Link>
+          <Button variant="outline" asChild>
+            <Link href="/grower/orders/history">View History</Link>
+          </Button>
+          <Button variant="primary" asChild>
+            <Link href="/grower/orders/add">+ New Order</Link>
+          </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
           <p className="text-sm text-gray-600">Total Orders</p>
           <p className="text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
           <p className="text-sm text-gray-600">Active Orders</p>
           <p className="text-2xl font-bold text-blue-600 mt-1">{activeCount}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
           <p className="text-sm text-gray-600">Pending</p>
           <p className="text-2xl font-bold text-yellow-600 mt-1">{pendingCount}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
           <p className="text-sm text-gray-600">Total Revenue</p>
           <p className="text-2xl font-bold text-green-600 mt-1">
             ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
@@ -132,18 +133,18 @@ export default async function GrowerOrdersPage() {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4">
-            <input
-              type="text"
-              placeholder="Search orders..."
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-            <select className="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent">
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="confirmed">Confirmed</option>
-              <option value="processing">Processing</option>
-              <option value="shipped">Shipped</option>
-            </select>
+        <input
+          type="text"
+          placeholder="Search orders..."
+          className="flex-1 rounded-lg border border-gray-300 bg-white px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-shadow"
+        />
+        <select className="rounded-lg border border-gray-300 bg-white px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent">
+          <option value="all">All Status</option>
+          <option value="pending">Pending</option>
+          <option value="confirmed">Confirmed</option>
+          <option value="processing">Processing</option>
+          <option value="shipped">Shipped</option>
+        </select>
       </div>
 
       {/* Active Orders List */}
@@ -158,47 +159,44 @@ export default async function GrowerOrdersPage() {
               <p className="text-sm text-gray-500">New orders will appear here</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="overflow-x-auto -mx-6">
+              <table className="w-full text-left border-collapse min-w-[600px]">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Order #</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Dispensary</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Date</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Total</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Status</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Actions</th>
+                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Order #</th>
+                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Dispensary</th>
+                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Date</th>
+                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Total</th>
+                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Status</th>
+                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {activeOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3">
+                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-6 py-3">
                         <div className="font-medium text-gray-900">#{order.orderId}</div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-6 py-3 text-sm text-gray-600">
                         {order.dispensary.businessName}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-6 py-3 text-sm text-gray-600">
                         {format(order.createdAt, 'MMM d, yyyy')}
                       </td>
-                      <td className="px-4 py-3 text-sm font-bold text-gray-900">
+                      <td className="px-6 py-3 text-sm font-bold text-gray-900">
                         ${Number(order.totalAmount).toFixed(2)}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-6 py-3">
                         <Badge variant={getBadgeVariant(order.status)}>
                           {getStatusLabel(order.status)}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-2">
-                          <Link 
-                            href={`/grower/orders/${order.id}`}
-                            className="text-blue-600 hover:text-blue-700 font-medium text-sm"
-                          >
+                      <td className="px-6 py-3">
+                        <Button variant="ghost" size="sm" asChild>
+                          <Link href={`/grower/orders/${order.id}`}>
                             View
                           </Link>
-                        </div>
+                        </Button>
                       </td>
                     </tr>
                   ))}
@@ -213,10 +211,10 @@ export default async function GrowerOrdersPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Link 
           href="/grower/orders/add"
-          className="bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-4 transition-colors"
+          className="bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-4 transition-colors group"
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600">
+            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 group-hover:scale-105 transition-transform">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
               </svg>
@@ -230,10 +228,10 @@ export default async function GrowerOrdersPage() {
 
         <Link 
           href="/grower/orders/history"
-          className="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-4 transition-colors"
+          className="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-4 transition-colors group"
         >
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-105 transition-transform">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>

@@ -14,7 +14,7 @@ interface StatCardProps {
 
 function StatCard({ title, value, trend, trendUp }: StatCardProps) {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
       <p className="text-sm text-gray-600">{title}</p>
       <div className="flex items-baseline gap-2 mt-1">
         <p className="text-2xl font-bold text-gray-900">{value}</p>
@@ -95,9 +95,9 @@ function QuickAction({ title, href, icon, description, color }: QuickActionProps
   const colors = colorMap[color] || colorMap.blue;
 
   return (
-    <Link href={href} className={`group block p-5 rounded-xl border-2 border-transparent hover:border-gray-200 ${colors.hoverBg} transition-all`}>
+    <Link href={href} className={`group block p-5 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm ${colors.hoverBg} transition-all`}>
       <div className="flex items-start gap-4">
-        <div className={`p-3 rounded-lg ${colors.bg} ${colors.text} group-hover:bg-opacity-75`}>
+        <div className={`p-3 rounded-lg ${colors.bg} ${colors.text} group-hover:scale-105 transition-transform`}>
           {icon}
         </div>
         <div>
@@ -223,6 +223,9 @@ export default async function GrowerDashboardPage() {
   const statusColor = syncStatusDisplay.status === 'success' ? 'green' :
                       syncStatusDisplay.status === 'error' ? 'red' : 'yellow';
 
+  // Calculate max revenue for chart, avoid division by zero
+  const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -234,10 +237,10 @@ export default async function GrowerDashboardPage() {
           <p className="text-gray-600 mt-1">Welcome back! Here&apos;s your overview.</p>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium">
+          <button className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 text-sm font-medium transition-colors">
             Download Report
           </button>
-          <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium">
+          <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors">
             + New Product
           </Link>
         </div>
@@ -300,12 +303,12 @@ export default async function GrowerDashboardPage() {
           {chartData.map((day, index) => (
             <div key={index} className="flex-1 flex flex-col items-center gap-2">
               <div 
-                className={`w-full rounded-t-lg ${
+                className={`w-full rounded-t-lg transition-colors ${
                   day.revenue > 0 
                     ? 'bg-green-500 hover:bg-green-600' 
                     : 'bg-gray-200'
                 }`}
-                style={{ height: `${Math.min((day.revenue / Math.max(...chartData.map(d => d.revenue)) * 100), 100)}%` }}
+                style={{ height: `${Math.min((day.revenue / maxRevenue * 100), 100)}%`, minHeight: '4px' }}
               />
               <span className="text-xs text-gray-500">
                 {format(new Date(day.date), 'EEE')}
