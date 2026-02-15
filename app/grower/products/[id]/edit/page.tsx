@@ -22,44 +22,73 @@ export default async function EditProductPage({ params }: PageProps) {
 
   const { id } = await params;
 
-  // Fetch product with strain and batch relations
-  const product = await db.product.findFirst({
-    where: { id, growerId: user.growerId },
-    include: {
-      strain: { select: { id: true, name: true } },
-      batch: { select: { id: true, batchNumber: true } },
-    },
-  });
+  let product: any = null;
+  let strains: any[] = [];
+  let batches: any[] = [];
+  let productTypeConfigs: any[] = [];
+
+  try {
+    // Fetch product with strain and batch relations
+    product = await db.product.findFirst({
+      where: { id, growerId: user.growerId },
+      include: {
+        strain: { select: { id: true, name: true } },
+        batch: { select: { id: true, batchNumber: true } },
+      },
+    });
+  } catch (error) {
+    console.error('Error fetching product:', error);
+    return (
+      <div className="p-8 max-w-4xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <h2 className="text-xl font-semibold text-red-800 mb-2">Error Loading Product</h2>
+          <p className="text-red-600">Unable to fetch product details. Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!product) {
     redirect('/grower/products');
   }
 
-  // Fetch grower's strains for the dropdown
-  const strains = await db.strain.findMany({
-    where: { growerId: user.growerId },
-    select: { id: true, name: true },
-    orderBy: { name: 'asc' },
-  });
+  try {
+    // Fetch grower's strains for the dropdown
+    strains = await db.strain.findMany({
+      where: { growerId: user.growerId },
+      select: { id: true, name: true },
+      orderBy: { name: 'asc' },
+    });
 
-  // Fetch grower's batches for the dropdown
-  const batches = await db.batch.findMany({
-    where: { growerId: user.growerId },
-    select: { id: true, batchNumber: true, strain: { select: { name: true } } },
-    orderBy: { batchNumber: 'desc' },
-    take: 50,
-  });
+    // Fetch grower's batches for the dropdown
+    batches = await db.batch.findMany({
+      where: { growerId: user.growerId },
+      select: { id: true, batchNumber: true, strain: { select: { name: true } } },
+      orderBy: { batchNumber: 'desc' },
+      take: 50,
+    });
 
-  // Fetch product type configs for dropdowns
-  const productTypeConfigs = await db.productTypeConfig.findMany({
-    where: { 
-      OR: [
-        { growerId: user.growerId },
-        { growerId: null } // Global configs
-      ]
-    },
-    select: { type: true, subTypes: true },
-  });
+    // Fetch product type configs for dropdowns
+    productTypeConfigs = await db.productTypeConfig.findMany({
+      where: { 
+        OR: [
+          { growerId: user.growerId },
+          { growerId: null } // Global configs
+        ]
+      },
+      select: { type: true, subTypes: true },
+    });
+  } catch (error) {
+    console.error('Error fetching strains, batches, or configs:', error);
+    return (
+      <div className="p-8 max-w-4xl mx-auto">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+          <h2 className="text-xl font-semibold text-red-800 mb-2">Error Loading Form Data</h2>
+          <p className="text-red-600">Unable to fetch strains, batches, or product type configurations. Please try again later.</p>
+        </div>
+      </div>
+    );
+  }
 
   // Serialize properly
   const { strain, batch, ...productData } = product;
