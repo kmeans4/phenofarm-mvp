@@ -7,16 +7,33 @@ import Link from 'next/link';
 import { ExtendedUser } from '@/types';
 import { Button } from '@/app/components/ui/Button';
 
+type FilterType = 'all' | 'byProductType' | 'byStrain' | 'byBatch';
+
+interface Batch {
+  id: string;
+  batchNumber: string;
+}
+
 interface Product {
   id: string;
   name: string;
   strain: string | null;
+  strainLegacy: string | null;
   category: string | null;
+  categoryLegacy: string | null;
+  productType: string | null;
+  subType: string | null;
+  batchId: string | null;
+  batch: Batch | null;
   price: number;
   inventoryQty: number;
   unit: string;
   isAvailable: boolean;
   createdAt: string;
+}
+
+interface GroupedProducts {
+  [key: string]: Product[];
 }
 
 export default function GrowerProductsPage() {
@@ -25,6 +42,7 @@ export default function GrowerProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -96,9 +114,166 @@ export default function GrowerProductsPage() {
     }
   };
 
+  // Group products based on active filter
+  const getGroupedProducts = (): { groups: GroupedProducts; groupOrder: string[] } => {
+    const groups: GroupedProducts = {};
+    const groupOrder: string[] = [];
+
+    if (activeFilter === 'all') {
+      groups['All Products'] = products;
+      groupOrder.push('All Products');
+      return { groups, groupOrder };
+    }
+
+    if (activeFilter === 'byProductType') {
+      products.forEach(product => {
+        const type = product.productType || product.categoryLegacy || 'Uncategorized';
+        if (!groups[type]) {
+          groups[type] = [];
+          groupOrder.push(type);
+        }
+        groups[type].push(product);
+      });
+    } else if (activeFilter === 'byStrain') {
+      products.forEach(product => {
+        const strain = product.strain || product.strainLegacy || 'Unknown Strain';
+        if (!groups[strain]) {
+          groups[strain] = [];
+          groupOrder.push(strain);
+        }
+        groups[strain].push(product);
+      });
+    } else if (activeFilter === 'byBatch') {
+      products.forEach(product => {
+        const batchLabel = product.batch?.batchNumber 
+          ? `Batch ${product.batch.batchNumber}`
+          : product.batchId 
+            ? `Batch ${product.batchId.slice(0, 8)}...`
+            : 'No Batch';
+        if (!groups[batchLabel]) {
+          groups[batchLabel] = [];
+          groupOrder.push(batchLabel);
+        }
+        groups[batchLabel].push(product);
+      });
+    }
+
+    // Sort groupOrder alphabetically
+    groupOrder.sort((a, b) => a.localeCompare(b));
+
+    return { groups, groupOrder };
+  };
+
+  const { groups, groupOrder } = getGroupedProducts();
+
   const totalProducts = products?.length || 0;
   const totalValue = products?.reduce((sum, p) => sum + ((p?.price || 0) * (p?.inventoryQty || 0)), 0) || 0;
   const availableCount = products?.filter(p => p?.isAvailable)?.length || 0;
+
+  const filterTabs = [
+    { key: 'all', label: 'All', icon: 'M4 6h16M4 12h16M4 18h16' },
+    { key: 'byProductType', label: 'By Product Type', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
+    { key: 'byStrain', label: 'By Strain', icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
+    { key: 'byBatch', label: 'By Batch', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
+  ] as const;
+
+  const getFilterLabel = () => {
+    switch (activeFilter) {
+      case 'byProductType': return 'Products by Type';
+      case 'byStrain': return 'Products by Strain';
+      case 'byBatch': return 'Products by Batch';
+      default: return 'All Products';
+    }
+  };
+
+  const ProductCard = ({ product }: { product: Product }) => (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200">
+      {/* Card Header */}
+      <div className="p-4 border-b border-gray-100">
+        <div className="flex justify-between items-start gap-2">
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold text-gray-900 truncate">{product?.name || 'Unnamed Product'}</p>
+            {(product?.strain || product?.strainLegacy) && (
+              <p className="text-sm text-gray-500 truncate">{product.strain || product.strainLegacy}</p>
+            )}
+          </div>
+          <span 
+            className={'px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ' + (
+              product?.isAvailable 
+                ? 'bg-green-100 text-green-700 border border-green-200' 
+                : 'bg-gray-100 text-gray-700 border border-gray-200'
+            )}
+          >
+            {product?.isAvailable ? 'Available' : 'Unavailable'}
+          </span>
+        </div>
+      </div>
+
+      {/* Card Body */}
+      <div className="p-4">
+        <div className="flex justify-between items-baseline mb-3">
+          <p className="text-2xl font-bold text-gray-900">
+            ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
+          </p>
+          <p className="text-sm text-gray-500">per {product?.unit || 'unit'}</p>
+        </div>
+        
+        {/* Additional Info */}
+        <div className="space-y-1 mb-3">
+          {(product?.productType || product?.categoryLegacy) && (
+            <p className="text-xs text-gray-500">
+              <span className="font-medium">Type:</span> {product.productType || product.categoryLegacy}
+            </p>
+          )}
+          {product?.batch?.batchNumber && (
+            <p className="text-xs text-gray-500">
+              <span className="font-medium">Batch:</span> {product.batch.batchNumber}
+            </p>
+          )}
+        </div>
+        
+        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+          <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
+            {product?.inventoryQty || 0} in stock
+          </span>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+          <Button variant="outline" size="sm" asChild className="flex-1">
+            <Link href={'/grower/products/' + product?.id + '/edit'}>
+              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit
+            </Link>
+          </Button>
+          
+          <Button 
+            variant="secondary" 
+            size="sm"
+            onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
+            className="flex-1"
+          >
+            {product?.isAvailable ? 'Disable' : 'Enable'}
+          </Button>
+          
+          <Button 
+            variant="destructive" 
+            size="sm"
+            onClick={() => deleteProduct(product?.id)}
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -147,92 +322,50 @@ export default function GrowerProductsPage() {
         </div>
       )}
 
-      {/* Section Divider */}
-      <div className="flex items-center gap-4 pt-2">
-        <div className="h-px flex-1 bg-gray-200"></div>
-        <div className="flex items-center gap-2">
-          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-          <span className="text-sm font-medium text-gray-600 uppercase tracking-wide">All Products</span>
+      {/* Filter Tabs */}
+      <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex flex-wrap gap-1">
+          {filterTabs.map((tab) => (
+            <button
+              key={tab.key}
+              onClick={() => setActiveFilter(tab.key as FilterType)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeFilter === tab.key
+                  ? 'bg-green-600 text-white shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
+              </svg>
+              {tab.label}
+            </button>
+          ))}
         </div>
-        <div className="h-px flex-1 bg-gray-200"></div>
       </div>
 
-      {/* Products Grid */}
+      {/* Products Display */}
       {products?.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {products.map((product) => (
-            <div key={product?.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-              {/* Card Header */}
-              <div className="p-4 border-b border-gray-100">
-                <div className="flex justify-between items-start gap-2">
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-gray-900 truncate">{product?.name || 'Unnamed Product'}</p>
-                    {product?.strain && (
-                      <p className="text-sm text-gray-500 truncate">{product.strain}</p>
-                    )}
-                  </div>
-                  <span 
-                    className={'px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ' + (
-                      product?.isAvailable 
-                        ? 'bg-green-100 text-green-700 border border-green-200' 
-                        : 'bg-gray-100 text-gray-700 border border-gray-200'
-                    )}
-                  >
-                    {product?.isAvailable ? 'Available' : 'Unavailable'}
+        <div className="space-y-8">
+          {groupOrder.map((groupName) => (
+            <div key={groupName} className="space-y-4">
+              {/* Group Header */}
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-gray-200"></div>
+                <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full">
+                  <span className="text-sm font-semibold text-gray-700">{groupName}</span>
+                  <span className="text-xs text-gray-500 bg-white px-2 py-0.5 rounded-full border border-gray-200">
+                    {groups[groupName]?.length || 0}
                   </span>
                 </div>
+                <div className="h-px flex-1 bg-gray-200"></div>
               </div>
 
-              {/* Card Body */}
-              <div className="p-4">
-                <div className="flex justify-between items-baseline mb-3">
-                  <p className="text-2xl font-bold text-gray-900">
-                    ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
-                  </p>
-                  <p className="text-sm text-gray-500">per {product?.unit || 'unit'}</p>
-                </div>
-                
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                  </svg>
-                  <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
-                    {product?.inventoryQty || 0} in stock
-                  </span>
-                </div>
-
-                {/* Action Buttons */}
-                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                  <Button variant="outline" size="sm" asChild className="flex-1">
-                    <Link href={'/grower/products/' + product?.id + '/edit'}>
-                      <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                      Edit
-                    </Link>
-                  </Button>
-                  
-                  <Button 
-                    variant="secondary" 
-                    size="sm"
-                    onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
-                    className="flex-1"
-                  >
-                    {product?.isAvailable ? 'Disable' : 'Enable'}
-                  </Button>
-                  
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => deleteProduct(product?.id)}
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                  </Button>
-                </div>
+              {/* Products Grid for this group */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {groups[groupName]?.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
               </div>
             </div>
           ))}

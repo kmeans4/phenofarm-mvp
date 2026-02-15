@@ -237,7 +237,7 @@ export default function AddBatchPage() {
                   <input
                     id="thc"
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     min="0"
                     max="100"
                     value={formData.thc}
@@ -254,7 +254,7 @@ export default function AddBatchPage() {
                   <input
                     id="cbd"
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     min="0"
                     max="100"
                     value={formData.cbd}
@@ -271,7 +271,7 @@ export default function AddBatchPage() {
                   <input
                     id="totalCannabinoids"
                     type="number"
-                    step="0.1"
+                    step="0.01"
                     min="0"
                     max="100"
                     value={formData.totalCannabinoids}
