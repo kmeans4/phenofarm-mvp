@@ -251,9 +251,9 @@ export default async function DispensaryDashboardPage() {
                 description="Your spending activity will be tracked here once you start placing orders."
               />
             ) : (
-              <div className="h-48 flex items-end justify-between gap-2">
+              <div className="h-40 sm:h-48 flex items-end justify-between gap-1 sm:gap-2 px-2 sm:px-0 overflow-x-auto pb-1">
                 {data.last7Days.map((day, index) => (
-                  <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                  <div key={index} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[36px]">
                     <div className="w-full flex flex-col gap-1">
                       <div className="w-full bg-green-500 rounded-t-lg" style={{ height: `${Math.min((day.revenue / 5000) * 100, 100)}%` }} />
                     </div>

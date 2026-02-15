@@ -193,14 +193,14 @@ export default async function GrowerReportsPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold mb-4">Revenue Trend (Last 6 Months)</h2>
           {monthlyRevenue.length > 0 ? (
-            <div className="h-48 flex items-end justify-between gap-2">
+            <div className="h-40 sm:h-48 flex items-end justify-between gap-1 sm:gap-2 px-2 overflow-x-auto pb-1">
               {monthlyRevenue.map((month, idx) => {
                 const maxRevenue = Math.max(...monthlyRevenue.map(m => Number(m.revenue)));
                 const height = maxRevenue > 0 ? (Number(month.revenue) / maxRevenue) * 100 : 0;
                 const monthLabel = formatMonth(month.month);
                 if (!monthLabel) return null;
                 return (
-                  <div key={idx} className="flex-1 flex flex-col items-center gap-2">
+                  <div key={idx} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[44px]">
                     <div 
                       className="w-full bg-green-500 rounded-t hover:bg-green-600 transition-colors"
                       style={{ height: `${Math.max(height, 4)}%`, minHeight: '4px' }}

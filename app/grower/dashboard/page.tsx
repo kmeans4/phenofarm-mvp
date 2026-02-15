@@ -305,9 +305,9 @@ export default async function GrowerDashboardPage() {
         {!hasRevenue ? (
           <RevenueChartEmpty />
         ) : (
-          <div className="h-64 flex items-end justify-between gap-2 px-4">
+          <div className="h-48 sm:h-64 flex items-end justify-between gap-1 sm:gap-2 px-2 sm:px-4 overflow-x-auto pb-1">
             {chartData.map((day, index) => (
-              <div key={index} className="flex-1 flex flex-col items-center gap-2">
+              <div key={index} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[40px]">
                 <div 
                   className={`w-full rounded-t-lg transition-colors ${
                     day.revenue > 0 
@@ -316,7 +316,7 @@ export default async function GrowerDashboardPage() {
                   }`}
                   style={{ height: `${Math.min((day.revenue / maxRevenue * 100), 100)}%`, minHeight: '4px' }}
                 />
-                <span className="text-xs text-gray-500">
+                <span className="text-[10px] sm:text-xs text-gray-500">
                   {format(new Date(day.date), 'EEE')}
                 </span>
                 {day.revenue > 0 && (
