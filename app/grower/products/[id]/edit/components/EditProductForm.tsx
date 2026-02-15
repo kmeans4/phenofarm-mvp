@@ -318,10 +318,14 @@ export default function EditProductForm({
       }
 
       showToast('success', 'Product updated successfully!');
+      // Reset dirty state before navigation to prevent popup
       setInitialData(formData);
       resetDirtyState();
-      router.push('/grower/products');
-      router.refresh();
+      // Small delay to ensure state updates before navigation
+      setTimeout(() => {
+        router.push('/grower/products');
+        router.refresh();
+      }, 50);
     } catch (err: unknown) {
       showToast('error', err instanceof Error ? err.message : 'Something went wrong');
     } finally {
@@ -650,7 +654,7 @@ export default function EditProductForm({
         </div>
       </div>
 
-      <div className="flex justify-end space-x border-gray-200-3 border-t pt-6">
+      <div className="flex justify-end gap-3 border-t border-gray-200 pt-6">
         <Button type="button" variant="outline" onClick={() => router.push('/grower/products')}>
           Cancel
         </Button>
