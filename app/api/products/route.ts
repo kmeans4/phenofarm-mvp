@@ -31,6 +31,7 @@ export async function GET(request: NextRequest) {
 
     const where: Prisma.ProductWhereInput = {
       growerId,
+      isDeleted: false,
       ...(productType && { productType }),
       ...(strainId && { strainId }),
       ...(batchId && { batchId }),
@@ -149,6 +150,7 @@ export async function POST(request: NextRequest) {
     const product = await db.product.create({
       data: {
         growerId,
+      isDeleted: false,
         name,
         productType: productType || null,
         subType: subType || null,

@@ -171,7 +171,7 @@ export async function PUT(
   }
 }
 
-// DELETE a product
+// DELETE a product (soft delete)
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
@@ -198,7 +198,15 @@ export async function DELETE(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    await db.product.delete({ where: { id: productId } });
+    // Soft delete instead of hard delete to handle FK constraints
+    await db.product.update({
+      where: { id: productId },
+      data: { 
+        isDeleted: true,
+        deletedAt: new Date(),
+        isAvailable: false // Also make unavailable when deleted
+      },
+    });
 
     return NextResponse.json({ message: 'Product deleted successfully' }, { status: 200 });
   } catch (error) {
