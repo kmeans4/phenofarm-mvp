@@ -22,7 +22,10 @@ export type AuthCredentials = {
 export type Product = {
   id: string;
   name: string;
+  productType?: string | null;
+  subType?: string | null;
   strain?: string;
+  strainId?: string | null;
   category?: string;
   subcategory?: string;
   thc?: number;
@@ -31,9 +34,15 @@ export type Product = {
   inventoryQty: number;
   unit: string;
   isAvailable: boolean;
-  description?: string;
+  description?: string | null;
   images: string[];
   growerId: string;
+  batchId?: string | null;
+  sku?: string | null;
+  brand?: string | null;
+  ingredients?: string | null;
+  isFeatured: boolean;
+  isDeleted: boolean;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -52,3 +61,16 @@ export type Order = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+// Re-export product type utilities for convenience
+export {
+  PRODUCT_TYPES_WITH_SUBTYPES,
+  PRODUCT_TYPE_NAMES,
+  getSubTypesForProductType,
+  hasSubTypes,
+  getAllProductTypes,
+  getProductTypeInfo,
+  type ProductTypeName,
+  type SubTypeFor,
+  type ProductTypeInfo,
+} from '@/lib/product-types';

@@ -2,54 +2,51 @@ import { PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
+// New product type to subtype mappings based on requirements
 const DEFAULT_PRODUCT_TYPES = [
   {
-    type: 'Flower',
-    subTypes: ['By the Pound', '3.5g Jar', '7g Jar', '14g Bag', '28g Bag', 'Pre-roll (single)', 'Pre-rolls (5pk)', 'Pre-rolls (10pk)']
-  },
-  {
-    type: 'Edibles',
-    subTypes: ['Gummy (single)', 'Gummies (10pk)', 'Chocolate Bar', 'Brownie', 'Beverage (12oz)', 'Beverage (16oz)']
+    type: 'Bulk Extract',
+    subTypes: ['Badder', 'Crude', 'Crumble', 'Diamonds', 'Distillate', 'Full Plant', 'Honeycomb', 'Isolate', 'Kief', 'Live Resin', 'RSO', 'Shatter', 'Sugar Wax', 'Terp Sugar', 'Terpenes', 'Water Soluble', 'Wax']
   },
   {
     type: 'Cartridge',
-    subTypes: ['0.5g', '1g', '2g', 'Live Resin', 'Distillate']
+    subTypes: ['CO2', 'CO2 Disposable', 'Cured Resin', 'Distillate', 'Distillate Disposable', 'High Terpene', 'Inhaler', 'Live Resin', 'Pax Pods', 'Syringe']
   },
   {
-    type: 'Bulk Extract',
-    subTypes: ['1g', '5g', '14g', '28g']
+    type: 'Edibles',
+    subTypes: ['Brownie', 'Candy', 'Chocolate', 'Coffee', 'Condiment', 'Cookie', 'Cooking', 'Frozen', 'Gummies', 'Popcorn', 'Snack Food', 'Tablets', 'Taffy', 'Tincture']
   },
   {
-    type: 'Drink',
-    subTypes: ['12oz Can', '16oz Can', '4pk', '6pk']
+    type: 'Beverages',
+    subTypes: [] // No subtypes
   },
   {
-    type: 'Merchandise',
-    subTypes: ['T-Shirt', 'Hoodie', 'Hat', 'Sticker', 'Accessory']
-  },
-  {
-    type: 'Prepack',
-    subTypes: ['1g', '3.5g', '7g', '14g']
-  },
-  {
-    type: 'Tincture',
-    subTypes: ['30ml', '60ml']
-  },
-  {
-    type: 'Topicals',
-    subTypes: ['Balm', 'Lotion', 'Cream', 'Salve']
-  },
-  {
-    type: 'Plant Material',
-    subTypes: ['Trim', 'Shake', 'Biomass']
+    type: 'Flower',
+    subTypes: ['A Bud', 'B Bud', 'C Bud', 'Infused Flower', 'Popcorn']
   },
   {
     type: 'Live Plant',
-    subTypes: ['Clone', 'Seedling']
+    subTypes: ['Clones', 'Seedlings', 'Starts', 'Teens', 'Tissue Culture']
   },
   {
-    type: 'Seed',
-    subTypes: ['Regular (5pk)', 'Feminized (5pk)', 'Auto (5pk)']
+    type: 'Plant Material',
+    subTypes: ['Fresh Frozen', 'Kief', 'Shake', 'Trim', 'Untrimmed Flower', 'Whole Plant']
+  },
+  {
+    type: 'Prepack',
+    subTypes: ['A Bud', 'B Bud', 'C Bud', 'Popcorn']
+  },
+  {
+    type: 'Preroll',
+    subTypes: ['Infused', 'Trim/Shake', 'Whole Flower', 'Whole Flower Blunt', 'Whole Flower Infused']
+  },
+  {
+    type: 'Tincture',
+    subTypes: ['Broad Spectrum', 'Full Spectrum', 'Full Spectrum THC Free', 'Isolate', 'Isolate THC Free', 'THC Free']
+  },
+  {
+    type: 'Topicals & Wellness',
+    subTypes: ['Balm', 'Bath Bomb', 'Bath Salt', 'Capsules', 'Cleanser', 'Cream', 'Essential Oil', 'Lip Balm', 'Lotion', 'Lubricant', 'Mask', 'Massage Oil', 'Muscle Gel', 'Salve', 'Serum', 'Shampoo', 'Soap', 'Suppositories', 'Toner', 'Transdermal Patches']
   }
 ]
 
@@ -71,9 +68,16 @@ async function main() {
           isCustom: false
         }
       })
-      console.log(`Created: ${typeConfig.type}`)
+      console.log(`Created: ${typeConfig.type} (${typeConfig.subTypes.length} subtypes)`)
     } else {
-      console.log(`Already exists: ${typeConfig.type}`)
+      // Update existing with new subtypes
+      await prisma.productTypeConfig.update({
+        where: { id: existing.id },
+        data: {
+          subTypes: typeConfig.subTypes
+        }
+      })
+      console.log(`Updated: ${typeConfig.type} (${typeConfig.subTypes.length} subtypes)`)
     }
   }
   

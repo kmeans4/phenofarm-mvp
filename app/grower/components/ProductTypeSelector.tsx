@@ -50,10 +50,11 @@ export function ProductTypeSelector({
 
   const selectedConfig = configs.find(c => c.type === productType);
   const subTypes = selectedConfig?.subTypes || [];
+  const hasSubTypes = subTypes.length > 0;
 
   useEffect(() => {
     // Check if current subType is not in the list (custom)
-    if (productType && subType && !subTypes.includes(subType) && subType !== 'Other') {
+    if (productType && subType && !subTypes.includes(subType) && subType !== 'Other' && subType !== '') {
       setShowOtherInput(true);
       setCustomSubType(subType);
     }
@@ -108,37 +109,58 @@ export function ProductTypeSelector({
           </select>
         </div>
 
-        {/* Sub Type */}
-        <div className="space-y-2">
-          <label htmlFor="subType" className="block text-sm font-medium text-gray-700">
-            Sub Type *
-          </label>
-          {productType ? (
-            <>
-              <select
-                id="subType"
-                value={showOtherInput ? 'Other' : subType}
-                onChange={(e) => handleSubTypeChange(e.target.value)}
+        {/* Sub Type - Only show if product type has subtypes */}
+        {productType && hasSubTypes && (
+          <div className="space-y-2">
+            <label htmlFor="subType" className="block text-sm font-medium text-gray-700">
+              Sub Type
+            </label>
+            <select
+              id="subType"
+              value={showOtherInput ? 'Other' : subType}
+              onChange={(e) => handleSubTypeChange(e.target.value)}
+              className={INPUT_CLASSES}
+            >
+              <option value="">Select a sub type</option>
+              {subTypes.map(sub => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+              <option value="Other">Other (custom)</option>
+            </select>
+            
+            {showOtherInput && (
+              <input
+                type="text"
+                value={customSubType}
+                onChange={(e) => handleCustomSubTypeChange(e.target.value)}
                 className={INPUT_CLASSES}
-              >
-                <option value="">Select a sub type</option>
-                {subTypes.map(sub => (
-                  <option key={sub} value={sub}>{sub}</option>
-                ))}
-                <option value="Other">Other (custom)</option>
-              </select>
-              
-              {showOtherInput && (
-                <input
-                  type="text"
-                  value={customSubType}
-                  onChange={(e) => handleCustomSubTypeChange(e.target.value)}
-                  className={INPUT_CLASSES}
-                  placeholder="Enter custom sub-type"
-                />
-              )}
-            </>
-          ) : (
+                placeholder="Enter custom sub-type"
+              />
+            )}
+          </div>
+        )}
+
+        {/* Show placeholder when product type selected but no subtypes */}
+        {productType && !hasSubTypes && (
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-400">
+              Sub Type
+            </label>
+            <input
+              type="text"
+              disabled
+              value="N/A"
+              className="w-full h-10 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-400"
+            />
+          </div>
+        )}
+
+        {/* Placeholder when no product type selected */}
+        {!productType && (
+          <div className="space-y-2">
+            <label htmlFor="subType" className="block text-sm font-medium text-gray-700">
+              Sub Type
+            </label>
             <input
               type="text"
               disabled
@@ -146,8 +168,8 @@ export function ProductTypeSelector({
               className="w-full h-10 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
               placeholder="Select a product type first"
             />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );

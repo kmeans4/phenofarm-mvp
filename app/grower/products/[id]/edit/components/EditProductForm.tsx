@@ -1,11 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
 import { Button } from '@/app/components/ui/Button';
+import { PRODUCT_TYPE_NAMES, getSubTypesForProductType, hasSubTypes } from '@/lib/product-types';
 
 interface Strain {
   id: string;
@@ -48,8 +50,6 @@ interface FieldErrors {
   price?: string;
   inventoryQty?: string;
   sku?: string;
-  thc?: string;
-  cbd?: string;
   description?: string;
   brand?: string;
   ingredients?: string;
@@ -82,21 +82,7 @@ interface FormData {
   isFeatured: boolean;
 }
 
-const DEFAULT_PRODUCT_TYPES = [
-  'Bulk Extract',
-  'Cartridge',
-  'Edible',
-  'Drink',
-  'Flower',
-  'Live Plant',
-  'Merchandise',
-  'Plant Material',
-  'Prepack',
-  'Seed',
-  'Tincture',
-  'Topicals/Wellness',
-  'Other',
-];
+// Product types imported from lib/product-types.ts
 
 // Validation functions
 const validateName = (name: string): string | undefined => {
@@ -128,24 +114,6 @@ const validateSku = (sku: string): string | undefined => {
   if (!sku) return undefined;
   if (sku.length > 50) return 'SKU must be less than 50 characters';
   if (!/^[a-zA-Z0-9-_]+$/.test(sku)) return 'SKU can only contain letters, numbers, hyphens, and underscores';
-  return undefined;
-};
-
-const validateThc = (thc: string): string | undefined => {
-  if (!thc) return undefined;
-  const numThc = parseFloat(thc);
-  if (isNaN(numThc)) return 'Please enter a valid number';
-  if (numThc < 0) return 'THC cannot be negative';
-  if (numThc > 100) return 'THC cannot exceed 100%';
-  return undefined;
-};
-
-const validateCbd = (cbd: string): string | undefined => {
-  if (!cbd) return undefined;
-  const numCbd = parseFloat(cbd);
-  if (isNaN(numCbd)) return 'Please enter a valid number';
-  if (numCbd < 0) return 'CBD cannot be negative';
-  if (numCbd > 100) return 'CBD cannot exceed 100%';
   return undefined;
 };
 
@@ -207,7 +175,7 @@ export default function EditProductForm({
     strainId: product?.strainId || '',
     batchId: product?.batchId || '',
     productType: product?.productType || product?.categoryLegacy || '',
-    subType: product?.subType || product?.subcategoryLegacy || '',
+    subType: product?.subType ?? product?.subcategoryLegacy ?? '',
     price: product?.price?.toString() || '',
     inventoryQty: product?.inventoryQty?.toString() || '',
     unit: product?.unit || 'gram',
@@ -222,7 +190,7 @@ export default function EditProductForm({
   });
 
   const availableSubtypes = formData.productType 
-    ? productTypeConfigs.find(c => c.type === formData.productType)?.subTypes || []
+    ? getSubTypesForProductType(formData.productType)
     : [];
 
   const filteredBatches = formData.strainId
@@ -246,8 +214,6 @@ export default function EditProductForm({
       price: validatePrice(formData.price),
       inventoryQty: validateInventoryQty(formData.inventoryQty),
       sku: validateSku(formData.sku),
-      thc: validateThc(formData.thc),
-      cbd: validateCbd(formData.cbd),
       description: validateDescription(formData.description),
       brand: validateBrand(formData.brand),
       ingredients: validateIngredients(formData.ingredients),
@@ -269,8 +235,6 @@ export default function EditProductForm({
       case 'price': return validatePrice(value);
       case 'inventoryQty': return validateInventoryQty(value);
       case 'sku': return validateSku(value);
-      case 'thc': return validateThc(value);
-      case 'cbd': return validateCbd(value);
       case 'description': return validateDescription(value);
       case 'brand': return validateBrand(value);
       case 'ingredients': return validateIngredients(value);
@@ -362,7 +326,7 @@ export default function EditProductForm({
     enabled: true
   });
 
-  const allProductTypes = [...new Set([...DEFAULT_PRODUCT_TYPES, ...productTypes])];
+  const allProductTypes = [...new Set([...PRODUCT_TYPE_NAMES, ...productTypes])];
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
@@ -433,9 +397,17 @@ export default function EditProductForm({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="strain" className="text-sm font-medium text-gray-900">
-              Strain
-            </label>
+            <div className="flex justify-between items-center">
+              <label htmlFor="strain" className="text-sm font-medium text-gray-900">
+                Strain
+              </label>
+              <Link 
+                href="/grower/strains/add"
+                className="text-xs text-green-600 hover:text-green-700 font-medium"
+              >
+                + Add Strain
+              </Link>
+            </div>
             <select
               id="strain"
               value={formData.strainId}
@@ -450,9 +422,17 @@ export default function EditProductForm({
           </div>
 
           <div className="space-y-2">
-            <label htmlFor="batch" className="text-sm font-medium text-gray-900">
-              Batch
-            </label>
+            <div className="flex justify-between items-center">
+              <label htmlFor="batch" className="text-sm font-medium text-gray-900">
+                Batch
+              </label>
+              <Link 
+                href="/grower/batches/add"
+                className="text-xs text-green-600 hover:text-green-700 font-medium"
+              >
+                + Add Batch
+              </Link>
+            </div>
             <select
               id="batch"
               value={formData.batchId}
@@ -472,7 +452,7 @@ export default function EditProductForm({
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
-        <h3 className="text-lg font-semibold text-gray-900">Pricing & Inventory</h3>
+        <h3 className="text-lg font-semibold text-gray-900">Pricing &amp; Inventory</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -553,46 +533,6 @@ export default function EditProductForm({
 
       <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
         <h3 className="text-lg font-semibold text-gray-900">Details</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <label htmlFor="thc" className="text-sm font-medium text-gray-900">
-              THC %
-            </label>
-            <input
-              id="thc"
-              type="number"
-              step="0.1"
-              max="100"
-              value={formData.thc}
-              onChange={(e) => handleChange('thc', e.target.value)}
-              onBlur={() => handleBlur('thc')}
-              className={errors.thc && touched.thc ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-            />
-            {errors.thc && touched.thc && (
-              <p className="text-sm text-red-600 mt-1">{errors.thc}</p>
-            )}
-          </div>
-
-          <div className="space-y-2">
-            <label htmlFor="cbd" className="text-sm font-medium text-gray-900">
-              CBD %
-            </label>
-            <input
-              id="cbd"
-              type="number"
-              step="0.1"
-              max="100"
-              value={formData.cbd}
-              onChange={(e) => handleChange('cbd', e.target.value)}
-              onBlur={() => handleBlur('cbd')}
-              className={errors.cbd && touched.cbd ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-            />
-            {errors.cbd && touched.cbd && (
-              <p className="text-sm text-red-600 mt-1">{errors.cbd}</p>
-            )}
-          </div>
-        </div>
 
         <div className="space-y-2">
           <label htmlFor="description" className="text-sm font-medium text-gray-900">

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { Button } from '@/app/components/ui/Button';
+import { PRODUCT_TYPE_NAMES, getSubTypesForProductType } from '@/lib/product-types';
 
 interface ProductFormProps {
   initialData?: {
@@ -10,8 +11,7 @@ interface ProductFormProps {
     strain?: string;
     category?: string;
     subcategory?: string;
-    thc?: string;
-    cbd?: string;
+    
     price?: string;
     inventoryQty?: string;
     unit?: string;
@@ -29,30 +29,14 @@ interface ProductFormProps {
   growerBrand?: string;
 }
 
-const CATEGORY_OPTIONS = [
-  'Bulk Extract',
-  'Cartridge',
-  'Edibles',
-  'Drink',
-  'Flower',
-  'Live Plant',
-  'Merchandise',
-  'Plant Material',
-  'Prepack',
-  'Seed',
-  'Tincture',
-  'Topicals/Wellness',
-  'Other',
-];
+const CATEGORY_OPTIONS = PRODUCT_TYPE_NAMES;
 
 export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: ProductFormProps) {
   const [name, setName] = useState(initialData?.name || '');
   const [strain, setStrain] = useState(initialData?.strain || '');
   const [category, setCategory] = useState(initialData?.category || '');
   const [subcategory, setSubcategory] = useState(initialData?.subcategory || '');
-  const [thc, setThc] = useState(initialData?.thc || '');
-  const [cbd, setCbd] = useState(initialData?.cbd || '');
-  const [price, setPrice] = useState(initialData?.price || '');
+      const [price, setPrice] = useState(initialData?.price || '');
   const [inventoryQty, setInventoryQty] = useState(initialData?.inventoryQty || '');
   const [unit, setUnit] = useState(initialData?.unit || 'gram');
   const [description, setDescription] = useState(initialData?.description || '');
@@ -71,6 +55,8 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: Pr
   const [productImages, setProductImages] = useState<string[]>(initialData?.images || []);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
+  
+  const availableSubtypes = category ? getSubTypesForProductType(category) : [];
   
   const imageInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
@@ -158,8 +144,6 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: Pr
       strain,
       category,
       subcategory,
-      thc,
-      cbd,
       price,
       inventoryQty,
       unit,
@@ -201,7 +185,7 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: Pr
             id="category"
             required
             value={category}
-            onChange={(e) => setCategory(e.target.value)}
+            onChange={(e) => { setCategory(e.target.value); setSubcategory(''); }}
             className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
           >
             <option value="">Select a category</option>
@@ -225,18 +209,34 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: Pr
           />
         </div>
 
-        {/* Subcategory */}
+        {/* Subcategory - Dynamic based on category */}
         <div className="space-y-2">
           <label htmlFor="subcategory" className="text-sm font-medium text-gray-900">
             Subcategory
           </label>
-          <input
-            id="subcategory"
-            type="text"
-            value={subcategory}
-            onChange={(e) => setSubcategory(e.target.value)}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
-          />
+          {availableSubtypes.length > 0 ? (
+            <select
+              id="subcategory"
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+            >
+              <option value="">Select a subtype</option>
+              {availableSubtypes.map((sub) => (
+                <option key={sub} value={sub}>{sub}</option>
+              ))}
+            </select>
+          ) : (
+            <input
+              id="subcategory"
+              type="text"
+              value={subcategory}
+              onChange={(e) => setSubcategory(e.target.value)}
+              placeholder={category ? "No subtypes available - enter custom" : "Select a category first"}
+              disabled={!category}
+              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+            />
+          )}
         </div>
 
         {/* SKU */}
@@ -269,37 +269,8 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: Pr
           <p className="text-xs text-gray-500">Defaults to your grower brand</p>
         </div>
 
-        {/* THC */}
-        <div className="space-y-2">
-          <label htmlFor="thc" className="text-sm font-medium text-gray-900">
-            THC %
-          </label>
-          <input
-            id="thc"
-            type="number"
-            step="0.1"
-            max="100"
-            value={thc}
-            onChange={(e) => setThc(e.target.value)}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
-          />
-        </div>
-
-        {/* CBD */}
-        <div className="space-y-2">
-          <label htmlFor="cbd" className="text-sm font-medium text-gray-900">
-            CBD %
-          </label>
-          <input
-            id="cbd"
-            type="number"
-            step="0.1"
-            max="100"
-            value={cbd}
-            onChange={(e) => setCbd(e.target.value)}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
-          />
-        </div>
+        
+        
 
         {/* Price */}
         <div className="space-y-2">
