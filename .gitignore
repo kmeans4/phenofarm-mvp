@@ -1,13 +1,10 @@
-# Prisma
-prisma/
-schema.prisma
-.migrations/
-
 # Node modules
 node_modules/
 
 # Environment variables
 .env.local
+.env.production
+.env.vercel
 
 # Build output
 .next/
@@ -36,8 +33,3 @@ Thumbs.db
 # Docker
 Dockerfile
 .vercel
-
-# NEVER commit these
-.env.local
-.env.production
-.env.vercel

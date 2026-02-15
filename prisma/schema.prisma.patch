@@ -1,0 +1,8 @@
+--- a/prisma/schema.prisma
++++ b/prisma/schema.prisma
+@@ -44,6 +44,7 @@ model Grower {
+   website       String?
+   description   String?
+   logo          String?
++  isVerified    Boolean   @default(false)
+   products      Product[]
