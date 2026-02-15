@@ -5,6 +5,7 @@ import { db } from '@/lib/db';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { EmptyState } from '@/app/components/ui/EmptyState';
+import { ActivityFeed } from './ActivityFeed';
 
 interface StatCardProps {
   title: string;
@@ -29,54 +30,6 @@ function StatCard({ title, value, trend, trendUp, isEmpty }: StatCardProps) {
       {isEmpty && (
         <p className="text-xs text-gray-400 mt-1">No data yet</p>
       )}
-    </div>
-  );
-}
-
-interface ActivityItemProps {
-  type: 'order' | 'customer' | 'product' | 'sync';
-  title: string;
-  subtitle: string;
-  timestamp: Date | string;
-  status?: 'success' | 'pending' | 'error';
-}
-
-function ActivityItem({ type, title, subtitle, timestamp, status }: ActivityItemProps) {
-  const icons = {
-    order: '📦',
-    customer: '👤',
-    product: '🌱',
-    sync: '🔄',
-  };
-
-  const colors = {
-    order: 'bg-blue-100 text-blue-800',
-    customer: 'bg-purple-100 text-purple-800',
-    product: 'bg-green-100 text-green-800',
-    sync: 'bg-yellow-100 text-yellow-800',
-  };
-
-  return (
-    <div className="flex gap-4 py-4 border-b border-gray-100 last:border-0">
-      <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center ${colors[type]}`}>
-        <span className="text-xl">{icons[type]}</span>
-      </div>
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 truncate">{title}</p>
-        <p className="text-sm text-gray-500 truncate">{subtitle}</p>
-        <p className="text-xs text-gray-400 mt-1">
-          {format(timestamp, 'MMM d, h:mm a')}
-          {status && (
-            <span className={`ml-2 px-2 py-0.5 rounded text-xs font-medium ${
-              status === 'success' ? 'bg-green-100 text-green-800' :
-              status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-              'bg-red-100 text-red-800'
-            }`}>
-              {status}
-            </span>
-          )}
-        </p>
-      </div>
     </div>
   );
 }
@@ -145,7 +98,7 @@ export default async function GrowerDashboardPage() {
 
   // Fetch grower dashboard data
   const [recentOrders, recentCustomers, activeProducts, syncStatus] = await Promise.all([
-    // Recent orders (last 5)
+    // Recent orders (last 100 for client-side filtering)
     db.$queryRaw<{ orderId: string; dispensaryName: string; totalAmount: number; status: string; createdAt: Date }[]>`
       SELECT 
         o."orderId",
@@ -157,7 +110,7 @@ export default async function GrowerDashboardPage() {
       JOIN "dispensaries" d ON o."dispensaryId" = d.id
       WHERE o."growerId" = ${user.growerId}
       ORDER BY o."createdAt" DESC
-      LIMIT 5
+      LIMIT 100
     `,
     
     // Recent customers (from orders)
@@ -250,6 +203,15 @@ export default async function GrowerDashboardPage() {
   // Calculate max revenue for chart, avoid division by zero
   const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
 
+  // Serialize orders for client component
+  const serializedOrders = recentOrders.map(order => ({
+    orderId: order.orderId,
+    dispensaryName: order.dispensaryName,
+    totalAmount: Number(order.totalAmount),
+    status: order.status,
+    createdAt: order.createdAt.toISOString(),
+  }));
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -261,7 +223,7 @@ export default async function GrowerDashboardPage() {
           <p className="text-gray-600 mt-1">Welcome back! Here&apos;s your overview.</p>
         </div>
         <div className="flex gap-3">
-                    <button className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-sm font-medium transition-colors">
+          <button className="px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-sm font-medium transition-colors">
             Download Report
           </button>
           <Link href="/grower/products/add" className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors">
@@ -368,39 +330,16 @@ export default async function GrowerDashboardPage() {
         )}
       </div>
 
-      {/* Recent Activity */}
+      {/* Recent Activity with Date Filter */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Activity Feed</h2>
           <Link href="/grower/orders" className="text-sm text-green-600 hover:text-green-700 font-medium">
-            View All
+            View All Orders
           </Link>
         </div>
         <div className="px-6 pb-6">
-          {recentOrders.length > 0 ? (
-            <div className="space-y-0">
-              {recentOrders.map((order: { orderId: string; dispensaryName: string; totalAmount: unknown; status: string; createdAt: Date }) => (
-                <ActivityItem
-                  key={order.orderId}
-                  type="order"
-                  title={`Order #${order.orderId}`}
-                  subtitle={`From ${order.dispensaryName}`}
-                  timestamp={order.createdAt}
-                />
-              ))}
-            </div>
-          ) : (
-            <EmptyState
-              icon={
-                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                </svg>
-              }
-              title="No orders yet"
-              description="When dispensaries place orders for your products, they'll appear here."
-              action={{ label: 'Manage Products', href: '/grower/products' }}
-            />
-          )}
+          <ActivityFeed orders={serializedOrders} />
         </div>
       </div>
 
