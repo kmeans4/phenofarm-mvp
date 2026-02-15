@@ -26,6 +26,21 @@ export default function StrainsPage() {
   const [strains, setStrains] = useState<Strain[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
+
+  // Load view mode from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('strainViewMode');
+    if (saved === 'card' || saved === 'list') {
+      setViewMode(saved);
+    }
+  }, []);
+
+  // Save view mode to localStorage when changed
+  const handleViewModeChange = (mode: 'card' | 'list') => {
+    setViewMode(mode);
+    localStorage.setItem('strainViewMode', mode);
+  };
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -131,55 +146,144 @@ export default function StrainsPage() {
         </div>
       </div>
 
-      {/* Strains Grid */}
+      {/* View Toggle */}
+      <div className="flex justify-end">
+        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+          <button
+            onClick={() => handleViewModeChange('card')}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              viewMode === 'card'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+            title="Card View"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            <span className="hidden sm:inline">Cards</span>
+          </button>
+          <button
+            onClick={() => handleViewModeChange('list')}
+            className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+              viewMode === 'list'
+                ? 'bg-white text-gray-900 shadow-sm'
+                : 'text-gray-600 hover:text-gray-900'
+            }`}
+            title="List View"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <span className="hidden sm:inline">List</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Strains Display */}
       {strains.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {strains.map((strain) => (
-            <div key={strain.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-              <div className="p-4">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{strain.name}</h3>
-                    {strain.genetics && (
-                      <p className="text-sm text-gray-500 mt-1">{strain.genetics}</p>
-                    )}
+        viewMode === 'card' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {strains.map((strain) => (
+              <div key={strain.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                <div className="p-4">
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <h3 className="font-semibold text-gray-900">{strain.name}</h3>
+                      {strain.genetics && (
+                        <p className="text-sm text-gray-500 mt-1">{strain.genetics}</p>
+                      )}
+                    </div>
+                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
+                      Strain
+                    </span>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
-                    Strain
-                  </span>
-                </div>
 
-                {strain.description && (
-                  <p className="text-sm text-gray-600 mt-3 line-clamp-2">{strain.description}</p>
-                )}
+                  {strain.description && (
+                    <p className="text-sm text-gray-600 mt-3 line-clamp-2">{strain.description}</p>
+                  )}
 
-                {strain.growerNotes && (
-                  <p className="text-sm text-gray-500 mt-2 italic line-clamp-2">{strain.growerNotes}</p>
-                )}
+                  {strain.growerNotes && (
+                    <p className="text-sm text-gray-500 mt-2 italic line-clamp-2">{strain.growerNotes}</p>
+                  )}
 
-                <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
-                  <span>{strain._count.batches} batches</span>
-                  <span>{strain._count.products} products</span>
-                </div>
+                  <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
+                    <span>{strain._count.batches} batches</span>
+                    <span>{strain._count.products} products</span>
+                  </div>
 
-                <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                  <Button variant="outline" size="sm" asChild className="flex-1">
-                    <Link href={'/grower/strains/' + strain.id + '/edit'}>Edit</Link>
-                  </Button>
-                  <Button 
-                    variant="destructive" 
-                    size="sm"
-                    onClick={() => deleteStrain(strain.id)}
-                    disabled={strain._count.products > 0 || strain._count.batches > 0}
-                    title={strain._count.products > 0 || strain._count.batches > 0 ? 'Cannot delete strain with associated data' : 'Delete'}
-                  >
-                    Delete
-                  </Button>
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+                    <Button variant="outline" size="sm" asChild className="flex-1">
+                      <Link href={'/grower/strains/' + strain.id + '/edit'}>Edit</Link>
+                    </Button>
+                    <Button 
+                      variant="destructive" 
+                      size="sm"
+                      onClick={() => deleteStrain(strain.id)}
+                      disabled={strain._count.products > 0 || strain._count.batches > 0}
+                      title={strain._count.products > 0 || strain._count.batches > 0 ? 'Cannot delete strain with associated data' : 'Delete'}
+                    >
+                      Delete
+                    </Button>
+                  </div>
                 </div>
               </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Strain</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genetics</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batches</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {strains.map((strain) => (
+                    <tr key={strain.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="font-medium text-gray-900">{strain.name}</div>
+                        {strain.description && (
+                          <div className="text-sm text-gray-500 line-clamp-1">{strain.description}</div>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {strain.genetics || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {strain._count.batches}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-600">
+                        {strain._count.products}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={'/grower/strains/' + strain.id + '/edit'}>Edit</Link>
+                          </Button>
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => deleteStrain(strain.id)}
+                            disabled={strain._count.products > 0 || strain._count.batches > 0}
+                            title={strain._count.products > 0 || strain._count.batches > 0 ? 'Cannot delete strain with associated data' : 'Delete'}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
+          </div>
+        )
       ) : (
         <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
