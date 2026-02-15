@@ -28,7 +28,6 @@ export default async function EditProductPage({ params }: PageProps) {
   let productTypeConfigs: any[] = [];
 
   try {
-    // Fetch product with strain and batch relations
     product = await db.product.findFirst({
       where: { id, growerId: user.growerId },
       include: {
@@ -53,14 +52,12 @@ export default async function EditProductPage({ params }: PageProps) {
   }
 
   try {
-    // Fetch grower's strains for the dropdown
     strains = await db.strain.findMany({
       where: { growerId: user.growerId },
       select: { id: true, name: true },
       orderBy: { name: 'asc' },
     });
 
-    // Fetch grower's batches for the dropdown
     batches = await db.batch.findMany({
       where: { growerId: user.growerId },
       select: { id: true, batchNumber: true, strain: { select: { name: true } } },
@@ -68,12 +65,11 @@ export default async function EditProductPage({ params }: PageProps) {
       take: 50,
     });
 
-    // Fetch product type configs for dropdowns
     productTypeConfigs = await db.productTypeConfig.findMany({
       where: { 
         OR: [
           { growerId: user.growerId },
-          { growerId: null } // Global configs
+          { growerId: null }
         ]
       },
       select: { type: true, subTypes: true },
@@ -90,7 +86,6 @@ export default async function EditProductPage({ params }: PageProps) {
     );
   }
 
-  // Serialize properly
   const { strain, batch, ...productData } = product;
   
   const serializedProduct = {
@@ -106,15 +101,8 @@ export default async function EditProductPage({ params }: PageProps) {
     cbd: product.cbdLegacy ? Number(product.cbdLegacy) : null,
   };
 
-  // Get unique product types from configs
   const productTypes = productTypeConfigs.map(c => c.type);
   const uniqueProductTypes = [...new Set(productTypes)];
-
-  // Build subtypes map for the selected product type
-  const subtypesForType = (productType: string) => {
-    const config = productTypeConfigs.find(c => c.type === productType);
-    return config?.subTypes || [];
-  };
 
   return (
     <div className="space-y-6 p-4 max-w-4xl mx-auto">
@@ -128,7 +116,7 @@ export default async function EditProductPage({ params }: PageProps) {
         strains={strains}
         batches={batches}
         productTypes={uniqueProductTypes}
-        getSubtypesForType={subtypesForType}
+        productTypeConfigs={productTypeConfigs}
       />
     </div>
   );

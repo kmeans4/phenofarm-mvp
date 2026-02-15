@@ -60,7 +60,7 @@ interface EditProductFormProps {
   strains: Strain[];
   batches: Batch[];
   productTypes: string[];
-  getSubtypesForType: (type: string) => string[];
+  productTypeConfigs: { type: string; subTypes: string[] }[];
 }
 
 interface FormData {
@@ -175,7 +175,7 @@ export default function EditProductForm({
   strains, 
   batches,
   productTypes,
-  getSubtypesForType 
+  productTypeConfigs 
 }: EditProductFormProps) {
   const router = useRouter();
   const { showToast } = useToast();
@@ -222,7 +222,7 @@ export default function EditProductForm({
   });
 
   const availableSubtypes = formData.productType 
-    ? getSubtypesForType(formData.productType)
+    ? productTypeConfigs.find(c => c.type === formData.productType)?.subTypes || []
     : [];
 
   const filteredBatches = formData.strainId
