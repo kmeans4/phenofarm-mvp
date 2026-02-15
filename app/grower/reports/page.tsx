@@ -190,28 +190,41 @@ export default async function GrowerReportsPage() {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Monthly Revenue Chart */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <h2 className="text-lg font-semibold mb-4">Revenue Trend (Last 6 Months)</h2>
           {monthlyRevenue.length > 0 ? (
-            <div className="h-40 sm:h-48 flex items-end justify-between gap-1 sm:gap-2 px-2 overflow-x-auto pb-1">
-              {monthlyRevenue.map((month, idx) => {
-                const maxRevenue = Math.max(...monthlyRevenue.map(m => Number(m.revenue)));
-                const height = maxRevenue > 0 ? (Number(month.revenue) / maxRevenue) * 100 : 0;
-                const monthLabel = formatMonth(month.month);
-                if (!monthLabel) return null;
-                return (
-                  <div key={idx} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[44px]">
-                    <div 
-                      className="w-full bg-green-500 rounded-t hover:bg-green-600 transition-colors"
-                      style={{ height: `${Math.max(height, 4)}%`, minHeight: '4px' }}
-                      title={`$${Number(month.revenue).toLocaleString()}`}
-                    />
-                    <span className="text-xs text-gray-500">
-                      {monthLabel}
-                    </span>
-                  </div>
-                );
-              })}
+            <div className="relative">
+              {/* Mobile scroll hint */}
+              <div className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+                <div className="bg-gray-100 rounded-full p-1 shadow-sm">
+                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </div>
+              <div 
+                className="h-40 sm:h-48 flex items-end justify-between gap-1 sm:gap-2 px-2 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-2 scrollbar-hide"
+                style={{ WebkitOverflowScrolling: 'touch' }}
+              >
+                {monthlyRevenue.map((month, idx) => {
+                  const maxRevenue = Math.max(...monthlyRevenue.map(m => Number(m.revenue)));
+                  const height = maxRevenue > 0 ? (Number(month.revenue) / maxRevenue) * 100 : 0;
+                  const monthLabel = formatMonth(month.month);
+                  if (!monthLabel) return null;
+                  return (
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[36px] sm:min-w-[44px]">
+                      <div 
+                        className="w-full bg-green-500 rounded-t hover:bg-green-600 transition-colors"
+                        style={{ height: `${Math.max(height, 4)}%`, minHeight: '4px' }}
+                        title={`${Number(month.revenue).toLocaleString()}`}
+                      />
+                      <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
+                        {monthLabel}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           ) : (
             <div className="h-48 flex items-center justify-center text-gray-500">

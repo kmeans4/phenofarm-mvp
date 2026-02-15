@@ -300,32 +300,45 @@ export default async function GrowerDashboardPage() {
       </div>
 
       {/* Revenue Chart */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue Overview (Last 7 Days)</h2>
         {!hasRevenue ? (
           <RevenueChartEmpty />
         ) : (
-          <div className="h-48 sm:h-64 flex items-end justify-between gap-1 sm:gap-2 px-2 sm:px-4 overflow-x-auto pb-1">
-            {chartData.map((day, index) => (
-              <div key={index} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[40px]">
-                <div 
-                  className={`w-full rounded-t-lg transition-colors ${
-                    day.revenue > 0 
-                      ? 'bg-green-500 hover:bg-green-600' 
-                      : 'bg-gray-200'
-                  }`}
-                  style={{ height: `${Math.min((day.revenue / maxRevenue * 100), 100)}%`, minHeight: '4px' }}
-                />
-                <span className="text-[10px] sm:text-xs text-gray-500">
-                  {format(new Date(day.date), 'EEE')}
-                </span>
-                {day.revenue > 0 && (
-                  <span className="text-xs font-medium text-gray-700">
-                    ${day.revenue.toLocaleString()}
-                  </span>
-                )}
+          <div className="relative">
+            {/* Mobile scroll hint */}
+            <div className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none">
+              <div className="bg-gray-100 rounded-full p-1 shadow-sm">
+                <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </div>
-            ))}
+            </div>
+            <div 
+              className="h-48 sm:h-64 flex items-end justify-between gap-1 sm:gap-2 px-2 sm:px-4 overflow-x-auto pb-1 -mx-4 px-4 sm:mx-0 sm:px-4 scrollbar-hide"
+              style={{ WebkitOverflowScrolling: 'touch' }}
+            >
+              {chartData.map((day, index) => (
+                <div key={index} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[32px] sm:min-w-[40px]">
+                  <div 
+                    className={`w-full rounded-t-lg transition-colors ${
+                      day.revenue > 0 
+                        ? 'bg-green-500 hover:bg-green-600' 
+                        : 'bg-gray-200'
+                    }`}
+                    style={{ height: `${Math.min((day.revenue / maxRevenue * 100), 100)}%`, minHeight: '4px' }}
+                  />
+                  <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap">
+                    {format(new Date(day.date), 'EEE')}
+                  </span>
+                  {day.revenue > 0 && (
+                    <span className="text-[10px] sm:text-xs font-medium text-gray-700 whitespace-nowrap">
+                      ${(day.revenue / 1000).toFixed(0)}k
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
