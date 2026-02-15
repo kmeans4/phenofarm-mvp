@@ -88,7 +88,8 @@ export function useUnsavedChanges(options: UseUnsavedChangesOptions = {}) {
 
     // Override router.push
     const originalPush = originalPushRef.current;
-    router.push = async (...args: Parameters<typeof router.push>) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any,react-hooks/immutability
+    (router as any).push = async (...args: Parameters<typeof router.push>) => {
       if (confirmNavigation()) {
         return originalPush(...args);
       }
@@ -98,7 +99,8 @@ export function useUnsavedChanges(options: UseUnsavedChangesOptions = {}) {
 
     // Override router.replace
     const originalReplace = originalReplaceRef.current!;
-    router.replace = async (...args: Parameters<typeof router.replace>) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (router as any).replace = async (...args: Parameters<typeof router.replace>) => {
       if (confirmNavigation()) {
         return originalReplace(...args);
       }
@@ -107,7 +109,8 @@ export function useUnsavedChanges(options: UseUnsavedChangesOptions = {}) {
 
     // Override router.back
     const originalBack = originalBackRef.current!;
-    router.back = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (router as any).back = () => {
       if (confirmNavigation()) {
         originalBack();
       }
@@ -115,7 +118,8 @@ export function useUnsavedChanges(options: UseUnsavedChangesOptions = {}) {
 
     // Override router.forward
     const originalForward = originalForwardRef.current!;
-    router.forward = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (router as any).forward = () => {
       if (confirmNavigation()) {
         originalForward();
       }

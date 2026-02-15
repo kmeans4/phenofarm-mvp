@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
 import { ProductTypeSelector } from '../../components/ProductTypeSelector';
+import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { StrainSelector } from '../../components/StrainSelector';
 import { BatchSelector } from '../../components/BatchSelector';
 
@@ -67,6 +68,38 @@ export function ProductForm({
   });
 
   const [imagePreviews, setImagePreviews] = useState<string[]>(initialData.images || []);
+
+  // Store initial data for dirty tracking
+  const initialDataState = {
+    id: initialData?.id,
+    name: initialData?.name || '',
+    productType: initialData?.productType || '',
+    subType: initialData?.subType || '',
+    strainId: initialData?.strainId || '',
+    batchId: initialData?.batchId || '',
+    price: initialData?.price || '',
+    inventoryQty: initialData?.inventoryQty || '0',
+    unit: initialData?.unit || 'Gram',
+    description: initialData?.description || '',
+    isAvailable: initialData?.isAvailable !== undefined ? initialData.isAvailable : true,
+    images: initialData?.images || [],
+    sku: initialData?.sku || '',
+    brand: initialData?.brand || '',
+    ingredients: initialData?.ingredients || '',
+    isFeatured: initialData?.isFeatured || false,
+  };
+
+  // Set up unsaved changes warning
+  const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
+    enabled: true,
+    message: 'You have unsaved changes in this product. Are you sure you want to leave?',
+  });
+
+  // Track dirty state
+  useEffect(() => {
+    const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialDataState);
+    setIsDirty(hasChanges);
+  }, [formData, setIsDirty]);
 
   const handleChange = (field: keyof ProductFormData, value: string | boolean) => {
     if (field === 'strainId') {

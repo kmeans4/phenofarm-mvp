@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
 import { LogoUpload } from '@/app/components/settings/LogoUpload';
+import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 
 interface SettingsData {
   businessName: string;
@@ -19,13 +20,31 @@ interface SettingsData {
   logo: string;
 }
 
-export function SettingsForm({ defaultValues }: { defaultValues: SettingsData }) {
+interface SettingsFormProps {
+  defaultValues: SettingsData;
+}
+
+export function SettingsForm({ defaultValues }: SettingsFormProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   
   const [formData, setFormData] = useState<SettingsData>(defaultValues);
+  const [initialData, setInitialData] = useState<SettingsData>(defaultValues);
+
+  // Set up unsaved changes warning
+  const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
+    enabled: true,
+    message: 'You have unsaved changes in your settings. Are you sure you want to leave?',
+  });
+
+  // Track dirty state when formData changes
+  useEffect(() => {
+    if (loading) return;
+    const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
+    setIsDirty(hasChanges);
+  }, [formData, initialData, loading, setIsDirty]);
 
   // Fetch settings on mount
   useEffect(() => {
@@ -34,7 +53,7 @@ export function SettingsForm({ defaultValues }: { defaultValues: SettingsData })
         const res = await fetch('/api/dispensary/settings');
         if (res.ok) {
           const data = await res.json();
-          setFormData({
+          const loadedData: SettingsData = {
             businessName: data.businessName || '',
             licenseNumber: data.licenseNumber || '',
             contactName: data.contactName || '',
@@ -47,7 +66,9 @@ export function SettingsForm({ defaultValues }: { defaultValues: SettingsData })
             website: data.website || '',
             description: data.description || '',
             logo: data.logo || '',
-          });
+          };
+          setFormData(loadedData);
+          setInitialData(loadedData);
         }
       } catch (err) {
         console.error('Failed to load settings:', err);
@@ -76,7 +97,6 @@ export function SettingsForm({ defaultValues }: { defaultValues: SettingsData })
 
   const handleLogoUpload = async (logoBase64: string) => {
     setFormData(prev => ({ ...prev, logo: logoBase64 }));
-    // Auto-save logo
     await handleSave(true);
   };
 
@@ -100,6 +120,8 @@ export function SettingsForm({ defaultValues }: { defaultValues: SettingsData })
       if (!isLogoSave) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
+        setInitialData(formData);
+        resetDirtyState();
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to save settings');
@@ -130,21 +152,25 @@ export function SettingsForm({ defaultValues }: { defaultValues: SettingsData })
         </div>
       )}
 
+      {isDirty && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
+          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          <span>You have unsaved changes. Do not forget to save before leaving.</span>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Company Logo Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h2 className="text-lg font-semibold text-gray-900">Company Logo</h2>
           </div>
           <div className="p-6">
-            <LogoUpload 
-              currentLogo={formData.logo} 
-              onUpload={handleLogoUpload} 
-            />
+            <LogoUpload currentLogo={formData.logo} onUpload={handleLogoUpload} />
           </div>
         </div>
 
-        {/* Business Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h2 className="text-lg font-semibold text-gray-900">Business Information</h2>
@@ -233,7 +259,6 @@ export function SettingsForm({ defaultValues }: { defaultValues: SettingsData })
         </div>
       </div>
 
-      {/* Save Button */}
       <div className="flex justify-end pt-4">
         <button 
           onClick={() => handleSave(false)}

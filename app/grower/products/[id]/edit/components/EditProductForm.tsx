@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { Button } from '@/app/components/ui/Button';
 
 interface Strain {
@@ -15,41 +16,62 @@ interface Batch {
   strain?: { name: string } | null;
 }
 
+interface ProductData {
+  id: string;
+  name: string;
+  strainId?: string | null;
+  strainName?: string | null;
+  batchId?: string | null;
+  batchNumber?: string | null;
+  productType?: string | null;
+  subType?: string | null;
+  categoryLegacy?: string | null;
+  subcategoryLegacy?: string | null;
+  price: number;
+  inventoryQty: number;
+  unit: string;
+  description?: string | null;
+  isAvailable: boolean;
+  thc?: number | null;
+  cbd?: number | null;
+  sku?: string | null;
+  brand?: string | null;
+  ingredients?: string | null;
+  images?: string[];
+  isFeatured?: boolean;
+}
+
 interface EditProductFormProps {
-  product: {
-    id: string;
-    name: string;
-    strainId?: string | null;
-    strainName?: string | null;
-    batchId?: string | null;
-    batchNumber?: string | null;
-    productType?: string | null;
-    subType?: string | null;
-    categoryLegacy?: string | null;
-    subcategoryLegacy?: string | null;
-    price: number;
-    inventoryQty: number;
-    unit: string;
-    description?: string | null;
-    isAvailable: boolean;
-    thc?: number | null;
-    cbd?: number | null;
-    sku?: string | null;
-    brand?: string | null;
-    ingredients?: string | null;
-    images?: string[];
-    isFeatured?: boolean;
-  };
+  product: ProductData;
   strains: Strain[];
   batches: Batch[];
   productTypes: string[];
   getSubtypesForType: (type: string) => string[];
 }
 
+interface FormData {
+  name: string;
+  strainId: string;
+  batchId: string;
+  productType: string;
+  subType: string;
+  price: string;
+  inventoryQty: string;
+  unit: string;
+  description: string;
+  isAvailable: boolean;
+  thc: string;
+  cbd: string;
+  sku: string;
+  brand: string;
+  ingredients: string;
+  isFeatured: boolean;
+}
+
 const DEFAULT_PRODUCT_TYPES = [
   'Bulk Extract',
   'Cartridge',
-  'Edibles',
+  'Edible',
   'Drink',
   'Flower',
   'Live Plant',
@@ -73,8 +95,7 @@ export default function EditProductForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   
-  // Form state - use new schema fields or fall back to legacy
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: product?.name || '',
     strainId: product?.strainId || '',
     batchId: product?.batchId || '',
@@ -93,15 +114,44 @@ export default function EditProductForm({
     isFeatured: product?.isFeatured || false,
   });
 
-  // Available subtypes based on selected product type
+  const [initialData, setInitialData] = useState<FormData>({
+    name: product?.name || '',
+    strainId: product?.strainId || '',
+    batchId: product?.batchId || '',
+    productType: product?.productType || product?.categoryLegacy || '',
+    subType: product?.subType || product?.subcategoryLegacy || '',
+    price: product?.price?.toString() || '',
+    inventoryQty: product?.inventoryQty?.toString() || '',
+    unit: product?.unit || 'gram',
+    description: product?.description || '',
+    isAvailable: product?.isAvailable ?? true,
+    thc: product?.thc?.toString() || '',
+    cbd: product?.cbd?.toString() || '',
+    sku: product?.sku || '',
+    brand: product?.brand || '',
+    ingredients: product?.ingredients || '',
+    isFeatured: product?.isFeatured || false,
+  });
+
   const availableSubtypes = formData.productType 
     ? getSubtypesForType(formData.productType)
     : [];
 
-  // Filter batches by selected strain
   const filteredBatches = formData.strainId
     ? batches.filter(b => b.strain?.name === strains.find(s => s.id === formData.strainId)?.name)
     : batches;
+
+  // Set up unsaved changes warning
+  const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
+    enabled: true,
+    message: 'You have unsaved changes to this product. Are you sure you want to leave?',
+  });
+
+  // Track dirty state
+  useEffect(() => {
+    const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
+    setIsDirty(hasChanges);
+  }, [formData, initialData, setIsDirty]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -123,7 +173,6 @@ export default function EditProductForm({
           unit: formData.unit,
           description: formData.description || null,
           isAvailable: formData.isAvailable,
-          // Legacy fields for backwards compatibility
           strainLegacy: formData.strainId ? strains.find(s => s.id === formData.strainId)?.name || null : null,
           categoryLegacy: formData.productType || null,
           subcategoryLegacy: formData.subType || null,
@@ -141,6 +190,10 @@ export default function EditProductForm({
         throw new Error(data.error || 'Failed to update product');
       }
 
+      setInitialData(formData);
+      resetDirtyState();
+      setInitialData(formData);
+      resetDirtyState();
       router.push('/grower/products');
       router.refresh();
     } catch (err: unknown) {
@@ -154,16 +207,32 @@ export default function EditProductForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {error && (
+      {isDirty && (
+      <div className="p-4 mb-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-center gap-2">
+        <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
+        </svg>
+        <span>You have unsaved changes.</span>
+      </div>
+    )}
+    {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-600">{error}</p>
+        </div>
+      )}
+
+      {isDirty && (
+        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
+          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          <span>You have unsaved changes. Do not forget to save before leaving.</span>
         </div>
       )}
 
       <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
         <h3 className="text-lg font-semibold text-gray-900">Basic Information</h3>
         
-        {/* Product Name */}
         <div className="space-y-2">
           <label htmlFor="name" className="text-sm font-medium text-gray-900">
             Product Name *
@@ -179,7 +248,6 @@ export default function EditProductForm({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Product Type */}
           <div className="space-y-2">
             <label htmlFor="productType" className="text-sm font-medium text-gray-900">
               Product Type
@@ -197,7 +265,6 @@ export default function EditProductForm({
             </select>
           </div>
 
-          {/* Sub Type */}
           <div className="space-y-2">
             <label htmlFor="subType" className="text-sm font-medium text-gray-900">
               Sub Type
@@ -216,7 +283,6 @@ export default function EditProductForm({
             </select>
           </div>
 
-          {/* Strain */}
           <div className="space-y-2">
             <label htmlFor="strain" className="text-sm font-medium text-gray-900">
               Strain
@@ -234,7 +300,6 @@ export default function EditProductForm({
             </select>
           </div>
 
-          {/* Batch */}
           <div className="space-y-2">
             <label htmlFor="batch" className="text-sm font-medium text-gray-900">
               Batch
@@ -261,7 +326,6 @@ export default function EditProductForm({
         <h3 className="text-lg font-semibold text-gray-900">Pricing & Inventory</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Price */}
           <div className="space-y-2">
             <label htmlFor="price" className="text-sm font-medium text-gray-900">
               Price ($) *
@@ -277,7 +341,6 @@ export default function EditProductForm({
             />
           </div>
 
-          {/* Unit */}
           <div className="space-y-2">
             <label htmlFor="unit" className="text-sm font-medium text-gray-900">
               Unit *
@@ -298,7 +361,6 @@ export default function EditProductForm({
             </select>
           </div>
 
-          {/* Inventory */}
           <div className="space-y-2">
             <label htmlFor="inventoryQty" className="text-sm font-medium text-gray-900">
               Inventory Quantity *
@@ -314,7 +376,6 @@ export default function EditProductForm({
             />
           </div>
 
-          {/* SKU */}
           <div className="space-y-2">
             <label htmlFor="sku" className="text-sm font-medium text-gray-900">
               SKU
@@ -335,7 +396,6 @@ export default function EditProductForm({
         <h3 className="text-lg font-semibold text-gray-900">Details</h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* THC */}
           <div className="space-y-2">
             <label htmlFor="thc" className="text-sm font-medium text-gray-900">
               THC %
@@ -351,7 +411,6 @@ export default function EditProductForm({
             />
           </div>
 
-          {/* CBD */}
           <div className="space-y-2">
             <label htmlFor="cbd" className="text-sm font-medium text-gray-900">
               CBD %
@@ -368,7 +427,6 @@ export default function EditProductForm({
           </div>
         </div>
 
-        {/* Description */}
         <div className="space-y-2">
           <label htmlFor="description" className="text-sm font-medium text-gray-900">
             Description
@@ -382,7 +440,6 @@ export default function EditProductForm({
           />
         </div>
 
-        {/* Brand */}
         <div className="space-y-2">
           <label htmlFor="brand" className="text-sm font-medium text-gray-900">
             Brand
@@ -396,7 +453,6 @@ export default function EditProductForm({
           />
         </div>
 
-        {/* Ingredients */}
         <div className="space-y-2">
           <label htmlFor="ingredients" className="text-sm font-medium text-gray-900">
             Ingredients
@@ -455,4 +511,3 @@ export default function EditProductForm({
     </form>
   );
 }
-
