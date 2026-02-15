@@ -427,29 +427,35 @@ export default function GrowerProductsPage() {
       )}
 
       {/* Filter Tabs & View Toggle */}
-      <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-200">
-        <div className="flex flex-wrap items-center justify-between gap-2">
+      <div className="bg-white p-2 sm:p-3 rounded-xl shadow-sm border border-gray-200">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          {/* Filter Tabs */}
           <div className="flex flex-wrap gap-1">
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveFilter(tab.key as FilterType)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
                   activeFilter === tab.key
                     ? 'bg-green-600 text-white shadow-sm'
                     : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
                 }`}
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
                 </svg>
-                {tab.label}
+                <span className="hidden sm:inline">{tab.label}</span>
+                <span className="sm:hidden">
+                  {tab.key === 'all' ? 'All' : 
+                   tab.key === 'byProductType' ? 'Type' :
+                   tab.key === 'byStrain' ? 'Strain' : 'Batch'}
+                </span>
               </button>
             ))}
           </div>
           
           {/* View Mode Toggle */}
-          <div className="flex items-center gap-1 border-l border-gray-200 pl-2 ml-2">
+          <div className="flex items-center gap-1 border-t border-gray-200 pt-2 sm:border-t-0 sm:border-l sm:border-gray-200 sm:pt-0 sm:pl-3">
             <button
               onClick={() => setViewMode('card')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
