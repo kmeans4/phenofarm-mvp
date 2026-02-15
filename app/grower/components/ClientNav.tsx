@@ -1,6 +1,6 @@
 'use client';
 
-import React;
+import React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Badge } from '@/app/components/ui/Badge';
