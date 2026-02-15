@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
+import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
 import { Button } from '@/app/components/ui/Button';
 
@@ -238,6 +239,7 @@ export default function EditProductForm({
     setIsDirty(hasChanges);
   }, [formData, initialData, setIsDirty]);
 
+
   const validateForm = (): boolean => {
     const newErrors: FieldErrors = {
       name: validateName(formData.name),
@@ -351,6 +353,14 @@ export default function EditProductForm({
       setIsSubmitting(false);
     }
   };
+
+  // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
+  useKeyboardShortcuts({
+    onSave: handleSubmit,
+    onCancel: () => router.push("/grower/products"),
+    isDirty,
+    enabled: true
+  });
 
   const allProductTypes = [...new Set([...DEFAULT_PRODUCT_TYPES, ...productTypes])];
   const hasErrors = Object.keys(errors).length > 0;

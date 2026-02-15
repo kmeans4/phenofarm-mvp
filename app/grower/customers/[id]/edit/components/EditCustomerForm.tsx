@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
+import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
 
 interface Customer {
@@ -257,6 +258,14 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
       setIsSubmitting(false);
     }
   };
+
+  // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
+  useKeyboardShortcuts({
+    onSave: handleSubmit,
+    onCancel: () => router.push("/grower/customers"),
+    isDirty,
+    enabled: true
+  });
 
   const handleDelete = async () => {
     if (!confirm('Are you sure you want to delete this customer? This action cannot be undone.')) return;

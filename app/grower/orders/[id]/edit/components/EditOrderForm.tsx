@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
+import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
 
 interface OrderItem {
@@ -276,6 +277,14 @@ export default function EditOrderForm({ order }: { order: Order }) {
       setIsSubmitting(false);
     }
   };
+
+  // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
+  useKeyboardShortcuts({
+    onSave: handleSubmit,
+    onCancel: () => router.push("/grower/orders"),
+    isDirty,
+    enabled: true
+  });
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {

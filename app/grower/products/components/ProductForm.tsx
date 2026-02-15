@@ -9,6 +9,8 @@ import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { StrainSelector } from '../../components/StrainSelector';
 import { BatchSelector } from '../../components/BatchSelector';
 import { useToast } from '@/app/hooks/useToast';
+import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
+import { useRouter } from 'next/navigation';
 
 interface ProductFormData {
   id?: string;
@@ -161,6 +163,7 @@ export function ProductForm({
     setIsDirty(hasChanges);
   }, [formData, setIsDirty]);
 
+
   const validateForm = (): boolean => {
     const newErrors: FieldErrors = {
       name: validateName(formData.name),
@@ -277,6 +280,16 @@ export function ProductForm({
       images: getBase64Images(),
     });
   };
+
+  const router = useRouter();
+
+  // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
+  useKeyboardShortcuts({
+    onSave: handleSubmit,
+    onCancel: onCancel || (() => router.push("/grower/products")),
+    isDirty,
+    enabled: true
+  });
 
   const hasErrors = Object.keys(errors).length > 0;
 
