@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
@@ -14,6 +14,8 @@ interface StrainFormData {
 
 export default function AddStrainPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<StrainFormData>({
@@ -56,7 +58,11 @@ export default function AddStrainPage() {
       }
 
       alert('Strain created successfully!');
-      router.push('/grower/strains');
+      if (returnUrl) {
+        router.push(returnUrl);
+      } else {
+        router.push('/grower/strains');
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

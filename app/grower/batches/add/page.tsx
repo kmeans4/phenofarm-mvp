@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
@@ -26,6 +26,8 @@ interface BatchFormData {
 
 export default function AddBatchPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl');
   const [loading, setLoading] = useState(false);
   const [fetchingStrains, setFetchingStrains] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -77,17 +79,7 @@ export default function AddBatchPage() {
       setLoading(true);
       setError(null);
 
-      // Parse terpenes JSON if provided
-      let terpenesParsed = null;
-      if (formData.terpenes.trim()) {
-        try {
-          terpenesParsed = JSON.parse(formData.terpenes.trim());
-        } catch {
-          setError('Invalid JSON format for terpenes');
-          setLoading(false);
-          return;
-        }
-      }
+      // Terpenes stored as plain text
 
       const response = await fetch('/api/batches', {
         method: 'POST',
@@ -100,7 +92,7 @@ export default function AddBatchPage() {
           thc: formData.thc.trim() || null,
           cbd: formData.cbd.trim() || null,
           totalCannabinoids: formData.totalCannabinoids.trim() || null,
-          terpenes: terpenesParsed,
+          terpenes: formData.terpenes.trim() || null,
           coaDocumentUrl: formData.coaDocumentUrl.trim() || null,
           notes: formData.notes.trim() || null
         })
@@ -112,7 +104,11 @@ export default function AddBatchPage() {
       }
 
       alert('Batch created successfully!');
-      router.push('/grower/batches');
+      if (returnUrl) {
+        router.push(returnUrl);
+      } else {
+        router.push('/grower/batches');
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -214,7 +210,7 @@ export default function AddBatchPage() {
                   required
                   value={formData.strainId}
                   onChange={(e) => handleChange('strainId', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full h-[42px] rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   <option value="">Select a strain</option>
                   {strains.map(strain => (
@@ -285,7 +281,7 @@ export default function AddBatchPage() {
 
             <div className="space-y-2">
               <label htmlFor="terpenes" className="block text-sm font-medium text-gray-700">
-                Terpenes (JSON)
+                Terpenes
               </label>
               <textarea
                 id="terpenes"

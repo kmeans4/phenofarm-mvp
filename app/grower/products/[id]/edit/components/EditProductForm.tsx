@@ -74,8 +74,6 @@ interface FormData {
   unit: string;
   description: string;
   isAvailable: boolean;
-  thc: string;
-  cbd: string;
   sku: string;
   brand: string;
   ingredients: string;
@@ -162,8 +160,6 @@ export default function EditProductForm({
     unit: product?.unit || 'gram',
     description: product?.description || '',
     isAvailable: product?.isAvailable ?? true,
-    thc: product?.thc?.toString() || '',
-    cbd: product?.cbd?.toString() || '',
     sku: product?.sku || '',
     brand: product?.brand || '',
     ingredients: product?.ingredients || '',
@@ -181,8 +177,6 @@ export default function EditProductForm({
     unit: product?.unit || 'gram',
     description: product?.description || '',
     isAvailable: product?.isAvailable ?? true,
-    thc: product?.thc?.toString() || '',
-    cbd: product?.cbd?.toString() || '',
     sku: product?.sku || '',
     brand: product?.brand || '',
     ingredients: product?.ingredients || '',
@@ -196,6 +190,23 @@ export default function EditProductForm({
   const filteredBatches = formData.strainId
     ? batches.filter(b => b.strain?.name === strains.find(s => s.id === formData.strainId)?.name)
     : batches;
+
+  // Restore form data if returning from strain/batch add
+  useEffect(() => {
+    const savedData = sessionStorage.getItem('editProductFormData');
+    const returnUrl = sessionStorage.getItem('editProductReturnUrl');
+    if (savedData && returnUrl === window.location.pathname) {
+      try {
+        const parsed = JSON.parse(savedData);
+        setFormData(parsed);
+        setInitialData(parsed);
+        sessionStorage.removeItem('editProductFormData');
+        sessionStorage.removeItem('editProductReturnUrl');
+      } catch {
+        // ignore parse errors
+      }
+    }
+  }, []);
 
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: true,
@@ -292,8 +303,8 @@ export default function EditProductForm({
           strainLegacy: formData.strainId ? strains.find(s => s.id === formData.strainId)?.name || null : null,
           categoryLegacy: formData.productType || null,
           subcategoryLegacy: formData.subType || null,
-          thcLegacy: formData.thc ? parseFloat(formData.thc) : null,
-          cbdLegacy: formData.cbd ? parseFloat(formData.cbd) : null,
+          thcLegacy: null,
+          cbdLegacy: null,
           sku: formData.sku || null,
           brand: formData.brand || null,
           ingredients: formData.ingredients || null,
@@ -401,12 +412,17 @@ export default function EditProductForm({
               <label htmlFor="strain" className="text-sm font-medium text-gray-900">
                 Strain
               </label>
-              <Link 
-                href="/grower/strains/add"
+              <button
+                type="button"
+                onClick={() => {
+                  sessionStorage.setItem('editProductFormData', JSON.stringify(formData));
+                  sessionStorage.setItem('editProductReturnUrl', window.location.pathname);
+                  router.push('/grower/strains/add?returnUrl=' + encodeURIComponent(window.location.pathname));
+                }}
                 className="text-xs text-green-600 hover:text-green-700 font-medium"
               >
                 + Add Strain
-              </Link>
+              </button>
             </div>
             <select
               id="strain"
@@ -426,12 +442,17 @@ export default function EditProductForm({
               <label htmlFor="batch" className="text-sm font-medium text-gray-900">
                 Batch
               </label>
-              <Link 
-                href="/grower/batches/add"
+              <button
+                type="button"
+                onClick={() => {
+                  sessionStorage.setItem('editProductFormData', JSON.stringify(formData));
+                  sessionStorage.setItem('editProductReturnUrl', window.location.pathname);
+                  router.push('/grower/batches/add?returnUrl=' + encodeURIComponent(window.location.pathname));
+                }}
                 className="text-xs text-green-600 hover:text-green-700 font-medium"
               >
                 + Add Batch
-              </Link>
+              </button>
             </div>
             <select
               id="batch"
@@ -636,7 +657,7 @@ export default function EditProductForm({
         <Button 
           type="submit" 
           variant="primary" 
-          disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
+          disabled={isSubmitting}
         >
           {isSubmitting ? 'Saving...' : 'Save Changes'}
         </Button>
