@@ -27,7 +27,7 @@ interface BatchFormData {
 export default function AddBatchPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnUrl = searchParams.get('returnUrl');
+  const returnUrl = searchParams?.get('returnUrl');
   const [loading, setLoading] = useState(false);
   const [fetchingStrains, setFetchingStrains] = useState(true);
   const [error, setError] = useState<string | null>(null);

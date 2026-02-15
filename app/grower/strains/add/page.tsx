@@ -15,7 +15,7 @@ interface StrainFormData {
 export default function AddStrainPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnUrl = searchParams.get('returnUrl');
+  const returnUrl = searchParams?.get('returnUrl');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<StrainFormData>({
