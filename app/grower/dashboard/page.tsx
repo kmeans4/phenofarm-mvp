@@ -4,26 +4,31 @@ import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import Link from 'next/link';
 import { format } from 'date-fns';
+import { EmptyState } from '@/app/components/ui/EmptyState';
 
 interface StatCardProps {
   title: string;
   value: string | number;
   trend?: string;
   trendUp?: boolean;
+  isEmpty?: boolean;
 }
 
-function StatCard({ title, value, trend, trendUp }: StatCardProps) {
+function StatCard({ title, value, trend, trendUp, isEmpty }: StatCardProps) {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+    <div className={`bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow ${isEmpty ? 'opacity-75' : ''}`}>
       <p className="text-sm text-gray-600">{title}</p>
       <div className="flex items-baseline gap-2 mt-1">
         <p className="text-2xl font-bold text-gray-900">{value}</p>
-        {trend && (
+        {trend && !isEmpty && (
           <span className={`text-sm font-medium ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
             {trend}
           </span>
         )}
       </div>
+      {isEmpty && (
+        <p className="text-xs text-gray-400 mt-1">No data yet</p>
+      )}
     </div>
   );
 }
@@ -106,6 +111,22 @@ function QuickAction({ title, href, icon, description, color }: QuickActionProps
         </div>
       </div>
     </Link>
+  );
+}
+
+// Revenue chart empty state component
+function RevenueChartEmpty() {
+  return (
+    <EmptyState
+      icon={
+        <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+      }
+      title="No revenue data yet"
+      description="Start adding products and receiving orders to see your revenue trend here."
+      action={{ label: 'Add Your First Product', href: '/grower/products/add' }}
+    />
   );
 }
 
@@ -192,6 +213,9 @@ export default async function GrowerDashboardPage() {
     activeProducts: activeProducts[0]?.count || 0,
   };
 
+  const hasData = stats.totalOrders > 0 || stats.activeProducts > 0;
+  const hasRevenue = revenueData.length > 0 && revenueData.some(d => Number(d.revenue) > 0);
+
   // Revenue chart data (last 7 days)
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = new Date();
@@ -248,15 +272,32 @@ export default async function GrowerDashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard title="Total Orders" value={stats.totalOrders} trend="+12%" trendUp={true} />
+        <StatCard 
+          title="Total Orders" 
+          value={stats.totalOrders} 
+          trend={stats.totalOrders > 0 ? "+12%" : undefined} 
+          trendUp={true} 
+          isEmpty={stats.totalOrders === 0}
+        />
         <StatCard 
           title="Total Revenue" 
           value={isNaN(stats.totalRevenue) ? '$0.00' : `\u0024${Number(stats.totalRevenue).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-          trend="+8.5%"
+          trend={stats.totalRevenue > 0 ? "+8.5%" : undefined}
           trendUp={true}
+          isEmpty={stats.totalRevenue === 0}
         />
-        <StatCard title="Active Customers" value={stats.activeCustomers} trend="+3" trendUp={true} />
-        <StatCard title="Pending Orders" value={stats.pendingOrders} />
+        <StatCard 
+          title="Active Customers" 
+          value={stats.activeCustomers} 
+          trend={stats.activeCustomers > 0 ? "+3" : undefined} 
+          trendUp={true} 
+          isEmpty={stats.activeCustomers === 0}
+        />
+        <StatCard 
+          title="Active Products" 
+          value={stats.activeProducts}
+          isEmpty={stats.activeProducts === 0}
+        />
       </div>
 
       {/* Quick Actions */}
@@ -269,7 +310,7 @@ export default async function GrowerDashboardPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           }
-          description="Browse your inventory and manage products"
+          description={stats.activeProducts > 0 ? `You have ${stats.activeProducts} active products` : "No products yet — add your first one"}
           color="blue"
         />
         <QuickAction
@@ -299,28 +340,32 @@ export default async function GrowerDashboardPage() {
       {/* Revenue Chart */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">Revenue Overview (Last 7 Days)</h2>
-        <div className="h-64 flex items-end justify-between gap-2 px-4">
-          {chartData.map((day, index) => (
-            <div key={index} className="flex-1 flex flex-col items-center gap-2">
-              <div 
-                className={`w-full rounded-t-lg transition-colors ${
-                  day.revenue > 0 
-                    ? 'bg-green-500 hover:bg-green-600' 
-                    : 'bg-gray-200'
-                }`}
-                style={{ height: `${Math.min((day.revenue / maxRevenue * 100), 100)}%`, minHeight: '4px' }}
-              />
-              <span className="text-xs text-gray-500">
-                {format(new Date(day.date), 'EEE')}
-              </span>
-              {day.revenue > 0 && (
-                <span className="text-xs font-medium text-gray-700">
-                  ${day.revenue.toLocaleString()}
+        {!hasRevenue ? (
+          <RevenueChartEmpty />
+        ) : (
+          <div className="h-64 flex items-end justify-between gap-2 px-4">
+            {chartData.map((day, index) => (
+              <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                <div 
+                  className={`w-full rounded-t-lg transition-colors ${
+                    day.revenue > 0 
+                      ? 'bg-green-500 hover:bg-green-600' 
+                      : 'bg-gray-200'
+                  }`}
+                  style={{ height: `${Math.min((day.revenue / maxRevenue * 100), 100)}%`, minHeight: '4px' }}
+                />
+                <span className="text-xs text-gray-500">
+                  {format(new Date(day.date), 'EEE')}
                 </span>
-              )}
-            </div>
-          ))}
-        </div>
+                {day.revenue > 0 && (
+                  <span className="text-xs font-medium text-gray-700">
+                    ${day.revenue.toLocaleString()}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Recent Activity */}
@@ -345,15 +390,37 @@ export default async function GrowerDashboardPage() {
               ))}
             </div>
           ) : (
-            <div className="py-8 text-center text-gray-500">
-              <p>No recent orders found</p>
-              <Link href="/grower/products" className="text-green-600 hover:text-green-700 mt-2 inline-block">
-                Add products to start receiving orders
-              </Link>
-            </div>
+            <EmptyState
+              icon={
+                <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              }
+              title="No orders yet"
+              description="When dispensaries place orders for your products, they'll appear here."
+              action={{ label: 'Manage Products', href: '/grower/products' }}
+            />
           )}
         </div>
       </div>
+
+      {/* Getting Started Banner - only show when no data */}
+      {!hasData && (
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-green-900">🌱 Welcome to PhenoFarm!</h3>
+              <p className="text-green-700 mt-1">Get started by adding your first product to your catalog.</p>
+            </div>
+            <Link 
+              href="/grower/products/add" 
+              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors whitespace-nowrap"
+            >
+              Add First Product
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

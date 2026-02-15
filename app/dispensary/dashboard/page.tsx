@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Badge } from '@/app/components/ui/Badge';
+import { EmptyState } from '@/app/components/ui/EmptyState';
 import Link from 'next/link';
 import { format, subDays, startOfDay } from 'date-fns';
 
@@ -85,6 +86,17 @@ const statusLabels: Record<string, string> = {
   SHIPPED: 'Shipped', DELIVERED: 'Delivered', CANCELLED: 'Cancelled',
 };
 
+// Empty state for stats
+function StatCardEmpty({ title, value }: { title: string; value: string | number }) {
+  return (
+    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 opacity-75">
+      <p className="text-sm text-gray-600">{title}</p>
+      <p className="text-2xl font-bold text-gray-400 mt-1">{value}</p>
+      <p className="text-xs text-gray-400 mt-1">No data yet</p>
+    </div>
+  );
+}
+
 export default async function DispensaryDashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect('/auth/sign_in');
@@ -92,6 +104,8 @@ export default async function DispensaryDashboardPage() {
   if (user.role !== 'DISPENSARY') redirect('/dashboard');
 
   const data = await fetchDispensaryDashboardData(user.dispensaryId!);
+  const hasOrders = data.orders.length > 0;
+  const hasSpending = data.last7Days.some(d => d.revenue > 0);
 
   return (
     <div className="space-y-6 p-4">
@@ -106,24 +120,35 @@ export default async function DispensaryDashboardPage() {
         </Link>
       </div>
 
-      {/* Stats Cards - matching orders page style */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Total Spent</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">${data.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Pending Orders</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{data.pendingOrders}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Active Growers</p>
-          <p className="text-2xl font-bold text-yellow-600 mt-1">{data.activeGrowers}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Active Orders</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">{data.activeOrders}</p>
-        </div>
+        {hasOrders ? (
+          <>
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-sm text-gray-600">Total Spent</p>
+              <p className="text-2xl font-bold text-gray-900 mt-1">${data.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-sm text-gray-600">Pending Orders</p>
+              <p className="text-2xl font-bold text-blue-600 mt-1">{data.pendingOrders}</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-sm text-gray-600">Active Growers</p>
+              <p className="text-2xl font-bold text-yellow-600 mt-1">{data.activeGrowers}</p>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+              <p className="text-sm text-gray-600">Active Orders</p>
+              <p className="text-2xl font-bold text-green-600 mt-1">{data.activeOrders}</p>
+            </div>
+          </>
+        ) : (
+          <>
+            <StatCardEmpty title="Total Spent" value="$0.00" />
+            <StatCardEmpty title="Pending Orders" value="0" />
+            <StatCardEmpty title="Active Growers" value="0" />
+            <StatCardEmpty title="Active Orders" value="0" />
+          </>
+        )}
       </div>
 
       {/* Quick Actions */}
@@ -168,25 +193,25 @@ export default async function DispensaryDashboardPage() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-            <Link href="/dispensary/orders" className="text-sm text-green-600 hover:text-green-700 font-medium">View All</Link>
+            {hasOrders && (
+              <Link href="/dispensary/orders" className="text-sm text-green-600 hover:text-green-700 font-medium">View All</Link>
+            )}
           </div>
         </CardHeader>
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order #</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grower</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {data.orders.length === 0 ? (
-                <tr><td colSpan={5} className="px-6 py-4 text-center text-gray-500">No orders yet</td></tr>
-              ) : (
-                data.orders.map((order) => (
+          {hasOrders ? (
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order #</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Grower</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {data.orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap font-medium text-gray-900">#{order.orderId}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">{order.grower?.businessName}</td>
@@ -198,14 +223,27 @@ export default async function DispensaryDashboardPage() {
                       </Badge>
                     </td>
                   </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <div className="px-6 pb-6">
+              <EmptyState
+                icon={
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                  </svg>
+                }
+                title="No orders yet"
+                description="Start browsing grower catalogs and place your first order. Your order history will appear here."
+                action={{ label: 'Browse Catalog', href: '/dispensary/catalog' }}
+              />
+            </div>
+          )}
         </div>
       </Card>
 
-      {/* Featured Products & Quick Stats */}
+      {/* Featured Products & 7-Day Spending */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardHeader>
@@ -213,7 +251,16 @@ export default async function DispensaryDashboardPage() {
           </CardHeader>
           <CardContent>
             {data.featuredProducts.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No products ordered yet</p>
+              <EmptyState
+                icon={
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                }
+                title="No products yet"
+                description="Products you order will appear here for quick reordering."
+                action={{ label: 'Browse Catalog', href: '/dispensary/catalog' }}
+              />
             ) : (
               <div className="space-y-3">
                 {data.featuredProducts.map((product) => (
@@ -235,20 +282,50 @@ export default async function DispensaryDashboardPage() {
             <CardTitle className="text-lg font-semibold text-gray-900">7-Day Spending</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="h-48 flex items-end justify-between gap-2">
-              {data.last7Days.map((day, index) => (
-                <div key={index} className="flex-1 flex flex-col items-center gap-2">
-                  <div className="w-full flex flex-col gap-1">
-                    <div className="w-full bg-green-500 rounded-t-lg" style={{ height: `${Math.min((day.revenue / 5000) * 100, 100)}%` }} />
+            {!hasSpending ? (
+              <EmptyState
+                icon={
+                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                }
+                title="No spending data yet"
+                description="Your spending activity will be tracked here once you start placing orders."
+              />
+            ) : (
+              <div className="h-48 flex items-end justify-between gap-2">
+                {data.last7Days.map((day, index) => (
+                  <div key={index} className="flex-1 flex flex-col items-center gap-2">
+                    <div className="w-full flex flex-col gap-1">
+                      <div className="w-full bg-green-500 rounded-t-lg" style={{ height: `${Math.min((day.revenue / 5000) * 100, 100)}%` }} />
+                    </div>
+                    <span className="text-xs text-gray-500">{day.day}</span>
+                    <span className="text-xs font-medium text-green-600">${Math.round(day.revenue)}</span>
                   </div>
-                  <span className="text-xs text-gray-500">{day.day}</span>
-                  <span className="text-xs font-medium text-green-600">${Math.round(day.revenue)}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      {/* Getting Started Banner - only show when no data */}
+      {!hasOrders && (
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <h3 className="text-lg font-semibold text-blue-900">🏪 Welcome to PhenoFarm!</h3>
+              <p className="text-blue-700 mt-1">Get started by browsing grower catalogs and finding products for your dispensary.</p>
+            </div>
+            <Link 
+              href="/dispensary/catalog" 
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors whitespace-nowrap"
+            >
+              Browse Catalogs
+            </Link>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
