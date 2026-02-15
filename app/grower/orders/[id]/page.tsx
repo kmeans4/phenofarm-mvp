@@ -130,13 +130,13 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Order #{order.orderId}</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order #{order.orderId}</h1>
+          <p className="text-gray-600 mt-1 text-sm sm:text-base">
             Placed on {format(new Date(order.createdAt), 'MMMM d, yyyy')}
           </p>
         </div>
-        <div className="flex gap-3">
-          <Link href="/grower/orders" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <Link href="/grower/orders" className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm sm:text-base text-center">
             ← Back
           </Link>
           <QuickStatusUpdate orderId={order.id} currentStatus={order.status} />
@@ -153,40 +153,40 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <CardContent>
               <div className="space-y-4">
                 {order.items.map((item) => (
-                  <div key={item.id} className="flex justify-between items-start py-3 border-b border-gray-100 last:border-0">
-                    <div>
-                      <p className="font-medium text-gray-900">{item.product?.name || 'Unknown Product'}</p>
+                  <div key={item.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-start py-3 border-b border-gray-100 last:border-0 gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 text-sm sm:text-base">{item.product?.name || 'Unknown Product'}</p>
                       {item.product?.strain && (
-                        <p className="text-sm text-gray-500">Strain: {item.product.strain}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">Strain: {item.product.strain}</p>
                       )}
                       {item.product?.productType && (
-                        <p className="text-sm text-gray-500">
+                        <p className="text-xs sm:text-sm text-gray-500">
                           Type: {item.product.productType} {item.product.subType && `- ${item.product.subType}`}
                         </p>
                       )}
-                      <p className="text-sm text-gray-500">
+                      <p className="text-xs sm:text-sm text-gray-500">
                         {item.quantity} × {formatCurrency(item.unitPrice)}/{item.product?.unit || 'unit'}
                       </p>
                     </div>
-                    <p className="font-medium text-gray-900">{formatCurrency(item.totalPrice)}</p>
+                    <p className="font-medium text-gray-900 text-sm sm:text-base sm:text-right">{formatCurrency(item.totalPrice)}</p>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
-                <div className="flex justify-between text-gray-600">
+              <div className="mt-4 sm:mt-6 pt-4 border-t border-gray-200 space-y-1 sm:space-y-2">
+                <div className="flex justify-between text-gray-600 text-sm sm:text-base">
                   <span>Subtotal</span>
                   <span>{formatCurrency(order.subtotal)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 text-sm sm:text-base">
                   <span>Tax</span>
                   <span>{formatCurrency(order.tax)}</span>
                 </div>
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-gray-600 text-sm sm:text-base">
                   <span>Shipping</span>
                   <span>{formatCurrency(order.shippingFee)}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t border-gray-200">
+                <div className="flex justify-between font-bold text-gray-900 pt-2 border-t border-gray-200 text-base sm:text-lg">
                   <span>Total</span>
                   <span>{formatCurrency(order.totalAmount)}</span>
                 </div>

@@ -111,13 +111,13 @@ export default function QuickStatusUpdate({ orderId, currentStatus }: QuickStatu
   }
   
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-4">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Update Status</h3>
-          <p className="text-sm text-gray-600">Quick actions to move order forward</p>
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">Update Status</h3>
+          <p className="text-xs sm:text-sm text-gray-600">Quick actions to move order forward</p>
         </div>
-        <span className={`px-3 py-1 rounded-full text-sm font-medium border ${config.color}`}>
+        <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border self-start ${config.color}`}>
           {config.label}
         </span>
       </div>
@@ -128,15 +128,15 @@ export default function QuickStatusUpdate({ orderId, currentStatus }: QuickStatu
         </div>
       )}
       
-      <div className="flex flex-wrap gap-3">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3">
         {config.actions.map((action) => (
           <button
             key={action.status}
             onClick={() => handleStatusChange(action.status)}
             disabled={isUpdating}
             className={`
-              relative px-4 py-2 rounded-lg text-white text-sm font-medium
-              transition-colors disabled:opacity-50
+              relative px-3 sm:px-4 py-2 rounded-lg text-white text-xs sm:text-sm font-medium
+              transition-colors disabled:opacity-50 whitespace-nowrap
               ${action.color}
               ${showConfirmation === action.status ? 'ring-2 ring-offset-2 ring-gray-400' : ''}
             `}

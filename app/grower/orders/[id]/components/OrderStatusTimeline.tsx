@@ -95,19 +95,19 @@ export default function OrderStatusTimeline({
       {/* Timeline */}
       <div className="relative">
         {/* Progress Line */}
-        <div className="absolute top-6 left-0 right-0 h-1 bg-gray-200 -translate-y-1/2" />
+        <div className="absolute top-4 sm:top-6 left-0 right-0 h-0.5 sm:h-1 bg-gray-200 -translate-y-1/2 mx-4 sm:mx-6" />
         <div 
-          className="absolute top-6 left-0 h-1 bg-green-500 -translate-y-1/2 transition-all duration-500"
-          style={{ width: `${(currentIndex / (STATUS_FLOW.length - 1)) * 100}%` }}
+          className="absolute top-4 sm:top-6 left-0 h-0.5 sm:h-1 bg-green-500 -translate-y-1/2 transition-all duration-500 mx-4 sm:mx-6"
+          style={{ width: `calc(${(currentIndex / (STATUS_FLOW.length - 1)) * 100}% - ${currentIndex === 0 ? '1rem' : currentIndex === STATUS_FLOW.length - 1 ? '2rem' : '1.5rem'})` }}
         />
         
         {/* Steps */}
         <div className="relative flex justify-between">
           {STATUS_FLOW.map((step, index) => (
-            <div key={step.status} className="flex flex-col items-center">
+            <div key={step.status} className="flex flex-col items-center flex-1 px-1">
               <div className={`
-                w-12 h-12 rounded-full flex items-center justify-center text-xl
-                border-4 transition-all duration-300
+                w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-base sm:text-xl
+                border-2 sm:border-4 transition-all duration-300
                 ${index <= currentIndex 
                   ? 'border-green-500 bg-white' 
                   : 'border-gray-300 bg-gray-100'}
@@ -116,11 +116,11 @@ export default function OrderStatusTimeline({
                   {step.icon}
                 </span>
               </div>
-              <div className="mt-2 text-center">
-                <p className={`text-sm font-medium ${getStatusTextColor(index)}`}>
+              <div className="mt-1 sm:mt-2 text-center min-w-0">
+                <p className={`text-xs sm:text-sm font-medium truncate ${getStatusTextColor(index)}`}>
                   {step.label}
                 </p>
-                <p className="text-xs text-gray-500 hidden sm:block">
+                <p className="text-[10px] sm:text-xs text-gray-500 hidden sm:block">
                   {step.description}
                 </p>
               </div>
@@ -159,14 +159,14 @@ export default function OrderStatusTimeline({
       
       {/* Quick Actions */}
       {onStatusChange && currentStatus !== 'DELIVERED' && currentStatus !== 'CANCELLED' && (
-        <div className="mt-6 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3">
           {prevStatus && currentIndex > 0 && (
             <button
               onClick={() => handleStatusUpdate(prevStatus.status)}
               disabled={isUpdating}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-sm font-medium disabled:opacity-50"
+              className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-medium disabled:opacity-50 whitespace-nowrap"
             >
-              ← Back to {prevStatus.label}
+              ← Back
             </button>
           )}
           
@@ -174,7 +174,7 @@ export default function OrderStatusTimeline({
             <button
               onClick={() => handleStatusUpdate(nextStatus.status)}
               disabled={isUpdating}
-              className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium disabled:opacity-50 flex items-center gap-2"
+              className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs sm:text-sm font-medium disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
             >
               Mark as {nextStatus.label}
               {isUpdating && (
@@ -189,9 +189,9 @@ export default function OrderStatusTimeline({
           <button
             onClick={() => handleStatusUpdate('CANCELLED')}
             disabled={isUpdating}
-            className="ml-auto px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 text-sm font-medium disabled:opacity-50"
+            className="sm:ml-auto px-3 sm:px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 text-xs sm:text-sm font-medium disabled:opacity-50 whitespace-nowrap"
           >
-            Cancel Order
+            Cancel
           </button>
         </div>
       )}
