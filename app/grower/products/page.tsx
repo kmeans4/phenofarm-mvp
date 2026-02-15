@@ -8,7 +8,6 @@ import { ExtendedUser } from '@/types';
 import { Button } from '@/app/components/ui/Button';
 
 type FilterType = 'all' | 'byProductType' | 'byStrain' | 'byBatch';
-
 interface Strain {
   id: string;
   name: string;
@@ -49,6 +48,21 @@ export default function GrowerProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<FilterType>('all');
+  const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
+
+  // Load view mode from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('productViewMode');
+    if (saved === 'card' || saved === 'list') {
+      setViewMode(saved);
+    }
+  }, []);
+
+  // Save view mode to localStorage when changed
+  const handleViewModeChange = (mode: 'card' | 'list') => {
+    setViewMode(mode);
+    localStorage.setItem('productViewMode', mode);
+  };
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -190,6 +204,19 @@ export default function GrowerProductsPage() {
     { key: 'byBatch', label: 'By Batch', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
   ] as const;
 
+  // View mode toggle icons
+  const CardViewIcon = () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+    </svg>
+  );
+
+  const ListViewIcon = () => (
+    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  );
+
   const ProductCard = ({ product }: { product: Product }) => {
     const strainName = getStrainName(product);
     
@@ -283,6 +310,192 @@ export default function GrowerProductsPage() {
     );
   };
 
+  // Product Row component for list view
+  const ProductRow = ({ product }: { product: Product }) => {
+    const strainName = getStrainName(product);
+    
+    return (
+      <tr className="hover:bg-gray-50 transition-colors">
+        <td className="px-4 py-3">
+          <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>
+          {strainName && <div className="text-sm text-gray-500">{strainName}</div>}
+        </td>
+        <td className="px-4 py-3 text-sm text-gray-600">
+          {product?.productType || product?.categoryLegacy || '-'}
+        </td>
+        <td className="px-4 py-3">
+          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+            product?.isAvailable 
+              ? 'bg-green-100 text-green-700' 
+              : 'bg-gray-100 text-gray-700'
+          }`}>
+            {product?.isAvailable ? 'Available' : 'Unavailable'}
+          </span>
+        </td>
+        <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+          ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
+        </td>
+        <td className="px-4 py-3 text-sm text-gray-600">
+          <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
+            {product?.inventoryQty || 0} {product?.unit}
+          </span>
+        </td>
+        <td className="px-4 py-3">
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" asChild>
+              <Link href={'/grower/products/' + product?.id + '/edit'}>Edit</Link>
+            </Button>
+            <Button 
+              variant="secondary" 
+              size="sm"
+              onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
+            >
+              {product?.isAvailable ? 'Disable' : 'Enable'}
+            </Button>
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => deleteProduct(product?.id)}
+            >
+              Delete
+            </Button>
+          </div>
+        </td>
+      </tr>
+    );
+  };
+
+  // Product Table component for list view
+  const ProductTable = ({ products }: { products: Product[] }) => (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inventory</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {products.map((product) => (
+              <ProductRow key={product.id} product={product} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+
+  const ProductRow = ({ product }: { product: Product }) => {
+    const strainName = getStrainName(product);
+    const type = product.productType || product.categoryLegacy || '-';
+    const batchLabel = product.batch?.batchNumber 
+      ? product.batch.batchNumber
+      : product.batchId 
+        ? product.batchId.slice(0, 8) + '...'
+        : '-';
+    const isLowStock = (product?.inventoryQty || 0) <= 5;
+
+    return (
+      <tr className="hover:bg-gray-50 transition-colors">
+        <td className="px-4 py-3">
+          <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>
+          {batchLabel !== '-' && (
+            <div className="text-xs text-gray-500">Batch: {batchLabel}</div>
+          )}
+        </td>
+        <td className="px-4 py-3 text-sm text-gray-600">{strainName || '-'}</td>
+        <td className="px-4 py-3 text-sm text-gray-600">{type}</td>
+        <td className="px-4 py-3 text-sm font-medium text-gray-900">
+          ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
+          <span className="text-xs text-gray-500 font-normal">/{product?.unit || 'unit'}</span>
+        </td>
+        <td className="px-4 py-3 text-sm">
+          <span className={isLowStock ? 'text-red-600 font-medium' : 'text-gray-600'}>
+            {product?.inventoryQty || 0}
+          </span>
+        </td>
+        <td className="px-4 py-3">
+          <span 
+            className={'inline-flex px-2 py-1 rounded-full text-xs font-medium ' + (
+              product?.isAvailable 
+                ? 'bg-green-100 text-green-700' 
+                : 'bg-gray-100 text-gray-700'
+            )}
+          >
+            {product?.isAvailable ? 'Available' : 'Unavailable'}
+          </span>
+        </td>
+        <td className="px-4 py-3">
+          <div className="flex items-center gap-1">
+            <Button variant="ghost" size="sm" asChild className="h-8 w-8 p-0">
+              <Link href={'/grower/products/' + product?.id + '/edit'} title="Edit">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </Link>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
+              className="h-8 w-8 p-0"
+              title={product?.isAvailable ? 'Disable' : 'Enable'}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                {product?.isAvailable ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                )}
+              </svg>
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => deleteProduct(product?.id)}
+              className="h-8 w-8 p-0 text-red-600 hover:text-red-700 hover:bg-red-50"
+              title="Delete"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </Button>
+          </div>
+        </td>
+      </tr>
+    );
+  };
+
+  const ProductTable = ({ products }: { products: Product[] }) => {
+    return (
+      <div className="overflow-x-auto bg-white rounded-lg border border-gray-200">
+        <table className="w-full text-left">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Name</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Strain</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Type</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Inventory</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+              <th className="px-4 py-3 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {products.map((product) => (
+              <ProductRow key={product.id} product={product} />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -330,25 +543,59 @@ export default function GrowerProductsPage() {
         </div>
       )}
 
-      {/* Filter Tabs */}
+      {/* Filter Tabs & View Toggle */}
       <div className="bg-white p-2 rounded-xl shadow-sm border border-gray-200">
-        <div className="flex flex-wrap gap-1">
-          {filterTabs.map((tab) => (
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex flex-wrap gap-1">
+            {filterTabs.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveFilter(tab.key as FilterType)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                  activeFilter === tab.key
+                    ? 'bg-green-600 text-white shadow-sm'
+                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                }`}
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
+                </svg>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          
+          {/* View Mode Toggle */}
+          <div className="flex items-center gap-1 border-l border-gray-200 pl-2 ml-2">
             <button
-              key={tab.key}
-              onClick={() => setActiveFilter(tab.key as FilterType)}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                activeFilter === tab.key
+              onClick={() => setViewMode('card')}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                viewMode === 'card'
                   ? 'bg-green-600 text-white shadow-sm'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
+              title="Card view"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
               </svg>
-              {tab.label}
+              <span className="hidden sm:inline">Cards</span>
             </button>
-          ))}
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                viewMode === 'list'
+                  ? 'bg-green-600 text-white shadow-sm'
+                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+              }`}
+              title="List view"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M3 6h18M3 18h18" />
+              </svg>
+              <span className="hidden sm:inline">List</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -369,12 +616,16 @@ export default function GrowerProductsPage() {
                 <div className="h-px flex-1 bg-gray-200"></div>
               </div>
 
-              {/* Products Grid for this group */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {groups[groupName]?.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
+              {/* Products Display based on view mode */}
+              {viewMode === 'card' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {groups[groupName]?.map((product) => (
+                    <ProductCard key={product.id} product={product} />
+                  ))}
+                </div>
+              ) : (
+                <ProductTable products={groups[groupName] || []} />
+              )}
             </div>
           ))}
         </div>
