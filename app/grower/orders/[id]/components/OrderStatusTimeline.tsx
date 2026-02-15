@@ -36,14 +36,18 @@ export default function OrderStatusTimeline({
   
   const currentIndex = STATUS_FLOW.findIndex(s => s.status === currentStatus);
   
+  // Handle CANCELLED or unknown status
+  const effectiveIndex = currentIndex >= 0 ? currentIndex : 0;
+  
   const getStatusTextColor = (index: number) => {
-    if (index <= currentIndex) return 'text-green-700';
+    if (currentStatus === 'CANCELLED') return index === effectiveIndex ? 'text-red-600' : 'text-gray-400';
+    if (index <= effectiveIndex) return 'text-green-700';
     return 'text-gray-400';
   };
   
   const getNextStatus = () => {
     if (currentStatus === 'CANCELLED') return null;
-    const nextIndex = currentIndex + 1;
+    const nextIndex = effectiveIndex + 1;
     if (nextIndex < STATUS_FLOW.length) {
       return STATUS_FLOW[nextIndex];
     }
@@ -52,8 +56,8 @@ export default function OrderStatusTimeline({
   
   const getPrevStatus = () => {
     if (currentStatus === 'CANCELLED') return null;
-    if (currentIndex > 0) {
-      return STATUS_FLOW[currentIndex - 1];
+    if (effectiveIndex > 0) {
+      return STATUS_FLOW[effectiveIndex - 1];
     }
     return null;
   };
@@ -98,7 +102,7 @@ export default function OrderStatusTimeline({
         <div className="absolute top-4 left-4 right-4 h-0.5 sm:h-1 bg-gray-200 sm:top-6">
           <div 
             className="h-full bg-green-500 transition-all duration-500"
-            style={{ width: `${(currentIndex / (STATUS_FLOW.length - 1)) * 100}%` }}
+            style={{ width: `${(effectiveIndex / (STATUS_FLOW.length - 1)) * 100}%` }}
           />
         </div>
         
@@ -130,17 +134,17 @@ export default function OrderStatusTimeline({
       {/* Current Status Info */}
       <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
         <div className="flex items-center gap-3">
-          <span className="text-xl sm:text-2xl flex-shrink-0">{STATUS_FLOW[currentIndex]?.icon}</span>
+          <span className="text-xl sm:text-2xl flex-shrink-0">{STATUS_FLOW[effectiveIndex]?.icon || '📋'}</span>
           <div className="min-w-0 flex-1">
-            <p className="font-medium text-green-800 text-sm sm:text-base">
-              Currently: {STATUS_FLOW[currentIndex]?.label}
+            <p className={`font-medium text-sm sm:text-base ${currentStatus === 'CANCELLED' ? 'text-red-800' : 'text-green-800'}`}>
+              Currently: {STATUS_FLOW[effectiveIndex]?.label || currentStatus}
             </p>
-            <p className="text-xs sm:text-sm text-green-600">
+            <p className={`text-xs sm:text-sm ${currentStatus === 'CANCELLED' ? 'text-red-600' : 'text-green-600'}`}>
               {currentStatus === 'SHIPPED' && shippedAt 
                 ? `Shipped on ${new Date(shippedAt).toLocaleDateString()}`
                 : currentStatus === 'DELIVERED' && deliveredAt
                 ? `Delivered on ${new Date(deliveredAt).toLocaleDateString()}`
-                : STATUS_FLOW[currentIndex]?.description
+                : STATUS_FLOW[effectiveIndex]?.description || ''
               }
             </p>
           </div>
@@ -156,7 +160,7 @@ export default function OrderStatusTimeline({
       {/* Quick Actions */}
       {onStatusChange && currentStatus !== 'DELIVERED' && currentStatus !== 'CANCELLED' && (
         <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
-          {prevStatus && currentIndex > 0 && (
+          {prevStatus && effectiveIndex > 0 && (
             <button
               onClick={() => handleStatusUpdate(prevStatus.status)}
               disabled={isUpdating}
@@ -196,7 +200,7 @@ export default function OrderStatusTimeline({
       <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
         <h3 className="text-xs sm:text-sm font-medium text-gray-900 mb-2 sm:mb-3">Status History</h3>
         <div className="space-y-2">
-          {STATUS_FLOW.slice(0, currentIndex + 1).reverse().map((step, idx) => (
+          {STATUS_FLOW.slice(0, effectiveIndex + 1).reverse().map((step, idx) => (
             <div key={step.status} className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
               <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 flex-shrink-0" />
               <span className="text-gray-600">
