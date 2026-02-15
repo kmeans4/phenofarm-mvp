@@ -3,7 +3,35 @@ import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { Prisma } from '@prisma/client';
 
-// GET all products for the authenticated grower with filtering and sorting
+/**
+ * Products API Endpoint
+ * 
+ * Base path: /api/products
+ * Authentication: Required (GROWER role)
+ * 
+ * This endpoint manages cannabis products for authenticated growers.
+ * Supports filtering by product type, strain, batch, availability, and search terms.
+ */
+
+/**
+ * GET /api/products
+ * 
+ * Retrieves all products for the authenticated grower with optional filtering and sorting.
+ * 
+ * Query Parameters:
+ * - productType (optional): Filter by product type (e.g., 'FLOWER', 'EDIBLE')
+ * - strainId (optional): Filter by associated strain ID
+ * - batchId (optional): Filter by associated batch ID
+ * - isAvailable (optional): Filter by availability status ('true' or 'false')
+ * - search (optional): Search in name, strainLegacy, and description fields
+ * - sortBy (optional): Sort field, defaults to 'createdAt'
+ * - sortOrder (optional): Sort direction ('asc' or 'desc'), defaults to 'desc'
+ * 
+ * Response: 200 OK - Array of serialized product objects
+ * Response: 401 Unauthorized - No valid session
+ * Response: 403 Forbidden - User is not a GROWER or has no growerId
+ * Response: 500 Internal Server Error - Database or server error
+ */
 export async function GET(request: NextRequest) {
   try {
     const session = await getAuthSession();
@@ -80,7 +108,38 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// POST create a new product
+/**
+ * POST /api/products
+ * 
+ * Creates a new product for the authenticated grower.
+ * 
+ * Request Body:
+ * - name (required): Product name (string)
+ * - price (required): Product price as number (will be converted to Decimal)
+ * - inventoryQty (required): Stock quantity as integer
+ * - unit (required): Unit of measurement (e.g., 'GRAM', 'OUNCE')
+ * - productType (optional): Category of product
+ * - subType (optional): Sub-category of product
+ * - strainId (optional): ID of associated strain (must belong to grower)
+ * - batchId (optional): ID of associated batch (must belong to grower)
+ * - description (optional): Product description
+ * - images (optional): Array of image URLs
+ * - isAvailable (optional): Boolean, defaults to true
+ * - sku (optional): Stock keeping unit identifier
+ * - brand (optional): Brand name
+ * - ingredients (optional): List of ingredients
+ * - ingredientsDocumentUrl (optional): URL to ingredients document
+ * - isFeatured (optional): Boolean, defaults to false
+ * - strainLegacy, categoryLegacy, subcategoryLegacy (optional): Legacy fields
+ * - thcLegacy, cbdLegacy (optional): Legacy cannabinoid percentages
+ * 
+ * Response: 201 Created - Newly created product object
+ * Response: 400 Bad Request - Missing required fields
+ * Response: 401 Unauthorized - No valid session
+ * Response: 403 Forbidden - User is not a GROWER
+ * Response: 404 Not Found - Associated strain or batch not found
+ * Response: 500 Internal Server Error - Database or server error
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();

@@ -3,12 +3,51 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 
+/**
+ * Orders API Endpoint
+ * 
+ * Base path: /api/orders
+ * Authentication: Required (GROWER or DISPENSARY role)
+ * 
+ * This endpoint manages cannabis product orders between growers and dispensaries.
+ * Growers can create orders and view their outgoing orders.
+ * Dispensaries can view their incoming orders.
+ */
+
 interface OrderItemInput {
   productId: string;
   quantity: number;
   unitPrice: number;
 }
 
+/**
+ * POST /api/orders
+ * 
+ * Creates a new order from a grower to a dispensary.
+ * Only users with GROWER role can create orders.
+ * 
+ * Request Body:
+ * - dispensaryId (required): ID of the target dispensary
+ * - items (required): Array of order items, each containing:
+ *   - productId (string): ID of the product
+ *   - quantity (number): Quantity ordered
+ *   - unitPrice (number): Price per unit
+ * - notes (optional): Order notes or special instructions
+ * - shippingFee (optional): Shipping cost as number
+ * 
+ * Business Logic:
+ * - Subtotal is calculated from items (quantity * unitPrice)
+ * - Tax is automatically calculated as 6% of subtotal
+ * - Total amount = subtotal + tax + shippingFee
+ * - Order status is set to 'PENDING' on creation
+ * - Order ID is auto-generated as 'ORD-{timestamp}'
+ * 
+ * Response: 201 Created - Newly created order with items and relations
+ * Response: 400 Bad Request - Missing required fields (dispensaryId or items)
+ * Response: 401 Unauthorized - No valid session
+ * Response: 403 Forbidden - User is not a GROWER
+ * Response: 500 Internal Server Error - Database or server error
+ */
 export async function POST(request: NextRequest) {
   try {
     const session: any = await getServerSession(authOptions);
@@ -71,6 +110,25 @@ export async function POST(request: NextRequest) {
   }
 }
 
+/**
+ * GET /api/orders
+ * 
+ * Retrieves orders for the authenticated user.
+ * - GROWERs see orders they created (outgoing orders)
+ * - DISPENSARYs see orders placed with them (incoming orders)
+ * 
+ * Query Parameters: None
+ * 
+ * Response includes:
+ * - Order details (id, orderId, status, totals, notes)
+ * - Dispensary business name
+ * - Order items with product names
+ * - Sorted by createdAt descending (newest first)
+ * 
+ * Response: 200 OK - Array of order objects
+ * Response: 401 Unauthorized - No valid session
+ * Response: 500 Internal Server Error - Database or server error
+ */
 export async function GET(request: NextRequest) {
   try {
     const session: any = await getServerSession(authOptions);

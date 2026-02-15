@@ -3,7 +3,34 @@ import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import bcrypt from 'bcryptjs';
 
-// GET all dispensaries (customers)
+/**
+ * Customers API Endpoint
+ * 
+ * Base path: /api/customers
+ * Authentication: Required (GROWER role)
+ * 
+ * This endpoint manages dispensary customers for growers. "Customers" in this context
+ * refers to dispensaries that purchase products from growers. The endpoint handles
+ * both listing existing dispensaries and creating new customer accounts.
+ */
+
+/**
+ * GET /api/customers
+ * 
+ * Retrieves all dispensaries (customers) in the system.
+ * Only accessible by users with GROWER role.
+ * 
+ * Query Parameters: None
+ * 
+ * Response includes:
+ * - All dispensary records with associated user details (email, name)
+ * - Full dispensary profile information
+ * 
+ * Response: 200 OK - Array of dispensary objects with user relation
+ * Response: 401 Unauthorized - No valid session
+ * Response: 403 Forbidden - User is not a GROWER
+ * Response: 500 Internal Server Error - Database or server error
+ */
 export async function GET() {
   try {
     const session = await getAuthSession();
@@ -31,7 +58,40 @@ export async function GET() {
   }
 }
 
-// POST create a new customer (creates User + Dispensary)
+/**
+ * POST /api/customers
+ * 
+ * Creates a new customer (dispensary) account.
+ * Only accessible by users with GROWER role.
+ * 
+ * This endpoint creates both a User record and associated Dispensary profile.
+ * A temporary random password is generated for the new account.
+ * 
+ * Request Body:
+ * - businessName (required): Official business name of the dispensary
+ * - email (required): Contact email (must be unique in system)
+ * - contactName (optional): Primary contact person's name
+ * - phone (optional): Business phone number
+ * - address (optional): Street address
+ * - city (optional): City
+ * - state (optional): State code, defaults to 'VT'
+ * - zipCode (optional): ZIP code
+ * - licenseNumber (optional): Cannabis dispensary license number
+ * 
+ * Business Logic:
+ * - Email uniqueness is validated before creation
+ * - Temporary password is auto-generated (12 chars, random)
+ * - Password is hashed with bcrypt (10 rounds)
+ * - User role is set to 'DISPENSARY'
+ * - User and Dispensary records are created in a sequence (not transactional)
+ * 
+ * Response: 201 Created - Newly created dispensary object with email
+ * Response: 400 Bad Request - Missing required fields (businessName or email)
+ * Response: 401 Unauthorized - No valid session
+ * Response: 403 Forbidden - User is not a GROWER
+ * Response: 409 Conflict - Email already exists in system
+ * Response: 500 Internal Server Error - Database or server error
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();

@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
 
+/**
+ * Checkout API Endpoint
+ * 
+ * Base path: /api/checkout
+ * Authentication: Required (DISPENSARY role)
+ * 
+ * This endpoint processes cart checkout for dispensaries, creating orders
+ * from multiple growers. Handles inventory deduction and order splitting
+ * when cart contains products from different growers.
+ */
+
 interface CartItem {
   id: string;
   growerId: string;
@@ -17,6 +28,39 @@ interface OrderItemData {
   totalPrice: number;
 }
 
+/**
+ * POST /api/checkout
+ * 
+ * Processes checkout from a dispensary's shopping cart.
+ * Creates one order per grower when cart contains items from multiple growers.
+ * 
+ * Request Body:
+ * - items (required): Array of cart items, each containing:
+ *   - id (string): Product ID
+ *   - growerId (string): ID of the grower selling the product
+ *   - price (number): Unit price
+ *   - quantity (number): Quantity to purchase
+ * - notes (optional): Order notes or special instructions
+ * 
+ * Business Logic:
+ * - Items are automatically grouped by growerId
+ * - One order is created per unique grower in the cart
+ * - Inventory is deducted atomically during order creation
+ * - Orders with insufficient inventory are skipped and reported as errors
+ * - Tax is calculated at 6% per order subtotal
+ * - Order IDs are auto-generated as 'ORD-{timestamp}-{sequence}'
+ * 
+ * Response: 200 OK - Checkout result with:
+ *   - success (boolean): true if at least one order created
+ *   - orders (array): Created orders with id and orderId
+ *   - orderCount (number): Number of orders created
+ *   - errors (array, optional): List of inventory errors by product ID
+ * 
+ * Response: 400 Bad Request - Empty cart or missing dispensary profile
+ * Response: 401 Unauthorized - No valid session
+ * Response: 403 Forbidden - User is not a DISPENSARY
+ * Response: 500 Internal Server Error - Database or server error
+ */
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
