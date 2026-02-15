@@ -9,6 +9,12 @@ import { Button } from '@/app/components/ui/Button';
 
 type FilterType = 'all' | 'byProductType' | 'byStrain' | 'byBatch';
 
+interface Strain {
+  id: string;
+  name: string;
+  genetics: string | null;
+}
+
 interface Batch {
   id: string;
   batchNumber: string;
@@ -17,7 +23,7 @@ interface Batch {
 interface Product {
   id: string;
   name: string;
-  strain: string | null;
+  strain: Strain | null;
   strainLegacy: string | null;
   category: string | null;
   categoryLegacy: string | null;
@@ -114,6 +120,13 @@ export default function GrowerProductsPage() {
     }
   };
 
+  // Get strain name for display
+  const getStrainName = (product: Product): string => {
+    if (product.strain?.name) return product.strain.name;
+    if (product.strainLegacy) return product.strainLegacy;
+    return '';
+  };
+
   // Group products based on active filter
   const getGroupedProducts = (): { groups: GroupedProducts; groupOrder: string[] } => {
     const groups: GroupedProducts = {};
@@ -136,12 +149,12 @@ export default function GrowerProductsPage() {
       });
     } else if (activeFilter === 'byStrain') {
       products.forEach(product => {
-        const strain = product.strain || product.strainLegacy || 'Unknown Strain';
-        if (!groups[strain]) {
-          groups[strain] = [];
-          groupOrder.push(strain);
+        const strainName = getStrainName(product) || 'Unknown Strain';
+        if (!groups[strainName]) {
+          groups[strainName] = [];
+          groupOrder.push(strainName);
         }
-        groups[strain].push(product);
+        groups[strainName].push(product);
       });
     } else if (activeFilter === 'byBatch') {
       products.forEach(product => {
@@ -177,103 +190,98 @@ export default function GrowerProductsPage() {
     { key: 'byBatch', label: 'By Batch', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
   ] as const;
 
-  const getFilterLabel = () => {
-    switch (activeFilter) {
-      case 'byProductType': return 'Products by Type';
-      case 'byStrain': return 'Products by Strain';
-      case 'byBatch': return 'Products by Batch';
-      default: return 'All Products';
-    }
-  };
+  const ProductCard = ({ product }: { product: Product }) => {
+    const strainName = getStrainName(product);
+    
+    return (
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200">
+        {/* Card Header */}
+        <div className="p-4 border-b border-gray-100">
+          <div className="flex justify-between items-start gap-2">
+            <div className="min-w-0 flex-1">
+              <p className="font-semibold text-gray-900 truncate">{product?.name || 'Unnamed Product'}</p>
+              {strainName && (
+                <p className="text-sm text-gray-500 truncate">{strainName}</p>
+              )}
+            </div>
+            <span 
+              className={'px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ' + (
+                product?.isAvailable 
+                  ? 'bg-green-100 text-green-700 border border-green-200' 
+                  : 'bg-gray-100 text-gray-700 border border-gray-200'
+              )}
+            >
+              {product?.isAvailable ? 'Available' : 'Unavailable'}
+            </span>
+          </div>
+        </div>
 
-  const ProductCard = ({ product }: { product: Product }) => (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200">
-      {/* Card Header */}
-      <div className="p-4 border-b border-gray-100">
-        <div className="flex justify-between items-start gap-2">
-          <div className="min-w-0 flex-1">
-            <p className="font-semibold text-gray-900 truncate">{product?.name || 'Unnamed Product'}</p>
-            {(product?.strain || product?.strainLegacy) && (
-              <p className="text-sm text-gray-500 truncate">{product.strain || product.strainLegacy}</p>
+        {/* Card Body */}
+        <div className="p-4">
+          <div className="flex justify-between items-baseline mb-3">
+            <p className="text-2xl font-bold text-gray-900">
+              ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
+            </p>
+            <p className="text-sm text-gray-500">per {product?.unit || 'unit'}</p>
+          </div>
+          
+          {/* Additional Info */}
+          <div className="space-y-1 mb-3">
+            {(product?.productType || product?.categoryLegacy) && (
+              <p className="text-xs text-gray-500">
+                <span className="font-medium">Type:</span> {product.productType || product.categoryLegacy}
+              </p>
+            )}
+            {product?.batch?.batchNumber && (
+              <p className="text-xs text-gray-500">
+                <span className="font-medium">Batch:</span> {product.batch.batchNumber}
+              </p>
             )}
           </div>
-          <span 
-            className={'px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ' + (
-              product?.isAvailable 
-                ? 'bg-green-100 text-green-700 border border-green-200' 
-                : 'bg-gray-100 text-gray-700 border border-gray-200'
-            )}
-          >
-            {product?.isAvailable ? 'Available' : 'Unavailable'}
-          </span>
-        </div>
-      </div>
-
-      {/* Card Body */}
-      <div className="p-4">
-        <div className="flex justify-between items-baseline mb-3">
-          <p className="text-2xl font-bold text-gray-900">
-            ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
-          </p>
-          <p className="text-sm text-gray-500">per {product?.unit || 'unit'}</p>
-        </div>
-        
-        {/* Additional Info */}
-        <div className="space-y-1 mb-3">
-          {(product?.productType || product?.categoryLegacy) && (
-            <p className="text-xs text-gray-500">
-              <span className="font-medium">Type:</span> {product.productType || product.categoryLegacy}
-            </p>
-          )}
-          {product?.batch?.batchNumber && (
-            <p className="text-xs text-gray-500">
-              <span className="font-medium">Batch:</span> {product.batch.batchNumber}
-            </p>
-          )}
-        </div>
-        
-        <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-          <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
-            {product?.inventoryQty || 0} in stock
-          </span>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-          <Button variant="outline" size="sm" asChild className="flex-1">
-            <Link href={'/grower/products/' + product?.id + '/edit'}>
-              <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-              </svg>
-              Edit
-            </Link>
-          </Button>
           
-          <Button 
-            variant="secondary" 
-            size="sm"
-            onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
-            className="flex-1"
-          >
-            {product?.isAvailable ? 'Disable' : 'Enable'}
-          </Button>
-          
-          <Button 
-            variant="destructive" 
-            size="sm"
-            onClick={() => deleteProduct(product?.id)}
-          >
+          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
-          </Button>
+            <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
+              {product?.inventoryQty || 0} in stock
+            </span>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
+            <Button variant="outline" size="sm" asChild className="flex-1">
+              <Link href={'/grower/products/' + product?.id + '/edit'}>
+                <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Edit
+              </Link>
+            </Button>
+            
+            <Button 
+              variant="secondary" 
+              size="sm"
+              onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
+              className="flex-1"
+            >
+              {product?.isAvailable ? 'Disable' : 'Enable'}
+            </Button>
+            
+            <Button 
+              variant="destructive" 
+              size="sm"
+              onClick={() => deleteProduct(product?.id)}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+            </Button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   if (loading) {
     return (
