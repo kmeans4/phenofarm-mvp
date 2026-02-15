@@ -57,8 +57,10 @@ export default function AddStrainPage() {
         throw new Error(data.error || 'Failed to create strain');
       }
 
+      const newStrain = await response.json();
       alert('Strain created successfully!');
       if (returnUrl) {
+        sessionStorage.setItem('newlyCreatedStrainId', newStrain.id || '');
         router.push(returnUrl);
       } else {
         router.push('/grower/strains');

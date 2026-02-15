@@ -198,6 +198,21 @@ export default function EditProductForm({
     if (savedData && returnUrl === window.location.pathname) {
       try {
         const parsed = JSON.parse(savedData);
+        
+        // Check for newly created strain and auto-select it
+        const newStrainId = sessionStorage.getItem('newlyCreatedStrainId');
+        if (newStrainId) {
+          parsed.strainId = newStrainId;
+          sessionStorage.removeItem('newlyCreatedStrainId');
+        }
+        
+        // Check for newly created batch and auto-select it
+        const newBatchId = sessionStorage.getItem('newlyCreatedBatchId');
+        if (newBatchId) {
+          parsed.batchId = newBatchId;
+          sessionStorage.removeItem('newlyCreatedBatchId');
+        }
+        
         setFormData(parsed);
         setInitialData(parsed);
         sessionStorage.removeItem('editProductFormData');
@@ -419,6 +434,8 @@ export default function EditProductForm({
               <button
                 type="button"
                 onClick={() => {
+                  // Temporarily disable unsaved changes warning
+                  setIsDirty(false);
                   sessionStorage.setItem('editProductFormData', JSON.stringify(formData));
                   sessionStorage.setItem('editProductReturnUrl', window.location.pathname);
                   router.push('/grower/strains/add?returnUrl=' + encodeURIComponent(window.location.pathname));
@@ -449,6 +466,8 @@ export default function EditProductForm({
               <button
                 type="button"
                 onClick={() => {
+                  // Temporarily disable unsaved changes warning
+                  setIsDirty(false);
                   sessionStorage.setItem('editProductFormData', JSON.stringify(formData));
                   sessionStorage.setItem('editProductReturnUrl', window.location.pathname);
                   router.push('/grower/batches/add?returnUrl=' + encodeURIComponent(window.location.pathname));

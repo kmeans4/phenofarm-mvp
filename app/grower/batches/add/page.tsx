@@ -103,8 +103,10 @@ export default function AddBatchPage() {
         throw new Error(data.error || 'Failed to create batch');
       }
 
+      const newBatch = await response.json();
       alert('Batch created successfully!');
       if (returnUrl) {
+        sessionStorage.setItem('newlyCreatedBatchId', newBatch.id || '');
         router.push(returnUrl);
       } else {
         router.push('/grower/batches');
