@@ -2,18 +2,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
-import { format } from 'date-fns';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { Badge } from '@/app/components/ui/Badge';
 import { Button } from '@/app/components/ui/Button';
+import OrdersList from './components/OrdersList';
 import { ExtendedUser } from '@/types';
-
-interface StatusLabelMap {
-  [key: string]: string;
-}
-
-type BadgeVariant = 'info' | 'error' | 'default' | 'success' | 'secondary' | 'warning' | 'danger' | null;
 
 export default async function GrowerOrdersPage() {
   const session = await getServerSession(authOptions);
@@ -68,31 +60,16 @@ export default async function GrowerOrdersPage() {
   const pendingCount = allOrders.filter(o => o.status === 'PENDING').length;
   const totalRevenue = allOrders.reduce((sum, o) => sum + Number(o.totalAmount), 0);
 
-  // Status label map
-  const statusLabels: StatusLabelMap = {
-    PENDING: 'Pending',
-    CONFIRMED: 'Confirmed',
-    PROCESSING: 'Processing',
-    SHIPPED: 'Shipped',
-    DELIVERED: 'Delivered',
-    CANCELLED: 'Cancelled',
-  };
-
-  // Helper to get status label safely
-  const getStatusLabel = (status: string): string => {
-    return statusLabels[status] || status;
-  };
-
-  // Helper to get badge variant safely
-  const getBadgeVariant = (status: string): BadgeVariant => {
-    if (status === 'DELIVERED') return 'success';
-    if (status === 'CANCELLED') return 'error';
-    if (status === 'SHIPPED') return 'warning';
-    return 'default';
-  };
+  // Serialize orders for client component
+  const serializedOrders = activeOrders.map(order => ({
+    ...order,
+    createdAt: order.createdAt.toISOString(),
+    totalAmount: Number(order.totalAmount),
+    updatedAt: order.updatedAt.toISOString(),
+  }));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-24">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -147,80 +124,8 @@ export default async function GrowerOrdersPage() {
         </select>
       </div>
 
-      {/* Active Orders List */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">Active Orders</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {activeOrders.length === 0 ? (
-            <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No active orders yet</h3>
-              <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                Get started by creating your first order for a dispensary customer.
-              </p>
-              <Button variant="primary" asChild>
-                <Link href="/grower/orders/add">
-                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Create your first order
-                </Link>
-              </Button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto -mx-6">
-              <table className="w-full text-left border-collapse min-w-[600px]">
-                <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Order #</th>
-                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Dispensary</th>
-                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Date</th>
-                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Total</th>
-                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Status</th>
-                    <th className="px-6 py-3 text-sm font-medium text-gray-700">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {activeOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-3">
-                        <div className="font-medium text-gray-900">#{order.orderId}</div>
-                      </td>
-                      <td className="px-6 py-3 text-sm text-gray-600">
-                        {order.dispensary.businessName}
-                      </td>
-                      <td className="px-6 py-3 text-sm text-gray-600">
-                        {format(order.createdAt, 'MMM d, yyyy')}
-                      </td>
-                      <td className="px-6 py-3 text-sm font-bold text-gray-900">
-                        ${Number(order.totalAmount).toFixed(2)}
-                      </td>
-                      <td className="px-6 py-3">
-                        <Badge variant={getBadgeVariant(order.status)}>
-                          {getStatusLabel(order.status)}
-                        </Badge>
-                      </td>
-                      <td className="px-6 py-3">
-                        <Button variant="ghost" size="sm" asChild>
-                          <Link href={`/grower/orders/${order.id}`}>
-                            View
-                          </Link>
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Orders List with Batch Actions */}
+      <OrdersList initialOrders={serializedOrders} />
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
