@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ProductForm } from '../components/ProductForm';
 
@@ -28,6 +28,9 @@ interface GrowerInfo {
 
 export default function AddProductPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const prefillStrainId = searchParams?.get('strainId');
+  const prefillBatchId = searchParams?.get('batchId');
   const [growerInfo, setGrowerInfo] = useState<GrowerInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -107,6 +110,10 @@ export default function AddProductPage() {
         onSubmit={handleSubmit} 
         onCancel={() => router.push('/grower/products')}
         growerBrand={growerInfo?.businessName}
+        initialData={{
+          strainId: prefillStrainId || undefined,
+          batchId: prefillBatchId || undefined,
+        }}
       />
     </div>
   );

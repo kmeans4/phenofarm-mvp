@@ -1,8 +1,19 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/app/components/ui/Button';
 import { PRODUCT_TYPE_NAMES, getSubTypesForProductType } from '@/lib/product-types';
+
+interface Strain {
+  id: string;
+  name: string;
+}
+
+interface Batch {
+  id: string;
+  batchNumber: string;
+  strain?: { name: string } | null;
+}
 
 interface ProductFormProps {
   initialData?: {
@@ -24,6 +35,8 @@ interface ProductFormProps {
     images?: string[];
     isFeatured?: boolean;
   };
+  initialStrainId?: string;
+  initialBatchId?: string;
   onSubmit: (data: any) => void;
   onCancel: () => void;
   growerBrand?: string;
@@ -31,7 +44,7 @@ interface ProductFormProps {
 
 const CATEGORY_OPTIONS = PRODUCT_TYPE_NAMES;
 
-export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: ProductFormProps) {
+export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, initialStrainId, initialBatchId }: ProductFormProps) {
   const [name, setName] = useState(initialData?.name || '');
   const [strain, setStrain] = useState(initialData?.strain || '');
   const [category, setCategory] = useState(initialData?.category || '');
@@ -58,8 +71,49 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: Pr
   
   const availableSubtypes = category ? getSubTypesForProductType(category) : [];
   
+  // Strains and batches for dropdowns
+  const [strains, setStrains] = useState<Strain[]>([]);
+  const [batches, setBatches] = useState<Batch[]>([]);
+  const [selectedStrainId, setSelectedStrainId] = useState(initialStrainId || '');
+  const [selectedBatchId, setSelectedBatchId] = useState(initialBatchId || '');
+  
   const imageInputRef = useRef<HTMLInputElement>(null);
   const docInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch strains and batches on mount
+  useEffect(() => {
+    const fetchStrains = async () => {
+      try {
+        const response = await fetch('/api/strains');
+        if (response.ok) {
+          const data = await response.json();
+          setStrains(data);
+        }
+      } catch (err) {
+        console.error('Error fetching strains:', err);
+      }
+    };
+
+    const fetchBatches = async () => {
+      try {
+        const response = await fetch('/api/batches');
+        if (response.ok) {
+          const data = await response.json();
+          setBatches(data);
+        }
+      } catch (err) {
+        console.error('Error fetching batches:', err);
+      }
+    };
+
+    fetchStrains();
+    fetchBatches();
+  }, []);
+
+  // Update filtered batches when strain changes
+  const filteredBatches = selectedStrainId
+    ? batches.filter(b => b.strain?.name === strains.find(s => s.id === selectedStrainId)?.name)
+    : batches;
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -141,7 +195,9 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: Pr
     
     onSubmit({
       name,
-      strain,
+      strain: selectedStrainId ? strains.find(s => s.id === selectedStrainId)?.name || '' : '',
+      strainId: selectedStrainId || null,
+      batchId: selectedBatchId || null,
       category,
       subcategory,
       price,
@@ -200,13 +256,41 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand }: Pr
           <label htmlFor="strain" className="text-sm font-medium text-gray-900">
             Strain
           </label>
-          <input
+          <select
             id="strain"
-            type="text"
-            value={strain}
-            onChange={(e) => setStrain(e.target.value)}
+            value={selectedStrainId}
+            onChange={(e) => {
+              setSelectedStrainId(e.target.value);
+              setSelectedBatchId(''); // Clear batch when strain changes
+            }}
             className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
-          />
+          >
+            <option value="">Select a strain</option>
+            {strains.map((s) => (
+              <option key={s.id} value={s.id}>{s.name}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Batch */}
+        <div className="space-y-2">
+          <label htmlFor="batch" className="text-sm font-medium text-gray-900">
+            Batch
+          </label>
+          <select
+            id="batch"
+            value={selectedBatchId}
+            onChange={(e) => setSelectedBatchId(e.target.value)}
+            disabled={!selectedStrainId && filteredBatches.length === 0}
+            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            <option value="">Select a batch</option>
+            {filteredBatches.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.batchNumber} {b.strain ? `(${b.strain.name})` : ''}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Subcategory - Dynamic based on category */}

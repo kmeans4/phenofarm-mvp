@@ -217,13 +217,14 @@ export default function StrainsPage() {
                       <Link href={'/grower/strains/' + strain.id + '/edit'}>Edit</Link>
                     </Button>
                     <Button 
-                      variant="destructive" 
+                      variant="primary" 
                       size="sm"
-                      onClick={() => deleteStrain(strain.id)}
-                      disabled={strain._count.products > 0 || strain._count.batches > 0}
-                      title={strain._count.products > 0 || strain._count.batches > 0 ? 'Cannot delete strain with associated data' : 'Delete'}
+                      asChild
+                      className="flex-1"
                     >
-                      Delete
+                      <Link href={'/grower/products/add?strainId=' + strain.id}>
+                        + Product
+                      </Link>
                     </Button>
                   </div>
                 </div>
@@ -267,13 +268,13 @@ export default function StrainsPage() {
                             <Link href={'/grower/strains/' + strain.id + '/edit'}>Edit</Link>
                           </Button>
                           <Button 
-                            variant="destructive" 
+                            variant="primary" 
                             size="sm"
-                            onClick={() => deleteStrain(strain.id)}
-                            disabled={strain._count.products > 0 || strain._count.batches > 0}
-                            title={strain._count.products > 0 || strain._count.batches > 0 ? 'Cannot delete strain with associated data' : 'Delete'}
+                            asChild
                           >
-                            Delete
+                            <Link href={'/grower/products/add?strainId=' + strain.id}>
+                              + Product
+                            </Link>
                           </Button>
                         </div>
                       </td>

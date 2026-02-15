@@ -195,13 +195,13 @@ export default function BatchesPage() {
                           <Link href={'/grower/batches/' + batch.id + '/edit'}>Edit</Link>
                         </Button>
                         <Button 
-                          variant="destructive" 
+                          variant="primary" 
                           size="sm"
-                          onClick={() => deleteBatch(batch.id)}
-                          disabled={batch._count.products > 0}
-                          title={batch._count.products > 0 ? 'Cannot delete batch with products' : 'Delete'}
+                          asChild
                         >
-                          Delete
+                          <Link href={'/grower/products/add?strainId=' + batch.strainId + '&batchId=' + batch.id}>
+                            + Product
+                          </Link>
                         </Button>
                       </div>
                     </td>
