@@ -1,9 +1,10 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
 import { LogoUpload } from '@/app/components/settings/LogoUpload';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
+import { useToast } from '@/app/hooks/useToast';
 
 interface SettingsData {
   businessName: string;
@@ -28,7 +29,6 @@ interface FieldErrors {
   licenseNumber?: string;
 }
 
-// Validation helpers
 const validateEmail = (email: string): string | undefined => {
   if (!email) return 'Business email is required';
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,7 +37,7 @@ const validateEmail = (email: string): string | undefined => {
 };
 
 const validatePhone = (phone: string): string | undefined => {
-  if (!phone) return undefined; // Optional field
+  if (!phone) return undefined;
   const digitsOnly = phone.replace(/\D/g, '');
   if (digitsOnly.length < 10) return 'Please enter a valid 10-digit phone number';
   if (digitsOnly.length > 11) return 'Phone number is too long';
@@ -45,7 +45,7 @@ const validatePhone = (phone: string): string | undefined => {
 };
 
 const validateWebsite = (website: string): string | undefined => {
-  if (!website) return undefined; // Optional field
+  if (!website) return undefined;
   const urlRegex = /^https?:\/\/.+/;
   if (!urlRegex.test(website)) return 'URL must start with http:// or https://';
   try {
@@ -64,19 +64,18 @@ const validateBusinessName = (name: string): string | undefined => {
 };
 
 const validateLicenseNumber = (license: string): string | undefined => {
-  if (!license.trim()) return undefined; // Optional field
+  if (!license.trim()) return undefined;
   if (license.trim().length < 3) return 'License number must be at least 3 characters';
   if (license.trim().length > 50) return 'License number must be less than 50 characters';
   return undefined;
 };
 
-// Format phone number as user types
 const formatPhoneNumber = (value: string): string => {
   const digitsOnly = value.replace(/\D/g, '');
   if (digitsOnly.length <= 3) return digitsOnly;
-  if (digitsOnly.length <= 6) return `(\${digitsOnly.slice(0, 3)}) \${digitsOnly.slice(3)}`;
-  if (digitsOnly.length <= 10) return `(\${digitsOnly.slice(0, 3)}) \${digitsOnly.slice(3, 6)}-\${digitsOnly.slice(6)}`;
-  return `(\${digitsOnly.slice(0, 3)}) \${digitsOnly.slice(3, 6)}-\${digitsOnly.slice(6, 10)}`;
+  if (digitsOnly.length <= 6) return `($\{digitsOnly.slice(0, 3)}) $\{digitsOnly.slice(3)}`;
+  if (digitsOnly.length <= 10) return `($\{digitsOnly.slice(0, 3)}) $\{digitsOnly.slice(3, 6)}-$\{digitsOnly.slice(6)}`;
+  return `($\{digitsOnly.slice(0, 3)}) $\{digitsOnly.slice(3, 6)}-$\{digitsOnly.slice(6, 10)}`;
 };
 
 const DEFAULT_FORM_DATA: SettingsData = {
@@ -105,23 +104,21 @@ export function SettingsForm() {
   const [formData, setFormData] = useState<SettingsData>(DEFAULT_FORM_DATA);
   const [initialData, setInitialData] = useState<SettingsData>(DEFAULT_FORM_DATA);
   
-  // Set up unsaved changes warning
+  const { update, showToast } = useToast();
+  
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: true,
     message: 'You have unsaved changes in your settings. Are you sure you want to leave?',
   });
 
-  // Track dirty state when formData changes
   useEffect(() => {
     if (loading) return;
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
   }, [formData, initialData, loading, setIsDirty]);
 
-  // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Ctrl+S or Cmd+S to save
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         if (!saving && !loading) {
@@ -129,21 +126,20 @@ export function SettingsForm() {
         }
       }
       
-      // Esc to cancel/revert changes
       if (e.key === 'Escape' && !loading) {
         setFormData(initialData);
         setTouched({});
         setFieldErrors({});
         setError('');
         setIsDirty(false);
+        showToast('info', 'Changes discarded');
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [saving, loading, initialData, setIsDirty]);
+  }, [saving, loading, initialData, setIsDirty, showToast]);
 
-  // Validate all fields
   const validateForm = useCallback((): boolean => {
     const errors: FieldErrors = {
       businessName: validateBusinessName(formData.businessName),
@@ -157,7 +153,6 @@ export function SettingsForm() {
     return !Object.values(errors).some(e => e !== undefined);
   }, [formData]);
 
-  // Validate single field
   const validateField = useCallback((field: keyof FieldErrors, value: string) => {
     let error: string | undefined;
     switch (field) {
@@ -181,7 +176,6 @@ export function SettingsForm() {
     return !error;
   }, []);
 
-  // Fetch settings on mount
   useEffect(() => {
     async function fetchSettings() {
       try {
@@ -207,12 +201,13 @@ export function SettingsForm() {
         }
       } catch (err) {
         console.error('Failed to load settings:', err);
+        showToast('error', 'Failed to load settings');
       } finally {
         setLoading(false);
       }
     }
     fetchSettings();
-  }, []);
+  }, [showToast]);
 
   const handleAddressSelect = (address: {
     fullAddress: string;
@@ -232,7 +227,6 @@ export function SettingsForm() {
 
   const handleLogoUpload = async (logoBase64: string) => {
     setFormData(prev => ({ ...prev, logo: logoBase64 }));
-    // Auto-save logo, but don't reset dirty state for logo alone
     await handleSave(true);
   };
 
@@ -241,14 +235,12 @@ export function SettingsForm() {
   ) => {
     let value = e.target.value;
     
-    // Auto-format phone numbers
     if (field === 'phone') {
       value = formatPhoneNumber(value);
     }
     
     setFormData(prev => ({ ...prev, [field]: value }));
     
-    // Clear error when user starts typing
     if (touched[field as keyof FieldErrors]) {
       validateField(field as keyof FieldErrors, value);
     }
@@ -260,7 +252,6 @@ export function SettingsForm() {
   };
 
   const handleSave = useCallback(async (isLogoSave = false) => {
-    // Validate all fields on save attempt
     if (!isLogoSave) {
       const errors: FieldErrors = {
         businessName: validateBusinessName(formData.businessName),
@@ -280,6 +271,7 @@ export function SettingsForm() {
           licenseNumber: true,
         });
         setError('Please fix the errors above before saving.');
+        showToast('error', 'Please fix validation errors before saving');
         return;
       }
     }
@@ -289,30 +281,37 @@ export function SettingsForm() {
     if (!isLogoSave) setSaved(false);
 
     try {
-      const res = await fetch('/api/grower/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to save');
-      }
+      const itemName = isLogoSave ? 'Logo' : 'Settings';
+      await update(
+        itemName,
+        fetch('/api/grower/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        }).then(async (res) => {
+          if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || 'Failed to save');
+          }
+          return res.json();
+        }),
+        { duration: 3000 }
+      );
 
       if (!isLogoSave) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
-        // Reset dirty state after successful save
         setInitialData(formData);
         resetDirtyState();
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save settings');
+      const msg = err instanceof Error ? err.message : 'Failed to save settings';
+      setError(msg);
+      showToast('error', 'Failed to save', { description: msg });
     } finally {
       setSaving(false);
     }
-  }, [formData, resetDirtyState]);
+  }, [formData, resetDirtyState, update, showToast]);
 
   if (loading) {
     return (
@@ -324,7 +323,6 @@ export function SettingsForm() {
 
   return (
     <div className="space-y-6">
-      {/* Keyboard shortcuts hint */}
       <div className="flex items-center gap-4 text-xs text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
         <span className="flex items-center gap-1">
           <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Ctrl</kbd>
@@ -339,7 +337,6 @@ export function SettingsForm() {
         </span>
       </div>
 
-      {/* Global error banner */}
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start gap-3">
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -349,7 +346,6 @@ export function SettingsForm() {
         </div>
       )}
       
-      {/* Success banner */}
       {saved && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-600 flex items-start gap-3">
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -359,7 +355,6 @@ export function SettingsForm() {
         </div>
       )}
 
-      {/* Unsaved changes indicator */}
       {isDirty && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -370,7 +365,6 @@ export function SettingsForm() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Company Logo Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h2 className="text-lg font-semibold text-gray-900">Company Logo</h2>
@@ -383,13 +377,11 @@ export function SettingsForm() {
           </div>
         </div>
 
-        {/* Business Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
             <h2 className="text-lg font-semibold text-gray-900">Business Information</h2>
           </div>
           <div className="p-6 space-y-4">
-            {/* Business Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Name <span className="text-red-500">*</span>
@@ -416,7 +408,6 @@ export function SettingsForm() {
               )}
             </div>
 
-            {/* Contact Name */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Contact Name <span className="text-gray-400 text-xs">(optional)</span>
@@ -430,7 +421,6 @@ export function SettingsForm() {
               />
             </div>
 
-            {/* License Number */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business License Number <span className="text-gray-400 text-xs">(optional)</span>
@@ -457,7 +447,6 @@ export function SettingsForm() {
               )}
             </div>
 
-            {/* Email */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Email <span className="text-red-500">*</span>
@@ -484,7 +473,6 @@ export function SettingsForm() {
               )}
             </div>
 
-            {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Phone <span className="text-gray-400 text-xs">(optional)</span>
@@ -511,7 +499,6 @@ export function SettingsForm() {
               )}
             </div>
 
-            {/* Address */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Address <span className="text-green-600 text-xs font-medium">(Autocomplete)</span>
@@ -525,7 +512,6 @@ export function SettingsForm() {
               <p className="text-xs text-gray-500 mt-1">Type 3+ characters to see suggestions (includes city, state, ZIP)</p>
             </div>
 
-            {/* Website */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Website <span className="text-gray-400 text-xs">(optional)</span>
@@ -552,7 +538,6 @@ export function SettingsForm() {
               )}
             </div>
 
-            {/* Description */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Description <span className="text-gray-400 text-xs">(optional)</span>
@@ -570,7 +555,6 @@ export function SettingsForm() {
         </div>
       </div>
 
-      {/* Save Button */}
       <div className="flex justify-end pt-4">
         <button 
           onClick={() => handleSave(false)}
