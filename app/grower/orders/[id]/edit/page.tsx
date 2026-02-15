@@ -11,7 +11,11 @@ async function fetchOrder(id: string, growerId: string) {
       dispensary: true,
       items: {
         include: {
-          product: true,
+          product: {
+            include: {
+              strain: { select: { id: true, name: true } }
+            }
+          },
         },
       },
     },
@@ -29,6 +33,14 @@ async function fetchOrder(id: string, growerId: string) {
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
+      product: {
+        ...item.product,
+        // Use strain relation or legacy field
+        strain: item.product.strain?.name || item.product.strainLegacy,
+        // Use new schema fields
+        productType: item.product.productType,
+        subType: item.product.subType,
+      },
     })),
   };
 }

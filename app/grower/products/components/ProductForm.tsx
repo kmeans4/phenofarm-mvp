@@ -4,27 +4,36 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { ProductTypeSelector } from '../../components/ProductTypeSelector';
+import { StrainSelector } from '../../components/StrainSelector';
+import { BatchSelector } from '../../components/BatchSelector';
 
 interface ProductFormData {
   id?: string;
   name: string;
-  strain: string;
-  category: string;
-  subcategory: string;
-  thc: string;
-  cbd: string;
+  productType: string;
+  subType: string;
+  strainId: string;
+  batchId: string;
   price: string;
   inventoryQty: string;
   unit: string;
   description: string;
   isAvailable: boolean;
   images: string[];
+  sku: string;
+  brand: string;
+  ingredients: string;
+  isFeatured: boolean;
 }
 
-const CATEGORIES = ['Flower', 'Concentrates', 'Edibles', 'Topicals', 'Accessories'];
-const UNITS = ['Gram', 'Half Ounce', 'Ounce', 'Eighth', 'Quarter', 'Unit', 'Pack'];
+const UNITS = ['Gram', 'Half Ounce', 'Ounce', 'Eighth', 'Quarter', 'Unit', 'Pack', 'Each', 'Lb'];
+
+// Consistent input styles
+const INPUT_CLASSES = "w-full h-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
 
 interface ProductFormProps {
+  growerBrand?: string;
   initialData?: Partial<ProductFormData>;
   onSubmit: (data: ProductFormData) => void;
   onCancel: () => void;
@@ -35,29 +44,36 @@ export function ProductForm({
   initialData = {}, 
   onSubmit, 
   onCancel,
+  growerBrand,
   isSubmitting = false 
 }: ProductFormProps) {
   const [formData, setFormData] = useState<ProductFormData>({
     id: initialData.id,
     name: initialData.name || '',
-    strain: initialData.strain || '',
-    category: initialData.category || '',
-    subcategory: initialData.subcategory || '',
-    thc: initialData.thc || '',
-    cbd: initialData.cbd || '',
+    productType: initialData.productType || '',
+    subType: initialData.subType || '',
+    strainId: initialData.strainId || '',
+    batchId: initialData.batchId || '',
     price: initialData.price || '',
     inventoryQty: initialData.inventoryQty || '0',
     unit: initialData.unit || 'Gram',
     description: initialData.description || '',
     isAvailable: initialData.isAvailable !== undefined ? initialData.isAvailable : true,
-    images: [],
+    images: initialData.images || [],
+    sku: initialData.sku || '',
+    brand: initialData.brand || '',
+    ingredients: initialData.ingredients || '',
+    isFeatured: initialData.isFeatured || false,
   });
 
   const [imagePreviews, setImagePreviews] = useState<string[]>(initialData.images || []);
 
   const handleChange = (field: keyof ProductFormData, value: string | boolean) => {
-    if (typeof value === 'boolean') {
-      setFormData(prev => ({ ...prev, isAvailable: value }));
+    if (field === 'strainId') {
+      // Reset batch when strain changes
+      setFormData(prev => ({ ...prev, strainId: String(value), batchId: '' }));
+    } else if (typeof value === 'boolean') {
+      setFormData(prev => ({ ...prev, [field]: value }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
     }
@@ -86,10 +102,8 @@ export function ProductForm({
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
-  // Get base64 images to send to API
   const getBase64Images = () => {
     return imagePreviews.map(preview => {
-      // Remove data:image/...;base64, prefix if present
       if (preview.startsWith('data:image/')) {
         return preview;
       }
@@ -123,111 +137,55 @@ export function ProductForm({
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                  Product Name *
-                </label>
-                <input
-                  id="name"
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => handleChange('name', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="e.g., Blueberries NF"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="strain" className="block text-sm font-medium text-gray-700">
-                  Strain
-                </label>
-                <input
-                  id="strain"
-                  type="text"
-                  value={formData.strain}
-                  onChange={(e) => handleChange('strain', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="e.g., Blueberries x Nevada"
-                />
-              </div>
+            <div className="space-y-2">
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Product Name *
+              </label>
+              <input
+                id="name"
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => handleChange('name', e.target.value)}
+                className={INPUT_CLASSES}
+                placeholder="e.g., Blueberries NF - 3.5g Jar"
+              />
             </div>
 
-            {/* Category & Subcategory */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="category" className="block text-sm font-medium text-gray-700">
-                  Category *
-                </label>
-                <select
-                  id="category"
-                  required
-                  value={formData.category}
-                  onChange={(e) => {
-                    handleChange('category', e.target.value);
-                    handleChange('subcategory', '');
-                  }}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                >
-                  <option value="">Select a category</option>
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              </div>
+            {/* Product Type & Sub-Type */}
+            <ProductTypeSelector
+              productType={formData.productType}
+              subType={formData.subType}
+              onProductTypeChange={(type) => handleChange('productType', type)}
+              onSubTypeChange={(subType) => handleChange('subType', subType)}
+            />
 
-              <div className="space-y-2">
-                <label htmlFor="subcategory" className="block text-sm font-medium text-gray-700">
-                  Subcategory
-                </label>
-                <input
-                  id="subcategory"
-                  type="text"
-                  value={formData.subcategory}
-                  onChange={(e) => handleChange('subcategory', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="e.g., Hybrid, Indica, Sativa"
-                />
-              </div>
+            {/* Strain Selection */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Strain
+              </label>
+              <StrainSelector
+                strainId={formData.strainId}
+                onStrainChange={(id) => handleChange('strainId', id || '')}
+              />
+              <p className="text-xs text-gray-500">Link to a strain for better inventory tracking</p>
             </div>
 
-            {/* Cannabinoids */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Batch Selection */}
+            {formData.strainId && (
               <div className="space-y-2">
-                <label htmlFor="thc" className="block text-sm font-medium text-gray-700">
-                  THC (%)
+                <label className="block text-sm font-medium text-gray-700">
+                  Batch
                 </label>
-                <input
-                  id="thc"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  value={formData.thc}
-                  onChange={(e) => handleChange('thc', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="e.g., 18.5"
+                <BatchSelector
+                  strainId={formData.strainId}
+                  batchId={formData.batchId}
+                  onBatchChange={(id) => handleChange('batchId', id || '')}
                 />
+                <p className="text-xs text-gray-500">Link to a harvest batch for lab results</p>
               </div>
-
-              <div className="space-y-2">
-                <label htmlFor="cbd" className="block text-sm font-medium text-gray-700">
-                  CBD (%)
-                </label>
-                <input
-                  id="cbd"
-                  type="number"
-                  step="0.1"
-                  min="0"
-                  max="100"
-                  value={formData.cbd}
-                  onChange={(e) => handleChange('cbd', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="e.g., 12.0"
-                />
-              </div>
-            </div>
+            )}
 
             {/* Pricing & Unit */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -243,7 +201,7 @@ export function ProductForm({
                   required
                   value={formData.price}
                   onChange={(e) => handleChange('price', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className={INPUT_CLASSES}
                   placeholder="e.g., 45.00"
                 />
               </div>
@@ -257,7 +215,7 @@ export function ProductForm({
                   required
                   value={formData.unit}
                   onChange={(e) => handleChange('unit', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className={INPUT_CLASSES}
                 >
                   <option value="">Select a unit</option>
                   {UNITS.map(unit => (
@@ -279,9 +237,40 @@ export function ProductForm({
                 required
                 value={formData.inventoryQty}
                 onChange={(e) => handleChange('inventoryQty', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className={INPUT_CLASSES}
                 placeholder="e.g., 100"
               />
+            </div>
+
+            {/* SKU & Brand */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="space-y-2">
+                <label htmlFor="sku" className="block text-sm font-medium text-gray-700">
+                  SKU
+                </label>
+                <input
+                  id="sku"
+                  type="text"
+                  value={formData.sku}
+                  onChange={(e) => handleChange('sku', e.target.value)}
+                  className={INPUT_CLASSES}
+                  placeholder="e.g., BERRY-3.5G"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="brand" className="block text-sm font-medium text-gray-700">
+                  Brand
+                </label>
+                <input
+                  id="brand"
+                  type="text"
+                  value={formData.brand}
+                  onChange={(e) => handleChange('brand', e.target.value)}
+                  className={INPUT_CLASSES}
+                  placeholder="e.g., Your Business Name"
+                />
+              </div>
             </div>
 
             {/* Availability Toggle */}
@@ -315,7 +304,7 @@ export function ProductForm({
                 rows={4}
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="Describe the product, effects, aroma, etc."
               />
             </div>

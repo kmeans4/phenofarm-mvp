@@ -17,19 +17,26 @@ export default async function GrowerMarketplacePage() {
     redirect('/dashboard');
   }
 
+  // Fetch products with strain info
   const rawProducts = await db.product.findMany({
     where: { growerId: user.growerId },
+    include: {
+      strain: { select: { id: true, name: true } }
+    },
     orderBy: { createdAt: 'desc' },
   });
 
+  // Convert Decimal prices to numbers and use new schema fields
   const products = rawProducts.map((p) => ({
     ...p,
     price: Number(p.price) || 0,
-    thc: p.thc ? Number(p.thc) : null,
-    cbd: p.cbd ? Number(p.cbd) : null,
+    thc: p.thcLegacy ? Number(p.thcLegacy) : null,
+    cbd: p.cbdLegacy ? Number(p.cbdLegacy) : null,
+    // Use strain relation or fallback to legacy
+    strainName: p.strain?.name || p.strainLegacy,
   }));
 
-  const categories = ['Flower', 'Concentrates', 'Edibles', 'Topicals', 'Vapes', 'Raw Materials'];
+  const categories = ['Flower', 'Edibles', 'Cartridge', 'Bulk Extract', 'Drink', 'Merchandise', 'Prepack', 'Tincture', 'Topicals', 'Plant Material', 'Live Plant', 'Seed'];
 
   return (
     <div className="space-y-6 p-4">
@@ -74,9 +81,12 @@ export default async function GrowerMarketplacePage() {
                   <div className="p-4">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                      <span className="text-sm text-gray-500">{product.category || 'Uncategorized'}</span>
+                      <span className="text-sm text-gray-500">
+                        {product.productType || 'Uncategorized'}
+                        {product.subType && ` - ${product.subType}`}
+                      </span>
                     </div>
-                    {product.strain && <p className="text-sm text-gray-600 mb-3">{product.strain}</p>}
+                    {product.strainName && <p className="text-sm text-gray-600 mb-3">Strain: {product.strainName}</p>}
                     <div className="flex justify-between items-center mb-2">
                       <span className="text-lg font-bold text-gray-900">${product.price.toFixed(2)}</span>
                       <span className="text-sm text-gray-500">/{product.unit || 'unit'}</span>

@@ -5,11 +5,16 @@ import { db } from '@/lib/db';
 interface DispensarySettingsBody {
   businessName: string;
   licenseNumber: string;
+  contactName: string;
   email: string;
   phone: string;
   address: string;
+  city: string;
+  state: string;
+  zip: string;
   website: string;
   description: string;
+  logo: string;
 }
 
 // GET - Fetch dispensary settings
@@ -32,6 +37,7 @@ export async function GET() {
       select: {
         businessName: true,
         licenseNumber: true,
+        contactName: true,
         phone: true,
         address: true,
         city: true,
@@ -39,6 +45,7 @@ export async function GET() {
         zip: true,
         website: true,
         description: true,
+        logo: true,
         user: { select: { email: true } },
       },
     });
@@ -50,6 +57,7 @@ export async function GET() {
     return NextResponse.json({
       businessName: dispensary.businessName,
       licenseNumber: dispensary.licenseNumber || '',
+      contactName: dispensary.contactName || '',
       email: dispensary.user.email,
       phone: dispensary.phone || '',
       address: dispensary.address || '',
@@ -58,6 +66,7 @@ export async function GET() {
       zip: dispensary.zip || '',
       website: dispensary.website || '',
       description: dispensary.description || '',
+      logo: dispensary.logo || '',
     });
   } catch (error) {
     console.error('Error fetching dispensary settings:', error);
@@ -81,7 +90,20 @@ export async function PUT(request: NextRequest) {
     }
 
     const body: DispensarySettingsBody = await request.json();
-    const { businessName, licenseNumber, email, phone, address, website, description } = body;
+    const { 
+      businessName, 
+      licenseNumber, 
+      contactName, 
+      email, 
+      phone, 
+      address,
+      city,
+      state,
+      zip,
+      website, 
+      description,
+      logo
+    } = body;
 
     // Validate required fields
     if (!businessName) {
@@ -105,20 +127,33 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    // Build update data
+    const updateData: any = {
+      businessName,
+      licenseNumber: licenseNumber || null,
+      contactName: contactName || null,
+      phone: phone || null,
+      website: website || null,
+      description: description || null,
+    };
+
+    // Only update address if provided
+    if (address) {
+      updateData.address = addressData.address || null;
+      updateData.city = addressData.city || null;
+      updateData.state = addressData.state || 'VT';
+      updateData.zip = addressData.zip || null;
+    }
+
+    // Update logo if provided
+    if (logo !== undefined) {
+      updateData.logo = logo || null;
+    }
+
     // Update dispensary record
     const dispensary = await db.dispensary.update({
       where: { id: user.dispensaryId },
-      data: {
-        businessName,
-        licenseNumber: licenseNumber || null,
-        phone: phone || null,
-        address: addressData.address || null,
-        city: addressData.city || null,
-        state: addressData.state || 'VT',
-        zip: addressData.zip || null,
-        website: website || null,
-        description: description || null,
-      },
+      data: updateData,
     });
 
     // Update email if changed and provided
@@ -135,8 +170,9 @@ export async function PUT(request: NextRequest) {
       dispensary: {
         businessName: dispensary.businessName,
         licenseNumber: dispensary.licenseNumber,
+        contactName: dispensary.contactName,
         phone: dispensary.phone,
-        address: dispensary.address,
+        logo: dispensary.logo,
       },
     });
   } catch (error) {

@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { Product } from '@prisma/client';
 
 // Helper to serialize product from Prisma
-function serializeProduct(product: Product | null) {
+function serializeProduct(product: any) {
   if (!product) return product;
   return {
     ...product,
     price: product.price ? parseFloat(product.price.toString()) : 0,
-    thc: product.thc ? parseFloat(product.thc.toString()) : null,
-    cbd: product.cbd ? parseFloat(product.cbd.toString()) : null,
+    thcLegacy: product.thcLegacy ? parseFloat(product.thcLegacy.toString()) : null,
+    cbdLegacy: product.cbdLegacy ? parseFloat(product.cbdLegacy.toString()) : null,
   };
 }
 
@@ -36,6 +35,10 @@ export async function GET(
 
     const product = await db.product.findFirst({
       where: { id: productId, growerId: user.growerId },
+      include: {
+        strain: true,
+        batch: true
+      }
     });
 
     if (!product) {
@@ -76,35 +79,77 @@ export async function PUT(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
 
-    const body = await request.json() as {
-      name?: string;
-      strain?: string | null;
-      category?: string | null;
-      subcategory?: string | null;
-      thc?: string | null;
-      cbd?: string | null;
-      price?: string;
-      inventoryQty?: string;
-      unit?: string;
-      description?: string | null;
-      images?: string[];
-      isAvailable?: boolean;
-    };
+    const body = await request.json();
     
-    const updateData: Record<string, unknown> = {};
+    const {
+      name,
+      productType,
+      subType,
+      strainId,
+      batchId,
+      price,
+      inventoryQty,
+      unit,
+      description,
+      images,
+      isAvailable,
+      sku,
+      brand,
+      ingredients,
+      ingredientsDocumentUrl,
+      isFeatured,
+      // Legacy fields
+      strainLegacy,
+      categoryLegacy,
+      subcategoryLegacy,
+      thcLegacy,
+      cbdLegacy,
+    } = body;
+
+    // Verify strain belongs to grower if provided
+    if (strainId) {
+      const strain = await db.strain.findFirst({
+        where: { id: strainId, growerId: user.growerId }
+      });
+      if (!strain) {
+        return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
+      }
+    }
+
+    // Verify batch belongs to grower if provided
+    if (batchId) {
+      const batch = await db.batch.findFirst({
+        where: { id: batchId, growerId: user.growerId }
+      });
+      if (!batch) {
+        return NextResponse.json({ error: 'Batch not found' }, { status: 404 });
+      }
+    }
+
+    const updateData: any = {};
     
-    if (body.name !== undefined) updateData.name = body.name;
-    if (body.strain !== undefined) updateData.strain = body.strain || null;
-    if (body.category !== undefined) updateData.category = body.category || null;
-    if (body.subcategory !== undefined) updateData.subcategory = body.subcategory || null;
-    if (body.thc !== undefined) updateData.thc = body.thc !== null ? parseFloat(body.thc) : null;
-    if (body.cbd !== undefined) updateData.cbd = body.cbd !== null ? parseFloat(body.cbd) : null;
-    if (body.price !== undefined) updateData.price = parseFloat(body.price);
-    if (body.inventoryQty !== undefined) updateData.inventoryQty = parseInt(body.inventoryQty);
-    if (body.unit !== undefined) updateData.unit = body.unit;
-    if (body.description !== undefined) updateData.description = body.description || null;
-    if (body.images !== undefined) updateData.images = body.images;
-    if (body.isAvailable !== undefined) updateData.isAvailable = body.isAvailable;
+    if (name !== undefined) updateData.name = name;
+    if (productType !== undefined) updateData.productType = productType || null;
+    if (subType !== undefined) updateData.subType = subType || null;
+    if (strainId !== undefined) updateData.strainId = strainId || null;
+    if (batchId !== undefined) updateData.batchId = batchId || null;
+    if (price !== undefined) updateData.price = parseFloat(price);
+    if (inventoryQty !== undefined) updateData.inventoryQty = parseInt(inventoryQty);
+    if (unit !== undefined) updateData.unit = unit;
+    if (description !== undefined) updateData.description = description || null;
+    if (images !== undefined) updateData.images = images;
+    if (isAvailable !== undefined) updateData.isAvailable = isAvailable;
+    if (sku !== undefined) updateData.sku = sku || null;
+    if (brand !== undefined) updateData.brand = brand || null;
+    if (ingredients !== undefined) updateData.ingredients = ingredients || null;
+    if (ingredientsDocumentUrl !== undefined) updateData.ingredientsDocumentUrl = ingredientsDocumentUrl || null;
+    if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
+    // Legacy fields
+    if (strainLegacy !== undefined) updateData.strainLegacy = strainLegacy || null;
+    if (categoryLegacy !== undefined) updateData.categoryLegacy = categoryLegacy || null;
+    if (subcategoryLegacy !== undefined) updateData.subcategoryLegacy = subcategoryLegacy || null;
+    if (thcLegacy !== undefined) updateData.thcLegacy = thcLegacy !== null ? parseFloat(thcLegacy) : null;
+    if (cbdLegacy !== undefined) updateData.cbdLegacy = cbdLegacy !== null ? parseFloat(cbdLegacy) : null;
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
@@ -113,6 +158,10 @@ export async function PUT(
     const updatedProduct = await db.product.update({
       where: { id: productId },
       data: updateData,
+      include: {
+        strain: true,
+        batch: true
+      }
     });
 
     return NextResponse.json(serializeProduct(updatedProduct), { status: 200 });

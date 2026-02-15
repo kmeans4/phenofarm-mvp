@@ -13,22 +13,27 @@ export default async function GrowerInventoryPage() {
 
   const sessionUser = (session as any).user as { growerId?: string };
   
-  // Fetch products for this grower
+  // Fetch products for this grower with strain info
   const rawProducts = await db.product.findMany({
     where: { growerId: sessionUser.growerId },
+    include: {
+      strain: { select: { id: true, name: true } }
+    },
     orderBy: { createdAt: 'desc' },
   });
 
-  // Convert Decimal prices to numbers
+  // Convert Decimal prices to numbers and use new schema fields
   const products = rawProducts.map((p) => ({
     ...p,
     price: Number(p.price) || 0,
-    thc: p.thc ? Number(p.thc) : null,
-    cbd: p.cbd ? Number(p.cbd) : null,
+    thc: p.thcLegacy ? Number(p.thcLegacy) : null,
+    cbd: p.cbdLegacy ? Number(p.cbdLegacy) : null,
+    // Use strain relation or fallback to legacy
+    strainName: p.strain?.name || p.strainLegacy,
   }));
 
   const totalValue = products?.reduce((sum: number, p: { price: number; inventoryQty: number }) => sum + ((p?.price || 0) * (p?.inventoryQty || 0)), 0) || 0;
-  const lowStockCount = products?.filter((p: { price: number; inventoryQty: number }) => (p?.inventoryQty || 0) <= 10)?.length || 0;
+  const lowStockCount = products?.filter((p: { inventoryQty: number }) => (p?.inventoryQty || 0) <= 10)?.length || 0;
 
   return (
     <div className="space-y-6 p-4">
@@ -72,7 +77,7 @@ export default async function GrowerInventoryPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inventory</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
@@ -83,9 +88,11 @@ export default async function GrowerInventoryPage() {
                   <tr key={product?.id}>
                     <td className="px-6 py-4">
                       <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>
-                      {product?.strain && <div className="text-xs text-gray-500">{product.strain}</div>}
+                      {product?.strainName && <div className="text-xs text-gray-500">{product.strainName}</div>}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{product?.category || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-gray-600">
+                      {product?.productType ? `${product.productType}${product.subType ? ` - ${product.subType}` : ''}` : (product?.categoryLegacy || '-')}
+                    </td>
                     <td className="px-6 py-4 text-sm text-gray-600">${product?.price?.toFixed(2) || '0.00'}/{product?.unit || 'unit'}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={(product?.inventoryQty || 0) <= 10 ? 'text-red-600 font-medium' : 'text-gray-900'}>

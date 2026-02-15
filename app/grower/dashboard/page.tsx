@@ -186,7 +186,7 @@ export default async function GrowerDashboardPage() {
   // Calculate stats
   const stats = {
     totalOrders: recentOrders.length,
-    totalRevenue: recentOrders.reduce((sum: number, order: { totalAmount: number }) => sum + Number(order.totalAmount), 0),
+    totalRevenue: recentOrders.reduce((sum: number, order: { totalAmount: unknown }) => sum + (Number(order.totalAmount) || 0), 0),
     activeCustomers: recentCustomers.length,
     pendingOrders: recentOrders.filter((o: { status: string }) => o.status === 'PENDING').length,
     activeProducts: activeProducts[0]?.count || 0,
@@ -251,7 +251,7 @@ export default async function GrowerDashboardPage() {
         <StatCard title="Total Orders" value={stats.totalOrders} trend="+12%" trendUp={true} />
         <StatCard 
           title="Total Revenue" 
-          value={`\u0024${Number(stats.totalRevenue).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+          value={isNaN(stats.totalRevenue) ? '$0.00' : `\u0024${Number(stats.totalRevenue).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
           trend="+8.5%"
           trendUp={true}
         />

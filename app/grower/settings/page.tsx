@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { SettingsForm } from "./components/SettingsForm";
-import { StripeConnect } from "./components/StripeConnect";
+import { SubscriptionBilling } from "@/app/components/settings/SubscriptionBilling";
 
 export default async function GrowerSettingsPage() {
   const session = await getServerSession(authOptions);
@@ -19,8 +19,8 @@ export default async function GrowerSettingsPage() {
         <p className="text-gray-600 mt-1">Manage your account and preferences</p>
       </div>
       
-      {/* Stripe Connect Section */}
-      <StripeConnect />
+      {/* Subscription Billing Section */}
+      <SubscriptionBilling />
       
       {/* Settings Form */}
       <div className="mt-8">

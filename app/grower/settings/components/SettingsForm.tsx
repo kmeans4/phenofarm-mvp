@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
+import { LogoUpload } from '@/app/components/settings/LogoUpload';
 
 interface SettingsData {
   businessName: string;
   licenseNumber: string;
+  contactName: string;
   email: string;
   phone: string;
   address: string;
@@ -15,6 +16,7 @@ interface SettingsData {
   zip: string;
   website: string;
   description: string;
+  logo: string;
 }
 
 export function SettingsForm() {
@@ -26,6 +28,7 @@ export function SettingsForm() {
   const [formData, setFormData] = useState<SettingsData>({
     businessName: '',
     licenseNumber: '',
+    contactName: '',
     email: '',
     phone: '',
     address: '',
@@ -34,6 +37,7 @@ export function SettingsForm() {
     zip: '',
     website: '',
     description: '',
+    logo: '',
   });
 
   // Fetch settings on mount
@@ -46,6 +50,7 @@ export function SettingsForm() {
           setFormData({
             businessName: data.businessName || '',
             licenseNumber: data.licenseNumber || '',
+            contactName: data.contactName || '',
             email: data.email || '',
             phone: data.phone || '',
             address: data.address || '',
@@ -54,6 +59,7 @@ export function SettingsForm() {
             zip: data.zip || '',
             website: data.website || '',
             description: data.description || '',
+            logo: data.logo || '',
           });
         }
       } catch (err) {
@@ -81,10 +87,16 @@ export function SettingsForm() {
     }));
   };
 
-  const handleSave = async () => {
+  const handleLogoUpload = async (logoBase64: string) => {
+    setFormData(prev => ({ ...prev, logo: logoBase64 }));
+    // Auto-save logo
+    await handleSave(true);
+  };
+
+  const handleSave = async (isLogoSave = false) => {
     setSaving(true);
     setError('');
-    setSaved(false);
+    if (!isLogoSave) setSaved(false);
 
     try {
       const res = await fetch('/api/grower/settings', {
@@ -98,8 +110,10 @@ export function SettingsForm() {
         throw new Error(data.error || 'Failed to save');
       }
 
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      if (!isLogoSave) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to save settings');
     } finally {
@@ -130,6 +144,19 @@ export function SettingsForm() {
       )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Company Logo Section */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-lg font-semibold text-gray-900">Company Logo</h2>
+          </div>
+          <div className="p-6">
+            <LogoUpload 
+              currentLogo={formData.logo} 
+              onUpload={handleLogoUpload} 
+            />
+          </div>
+        </div>
+
         {/* Business Information */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
@@ -145,6 +172,18 @@ export function SettingsForm() {
                 value={formData.businessName}
                 onChange={(e) => setFormData({...formData, businessName: e.target.value})}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Contact Name <span className="text-gray-400 text-xs">(optional)</span>
+              </label>
+              <input 
+                type="text" 
+                value={formData.contactName}
+                onChange={(e) => setFormData({...formData, contactName: e.target.value})}
+                placeholder="Primary contact person"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500"
               />
             </div>
             <div>
@@ -192,61 +231,24 @@ export function SettingsForm() {
               />
               <p className="text-xs text-gray-500 mt-1">Type 3+ characters to see suggestions (includes city, state, ZIP)</p>
             </div>
-          </div>
-        </div>
-
-        {/* Banking & Payment Information */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-900">Banking Information</h2>
-          </div>
-          <div className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Bank Name
-              </label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
               <input 
-                type="text" 
-                placeholder="Bank name"
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                type="url" 
+                value={formData.website}
+                onChange={(e) => setFormData({...formData, website: e.target.value})}
+                placeholder="https://"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Account Holder Name
-              </label>
-              <input 
-                type="text" 
-                placeholder="Account holder name"
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea 
+                rows={3}
+                value={formData.description}
+                onChange={(e) => setFormData({...formData, description: e.target.value})}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500"
               />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Routing Number
-                </label>
-                <input 
-                  type="text" 
-                  placeholder="Routing #"
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Account Number
-                </label>
-                <input 
-                  type="text" 
-                  placeholder="Account #"
-                  className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500"
-                />
-              </div>
-            </div>
-            <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
-              <p className="text-sm text-yellow-800">
-                <strong>Security Note:</strong> Your banking information is encrypted and never shared with third parties.
-              </p>
             </div>
           </div>
         </div>
@@ -255,7 +257,7 @@ export function SettingsForm() {
       {/* Save Button */}
       <div className="flex justify-end pt-4">
         <button 
-          onClick={handleSave}
+          onClick={() => handleSave(false)}
           disabled={saving}
           className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition disabled:opacity-50"
         >

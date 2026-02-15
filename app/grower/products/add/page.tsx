@@ -1,40 +1,72 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { ProductForm } from './components/ProductForm';
+import { useEffect, useState } from 'react';
+import { ProductForm } from '../components/ProductForm';
 
 interface ProductFormData {
   name: string;
-  strain: string;
-  category: string;
-  subcategory: string;
-  thc: string;
-  cbd: string;
+  productType: string;
+  subType: string;
+  strainId: string;
+  batchId: string;
   price: string;
   inventoryQty: string;
   unit: string;
   description: string;
   isAvailable: boolean;
+  images: string[];
+  sku: string;
+  brand: string;
+  ingredients: string;
+  isFeatured: boolean;
+}
+
+interface GrowerInfo {
+  businessName: string;
 }
 
 export default function AddProductPage() {
   const router = useRouter();
+  const [growerInfo, setGrowerInfo] = useState<GrowerInfo | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchGrowerInfo = async () => {
+      try {
+        const response = await fetch('/api/growers/me');
+        if (response.ok) {
+          const data = await response.json();
+          setGrowerInfo(data);
+        }
+      } catch (error) {
+        console.error('Error fetching grower info:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGrowerInfo();
+  }, []);
 
   const handleSubmit = async (formData: ProductFormData) => {
     try {
       const productData = {
         name: formData.name,
-        strain: formData.strain || null,
-        category: formData.category || null,
-        subcategory: formData.subcategory || null,
-        thc: formData.thc ? parseFloat(formData.thc) : null,
-        cbd: formData.cbd ? parseFloat(formData.cbd) : null,
+        productType: formData.productType || null,
+        subType: formData.subType || null,
+        strainId: formData.strainId || null,
+        batchId: formData.batchId || null,
         price: parseFloat(formData.price),
         inventoryQty: parseInt(formData.inventoryQty),
         unit: formData.unit,
         description: formData.description || null,
-        images: [],
+        images: formData.images || [],
         isAvailable: formData.isAvailable,
+        sku: formData.sku || null,
+        brand: formData.brand || null,
+        ingredients: formData.ingredients || null,
+        isFeatured: formData.isFeatured || false,
       };
 
       const response = await fetch('/api/products', {
@@ -55,6 +87,14 @@ export default function AddProductPage() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-gray-500">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -63,7 +103,11 @@ export default function AddProductPage() {
           <p className="text-gray-600 mt-1">Create a new cannabis product listing</p>
         </div>
       </div>
-      <ProductForm onSubmit={handleSubmit} onCancel={() => router.push('/grower/products')} />
+      <ProductForm 
+        onSubmit={handleSubmit} 
+        onCancel={() => router.push('/grower/products')}
+        growerBrand={growerInfo?.businessName}
+      />
     </div>
   );
 }

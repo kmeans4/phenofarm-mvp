@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { SettingsForm } from "./components/SettingsForm";
 
@@ -20,6 +20,7 @@ export default async function DispensarySettingsPage() {
         <SettingsForm defaultValues={{
           businessName: '',
           licenseNumber: '',
+          contactName: '',
           email: '',
           phone: '',
           address: '',
@@ -28,6 +29,7 @@ export default async function DispensarySettingsPage() {
           zip: '',
           website: '',
           description: '',
+          logo: '',
         }} />
       </div>
     </div>

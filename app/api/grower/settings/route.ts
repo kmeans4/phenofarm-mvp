@@ -5,9 +5,16 @@ import { db } from '@/lib/db';
 interface GrowerSettingsBody {
   businessName: string;
   licenseNumber: string;
+  contactName: string;
   email: string;
   phone: string;
   address: string;
+  city: string;
+  state: string;
+  zip: string;
+  website: string;
+  description: string;
+  logo: string;
 }
 
 // GET - Fetch grower settings
@@ -30,6 +37,7 @@ export async function GET() {
       select: {
         businessName: true,
         licenseNumber: true,
+        contactName: true,
         phone: true,
         address: true,
         city: true,
@@ -37,6 +45,7 @@ export async function GET() {
         zip: true,
         website: true,
         description: true,
+        logo: true,
         user: { select: { email: true } },
       },
     });
@@ -48,6 +57,7 @@ export async function GET() {
     return NextResponse.json({
       businessName: grower.businessName,
       licenseNumber: grower.licenseNumber || '',
+      contactName: grower.contactName || '',
       email: grower.user.email,
       phone: grower.phone || '',
       address: grower.address || '',
@@ -56,6 +66,7 @@ export async function GET() {
       zip: grower.zip || '',
       website: grower.website || '',
       description: grower.description || '',
+      logo: grower.logo || '',
     });
   } catch (error) {
     console.error('Error fetching grower settings:', error);
@@ -79,7 +90,20 @@ export async function PUT(request: NextRequest) {
     }
 
     const body: GrowerSettingsBody = await request.json();
-    const { businessName, licenseNumber, email, phone, address } = body;
+    const { 
+      businessName, 
+      licenseNumber, 
+      contactName, 
+      email, 
+      phone, 
+      address,
+      city,
+      state,
+      zip,
+      website,
+      description,
+      logo 
+    } = body;
 
     // Validate required fields
     if (!businessName) {
@@ -89,7 +113,6 @@ export async function PUT(request: NextRequest) {
     // Parse address components if full address provided
     const addressData: Record<string, string> = {};
     if (address) {
-      // Try to extract city, state, zip from address
       const parts = address.split(',').map((p) => p.trim());
       if (parts.length >= 2) {
         addressData.address = parts[0];
@@ -104,18 +127,33 @@ export async function PUT(request: NextRequest) {
       }
     }
 
+    // Build update data object
+    const updateData: any = {
+      businessName,
+      licenseNumber: licenseNumber || null,
+      contactName: contactName || null,
+      phone: phone || null,
+      website: website || null,
+      description: description || null,
+    };
+
+    // Only update address if provided
+    if (address) {
+      updateData.address = addressData.address || null;
+      updateData.city = addressData.city || null;
+      updateData.state = addressData.state || 'VT';
+      updateData.zip = addressData.zip || null;
+    }
+
+    // Update logo if provided (base64 string)
+    if (logo !== undefined) {
+      updateData.logo = logo || null;
+    }
+
     // Update grower record
     const grower = await db.grower.update({
       where: { id: user.growerId },
-      data: {
-        businessName,
-        licenseNumber: licenseNumber || null,
-        phone: phone || null,
-        address: addressData.address || null,
-        city: addressData.city || null,
-        state: addressData.state || 'VT',
-        zip: addressData.zip || null,
-      },
+      data: updateData,
     });
 
     // Update email if changed and provided
@@ -132,8 +170,9 @@ export async function PUT(request: NextRequest) {
       grower: {
         businessName: grower.businessName,
         licenseNumber: grower.licenseNumber,
+        contactName: grower.contactName,
         phone: grower.phone,
-        address: grower.address,
+        logo: grower.logo,
       },
     });
   } catch (error) {

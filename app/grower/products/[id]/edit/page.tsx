@@ -22,20 +22,36 @@ export default async function EditProductPage({ params }: PageProps) {
 
   const { id } = await params;
 
+  // Fetch product with strain relation
   const product = await db.product.findFirst({
     where: { id, growerId: user.growerId },
+    include: {
+      strain: { select: { id: true, name: true } },
+      batch: { select: { id: true, batchNumber: true } },
+    },
   });
 
   if (!product) {
     redirect('/grower/products');
   }
 
-  // Serialize Decimal fields
+  // Serialize properly - extract strain name and exclude relations
+  const { strain, batch, ...productData } = product;
+  
   const serializedProduct = {
-    ...product,
+    ...productData,
     price: Number(product.price),
-    thc: product.thc ? Number(product.thc) : null,
-    cbd: product.cbd ? Number(product.cbd) : null,
+    // Use strain relation or legacy field
+    strain: strain?.name || product.strainLegacy,
+    strainId: product.strainId,
+    batchId: product.batchId,
+    batchNumber: batch?.batchNumber,
+    // Use new schema fields
+    productType: product.productType,
+    subType: product.subType,
+    // Legacy fields
+    thc: product.thcLegacy ? Number(product.thcLegacy) : null,
+    cbd: product.cbdLegacy ? Number(product.cbdLegacy) : null,
   };
 
   return (

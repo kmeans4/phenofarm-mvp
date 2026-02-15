@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
 
-// Handles file uploads with base64 encoding
+// Handles file uploads (images and documents) with base64 encoding
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
@@ -18,39 +18,89 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const files = formData.getAll('files') as File[];
     const productId = formData.get('productId') as string;
+    const fileType = formData.get('fileType') as string || 'image'; // 'image' or 'document'
 
-    if (!file) {
-      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+    if (!files || files.length === 0) {
+      return NextResponse.json({ error: 'No files provided' }, { status: 400 });
     }
 
-    // Convert file to base64
-    const bytes = await file.arrayBuffer();
-    const base64 = Buffer.from(bytes).toString('base64');
-    
-    // Determine file type
-    const extension = file.name.split('.').pop()?.toLowerCase();
-    const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-    
-    if (!validExtensions.includes(extension || '')) {
-      return NextResponse.json({ error: 'Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.' }, { status: 400 });
+    const uploadedFiles: { fileName: string; base64: string; extension: string }[] = [];
+
+    for (const file of files) {
+      // Convert file to base64
+      const bytes = await file.arrayBuffer();
+      const base64 = Buffer.from(bytes).toString('base64');
+      
+      // Determine file type
+      const extension = file.name.split('.').pop()?.toLowerCase();
+      
+      if (fileType === 'image') {
+        const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+        if (!validExtensions.includes(extension || '')) {
+          return NextResponse.json({ error: `Invalid file type for ${file.name}. Only JPG, PNG, GIF, and WebP are allowed.` }, { status: 400 });
+        }
+      } else if (fileType === 'document') {
+        const validExtensions = ['pdf', 'doc', 'docx'];
+        if (!validExtensions.includes(extension || '')) {
+          return NextResponse.json({ error: `Invalid file type for ${file.name}. Only PDF, DOC, and DOCX are allowed.` }, { status: 400 });
+        }
+      }
+
+      uploadedFiles.push({
+        fileName: file.name,
+        base64,
+        extension: extension || '',
+      });
     }
 
-    // Store in database
-    const updatedProduct = await db.product.update({
-      where: { id: productId, growerId: user.growerId },
-      data: {
-        images: {
-          push: base64,
-        },
-      },
-    });
+    // If productId is provided, update the product
+    if (productId) {
+      if (fileType === 'image') {
+        const existingProduct = await db.product.findFirst({
+          where: { id: productId, growerId: user.growerId },
+        });
+        
+        const existingImages = existingProduct?.images || [];
+        const newImages = [...existingImages, ...uploadedFiles.map(f => f.base64)];
+        
+        // Limit to 5 images
+        const limitedImages = newImages.slice(0, 5);
+        
+        const updatedProduct = await db.product.update({
+          where: { id: productId, growerId: user.growerId },
+          data: {
+            images: limitedImages,
+          },
+        });
 
+        return NextResponse.json({ 
+          success: true, 
+          images: updatedProduct.images,
+          uploadedFiles,
+        }, { status: 200 });
+      } else if (fileType === 'document') {
+        // For documents, store the first one (ingredients document)
+        const updatedProduct = await db.product.update({
+          where: { id: productId, growerId: user.growerId },
+          data: {
+            ingredientsDocumentUrl: uploadedFiles[0].base64,
+          },
+        });
+
+        return NextResponse.json({ 
+          success: true, 
+          documentBase64: uploadedFiles[0].base64,
+          fileName: uploadedFiles[0].fileName,
+        }, { status: 200 });
+      }
+    }
+
+    // Return the uploaded files for client to use
     return NextResponse.json({ 
       success: true, 
-      imageBase64: base64,
-      images: updatedProduct.images 
+      uploadedFiles,
     }, { status: 200 });
   } catch (error) {
     console.error('Error uploading file:', error);

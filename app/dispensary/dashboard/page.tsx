@@ -33,7 +33,7 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
       items: {
         include: {
           product: {
-            select: { name: true, category: true, price: true }
+            select: { name: true, productType: true, price: true }
           }
         }
       }
@@ -69,7 +69,7 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     .map(item => ({
       productId: item.productId,
       name: item.product?.name || 'Unknown',
-      category: item.product?.category || 'N/A',
+      category: item.product?.productType || 'N/A',
       pricePerUnit: Number(item.unitPrice),
       quantity: item.quantity,
       grower: orders.find(o => o.id === item.orderId)?.grower?.businessName || 'Unknown',

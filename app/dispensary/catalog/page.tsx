@@ -17,7 +17,7 @@ export default async function DispensaryCatalogPage() {
     redirect('/dashboard');
   }
 
-  // Fetch all available products with grower info
+  // Fetch all available products with grower and strain info
   const products = await db.product.findMany({
     where: {
       isAvailable: true,
@@ -30,6 +30,12 @@ export default async function DispensaryCatalogPage() {
           businessName: true,
         },
       },
+      strain: {
+        select: {
+          id: true,
+          name: true,
+        },
+      },
     },
     orderBy: [
       { grower: { businessName: 'asc' } },
@@ -37,17 +43,36 @@ export default async function DispensaryCatalogPage() {
     ],
   });
 
-  // Group products by grower
-  const growerGroups = products.reduce((groups: { growerId: string; growerName: string; products: { id: string; name: string; price: number; strain: string | null; unit: string | null; thc: number | null; inventoryQty: number; category: string | null; grower: { id: string; businessName: string } }[] }[], product) => {
+  // Group products by grower - use new schema fields
+  const growerGroups = products.reduce((groups: { growerId: string; growerName: string; products: { id: string; name: string; price: number; strain: string | null; strainId: string | null; productType: string | null; subType: string | null; unit: string | null; thc: number | null; inventoryQty: number; grower: { id: string; businessName: string } }[] }[], product) => {
     const existingGroup = groups.find(g => g.growerId === product.grower.id);
     
+    // Use strain relation or fallback to legacy
+    const strainName = product.strain?.name || product.strainLegacy;
+    
     if (existingGroup) {
-      existingGroup.products.push({ ...product, price: Number(product.price) });
+      existingGroup.products.push({ 
+        ...product, 
+        price: Number(product.price),
+        strain: strainName,
+        strainId: product.strainId,
+        productType: product.productType,
+        subType: product.subType,
+        thc: product.thcLegacy,
+      });
     } else {
       groups.push({
         growerId: product.grower.id,
         growerName: product.grower.businessName,
-        products: [{ ...product, price: Number(product.price) }],
+        products: [{ 
+          ...product, 
+          price: Number(product.price),
+          strain: strainName,
+          strainId: product.strainId,
+          productType: product.productType,
+          subType: product.subType,
+          thc: product.thcLegacy,
+        }],
       });
     }
     

@@ -30,7 +30,7 @@ interface OrderDetail {
     quantity: number;
     unitPrice: number;
     totalPrice: number;
-    product?: { name: string; strain: string | null; unit: string };
+    product?: { name: string; strain: string | null; productType: string | null; subType: string | null; unit: string };
   }>;
 }
 
@@ -39,7 +39,13 @@ async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | n
     where: { id, growerId },
     include: {
       dispensary: true,
-      items: { include: { product: true } },
+      items: { 
+        include: { 
+          product: {
+            include: { strain: { select: { id: true, name: true } } }
+          } 
+        } 
+      },
     },
   });
   
@@ -55,6 +61,15 @@ async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | n
       ...item,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
+      product: {
+        name: item.product.name,
+        // Use strain relation or legacy field
+        strain: item.product.strain?.name || item.product.strainLegacy,
+        // Use new schema fields
+        productType: item.product.productType,
+        subType: item.product.subType,
+        unit: item.product.unit,
+      },
     })),
   } as OrderDetail;
 }
@@ -83,21 +98,17 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-export default async function OrderDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
 
   if (!session) {
     redirect('/auth/sign_in');
   }
 
-  const user = (session as any).user as { role: string; growerId?: string; dispensaryId?: string };
+  const user = (session as any).user as { role: string; growerId?: string };
 
   if (user.role !== 'GROWER') {
-    redirect('/auth/sign_in');
+    redirect('/dashboard');
   }
 
   const { id } = await params;
@@ -105,10 +116,9 @@ export default async function OrderDetailPage({
 
   if (!order) {
     return (
-      <div className="p-6">
-        <h1 className="text-2xl font-bold">Order Not Found</h1>
-        <p className="mt-2 text-gray-600">The requested order could not be found.</p>
-        <Link href="/grower/orders" className="mt-4 inline-block text-green-600 hover:underline">
+      <div className="text-center py-12">
+        <h2 className="text-2xl font-bold text-gray-900">Order not found</h2>
+        <Link href="/grower/orders" className="text-green-600 hover:underline mt-4 inline-block">
           Back to Orders
         </Link>
       </div>
@@ -116,155 +126,105 @@ export default async function OrderDetailPage({
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-5xl">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <Link href="/grower/orders" className="text-sm text-gray-500 hover:text-gray-700">
-            ← Back to Orders
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">Order #{order.orderId}</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Order #{order.orderId}</h1>
+          <p className="text-gray-600 mt-1">
+            Placed on {format(new Date(order.createdAt), 'MMMM d, yyyy')}
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-          <StatusBadge status={order.status} />
-          <Link
-            href={`/grower/orders/${order.id}/edit`}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
-          >
-            Edit Order
+        <div className="flex gap-3">
+          <Link href="/grower/orders" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+            ← Back
           </Link>
+          <QuickStatusUpdate orderId={order.id} currentStatus={order.status} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column - Status & Timeline */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Status Timeline */}
-          <OrderStatusTimeline 
-            currentStatus={order.status}
-            orderId={order.orderId}
-            shippedAt={order.shippedAt}
-            deliveredAt={order.deliveredAt}
-          />
+        {/* Order Details */}
+        <div className="lg:col-span-2 space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Order Items</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {order.items.map((item) => (
+                  <div key={item.id} className="flex justify-between items-start py-3 border-b border-gray-100 last:border-0">
+                    <div>
+                      <p className="font-medium text-gray-900">{item.product?.name || 'Unknown Product'}</p>
+                      {item.product?.strain && (
+                        <p className="text-sm text-gray-500">Strain: {item.product.strain}</p>
+                      )}
+                      {item.product?.productType && (
+                        <p className="text-sm text-gray-500">
+                          Type: {item.product.productType} {item.product.subType && `- ${item.product.subType}`}
+                        </p>
+                      )}
+                      <p className="text-sm text-gray-500">
+                        {item.quantity} × {formatCurrency(item.unitPrice)}/{item.product?.unit || 'unit'}
+                      </p>
+                    </div>
+                    <p className="font-medium text-gray-900">{formatCurrency(item.totalPrice)}</p>
+                  </div>
+                ))}
+              </div>
 
-          {/* Quick Status Update */}
-          <QuickStatusUpdate 
-            orderId={order.id}
-            currentStatus={order.status}
-          />
-
-          {/* Order Info Cards */}
-          <div className="grid grid-cols-1 gap-4">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm text-gray-600">Order Date</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-semibold">{format(order.createdAt, 'MMM dd, yyyy')}</p>
-                <p className="text-sm text-gray-500">{format(order.createdAt, 'h:mm a')}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm text-gray-600">Total Amount</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-2xl font-semibold text-green-600">{formatCurrency(order.totalAmount)}</p>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm text-gray-600">Dispensary</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-xl font-semibold">{order.dispensary.businessName}</p>
-              </CardContent>
-            </Card>
-          </div>
+              <div className="mt-6 pt-4 border-t border-gray-200 space-y-2">
+                <div className="flex justify-between text-gray-600">
+                  <span>Subtotal</span>
+                  <span>{formatCurrency(order.subtotal)}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Tax</span>
+                  <span>{formatCurrency(order.tax)}</span>
+                </div>
+                <div className="flex justify-between text-gray-600">
+                  <span>Shipping</span>
+                  <span>{formatCurrency(order.shippingFee)}</span>
+                </div>
+                <div className="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t border-gray-200">
+                  <span>Total</span>
+                  <span>{formatCurrency(order.totalAmount)}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Right Column - Items & Details */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Order Items */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <h2 className="text-lg font-semibold text-gray-900">Order Items</h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Qty</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Unit Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {order.items.map((item) => (
-                    <tr key={item.id}>
-                      <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                        {item.product?.name || 'Product Deleted'}
-                        {item.product?.strain && <span className="text-gray-500"> ({item.product.strain})</span>}
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{item.quantity}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">{formatCurrency(item.unitPrice)}</td>
-                      <td className="px-6 py-4 text-sm font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="px-6 py-4 bg-gray-50 rounded-b-lg space-y-2">
-              <div className="flex justify-end">
-                <span className="text-sm text-gray-600">Subtotal:</span>
-                <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.subtotal)}</span>
-              </div>
-              <div className="flex justify-end">
-                <span className="text-sm text-gray-600">Tax:</span>
-                <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.tax)}</span>
-              </div>
-              <div className="flex justify-end">
-                <span className="text-sm text-gray-600">Shipping:</span>
-                <span className="ml-2 text-sm font-medium text-gray-900">{formatCurrency(order.shippingFee)}</span>
-              </div>
-              <div className="flex justify-end border-t pt-2">
-                <span className="text-sm font-semibold text-gray-900">Total:</span>
-                <span className="ml-2 text-sm font-bold text-green-600">{formatCurrency(order.totalAmount)}</span>
-              </div>
-            </div>
-          </div>
+        {/* Sidebar */}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Status</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <StatusBadge status={order.status} />
+              <OrderStatusTimeline currentStatus={order.status} orderId={order.id} />
+            </CardContent>
+          </Card>
 
-          {/* Notes */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Customer</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="font-medium text-gray-900">{order.dispensary.businessName}</p>
+            </CardContent>
+          </Card>
+
           {order.notes && (
-            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-              <h3 className="text-sm font-medium text-yellow-900 mb-2">Order Notes</h3>
-              <p className="text-sm text-yellow-800">{order.notes}</p>
-            </div>
-          )}
-
-          {/* Shipping Info if shipped */}
-          {order.status === 'SHIPPED' && order.shippedAt && (
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-              <h3 className="text-sm font-medium text-orange-900 mb-2">Shipping Information</h3>
-              <p className="text-sm text-orange-800">
-                📦 Shipped on {new Date(order.shippedAt).toLocaleDateString()} at {' '}
-                {new Date(order.shippedAt).toLocaleTimeString()}
-              </p>
-            </div>
-          )}
-
-          {/* Delivery Info if delivered */}
-          {order.status === 'DELIVERED' && order.deliveredAt && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <h3 className="text-sm font-medium text-green-900 mb-2">Delivery Information</h3>
-              <p className="text-sm text-green-800">
-                ✅ Delivered on {new Date(order.deliveredAt).toLocaleDateString()} at {' '}
-                {new Date(order.deliveredAt).toLocaleTimeString()}
-              </p>
-            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle>Notes</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600">{order.notes}</p>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>

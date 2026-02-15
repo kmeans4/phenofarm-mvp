@@ -62,21 +62,29 @@ export async function POST(request: NextRequest) {
 
         const growerId = user.growerId!;
 
+        // Map legacy column names to new schema fields
         await db.product.create({
           data: {
             growerId,
             name: productData.name || '',
-            strain: productData.strain || null,
-            category: productData.category || null,
-            subcategory: productData.subcategory || null,
-            thc: productData.thc ? parseFloat(productData.thc) : null,
-            cbd: productData.cbd ? parseFloat(productData.cbd) : null,
+            // New flexible type/subtype system
+            productType: productData.producttype || productData.category || null,
+            subType: productData.subtype || productData.subcategory || null,
+            // Legacy fields for backwards compatibility
+            strainLegacy: productData.strain || null,
+            categoryLegacy: productData.category || null,
+            subcategoryLegacy: productData.subcategory || null,
+            thcLegacy: productData.thc ? parseFloat(productData.thc) : null,
+            cbdLegacy: productData.cbd ? parseFloat(productData.cbd) : null,
             price: parseFloat(productData.price || '0'),
-            inventoryQty: parseInt(productData.inventoryQty || '0'),
-            unit: productData.unit || 'Unit',
+            inventoryQty: parseInt(productData.inventoryqty || '0'),
+            unit: productData.unit || 'Gram',
             description: productData.description || null,
             images: productData.images ? productData.images.split(';') : [],
             isAvailable: productData.isavailable !== 'false',
+            sku: productData.sku || null,
+            brand: productData.brand || null,
+            isFeatured: productData.isfeatured === 'true',
           },
         });
         
@@ -112,72 +120,31 @@ export async function GET(request: NextRequest) {
     }
 
     if (template === 'true') {
-      const templateHeaders = ['name', 'strain', 'category', 'subcategory', 'thc', 'cbd', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images'];
+      // Updated template with new field names
+      const templateHeaders = ['name', 'productType', 'subType', 'strain', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images', 'sku', 'brand'];
       const sampleRow = [
-        'Blue Dream', 'Blue Dream x Haze', 'Flower', 'Sativa',
-        '18.5', '0.2', '45.00', '100', 'Ounce',
+        'Blue Dream - 3.5g Jar', 'Flower', '3.5g Jar', 'Blue Dream',
+        '45.00', '100', 'Gram',
         'Premium sativa flower with berry aroma', 'true',
-        'https://example.com/image1.jpg;https://example.com/image2.jpg'
+        'https://example.com/image1.jpg', 'BD-001', 'PhenoFarm'
       ];
       
       const csvContent = [
         templateHeaders.join(','),
-        sampleRow.join(','),
+        sampleRow.join(',')
       ].join('\n');
 
-      return new Response(csvContent, {
+      return new NextResponse(csvContent, {
         headers: {
           'Content-Type': 'text/csv',
-          'Content-Disposition': 'attachment; filename="products-template.csv"',
+          'Content-Disposition': 'attachment; filename=product-template.csv',
         },
       });
     }
 
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = (session as any).user;
-    
-    if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    const products = await db.product.findMany({
-      where: { growerId: user.growerId },
-      orderBy: { name: 'asc' },
-    });
-
-    const headers = ['name', 'strain', 'category', 'subcategory', 'thc', 'cbd', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images'];
-    
-    const rows = products.map(p => [
-      p.name,
-      p.strain || '',
-      p.category || '',
-      p.subcategory || '',
-      p.thc?.toString() || '',
-      p.cbd?.toString() || '',
-      p.price.toString(),
-      p.inventoryQty.toString(),
-      p.unit,
-      p.description || '',
-      p.isAvailable.toString(),
-      p.images.join(';'),
-    ]);
-
-    const csvContent = [
-      headers.join(','),
-      ...rows.map(row => row.map(v => `"${v.replace(/"/g, '""')}"`).join(',')),
-    ].join('\n');
-
-    return new Response(csvContent, {
-      headers: {
-        'Content-Type': 'text/csv',
-        'Content-Disposition': 'attachment; filename="products-export.csv"',
-      },
-    });
+    return NextResponse.json({ error: 'Template not specified' }, { status: 400 });
   } catch (error) {
-    console.error('Error exporting products:', error);
+    console.error('Error generating template:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
