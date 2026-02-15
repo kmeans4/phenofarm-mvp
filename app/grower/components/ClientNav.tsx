@@ -1,5 +1,6 @@
 'use client';
 
+import React;
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Badge } from '@/app/components/ui/Badge';
@@ -8,6 +9,7 @@ interface NavLink {
   name: string;
   href: string;
   badge?: number | null;
+  badgeComponent?: React.ReactNode;
 }
 
 export function ClientNav({ links }: { links: NavLink[] }) {
@@ -36,9 +38,11 @@ export function ClientNav({ links }: { links: NavLink[] }) {
             }`}
           >
             <span>{link.name}</span>
-            {link.badge && link.badge > 0 && (
+            {(link.badge && link.badge > 0) ? (
               <Badge variant="warning" className="ml-2">{link.badge}</Badge>
-            )}
+            ) : link.badgeComponent ? (
+              <span className="ml-2">{link.badgeComponent}</span>
+            ) : null}
           </Link>
         );
       })}

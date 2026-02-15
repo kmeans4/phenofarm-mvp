@@ -5,6 +5,7 @@ import { MobileNav } from "@/app/dispensary/_components/MobileNav";
 import { ClientNav } from "@/app/grower/components/ClientNav";
 import { SignOutButton } from "@/app/components/SignOutButton";
 import { db } from "@/lib/db";
+import CartBadge from "./catalog/components/CartBadge";
 
 interface SessionUser {
   role?: string;
@@ -45,7 +46,7 @@ export default async function DispensaryLayout({ children }: { children: React.R
     { name: 'Dashboard', href: '/dispensary/dashboard', badge: null },
     { name: 'Catalog', href: '/dispensary/catalog', badge: null },
     { name: 'Orders', href: '/dispensary/orders', badge: pendingOrdersCount > 0 ? pendingOrdersCount : null },
-    { name: 'Cart', href: '/dispensary/cart', badge: null },
+    { name: 'Cart', href: '/dispensary/cart', badge: null, badgeComponent: <CartBadge /> },
     { name: 'Settings', href: '/dispensary/settings', badge: null },
   ];
 

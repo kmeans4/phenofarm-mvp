@@ -92,7 +92,7 @@ export default function DispensaryCartPage() {
   };
 
   const handleCheckout = async () => {
-    if (!confirm('Place order? This will deduct inventory.')) return;
+    // Order confirmation - proceed directly without warning
     setCheckingOut(true);
     setCheckoutError('');
 
