@@ -21,6 +21,8 @@ export default async function GrowerLayout({ children }: { children: React.React
   const navLinks = [
     { name: 'Dashboard', href: '/grower/dashboard' },
     { name: 'Products', href: '/grower/products' },
+    { name: 'Strains', href: '/grower/strains' },
+    { name: 'Batches', href: '/grower/batches' },
     { name: 'Orders', href: '/grower/orders' },
     { name: 'Customers', href: '/grower/customers' },
     { name: 'Inventory', href: '/grower/inventory' },
