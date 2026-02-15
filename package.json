@@ -2,6 +2,9 @@
   "name": "phenofarm-mvp",
   "version": "0.1.0",
   "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "prisma": {
     "schema": "prisma/schema.prisma"
   },
