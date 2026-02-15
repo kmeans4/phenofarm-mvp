@@ -93,35 +93,33 @@ export default function OrderStatusTimeline({
       </div>
       
       {/* Timeline */}
-      <div className="relative">
-        {/* Progress Line */}
-        <div className="absolute top-4 sm:top-6 left-0 right-0 h-0.5 sm:h-1 bg-gray-200 -translate-y-1/2 mx-4 sm:mx-6" />
-        <div 
-          className="absolute top-4 sm:top-6 left-0 h-0.5 sm:h-1 bg-green-500 -translate-y-1/2 transition-all duration-500 mx-4 sm:mx-6"
-          style={{ width: `calc(${(currentIndex / (STATUS_FLOW.length - 1)) * 100}% - ${currentIndex === 0 ? '1rem' : currentIndex === STATUS_FLOW.length - 1 ? '2rem' : '1.5rem'})` }}
-        />
+      <div className="relative px-2 sm:px-4">
+        {/* Progress line container */}
+        <div className="absolute top-4 left-4 right-4 h-0.5 sm:h-1 bg-gray-200 sm:top-6">
+          <div 
+            className="h-full bg-green-500 transition-all duration-500"
+            style={{ width: `${(currentIndex / (STATUS_FLOW.length - 1)) * 100}%` }}
+          />
+        </div>
         
         {/* Steps */}
         <div className="relative flex justify-between">
           {STATUS_FLOW.map((step, index) => (
-            <div key={step.status} className="flex flex-col items-center flex-1 px-1">
+            <div key={step.status} className="flex flex-col items-center">
               <div className={`
-                w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-base sm:text-xl
-                border-2 sm:border-4 transition-all duration-300
+                relative z-10 w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-base sm:text-xl
+                border-2 sm:border-4 transition-all duration-300 bg-white
                 ${index <= currentIndex 
-                  ? 'border-green-500 bg-white' 
-                  : 'border-gray-300 bg-gray-100'}
+                  ? 'border-green-500' 
+                  : 'border-gray-300 bg-gray-50'}
               `}>
-                <span className={index <= currentIndex ? 'grayscale-0' : 'grayscale'}>
+                <span className={index <= currentIndex ? 'grayscale-0' : 'grayscale opacity-50'}>
                   {step.icon}
                 </span>
               </div>
-              <div className="mt-1 sm:mt-2 text-center min-w-0">
-                <p className={`text-xs sm:text-sm font-medium truncate ${getStatusTextColor(index)}`}>
+              <div className="mt-2 sm:mt-3 text-center w-12 sm:w-16">
+                <p className={`text-[10px] sm:text-xs font-medium leading-tight ${getStatusTextColor(index)}`}>
                   {step.label}
-                </p>
-                <p className="text-[10px] sm:text-xs text-gray-500 hidden sm:block">
-                  {step.description}
                 </p>
               </div>
             </div>
@@ -130,27 +128,25 @@ export default function OrderStatusTimeline({
       </div>
       
       {/* Current Status Info */}
-      <div className="mt-8 p-4 bg-green-50 border border-green-200 rounded-lg">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{STATUS_FLOW[currentIndex]?.icon}</span>
-            <div>
-              <p className="font-medium text-green-800">
-                Currently: {STATUS_FLOW[currentIndex]?.label}
-              </p>
-              <p className="text-sm text-green-600">
-                {currentStatus === 'SHIPPED' && shippedAt 
-                  ? `Shipped on ${new Date(shippedAt).toLocaleDateString()}`
-                  : currentStatus === 'DELIVERED' && deliveredAt
-                  ? `Delivered on ${new Date(deliveredAt).toLocaleDateString()}`
-                  : STATUS_FLOW[currentIndex]?.description
-                }
-              </p>
-            </div>
+      <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
+        <div className="flex items-center gap-3">
+          <span className="text-xl sm:text-2xl flex-shrink-0">{STATUS_FLOW[currentIndex]?.icon}</span>
+          <div className="min-w-0 flex-1">
+            <p className="font-medium text-green-800 text-sm sm:text-base">
+              Currently: {STATUS_FLOW[currentIndex]?.label}
+            </p>
+            <p className="text-xs sm:text-sm text-green-600">
+              {currentStatus === 'SHIPPED' && shippedAt 
+                ? `Shipped on ${new Date(shippedAt).toLocaleDateString()}`
+                : currentStatus === 'DELIVERED' && deliveredAt
+                ? `Delivered on ${new Date(deliveredAt).toLocaleDateString()}`
+                : STATUS_FLOW[currentIndex]?.description
+              }
+            </p>
           </div>
           
           {currentStatus === 'DELIVERED' && (
-            <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+            <span className="px-2 sm:px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs sm:text-sm font-medium flex-shrink-0">
               Complete ✓
             </span>
           )}
@@ -159,12 +155,12 @@ export default function OrderStatusTimeline({
       
       {/* Quick Actions */}
       {onStatusChange && currentStatus !== 'DELIVERED' && currentStatus !== 'CANCELLED' && (
-        <div className="mt-6 flex flex-col sm:flex-row flex-wrap gap-2 sm:gap-3">
+        <div className="mt-4 sm:mt-6 flex flex-wrap gap-2">
           {prevStatus && currentIndex > 0 && (
             <button
               onClick={() => handleStatusUpdate(prevStatus.status)}
               disabled={isUpdating}
-              className="px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-xs sm:text-sm font-medium disabled:opacity-50 whitespace-nowrap"
+              className="px-3 py-1.5 sm:py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-xs font-medium disabled:opacity-50"
             >
               ← Back
             </button>
@@ -174,7 +170,7 @@ export default function OrderStatusTimeline({
             <button
               onClick={() => handleStatusUpdate(nextStatus.status)}
               disabled={isUpdating}
-              className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs sm:text-sm font-medium disabled:opacity-50 flex items-center gap-2 whitespace-nowrap"
+              className="px-3 py-1.5 sm:py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs font-medium disabled:opacity-50 flex items-center gap-1"
             >
               Mark as {nextStatus.label}
               {isUpdating && (
@@ -189,7 +185,7 @@ export default function OrderStatusTimeline({
           <button
             onClick={() => handleStatusUpdate('CANCELLED')}
             disabled={isUpdating}
-            className="sm:ml-auto px-3 sm:px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 text-xs sm:text-sm font-medium disabled:opacity-50 whitespace-nowrap"
+            className="ml-auto px-3 py-1.5 sm:py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 text-xs font-medium disabled:opacity-50"
           >
             Cancel
           </button>
@@ -197,12 +193,12 @@ export default function OrderStatusTimeline({
       )}
       
       {/* Status History */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <h3 className="text-sm font-medium text-gray-900 mb-3">Status History</h3>
+      <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-200">
+        <h3 className="text-xs sm:text-sm font-medium text-gray-900 mb-2 sm:mb-3">Status History</h3>
         <div className="space-y-2">
           {STATUS_FLOW.slice(0, currentIndex + 1).reverse().map((step, idx) => (
-            <div key={step.status} className="flex items-center gap-3 text-sm">
-              <span className="w-2 h-2 rounded-full bg-green-500" />
+            <div key={step.status} className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+              <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-green-500 flex-shrink-0" />
               <span className="text-gray-600">
                 {idx === 0 ? 'Current' : 'Completed'}: {step.label}
               </span>
