@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
+import { useToast } from '@/app/hooks/useToast';
 import { Button } from '@/app/components/ui/Button';
 
 interface Strain {
@@ -39,6 +40,18 @@ interface ProductData {
   ingredients?: string | null;
   images?: string[];
   isFeatured?: boolean;
+}
+
+interface FieldErrors {
+  name?: string;
+  price?: string;
+  inventoryQty?: string;
+  sku?: string;
+  thc?: string;
+  cbd?: string;
+  description?: string;
+  brand?: string;
+  ingredients?: string;
 }
 
 interface EditProductFormProps {
@@ -84,6 +97,78 @@ const DEFAULT_PRODUCT_TYPES = [
   'Other',
 ];
 
+// Validation functions
+const validateName = (name: string): string | undefined => {
+  if (!name.trim()) return 'Product name is required';
+  if (name.trim().length < 2) return 'Product name must be at least 2 characters';
+  if (name.trim().length > 100) return 'Product name must be less than 100 characters';
+  return undefined;
+};
+
+const validatePrice = (price: string): string | undefined => {
+  if (!price) return 'Price is required';
+  const numPrice = parseFloat(price);
+  if (isNaN(numPrice)) return 'Please enter a valid number';
+  if (numPrice < 0) return 'Price cannot be negative';
+  if (numPrice > 999999.99) return 'Price exceeds maximum allowed';
+  return undefined;
+};
+
+const validateInventoryQty = (qty: string): string | undefined => {
+  if (!qty) return 'Inventory quantity is required';
+  const numQty = parseInt(qty, 10);
+  if (isNaN(numQty)) return 'Please enter a valid whole number';
+  if (numQty < 0) return 'Quantity cannot be negative';
+  if (numQty > 999999) return 'Quantity exceeds maximum allowed';
+  return undefined;
+};
+
+const validateSku = (sku: string): string | undefined => {
+  if (!sku) return undefined;
+  if (sku.length > 50) return 'SKU must be less than 50 characters';
+  if (!/^[a-zA-Z0-9-_]+$/.test(sku)) return 'SKU can only contain letters, numbers, hyphens, and underscores';
+  return undefined;
+};
+
+const validateThc = (thc: string): string | undefined => {
+  if (!thc) return undefined;
+  const numThc = parseFloat(thc);
+  if (isNaN(numThc)) return 'Please enter a valid number';
+  if (numThc < 0) return 'THC cannot be negative';
+  if (numThc > 100) return 'THC cannot exceed 100%';
+  return undefined;
+};
+
+const validateCbd = (cbd: string): string | undefined => {
+  if (!cbd) return undefined;
+  const numCbd = parseFloat(cbd);
+  if (isNaN(numCbd)) return 'Please enter a valid number';
+  if (numCbd < 0) return 'CBD cannot be negative';
+  if (numCbd > 100) return 'CBD cannot exceed 100%';
+  return undefined;
+};
+
+const validateDescription = (desc: string): string | undefined => {
+  if (!desc) return undefined;
+  if (desc.length > 2000) return 'Description must be less than 2000 characters';
+  return undefined;
+};
+
+const validateBrand = (brand: string): string | undefined => {
+  if (!brand) return undefined;
+  if (brand.length > 100) return 'Brand must be less than 100 characters';
+  return undefined;
+};
+
+const validateIngredients = (ingredients: string): string | undefined => {
+  if (!ingredients) return undefined;
+  if (ingredients.length > 1000) return 'Ingredients must be less than 1000 characters';
+  return undefined;
+};
+
+const INPUT_CLASSES = "block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500";
+const INPUT_ERROR_CLASSES = "block w-full rounded-md border border-red-500 px-3 py-2 shadow-sm focus:border-red-500 focus:ring-red-500 bg-red-50";
+
 export default function EditProductForm({ 
   product, 
   strains, 
@@ -92,8 +177,10 @@ export default function EditProductForm({
   getSubtypesForType 
 }: EditProductFormProps) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   
   const [formData, setFormData] = useState<FormData>({
     name: product?.name || '',
@@ -141,22 +228,85 @@ export default function EditProductForm({
     ? batches.filter(b => b.strain?.name === strains.find(s => s.id === formData.strainId)?.name)
     : batches;
 
-  // Set up unsaved changes warning
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: true,
     message: 'You have unsaved changes to this product. Are you sure you want to leave?',
   });
 
-  // Track dirty state
   useEffect(() => {
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
   }, [formData, initialData, setIsDirty]);
 
+  const validateForm = (): boolean => {
+    const newErrors: FieldErrors = {
+      name: validateName(formData.name),
+      price: validatePrice(formData.price),
+      inventoryQty: validateInventoryQty(formData.inventoryQty),
+      sku: validateSku(formData.sku),
+      thc: validateThc(formData.thc),
+      cbd: validateCbd(formData.cbd),
+      description: validateDescription(formData.description),
+      brand: validateBrand(formData.brand),
+      ingredients: validateIngredients(formData.ingredients),
+    };
+    
+    Object.keys(newErrors).forEach(key => {
+      if (newErrors[key as keyof FieldErrors] === undefined) {
+        delete newErrors[key as keyof FieldErrors];
+      }
+    });
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateField = (field: keyof FieldErrors, value: string): string | undefined => {
+    switch (field) {
+      case 'name': return validateName(value);
+      case 'price': return validatePrice(value);
+      case 'inventoryQty': return validateInventoryQty(value);
+      case 'sku': return validateSku(value);
+      case 'thc': return validateThc(value);
+      case 'cbd': return validateCbd(value);
+      case 'description': return validateDescription(value);
+      case 'brand': return validateBrand(value);
+      case 'ingredients': return validateIngredients(value);
+      default: return undefined;
+    }
+  };
+
+  const handleChange = (field: keyof FormData, value: string | boolean) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    if (touched[field as string] && typeof value === 'string') {
+      const error = validateField(field as keyof FieldErrors, value);
+      setErrors(prev => ({ ...prev, [field]: error }));
+    }
+  };
+
+  const handleBlur = (field: keyof FieldErrors) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const value = formData[field as keyof FormData] as string;
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const allTouched: Record<string, boolean> = {};
+    Object.keys(formData).forEach(key => {
+      allTouched[key] = true;
+    });
+    setTouched(allTouched);
+    
+    if (!validateForm()) {
+      showToast('error', 'Please fix the errors below before saving');
+      return;
+    }
+    
     setIsSubmitting(true);
-    setError('');
 
     try {
       const res = await fetch(`/api/products/${product.id}`, {
@@ -190,37 +340,23 @@ export default function EditProductForm({
         throw new Error(data.error || 'Failed to update product');
       }
 
-      setInitialData(formData);
-      resetDirtyState();
+      showToast('success', 'Product updated successfully!');
       setInitialData(formData);
       resetDirtyState();
       router.push('/grower/products');
       router.refresh();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      showToast('error', err instanceof Error ? err.message : 'Something went wrong');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const allProductTypes = [...new Set([...DEFAULT_PRODUCT_TYPES, ...productTypes])];
+  const hasErrors = Object.keys(errors).length > 0;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
-      {isDirty && (
-      <div className="p-4 mb-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-center gap-2">
-        <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
-        </svg>
-        <span>You have unsaved changes.</span>
-      </div>
-    )}
-    {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{error}</p>
-        </div>
-      )}
-
       {isDirty && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -240,11 +376,14 @@ export default function EditProductForm({
           <input
             id="name"
             type="text"
-            required
             value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+            onChange={(e) => handleChange('name', e.target.value)}
+            onBlur={() => handleBlur('name')}
+            className={errors.name && touched.name ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
           />
+          {errors.name && touched.name && (
+            <p className="text-sm text-red-600 mt-1">{errors.name}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -256,7 +395,7 @@ export default function EditProductForm({
               id="productType"
               value={formData.productType}
               onChange={(e) => setFormData({ ...formData, productType: e.target.value, subType: '' })}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              className={INPUT_CLASSES}
             >
               <option value="">Select a type</option>
               {allProductTypes.map((type) => (
@@ -274,7 +413,7 @@ export default function EditProductForm({
               value={formData.subType}
               onChange={(e) => setFormData({ ...formData, subType: e.target.value })}
               disabled={!formData.productType}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className={`${INPUT_CLASSES} disabled:bg-gray-100 disabled:cursor-not-allowed`}
             >
               <option value="">Select a subtype</option>
               {availableSubtypes.map((subtype) => (
@@ -291,7 +430,7 @@ export default function EditProductForm({
               id="strain"
               value={formData.strainId}
               onChange={(e) => setFormData({ ...formData, strainId: e.target.value, batchId: '' })}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              className={INPUT_CLASSES}
             >
               <option value="">Select a strain</option>
               {strains.map((strain) => (
@@ -309,7 +448,7 @@ export default function EditProductForm({
               value={formData.batchId}
               onChange={(e) => setFormData({ ...formData, batchId: e.target.value })}
               disabled={!formData.strainId && filteredBatches.length === 0}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
+              className={`${INPUT_CLASSES} disabled:bg-gray-100 disabled:cursor-not-allowed`}
             >
               <option value="">Select a batch</option>
               {filteredBatches.map((batch) => (
@@ -334,11 +473,14 @@ export default function EditProductForm({
               id="price"
               type="number"
               step="0.01"
-              required
               value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              onChange={(e) => handleChange('price', e.target.value)}
+              onBlur={() => handleBlur('price')}
+              className={errors.price && touched.price ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
             />
+            {errors.price && touched.price && (
+              <p className="text-sm text-red-600 mt-1">{errors.price}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -348,8 +490,8 @@ export default function EditProductForm({
             <select
               id="unit"
               value={formData.unit}
-              onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              onChange={(e) => handleChange('unit', e.target.value)}
+              className={INPUT_CLASSES}
             >
               <option value="gram">Gram</option>
               <option value="eighth">1/8 Oz (3.5g)</option>
@@ -368,12 +510,15 @@ export default function EditProductForm({
             <input
               id="inventoryQty"
               type="number"
-              required
               min="0"
               value={formData.inventoryQty}
-              onChange={(e) => setFormData({ ...formData, inventoryQty: e.target.value })}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              onChange={(e) => handleChange('inventoryQty', e.target.value)}
+              onBlur={() => handleBlur('inventoryQty')}
+              className={errors.inventoryQty && touched.inventoryQty ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
             />
+            {errors.inventoryQty && touched.inventoryQty && (
+              <p className="text-sm text-red-600 mt-1">{errors.inventoryQty}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -384,10 +529,14 @@ export default function EditProductForm({
               id="sku"
               type="text"
               value={formData.sku}
-              onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+              onChange={(e) => handleChange('sku', e.target.value)}
+              onBlur={() => handleBlur('sku')}
               placeholder="Enter product SKU"
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              className={errors.sku && touched.sku ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
             />
+            {errors.sku && touched.sku && (
+              <p className="text-sm text-red-600 mt-1">{errors.sku}</p>
+            )}
           </div>
         </div>
       </div>
@@ -406,9 +555,13 @@ export default function EditProductForm({
               step="0.1"
               max="100"
               value={formData.thc}
-              onChange={(e) => setFormData({ ...formData, thc: e.target.value })}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              onChange={(e) => handleChange('thc', e.target.value)}
+              onBlur={() => handleBlur('thc')}
+              className={errors.thc && touched.thc ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
             />
+            {errors.thc && touched.thc && (
+              <p className="text-sm text-red-600 mt-1">{errors.thc}</p>
+            )}
           </div>
 
           <div className="space-y-2">
@@ -421,9 +574,13 @@ export default function EditProductForm({
               step="0.1"
               max="100"
               value={formData.cbd}
-              onChange={(e) => setFormData({ ...formData, cbd: e.target.value })}
-              className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+              onChange={(e) => handleChange('cbd', e.target.value)}
+              onBlur={() => handleBlur('cbd')}
+              className={errors.cbd && touched.cbd ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
             />
+            {errors.cbd && touched.cbd && (
+              <p className="text-sm text-red-600 mt-1">{errors.cbd}</p>
+            )}
           </div>
         </div>
 
@@ -435,9 +592,18 @@ export default function EditProductForm({
             id="description"
             rows={3}
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+            onChange={(e) => handleChange('description', e.target.value)}
+            onBlur={() => handleBlur('description')}
+            className={errors.description && touched.description 
+              ? "block w-full rounded-md border border-red-500 px-3 py-2 shadow-sm focus:border-red-500 focus:ring-red-500 bg-red-50" 
+              : INPUT_CLASSES}
           />
+          {errors.description && touched.description && (
+            <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+          )}
+          <p className="text-xs text-gray-500 text-right">
+            {formData.description.length}/2000 characters
+          </p>
         </div>
 
         <div className="space-y-2">
@@ -448,9 +614,13 @@ export default function EditProductForm({
             id="brand"
             type="text"
             value={formData.brand}
-            onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+            onChange={(e) => handleChange('brand', e.target.value)}
+            onBlur={() => handleBlur('brand')}
+            className={errors.brand && touched.brand ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
           />
+          {errors.brand && touched.brand && (
+            <p className="text-sm text-red-600 mt-1">{errors.brand}</p>
+          )}
         </div>
 
         <div className="space-y-2">
@@ -461,10 +631,19 @@ export default function EditProductForm({
             id="ingredients"
             rows={3}
             value={formData.ingredients}
-            onChange={(e) => setFormData({ ...formData, ingredients: e.target.value })}
+            onChange={(e) => handleChange('ingredients', e.target.value)}
+            onBlur={() => handleBlur('ingredients')}
             placeholder="List ingredients..."
-            className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
+            className={errors.ingredients && touched.ingredients 
+              ? "block w-full rounded-md border border-red-500 px-3 py-2 shadow-sm focus:border-red-500 focus:ring-red-500 bg-red-50" 
+              : INPUT_CLASSES}
           />
+          {errors.ingredients && touched.ingredients && (
+            <p className="text-sm text-red-600 mt-1">{errors.ingredients}</p>
+          )}
+          <p className="text-xs text-gray-500 text-right">
+            {formData.ingredients.length}/1000 characters
+          </p>
         </div>
       </div>
 
@@ -477,7 +656,7 @@ export default function EditProductForm({
               id="isAvailable"
               type="checkbox"
               checked={formData.isAvailable}
-              onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
+              onChange={(e) => handleChange('isAvailable', e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
             />
             <label htmlFor="isAvailable" className="text-sm font-medium text-gray-900">
@@ -490,7 +669,7 @@ export default function EditProductForm({
               id="isFeatured"
               type="checkbox"
               checked={formData.isFeatured}
-              onChange={(e) => setFormData({ ...formData, isFeatured: e.target.checked })}
+              onChange={(e) => handleChange('isFeatured', e.target.checked)}
               className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
             />
             <label htmlFor="isFeatured" className="text-sm font-medium text-gray-900">
@@ -504,7 +683,11 @@ export default function EditProductForm({
         <Button type="button" variant="outline" onClick={() => router.push('/grower/products')}>
           Cancel
         </Button>
-        <Button type="submit" variant="primary" disabled={isSubmitting}>
+        <Button 
+          type="submit" 
+          variant="primary" 
+          disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
+        >
           {isSubmitting ? 'Saving...' : 'Save Changes'}
         </Button>
       </div>

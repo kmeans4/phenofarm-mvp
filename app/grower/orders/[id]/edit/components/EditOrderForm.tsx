@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
-
+import { useToast } from '@/app/hooks/useToast';
 
 interface OrderItem {
   id: string;
@@ -42,6 +42,12 @@ interface Order {
   items: OrderItem[];
 }
 
+interface FieldErrors {
+  shippingFee?: string;
+  tax?: string;
+  notes?: string;
+}
+
 const STATUS_OPTIONS = [
   { value: 'PENDING', label: 'Pending', color: 'bg-yellow-100 text-yellow-800' },
   { value: 'CONFIRMED', label: 'Confirmed', color: 'bg-blue-100 text-blue-800' },
@@ -51,18 +57,45 @@ const STATUS_OPTIONS = [
   { value: 'CANCELLED', label: 'Cancelled', color: 'bg-red-100 text-red-800' },
 ];
 
+const validateShippingFee = (fee: number): string | undefined => {
+  if (fee < 0) return 'Shipping fee cannot be negative';
+  if (fee > 999999.99) return 'Shipping fee exceeds maximum allowed';
+  return undefined;
+};
+
+const validateTax = (tax: number): string | undefined => {
+  if (tax < 0) return 'Tax cannot be negative';
+  if (tax > 999999.99) return 'Tax exceeds maximum allowed';
+  return undefined;
+};
+
+const validateNotes = (notes: string): string | undefined => {
+  if (!notes) return undefined;
+  if (notes.length > 1000) return 'Notes must be less than 1000 characters';
+  return undefined;
+};
+
+const validateQuantity = (qty: number): string | undefined => {
+  if (qty < 1) return 'Quantity must be at least 1';
+  if (qty > 9999) return 'Quantity cannot exceed 9999';
+  return undefined;
+};
+
+const INPUT_CLASSES = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const INPUT_ERROR_CLASSES = "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
+
 export default function EditOrderForm({ order }: { order: Order }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [status, setStatus] = useState(order.status);
   const [notes, setNotes] = useState(order.notes || '');
   const [shippingFee, setShippingFee] = useState(order.shippingFee);
   const [tax, setTax] = useState(order.tax);
   const [items, setItems] = useState(order.items);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
 
-  // Store initial data for comparison
   const initialData = {
     status: order.status,
     notes: order.notes || '',
@@ -73,13 +106,11 @@ export default function EditOrderForm({ order }: { order: Order }) {
 
   const currentData = { status, notes, shippingFee, tax, items };
 
-  // Set up unsaved changes warning
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: true,
     message: 'You have unsaved changes in this order. Are you sure you want to leave?',
   });
 
-  // Track dirty state
   useEffect(() => {
     const hasChanges = JSON.stringify(currentData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
@@ -93,8 +124,83 @@ export default function EditOrderForm({ order }: { order: Order }) {
 
   const { subtotal, total } = calculateTotals();
 
+  const validateForm = (): boolean => {
+    const newErrors: FieldErrors = {
+      shippingFee: validateShippingFee(shippingFee),
+      tax: validateTax(tax),
+      notes: validateNotes(notes),
+    };
+    
+    Object.keys(newErrors).forEach(key => {
+      if (newErrors[key as keyof FieldErrors] === undefined) {
+        delete newErrors[key as keyof FieldErrors];
+      }
+    });
+    
+    const invalidItems = items.filter(item => validateQuantity(item.quantity));
+    if (invalidItems.length > 0) {
+      showToast('error', 'One or more items have invalid quantities');
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0 && invalidItems.length === 0;
+  };
+
+  const validateField = (field: keyof FieldErrors, value: string | number): string | undefined => {
+    switch (field) {
+      case 'shippingFee': return validateShippingFee(Number(value) || 0);
+      case 'tax': return validateTax(Number(value) || 0);
+      case 'notes': return validateNotes(String(value));
+      default: return undefined;
+    }
+  };
+
+  const handleShippingFeeChange = (value: string) => {
+    const numValue = parseFloat(value) || 0;
+    setShippingFee(numValue);
+    if (touched.shippingFee) {
+      const error = validateShippingFee(numValue);
+      setErrors(prev => ({ ...prev, shippingFee: error }));
+    }
+  };
+
+  const handleTaxChange = (value: string) => {
+    const numValue = parseFloat(value) || 0;
+    setTax(numValue);
+    if (touched.tax) {
+      const error = validateTax(numValue);
+      setErrors(prev => ({ ...prev, tax: error }));
+    }
+  };
+
+  const handleNotesChange = (value: string) => {
+    setNotes(value);
+    if (touched.notes) {
+      const error = validateNotes(value);
+      setErrors(prev => ({ ...prev, notes: error }));
+    }
+  };
+
+  const handleBlur = (field: keyof FieldErrors) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    let value: string | number;
+    switch (field) {
+      case 'shippingFee': value = shippingFee; break;
+      case 'tax': value = tax; break;
+      case 'notes': value = notes; break;
+      default: value = '';
+    }
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+  };
+
   const updateItemQuantity = (itemId: string, newQuantity: number) => {
-    if (newQuantity < 1) return;
+    const error = validateQuantity(newQuantity);
+    if (error) {
+      showToast('error', error);
+      return;
+    }
+    
     setItems(items.map(item => {
       if (item.id === itemId) {
         return {
@@ -110,13 +216,30 @@ export default function EditOrderForm({ order }: { order: Order }) {
   const removeItem = (itemId: string) => {
     if (!confirm('Remove this item from the order?')) return;
     setItems(items.filter(item => item.id !== itemId));
+    showToast('info', 'Item has been removed from the order');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const allTouched: Record<string, boolean> = {
+      shippingFee: true,
+      tax: true,
+      notes: true,
+    };
+    setTouched(allTouched);
+    
+    if (!validateForm()) {
+      showToast('error', 'Please fix the errors below before saving');
+      return;
+    }
+    
+    if (items.length === 0) {
+      showToast('error', 'Order must have at least one item');
+      return;
+    }
+    
     setIsSubmitting(true);
-    setError('');
-    setSuccess('');
 
     try {
       const response = await fetch(`/api/orders/${order.id}`, {
@@ -137,7 +260,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
       });
 
       if (response.ok) {
-        setSuccess('Order updated successfully!');
+        showToast('success', 'Order updated successfully!');
         resetDirtyState();
         setTimeout(() => {
           router.push(`/grower/orders/${order.id}`);
@@ -145,10 +268,10 @@ export default function EditOrderForm({ order }: { order: Order }) {
         }, 1500);
       } else {
         const data = await response.json();
-        setError(data.error || 'Failed to update order');
+        showToast('error', data.error || 'Failed to update order');
       }
     } catch {
-      setError('An error occurred while updating');
+      showToast('error', 'An error occurred while updating');
     } finally {
       setIsSubmitting(false);
     }
@@ -160,6 +283,8 @@ export default function EditOrderForm({ order }: { order: Order }) {
       currency: 'USD',
     }).format(amount);
   };
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   return (
     <div className="space-y-6 p-4 max-w-4xl mx-auto">
@@ -188,15 +313,8 @@ export default function EditOrderForm({ order }: { order: Order }) {
           <span>You have unsaved changes.</span>
         </div>
       )}
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">{error}</div>
-      )}
-      {success && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">{success}</div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Status */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Status</h2>
           
@@ -226,7 +344,6 @@ export default function EditOrderForm({ order }: { order: Order }) {
           </div>
         </div>
 
-        {/* Items */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Order Items</h2>
 
@@ -248,7 +365,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
                     <button
                       type="button"
                       onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                      className="px-3 py-1 hover:bg-gray-100 border-r"
+                      className="px-3 py-1 hover:bg-gray-100 border-r disabled:opacity-50 disabled:cursor-not-allowed"
                       disabled={item.quantity <= 1}
                     >
                       -
@@ -257,7 +374,8 @@ export default function EditOrderForm({ order }: { order: Order }) {
                     <button
                       type="button"
                       onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                      className="px-3 py-1 hover:bg-gray-100 border-l"
+                      className="px-3 py-1 hover:bg-gray-100 border-l disabled:opacity-50 disabled:cursor-not-allowed"
+                      disabled={item.quantity >= 9999}
                     >
                       +
                     </button>
@@ -283,54 +401,76 @@ export default function EditOrderForm({ order }: { order: Order }) {
           </div>
 
           {items.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <p>No items in this order</p>
+            <div className="text-center py-8 text-red-600 bg-red-50 rounded-lg border border-red-200">
+              <p className="font-medium">No items in this order</p>
+              <p className="text-sm mt-1">Add items before saving</p>
             </div>
           )}
         </div>
 
-        {/* Pricing */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Pricing Notes</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Shipping Fee ($)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Shipping Fee ($)
+              </label>
               <input
                 type="number"
                 step="0.01"
                 min="0"
                 value={shippingFee}
-                onChange={(e) => setShippingFee(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                onChange={(e) => handleShippingFeeChange(e.target.value)}
+                onBlur={() => handleBlur('shippingFee')}
+                className={errors.shippingFee && touched.shippingFee ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
               />
+              {errors.shippingFee && touched.shippingFee && (
+                <p className="text-sm text-red-600 mt-1">{errors.shippingFee}</p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Tax ($)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Tax ($)
+              </label>
               <input
                 type="number"
                 step="0.01"
                 min="0"
                 value={tax}
-                onChange={(e) => setTax(parseFloat(e.target.value) || 0)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                onChange={(e) => handleTaxChange(e.target.value)}
+                onBlur={() => handleBlur('tax')}
+                className={errors.tax && touched.tax ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
               />
+              {errors.tax && touched.tax && (
+                <p className="text-sm text-red-600 mt-1">{errors.tax}</p>
+              )}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Order Notes</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Order Notes
+            </label>
             <textarea
               rows={3}
               value={notes}
-              onChange={(e) => setNotes(e.target.value)}
+              onChange={(e) => handleNotesChange(e.target.value)}
+              onBlur={() => handleBlur('notes')}
               placeholder="Add any special instructions or notes..."
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+              className={errors.notes && touched.notes 
+                ? "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50" 
+                : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"}
             />
+            {errors.notes && touched.notes && (
+              <p className="text-sm text-red-600 mt-1">{errors.notes}</p>
+            )}
+            <p className="text-xs text-gray-500 text-right mt-1">
+              {notes.length}/1000 characters
+            </p>
           </div>
         </div>
 
-        {/* Summary */}
         <div className="bg-gray-50 rounded-lg border border-gray-200 p-6">
           <h3 className="text-sm font-medium text-gray-900 uppercase tracking-wide mb-4">Order Summary</h3>
           <div className="space-y-2 text-sm">
@@ -353,7 +493,6 @@ export default function EditOrderForm({ order }: { order: Order }) {
           </div>
         </div>
 
-        {/* Actions */}
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4">
           <Link
             href={`/grower/orders/${order.id}`}
@@ -364,8 +503,8 @@ export default function EditOrderForm({ order }: { order: Order }) {
           
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50"
+            disabled={isSubmitting || items.length === 0 || (hasErrors && Object.keys(touched).length > 0)}
+            className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Saving...' : 'Save Changes'}
           </button>

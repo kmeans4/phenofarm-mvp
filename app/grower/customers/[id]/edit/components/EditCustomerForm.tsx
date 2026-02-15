@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
+import { useToast } from '@/app/hooks/useToast';
 
 interface Customer {
   id: string;
@@ -18,6 +19,16 @@ interface Customer {
   description: string | null;
   email?: string;
   contactName?: string;
+}
+
+interface FieldErrors {
+  businessName?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  zipCode?: string;
+  licenseNumber?: string;
+  description?: string;
 }
 
 const US_STATES = [
@@ -36,8 +47,75 @@ const US_STATES = [
   { code: 'VA', name: 'Virginia' },
 ];
 
+// Validation functions
+const validateBusinessName = (name: string): string | undefined => {
+  if (!name.trim()) return 'Business name is required';
+  if (name.trim().length < 2) return 'Business name must be at least 2 characters';
+  if (name.trim().length > 100) return 'Business name must be less than 100 characters';
+  return undefined;
+};
+
+const validateEmail = (email: string): string | undefined => {
+  if (!email) return undefined;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return 'Please enter a valid email address';
+  return undefined;
+};
+
+const validatePhone = (phone: string): string | undefined => {
+  if (!phone) return undefined;
+  const digitsOnly = phone.replace(/\D/g, '');
+  if (digitsOnly.length < 10) return 'Please enter a valid 10-digit phone number';
+  if (digitsOnly.length > 11) return 'Phone number is too long';
+  return undefined;
+};
+
+const validateWebsite = (website: string): string | undefined => {
+  if (!website) return undefined;
+  const urlRegex = /^https?:\/\/.+/;
+  if (!urlRegex.test(website)) return 'URL must start with http:// or https://';
+  try {
+    new URL(website);
+    return undefined;
+  } catch {
+    return 'Please enter a valid URL';
+  }
+};
+
+const validateZipCode = (zip: string): string | undefined => {
+  if (!zip) return undefined;
+  const zipRegex = /^\d{5}(-\d{4})?$/;
+  if (!zipRegex.test(zip)) return 'Please enter a valid ZIP code (12345 or 12345-6789)';
+  return undefined;
+};
+
+const validateLicenseNumber = (license: string): string | undefined => {
+  if (!license.trim()) return undefined;
+  if (license.trim().length < 3) return 'License number must be at least 3 characters';
+  if (license.trim().length > 50) return 'License number must be less than 50 characters';
+  return undefined;
+};
+
+const validateDescription = (desc: string): string | undefined => {
+  if (!desc) return undefined;
+  if (desc.length > 500) return 'Description must be less than 500 characters';
+  return undefined;
+};
+
+const formatPhoneNumber = (value: string): string => {
+  const digitsOnly = value.replace(/\D/g, '');
+  if (digitsOnly.length <= 3) return digitsOnly;
+  if (digitsOnly.length <= 6) return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3)}`;
+  if (digitsOnly.length <= 10) return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6)}`;
+  return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`;
+};
+
+const INPUT_CLASSES = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const INPUT_ERROR_CLASSES = "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
+
 export default function EditCustomerForm({ customer }: { customer: Customer }) {
   const router = useRouter();
+  const { showToast } = useToast();
   const [formData, setFormData] = useState({
     businessName: customer.businessName || '',
     contactName: customer.contactName || '',
@@ -52,11 +130,10 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
     description: customer.description || '',
   });
   
+  const [errors, setErrors] = useState<FieldErrors>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
 
-  // Store initial data for comparison
   const initialData = {
     businessName: customer.businessName || '',
     contactName: customer.contactName || '',
@@ -71,34 +148,90 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
     description: customer.description || '',
   };
 
-  // Set up unsaved changes warning
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: true,
     message: 'You have unsaved changes in this customer. Are you sure you want to leave?',
   });
 
-  // Track dirty state
   useEffect(() => {
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
   }, [formData, setIsDirty]);
 
+  const validateForm = (): boolean => {
+    const newErrors: FieldErrors = {
+      businessName: validateBusinessName(formData.businessName),
+      email: validateEmail(formData.email),
+      phone: validatePhone(formData.phone),
+      website: validateWebsite(formData.website),
+      zipCode: validateZipCode(formData.zipCode),
+      licenseNumber: validateLicenseNumber(formData.licenseNumber),
+      description: validateDescription(formData.description),
+    };
+    
+    Object.keys(newErrors).forEach(key => {
+      if (newErrors[key as keyof FieldErrors] === undefined) {
+        delete newErrors[key as keyof FieldErrors];
+      }
+    });
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateField = (field: keyof FieldErrors, value: string): string | undefined => {
+    switch (field) {
+      case 'businessName': return validateBusinessName(value);
+      case 'email': return validateEmail(value);
+      case 'phone': return validatePhone(value);
+      case 'website': return validateWebsite(value);
+      case 'zipCode': return validateZipCode(value);
+      case 'licenseNumber': return validateLicenseNumber(value);
+      case 'description': return validateDescription(value);
+      default: return undefined;
+    }
+  };
+
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
-    setError('');
+    
+    if (touched[field]) {
+      const error = validateField(field as keyof FieldErrors, value);
+      setErrors(prev => ({ ...prev, [field]: error }));
+    }
+  };
+
+  const handleBlur = (field: keyof FieldErrors) => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    const value = formData[field as keyof typeof formData];
+    const error = validateField(field, value);
+    setErrors(prev => ({ ...prev, [field]: error }));
+  };
+
+  const handlePhoneChange = (value: string) => {
+    const formatted = formatPhoneNumber(value);
+    setFormData(prev => ({ ...prev, phone: formatted }));
+    if (touched.phone) {
+      const error = validatePhone(formatted);
+      setErrors(prev => ({ ...prev, phone: error }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    setError('');
-    setSuccess('');
-
-    if (!formData.businessName || !formData.email) {
-      setError('Business name and email are required');
-      setIsSubmitting(false);
+    
+    const allTouched: Record<string, boolean> = {};
+    Object.keys(formData).forEach(key => {
+      allTouched[key] = true;
+    });
+    setTouched(allTouched);
+    
+    if (!validateForm()) {
+      showToast('error', 'Validation Error', { description: 'Please fix the errors below before saving' });
       return;
     }
+    
+    setIsSubmitting(true);
 
     try {
       const response = await fetch(`/api/customers/${customer.id}`, {
@@ -108,7 +241,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
       });
 
       if (response.ok) {
-        setSuccess('Customer updated successfully!');
+        showToast('success', 'Customer updated successfully!');
         resetDirtyState();
         setTimeout(() => {
           router.push('/grower/customers');
@@ -116,10 +249,10 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
         }, 1500);
       } else {
         const data = await response.json();
-        setError(data.error || 'Failed to update customer');
+        showToast('error', data.error || 'Failed to update customer');
       }
     } catch {
-      setError('An error occurred while updating');
+      showToast('error', 'An error occurred while updating');
     } finally {
       setIsSubmitting(false);
     }
@@ -134,16 +267,19 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
       });
 
       if (response.ok) {
+        showToast('success', 'Customer has been deleted');
         router.push('/grower/customers');
         router.refresh();
       } else {
         const data = await response.json();
-        setError(data.error || 'Failed to delete customer');
+        showToast('error', data.error || 'Failed to delete customer');
       }
     } catch {
-      setError('An error occurred while deleting');
+      showToast('error', 'An error occurred while deleting');
     }
   };
+
+  const hasErrors = Object.keys(errors).length > 0;
 
   return (
     <div className="space-y-6 p-4 max-w-3xl mx-auto">
@@ -165,12 +301,6 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           <span>You have unsaved changes.</span>
         </div>
       )}
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">{error}</div>
-      )}
-      {success && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">{success}</div>
-      )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -178,49 +308,77 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Business Name *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Business Name *
+              </label>
               <input
                 type="text"
-                required
                 value={formData.businessName}
                 onChange={(e) => handleChange('businessName', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                onBlur={() => handleBlur('businessName')}
+                className={errors.businessName && touched.businessName ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                 placeholder="Enter business name"
               />
+              {errors.businessName && touched.businessName && (
+                <p className="text-sm text-red-600 mt-1">{errors.businessName}</p>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  License Number
+                </label>
                 <input
                   type="text"
                   value={formData.licenseNumber}
                   onChange={(e) => handleChange('licenseNumber', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  onBlur={() => handleBlur('licenseNumber')}
+                  className={errors.licenseNumber && touched.licenseNumber ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="License #"
                 />
+                {errors.licenseNumber && touched.licenseNumber && (
+                  <p className="text-sm text-red-600 mt-1">{errors.licenseNumber}</p>
+                )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Website
+                </label>
                 <input
                   type="url"
                   value={formData.website}
                   onChange={(e) => handleChange('website', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  onBlur={() => handleBlur('website')}
+                  className={errors.website && touched.website ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="https://..."
                 />
+                {errors.website && touched.website && (
+                  <p className="text-sm text-red-600 mt-1">{errors.website}</p>
+                )}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Description
+              </label>
               <textarea
                 rows={3}
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                onBlur={() => handleBlur('description')}
+                className={errors.description && touched.description 
+                  ? "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50" 
+                  : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"}
                 placeholder="Brief description..."
               />
+              {errors.description && touched.description && (
+                <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+              )}
+              <p className="text-xs text-gray-500 text-right mt-1">
+                {formData.description.length}/500 characters
+              </p>
             </div>
           </div>
         </div>
@@ -231,37 +389,50 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           <div className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Contact Person
+                </label>
                 <input
                   type="text"
                   value={formData.contactName}
                   onChange={(e) => handleChange('contactName', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className={INPUT_CLASSES}
                   placeholder="Full name"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Email
+                </label>
                 <input
                   type="email"
-                  required
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  onBlur={() => handleBlur('email')}
+                  className={errors.email && touched.email ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="email@example.com"
                 />
+                {errors.email && touched.email && (
+                  <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                )}
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone
+              </label>
               <input
                 type="tel"
                 value={formData.phone}
-                onChange={(e) => handleChange('phone', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                onChange={(e) => handlePhoneChange(e.target.value)}
+                onBlur={() => handleBlur('phone')}
+                className={errors.phone && touched.phone ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                 placeholder="(555) 123-4567"
               />
+              {errors.phone && touched.phone && (
+                <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
+              )}
             </div>
           </div>
         </div>
@@ -271,33 +442,39 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Street Address
+              </label>
               <input
                 type="text"
                 value={formData.address}
                 onChange={(e) => handleChange('address', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                className={INPUT_CLASSES}
                 placeholder="123 Main St"
               />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  City
+                </label>
                 <input
                   type="text"
                   value={formData.city}
                   onChange={(e) => handleChange('city', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className={INPUT_CLASSES}
                   placeholder="City"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  State
+                </label>
                 <select
                   value={formData.state}
                   onChange={(e) => handleChange('state', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  className={INPUT_CLASSES}
                 >
                   {US_STATES.map((state) => (
                     <option key={state.code} value={state.code}>
@@ -307,14 +484,20 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  ZIP Code
+                </label>
                 <input
                   type="text"
                   value={formData.zipCode}
                   onChange={(e) => handleChange('zipCode', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
+                  onBlur={() => handleBlur('zipCode')}
+                  className={errors.zipCode && touched.zipCode ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="12345"
                 />
+                {errors.zipCode && touched.zipCode && (
+                  <p className="text-sm text-red-600 mt-1">{errors.zipCode}</p>
+                )}
               </div>
             </div>
           </div>
@@ -338,8 +521,8 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
             </Link>
             <button
               type="submit"
-              disabled={isSubmitting}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 transition-colors"
+              disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
+              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>
