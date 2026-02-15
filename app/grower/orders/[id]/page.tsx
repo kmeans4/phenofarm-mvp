@@ -39,41 +39,46 @@ interface OrderDetail {
 }
 
 async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | null> {
-  const order = await db.order.findUnique({
-    where: { id, growerId },
-    include: {
-      dispensary: true,
-      items: { 
-        include: { 
-          product: {
-            include: { strain: { select: { id: true, name: true } } }
+  try {
+    const order = await db.order.findUnique({
+      where: { id, growerId },
+      include: {
+        dispensary: true,
+        items: { 
+          include: { 
+            product: {
+              include: { strain: { select: { id: true, name: true } } }
+            } 
           } 
-        } 
+        },
       },
-    },
-  });
-  
-  if (!order) return null;
-  
-  return {
-    ...order,
-    totalAmount: Number(order.totalAmount),
-    subtotal: Number(order.subtotal),
-    tax: Number(order.tax),
-    shippingFee: Number(order.shippingFee),
-    items: order.items.map((item) => ({
-      ...item,
-      unitPrice: Number(item.unitPrice),
-      totalPrice: Number(item.totalPrice),
-      product: {
-        name: item.product.name,
-        strain: item.product.strain?.name || item.product.strainLegacy,
-        productType: item.product.productType,
-        subType: item.product.subType,
-        unit: item.product.unit,
-      },
-    })),
-  } as OrderDetail;
+    });
+    
+    if (!order) return null;
+    
+    return {
+      ...order,
+      totalAmount: Number(order.totalAmount),
+      subtotal: Number(order.subtotal),
+      tax: Number(order.tax),
+      shippingFee: Number(order.shippingFee),
+      items: order.items.map((item) => ({
+        ...item,
+        unitPrice: Number(item.unitPrice),
+        totalPrice: Number(item.totalPrice),
+        product: item.product ? {
+          name: item.product.name,
+          strain: item.product.strain?.name || item.product.strainLegacy,
+          productType: item.product.productType,
+          subType: item.product.subType,
+          unit: item.product.unit,
+        } : undefined,
+      })),
+    } as OrderDetail;
+  } catch (error) {
+    console.error('Error fetching order:', error);
+    return null;
+  }
 }
 
 function formatCurrency(amount: number) {
@@ -101,22 +106,23 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
+  try {
+    const session = await getServerSession(authOptions);
 
-  if (!session) {
-    redirect('/auth/sign_in');
-  }
+    if (!session) {
+      redirect('/auth/sign_in');
+    }
 
-  const user = (session as any).user as { role: string; growerId?: string };
+    const user = (session as any).user as { role: string; growerId?: string };
 
-  if (user.role !== 'GROWER') {
-    redirect('/dashboard');
-  }
+    if (user.role !== 'GROWER') {
+      redirect('/dashboard');
+    }
 
-  const { id } = await params;
-  const order = await fetchOrder(id, user.growerId!);
+    const { id } = await params;
+    const order = await fetchOrder(id, user.growerId!);
 
-  if (!order) {
+    if (!order) {
     return (
       <div className="min-h-[50vh] flex flex-col items-center justify-center p-4">
         <div className="text-center max-w-md">
@@ -382,4 +388,29 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       </div>
     </div>
   );
+  } catch (error) {
+    console.error('Order detail page error:', error);
+    return (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
+          <p className="text-gray-600 mb-6">We couldn&apos;t load this order. Please try again.</p>
+          <Link 
+            href="/grower/orders" 
+            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Orders
+          </Link>
+        </div>
+      </div>
+    );
+  }
 }
