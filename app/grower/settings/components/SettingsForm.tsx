@@ -118,6 +118,31 @@ export function SettingsForm() {
     setIsDirty(hasChanges);
   }, [formData, initialData, loading, setIsDirty]);
 
+  // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl+S or Cmd+S to save
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (!saving && !loading) {
+          handleSave(false);
+        }
+      }
+      
+      // Esc to cancel/revert changes
+      if (e.key === 'Escape' && !loading) {
+        setFormData(initialData);
+        setTouched({});
+        setFieldErrors({});
+        setError('');
+        setIsDirty(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [saving, loading, initialData, setIsDirty]);
+
   // Validate all fields
   const validateForm = useCallback((): boolean => {
     const errors: FieldErrors = {
@@ -234,18 +259,29 @@ export function SettingsForm() {
     validateField(field, formData[field] as string);
   };
 
-  const handleSave = async (isLogoSave = false) => {
+  const handleSave = useCallback(async (isLogoSave = false) => {
     // Validate all fields on save attempt
-    if (!isLogoSave && !validateForm()) {
-      setTouched({
-        businessName: true,
-        email: true,
-        phone: true,
-        website: true,
-        licenseNumber: true,
-      });
-      setError('Please fix the errors above before saving.');
-      return;
+    if (!isLogoSave) {
+      const errors: FieldErrors = {
+        businessName: validateBusinessName(formData.businessName),
+        email: validateEmail(formData.email),
+        phone: validatePhone(formData.phone),
+        website: validateWebsite(formData.website),
+        licenseNumber: validateLicenseNumber(formData.licenseNumber),
+      };
+      setFieldErrors(errors);
+      
+      if (Object.values(errors).some(e => e !== undefined)) {
+        setTouched({
+          businessName: true,
+          email: true,
+          phone: true,
+          website: true,
+          licenseNumber: true,
+        });
+        setError('Please fix the errors above before saving.');
+        return;
+      }
     }
 
     setSaving(true);
@@ -276,7 +312,7 @@ export function SettingsForm() {
     } finally {
       setSaving(false);
     }
-  };
+  }, [formData, resetDirtyState]);
 
   if (loading) {
     return (
@@ -288,6 +324,21 @@ export function SettingsForm() {
 
   return (
     <div className="space-y-6">
+      {/* Keyboard shortcuts hint */}
+      <div className="flex items-center gap-4 text-xs text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+        <span className="flex items-center gap-1">
+          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Ctrl</kbd>
+          <span>+</span>
+          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">S</kbd>
+          <span className="ml-1">to save</span>
+        </span>
+        <span className="text-gray-300">|</span>
+        <span className="flex items-center gap-1">
+          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Esc</kbd>
+          <span className="ml-1">to cancel</span>
+        </span>
+      </div>
+
       {/* Global error banner */}
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start gap-3">
@@ -348,7 +399,7 @@ export function SettingsForm() {
                 value={formData.businessName}
                 onChange={handleChange('businessName')}
                 onBlur={handleBlur('businessName')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors \${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
                   touched.businessName && fieldErrors.businessName
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
@@ -389,7 +440,7 @@ export function SettingsForm() {
                 value={formData.licenseNumber}
                 onChange={handleChange('licenseNumber')}
                 onBlur={handleBlur('licenseNumber')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors \${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
                   touched.licenseNumber && fieldErrors.licenseNumber
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
@@ -416,7 +467,7 @@ export function SettingsForm() {
                 value={formData.email}
                 onChange={handleChange('email')}
                 onBlur={handleBlur('email')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors \${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
                   touched.email && fieldErrors.email
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
@@ -443,7 +494,7 @@ export function SettingsForm() {
                 value={formData.phone}
                 onChange={handleChange('phone')}
                 onBlur={handleBlur('phone')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors \${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
                   touched.phone && fieldErrors.phone
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
@@ -484,7 +535,7 @@ export function SettingsForm() {
                 value={formData.website}
                 onChange={handleChange('website')}
                 onBlur={handleBlur('website')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none transition-colors \${
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none transition-colors ${
                   touched.website && fieldErrors.website
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
