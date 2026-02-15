@@ -113,11 +113,11 @@ export default function OrderStatusTimeline({
               <div className={`
                 relative z-10 w-8 h-8 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-base sm:text-xl
                 border-2 sm:border-4 transition-all duration-300 bg-white
-                ${index <= currentIndex 
+                ${index <= effectiveIndex 
                   ? 'border-green-500' 
                   : 'border-gray-300 bg-gray-50'}
               `}>
-                <span className={index <= currentIndex ? 'grayscale-0' : 'grayscale opacity-50'}>
+                <span className={index <= effectiveIndex ? 'grayscale-0' : 'grayscale opacity-50'}>
                   {step.icon}
                 </span>
               </div>
