@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from "next/link";
 import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, Check, Plus, BarChart3 } from "lucide-react";
+import { Bookmark, BookmarkCheck } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 import MobileFilterSheet from "./components/MobileFilterSheet";
@@ -35,6 +36,14 @@ interface FilterState {
   priceRanges: string[];
 }
 
+interface SavedFilter {
+  id: string;
+  name: string;
+  filters: FilterState;
+  searchQuery: string;
+  sortBy: SortOption;
+  createdAt: string;
+}
 interface SearchSuggestion {
   text: string;
   type: string;
@@ -74,6 +83,8 @@ const RECENT_SEARCHES_KEY = 'phenofarm_recent_searches';
 const MAX_RECENT_SEARCHES = 5;
 const MAX_COMPARE_ITEMS = 3;
 const COMPARE_STORAGE_KEY = 'phenofarm_compare_products';
+const SAVED_FILTERS_KEY = 'phenofarm_saved_filters';
+const MAX_SAVED_FILTERS = 5;
 
 export default function CatalogContent() {
   // State
@@ -94,7 +105,11 @@ export default function CatalogContent() {
   // Compare state
   const [compareList, setCompareList] = useState<Product[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
-  const [showCompareBar, setShowCompareBar] = useState(true);
+  const [showCompareBar, setShowCompareBar] = useState(true);  // Saved filters state
+  const [savedFilters, setSavedFilters] = useState<SavedFilter[]>([]);
+  const [showSaveFilterModal, setShowSaveFilterModal] = useState(false);
+  const [newFilterName, setNewFilterName] = useState('');
+
   
   // Search autocomplete state
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
@@ -138,6 +153,28 @@ export default function CatalogContent() {
       console.error('Failed to save compare list:', e);
     }
   }, [compareList]);
+  // Load saved filters from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SAVED_FILTERS_KEY);
+      if (stored) {
+        setSavedFilters(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load saved filters:', e);
+    }
+  }, []);
+
+  // Save saved filters to localStorage when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(SAVED_FILTERS_KEY, JSON.stringify(savedFilters));
+    } catch (e) {
+      console.error('Failed to save filters:', e);
+    }
+  }, [savedFilters]);
+
+
 
   // Add product to compare
   const addToCompare = useCallback((product: Product) => {
@@ -165,6 +202,52 @@ export default function CatalogContent() {
   const clearCompare = useCallback(() => {
     setCompareList([]);
   }, []);
+  // Save current filter configuration
+  const saveCurrentFilter = useCallback(() => {
+    if (!newFilterName.trim()) return;
+    
+    const hasActiveFilters = filters.productTypes.length > 0 || 
+                             filters.thcRanges.length > 0 || 
+                             filters.priceRanges.length > 0 ||
+                             searchQuery ||
+                             sortBy !== 'default';
+    
+    if (!hasActiveFilters) {
+      alert('No active filters to save. Apply some filters first!');
+      return;
+    }
+    
+    const newFilter: SavedFilter = {
+      id: Date.now().toString(),
+      name: newFilterName.trim(),
+      filters: { ...filters },
+      searchQuery,
+      sortBy,
+      createdAt: new Date().toISOString(),
+    };
+    
+    setSavedFilters(prev => {
+      const updated = [newFilter, ...prev].slice(0, MAX_SAVED_FILTERS);
+      return updated;
+    });
+    
+    setNewFilterName('');
+    setShowSaveFilterModal(false);
+  }, [filters, searchQuery, sortBy, newFilterName]);
+
+  // Apply a saved filter
+  const applySavedFilter = useCallback((savedFilter: SavedFilter) => {
+    setFilters(savedFilter.filters);
+    setSearchQuery(savedFilter.searchQuery);
+    setSortBy(savedFilter.sortBy);
+  }, []);
+
+  // Delete a saved filter
+  const deleteSavedFilter = useCallback((filterId: string) => {
+    setSavedFilters(prev => prev.filter(f => f.id !== filterId));
+  }, []);
+
+
 
   // Load recent searches from localStorage on mount
   useEffect(() => {
@@ -730,6 +813,48 @@ export default function CatalogContent() {
         {/* Filters Sidebar */}
         {showFilters && (
           <div className="w-64 flex-shrink-0 space-y-6">
+            {/* Saved Filters Section */}
+            {savedFilters.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <BookmarkCheck size={18} className="text-green-600" />
+                  Saved Filters
+                </h3>
+                <div className="space-y-2">
+                  {savedFilters.map(savedFilter => (
+                    <div key={savedFilter.id} className="group">
+                      <button
+                        onClick={() => applySavedFilter(savedFilter)}
+                        className="w-full text-left px-3 py-2 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-between"
+                      >
+                        <span className="font-medium truncate">{savedFilter.name}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteSavedFilter(savedFilter.id);
+                          }}
+                          className="text-green-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={14} />
+                        </button>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Save Filter Button */}
+            {(filters.productTypes.length > 0 || filters.thcRanges.length > 0 || filters.priceRanges.length > 0 || searchQuery || sortBy !== 'default') && (
+              <button
+                onClick={() => setShowSaveFilterModal(true)}
+                className="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+              >
+                <Bookmark size={16} />
+                Save Current Filter
+              </button>
+            )}
+
             {/* Product Type Filter */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Product Type</h3>
@@ -967,6 +1092,112 @@ export default function CatalogContent() {
           onClear={clearCompare}
         />
       )}
+      {/* Save Filter Modal */}
+      {showSaveFilterModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Bookmark className="w-5 h-5 text-green-600" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">Save Filter</h2>
+              </div>
+              <button
+                onClick={() => setShowSaveFilterModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Filter Name
+                </label>
+                <input
+                  type="text"
+                  value={newFilterName}
+                  onChange={(e) => setNewFilterName(e.target.value)}
+                  placeholder="e.g., High THC Flower Under $20"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && newFilterName.trim()) {
+                      saveCurrentFilter();
+                    }
+                    if (e.key === 'Escape') {
+                      setShowSaveFilterModal(false);
+                    }
+                  }}
+                  autoFocus
+                />
+              </div>
+              
+              {/* Preview of what will be saved */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">This filter includes:</p>
+                <div className="flex flex-wrap gap-2">
+                  {filters.productTypes.map(type => (
+                    <span key={type} className="px-2 py-1 bg-white text-gray-700 text-xs rounded border border-gray-200">
+                      {type}
+                    </span>
+                  ))}
+                  {filters.thcRanges.map(rangeId => {
+                    const range = THC_RANGES.find(r => r.id === rangeId);
+                    return range ? (
+                      <span key={rangeId} className="px-2 py-1 bg-white text-gray-700 text-xs rounded border border-gray-200">
+                        THC {range.label}
+                      </span>
+                    ) : null;
+                  })}
+                  {filters.priceRanges.map(rangeId => {
+                    const range = PRICE_RANGES.find(r => r.id === rangeId);
+                    return range ? (
+                      <span key={rangeId} className="px-2 py-1 bg-white text-gray-700 text-xs rounded border border-gray-200">
+                        Price {range.label}
+                      </span>
+                    ) : null;
+                  })}
+                  {searchQuery && (
+                    <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">
+                      Search: &quot;{searchQuery}&quot;
+                    </span>
+                  )}
+                  {sortBy !== 'default' && (
+                    <span className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded border border-purple-200">
+                      Sort: {SORT_OPTIONS.find(o => o.value === sortBy)?.label}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <p className="text-xs text-gray-500">
+                {savedFilters.length >= MAX_SAVED_FILTERS 
+                  ? `⚠️ You have reached the maximum of ${MAX_SAVED_FILTERS} saved filters. Saving will remove the oldest filter.`
+                  : `You can save up to ${MAX_SAVED_FILTERS} filters (${MAX_SAVED_FILTERS - savedFilters.length} remaining).`}
+              </p>
+            </div>
+            
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={() => setShowSaveFilterModal(false)}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveCurrentFilter}
+                disabled={!newFilterName.trim()}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
       {/* Mobile Filter Sheet */}
       <MobileFilterSheet
