@@ -36,6 +36,7 @@ interface FilterState {
   thcRanges: string[];
   priceRanges: string[];
   recentlyAdded: boolean;
+  trending: boolean;
 }
 
 interface SavedFilter {
@@ -103,6 +104,7 @@ export default function CatalogContent() {
     thcRanges: [],
     priceRanges: [],
     recentlyAdded: false,
+    trending: false,
   });
   
   // Mobile filter sheet state
@@ -480,7 +482,7 @@ export default function CatalogContent() {
 
   // Clear all filters
   const clearAllFilters = () => {
-    setFilters({ productTypes: [], thcRanges: [], priceRanges: [], recentlyAdded: false });
+    setFilters({ productTypes: [], thcRanges: [], priceRanges: [], recentlyAdded: false, trending: false })
     setSearchQuery('');
     setSortBy('default');
     setShowSuggestions(false);
@@ -574,7 +576,7 @@ export default function CatalogContent() {
     : [{ growerId: 'all', growerName: 'All Products', products: filteredProducts }];
 
   // Get active filter count
-  const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length + (filters.recentlyAdded ? 1 : 0) + (showFavoritesOnly ? 1 : 0);
+  const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length + (filters.recentlyAdded ? 1 : 0) + (filters.trending ? 1 : 0) + (showFavoritesOnly ? 1 : 0);
 
   // Get active filter chips
   const getFilterChips = () => {

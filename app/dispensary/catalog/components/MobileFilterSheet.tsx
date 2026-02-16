@@ -4,6 +4,7 @@ import { X, SlidersHorizontal, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface FilterState {
+  trending: boolean;
   recentlyAdded: boolean;
   productTypes: string[];
   thcRanges: string[];
@@ -102,7 +103,7 @@ export default function MobileFilterSheet({
   };
 
   const clearAll = () => {
-    const empty: FilterState = { productTypes: [], thcRanges: [], priceRanges: [], recentlyAdded: false };
+    const empty: FilterState = { productTypes: [], thcRanges: [], priceRanges: [], recentlyAdded: false, trending: false };
     setLocalFilters(empty);
     onFilterChange(empty);
   };

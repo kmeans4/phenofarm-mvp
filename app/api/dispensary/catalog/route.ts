@@ -16,6 +16,7 @@ import { getAuthSession } from '@/lib/auth-helpers';
  * - priceRanges (optional): Comma-separated list of price range IDs (budget, standard, premium, luxury)
  * - sortBy (optional): Sort option (default, price-asc, price-desc, thc-asc, thc-desc, name-asc, name-desc)
  * - recentlyAdded (optional): Show only products added in last 7 days (true/false)
+ * - trending (optional): Show trending products sorted by order volume (true/false)
  * 
  * Response: 200 OK - { products: [], hasMore: boolean, total: number }
  */
@@ -62,6 +63,7 @@ export async function GET(request: NextRequest) {
     const priceRanges = searchParams.get('priceRanges')?.split(',').filter(Boolean);
     const sortBy = searchParams.get('sortBy') || 'default';
     const recentlyAdded = searchParams.get('recentlyAdded') === 'true';
+    const trending = searchParams.get('trending') === 'true';
 
     // Build where clause
     const where: any = {
@@ -74,6 +76,13 @@ export async function GET(request: NextRequest) {
       const sevenDaysAgo = new Date();
       sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
       where.createdAt = { gte: sevenDaysAgo };
+    }
+
+    // Trending filter - products with order volume in last 30 days
+    if (trending) {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      where.orderItems = { some: { createdAt: { gte: thirtyDaysAgo } } };
     }
 
     // Search filter
@@ -138,30 +147,72 @@ export async function GET(request: NextRequest) {
 
     // Determine order by
     let orderBy: any = {};
-    switch (sortBy) {
-      case 'price-asc':
-        orderBy = { price: 'asc' };
-        break;
-      case 'price-desc':
-        orderBy = { price: 'desc' };
-        break;
-      case 'thc-asc':
-        orderBy = { batch: { thc: 'asc' } };
-        break;
-      case 'thc-desc':
-        orderBy = { batch: { thc: 'desc' } };
-        break;
-      case 'name-asc':
-        orderBy = { name: 'asc' };
-        break;
-      case 'name-desc':
-        orderBy = { name: 'desc' };
-        break;
-      default:
-        orderBy = [
-          { grower: { businessName: 'asc' } },
-          { name: 'asc' },
-        ];
+    let trendingSort = false;
+    
+    if (trending) {
+      trendingSort = true;
+      orderBy = { id: 'asc' }; // placeholder, will sort manually
+    } else {
+      switch (sortBy) {
+        case 'price-asc':
+          orderBy = { price: 'asc' };
+          break;
+        case 'price-desc':
+          orderBy = { price: 'desc' };
+          break;
+        case 'thc-asc':
+          orderBy = { batch: { thc: 'asc' } };
+          break;
+        case 'thc-desc':
+          orderBy = { batch: { thc: 'desc' } };
+          break;
+        case 'name-asc':
+          orderBy = { name: 'asc' };
+          break;
+        case 'name-desc':
+          orderBy = { name: 'desc' };
+          break;
+        default:
+          orderBy = [
+            { grower: { businessName: 'asc' } },
+            { name: 'asc' },
+          ];
+      }
+    }
+
+    // Build include object conditionally
+    const include: any = {
+      grower: {
+        select: {
+          id: true,
+          businessName: true,
+          city: true,
+          state: true,
+          isVerified: true,
+        },
+      },
+      strain: {
+        select: {
+          id: true,
+          name: true,
+          genetics: true,
+        },
+      },
+      batch: {
+        select: {
+          thc: true,
+          cbd: true,
+        },
+      },
+    };
+
+    if (trendingSort) {
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+      include.orderItems = {
+        where: { createdAt: { gte: thirtyDaysAgo } },
+        select: { quantity: true }
+      };
     }
 
     // Get total count for pagination info
@@ -170,37 +221,25 @@ export async function GET(request: NextRequest) {
     // Fetch products
     const products = await db.product.findMany({
       where,
-      include: {
-        grower: {
-          select: {
-            id: true,
-            businessName: true,
-            city: true,
-            state: true,
-            isVerified: true,
-          },
-        },
-        strain: {
-          select: {
-            id: true,
-            name: true,
-            genetics: true,
-          },
-        },
-        batch: {
-          select: {
-            thc: true,
-            cbd: true,
-          },
-        },
-      },
+      include,
       orderBy,
-      skip,
-      take: limit,
+      skip: trendingSort ? 0 : skip,
+      take: trendingSort ? 1000 : limit,
     });
 
-    // Serialize products
-    const serializedProducts = products.map((p) => ({
+    // Calculate trending score if needed and sort
+    let processedProducts: any[] = products;
+    if (trendingSort) {
+      processedProducts = products
+        .map(p => ({
+          ...p,
+          _orderVolume: (p as any).orderItems?.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0) || 0
+        }))
+        .sort((a: any, b: any) => b._orderVolume - a._orderVolume)
+        .slice(skip, skip + limit);
+    }
+
+    const serializedProducts = processedProducts.map((p) => ({
       id: p.id,
       name: p.name,
       price: parseFloat(String(p.price)),
@@ -232,6 +271,7 @@ export async function GET(request: NextRequest) {
       page,
       limit,
       recentlyAdded,
+      trending,
     }, { status: 200 });
 
   } catch (error) {
