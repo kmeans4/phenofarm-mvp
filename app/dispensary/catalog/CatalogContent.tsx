@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from "next/link";
-import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, Check, Plus, BarChart3 } from "lucide-react";
-import { Bookmark, BookmarkCheck, Heart } from "lucide-react";
+import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, Check, Plus, BarChart3, AlertCircle } from "lucide-react";
+import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 import MobileFilterSheet from "./components/MobileFilterSheet";
@@ -87,6 +87,8 @@ const MAX_COMPARE_ITEMS = 3;
 const COMPARE_STORAGE_KEY = 'phenofarm_compare_products';
 const SAVED_FILTERS_KEY = 'phenofarm_saved_filters';
 const FAVORITES_KEY = 'phenofarm_favorites';
+const PRICE_ALERTS_KEY = 'phenofarm_price_alerts';
+const MAX_PRICE_ALERTS = 20;
 const MAX_SAVED_FILTERS = 5;
 
 export default function CatalogContent() {
@@ -111,6 +113,11 @@ export default function CatalogContent() {
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showCompareBar, setShowCompareBar] = useState(true);  // Saved filters state
   const [savedFilters, setSavedFilters] = useState<SavedFilter[]>([]);
+  const [priceAlerts, setPriceAlerts] = useState<string[]>([]);
+  const [showPriceAlertModal, setShowPriceAlertModal] = useState(false);
+  const [priceAlertProduct, setPriceAlertProduct] = useState<Product | null>(null);
+  const [targetPrice, setTargetPrice] = useState('');
+  const [alertError, setAlertError] = useState('');
   const [favorites, setFavorites] = useState<string[]>([]);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showSaveFilterModal, setShowSaveFilterModal] = useState(false);
@@ -215,6 +222,24 @@ export default function CatalogContent() {
   const isFavorite = useCallback((productId: string) => {
     return favorites.includes(productId);
   }, [favorites]);
+
+  // Load price alerts from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(PRICE_ALERTS_KEY);
+      if (stored) {
+        const alerts = JSON.parse(stored);
+        setPriceAlerts(alerts.map((a: any) => a.productId));
+      }
+    } catch (e) {
+      console.error("Failed to load price alerts:", e);
+    }
+  }, []);
+
+  // Check if product has price alert
+  const hasPriceAlert = useCallback((productId: string) => {
+    return priceAlerts.includes(productId);
+  }, [priceAlerts]);
 
 
 
@@ -598,6 +623,57 @@ export default function CatalogContent() {
       case 'popular': return 'Popular';
       default: return 'Search';
     }
+  };
+
+  // ============ PRICE ALERT FUNCTIONS ============
+  const openPriceAlertModal = (product: Product) => {
+    setPriceAlertProduct(product);
+    setTargetPrice((product.price * 0.9).toFixed(2));
+    setAlertError('');
+    setShowPriceAlertModal(true);
+  };
+
+  const savePriceAlert = () => {
+    if (!priceAlertProduct || !targetPrice) return;
+    
+    const target = parseFloat(targetPrice);
+    if (isNaN(target) || target <= 0) {
+      setAlertError('Please enter a valid price');
+      return;
+    }
+    
+    if (target >= priceAlertProduct.price) {
+      setAlertError('Target price must be lower than current price');
+      return;
+    }
+    
+    const existingAlerts = JSON.parse(localStorage.getItem(PRICE_ALERTS_KEY) || '[]');
+    
+    if (existingAlerts.length >= MAX_PRICE_ALERTS) {
+      setAlertError(`Maximum ${MAX_PRICE_ALERTS} alerts allowed. Remove some first.`);
+      return;
+    }
+    
+    const newAlert = {
+      id: Date.now().toString(),
+      productId: priceAlertProduct.id,
+      productName: priceAlertProduct.name,
+      productImage: priceAlertProduct.images?.[0],
+      growerName: priceAlertProduct.grower.businessName,
+      growerId: priceAlertProduct.grower.id,
+      targetPrice: target,
+      currentPrice: priceAlertProduct.price,
+      thc: priceAlertProduct.thc,
+      productType: priceAlertProduct.productType,
+      unit: priceAlertProduct.unit,
+      createdAt: new Date().toISOString(),
+      isTriggered: false,
+    };
+    
+    const updated = [...existingAlerts, newAlert];
+    localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(updated));
+    setPriceAlerts(prev => [...prev, priceAlertProduct.id]);
+    setShowPriceAlertModal(false);
   };
 
   return (
@@ -1083,6 +1159,8 @@ export default function CatalogContent() {
                             compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
                             isFav={isFavorite(product.id)}
                             onFavoriteToggle={() => toggleFavorite(product.id)}
+                            hasAlert={hasPriceAlert(product.id)}
+                            onAlertToggle={() => openPriceAlertModal(product)}
                           />
                         ))}
                       </div>
@@ -1098,6 +1176,8 @@ export default function CatalogContent() {
                             compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
                             isFav={isFavorite(product.id)}
                             onFavoriteToggle={() => toggleFavorite(product.id)}
+                            hasAlert={hasPriceAlert(product.id)}
+                            onAlertToggle={() => openPriceAlertModal(product)}
                           />
                         ))}
                       </div>
@@ -1315,7 +1395,6 @@ export default function CatalogContent() {
         </div>
       )}
 
-
       {/* Mobile Filter Sheet */}
       <MobileFilterSheet
         isOpen={showMobileFilters}
@@ -1327,7 +1406,6 @@ export default function CatalogContent() {
     </div>
   );
 }
-
 // ============================================
 // COMPARE MODAL COMPONENT
 // ============================================
@@ -1516,7 +1594,6 @@ function CompareModal({
   );
 }
 
-// Helper function to group products by grower
 function groupByGrower(products: Product[]) {
   const groups: { growerId: string; growerName: string; products: Product[] }[] = [];
   
@@ -1536,16 +1613,19 @@ function groupByGrower(products: Product[]) {
   return groups;
 }
 
+// ============== END PRICE ALERT FUNCTIONS ==================
+
 // ============================================
 // ENHANCED PRODUCT CARD COMPONENT (Grid View)
-// ============================================
 function ProductCard({ 
   product, 
   isInCompare, 
   onCompareToggle,
   compareDisabled,
   isFav,
-  onFavoriteToggle
+  onFavoriteToggle,
+  hasAlert,
+  onAlertToggle
 }: { 
   product: Product; 
   isInCompare: boolean;
@@ -1553,6 +1633,8 @@ function ProductCard({
   compareDisabled: boolean;
   isFav: boolean;
   onFavoriteToggle: () => void;
+  hasAlert?: boolean;
+  onAlertToggle?: () => void;
 }) {
   const [imageHovered, setImageHovered] = useState(false);
   const [imagePosition, setImagePosition] = useState({ x: 50, y: 50 });
@@ -1792,14 +1874,15 @@ function ProductCard({
 
 // ============================================
 // ENHANCED PRODUCT LIST ITEM (List View)
-// ============================================
 function ProductListItem({ 
   product, 
   isInCompare, 
   onCompareToggle,
   compareDisabled,
   isFav,
-  onFavoriteToggle
+  onFavoriteToggle,
+  hasAlert,
+  onAlertToggle
 }: { 
   product: Product; 
   isInCompare: boolean;
@@ -1807,6 +1890,8 @@ function ProductListItem({
   compareDisabled: boolean;
   isFav: boolean;
   onFavoriteToggle: () => void;
+  hasAlert?: boolean;
+  onAlertToggle?: () => void;
 }) {
   const stockStatus = product.inventoryQty === 0 
     ? { text: 'Out of Stock', color: 'text-red-600', bg: 'bg-red-50' }
@@ -1870,6 +1955,19 @@ function ProductListItem({
         title={isFav ? "Remove from favorites" : "Add to favorites"}
       >
         <Heart size={16} fill={isFav ? "currentColor" : "none"} />
+      </button>
+
+      {/* Price Alert Button */}
+      <button
+        onClick={onAlertToggle}
+        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
+          hasAlert
+            ? "bg-orange-100 text-orange-600"
+            : "bg-gray-100 text-gray-400 hover:text-orange-500 hover:bg-gray-200"
+        }`}
+        title={hasAlert ? "Price alert set" : "Set price alert"}
+      >
+        {hasAlert ? <BellRing size={16} /> : <Bell size={16} />}
       </button>
 
       {/* Product Image Thumbnail */}
