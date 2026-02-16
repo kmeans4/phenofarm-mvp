@@ -15,6 +15,7 @@ import { getAuthSession } from '@/lib/auth-helpers';
  * - thcRanges (optional): Comma-separated list of THC range IDs (low, medium, high, very-high)
  * - priceRanges (optional): Comma-separated list of price range IDs (budget, standard, premium, luxury)
  * - sortBy (optional): Sort option (default, price-asc, price-desc, thc-asc, thc-desc, name-asc, name-desc)
+ * - recentlyAdded (optional): Show only products added in last 7 days (true/false)
  * 
  * Response: 200 OK - { products: [], hasMore: boolean, total: number }
  */
@@ -60,12 +61,20 @@ export async function GET(request: NextRequest) {
     const thcRanges = searchParams.get('thcRanges')?.split(',').filter(Boolean);
     const priceRanges = searchParams.get('priceRanges')?.split(',').filter(Boolean);
     const sortBy = searchParams.get('sortBy') || 'default';
+    const recentlyAdded = searchParams.get('recentlyAdded') === 'true';
 
     // Build where clause
     const where: any = {
       isAvailable: true,
       inventoryQty: { gt: 0 },
     };
+
+    // Recently Added filter (last 7 days)
+    if (recentlyAdded) {
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      where.createdAt = { gte: sevenDaysAgo };
+    }
 
     // Search filter
     if (search) {
@@ -197,7 +206,7 @@ export async function GET(request: NextRequest) {
       price: parseFloat(String(p.price)),
       strain: p.strain?.name || p.strainLegacy || null,
       strainId: p.strainId,
-      strainType: p.strain?.genetics || null, // Use genetics as strain type info
+      strainType: p.strain?.genetics || null,
       productType: p.productType,
       subType: p.subType,
       unit: p.unit,
@@ -205,6 +214,7 @@ export async function GET(request: NextRequest) {
       cbd: p.batch?.cbd ?? p.cbdLegacy ?? null,
       images: p.images || [],
       inventoryQty: p.inventoryQty,
+      createdAt: p.createdAt,
       grower: {
         id: p.grower.id,
         businessName: p.grower.businessName,
@@ -221,6 +231,7 @@ export async function GET(request: NextRequest) {
       total,
       page,
       limit,
+      recentlyAdded,
     }, { status: 200 });
 
   } catch (error) {

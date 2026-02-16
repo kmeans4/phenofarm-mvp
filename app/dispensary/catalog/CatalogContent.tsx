@@ -22,6 +22,7 @@ interface Product {
   cbd: number | null;
   images: string[];
   inventoryQty: number;
+  createdAt?: string;
   grower: {
     id: string;
     businessName: string;
@@ -34,6 +35,7 @@ interface FilterState {
   productTypes: string[];
   thcRanges: string[];
   priceRanges: string[];
+  recentlyAdded: boolean;
 }
 
 interface SavedFilter {
@@ -98,6 +100,7 @@ export default function CatalogContent() {
     productTypes: [],
     thcRanges: [],
     priceRanges: [],
+    recentlyAdded: false,
   });
   
   // Mobile filter sheet state
@@ -439,8 +442,8 @@ export default function CatalogContent() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  // Toggle filter value
-  const toggleFilter = (category: keyof FilterState, value: string) => {
+  // Toggle filter value (only for array-based filters, not recentlyAdded)
+  const toggleFilter = (category: 'productTypes' | 'thcRanges' | 'priceRanges', value: string) => {
     setFilters(prev => {
       const current = prev[category];
       const updated = current.includes(value)
@@ -452,7 +455,7 @@ export default function CatalogContent() {
 
   // Clear all filters
   const clearAllFilters = () => {
-    setFilters({ productTypes: [], thcRanges: [], priceRanges: [] });
+    setFilters({ productTypes: [], thcRanges: [], priceRanges: [], recentlyAdded: false });
     setSearchQuery('');
     setSortBy('default');
     setShowSuggestions(false);
@@ -475,6 +478,7 @@ export default function CatalogContent() {
       if (filters.thcRanges.length > 0) params.set('thcRanges', filters.thcRanges.join(','));
       if (filters.priceRanges.length > 0) params.set('priceRanges', filters.priceRanges.join(','));
       if (sortBy !== 'default') params.set('sortBy', sortBy);
+      if (filters.recentlyAdded) params.set('recentlyAdded', 'true');
       
       const response = await fetch(`/api/dispensary/catalog?\${params.toString()}`);
       
@@ -514,7 +518,7 @@ export default function CatalogContent() {
     if (!isFirstRender.current) {
       fetchProducts(1, false);
     }
-  }, [searchQuery, filters.productTypes, filters.thcRanges, filters.priceRanges, sortBy]);
+  }, [searchQuery, filters.productTypes, filters.thcRanges, filters.priceRanges, filters.recentlyAdded, sortBy]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -545,13 +549,16 @@ export default function CatalogContent() {
     : [{ growerId: 'all', growerName: 'All Products', products: filteredProducts }];
 
   // Get active filter count
-  const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length + (showFavoritesOnly ? 1 : 0);
+  const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length + (filters.recentlyAdded ? 1 : 0) + (showFavoritesOnly ? 1 : 0);
 
   // Get active filter chips
   const getFilterChips = () => {
-    const chips: { label: string; category: keyof FilterState | 'favorites'; value: string }[] = [];
+    const chips: { label: string; category: 'productTypes' | 'thcRanges' | 'priceRanges' | 'favorites' | 'recentlyAdded'; value: string }[] = [];
     if (showFavoritesOnly) {
       chips.push({ label: `Favorites (${favorites.length})`, category: 'favorites', value: 'favorites' });
+    }
+    if (filters.recentlyAdded) {
+      chips.push({ label: 'Recently Added (7 days)', category: 'recentlyAdded', value: 'recentlyAdded' });
     }
     filters.productTypes.forEach(type => {
       chips.push({ label: type, category: 'productTypes', value: type });
@@ -835,8 +842,10 @@ export default function CatalogContent() {
                 onClick={() => {
                   if (chip.category === "favorites") {
                     setShowFavoritesOnly(false);
+                  } else if (chip.category === "recentlyAdded") {
+                    setFilters(prev => ({ ...prev, recentlyAdded: false }));
                   } else {
-                    toggleFilter(chip.category, chip.value);
+                    toggleFilter(chip.category as 'productTypes' | 'thcRanges' | 'priceRanges', chip.value);
                   }
                 }}
                 className="hover:text-green-900"
@@ -928,6 +937,33 @@ export default function CatalogContent() {
                 </span>
                 <span className="text-xs bg-white text-gray-600 px-2 py-1 rounded-full border border-gray-200">
                   {favorites.length} items
+                </span>
+              </button>
+            </div>
+
+            {/* Recently Added Section */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Clock size={18} className="text-green-600" />
+                Recently Added
+              </h3>
+              <button
+                onClick={() => setFilters(prev => ({ ...prev, recentlyAdded: !prev.recentlyAdded }))}
+                className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-between ${
+                  filters.recentlyAdded 
+                    ? 'bg-green-50 text-green-700 border border-green-200' 
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span className="font-medium">
+                  {filters.recentlyAdded ? 'Recently Added (7 days)' : 'Show Recently Added'}
+                </span>
+                <span className={`text-xs px-2 py-1 rounded-full border ${
+                  filters.recentlyAdded 
+                    ? 'bg-white text-green-700 border-green-200' 
+                    : 'bg-white text-gray-600 border-gray-200'
+                }`}>
+                  {filters.recentlyAdded ? 'Active' : '7 days'}
                 </span>
               </button>
             </div>
@@ -1602,6 +1638,24 @@ function ProductCard({
           </button>
         </div>
 
+        {/* Favorite Button */}
+        <div className="absolute top-2 right-12 z-10">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onFavoriteToggle();
+            }}
+            className={`p-2 rounded-lg transition-all ${
+              isFav
+                ? "bg-red-100 text-red-500 shadow-md"
+                : "bg-white/90 backdrop-blur-sm text-gray-400 hover:text-red-400 hover:bg-white shadow-sm"
+            }`}
+            title={isFav ? "Remove from favorites" : "Add to favorites"}
+          >
+            <Heart size={16} fill={isFav ? "currentColor" : "none"} />
+          </button>
+        </div>
+
         {/* Product Image or Placeholder */}
         {product.images && product.images.length > 0 ? (
           <div 
@@ -1803,6 +1857,19 @@ function ProductListItem({
         title={isInCompare ? 'Remove from compare' : compareDisabled ? 'Max 3 products' : 'Add to compare'}
       >
         {isInCompare ? <Check size={16} /> : <Scale size={16} />}
+      </button>
+
+      {/* Favorite Button */}
+      <button
+        onClick={onFavoriteToggle}
+        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
+          isFav
+            ? "bg-red-100 text-red-500" 
+            : "bg-gray-100 text-gray-400 hover:text-red-400 hover:bg-gray-200"
+        }`}
+        title={isFav ? "Remove from favorites" : "Add to favorites"}
+      >
+        <Heart size={16} fill={isFav ? "currentColor" : "none"} />
       </button>
 
       {/* Product Image Thumbnail */}

@@ -1,9 +1,10 @@
 'use client';
 
-import { X, SlidersHorizontal } from 'lucide-react';
+import { X, SlidersHorizontal, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 interface FilterState {
+  recentlyAdded: boolean;
   productTypes: string[];
   thcRanges: string[];
   priceRanges: string[];
@@ -85,7 +86,7 @@ export default function MobileFilterSheet({
     }
   };
 
-  const toggleFilter = (category: keyof FilterState, value: string) => {
+  const toggleFilter = (category: 'productTypes' | 'thcRanges' | 'priceRanges', value: string) => {
     setLocalFilters(prev => {
       const current = prev[category];
       const updated = current.includes(value)
@@ -101,7 +102,7 @@ export default function MobileFilterSheet({
   };
 
   const clearAll = () => {
-    const empty: FilterState = { productTypes: [], thcRanges: [], priceRanges: [] };
+    const empty: FilterState = { productTypes: [], thcRanges: [], priceRanges: [], recentlyAdded: false };
     setLocalFilters(empty);
     onFilterChange(empty);
   };
@@ -153,6 +154,36 @@ export default function MobileFilterSheet({
 
         {/* Filter Content - Scrollable */}
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-6">
+          {/* Recently Added Toggle */}
+          <div className="bg-green-50/50 rounded-xl p-4 border border-green-100">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-colors ${
+                  localFilters.recentlyAdded ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-500'
+                }`}>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900">Recently Added</h3>
+                  <p className="text-xs text-gray-500">Products from last 7 days</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setLocalFilters(prev => ({ ...prev, recentlyAdded: !prev.recentlyAdded }))}
+                className={`relative inline-flex h-7 w-12 items-center rounded-full transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${
+                  localFilters.recentlyAdded ? 'bg-green-600' : 'bg-gray-300'
+                }`}
+              >
+                <span className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform duration-300 ${
+                  localFilters.recentlyAdded ? 'translate-x-6' : 'translate-x-1'
+                }`} />
+              </button>
+            </div>
+          </div>
+
           {/* Product Type Filter */}
           <div>
             <h3 className="text-sm font-semibold text-gray-900 mb-3 uppercase tracking-wide">
