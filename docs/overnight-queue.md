@@ -353,3 +353,62 @@ All 9 priority features for the dispensary marketplace have been successfully im
 10. Saved filters
 
 Next phase: Advanced features (favorites, price alerts, Metrc integration, enhanced grower profiles)
+
+### Feb 16, 2026 9:50 AM - Favorites Feature
+- Created `/app/dispensary/favorites/page.tsx` - Server component for favorites page
+  - Auth check for DISPENSARY role
+  - Metadata for SEO
+  
+- Created `/app/dispensary/favorites/FavoritesContent.tsx` - Client component
+  - Load favorites from localStorage (FAVORITES_KEY)
+  - Fetch full product details via `/api/dispensary/favorites` endpoint
+  - Grid/List view toggle with sort options (Recently Added, Price, THC, Name)
+  - Remove individual items with trash icon
+  - Clear all favorites with confirmation modal
+  - Empty state with CTA to browse catalog
+  - Back to catalog navigation link
+  - FavoriteCard component for grid view with product details
+  - FavoriteListItem component for list view with compact layout
+  
+- Created `/app/api/dispensary/favorites/route.ts` - API endpoint
+  - POST handler accepts productIds array
+  - Fetches full product data with grower info from Prisma
+  - Returns products ordered by input array
+  
+- Catalog integration already in place:
+  - Heart icon button on product cards (grid and list)
+  - "View Favorites Only" filter in sidebar with count badge
+  - Favorites filter chip in active filters bar
+  - localStorage persistence across sessions
+  
+- Build: Success
+- Deploy: https://phenofarm-mvp.vercel.app
+
+## Updated Priority Status
+- [x] Grid/List toggle view - COMPLETED
+- [x] Sort by price/THC - COMPLETED  
+- [x] Filters sidebar - COMPLETED
+- [x] Vendor shop pages - COMPLETED
+- [x] Product cards with quick add - COMPLETED
+- [x] Infinite scroll - COMPLETED
+- [x] Search with autocomplete - COMPLETED
+- [x] Compare products - COMPLETED
+- [x] Mobile bottom sheet filters - COMPLETED
+- [x] Saved filters - COMPLETED
+- [x] **Favorites - COMPLETED** Feb 16, 2026 9:50 AM
+
+## Summary - All Priority + Phase 1 Features Complete
+All 10 priority features plus advanced phase 1 complete:
+1. Grid/List toggle view
+2. Sort by price/THC
+3. Filters sidebar
+4. Vendor shop pages
+5. Product cards with quick add
+6. Infinite scroll
+7. Search with autocomplete
+8. Compare products
+9. Mobile bottom sheet filters
+10. Saved filters
+11. Favorites
+
+Next phase: Advanced features (price alerts, Metrc integration, enhanced grower profiles)
