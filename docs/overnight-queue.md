@@ -143,3 +143,44 @@ Implement enhanced product cards with quick-add functionality and hover effects.
 
 ## Next Priority
 Implement infinite scroll for product catalog (replace pagination/load more pattern).
+
+### Feb 16, 2026 2:49 AM - Infinite Scroll Feature
+- Created `/api/dispensary/catalog/route.ts` - Paginated API endpoint
+  - Supports page/limit query params (default 20 items per page)
+  - Full filter support: search, product types, THC ranges, price ranges
+  - Sort support: default (grower), price, THC, name
+  - Returns: products[], hasMore flag, total count
+  - Uses Prisma for efficient pagination with skip/take
+
+- Refactored `/app/dispensary/catalog/CatalogContent.tsx` for infinite scroll
+  - Removed server-side data fetching (now client-side via API)
+  - Added IntersectionObserver hook to detect scroll-to-bottom
+  - Auto-loads next page when user scrolls near bottom (100px margin)
+  - Loading states: initial spinner + inline "Loading more..." indicator
+  - "Reached end" message when all products loaded
+  - Product counter: "X of Y products" format
+  - Preserved all existing features: Grid/List toggle, filters, sort, search
+  - Added grower verification badges to product cards
+  - Added grower location info to product cards
+
+- Updated `/app/dispensary/catalog/page.tsx`
+  - Simplified to remove server-side product fetching
+  - CatalogContent now self-manages data via API
+
+- Commit: a8ad6f3 "feat: Infinite scroll for dispensary catalog"
+- Build: Success
+- Deploy: https://phenofarm-mvp.vercel.app
+
+## Updated Priority Status
+- [x] Grid/List toggle view - COMPLETED
+- [x] Sort by price/THC - COMPLETED  
+- [x] Filters sidebar - COMPLETED
+- [x] Vendor shop pages - COMPLETED
+- [x] Product cards with quick add - COMPLETED
+- [x] **Infinite scroll - COMPLETED** Feb 16, 2026 2:49 AM
+- [ ] Search with autocomplete
+- [ ] Compare products
+- [ ] Mobile bottom sheet filters
+
+## Next Priority
+Implement search with autocomplete for strain names, growers, and product types.
