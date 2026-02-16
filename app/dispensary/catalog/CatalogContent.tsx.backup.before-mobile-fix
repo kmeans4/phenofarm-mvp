@@ -967,15 +967,6 @@ export default function CatalogContent() {
           onClear={clearCompare}
         />
       )}
-
-      {/* Mobile Filter Sheet */}
-      <MobileFilterSheet
-        isOpen={showMobileFilters}
-        onClose={() => setShowMobileFilters(false)}
-        filters={filters}
-        onFilterChange={setFilters}
-        activeFilterCount={activeFilterCount}
-      />
     </div>
   );
 }
@@ -1163,6 +1154,15 @@ function CompareModal({
             </div>
           )}
         </div>
+
+      {/* Mobile Filter Sheet */}
+      <MobileFilterSheet
+        isOpen={showMobileFilters}
+        onClose={() => setShowMobileFilters(false)}
+        filters={filters}
+        onFilterChange={setFilters}
+        activeFilterCount={activeFilterCount}
+      />
       </div>
     </div>
   );
