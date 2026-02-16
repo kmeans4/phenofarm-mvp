@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from "next/link";
 import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, Check, Plus, BarChart3 } from "lucide-react";
-import { Bookmark, BookmarkCheck } from "lucide-react";
+import { Bookmark, BookmarkCheck, Heart } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 import MobileFilterSheet from "./components/MobileFilterSheet";
@@ -84,6 +84,7 @@ const MAX_RECENT_SEARCHES = 5;
 const MAX_COMPARE_ITEMS = 3;
 const COMPARE_STORAGE_KEY = 'phenofarm_compare_products';
 const SAVED_FILTERS_KEY = 'phenofarm_saved_filters';
+const FAVORITES_KEY = 'phenofarm_favorites';
 const MAX_SAVED_FILTERS = 5;
 
 export default function CatalogContent() {
@@ -107,6 +108,8 @@ export default function CatalogContent() {
   const [showCompareModal, setShowCompareModal] = useState(false);
   const [showCompareBar, setShowCompareBar] = useState(true);  // Saved filters state
   const [savedFilters, setSavedFilters] = useState<SavedFilter[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showSaveFilterModal, setShowSaveFilterModal] = useState(false);
   const [newFilterName, setNewFilterName] = useState('');
 
@@ -173,6 +176,42 @@ export default function CatalogContent() {
       console.error('Failed to save filters:', e);
     }
   }, [savedFilters]);
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(FAVORITES_KEY);
+      if (stored) {
+        setFavorites(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load favorites:', e);
+    }
+  }, []);
+
+  // Save favorites to localStorage when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    } catch (e) {
+      console.error('Failed to save favorites:', e);
+    }
+  }, [favorites]);
+
+  // Toggle favorite status
+  const toggleFavorite = useCallback((productId: string) => {
+    setFavorites(prev => {
+      if (prev.includes(productId)) {
+        return prev.filter(id => id !== productId);
+      }
+      return [...prev, productId];
+    });
+  }, []);
+
+  // Check if product is favorite
+  const isFavorite = useCallback((productId: string) => {
+    return favorites.includes(productId);
+  }, [favorites]);
 
 
 
@@ -417,6 +456,7 @@ export default function CatalogContent() {
     setSearchQuery('');
     setSortBy('default');
     setShowSuggestions(false);
+    setShowFavoritesOnly(false);
   };
 
   // Fetch products from API
@@ -494,17 +534,25 @@ export default function CatalogContent() {
     return () => observer.disconnect();
   }, [hasMore, isLoading, page, fetchProducts]);
 
+  // Filter products by favorites if needed
+  const filteredProducts = showFavoritesOnly
+    ? products.filter(p => favorites.includes(p.id))
+    : products;
+
   // Group products by grower when not sorting
   const groupedProducts = sortBy === 'default' 
-    ? groupByGrower(products)
-    : [{ growerId: 'all', growerName: 'All Products', products }];
+    ? groupByGrower(filteredProducts)
+    : [{ growerId: 'all', growerName: 'All Products', products: filteredProducts }];
 
   // Get active filter count
-  const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length;
+  const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length + (showFavoritesOnly ? 1 : 0);
 
   // Get active filter chips
   const getFilterChips = () => {
-    const chips: { label: string; category: keyof FilterState; value: string }[] = [];
+    const chips: { label: string; category: keyof FilterState | 'favorites'; value: string }[] = [];
+    if (showFavoritesOnly) {
+      chips.push({ label: `Favorites (${favorites.length})`, category: 'favorites', value: 'favorites' });
+    }
     filters.productTypes.forEach(type => {
       chips.push({ label: type, category: 'productTypes', value: type });
     });
@@ -784,7 +832,13 @@ export default function CatalogContent() {
             >
               {chip.label}
               <button 
-                onClick={() => toggleFilter(chip.category, chip.value)}
+                onClick={() => {
+                  if (chip.category === "favorites") {
+                    setShowFavoritesOnly(false);
+                  } else {
+                    toggleFilter(chip.category, chip.value);
+                  }
+                }}
                 className="hover:text-green-900"
               >
                 <X size={14} />
@@ -854,6 +908,29 @@ export default function CatalogContent() {
                 Save Current Filter
               </button>
             )}
+
+            {/* Favorites Section */}
+            <div className="bg-white rounded-lg border border-gray-200 p-4">
+              <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                <Heart size={18} className="text-red-500" />
+                Favorites
+              </h3>
+              <button
+                onClick={() => setShowFavoritesOnly(!showFavoritesOnly)}
+                className={`w-full text-left px-3 py-2 text-sm rounded-lg transition-colors flex items-center justify-between ${
+                  showFavoritesOnly 
+                    ? 'bg-red-50 text-red-700 border border-red-200' 
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <span className="font-medium">
+                  {showFavoritesOnly ? 'Showing Favorites Only' : 'View Favorites Only'}
+                </span>
+                <span className="text-xs bg-white text-gray-600 px-2 py-1 rounded-full border border-gray-200">
+                  {favorites.length} items
+                </span>
+              </button>
+            </div>
 
             {/* Product Type Filter */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -968,6 +1045,8 @@ export default function CatalogContent() {
                             isInCompare={isInCompareList(product.id)}
                             onCompareToggle={() => isInCompareList(product.id) ? removeFromCompare(product.id) : addToCompare(product)}
                             compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
+                            isFav={isFavorite(product.id)}
+                            onFavoriteToggle={() => toggleFavorite(product.id)}
                           />
                         ))}
                       </div>
@@ -981,6 +1060,8 @@ export default function CatalogContent() {
                             isInCompare={isInCompareList(product.id)}
                             onCompareToggle={() => isInCompareList(product.id) ? removeFromCompare(product.id) : addToCompare(product)}
                             compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
+                            isFav={isFavorite(product.id)}
+                            onFavoriteToggle={() => toggleFavorite(product.id)}
                           />
                         ))}
                       </div>
@@ -1426,12 +1507,16 @@ function ProductCard({
   product, 
   isInCompare, 
   onCompareToggle,
-  compareDisabled 
+  compareDisabled,
+  isFav,
+  onFavoriteToggle
 }: { 
   product: Product; 
   isInCompare: boolean;
   onCompareToggle: () => void;
   compareDisabled: boolean;
+  isFav: boolean;
+  onFavoriteToggle: () => void;
 }) {
   const [imageHovered, setImageHovered] = useState(false);
   const [imagePosition, setImagePosition] = useState({ x: 50, y: 50 });
@@ -1658,12 +1743,16 @@ function ProductListItem({
   product, 
   isInCompare, 
   onCompareToggle,
-  compareDisabled 
+  compareDisabled,
+  isFav,
+  onFavoriteToggle
 }: { 
   product: Product; 
   isInCompare: boolean;
   onCompareToggle: () => void;
   compareDisabled: boolean;
+  isFav: boolean;
+  onFavoriteToggle: () => void;
 }) {
   const stockStatus = product.inventoryQty === 0 
     ? { text: 'Out of Stock', color: 'text-red-600', bg: 'bg-red-50' }

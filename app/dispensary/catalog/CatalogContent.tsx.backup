@@ -1,10 +1,12 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from "next/link";
-import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText } from "lucide-react";
+import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, Check, Plus, BarChart3 } from "lucide-react";
+import { Bookmark, BookmarkCheck, Heart } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
+import MobileFilterSheet from "./components/MobileFilterSheet";
 
 interface Product {
   id: string;
@@ -12,6 +14,7 @@ interface Product {
   price: number;
   strain: string | null;
   strainId: string | null;
+  strainType: string | null;
   productType: string | null;
   subType: string | null;
   unit: string | null;
@@ -22,19 +25,29 @@ interface Product {
   grower: {
     id: string;
     businessName: string;
+    location?: string | null;
+    isVerified?: boolean;
   };
-}
-
-interface GrowerGroup {
-  growerId: string;
-  growerName: string;
-  products: Product[];
 }
 
 interface FilterState {
   productTypes: string[];
   thcRanges: string[];
   priceRanges: string[];
+}
+
+interface SavedFilter {
+  id: string;
+  name: string;
+  filters: FilterState;
+  searchQuery: string;
+  sortBy: SortOption;
+  createdAt: string;
+}
+interface SearchSuggestion {
+  text: string;
+  type: string;
+  id?: string;
 }
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'thc-asc' | 'thc-desc' | 'name-asc' | 'name-desc';
@@ -65,11 +78,18 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'name-desc', label: 'Name: Z-A' },
 ];
 
-export default function CatalogContent({ 
-  initialGroups 
-}: { 
-  initialGroups: GrowerGroup[] 
-}) {
+const ITEMS_PER_PAGE = 20;
+const RECENT_SEARCHES_KEY = 'phenofarm_recent_searches';
+const MAX_RECENT_SEARCHES = 5;
+const MAX_COMPARE_ITEMS = 3;
+const COMPARE_STORAGE_KEY = 'phenofarm_compare_products';
+const SAVED_FILTERS_KEY = 'phenofarm_saved_filters';
+const FAVORITES_KEY = 'phenofarm_favorites';
+const MAX_SAVED_FILTERS = 5;
+
+export default function CatalogContent() {
+  // State
+  const [products, setProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(true);
@@ -79,6 +99,345 @@ export default function CatalogContent({
     thcRanges: [],
     priceRanges: [],
   });
+  
+  // Mobile filter sheet state
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
+
+  // Compare state
+  const [compareList, setCompareList] = useState<Product[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showCompareBar, setShowCompareBar] = useState(true);  // Saved filters state
+  const [savedFilters, setSavedFilters] = useState<SavedFilter[]>([]);
+  const [favorites, setFavorites] = useState<string[]>([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [showSaveFilterModal, setShowSaveFilterModal] = useState(false);
+  const [newFilterName, setNewFilterName] = useState('');
+
+  
+  // Search autocomplete state
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [popularSearches, setPopularSearches] = useState<SearchSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  
+  // Infinite scroll state
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [totalProducts, setTotalProducts] = useState(0);
+  
+  // Refs
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Load compare list from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(COMPARE_STORAGE_KEY);
+      if (stored) {
+        setCompareList(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load compare list:', e);
+    }
+  }, []);
+
+  // Save compare list to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(compareList));
+    } catch (e) {
+      console.error('Failed to save compare list:', e);
+    }
+  }, [compareList]);
+  // Load saved filters from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(SAVED_FILTERS_KEY);
+      if (stored) {
+        setSavedFilters(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load saved filters:', e);
+    }
+  }, []);
+
+  // Save saved filters to localStorage when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(SAVED_FILTERS_KEY, JSON.stringify(savedFilters));
+    } catch (e) {
+      console.error('Failed to save filters:', e);
+    }
+  }, [savedFilters]);
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(FAVORITES_KEY);
+      if (stored) {
+        setFavorites(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load favorites:', e);
+    }
+  }, []);
+
+  // Save favorites to localStorage when they change
+  useEffect(() => {
+    try {
+      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    } catch (e) {
+      console.error('Failed to save favorites:', e);
+    }
+  }, [favorites]);
+
+  // Toggle favorite status
+  const toggleFavorite = useCallback((productId: string) => {
+    setFavorites(prev => {
+      if (prev.includes(productId)) {
+        return prev.filter(id => id !== productId);
+      }
+      return [...prev, productId];
+    });
+  }, []);
+
+  // Check if product is favorite
+  const isFavorite = useCallback((productId: string) => {
+    return favorites.includes(productId);
+  }, [favorites]);
+
+
+
+  // Add product to compare
+  const addToCompare = useCallback((product: Product) => {
+    setCompareList(prev => {
+      if (prev.find(p => p.id === product.id)) return prev;
+      if (prev.length >= MAX_COMPARE_ITEMS) {
+        // Remove first item if at max
+        return [...prev.slice(1), product];
+      }
+      return [...prev, product];
+    });
+  }, []);
+
+  // Remove product from compare
+  const removeFromCompare = useCallback((productId: string) => {
+    setCompareList(prev => prev.filter(p => p.id !== productId));
+  }, []);
+
+  // Check if product is in compare list
+  const isInCompareList = useCallback((productId: string) => {
+    return compareList.some(p => p.id === productId);
+  }, [compareList]);
+
+  // Clear all compare items
+  const clearCompare = useCallback(() => {
+    setCompareList([]);
+  }, []);
+  // Save current filter configuration
+  const saveCurrentFilter = useCallback(() => {
+    if (!newFilterName.trim()) return;
+    
+    const hasActiveFilters = filters.productTypes.length > 0 || 
+                             filters.thcRanges.length > 0 || 
+                             filters.priceRanges.length > 0 ||
+                             searchQuery ||
+                             sortBy !== 'default';
+    
+    if (!hasActiveFilters) {
+      alert('No active filters to save. Apply some filters first!');
+      return;
+    }
+    
+    const newFilter: SavedFilter = {
+      id: Date.now().toString(),
+      name: newFilterName.trim(),
+      filters: { ...filters },
+      searchQuery,
+      sortBy,
+      createdAt: new Date().toISOString(),
+    };
+    
+    setSavedFilters(prev => {
+      const updated = [newFilter, ...prev].slice(0, MAX_SAVED_FILTERS);
+      return updated;
+    });
+    
+    setNewFilterName('');
+    setShowSaveFilterModal(false);
+  }, [filters, searchQuery, sortBy, newFilterName]);
+
+  // Apply a saved filter
+  const applySavedFilter = useCallback((savedFilter: SavedFilter) => {
+    setFilters(savedFilter.filters);
+    setSearchQuery(savedFilter.searchQuery);
+    setSortBy(savedFilter.sortBy);
+  }, []);
+
+  // Delete a saved filter
+  const deleteSavedFilter = useCallback((filterId: string) => {
+    setSavedFilters(prev => prev.filter(f => f.id !== filterId));
+  }, []);
+
+
+
+  // Load recent searches from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+      if (stored) {
+        setRecentSearches(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load recent searches:', e);
+    }
+    
+    // Load popular searches
+    fetchPopularSearches();
+  }, []);
+
+  // Save recent searches to localStorage
+  const saveRecentSearch = useCallback((query: string) => {
+    if (!query.trim()) return;
+    
+    try {
+      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+      let searches: string[] = stored ? JSON.parse(stored) : [];
+      
+      // Remove duplicates and add to front
+      searches = searches.filter(s => s.toLowerCase() !== query.toLowerCase());
+      searches.unshift(query);
+      searches = searches.slice(0, MAX_RECENT_SEARCHES);
+      
+      localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+      setRecentSearches(searches);
+    } catch (e) {
+      console.error('Failed to save recent search:', e);
+    }
+  }, []);
+
+  // Fetch search suggestions
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const response = await fetch(`/api/dispensary/search-suggestions?q=\${encodeURIComponent(query)}&limit=8`);
+      if (response.ok) {
+        const data = await response.json();
+        setSuggestions(data.suggestions || []);
+        setPopularSearches(data.popular || []);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Fetch popular searches
+  const fetchPopularSearches = async () => {
+    try {
+      const response = await fetch('/api/dispensary/search-suggestions?q=');
+      if (response.ok) {
+        const data = await response.json();
+        setPopularSearches(data.popular || []);
+      }
+    } catch (error) {
+      console.error('Error fetching popular searches:', error);
+    }
+  };
+
+  // Debounced search input handler
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setShowSuggestions(true);
+    setHighlightedIndex(-1);
+    
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    
+    debounceTimer.current = setTimeout(() => {
+      fetchSuggestions(value);
+    }, 150);
+  };
+
+  // Handle search submission
+  const handleSearchSubmit = (query: string) => {
+    setSearchQuery(query);
+    setShowSuggestions(false);
+    saveRecentSearch(query);
+    // Trigger search via the existing useEffect
+  };
+
+  // Clear recent searches
+  const clearRecentSearches = () => {
+    localStorage.removeItem(RECENT_SEARCHES_KEY);
+    setRecentSearches([]);
+  };
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const allItems = [
+      ...suggestions,
+      ...recentSearches.map(r => ({ text: r, type: 'recent' })),
+      ...popularSearches.map(p => ({ text: p.text, type: 'popular' })),
+    ].filter((item, index, self) => 
+      index === self.findIndex(i => i.text === item.text)
+    );
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : prev));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && allItems[highlightedIndex]) {
+          handleSearchSubmit(allItems[highlightedIndex].text);
+        } else if (searchQuery.trim()) {
+          handleSearchSubmit(searchQuery);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        searchInputRef.current?.blur();
+        break;
+    }
+  };
+
+  // Click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        suggestionsRef.current && 
+        !suggestionsRef.current.contains(e.target as Node) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Toggle filter value
   const toggleFilter = (category: keyof FilterState, value: string) => {
@@ -96,145 +455,88 @@ export default function CatalogContent({
     setFilters({ productTypes: [], thcRanges: [], priceRanges: [] });
     setSearchQuery('');
     setSortBy('default');
+    setShowSuggestions(false);
   };
 
-  // Check if product matches THC range
-  const matchesThcRange = (thc: number | null, rangeIds: string[]) => {
-    if (!thc || rangeIds.length === 0) return true;
-    return rangeIds.some(rangeId => {
-      const range = THC_RANGES.find(r => r.id === rangeId);
-      if (!range) return false;
-      return thc >= range.min && thc < range.max;
-    });
-  };
-
-  // Check if product matches price range
-  const matchesPriceRange = (price: number, rangeIds: string[]) => {
-    if (rangeIds.length === 0) return true;
-    return rangeIds.some(rangeId => {
-      const range = PRICE_RANGES.find(r => r.id === rangeId);
-      if (!range) return false;
-      return price >= range.min && price < range.max;
-    });
-  };
-
-  // Sort products
-  const sortProducts = (products: Product[]): Product[] => {
-    const sorted = [...products];
-    switch (sortBy) {
-      case 'price-asc':
-        return sorted.sort((a, b) => a.price - b.price);
-      case 'price-desc':
-        return sorted.sort((a, b) => b.price - a.price);
-      case 'thc-asc':
-        return sorted.sort((a, b) => (a.thc || 0) - (b.thc || 0));
-      case 'thc-desc':
-        return sorted.sort((a, b) => (b.thc || 0) - (a.thc || 0));
-      case 'name-asc':
-        return sorted.sort((a, b) => a.name.localeCompare(b.name));
-      case 'name-desc':
-        return sorted.sort((a, b) => b.name.localeCompare(a.name));
-      default:
-        return sorted;
-    }
-  };
-
-  // Filter and sort groups based on all criteria
-  const filteredGroups = useMemo(() => {
-    // If sorting by anything other than default, flatten and regroup
-    if (sortBy !== 'default') {
-      // Get all products
-      const allProducts = initialGroups.flatMap(g => g.products);
+  // Fetch products from API
+  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
+    if (isLoading) return;
+    
+    setIsLoading(true);
+    
+    try {
+      const params = new URLSearchParams();
+      params.set('page', pageNum.toString());
+      params.set('limit', ITEMS_PER_PAGE.toString());
       
-      // Apply filters
-      let filteredProducts = allProducts;
-
-      // Filter by product type
-      if (filters.productTypes.length > 0) {
-        filteredProducts = filteredProducts.filter(p => 
-          p.productType && filters.productTypes.includes(p.productType)
-        );
+      if (searchQuery) params.set('search', searchQuery);
+      if (filters.productTypes.length > 0) params.set('productTypes', filters.productTypes.join(','));
+      if (filters.thcRanges.length > 0) params.set('thcRanges', filters.thcRanges.join(','));
+      if (filters.priceRanges.length > 0) params.set('priceRanges', filters.priceRanges.join(','));
+      if (sortBy !== 'default') params.set('sortBy', sortBy);
+      
+      const response = await fetch(`/api/dispensary/catalog?\${params.toString()}`);
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch products');
       }
-
-      // Filter by THC range
-      if (filters.thcRanges.length > 0) {
-        filteredProducts = filteredProducts.filter(p => 
-          matchesThcRange(p.thc, filters.thcRanges)
-        );
+      
+      const data = await response.json();
+      
+      if (append) {
+        setProducts(prev => [...prev, ...data.products]);
+      } else {
+        setProducts(data.products);
       }
+      
+      setHasMore(data.hasMore);
+      setTotalProducts(data.total);
+      setPage(pageNum);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setIsLoading(false);
+      setIsInitialLoading(false);
+    }
+  }, [searchQuery, filters, sortBy, isLoading]);
 
-      // Filter by price range
-      if (filters.priceRanges.length > 0) {
-        filteredProducts = filteredProducts.filter(p => 
-          matchesPriceRange(p.price, filters.priceRanges)
-        );
-      }
+  // Initial load
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      fetchProducts(1, false);
+    }
+  }, [fetchProducts]);
 
-      // Filter by search query
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        filteredProducts = filteredProducts.filter(p => 
-          p.name.toLowerCase().includes(query) ||
-          (p.strain && p.strain.toLowerCase().includes(query)) ||
-          (p.productType && p.productType.toLowerCase().includes(query))
-        );
-      }
+  // Refetch when filters/sort/search change
+  useEffect(() => {
+    if (!isFirstRender.current) {
+      fetchProducts(1, false);
+    }
+  }, [searchQuery, filters.productTypes, filters.thcRanges, filters.priceRanges, sortBy]);
 
-      // Sort products
-      filteredProducts = sortProducts(filteredProducts);
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          fetchProducts(page + 1, true);
+        }
+      },
+      { threshold: 0.1, rootMargin: '100px' }
+    );
 
-      // Return as single group when sorting
-      return filteredProducts.length > 0 
-        ? [{ growerId: 'all', growerName: 'All Products', products: filteredProducts }]
-        : [];
+    if (loadMoreRef.current) {
+      observer.observe(loadMoreRef.current);
     }
 
-    // Default view - grouped by grower
-    return initialGroups.map(group => {
-      let filteredProducts = group.products;
+    return () => observer.disconnect();
+  }, [hasMore, isLoading, page, fetchProducts]);
 
-      // Filter by product type
-      if (filters.productTypes.length > 0) {
-        filteredProducts = filteredProducts.filter(p => 
-          p.productType && filters.productTypes.includes(p.productType)
-        );
-      }
-
-      // Filter by THC range
-      if (filters.thcRanges.length > 0) {
-        filteredProducts = filteredProducts.filter(p => 
-          matchesThcRange(p.thc, filters.thcRanges)
-        );
-      }
-
-      // Filter by price range
-      if (filters.priceRanges.length > 0) {
-        filteredProducts = filteredProducts.filter(p => 
-          matchesPriceRange(p.price, filters.priceRanges)
-        );
-      }
-
-      // Filter by search query
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        filteredProducts = filteredProducts.filter(p => 
-          p.name.toLowerCase().includes(query) ||
-          (p.strain && p.strain.toLowerCase().includes(query)) ||
-          (p.productType && p.productType.toLowerCase().includes(query))
-        );
-      }
-
-      return {
-        ...group,
-        products: filteredProducts,
-      };
-    }).filter(group => group.products.length > 0);
-  }, [initialGroups, filters, searchQuery, sortBy]);
-
-  // Calculate total products
-  const totalProducts = useMemo(() => {
-    return filteredGroups.reduce((sum, group) => sum + group.products.length, 0);
-  }, [filteredGroups]);
+  // Group products by grower when not sorting
+  const groupedProducts = sortBy === 'default' 
+    ? groupByGrower(products)
+    : [{ growerId: 'all', growerName: 'All Products', products }];
 
   // Get active filter count
   const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length;
@@ -247,17 +549,43 @@ export default function CatalogContent({
     });
     filters.thcRanges.forEach(rangeId => {
       const range = THC_RANGES.find(r => r.id === rangeId);
-      if (range) chips.push({ label: `THC: ${range.label}`, category: 'thcRanges', value: rangeId });
+      if (range) chips.push({ label: `THC: \${range.label}`, category: 'thcRanges', value: rangeId });
     });
     filters.priceRanges.forEach(rangeId => {
       const range = PRICE_RANGES.find(r => r.id === rangeId);
-      if (range) chips.push({ label: `Price: ${range.label}`, category: 'priceRanges', value: rangeId });
+      if (range) chips.push({ label: `Price: \${range.label}`, category: 'priceRanges', value: rangeId });
     });
     return chips;
   };
 
+  // Get icon for suggestion type
+  const getSuggestionIcon = (type: string) => {
+    switch (type) {
+      case 'product': return <span className="text-green-600">🌿</span>;
+      case 'strain': return <span className="text-purple-600">🧬</span>;
+      case 'grower': return <MapPin size={16} className="text-blue-500" />;
+      case 'category': return <LayoutGrid size={16} className="text-orange-500" />;
+      case 'recent': return <Clock size={16} className="text-gray-400" />;
+      case 'popular': return <TrendingUp size={16} className="text-red-500" />;
+      default: return <Search size={16} className="text-gray-400" />;
+    }
+  };
+
+  // Get label for suggestion type
+  const getSuggestionLabel = (type: string) => {
+    switch (type) {
+      case 'product': return 'Product';
+      case 'strain': return 'Strain';
+      case 'grower': return 'Grower';
+      case 'category': return 'Category';
+      case 'recent': return 'Recent';
+      case 'popular': return 'Popular';
+      default: return 'Search';
+    }
+  };
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -268,21 +596,140 @@ export default function CatalogContent({
       </div>
 
       {/* Search, Sort, and Controls Bar */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <input
-          type="text"
-          placeholder="Search products by name, strain, or type..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-        />
+      <div className="flex flex-col lg:flex-row gap-4 relative">
+        {/* Search with Autocomplete */}
+        <div className="flex-1 relative" ref={suggestionsRef}>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search by product, strain, grower, or type..."
+              value={searchQuery}
+              onChange={handleSearchInput}
+              onFocus={() => setShowSuggestions(true)}
+              onKeyDown={handleKeyDown}
+              className="w-full rounded-lg border border-gray-300 pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
+          
+          {/* Autocomplete Dropdown */}
+          {showSuggestions && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+              {/* Loading State */}
+              {isSearching && searchQuery.length >= 2 && (
+                <div className="px-4 py-3 flex items-center gap-2 text-gray-500">
+                  <Loader2 size={16} className="animate-spin" />
+                  <span className="text-sm">Searching...</span>
+                </div>
+              )}
+              
+              {/* Live Suggestions */}
+              {suggestions.length > 0 && (
+                <div className="py-2">
+                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Suggestions
+                  </div>
+                  {suggestions.map((suggestion, index) => (
+                    <button
+                      key={`suggestion-\${suggestion.text}-\${index}`}
+                      onClick={() => handleSearchSubmit(suggestion.text)}
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
+                        highlightedIndex === index ? 'bg-green-50' : ''
+                      }`}
+                    >
+                      {getSuggestionIcon(suggestion.type)}
+                      <span className="flex-1 text-sm text-gray-700">{suggestion.text}</span>
+                      <span className="text-xs text-gray-400">{getSuggestionLabel(suggestion.type)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Recent Searches */}
+              {recentSearches.length > 0 && (
+                <div className="py-2 border-t border-gray-100">
+                  <div className="px-4 py-1.5 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recent</span>
+                    <button
+                      onClick={clearRecentSearches}
+                      className="text-xs text-red-500 hover:text-red-600"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  {recentSearches.map((search, index) => (
+                    <button
+                      key={`recent-\${search}-\${index}`}
+                      onClick={() => handleSearchSubmit(search)}
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
+                        highlightedIndex === suggestions.length + index ? 'bg-green-50' : ''
+                      }`}
+                    >
+                      <Clock size={16} className="text-gray-400" />
+                      <span className="flex-1 text-sm text-gray-700">{search}</span>
+                      <span className="text-xs text-gray-400">Recent</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Popular Searches */}
+              {popularSearches.length > 0 && !searchQuery && (
+                <div className="py-2 border-t border-gray-100">
+                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Popular
+                  </div>
+                  {popularSearches.map((popular, index) => (
+                    <button
+                      key={`popular-\${popular.text}-\${index}`}
+                      onClick={() => handleSearchSubmit(popular.text)}
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
+                        highlightedIndex === suggestions.length + recentSearches.length + index ? 'bg-green-50' : ''
+                      }`}
+                    >
+                      <TrendingUp size={16} className="text-red-500" />
+                      <span className="flex-1 text-sm text-gray-700">{popular.text}</span>
+                      <span className="text-xs text-gray-400">{getSuggestionLabel(popular.type)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* No Results */}
+              {searchQuery.length >= 2 && !isSearching && suggestions.length === 0 && (
+                <div className="px-4 py-3 text-sm text-gray-500">
+                  No suggestions found. Press Enter to search for &quot;{searchQuery}&quot;
+                </div>
+              )}
+              
+              {/* Empty State (no query) */}
+              {!searchQuery && recentSearches.length === 0 && popularSearches.length === 0 && (
+                <div className="px-4 py-3 text-sm text-gray-500">
+                  Type to search products, strains, and growers...
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         
         {/* Sort Dropdown */}
         <div className="relative">
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer text-sm"
+            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer text-sm"
           >
             {SORT_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>
@@ -295,8 +742,14 @@ export default function CatalogContent({
 
         <div className="flex gap-2">
           <button
-            onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+            onClick={() => {
+              if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+                setShowMobileFilters(true);
+              } else {
+                setShowFilters(!showFilters);
+              }
+            }}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors \${
               showFilters 
                 ? 'bg-green-600 text-white border-green-600' 
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -315,7 +768,7 @@ export default function CatalogContent({
           <div className="flex rounded-lg border border-gray-300 overflow-hidden">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-2 flex items-center gap-2 transition-colors ${
+              className={`px-3 py-2 flex items-center gap-2 transition-colors \${
                 viewMode === 'grid' 
                   ? 'bg-green-600 text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -328,7 +781,7 @@ export default function CatalogContent({
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-2 flex items-center gap-2 transition-colors ${
+              className={`px-3 py-2 flex items-center gap-2 transition-colors \${
                 viewMode === 'list' 
                   ? 'bg-green-600 text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -357,7 +810,7 @@ export default function CatalogContent({
           )}
           {searchQuery && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full">
-              Search: "{searchQuery}"
+              Search: &quot;{searchQuery}&quot;
               <button onClick={() => setSearchQuery('')} className="hover:text-blue-900">
                 <X size={14} />
               </button>
@@ -365,7 +818,7 @@ export default function CatalogContent({
           )}
           {getFilterChips().map((chip, idx) => (
             <span 
-              key={`${chip.category}-${chip.value}`}
+              key={`\${chip.category}-\${chip.value}`}
               className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full"
             >
               {chip.label}
@@ -390,8 +843,8 @@ export default function CatalogContent({
 
       {/* Results count */}
       <div className="flex items-center justify-between text-sm text-gray-600">
-        <span>{totalProducts} product{totalProducts !== 1 ? 's' : ''} found</span>
-        <span className="text-xs text-gray-500">View: {viewMode === 'grid' ? 'Grid' : 'List'}{sortBy !== 'default' && ` • Sorted: ${SORT_OPTIONS.find(o => o.value === sortBy)?.label}`}</span>
+        <span>{isInitialLoading ? 'Loading...' : `\${products.length} of \${totalProducts} product\${totalProducts !== 1 ? 's' : ''}`}</span>
+        <span className="text-xs text-gray-500">View: {viewMode === 'grid' ? 'Grid' : 'List'}{sortBy !== 'default' && ` • Sorted: \${SORT_OPTIONS.find(o => o.value === sortBy)?.label}`}</span>
       </div>
 
       {/* Main Content Area */}
@@ -399,6 +852,48 @@ export default function CatalogContent({
         {/* Filters Sidebar */}
         {showFilters && (
           <div className="w-64 flex-shrink-0 space-y-6">
+            {/* Saved Filters Section */}
+            {savedFilters.length > 0 && (
+              <div className="bg-white rounded-lg border border-gray-200 p-4">
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                  <BookmarkCheck size={18} className="text-green-600" />
+                  Saved Filters
+                </h3>
+                <div className="space-y-2">
+                  {savedFilters.map(savedFilter => (
+                    <div key={savedFilter.id} className="group">
+                      <button
+                        onClick={() => applySavedFilter(savedFilter)}
+                        className="w-full text-left px-3 py-2 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-between"
+                      >
+                        <span className="font-medium truncate">{savedFilter.name}</span>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteSavedFilter(savedFilter.id);
+                          }}
+                          className="text-green-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                        >
+                          <X size={14} />
+                        </button>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Save Filter Button */}
+            {(filters.productTypes.length > 0 || filters.thcRanges.length > 0 || filters.priceRanges.length > 0 || searchQuery || sortBy !== 'default') && (
+              <button
+                onClick={() => setShowSaveFilterModal(true)}
+                className="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
+              >
+                <Bookmark size={16} />
+                Save Current Filter
+              </button>
+            )}
+
             {/* Product Type Filter */}
             <div className="bg-white rounded-lg border border-gray-200 p-4">
               <h3 className="font-semibold text-gray-900 mb-3">Product Type</h3>
@@ -467,11 +962,17 @@ export default function CatalogContent({
 
         {/* Product Grid/List */}
         <div className="flex-1 min-w-0">
-          {filteredGroups.length > 0 ? (
+          {isInitialLoading ? (
+            // Initial loading state
+            <div className="flex flex-col items-center justify-center py-20">
+              <Loader2 className="w-10 h-10 text-green-600 animate-spin mb-4" />
+              <p className="text-gray-600">Loading products...</p>
+            </div>
+          ) : groupedProducts.length > 0 ? (
             <div className="space-y-8">
-              {filteredGroups.map(group => (
-                <div key={group.growerId} className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ${sortBy !== 'default' ? 'border-green-200 ring-1 ring-green-100' : ''}`}>
-                  <div className={`px-6 py-4 border-b border-gray-200 ${sortBy !== 'default' ? 'bg-green-50' : 'bg-gray-50'}`}>
+              {groupedProducts.map(group => (
+                <div key={group.growerId} className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden \${sortBy !== 'default' ? 'border-green-200 ring-1 ring-green-100' : ''}`}>
+                  <div className={`px-6 py-4 border-b border-gray-200 \${sortBy !== 'default' ? 'bg-green-50' : 'bg-gray-50'}`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <h2 className="text-xl font-semibold text-gray-900">
@@ -486,7 +987,7 @@ export default function CatalogContent({
                       </div>
                       {group.growerId !== 'all' && (
                         <Link 
-                          href={`/dispensary/grower/${group.growerId}`}
+                          href={`/dispensary/grower/\${group.growerId}`}
                           className="text-sm text-green-600 hover:text-green-700 font-medium"
                         >
                           View Shop →
@@ -500,20 +1001,51 @@ export default function CatalogContent({
                       /* Grid View */
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {group.products.map(product => (
-                          <ProductCard key={product.id} product={product} />
+                          <ProductCard 
+                            key={product.id} 
+                            product={product}
+                            isInCompare={isInCompareList(product.id)}
+                            onCompareToggle={() => isInCompareList(product.id) ? removeFromCompare(product.id) : addToCompare(product)}
+                            compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
+                            isFav={isFavorite(product.id)}
+                            onFavoriteToggle={() => toggleFavorite(product.id)}
+                          />
                         ))}
                       </div>
                     ) : (
                       /* List View */
                       <div className="space-y-2">
                         {group.products.map(product => (
-                          <ProductListItem key={product.id} product={product} />
+                          <ProductListItem 
+                            key={product.id} 
+                            product={product}
+                            isInCompare={isInCompareList(product.id)}
+                            onCompareToggle={() => isInCompareList(product.id) ? removeFromCompare(product.id) : addToCompare(product)}
+                            compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
+                            isFav={isFavorite(product.id)}
+                            onFavoriteToggle={() => toggleFavorite(product.id)}
+                          />
                         ))}
                       </div>
                     )}
                   </div>
                 </div>
               ))}
+              
+              {/* Infinite Scroll Loading Indicator */}
+              <div ref={loadMoreRef} className="py-8">
+                {isLoading && hasMore && (
+                  <div className="flex flex-col items-center justify-center">
+                    <Loader2 className="w-8 h-8 text-green-600 animate-spin mb-2" />
+                    <p className="text-sm text-gray-500">Loading more products...</p>
+                  </div>
+                )}
+                {!hasMore && products.length > 0 && (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-gray-500">You&apos;ve reached the end • {totalProducts} products total</p>
+                  </div>
+                )}
+              </div>
             </div>
           ) : (
             <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
@@ -529,18 +1061,428 @@ export default function CatalogContent({
           )}
         </div>
       </div>
+
+      {/* Compare Bar - Floating at bottom */}
+      {compareList.length > 0 && showCompareBar && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-4">
+          <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-4 flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Scale className="w-5 h-5 text-green-600" />
+              <span className="font-semibold text-gray-900">
+                Compare ({compareList.length}/{MAX_COMPARE_ITEMS})
+              </span>
+            </div>
+            
+            <div className="flex-1 flex gap-2 overflow-x-auto">
+              {compareList.map(product => (
+                <div 
+                  key={product.id} 
+                  className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 min-w-fit"
+                >
+                  <div className="w-8 h-8 rounded bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center text-sm">
+                    {product.images && product.images.length > 0 ? (
+                      <img src={product.images[0]} alt="" className="w-full h-full object-cover rounded" />
+                    ) : (
+                      <span className="opacity-50">🌿</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">
+                    {product.name}
+                  </span>
+                  <button
+                    onClick={() => removeFromCompare(product.id)}
+                    className="text-gray-400 hover:text-red-500"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowCompareModal(true)}
+                disabled={compareList.length < 2}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <BarChart3 size={18} />
+                Compare Now
+              </button>
+              <button
+                onClick={clearCompare}
+                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                title="Clear all"
+              >
+                <X size={20} />
+              </button>
+              <button
+                onClick={() => setShowCompareBar(false)}
+                className="p-2 text-gray-400 hover:text-gray-600"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Compare Modal */}
+      {showCompareModal && (
+        <CompareModal
+          products={compareList}
+          onClose={() => setShowCompareModal(false)}
+          onRemove={removeFromCompare}
+          onClear={clearCompare}
+        />
+      )}
+      {/* Save Filter Modal */}
+      {showSaveFilterModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <Bookmark className="w-5 h-5 text-green-600" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">Save Filter</h2>
+              </div>
+              <button
+                onClick={() => setShowSaveFilterModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Filter Name
+                </label>
+                <input
+                  type="text"
+                  value={newFilterName}
+                  onChange={(e) => setNewFilterName(e.target.value)}
+                  placeholder="e.g., High THC Flower Under $20"
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && newFilterName.trim()) {
+                      saveCurrentFilter();
+                    }
+                    if (e.key === 'Escape') {
+                      setShowSaveFilterModal(false);
+                    }
+                  }}
+                  autoFocus
+                />
+              </div>
+              
+              {/* Preview of what will be saved */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <p className="text-sm font-medium text-gray-700 mb-2">This filter includes:</p>
+                <div className="flex flex-wrap gap-2">
+                  {filters.productTypes.map(type => (
+                    <span key={type} className="px-2 py-1 bg-white text-gray-700 text-xs rounded border border-gray-200">
+                      {type}
+                    </span>
+                  ))}
+                  {filters.thcRanges.map(rangeId => {
+                    const range = THC_RANGES.find(r => r.id === rangeId);
+                    return range ? (
+                      <span key={rangeId} className="px-2 py-1 bg-white text-gray-700 text-xs rounded border border-gray-200">
+                        THC {range.label}
+                      </span>
+                    ) : null;
+                  })}
+                  {filters.priceRanges.map(rangeId => {
+                    const range = PRICE_RANGES.find(r => r.id === rangeId);
+                    return range ? (
+                      <span key={rangeId} className="px-2 py-1 bg-white text-gray-700 text-xs rounded border border-gray-200">
+                        Price {range.label}
+                      </span>
+                    ) : null;
+                  })}
+                  {searchQuery && (
+                    <span className="px-2 py-1 bg-blue-50 text-blue-700 text-xs rounded border border-blue-200">
+                      Search: &quot;{searchQuery}&quot;
+                    </span>
+                  )}
+                  {sortBy !== 'default' && (
+                    <span className="px-2 py-1 bg-purple-50 text-purple-700 text-xs rounded border border-purple-200">
+                      Sort: {SORT_OPTIONS.find(o => o.value === sortBy)?.label}
+                    </span>
+                  )}
+                </div>
+              </div>
+              
+              <p className="text-xs text-gray-500">
+                {savedFilters.length >= MAX_SAVED_FILTERS 
+                  ? `⚠️ You have reached the maximum of ${MAX_SAVED_FILTERS} saved filters. Saving will remove the oldest filter.`
+                  : `You can save up to ${MAX_SAVED_FILTERS} filters (${MAX_SAVED_FILTERS - savedFilters.length} remaining).`}
+              </p>
+            </div>
+            
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={() => setShowSaveFilterModal(false)}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveCurrentFilter}
+                disabled={!newFilterName.trim()}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save Filter
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* Mobile Filter Sheet */}
+      <MobileFilterSheet
+        isOpen={showMobileFilters}
+        onClose={() => setShowMobileFilters(false)}
+        filters={filters}
+        onFilterChange={setFilters}
+        activeFilterCount={activeFilterCount}
+      />
     </div>
   );
 }
 
 // ============================================
+// COMPARE MODAL COMPONENT
+// ============================================
+function CompareModal({ 
+  products, 
+  onClose, 
+  onRemove, 
+  onClear 
+}: { 
+  products: Product[]; 
+  onClose: () => void; 
+  onRemove: (id: string) => void;
+  onClear: () => void;
+}) {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, []);
+
+  const getThcColor = (thc: number | null) => {
+    if (!thc) return 'bg-gray-100';
+    if (thc < 15) return 'bg-emerald-500';
+    if (thc < 20) return 'bg-yellow-500';
+    if (thc < 25) return 'bg-orange-500';
+    return 'bg-red-500';
+  };
+
+  const getStrainTypeColor = (strainType: string | null) => {
+    if (!strainType) return 'bg-gray-100 text-gray-700';
+    const lower = strainType.toLowerCase();
+    if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
+    if (lower.includes('sativa')) return 'bg-amber-100 text-amber-700';
+    return 'bg-blue-100 text-blue-700';
+  };
+
+  const comparisonAttributes = [
+    { label: 'Price', key: 'price', format: (p: Product) => `\$\${p.price.toFixed(2)}` },
+    { label: 'THC', key: 'thc', format: (p: Product) => p.thc ? `\${p.thc}%` : 'N/A' },
+    { label: 'CBD', key: 'cbd', format: (p: Product) => p.cbd ? `\${p.cbd}%` : 'N/A' },
+    { label: 'Strain Type', key: 'strainType', format: (p: Product) => p.strainType || 'N/A' },
+    { label: 'Strain', key: 'strain', format: (p: Product) => p.strain || 'N/A' },
+    { label: 'Product Type', key: 'productType', format: (p: Product) => p.productType || 'N/A' },
+    { label: 'Unit', key: 'unit', format: (p: Product) => p.unit || 'unit' },
+    { label: 'Stock', key: 'inventoryQty', format: (p: Product) => `\${p.inventoryQty} units` },
+    { label: 'Grower', key: 'grower', format: (p: Product) => p.grower.businessName },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Scale className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Product Comparison</h2>
+              <p className="text-sm text-gray-500">Comparing {products.length} products side-by-side</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClear}
+              className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              Clear All
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
+        </div>
+
+        {/* Comparison Content */}
+        <div className="flex-1 overflow-auto p-6">
+          <div className={`grid gap-4 \${products.length === 2 ? 'grid-cols-2' : products.length === 3 ? 'grid-cols-3' : 'grid-cols-1'}`}>
+            {products.map(product => (
+              <div key={product.id} className="bg-gray-50 rounded-xl overflow-hidden">
+                {/* Product Header */}
+                <div className="p-4 bg-white border-b border-gray-200">
+                  <div className="relative h-32 bg-gradient-to-br from-green-50 to-emerald-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                    {product.images && product.images.length > 0 ? (
+                      <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-5xl opacity-30">🌿</span>
+                    )}
+                    <button
+                      onClick={() => onRemove(product.id)}
+                      className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full text-gray-400 hover:text-red-500 shadow-sm"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-lg leading-tight">{product.name}</h3>
+                  <Link 
+                    href={`/dispensary/grower/\${product.grower.id}`}
+                    className="text-sm text-green-600 hover:underline"
+                  >
+                    {product.grower.businessName}
+                  </Link>
+                </div>
+
+                {/* THC Visual Bar */}
+                {product.thc && (
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-600">THC Potency</span>
+                      <span className="text-lg font-bold text-gray-900">{product.thc}%</span>
+                    </div>
+                    <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full \${getThcColor(product.thc)} transition-all duration-500`}
+                        style={{ width: `\${Math.min(product.thc, 35) / 35 * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Attributes */}
+                <div className="divide-y divide-gray-200">
+                  {comparisonAttributes.map(attr => (
+                    <div key={attr.key} className="px-4 py-3 flex items-center justify-between">
+                      <span className="text-sm text-gray-500">{attr.label}</span>
+                      <span className={`text-sm font-medium \${
+                        attr.key === 'price' ? 'text-green-700 text-lg' : 
+                        attr.key === 'thc' ? 'text-gray-900' :
+                        attr.key === 'strainType' ? 'px-2 py-0.5 rounded-full ' + getStrainTypeColor(product.strainType) :
+                        'text-gray-900'
+                      }`}>
+                        {attr.format(product)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Action Button */}
+                <div className="p-4 bg-white border-t border-gray-200">
+                  <AddToCartButton 
+                    product={product}
+                    growerName={product.grower.businessName}
+                    growerId={product.grower.id}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Visual Comparison Charts */}
+          {products.length >= 2 && (
+            <div className="mt-8 bg-gray-50 rounded-xl p-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-green-600" />
+                Price Comparison
+              </h3>
+              <div className="space-y-4">
+                {products.map(product => {
+                  const maxPrice = Math.max(...products.map(p => p.price));
+                  const percentage = (product.price / maxPrice) * 100;
+                  return (
+                    <div key={product.id} className="flex items-center gap-4">
+                      <div className="w-32 truncate text-sm font-medium text-gray-700">
+                        {product.name}
+                      </div>
+                      <div className="flex-1 h-8 bg-gray-200 rounded-lg overflow-hidden">
+                        <div 
+                          className="h-full bg-green-500 flex items-center justify-end pr-2"
+                          style={{ width: `\${percentage}%` }}
+                        >
+                          <span className="text-white text-sm font-bold">\${product.price.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Helper function to group products by grower
+function groupByGrower(products: Product[]) {
+  const groups: { growerId: string; growerName: string; products: Product[] }[] = [];
+  
+  products.forEach(product => {
+    const existingGroup = groups.find(g => g.growerId === product.grower.id);
+    if (existingGroup) {
+      existingGroup.products.push(product);
+    } else {
+      groups.push({
+        growerId: product.grower.id,
+        growerName: product.grower.businessName,
+        products: [product],
+      });
+    }
+  });
+  
+  return groups;
+}
+
+// ============================================
 // ENHANCED PRODUCT CARD COMPONENT (Grid View)
 // ============================================
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ 
+  product, 
+  isInCompare, 
+  onCompareToggle,
+  compareDisabled,
+  isFav,
+  onFavoriteToggle
+}: { 
+  product: Product; 
+  isInCompare: boolean;
+  onCompareToggle: () => void;
+  compareDisabled: boolean;
+  isFav: boolean;
+  onFavoriteToggle: () => void;
+}) {
   const [imageHovered, setImageHovered] = useState(false);
   const [imagePosition, setImagePosition] = useState({ x: 50, y: 50 });
   
-  // Feature 1: Product Image with zoom on hover (magnify effect)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -548,18 +1490,16 @@ function ProductCard({ product }: { product: Product }) {
     setImagePosition({ x, y });
   };
   
-  // Feature 3: Stock status badges
   const getStockStatus = () => {
     if (product.inventoryQty === 0) {
       return { text: 'Out of Stock', color: 'bg-red-100 text-red-700 border-red-200', dotColor: 'bg-red-500' };
     }
     if (product.inventoryQty <= 10) {
-      return { text: `Low Stock (${product.inventoryQty})`, color: 'bg-orange-100 text-orange-700 border-orange-200', dotColor: 'bg-orange-500' };
+      return { text: `Low Stock (\${product.inventoryQty})`, color: 'bg-orange-100 text-orange-700 border-orange-200', dotColor: 'bg-orange-500' };
     }
     return { text: 'In Stock', color: 'bg-green-100 text-green-700 border-green-200', dotColor: 'bg-green-500' };
   };
   
-  // Feature 2: Better THC/CBD badges with visual indicators (color-coded potency levels)
   const getThcBadgeColor = (thc: number) => {
     if (thc < 15) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
     if (thc < 20) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
@@ -573,8 +1513,13 @@ function ProductCard({ product }: { product: Product }) {
     return 'bg-indigo-100 text-indigo-800 border-indigo-200';
   };
   
-  // Feature 6: Strain type indicator (Indica/Sativa/Hybrid with colors)
-  const getStrainTypeColor = (strain: string | null) => {
+  const getStrainTypeColor = (strain: string | null, strainType: string | null) => {
+    if (strainType) {
+      const lower = strainType.toLowerCase();
+      if (lower.includes('indica')) return 'bg-purple-100 text-purple-800 border-purple-200';
+      if (lower.includes('sativa')) return 'bg-amber-100 text-amber-800 border-amber-200';
+      if (lower.includes('hybrid')) return 'bg-blue-100 text-blue-800 border-blue-200';
+    }
     if (!strain) return 'bg-gray-100 text-gray-700';
     const lower = strain.toLowerCase();
     if (lower.includes('indica')) return 'bg-purple-100 text-purple-800 border-purple-200';
@@ -582,17 +1527,13 @@ function ProductCard({ product }: { product: Product }) {
     return 'bg-blue-100 text-blue-800 border-blue-200';
   };
   
-  const strainType = product.strain ? 
+  const strainType = product.strainType || (product.strain ? 
     (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
-     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null;
+     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
   
-  // Feature 5: MOQ (Minimum Order Quantity) badge - calculated as minimum units based on price
   const moq = Math.max(1, Math.ceil(product.price / 50));
   const stockStatus = getStockStatus();
   
-  // Feature 4: Test Results link/icon
-  const hasTestResults = true; // Placeholder - would check product.testResults
-
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 bg-white group">
       {/* Product Image with Zoom */}
@@ -602,14 +1543,35 @@ function ProductCard({ product }: { product: Product }) {
         onMouseLeave={() => setImageHovered(false)}
         onMouseMove={handleMouseMove}
       >
+        {/* Compare Checkbox Overlay */}
+        <div className="absolute top-2 left-2 z-10">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onCompareToggle();
+            }}
+            disabled={compareDisabled && !isInCompare}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all \${
+              isInCompare 
+                ? 'bg-green-600 text-white shadow-lg' 
+                : compareDisabled 
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-white shadow-sm'
+            }`}
+          >
+            {isInCompare ? <Check size={14} /> : <Plus size={14} />}
+            {isInCompare ? 'Comparing' : 'Compare'}
+          </button>
+        </div>
+
         {/* Product Image or Placeholder */}
         {product.images && product.images.length > 0 ? (
           <div 
             className="w-full h-full bg-cover bg-center transition-transform duration-300"
             style={{ 
-              backgroundImage: `url(${product.images[0]})`,
+              backgroundImage: `url(\${product.images[0]})`,
               transform: imageHovered ? 'scale(1.5)' : 'scale(1)',
-              transformOrigin: `${imagePosition.x}% ${imagePosition.y}%`
+              transformOrigin: `\${imagePosition.x}% \${imagePosition.y}%`
             }}
           />
         ) : (
@@ -624,7 +1586,7 @@ function ProductCard({ product }: { product: Product }) {
         )}
         
         {/* Magnify Overlay on Hover */}
-        <div className={`absolute inset-0 bg-black/10 flex items-center justify-center transition-all duration-300 ${imageHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 bg-black/10 flex items-center justify-center transition-all duration-300 \${imageHovered ? 'opacity-100' : 'opacity-0'}`}>
           <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg transform scale-110">
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -632,14 +1594,14 @@ function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
         
-        {/* Feature 3: Stock Status Badge */}
-        <div className={`absolute top-2 left-2 px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${stockStatus.color}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${stockStatus.dotColor}`}></span>
+        {/* Stock Status Badge */}
+        <div className={`absolute top-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 \${stockStatus.color}`}>
+          <span className={`w-1.5 h-1.5 rounded-full \${stockStatus.dotColor}`}></span>
           {stockStatus.text}
         </div>
         
-        {/* Feature 5: MOQ Badge */}
-        <div className="absolute top-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+        {/* MOQ Badge */}
+        <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
           MOQ: {moq}
         </div>
       </div>
@@ -648,21 +1610,33 @@ function ProductCard({ product }: { product: Product }) {
         {/* Product Name */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">{product.name}</h3>
+          {product.grower.isVerified && (
+            <span className="text-green-600" title="Verified Grower">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+              </svg>
+            </span>
+          )}
         </div>
         
-        {/* Feature 6: Strain Type Badge Row */}
+        {/* Grower Name */}
+        <p className="text-sm text-gray-500 mb-2">
+          by <Link href={`/dispensary/grower/\${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link>
+        </p>
+        
+        {/* Strain Type Badge */}
         {strainType && (
           <div className="mb-2">
-            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(product.strain)}`}>
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border \${getStrainTypeColor(product.strain, strainType)}`}>
               {strainType}
             </span>
           </div>
         )}
         
-        {/* Feature 2: THC & CBD Badges */}
+        {/* THC & CBD Badges */}
         <div className="flex flex-wrap gap-2 mb-3">
           {product.thc && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)} flex items-center gap-1`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border \${getThcBadgeColor(product.thc)} flex items-center gap-1`}>
               <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.616a1 1 0 01.894-1.79l1.599.8L9 4.323V3a1 1 0 011-1z"/>
               </svg>
@@ -670,7 +1644,7 @@ function ProductCard({ product }: { product: Product }) {
             </span>
           )}
           {product.cbd && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getCbdBadgeColor(product.cbd)} flex items-center gap-1`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border \${getCbdBadgeColor(product.cbd)} flex items-center gap-1`}>
               <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7 2a1 1 0 00-.707 1.707L7 4.414v3.758a1 1 0 01-.293.707l-2 2A1 1 0 004 11v5a1 1 0 001 1h10a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0013 8.171V4.414l.707-.707A1 1 0 0013 2H7zm2 6.172V4h2v4.172a3 3 0 00.879 2.12l1.027 1.028a4 4 0 00-2.171.102l-.47.156a4 4 0 01-2.53 0l-.563-.187a4 4 0 00-2.17-.102l1.027-1.028A3 3 0 009 8.172z" clipRule="evenodd"/>
               </svg>
@@ -696,14 +1670,11 @@ function ProductCard({ product }: { product: Product }) {
           </p>
         </div>
 
-        {/* Feature 8: Price per unit display with better formatting */}
+        {/* Price & Add to Cart */}
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <div>
-            <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
+            <span className="text-xl font-bold text-green-700">\${product.price.toFixed(2)}</span>
             <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
-            <p className="text-xs text-gray-400">
-              ${(product.price / (product.inventoryQty > 0 ? product.inventoryQty : 1)).toFixed(2)}/unit total stock value
-            </p>
           </div>
           <AddToCartButton 
             product={product} 
@@ -712,7 +1683,7 @@ function ProductCard({ product }: { product: Product }) {
           />
         </div>
         
-        {/* Feature 4: Test Results Link */}
+        {/* Test Results Link */}
         <div className="mt-3 pt-3 border-t border-gray-100">
           <button 
             className="w-full flex items-center justify-center gap-2 text-xs font-medium text-gray-500 hover:text-green-700 py-1 rounded-lg hover:bg-green-50 transition-colors"
@@ -730,20 +1701,38 @@ function ProductCard({ product }: { product: Product }) {
 // ============================================
 // ENHANCED PRODUCT LIST ITEM (List View)
 // ============================================
-function ProductListItem({ product }: { product: Product }) {
-  // Feature 3: Stock status for list view
+function ProductListItem({ 
+  product, 
+  isInCompare, 
+  onCompareToggle,
+  compareDisabled,
+  isFav,
+  onFavoriteToggle
+}: { 
+  product: Product; 
+  isInCompare: boolean;
+  onCompareToggle: () => void;
+  compareDisabled: boolean;
+  isFav: boolean;
+  onFavoriteToggle: () => void;
+}) {
   const stockStatus = product.inventoryQty === 0 
     ? { text: 'Out of Stock', color: 'text-red-600', bg: 'bg-red-50' }
     : product.inventoryQty <= 10 
       ? { text: 'Low Stock', color: 'text-orange-600', bg: 'bg-orange-50' }
       : { text: 'In Stock', color: 'text-green-600', bg: 'bg-green-50' };
 
-  // Feature 6: Strain type
-  const strainType = product.strain ? 
+  const strainType = product.strainType || (product.strain ? 
     (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
-     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null;
+     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
   
-  const getStrainTypeColor = (strain: string | null) => {
+  const getStrainTypeColor = (strain: string | null, strainType: string | null) => {
+    if (strainType) {
+      const lower = strainType.toLowerCase();
+      if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
+      if (lower.includes('sativa')) return 'bg-amber-100 text-amber-700';
+      if (lower.includes('hybrid')) return 'bg-blue-100 text-blue-700';
+    }
     if (!strain) return 'bg-gray-100 text-gray-600';
     const lower = strain.toLowerCase();
     if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
@@ -751,7 +1740,6 @@ function ProductListItem({ product }: { product: Product }) {
     return 'bg-blue-100 text-blue-700';
   };
 
-  // Feature 2: THC badge color
   const getThcBadgeColor = (thc: number) => {
     if (thc < 15) return 'bg-emerald-50 text-emerald-700';
     if (thc < 20) return 'bg-yellow-50 text-yellow-700';
@@ -759,11 +1747,26 @@ function ProductListItem({ product }: { product: Product }) {
     return 'bg-red-50 text-red-700';
   };
   
-  // Feature 5: MOQ
   const moq = Math.max(1, Math.ceil(product.price / 50));
 
   return (
     <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors bg-white">
+      {/* Compare Checkbox */}
+      <button
+        onClick={onCompareToggle}
+        disabled={compareDisabled && !isInCompare}
+        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all \${
+          isInCompare 
+            ? 'bg-green-600 text-white' 
+            : compareDisabled 
+              ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+        }`}
+        title={isInCompare ? 'Remove from compare' : compareDisabled ? 'Max 3 products' : 'Add to compare'}
+      >
+        {isInCompare ? <Check size={16} /> : <Scale size={16} />}
+      </button>
+
       {/* Product Image Thumbnail */}
       <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
         {product.images && product.images.length > 0 ? (
@@ -777,8 +1780,18 @@ function ProductListItem({ product }: { product: Product }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <h3 className="font-semibold text-gray-900">{product.name}</h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-semibold text-gray-900">{product.name}</h3>
+              {product.grower.isVerified && (
+                <span className="text-green-600" title="Verified Grower">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                  </svg>
+                </span>
+              )}
+            </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-gray-600">
+              <span>by <Link href={`/dispensary/grower/\${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link></span>
               {product.strain && (
                 <span><span className="font-medium">Strain:</span> {product.strain}</span>
               )}
@@ -795,12 +1808,12 @@ function ProductListItem({ product }: { product: Product }) {
         {/* Mobile Badges */}
         <div className="flex flex-wrap gap-2 mt-2 md:hidden">
           {strainType && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStrainTypeColor(strainType)}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium \${getStrainTypeColor(strainType, strainType)}`}>
               {strainType}
             </span>
           )}
           {product.thc && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getThcBadgeColor(product.thc)}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium \${getThcBadgeColor(product.thc)}`}>
               THC {product.thc}%
             </span>
           )}
@@ -812,7 +1825,7 @@ function ProductListItem({ product }: { product: Product }) {
 
       {/* Desktop: THC Badge */}
       {product.thc && (
-        <div className={`hidden md:flex flex-col items-center px-3 py-1.5 rounded-lg ${getThcBadgeColor(product.thc)}`}>
+        <div className={`hidden md:flex flex-col items-center px-3 py-1.5 rounded-lg \${getThcBadgeColor(product.thc)}`}>
           <span className="text-xs font-medium">THC</span>
           <span className="text-sm font-bold">{product.thc}%</span>
         </div>
@@ -820,25 +1833,25 @@ function ProductListItem({ product }: { product: Product }) {
 
       {/* Desktop: Strain Type */}
       {strainType && (
-        <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-lg ${getStrainTypeColor(strainType)}`}>
+        <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-lg \${getStrainTypeColor(strainType, strainType)}`}>
           <span className="text-sm font-medium">{strainType}</span>
         </div>
       )}
 
-      {/* Feature 3: Stock Status */}
-      <div className={`hidden md:flex items-center px-3 py-1.5 rounded-lg ${stockStatus.bg}`}>
-        <span className={`text-sm font-medium ${stockStatus.color}`}>{stockStatus.text}</span>
+      {/* Stock Status */}
+      <div className={`hidden md:flex items-center px-3 py-1.5 rounded-lg \${stockStatus.bg}`}>
+        <span className={`text-sm font-medium \${stockStatus.color}`}>{stockStatus.text}</span>
       </div>
       
-      {/* Desktop: MOQ */}
+      {/* MOQ */}
       <div className="hidden lg:flex flex-col items-center px-3 py-1.5 bg-blue-50 rounded-lg">
         <span className="text-xs text-blue-600 font-medium">MOQ</span>
         <span className="text-sm font-bold text-blue-700">{moq}</span>
       </div>
 
-      {/* Feature 8: Price */}
+      {/* Price */}
       <div className="text-right min-w-[100px]">
-        <div className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</div>
+        <div className="text-lg font-bold text-green-700">\${product.price.toFixed(2)}</div>
         <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
       </div>
 
