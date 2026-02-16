@@ -71,3 +71,42 @@ None
 
 ## Next Priority
 Implement vendor shop pages at `/dispensary/grower/[id]` - show grower profile, all their products, and contact options.
+
+### Feb 16, 2026 1:45 AM - Vendor Shop Pages Feature
+- Created `/dispensary/grower/[id]/page.tsx` - Server component for grower shop pages
+  - Fetches grower data with products, strain info, and batch/THC data
+  - Displays grower banner with gradient background
+  - Shows grower logo (or placeholder with initial)
+  - Verified badge for verified growers
+  - Contact info: location, phone, website, license number
+  - Action buttons: "Contact Grower" and "Follow Shop"
+  - Stats bar: product count, orders filled, avg THC, categories count
+  
+- Created `/dispensary/grower/[id]/GrowerShopContent.tsx` - Client component
+  - Grid/List view toggle with product cards and list items
+  - Product type filter chips (desktop) and mobile filter panel
+  - Sort dropdown: Featured, Price, THC, Name
+  - Search within grower's products
+  - Active filter chips with clear buttons
+  - Product cards with: image, THC badge, type badge, strain, price, add to cart
+  - Product list items with compact layout
+  - Responsive design for mobile/tablet/desktop
+  - Empty state with helpful messaging
+
+- Modified: `app/dispensary/catalog/CatalogContent.tsx` - Verified "View Shop" links work
+- Build: Success
+- Deploy: https://phenofarm-mvp.vercel.app (aliased)
+
+## Updated Priority Status
+- [x] Grid/List toggle view - COMPLETED
+- [x] Sort by price/THC - COMPLETED  
+- [x] Filters sidebar - COMPLETED
+- [x] **Vendor shop pages - COMPLETED** Feb 16, 2026 1:45 AM
+- [ ] Product cards with quick add - Next priority
+- [ ] Infinite scroll
+- [ ] Search with autocomplete
+- [ ] Compare products
+- [ ] Mobile bottom sheet filters
+
+## Next Priority
+Implement enhanced product cards with quick-add functionality and hover effects.
