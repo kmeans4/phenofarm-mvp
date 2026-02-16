@@ -532,52 +532,134 @@ export default function CatalogContent({
   );
 }
 
-// Product Card Component (Grid View)
+// Enhanced Product Card Component (Grid View)
 function ProductCard({ product }: { product: Product }) {
-  const stockStatus = product.inventoryQty === 0 
-    ? { text: 'Out of stock', color: 'text-red-600' }
-    : product.inventoryQty <= 10 
-      ? { text: `Only ${product.inventoryQty} left!`, color: 'text-orange-600' }
-      : { text: 'In Stock', color: 'text-green-600' };
+  const [imageHovered, setImageHovered] = useState(false);
+  
+  // Stock status with badge styling
+  const getStockStatus = () => {
+    if (product.inventoryQty === 0) {
+      return { text: 'Out of Stock', color: 'bg-red-100 text-red-700 border-red-200', icon: '●' };
+    }
+    if (product.inventoryQty <= 10) {
+      return { text: `Low Stock (${product.inventoryQty})`, color: 'bg-orange-100 text-orange-700 border-orange-200', icon: '●' };
+    }
+    return { text: 'In Stock', color: 'bg-green-100 text-green-700 border-green-200', icon: '●' };
+  };
+  
+  // THC color coding based on potency
+  const getThcBadgeColor = (thc: number) => {
+    if (thc < 15) return 'bg-green-100 text-green-800 border-green-200';
+    if (thc < 20) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    if (thc < 25) return 'bg-orange-100 text-orange-800 border-orange-200';
+    return 'bg-red-100 text-red-800 border-red-200';
+  };
+  
+  // Strain type color coding
+  const getStrainTypeColor = (strain: string | null) => {
+    if (!strain) return 'bg-gray-100 text-gray-700';
+    const lower = strain.toLowerCase();
+    if (lower.includes('indica')) return 'bg-purple-100 text-purple-800 border-purple-200';
+    if (lower.includes('sativa')) return 'bg-amber-100 text-amber-800 border-amber-200';
+    return 'bg-blue-100 text-blue-800 border-blue-200';
+  };
+  
+  const strainType = product.strain ? 
+    (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
+     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null;
+  
+  const moq = Math.max(1, Math.ceil(product.price / 100));
+  const stockStatus = getStockStatus();
 
   return (
-    <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
-      <div className="flex justify-between items-start mb-2">
-        <h3 className="font-semibold text-gray-900 line-clamp-2">{product.name}</h3>
-      </div>
-      
-      {/* Strain & Product Type */}
-      <div className="mb-3 space-y-1">
-        {product.strain && (
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">Strain:</span> {product.strain}
-          </p>
-        )}
-        {product.productType && (
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">Type:</span> {product.productType} {product.subType && `- ${product.subType}`}
-          </p>
-        )}
-        {product.thc && (
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">THC:</span> {product.thc}%
-          </p>
-        )}
-      </div>
-
-      <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-        <div>
-          <span className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</span>
-          <span className="text-sm text-gray-500">/{product.unit || 'unit'}</span>
+    <div className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 bg-white group">
+      {/* Product Image with Zoom */}
+      <div 
+        className="relative h-48 bg-gradient-to-br from-green-50 to-emerald-100 overflow-hidden cursor-pointer"
+        onMouseEnter={() => setImageHovered(true)}
+        onMouseLeave={() => setImageHovered(false)}
+      >
+        <div className={`w-full h-full flex items-center justify-center transition-transform duration-500 ${imageHovered ? 'scale-110' : 'scale-100'}`}>
+          <div className="text-6xl opacity-20">🌿</div>
         </div>
-        <AddToCartButton 
-          product={product} 
-          growerName={product.grower.businessName}
-          growerId={product.grower.id}
-        />
+        
+        {/* Zoom Icon on Hover */}
+        <div className={`absolute inset-0 bg-black/20 flex items-center justify-center transition-opacity duration-300 ${imageHovered ? 'opacity-100' : 'opacity-0'}`}>
+          <div className="bg-white/90 rounded-full p-2 shadow-lg">
+            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
+            </svg>
+          </div>
+        </div>
+        
+        {/* Stock Badge */}
+        <div className={`absolute top-2 left-2 px-2 py-1 rounded-full text-xs font-semibold border ${stockStatus.color}`}>
+          <span className="mr-1">{stockStatus.icon}</span>
+          {stockStatus.text}
+        </div>
+        
+        {/* Test Results Link */}
+        <button className="absolute top-2 right-2 bg-white/90 hover:bg-white text-gray-700 hover:text-green-700 px-2 py-1 rounded-lg text-xs font-medium shadow-sm transition-colors flex items-center gap-1">
+          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          COA
+        </button>
       </div>
       
-      <p className={`text-xs mt-2 ${stockStatus.color}`}>{stockStatus.text}</p>
+      <div className="p-4">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">{product.name}</h3>
+        </div>
+        
+        {/* Badges Row */}
+        <div className="flex flex-wrap gap-2 mb-3">
+          {product.thc && (
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)}`}>
+              THC {product.thc}%
+            </span>
+          )}
+          {strainType && (
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(product.strain)}`}>
+              {strainType}
+            </span>
+          )}
+          {product.productType && (
+            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700 border border-gray-200">
+              {product.productType}
+            </span>
+          )}
+          <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+            MOQ: {moq} units
+          </span>
+        </div>
+        
+        {/* Strain & Unit Info */}
+        <div className="mb-3 text-sm text-gray-600">
+          {product.strain && (
+            <p className="mb-1">
+              <span className="text-gray-400">Strain:</span> {product.strain}
+            </p>
+          )}
+          <p>
+            <span className="text-gray-400">Unit:</span> {product.unit || 'unit'} • <span className="text-gray-400">Available:</span> {product.inventoryQty} units
+          </p>
+        </div>
+
+        {/* Price & Add to Cart */}
+        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+          <div>
+            <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
+            <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
+            <p className="text-xs text-gray-400">${(product.price / (moq || 1)).toFixed(2)} / unit at MOQ</p>
+          </div>
+          <AddToCartButton 
+            product={product} 
+            growerName={product.grower.businessName}
+            growerId={product.grower.id}
+          />
+        </div>
+      </div>
     </div>
   );
 }

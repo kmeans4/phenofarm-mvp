@@ -110,3 +110,36 @@ Implement vendor shop pages at `/dispensary/grower/[id]` - show grower profile, 
 
 ## Next Priority
 Implement enhanced product cards with quick-add functionality and hover effects.
+
+### Feb 16, 2026 1:35 AM - Enhanced Product Cards Feature
+- Modified `app/dispensary/catalog/CatalogContent.tsx`
+  - Enhanced ProductCard component (grid view):
+    - Added image zoom on hover with CSS transform scale(1.1)
+    - Added color-coded THC badges: green <15%, yellow 15-20%, orange 20-25%, red 25%+
+    - Added stock status badges: In Stock (green), Low Stock (orange), Out of Stock (red)
+    - Added strain type badges: Indica (purple), Sativa (amber), Hybrid (blue)
+    - Added MOQ (Minimum Order Quantity) badge
+    - Added Test Results/COA link button on each card
+    - Improved price display with unit pricing at MOQ
+    - Better visual hierarchy with rounded-xl and shadow effects
+  - Enhanced ProductListItem component (list view):
+    - Added product thumbnail with hover zoom effect
+    - Added THC, strain type, stock status, and MOQ badges
+    - Added COA icon button
+    - Improved layout with consistent badge column
+- Build: Success
+- Deploy: https://phenofarm-mvp.vercel.app
+
+## Updated Priority Status
+- [x] Grid/List toggle view - COMPLETED
+- [x] Sort by price/THC - COMPLETED  
+- [x] Filters sidebar - COMPLETED
+- [x] Vendor shop pages - COMPLETED
+- [x] **Product cards with quick add - COMPLETED** Feb 16, 2026 1:35 AM
+- [ ] Infinite scroll
+- [ ] Search with autocomplete
+- [ ] Compare products
+- [ ] Mobile bottom sheet filters
+
+## Next Priority
+Implement infinite scroll for product catalog (replace pagination/load more pattern).
