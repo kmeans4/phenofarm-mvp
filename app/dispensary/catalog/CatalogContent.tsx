@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from "next/link";
-import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2 } from "lucide-react";
+import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 
@@ -34,6 +34,12 @@ interface FilterState {
   priceRanges: string[];
 }
 
+interface SearchSuggestion {
+  text: string;
+  type: string;
+  id?: string;
+}
+
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'thc-asc' | 'thc-desc' | 'name-asc' | 'name-desc';
 
 const PRODUCT_TYPES = ['Flower', 'Edibles', 'Cartridge', 'Concentrate', 'Pre-roll', 'Tincture', 'Topical', 'Drink'];
@@ -63,6 +69,8 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 ];
 
 const ITEMS_PER_PAGE = 20;
+const RECENT_SEARCHES_KEY = 'phenofarm_recent_searches';
+const MAX_RECENT_SEARCHES = 5;
 
 export default function CatalogContent() {
   // State
@@ -77,6 +85,16 @@ export default function CatalogContent() {
     priceRanges: [],
   });
   
+  // Search autocomplete state
+  const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [popularSearches, setPopularSearches] = useState<SearchSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
+  
   // Infinite scroll state
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -87,6 +105,158 @@ export default function CatalogContent() {
   // Refs
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Load recent searches from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+      if (stored) {
+        setRecentSearches(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load recent searches:', e);
+    }
+    
+    // Load popular searches
+    fetchPopularSearches();
+  }, []);
+
+  // Save recent searches to localStorage
+  const saveRecentSearch = useCallback((query: string) => {
+    if (!query.trim()) return;
+    
+    try {
+      const stored = localStorage.getItem(RECENT_SEARCHES_KEY);
+      let searches: string[] = stored ? JSON.parse(stored) : [];
+      
+      // Remove duplicates and add to front
+      searches = searches.filter(s => s.toLowerCase() !== query.toLowerCase());
+      searches.unshift(query);
+      searches = searches.slice(0, MAX_RECENT_SEARCHES);
+      
+      localStorage.setItem(RECENT_SEARCHES_KEY, JSON.stringify(searches));
+      setRecentSearches(searches);
+    } catch (e) {
+      console.error('Failed to save recent search:', e);
+    }
+  }, []);
+
+  // Fetch search suggestions
+  const fetchSuggestions = useCallback(async (query: string) => {
+    if (query.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    
+    setIsSearching(true);
+    try {
+      const response = await fetch(`/api/dispensary/search-suggestions?q=${encodeURIComponent(query)}&limit=8`);
+      if (response.ok) {
+        const data = await response.json();
+        setSuggestions(data.suggestions || []);
+        setPopularSearches(data.popular || []);
+      }
+    } catch (error) {
+      console.error('Error fetching suggestions:', error);
+    } finally {
+      setIsSearching(false);
+    }
+  }, []);
+
+  // Fetch popular searches
+  const fetchPopularSearches = async () => {
+    try {
+      const response = await fetch('/api/dispensary/search-suggestions?q=');
+      if (response.ok) {
+        const data = await response.json();
+        setPopularSearches(data.popular || []);
+      }
+    } catch (error) {
+      console.error('Error fetching popular searches:', error);
+    }
+  };
+
+  // Debounced search input handler
+  const handleSearchInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    setShowSuggestions(true);
+    setHighlightedIndex(-1);
+    
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+    
+    debounceTimer.current = setTimeout(() => {
+      fetchSuggestions(value);
+    }, 150);
+  };
+
+  // Handle search submission
+  const handleSearchSubmit = (query: string) => {
+    setSearchQuery(query);
+    setShowSuggestions(false);
+    saveRecentSearch(query);
+    // Trigger search via the existing useEffect
+  };
+
+  // Clear recent searches
+  const clearRecentSearches = () => {
+    localStorage.removeItem(RECENT_SEARCHES_KEY);
+    setRecentSearches([]);
+  };
+
+  // Keyboard navigation
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const allItems = [
+      ...suggestions,
+      ...recentSearches.map(r => ({ text: r, type: 'recent' })),
+      ...popularSearches.map(p => ({ text: p.text, type: 'popular' })),
+    ].filter((item, index, self) => 
+      index === self.findIndex(i => i.text === item.text)
+    );
+    
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        setHighlightedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : prev));
+        break;
+      case 'ArrowUp':
+        e.preventDefault();
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1));
+        break;
+      case 'Enter':
+        e.preventDefault();
+        if (highlightedIndex >= 0 && allItems[highlightedIndex]) {
+          handleSearchSubmit(allItems[highlightedIndex].text);
+        } else if (searchQuery.trim()) {
+          handleSearchSubmit(searchQuery);
+        }
+        break;
+      case 'Escape':
+        setShowSuggestions(false);
+        searchInputRef.current?.blur();
+        break;
+    }
+  };
+
+  // Click outside to close suggestions
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        suggestionsRef.current && 
+        !suggestionsRef.current.contains(e.target as Node) &&
+        searchInputRef.current &&
+        !searchInputRef.current.contains(e.target as Node)
+      ) {
+        setShowSuggestions(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   // Toggle filter value
   const toggleFilter = (category: keyof FilterState, value: string) => {
@@ -104,6 +274,7 @@ export default function CatalogContent() {
     setFilters({ productTypes: [], thcRanges: [], priceRanges: [] });
     setSearchQuery('');
     setSortBy('default');
+    setShowSuggestions(false);
   };
 
   // Fetch products from API
@@ -206,6 +377,32 @@ export default function CatalogContent() {
     return chips;
   };
 
+  // Get icon for suggestion type
+  const getSuggestionIcon = (type: string) => {
+    switch (type) {
+      case 'product': return <span className="text-green-600">🌿</span>;
+      case 'strain': return <span className="text-purple-600">🧬</span>;
+      case 'grower': return <MapPin size={16} className="text-blue-500" />;
+      case 'category': return <LayoutGrid size={16} className="text-orange-500" />;
+      case 'recent': return <Clock size={16} className="text-gray-400" />;
+      case 'popular': return <TrendingUp size={16} className="text-red-500" />;
+      default: return <Search size={16} className="text-gray-400" />;
+    }
+  };
+
+  // Get label for suggestion type
+  const getSuggestionLabel = (type: string) => {
+    switch (type) {
+      case 'product': return 'Product';
+      case 'strain': return 'Strain';
+      case 'grower': return 'Grower';
+      case 'category': return 'Category';
+      case 'recent': return 'Recent';
+      case 'popular': return 'Popular';
+      default: return 'Search';
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -218,21 +415,140 @@ export default function CatalogContent() {
       </div>
 
       {/* Search, Sort, and Controls Bar */}
-      <div className="flex flex-col lg:flex-row gap-4">
-        <input
-          type="text"
-          placeholder="Search products by name, strain, or type..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="flex-1 rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-        />
+      <div className="flex flex-col lg:flex-row gap-4 relative">
+        {/* Search with Autocomplete */}
+        <div className="flex-1 relative" ref={suggestionsRef}>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search by product, strain, grower, or type..."
+              value={searchQuery}
+              onChange={handleSearchInput}
+              onFocus={() => setShowSuggestions(true)}
+              onKeyDown={handleKeyDown}
+              className="w-full rounded-lg border border-gray-300 pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  searchInputRef.current?.focus();
+                }}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <X size={18} />
+              </button>
+            )}
+          </div>
+          
+          {/* Autocomplete Dropdown */}
+          {showSuggestions && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+              {/* Loading State */}
+              {isSearching && searchQuery.length >= 2 && (
+                <div className="px-4 py-3 flex items-center gap-2 text-gray-500">
+                  <Loader2 size={16} className="animate-spin" />
+                  <span className="text-sm">Searching...</span>
+                </div>
+              )}
+              
+              {/* Live Suggestions */}
+              {suggestions.length > 0 && (
+                <div className="py-2">
+                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Suggestions
+                  </div>
+                  {suggestions.map((suggestion, index) => (
+                    <button
+                      key={`suggestion-${suggestion.text}-${index}`}
+                      onClick={() => handleSearchSubmit(suggestion.text)}
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
+                        highlightedIndex === index ? 'bg-green-50' : ''
+                      }`}
+                    >
+                      {getSuggestionIcon(suggestion.type)}
+                      <span className="flex-1 text-sm text-gray-700">{suggestion.text}</span>
+                      <span className="text-xs text-gray-400">{getSuggestionLabel(suggestion.type)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Recent Searches */}
+              {recentSearches.length > 0 && (
+                <div className="py-2 border-t border-gray-100">
+                  <div className="px-4 py-1.5 flex items-center justify-between">
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Recent</span>
+                    <button
+                      onClick={clearRecentSearches}
+                      className="text-xs text-red-500 hover:text-red-600"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                  {recentSearches.map((search, index) => (
+                    <button
+                      key={`recent-${search}-${index}`}
+                      onClick={() => handleSearchSubmit(search)}
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
+                        highlightedIndex === suggestions.length + index ? 'bg-green-50' : ''
+                      }`}
+                    >
+                      <Clock size={16} className="text-gray-400" />
+                      <span className="flex-1 text-sm text-gray-700">{search}</span>
+                      <span className="text-xs text-gray-400">Recent</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* Popular Searches */}
+              {popularSearches.length > 0 && !searchQuery && (
+                <div className="py-2 border-t border-gray-100">
+                  <div className="px-4 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                    Popular
+                  </div>
+                  {popularSearches.map((popular, index) => (
+                    <button
+                      key={`popular-${popular.text}-${index}`}
+                      onClick={() => handleSearchSubmit(popular.text)}
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
+                        highlightedIndex === suggestions.length + recentSearches.length + index ? 'bg-green-50' : ''
+                      }`}
+                    >
+                      <TrendingUp size={16} className="text-red-500" />
+                      <span className="flex-1 text-sm text-gray-700">{popular.text}</span>
+                      <span className="text-xs text-gray-400">{getSuggestionLabel(popular.type)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+              
+              {/* No Results */}
+              {searchQuery.length >= 2 && !isSearching && suggestions.length === 0 && (
+                <div className="px-4 py-3 text-sm text-gray-500">
+                  No suggestions found. Press Enter to search for &quot;{searchQuery}&quot;
+                </div>
+              )}
+              
+              {/* Empty State (no query) */}
+              {!searchQuery && recentSearches.length === 0 && popularSearches.length === 0 && (
+                <div className="px-4 py-3 text-sm text-gray-500">
+                  Type to search products, strains, and growers...
+                </div>
+              )}
+            </div>
+          )}
+        </div>
         
         {/* Sort Dropdown */}
         <div className="relative">
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer text-sm"
+            className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer text-sm"
           >
             {SORT_OPTIONS.map(option => (
               <option key={option.value} value={option.value}>
@@ -307,7 +623,7 @@ export default function CatalogContent() {
           )}
           {searchQuery && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full">
-              Search: "{searchQuery}"
+              Search: &quot;{searchQuery}&quot;
               <button onClick={() => setSearchQuery('')} className="hover:text-blue-900">
                 <X size={14} />
               </button>
@@ -481,7 +797,7 @@ export default function CatalogContent() {
                 )}
                 {!hasMore && products.length > 0 && (
                   <div className="text-center py-4">
-                    <p className="text-sm text-gray-500">You've reached the end • {totalProducts} products total</p>
+                    <p className="text-sm text-gray-500">You&apos;ve reached the end • {totalProducts} products total</p>
                   </div>
                 )}
               </div>
