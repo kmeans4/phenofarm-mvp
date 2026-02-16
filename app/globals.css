@@ -129,3 +129,12 @@ input[type="number"] {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Force dark text on all form inputs regardless of color scheme */
+input, select, textarea {
+  color: #111827 !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #6b7280 !important;
+}

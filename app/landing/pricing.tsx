@@ -59,10 +59,10 @@ export function Pricing() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
             Simple, Transparent Pricing
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8">
             Choose the plan that works best for your business. Save 60% compared to traditional platforms.
           </p>
 
@@ -73,7 +73,7 @@ export function Pricing() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 !isAnnual
                   ? 'bg-green-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-300 hover:text-white'
               }`}
             >
               Monthly
@@ -83,7 +83,7 @@ export function Pricing() {
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                 isAnnual
                   ? 'bg-green-600 text-white'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-300 hover:text-white'
               }`}
             >
               Annual
@@ -121,7 +121,7 @@ export function Pricing() {
 
               <div className="text-center mb-8">
                 <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
-                <p className="text-gray-400 text-sm">{plan.description}</p>
+                <p className="text-gray-300 text-sm">{plan.description}</p>
               </div>
 
               <div className="text-center mb-8">
@@ -129,7 +129,7 @@ export function Pricing() {
                   <span className="text-5xl font-bold text-white">
                     ${isAnnual ? plan.price.annual : plan.price.monthly}
                   </span>
-                  <span className="text-gray-400">/mo</span>
+                  <span className="text-gray-300">/mo</span>
                 </div>
                 {isAnnual && plan.price.monthly > 0 && (
                   <p className="text-gray-500 text-sm mt-2">

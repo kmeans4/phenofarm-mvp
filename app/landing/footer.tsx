@@ -43,7 +43,7 @@ export function Footer() {
               </div>
               <span className="text-xl font-bold text-white">PhenoFarm</span>
             </div>
-            <p className="text-gray-400 text-sm mb-6 max-w-xs">
+            <p className="text-gray-300 text-sm mb-6 max-w-xs">
               The affordable B2B marketplace connecting cannabis growers and dispensaries. Save 60% on platform costs.
             </p>
             <div className="flex items-center gap-3">
@@ -51,7 +51,7 @@ export function Footer() {
                 <a
                   key={social.label}
                   href={social.href}
-                  className="w-10 h-10 rounded-lg bg-gray-900 hover:bg-gray-800 flex items-center justify-center text-gray-400 hover:text-green-400 transition-colors"
+                  className="w-10 h-10 rounded-lg bg-gray-900 hover:bg-gray-800 flex items-center justify-center text-gray-300 hover:text-green-400 transition-colors"
                   aria-label={social.label}
                 >
                   <social.icon className="w-5 h-5" />
@@ -68,7 +68,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link 
                     href={link.href}
-                    className="text-gray-400 hover:text-green-400 text-sm transition-colors"
+                    className="text-gray-300 hover:text-green-400 text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -85,7 +85,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link 
                     href={link.href}
-                    className="text-gray-400 hover:text-green-400 text-sm transition-colors"
+                    className="text-gray-300 hover:text-green-400 text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -102,7 +102,7 @@ export function Footer() {
                 <li key={link.label}>
                   <Link 
                     href={link.href}
-                    className="text-gray-400 hover:text-green-400 text-sm transition-colors"
+                    className="text-gray-300 hover:text-green-400 text-sm transition-colors"
                   >
                     {link.label}
                   </Link>
@@ -117,13 +117,13 @@ export function Footer() {
             &copy; {new Date().getFullYear()} PhenoFarm. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm">
-            <Link href="#" className="text-gray-500 hover:text-gray-400 transition-colors">
+            <Link href="#" className="text-gray-500 hover:text-gray-300 transition-colors">
               Privacy
             </Link>
-            <Link href="#" className="text-gray-500 hover:text-gray-400 transition-colors">
+            <Link href="#" className="text-gray-500 hover:text-gray-300 transition-colors">
               Terms
             </Link>
-            <Link href="#" className="text-gray-500 hover:text-gray-400 transition-colors">
+            <Link href="#" className="text-gray-500 hover:text-gray-300 transition-colors">
               Cookies
             </Link>
           </div>

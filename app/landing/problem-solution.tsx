@@ -73,9 +73,9 @@ export function ProblemSolution() {
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-2 h-8 bg-red-500 rounded-full" />
-            <h2 className="text-3xl md:text-4xl font-bold text-white">The Problem</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">The Problem</h2>
           </div>
-          <p className="text-gray-400 text-lg max-w-2xl">
+          <p className="text-gray-300 text-lg max-w-2xl">
             Traditional cannabis wholesale is broken. You&apos;re paying too much for too little.
           </p>
         </motion.div>
@@ -95,7 +95,7 @@ export function ProblemSolution() {
                 <problem.icon className="w-7 h-7 text-red-400" />
               </div>
               <h3 className="text-xl font-semibold text-white mb-3">{problem.title}</h3>
-              <p className="text-gray-400 leading-relaxed">{problem.description}</p>
+              <p className="text-gray-300 leading-relaxed">{problem.description}</p>
             </motion.div>
           ))}
         </div>
@@ -129,9 +129,9 @@ export function ProblemSolution() {
         >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-2 h-8 bg-green-500 rounded-full" />
-            <h2 className="text-3xl md:text-4xl font-bold text-white">The Solution: PhenoFarm</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">The Solution: PhenoFarm</h2>
           </div>
-          <p className="text-gray-400 text-lg max-w-2xl">
+          <p className="text-gray-300 text-lg max-w-2xl">
             A modern marketplace built for today&apos;s cannabis industry. Affordable, transparent, connected.
           </p>
         </motion.div>
@@ -153,7 +153,7 @@ export function ProblemSolution() {
                   <solution.icon className="w-7 h-7 text-green-400" />
                 </div>
                 <h3 className="text-xl font-semibold text-white mb-3">{solution.title}</h3>
-                <p className="text-gray-400 leading-relaxed">{solution.description}</p>
+                <p className="text-gray-300 leading-relaxed">{solution.description}</p>
               </div>
             </motion.div>
           ))}

@@ -48,7 +48,7 @@ export function CTASection() {
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6 }}
         >
-          <h2 className="text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
             Ready to Transform Your
             <br />
             <span className="bg-gradient-to-r from-green-300 to-emerald-200 bg-clip-text text-transparent">

@@ -73,10 +73,10 @@ export function Testimonials() {
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
             Trusted by Industry Leaders
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
             Join hundreds of businesses transforming their wholesale operations.
           </p>
         </motion.div>
@@ -103,7 +103,7 @@ export function Testimonials() {
                 }}
               >
                 <Quote className="w-16 h-16 text-green-500/30 mx-auto mb-6" />
-                <blockquote className="text-2xl md:text-3xl font-medium text-white mb-8 leading-relaxed">
+                <blockquote className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-8 leading-relaxed">
                   &ldquo;{testimonial.quote}&rdquo;
                 </blockquote>
                 <div className="flex items-center justify-center gap-1 mb-4">
@@ -112,7 +112,7 @@ export function Testimonials() {
                   ))}
                 </div>
                 <div className="text-white font-semibold">{testimonial.author}</div>
-                <div className="text-gray-400 text-sm">{testimonial.role}, {testimonial.company}</div>
+                <div className="text-gray-300 text-sm">{testimonial.role}, {testimonial.company}</div>
               </motion.div>
             ))}
           </div>

@@ -93,7 +93,7 @@ export function HowItWorks() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             How It Works
           </h2>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto mb-8">
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8">
             Simple steps to wholesale success. Whether you&apos;re growing or selling, we&apos;ve got you covered.
           </p>
 
@@ -104,7 +104,7 @@ export function HowItWorks() {
               className={`px-6 py-3 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === 'grower'
                   ? 'bg-green-600 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-300 hover:text-white'
               }`}
             >
               For Growers
@@ -114,7 +114,7 @@ export function HowItWorks() {
               className={`px-6 py-3 rounded-lg text-sm font-semibold transition-all ${
                 activeTab === 'dispensary'
                   ? 'bg-green-600 text-white shadow-lg'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-300 hover:text-white'
               }`}
             >
               For Dispensaries
@@ -159,7 +159,7 @@ export function HowItWorks() {
                     <step.icon className="w-6 h-6 text-green-400" />
                   </div>
                   <h3 className="text-lg font-semibold text-white mb-2">{step.title}</h3>
-                  <p className="text-gray-400 text-sm leading-relaxed">{step.description}</p>
+                  <p className="text-gray-300 text-sm leading-relaxed">{step.description}</p>
                 </div>
               </motion.div>
             ))}
