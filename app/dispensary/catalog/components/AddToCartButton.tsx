@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { Plus, Check, ShoppingCart } from "lucide-react";
 
 interface ProductData {
   id: string;
@@ -28,18 +29,20 @@ interface CartItem {
 export default function AddToCartButton({ 
   product, 
   growerName, 
-  growerId 
+  growerId,
+  compact = false
 }: { 
   product: ProductData; 
   growerName: string;
   growerId: string;
+  compact?: boolean;
 }) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const addToCart = () => {
-    if (quantity < 1 || quantity > product.inventoryQty) {
+  const addToCart = (qty: number = quantity) => {
+    if (qty < 1 || qty > product.inventoryQty) {
       alert(`Please select quantity between 1 and ${product.inventoryQty}`);
       return;
     }
@@ -60,9 +63,9 @@ export default function AddToCartButton({
     const existingIndex = cart.items.findIndex((item: CartItem) => item.id === product.id);
     
     if (existingIndex >= 0) {
-      const newQty = cart.items[existingIndex].quantity + quantity;
+      const newQty = cart.items[existingIndex].quantity + qty;
       if (newQty > product.inventoryQty) {
-        alert(`Cannot add ${quantity} more. Only ${product.inventoryQty - cart.items[existingIndex].quantity} available.`);
+        alert(`Cannot add ${qty} more. Only ${product.inventoryQty - cart.items[existingIndex].quantity} available.`);
         setLoading(false);
         return;
       }
@@ -74,7 +77,7 @@ export default function AddToCartButton({
         price: product.price,
         grower: growerName,
         growerId: growerId,
-        quantity: quantity,
+        quantity: qty,
         maxQty: product.inventoryQty,
         strain: product.strain || undefined,
         unit: product.unit || undefined,
@@ -96,6 +99,33 @@ export default function AddToCartButton({
     window.dispatchEvent(new Event('cart-updated'));
   };
 
+  // Compact mode for list view - single click to add 1 unit
+  if (compact) {
+    return (
+      <button 
+        onClick={() => addToCart(1)}
+        disabled={loading || product.inventoryQty < 1 || added}
+        className={`p-2 rounded-lg flex items-center justify-center transition-colors ${
+          added 
+            ? 'bg-green-700 text-white' 
+            : product.inventoryQty < 1
+              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              : 'bg-green-600 text-white hover:bg-green-700'
+        }`}
+        title={product.inventoryQty < 1 ? 'Out of Stock' : 'Quick Add (1 unit)'}
+      >
+        {loading ? (
+          <span className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+        ) : added ? (
+          <Check size={20} />
+        ) : (
+          <Plus size={20} />
+        )}
+      </button>
+    );
+  }
+
+  // Full mode for grid view
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
@@ -128,7 +158,7 @@ export default function AddToCartButton({
       </div>
       
       <button 
-        onClick={addToCart}
+        onClick={() => addToCart()}
         disabled={loading || product.inventoryQty < 1}
         className={`w-full py-2 rounded-lg flex items-center justify-center gap-2 font-medium transition-colors ${
           added 
@@ -142,18 +172,17 @@ export default function AddToCartButton({
           '...'
         ) : added ? (
           <>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <Check size={18} />
             Added!
           </>
         ) : product.inventoryQty < 1 ? (
-          'Out of Stock'
+          <>
+            <ShoppingCart size={18} />
+            Out of Stock
+          </>
         ) : (
           <>
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
+            <Plus size={18} />
             Add to Cart
           </>
         )}
