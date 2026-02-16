@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import Link from "next/link";
-import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2 } from "lucide-react";
+import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 
@@ -12,7 +12,6 @@ interface Product {
   price: number;
   strain: string | null;
   strainId: string | null;
-  strainType: string | null;
   productType: string | null;
   subType: string | null;
   unit: string | null;
@@ -23,9 +22,13 @@ interface Product {
   grower: {
     id: string;
     businessName: string;
-    location?: string | null;
-    isVerified?: boolean;
   };
+}
+
+interface GrowerGroup {
+  growerId: string;
+  growerName: string;
+  products: Product[];
 }
 
 interface FilterState {
@@ -62,11 +65,11 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'name-desc', label: 'Name: Z-A' },
 ];
 
-const ITEMS_PER_PAGE = 20;
-
-export default function CatalogContent() {
-  // State
-  const [products, setProducts] = useState<Product[]>([]);
+export default function CatalogContent({ 
+  initialGroups 
+}: { 
+  initialGroups: GrowerGroup[] 
+}) {
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(true);
@@ -76,17 +79,6 @@ export default function CatalogContent() {
     thcRanges: [],
     priceRanges: [],
   });
-  
-  // Infinite scroll state
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [totalProducts, setTotalProducts] = useState(0);
-  
-  // Refs
-  const loadMoreRef = useRef<HTMLDivElement>(null);
-  const isFirstRender = useRef(true);
 
   // Toggle filter value
   const toggleFilter = (category: keyof FilterState, value: string) => {
@@ -106,85 +98,143 @@ export default function CatalogContent() {
     setSortBy('default');
   };
 
-  // Fetch products from API
-  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
-    if (isLoading) return;
-    
-    setIsLoading(true);
-    
-    try {
-      const params = new URLSearchParams();
-      params.set('page', pageNum.toString());
-      params.set('limit', ITEMS_PER_PAGE.toString());
+  // Check if product matches THC range
+  const matchesThcRange = (thc: number | null, rangeIds: string[]) => {
+    if (!thc || rangeIds.length === 0) return true;
+    return rangeIds.some(rangeId => {
+      const range = THC_RANGES.find(r => r.id === rangeId);
+      if (!range) return false;
+      return thc >= range.min && thc < range.max;
+    });
+  };
+
+  // Check if product matches price range
+  const matchesPriceRange = (price: number, rangeIds: string[]) => {
+    if (rangeIds.length === 0) return true;
+    return rangeIds.some(rangeId => {
+      const range = PRICE_RANGES.find(r => r.id === rangeId);
+      if (!range) return false;
+      return price >= range.min && price < range.max;
+    });
+  };
+
+  // Sort products
+  const sortProducts = (products: Product[]): Product[] => {
+    const sorted = [...products];
+    switch (sortBy) {
+      case 'price-asc':
+        return sorted.sort((a, b) => a.price - b.price);
+      case 'price-desc':
+        return sorted.sort((a, b) => b.price - a.price);
+      case 'thc-asc':
+        return sorted.sort((a, b) => (a.thc || 0) - (b.thc || 0));
+      case 'thc-desc':
+        return sorted.sort((a, b) => (b.thc || 0) - (a.thc || 0));
+      case 'name-asc':
+        return sorted.sort((a, b) => a.name.localeCompare(b.name));
+      case 'name-desc':
+        return sorted.sort((a, b) => b.name.localeCompare(a.name));
+      default:
+        return sorted;
+    }
+  };
+
+  // Filter and sort groups based on all criteria
+  const filteredGroups = useMemo(() => {
+    // If sorting by anything other than default, flatten and regroup
+    if (sortBy !== 'default') {
+      // Get all products
+      const allProducts = initialGroups.flatMap(g => g.products);
       
-      if (searchQuery) params.set('search', searchQuery);
-      if (filters.productTypes.length > 0) params.set('productTypes', filters.productTypes.join(','));
-      if (filters.thcRanges.length > 0) params.set('thcRanges', filters.thcRanges.join(','));
-      if (filters.priceRanges.length > 0) params.set('priceRanges', filters.priceRanges.join(','));
-      if (sortBy !== 'default') params.set('sortBy', sortBy);
-      
-      const response = await fetch(`/api/dispensary/catalog?${params.toString()}`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch products');
+      // Apply filters
+      let filteredProducts = allProducts;
+
+      // Filter by product type
+      if (filters.productTypes.length > 0) {
+        filteredProducts = filteredProducts.filter(p => 
+          p.productType && filters.productTypes.includes(p.productType)
+        );
       }
-      
-      const data = await response.json();
-      
-      if (append) {
-        setProducts(prev => [...prev, ...data.products]);
-      } else {
-        setProducts(data.products);
+
+      // Filter by THC range
+      if (filters.thcRanges.length > 0) {
+        filteredProducts = filteredProducts.filter(p => 
+          matchesThcRange(p.thc, filters.thcRanges)
+        );
       }
-      
-      setHasMore(data.hasMore);
-      setTotalProducts(data.total);
-      setPage(pageNum);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-    } finally {
-      setIsLoading(false);
-      setIsInitialLoading(false);
-    }
-  }, [searchQuery, filters, sortBy, isLoading]);
 
-  // Initial load
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      fetchProducts(1, false);
-    }
-  }, [fetchProducts]);
+      // Filter by price range
+      if (filters.priceRanges.length > 0) {
+        filteredProducts = filteredProducts.filter(p => 
+          matchesPriceRange(p.price, filters.priceRanges)
+        );
+      }
 
-  // Refetch when filters/sort/search change
-  useEffect(() => {
-    if (!isFirstRender.current) {
-      fetchProducts(1, false);
-    }
-  }, [searchQuery, filters.productTypes, filters.thcRanges, filters.priceRanges, sortBy]);
+      // Filter by search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filteredProducts = filteredProducts.filter(p => 
+          p.name.toLowerCase().includes(query) ||
+          (p.strain && p.strain.toLowerCase().includes(query)) ||
+          (p.productType && p.productType.toLowerCase().includes(query))
+        );
+      }
 
-  // Intersection Observer for infinite scroll
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoading) {
-          fetchProducts(page + 1, true);
-        }
-      },
-      { threshold: 0.1, rootMargin: '100px' }
-    );
+      // Sort products
+      filteredProducts = sortProducts(filteredProducts);
 
-    if (loadMoreRef.current) {
-      observer.observe(loadMoreRef.current);
+      // Return as single group when sorting
+      return filteredProducts.length > 0 
+        ? [{ growerId: 'all', growerName: 'All Products', products: filteredProducts }]
+        : [];
     }
 
-    return () => observer.disconnect();
-  }, [hasMore, isLoading, page, fetchProducts]);
+    // Default view - grouped by grower
+    return initialGroups.map(group => {
+      let filteredProducts = group.products;
 
-  // Group products by grower when not sorting
-  const groupedProducts = sortBy === 'default' 
-    ? groupByGrower(products)
-    : [{ growerId: 'all', growerName: 'All Products', products }];
+      // Filter by product type
+      if (filters.productTypes.length > 0) {
+        filteredProducts = filteredProducts.filter(p => 
+          p.productType && filters.productTypes.includes(p.productType)
+        );
+      }
+
+      // Filter by THC range
+      if (filters.thcRanges.length > 0) {
+        filteredProducts = filteredProducts.filter(p => 
+          matchesThcRange(p.thc, filters.thcRanges)
+        );
+      }
+
+      // Filter by price range
+      if (filters.priceRanges.length > 0) {
+        filteredProducts = filteredProducts.filter(p => 
+          matchesPriceRange(p.price, filters.priceRanges)
+        );
+      }
+
+      // Filter by search query
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filteredProducts = filteredProducts.filter(p => 
+          p.name.toLowerCase().includes(query) ||
+          (p.strain && p.strain.toLowerCase().includes(query)) ||
+          (p.productType && p.productType.toLowerCase().includes(query))
+        );
+      }
+
+      return {
+        ...group,
+        products: filteredProducts,
+      };
+    }).filter(group => group.products.length > 0);
+  }, [initialGroups, filters, searchQuery, sortBy]);
+
+  // Calculate total products
+  const totalProducts = useMemo(() => {
+    return filteredGroups.reduce((sum, group) => sum + group.products.length, 0);
+  }, [filteredGroups]);
 
   // Get active filter count
   const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length;
@@ -340,7 +390,7 @@ export default function CatalogContent() {
 
       {/* Results count */}
       <div className="flex items-center justify-between text-sm text-gray-600">
-        <span>{isInitialLoading ? 'Loading...' : `${products.length} of ${totalProducts} product${totalProducts !== 1 ? 's' : ''}`}</span>
+        <span>{totalProducts} product{totalProducts !== 1 ? 's' : ''} found</span>
         <span className="text-xs text-gray-500">View: {viewMode === 'grid' ? 'Grid' : 'List'}{sortBy !== 'default' && ` • Sorted: ${SORT_OPTIONS.find(o => o.value === sortBy)?.label}`}</span>
       </div>
 
@@ -417,15 +467,9 @@ export default function CatalogContent() {
 
         {/* Product Grid/List */}
         <div className="flex-1 min-w-0">
-          {isInitialLoading ? (
-            // Initial loading state
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="w-10 h-10 text-green-600 animate-spin mb-4" />
-              <p className="text-gray-600">Loading products...</p>
-            </div>
-          ) : groupedProducts.length > 0 ? (
+          {filteredGroups.length > 0 ? (
             <div className="space-y-8">
-              {groupedProducts.map(group => (
+              {filteredGroups.map(group => (
                 <div key={group.growerId} className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ${sortBy !== 'default' ? 'border-green-200 ring-1 ring-green-100' : ''}`}>
                   <div className={`px-6 py-4 border-b border-gray-200 ${sortBy !== 'default' ? 'bg-green-50' : 'bg-gray-50'}`}>
                     <div className="flex items-center justify-between">
@@ -470,21 +514,6 @@ export default function CatalogContent() {
                   </div>
                 </div>
               ))}
-              
-              {/* Infinite Scroll Loading Indicator */}
-              <div ref={loadMoreRef} className="py-8">
-                {isLoading && hasMore && (
-                  <div className="flex flex-col items-center justify-center">
-                    <Loader2 className="w-8 h-8 text-green-600 animate-spin mb-2" />
-                    <p className="text-sm text-gray-500">Loading more products...</p>
-                  </div>
-                )}
-                {!hasMore && products.length > 0 && (
-                  <div className="text-center py-4">
-                    <p className="text-sm text-gray-500">You've reached the end • {totalProducts} products total</p>
-                  </div>
-                )}
-              </div>
             </div>
           ) : (
             <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
@@ -502,26 +531,6 @@ export default function CatalogContent() {
       </div>
     </div>
   );
-}
-
-// Helper function to group products by grower
-function groupByGrower(products: Product[]) {
-  const groups: { growerId: string; growerName: string; products: Product[] }[] = [];
-  
-  products.forEach(product => {
-    const existingGroup = groups.find(g => g.growerId === product.grower.id);
-    if (existingGroup) {
-      existingGroup.products.push(product);
-    } else {
-      groups.push({
-        growerId: product.grower.id,
-        growerName: product.grower.businessName,
-        products: [product],
-      });
-    }
-  });
-  
-  return groups;
 }
 
 // ============================================
@@ -565,13 +574,7 @@ function ProductCard({ product }: { product: Product }) {
   };
   
   // Feature 6: Strain type indicator (Indica/Sativa/Hybrid with colors)
-  const getStrainTypeColor = (strain: string | null, strainType: string | null) => {
-    if (strainType) {
-      const lower = strainType.toLowerCase();
-      if (lower.includes('indica')) return 'bg-purple-100 text-purple-800 border-purple-200';
-      if (lower.includes('sativa')) return 'bg-amber-100 text-amber-800 border-amber-200';
-      if (lower.includes('hybrid')) return 'bg-blue-100 text-blue-800 border-blue-200';
-    }
+  const getStrainTypeColor = (strain: string | null) => {
     if (!strain) return 'bg-gray-100 text-gray-700';
     const lower = strain.toLowerCase();
     if (lower.includes('indica')) return 'bg-purple-100 text-purple-800 border-purple-200';
@@ -579,9 +582,9 @@ function ProductCard({ product }: { product: Product }) {
     return 'bg-blue-100 text-blue-800 border-blue-200';
   };
   
-  const strainType = product.strainType || (product.strain ? 
+  const strainType = product.strain ? 
     (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
-     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
+     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null;
   
   // Feature 5: MOQ (Minimum Order Quantity) badge - calculated as minimum units based on price
   const moq = Math.max(1, Math.ceil(product.price / 50));
@@ -645,24 +648,12 @@ function ProductCard({ product }: { product: Product }) {
         {/* Product Name */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-gray-900 line-clamp-2 flex-1">{product.name}</h3>
-          {product.grower.isVerified && (
-            <span className="text-green-600" title="Verified Grower">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-              </svg>
-            </span>
-          )}
         </div>
-        
-        {/* Grower Name */}
-        <p className="text-sm text-gray-500 mb-2">
-          by <Link href={`/dispensary/grower/${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link>
-        </p>
         
         {/* Feature 6: Strain Type Badge Row */}
         {strainType && (
           <div className="mb-2">
-            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(product.strain, strainType)}`}>
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(product.strain)}`}>
               {strainType}
             </span>
           </div>
@@ -710,6 +701,9 @@ function ProductCard({ product }: { product: Product }) {
           <div>
             <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
             <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
+            <p className="text-xs text-gray-400">
+              ${(product.price / (product.inventoryQty > 0 ? product.inventoryQty : 1)).toFixed(2)}/unit total stock value
+            </p>
           </div>
           <AddToCartButton 
             product={product} 
@@ -745,17 +739,11 @@ function ProductListItem({ product }: { product: Product }) {
       : { text: 'In Stock', color: 'text-green-600', bg: 'bg-green-50' };
 
   // Feature 6: Strain type
-  const strainType = product.strainType || (product.strain ? 
+  const strainType = product.strain ? 
     (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
-     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
+     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null;
   
-  const getStrainTypeColor = (strain: string | null, strainType: string | null) => {
-    if (strainType) {
-      const lower = strainType.toLowerCase();
-      if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
-      if (lower.includes('sativa')) return 'bg-amber-100 text-amber-700';
-      if (lower.includes('hybrid')) return 'bg-blue-100 text-blue-700';
-    }
+  const getStrainTypeColor = (strain: string | null) => {
     if (!strain) return 'bg-gray-100 text-gray-600';
     const lower = strain.toLowerCase();
     if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
@@ -789,18 +777,8 @@ function ProductListItem({ product }: { product: Product }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-semibold text-gray-900">{product.name}</h3>
-              {product.grower.isVerified && (
-                <span className="text-green-600" title="Verified Grower">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-                  </svg>
-                </span>
-              )}
-            </div>
+            <h3 className="font-semibold text-gray-900">{product.name}</h3>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-gray-600">
-              <span>by <Link href={`/dispensary/grower/${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link></span>
               {product.strain && (
                 <span><span className="font-medium">Strain:</span> {product.strain}</span>
               )}
@@ -817,7 +795,7 @@ function ProductListItem({ product }: { product: Product }) {
         {/* Mobile Badges */}
         <div className="flex flex-wrap gap-2 mt-2 md:hidden">
           {strainType && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStrainTypeColor(strainType, strainType)}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStrainTypeColor(strainType)}`}>
               {strainType}
             </span>
           )}
@@ -842,7 +820,7 @@ function ProductListItem({ product }: { product: Product }) {
 
       {/* Desktop: Strain Type */}
       {strainType && (
-        <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-lg ${getStrainTypeColor(strainType, strainType)}`}>
+        <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-lg ${getStrainTypeColor(strainType)}`}>
           <span className="text-sm font-medium">{strainType}</span>
         </div>
       )}
