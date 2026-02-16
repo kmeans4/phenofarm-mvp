@@ -184,3 +184,73 @@ Implement infinite scroll for product catalog (replace pagination/load more patt
 
 ## Next Priority
 Implement search with autocomplete for strain names, growers, and product types.
+
+### Feb 16, 2026 3:52 AM - Search with Autocomplete Feature
+- Created `/api/dispensary/search-suggestions/route.ts` - Autocomplete API endpoint
+  - Searches products, strains, growers, and product types
+  - Returns suggestions with type classification (product, strain, grower, category)
+  - Returns popular searches for discovery
+  - 150ms debounced API calls for performance
+  
+- Modified `/app/dispensary/catalog/CatalogContent.tsx`
+  - Added search autocomplete state management
+  - Real-time dropdown with search suggestions (products, strains, growers, categories)
+  - Recent searches stored in localStorage (max 5, deduplicated)
+  - Popular searches section with trending strains and categories
+  - Keyboard navigation: ArrowUp/Down to highlight, Enter to select, Escape to close
+  - Visual type icons for each suggestion category
+  - "Clear" button for recent searches
+  - Click outside to close dropdown
+  - Debounced API calls (150ms) for smooth typing experience
+  - No results state with helpful message
+
+- Commit: 58e824a "feat: Search autocomplete with suggestions and recent searches"
+- Build: Success
+- Deploy: https://phenofarm-mvp.vercel.app
+
+## Updated Priority Status
+- [x] Grid/List toggle view - COMPLETED
+- [x] Sort by price/THC - COMPLETED  
+- [x] Filters sidebar - COMPLETED
+- [x] Vendor shop pages - COMPLETED
+- [x] Product cards with quick add - COMPLETED
+- [x] Infinite scroll - COMPLETED
+- [x] **Search with autocomplete - COMPLETED** Feb 16, 2026 3:52 AM
+- [ ] Compare products
+- [ ] Mobile bottom sheet filters
+
+## Next Priority
+Implement product comparison feature - allow users to compare up to 3 products side-by-side.
+
+
+### Feb 16, 2026 4:33 AM - Compare Products Feature
+- Modified app/dispensary/catalog/CatalogContent.tsx
+  - Added compare checkboxes to product cards (Grid and List views)
+  - Max 3 products for comparison with visual limit indicator
+  - Floating comparison bar at bottom of screen
+  - Side-by-side comparison modal with product images, names, prices
+  - THC potency visual bars (color-coded by percentage)
+  - Price comparison chart (bar chart showing relative prices)
+  - CBD%, strain type, product type, stock status displayed
+  - Grower information with links to shop pages
+  - Add to cart button for each compared product
+  - localStorage persistence for compare list across sessions
+  - Clear all and individual remove functionality
+  - Compare button disabled until 2+ products selected
+  - Responsive design for mobile (scrollable comparison)
+- Build: Success
+- Deploy: https://phenofarm-mvp.vercel.app
+
+## Updated Priority Status
+- [x] Grid/List toggle view - COMPLETED
+- [x] Sort by price/THC - COMPLETED
+- [x] Filters sidebar - COMPLETED
+- [x] Vendor shop pages - COMPLETED
+- [x] Product cards with quick add - COMPLETED
+- [x] Infinite scroll - COMPLETED
+- [x] Search with autocomplete - COMPLETED
+- [x] Compare products - COMPLETED Feb 16, 2026 4:33 AM
+- [ ] Mobile bottom sheet filters
+
+## Next Priority
+Implement mobile bottom sheet filters for improved mobile UX.

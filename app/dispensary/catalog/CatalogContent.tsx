@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from "next/link";
-import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin } from "lucide-react";
+import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, Check, Plus, BarChart3 } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 
@@ -71,6 +71,8 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 const ITEMS_PER_PAGE = 20;
 const RECENT_SEARCHES_KEY = 'phenofarm_recent_searches';
 const MAX_RECENT_SEARCHES = 5;
+const MAX_COMPARE_ITEMS = 3;
+const COMPARE_STORAGE_KEY = 'phenofarm_compare_products';
 
 export default function CatalogContent() {
   // State
@@ -84,6 +86,11 @@ export default function CatalogContent() {
     thcRanges: [],
     priceRanges: [],
   });
+  
+  // Compare state
+  const [compareList, setCompareList] = useState<Product[]>([]);
+  const [showCompareModal, setShowCompareModal] = useState(false);
+  const [showCompareBar, setShowCompareBar] = useState(true);
   
   // Search autocomplete state
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
@@ -106,6 +113,54 @@ export default function CatalogContent() {
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Load compare list from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(COMPARE_STORAGE_KEY);
+      if (stored) {
+        setCompareList(JSON.parse(stored));
+      }
+    } catch (e) {
+      console.error('Failed to load compare list:', e);
+    }
+  }, []);
+
+  // Save compare list to localStorage when it changes
+  useEffect(() => {
+    try {
+      localStorage.setItem(COMPARE_STORAGE_KEY, JSON.stringify(compareList));
+    } catch (e) {
+      console.error('Failed to save compare list:', e);
+    }
+  }, [compareList]);
+
+  // Add product to compare
+  const addToCompare = useCallback((product: Product) => {
+    setCompareList(prev => {
+      if (prev.find(p => p.id === product.id)) return prev;
+      if (prev.length >= MAX_COMPARE_ITEMS) {
+        // Remove first item if at max
+        return [...prev.slice(1), product];
+      }
+      return [...prev, product];
+    });
+  }, []);
+
+  // Remove product from compare
+  const removeFromCompare = useCallback((productId: string) => {
+    setCompareList(prev => prev.filter(p => p.id !== productId));
+  }, []);
+
+  // Check if product is in compare list
+  const isInCompareList = useCallback((productId: string) => {
+    return compareList.some(p => p.id === productId);
+  }, [compareList]);
+
+  // Clear all compare items
+  const clearCompare = useCallback(() => {
+    setCompareList([]);
+  }, []);
 
   // Load recent searches from localStorage on mount
   useEffect(() => {
@@ -151,7 +206,7 @@ export default function CatalogContent() {
     
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/dispensary/search-suggestions?q=${encodeURIComponent(query)}&limit=8`);
+      const response = await fetch(`/api/dispensary/search-suggestions?q=\${encodeURIComponent(query)}&limit=8`);
       if (response.ok) {
         const data = await response.json();
         setSuggestions(data.suggestions || []);
@@ -294,7 +349,7 @@ export default function CatalogContent() {
       if (filters.priceRanges.length > 0) params.set('priceRanges', filters.priceRanges.join(','));
       if (sortBy !== 'default') params.set('sortBy', sortBy);
       
-      const response = await fetch(`/api/dispensary/catalog?${params.toString()}`);
+      const response = await fetch(`/api/dispensary/catalog?\${params.toString()}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch products');
@@ -368,11 +423,11 @@ export default function CatalogContent() {
     });
     filters.thcRanges.forEach(rangeId => {
       const range = THC_RANGES.find(r => r.id === rangeId);
-      if (range) chips.push({ label: `THC: ${range.label}`, category: 'thcRanges', value: rangeId });
+      if (range) chips.push({ label: `THC: \${range.label}`, category: 'thcRanges', value: rangeId });
     });
     filters.priceRanges.forEach(rangeId => {
       const range = PRICE_RANGES.find(r => r.id === rangeId);
-      if (range) chips.push({ label: `Price: ${range.label}`, category: 'priceRanges', value: rangeId });
+      if (range) chips.push({ label: `Price: \${range.label}`, category: 'priceRanges', value: rangeId });
     });
     return chips;
   };
@@ -404,7 +459,7 @@ export default function CatalogContent() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
@@ -462,9 +517,9 @@ export default function CatalogContent() {
                   </div>
                   {suggestions.map((suggestion, index) => (
                     <button
-                      key={`suggestion-${suggestion.text}-${index}`}
+                      key={`suggestion-\${suggestion.text}-\${index}`}
                       onClick={() => handleSearchSubmit(suggestion.text)}
-                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
                         highlightedIndex === index ? 'bg-green-50' : ''
                       }`}
                     >
@@ -490,9 +545,9 @@ export default function CatalogContent() {
                   </div>
                   {recentSearches.map((search, index) => (
                     <button
-                      key={`recent-${search}-${index}`}
+                      key={`recent-\${search}-\${index}`}
                       onClick={() => handleSearchSubmit(search)}
-                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
                         highlightedIndex === suggestions.length + index ? 'bg-green-50' : ''
                       }`}
                     >
@@ -512,9 +567,9 @@ export default function CatalogContent() {
                   </div>
                   {popularSearches.map((popular, index) => (
                     <button
-                      key={`popular-${popular.text}-${index}`}
+                      key={`popular-\${popular.text}-\${index}`}
                       onClick={() => handleSearchSubmit(popular.text)}
-                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
                         highlightedIndex === suggestions.length + recentSearches.length + index ? 'bg-green-50' : ''
                       }`}
                     >
@@ -562,7 +617,7 @@ export default function CatalogContent() {
         <div className="flex gap-2">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors \${
               showFilters 
                 ? 'bg-green-600 text-white border-green-600' 
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -581,7 +636,7 @@ export default function CatalogContent() {
           <div className="flex rounded-lg border border-gray-300 overflow-hidden">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-2 flex items-center gap-2 transition-colors ${
+              className={`px-3 py-2 flex items-center gap-2 transition-colors \${
                 viewMode === 'grid' 
                   ? 'bg-green-600 text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -594,7 +649,7 @@ export default function CatalogContent() {
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-2 flex items-center gap-2 transition-colors ${
+              className={`px-3 py-2 flex items-center gap-2 transition-colors \${
                 viewMode === 'list' 
                   ? 'bg-green-600 text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -631,7 +686,7 @@ export default function CatalogContent() {
           )}
           {getFilterChips().map((chip, idx) => (
             <span 
-              key={`${chip.category}-${chip.value}`}
+              key={`\${chip.category}-\${chip.value}`}
               className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full"
             >
               {chip.label}
@@ -656,8 +711,8 @@ export default function CatalogContent() {
 
       {/* Results count */}
       <div className="flex items-center justify-between text-sm text-gray-600">
-        <span>{isInitialLoading ? 'Loading...' : `${products.length} of ${totalProducts} product${totalProducts !== 1 ? 's' : ''}`}</span>
-        <span className="text-xs text-gray-500">View: {viewMode === 'grid' ? 'Grid' : 'List'}{sortBy !== 'default' && ` • Sorted: ${SORT_OPTIONS.find(o => o.value === sortBy)?.label}`}</span>
+        <span>{isInitialLoading ? 'Loading...' : `\${products.length} of \${totalProducts} product\${totalProducts !== 1 ? 's' : ''}`}</span>
+        <span className="text-xs text-gray-500">View: {viewMode === 'grid' ? 'Grid' : 'List'}{sortBy !== 'default' && ` • Sorted: \${SORT_OPTIONS.find(o => o.value === sortBy)?.label}`}</span>
       </div>
 
       {/* Main Content Area */}
@@ -742,8 +797,8 @@ export default function CatalogContent() {
           ) : groupedProducts.length > 0 ? (
             <div className="space-y-8">
               {groupedProducts.map(group => (
-                <div key={group.growerId} className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ${sortBy !== 'default' ? 'border-green-200 ring-1 ring-green-100' : ''}`}>
-                  <div className={`px-6 py-4 border-b border-gray-200 ${sortBy !== 'default' ? 'bg-green-50' : 'bg-gray-50'}`}>
+                <div key={group.growerId} className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden \${sortBy !== 'default' ? 'border-green-200 ring-1 ring-green-100' : ''}`}>
+                  <div className={`px-6 py-4 border-b border-gray-200 \${sortBy !== 'default' ? 'bg-green-50' : 'bg-gray-50'}`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <h2 className="text-xl font-semibold text-gray-900">
@@ -758,7 +813,7 @@ export default function CatalogContent() {
                       </div>
                       {group.growerId !== 'all' && (
                         <Link 
-                          href={`/dispensary/grower/${group.growerId}`}
+                          href={`/dispensary/grower/\${group.growerId}`}
                           className="text-sm text-green-600 hover:text-green-700 font-medium"
                         >
                           View Shop →
@@ -772,14 +827,26 @@ export default function CatalogContent() {
                       /* Grid View */
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         {group.products.map(product => (
-                          <ProductCard key={product.id} product={product} />
+                          <ProductCard 
+                            key={product.id} 
+                            product={product}
+                            isInCompare={isInCompareList(product.id)}
+                            onCompareToggle={() => isInCompareList(product.id) ? removeFromCompare(product.id) : addToCompare(product)}
+                            compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
+                          />
                         ))}
                       </div>
                     ) : (
                       /* List View */
                       <div className="space-y-2">
                         {group.products.map(product => (
-                          <ProductListItem key={product.id} product={product} />
+                          <ProductListItem 
+                            key={product.id} 
+                            product={product}
+                            isInCompare={isInCompareList(product.id)}
+                            onCompareToggle={() => isInCompareList(product.id) ? removeFromCompare(product.id) : addToCompare(product)}
+                            compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
+                          />
                         ))}
                       </div>
                     )}
@@ -816,6 +883,268 @@ export default function CatalogContent() {
           )}
         </div>
       </div>
+
+      {/* Compare Bar - Floating at bottom */}
+      {compareList.length > 0 && showCompareBar && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 w-full max-w-4xl px-4">
+          <div className="bg-white rounded-xl shadow-2xl border border-gray-200 p-4 flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Scale className="w-5 h-5 text-green-600" />
+              <span className="font-semibold text-gray-900">
+                Compare ({compareList.length}/{MAX_COMPARE_ITEMS})
+              </span>
+            </div>
+            
+            <div className="flex-1 flex gap-2 overflow-x-auto">
+              {compareList.map(product => (
+                <div 
+                  key={product.id} 
+                  className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2 min-w-fit"
+                >
+                  <div className="w-8 h-8 rounded bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center text-sm">
+                    {product.images && product.images.length > 0 ? (
+                      <img src={product.images[0]} alt="" className="w-full h-full object-cover rounded" />
+                    ) : (
+                      <span className="opacity-50">🌿</span>
+                    )}
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 truncate max-w-[120px]">
+                    {product.name}
+                  </span>
+                  <button
+                    onClick={() => removeFromCompare(product.id)}
+                    className="text-gray-400 hover:text-red-500"
+                  >
+                    <X size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowCompareModal(true)}
+                disabled={compareList.length < 2}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <BarChart3 size={18} />
+                Compare Now
+              </button>
+              <button
+                onClick={clearCompare}
+                className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                title="Clear all"
+              >
+                <X size={20} />
+              </button>
+              <button
+                onClick={() => setShowCompareBar(false)}
+                className="p-2 text-gray-400 hover:text-gray-600"
+              >
+                <X size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Compare Modal */}
+      {showCompareModal && (
+        <CompareModal
+          products={compareList}
+          onClose={() => setShowCompareModal(false)}
+          onRemove={removeFromCompare}
+          onClear={clearCompare}
+        />
+      )}
+    </div>
+  );
+}
+
+// ============================================
+// COMPARE MODAL COMPONENT
+// ============================================
+function CompareModal({ 
+  products, 
+  onClose, 
+  onRemove, 
+  onClear 
+}: { 
+  products: Product[]; 
+  onClose: () => void; 
+  onRemove: (id: string) => void;
+  onClear: () => void;
+}) {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = 'unset'; };
+  }, []);
+
+  const getThcColor = (thc: number | null) => {
+    if (!thc) return 'bg-gray-100';
+    if (thc < 15) return 'bg-emerald-500';
+    if (thc < 20) return 'bg-yellow-500';
+    if (thc < 25) return 'bg-orange-500';
+    return 'bg-red-500';
+  };
+
+  const getStrainTypeColor = (strainType: string | null) => {
+    if (!strainType) return 'bg-gray-100 text-gray-700';
+    const lower = strainType.toLowerCase();
+    if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
+    if (lower.includes('sativa')) return 'bg-amber-100 text-amber-700';
+    return 'bg-blue-100 text-blue-700';
+  };
+
+  const comparisonAttributes = [
+    { label: 'Price', key: 'price', format: (p: Product) => `\$\${p.price.toFixed(2)}` },
+    { label: 'THC', key: 'thc', format: (p: Product) => p.thc ? `\${p.thc}%` : 'N/A' },
+    { label: 'CBD', key: 'cbd', format: (p: Product) => p.cbd ? `\${p.cbd}%` : 'N/A' },
+    { label: 'Strain Type', key: 'strainType', format: (p: Product) => p.strainType || 'N/A' },
+    { label: 'Strain', key: 'strain', format: (p: Product) => p.strain || 'N/A' },
+    { label: 'Product Type', key: 'productType', format: (p: Product) => p.productType || 'N/A' },
+    { label: 'Unit', key: 'unit', format: (p: Product) => p.unit || 'unit' },
+    { label: 'Stock', key: 'inventoryQty', format: (p: Product) => `\${p.inventoryQty} units` },
+    { label: 'Grower', key: 'grower', format: (p: Product) => p.grower.businessName },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+        {/* Header */}
+        <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 rounded-lg">
+              <Scale className="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-bold text-gray-900">Product Comparison</h2>
+              <p className="text-sm text-gray-500">Comparing {products.length} products side-by-side</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={onClear}
+              className="px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              Clear All
+            </button>
+            <button
+              onClick={onClose}
+              className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </div>
+        </div>
+
+        {/* Comparison Content */}
+        <div className="flex-1 overflow-auto p-6">
+          <div className={`grid gap-4 \${products.length === 2 ? 'grid-cols-2' : products.length === 3 ? 'grid-cols-3' : 'grid-cols-1'}`}>
+            {products.map(product => (
+              <div key={product.id} className="bg-gray-50 rounded-xl overflow-hidden">
+                {/* Product Header */}
+                <div className="p-4 bg-white border-b border-gray-200">
+                  <div className="relative h-32 bg-gradient-to-br from-green-50 to-emerald-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
+                    {product.images && product.images.length > 0 ? (
+                      <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-5xl opacity-30">🌿</span>
+                    )}
+                    <button
+                      onClick={() => onRemove(product.id)}
+                      className="absolute top-2 right-2 p-1.5 bg-white/90 rounded-full text-gray-400 hover:text-red-500 shadow-sm"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <h3 className="font-bold text-gray-900 text-lg leading-tight">{product.name}</h3>
+                  <Link 
+                    href={`/dispensary/grower/\${product.grower.id}`}
+                    className="text-sm text-green-600 hover:underline"
+                  >
+                    {product.grower.businessName}
+                  </Link>
+                </div>
+
+                {/* THC Visual Bar */}
+                {product.thc && (
+                  <div className="px-4 py-3 border-b border-gray-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium text-gray-600">THC Potency</span>
+                      <span className="text-lg font-bold text-gray-900">{product.thc}%</span>
+                    </div>
+                    <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                      <div 
+                        className={`h-full \${getThcColor(product.thc)} transition-all duration-500`}
+                        style={{ width: `\${Math.min(product.thc, 35) / 35 * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Attributes */}
+                <div className="divide-y divide-gray-200">
+                  {comparisonAttributes.map(attr => (
+                    <div key={attr.key} className="px-4 py-3 flex items-center justify-between">
+                      <span className="text-sm text-gray-500">{attr.label}</span>
+                      <span className={`text-sm font-medium \${
+                        attr.key === 'price' ? 'text-green-700 text-lg' : 
+                        attr.key === 'thc' ? 'text-gray-900' :
+                        attr.key === 'strainType' ? 'px-2 py-0.5 rounded-full ' + getStrainTypeColor(product.strainType) :
+                        'text-gray-900'
+                      }`}>
+                        {attr.format(product)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Action Button */}
+                <div className="p-4 bg-white border-t border-gray-200">
+                  <AddToCartButton 
+                    product={product}
+                    growerName={product.grower.businessName}
+                    growerId={product.grower.id}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Visual Comparison Charts */}
+          {products.length >= 2 && (
+            <div className="mt-8 bg-gray-50 rounded-xl p-6">
+              <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <BarChart3 className="w-5 h-5 text-green-600" />
+                Price Comparison
+              </h3>
+              <div className="space-y-4">
+                {products.map(product => {
+                  const maxPrice = Math.max(...products.map(p => p.price));
+                  const percentage = (product.price / maxPrice) * 100;
+                  return (
+                    <div key={product.id} className="flex items-center gap-4">
+                      <div className="w-32 truncate text-sm font-medium text-gray-700">
+                        {product.name}
+                      </div>
+                      <div className="flex-1 h-8 bg-gray-200 rounded-lg overflow-hidden">
+                        <div 
+                          className="h-full bg-green-500 flex items-center justify-end pr-2"
+                          style={{ width: `\${percentage}%` }}
+                        >
+                          <span className="text-white text-sm font-bold">\${product.price.toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -843,11 +1172,20 @@ function groupByGrower(products: Product[]) {
 // ============================================
 // ENHANCED PRODUCT CARD COMPONENT (Grid View)
 // ============================================
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ 
+  product, 
+  isInCompare, 
+  onCompareToggle,
+  compareDisabled 
+}: { 
+  product: Product; 
+  isInCompare: boolean;
+  onCompareToggle: () => void;
+  compareDisabled: boolean;
+}) {
   const [imageHovered, setImageHovered] = useState(false);
   const [imagePosition, setImagePosition] = useState({ x: 50, y: 50 });
   
-  // Feature 1: Product Image with zoom on hover (magnify effect)
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -855,18 +1193,16 @@ function ProductCard({ product }: { product: Product }) {
     setImagePosition({ x, y });
   };
   
-  // Feature 3: Stock status badges
   const getStockStatus = () => {
     if (product.inventoryQty === 0) {
       return { text: 'Out of Stock', color: 'bg-red-100 text-red-700 border-red-200', dotColor: 'bg-red-500' };
     }
     if (product.inventoryQty <= 10) {
-      return { text: `Low Stock (${product.inventoryQty})`, color: 'bg-orange-100 text-orange-700 border-orange-200', dotColor: 'bg-orange-500' };
+      return { text: `Low Stock (\${product.inventoryQty})`, color: 'bg-orange-100 text-orange-700 border-orange-200', dotColor: 'bg-orange-500' };
     }
     return { text: 'In Stock', color: 'bg-green-100 text-green-700 border-green-200', dotColor: 'bg-green-500' };
   };
   
-  // Feature 2: Better THC/CBD badges with visual indicators (color-coded potency levels)
   const getThcBadgeColor = (thc: number) => {
     if (thc < 15) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
     if (thc < 20) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
@@ -880,7 +1216,6 @@ function ProductCard({ product }: { product: Product }) {
     return 'bg-indigo-100 text-indigo-800 border-indigo-200';
   };
   
-  // Feature 6: Strain type indicator (Indica/Sativa/Hybrid with colors)
   const getStrainTypeColor = (strain: string | null, strainType: string | null) => {
     if (strainType) {
       const lower = strainType.toLowerCase();
@@ -899,13 +1234,9 @@ function ProductCard({ product }: { product: Product }) {
     (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
      product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
   
-  // Feature 5: MOQ (Minimum Order Quantity) badge - calculated as minimum units based on price
   const moq = Math.max(1, Math.ceil(product.price / 50));
   const stockStatus = getStockStatus();
   
-  // Feature 4: Test Results link/icon
-  const hasTestResults = true; // Placeholder - would check product.testResults
-
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 bg-white group">
       {/* Product Image with Zoom */}
@@ -915,14 +1246,35 @@ function ProductCard({ product }: { product: Product }) {
         onMouseLeave={() => setImageHovered(false)}
         onMouseMove={handleMouseMove}
       >
+        {/* Compare Checkbox Overlay */}
+        <div className="absolute top-2 left-2 z-10">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onCompareToggle();
+            }}
+            disabled={compareDisabled && !isInCompare}
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all \${
+              isInCompare 
+                ? 'bg-green-600 text-white shadow-lg' 
+                : compareDisabled 
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-white/90 backdrop-blur-sm text-gray-700 hover:bg-white shadow-sm'
+            }`}
+          >
+            {isInCompare ? <Check size={14} /> : <Plus size={14} />}
+            {isInCompare ? 'Comparing' : 'Compare'}
+          </button>
+        </div>
+
         {/* Product Image or Placeholder */}
         {product.images && product.images.length > 0 ? (
           <div 
             className="w-full h-full bg-cover bg-center transition-transform duration-300"
             style={{ 
-              backgroundImage: `url(${product.images[0]})`,
+              backgroundImage: `url(\${product.images[0]})`,
               transform: imageHovered ? 'scale(1.5)' : 'scale(1)',
-              transformOrigin: `${imagePosition.x}% ${imagePosition.y}%`
+              transformOrigin: `\${imagePosition.x}% \${imagePosition.y}%`
             }}
           />
         ) : (
@@ -937,7 +1289,7 @@ function ProductCard({ product }: { product: Product }) {
         )}
         
         {/* Magnify Overlay on Hover */}
-        <div className={`absolute inset-0 bg-black/10 flex items-center justify-center transition-all duration-300 ${imageHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 bg-black/10 flex items-center justify-center transition-all duration-300 \${imageHovered ? 'opacity-100' : 'opacity-0'}`}>
           <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg transform scale-110">
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -945,14 +1297,14 @@ function ProductCard({ product }: { product: Product }) {
           </div>
         </div>
         
-        {/* Feature 3: Stock Status Badge */}
-        <div className={`absolute top-2 left-2 px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${stockStatus.color}`}>
-          <span className={`w-1.5 h-1.5 rounded-full ${stockStatus.dotColor}`}></span>
+        {/* Stock Status Badge */}
+        <div className={`absolute top-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 \${stockStatus.color}`}>
+          <span className={`w-1.5 h-1.5 rounded-full \${stockStatus.dotColor}`}></span>
           {stockStatus.text}
         </div>
         
-        {/* Feature 5: MOQ Badge */}
-        <div className="absolute top-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
+        {/* MOQ Badge */}
+        <div className="absolute bottom-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 border border-blue-200">
           MOQ: {moq}
         </div>
       </div>
@@ -972,22 +1324,22 @@ function ProductCard({ product }: { product: Product }) {
         
         {/* Grower Name */}
         <p className="text-sm text-gray-500 mb-2">
-          by <Link href={`/dispensary/grower/${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link>
+          by <Link href={`/dispensary/grower/\${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link>
         </p>
         
-        {/* Feature 6: Strain Type Badge Row */}
+        {/* Strain Type Badge */}
         {strainType && (
           <div className="mb-2">
-            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(product.strain, strainType)}`}>
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border \${getStrainTypeColor(product.strain, strainType)}`}>
               {strainType}
             </span>
           </div>
         )}
         
-        {/* Feature 2: THC & CBD Badges */}
+        {/* THC & CBD Badges */}
         <div className="flex flex-wrap gap-2 mb-3">
           {product.thc && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)} flex items-center gap-1`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border \${getThcBadgeColor(product.thc)} flex items-center gap-1`}>
               <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.616a1 1 0 01.894-1.79l1.599.8L9 4.323V3a1 1 0 011-1z"/>
               </svg>
@@ -995,7 +1347,7 @@ function ProductCard({ product }: { product: Product }) {
             </span>
           )}
           {product.cbd && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getCbdBadgeColor(product.cbd)} flex items-center gap-1`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border \${getCbdBadgeColor(product.cbd)} flex items-center gap-1`}>
               <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7 2a1 1 0 00-.707 1.707L7 4.414v3.758a1 1 0 01-.293.707l-2 2A1 1 0 004 11v5a1 1 0 001 1h10a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0013 8.171V4.414l.707-.707A1 1 0 0013 2H7zm2 6.172V4h2v4.172a3 3 0 00.879 2.12l1.027 1.028a4 4 0 00-2.171.102l-.47.156a4 4 0 01-2.53 0l-.563-.187a4 4 0 00-2.17-.102l1.027-1.028A3 3 0 009 8.172z" clipRule="evenodd"/>
               </svg>
@@ -1021,10 +1373,10 @@ function ProductCard({ product }: { product: Product }) {
           </p>
         </div>
 
-        {/* Feature 8: Price per unit display with better formatting */}
+        {/* Price & Add to Cart */}
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <div>
-            <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
+            <span className="text-xl font-bold text-green-700">\${product.price.toFixed(2)}</span>
             <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
           </div>
           <AddToCartButton 
@@ -1034,7 +1386,7 @@ function ProductCard({ product }: { product: Product }) {
           />
         </div>
         
-        {/* Feature 4: Test Results Link */}
+        {/* Test Results Link */}
         <div className="mt-3 pt-3 border-t border-gray-100">
           <button 
             className="w-full flex items-center justify-center gap-2 text-xs font-medium text-gray-500 hover:text-green-700 py-1 rounded-lg hover:bg-green-50 transition-colors"
@@ -1052,15 +1404,23 @@ function ProductCard({ product }: { product: Product }) {
 // ============================================
 // ENHANCED PRODUCT LIST ITEM (List View)
 // ============================================
-function ProductListItem({ product }: { product: Product }) {
-  // Feature 3: Stock status for list view
+function ProductListItem({ 
+  product, 
+  isInCompare, 
+  onCompareToggle,
+  compareDisabled 
+}: { 
+  product: Product; 
+  isInCompare: boolean;
+  onCompareToggle: () => void;
+  compareDisabled: boolean;
+}) {
   const stockStatus = product.inventoryQty === 0 
     ? { text: 'Out of Stock', color: 'text-red-600', bg: 'bg-red-50' }
     : product.inventoryQty <= 10 
       ? { text: 'Low Stock', color: 'text-orange-600', bg: 'bg-orange-50' }
       : { text: 'In Stock', color: 'text-green-600', bg: 'bg-green-50' };
 
-  // Feature 6: Strain type
   const strainType = product.strainType || (product.strain ? 
     (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
      product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
@@ -1079,7 +1439,6 @@ function ProductListItem({ product }: { product: Product }) {
     return 'bg-blue-100 text-blue-700';
   };
 
-  // Feature 2: THC badge color
   const getThcBadgeColor = (thc: number) => {
     if (thc < 15) return 'bg-emerald-50 text-emerald-700';
     if (thc < 20) return 'bg-yellow-50 text-yellow-700';
@@ -1087,11 +1446,26 @@ function ProductListItem({ product }: { product: Product }) {
     return 'bg-red-50 text-red-700';
   };
   
-  // Feature 5: MOQ
   const moq = Math.max(1, Math.ceil(product.price / 50));
 
   return (
     <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors bg-white">
+      {/* Compare Checkbox */}
+      <button
+        onClick={onCompareToggle}
+        disabled={compareDisabled && !isInCompare}
+        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all \${
+          isInCompare 
+            ? 'bg-green-600 text-white' 
+            : compareDisabled 
+              ? 'bg-gray-100 text-gray-300 cursor-not-allowed'
+              : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+        }`}
+        title={isInCompare ? 'Remove from compare' : compareDisabled ? 'Max 3 products' : 'Add to compare'}
+      >
+        {isInCompare ? <Check size={16} /> : <Scale size={16} />}
+      </button>
+
       {/* Product Image Thumbnail */}
       <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
         {product.images && product.images.length > 0 ? (
@@ -1116,7 +1490,7 @@ function ProductListItem({ product }: { product: Product }) {
               )}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-gray-600">
-              <span>by <Link href={`/dispensary/grower/${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link></span>
+              <span>by <Link href={`/dispensary/grower/\${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link></span>
               {product.strain && (
                 <span><span className="font-medium">Strain:</span> {product.strain}</span>
               )}
@@ -1133,12 +1507,12 @@ function ProductListItem({ product }: { product: Product }) {
         {/* Mobile Badges */}
         <div className="flex flex-wrap gap-2 mt-2 md:hidden">
           {strainType && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStrainTypeColor(strainType, strainType)}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium \${getStrainTypeColor(strainType, strainType)}`}>
               {strainType}
             </span>
           )}
           {product.thc && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getThcBadgeColor(product.thc)}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium \${getThcBadgeColor(product.thc)}`}>
               THC {product.thc}%
             </span>
           )}
@@ -1150,7 +1524,7 @@ function ProductListItem({ product }: { product: Product }) {
 
       {/* Desktop: THC Badge */}
       {product.thc && (
-        <div className={`hidden md:flex flex-col items-center px-3 py-1.5 rounded-lg ${getThcBadgeColor(product.thc)}`}>
+        <div className={`hidden md:flex flex-col items-center px-3 py-1.5 rounded-lg \${getThcBadgeColor(product.thc)}`}>
           <span className="text-xs font-medium">THC</span>
           <span className="text-sm font-bold">{product.thc}%</span>
         </div>
@@ -1158,25 +1532,25 @@ function ProductListItem({ product }: { product: Product }) {
 
       {/* Desktop: Strain Type */}
       {strainType && (
-        <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-lg ${getStrainTypeColor(strainType, strainType)}`}>
+        <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-lg \${getStrainTypeColor(strainType, strainType)}`}>
           <span className="text-sm font-medium">{strainType}</span>
         </div>
       )}
 
-      {/* Feature 3: Stock Status */}
-      <div className={`hidden md:flex items-center px-3 py-1.5 rounded-lg ${stockStatus.bg}`}>
-        <span className={`text-sm font-medium ${stockStatus.color}`}>{stockStatus.text}</span>
+      {/* Stock Status */}
+      <div className={`hidden md:flex items-center px-3 py-1.5 rounded-lg \${stockStatus.bg}`}>
+        <span className={`text-sm font-medium \${stockStatus.color}`}>{stockStatus.text}</span>
       </div>
       
-      {/* Desktop: MOQ */}
+      {/* MOQ */}
       <div className="hidden lg:flex flex-col items-center px-3 py-1.5 bg-blue-50 rounded-lg">
         <span className="text-xs text-blue-600 font-medium">MOQ</span>
         <span className="text-sm font-bold text-blue-700">{moq}</span>
       </div>
 
-      {/* Feature 8: Price */}
+      {/* Price */}
       <div className="text-right min-w-[100px]">
-        <div className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</div>
+        <div className="text-lg font-bold text-green-700">\${product.price.toFixed(2)}</div>
         <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
       </div>
 
