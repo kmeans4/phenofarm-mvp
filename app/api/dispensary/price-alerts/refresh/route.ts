@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
-    const userRole = (session as any)?.user?.role;
+    const userRole = session?.user?.role;
     
     if (!session || userRole !== "DISPENSARY") {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid alerts data" }, { status: 400 });
     }
 
-    const productIds = alerts.map((a: any) => a.productId);
+    const productIds = alerts.map((a: { productId: string }) => a.productId);
     
     const products = await prisma.product.findMany({
       where: { id: { in: productIds } },

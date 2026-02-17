@@ -13,7 +13,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const user = (session as any)?.user as { role: string } | undefined;
+  const user = session?.user as { role: string } | undefined;
   if (!user || user.role !== 'ADMIN') {
     redirect('/dashboard');
   }

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
+import { AuthSession } from "@/types";
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const user = (session as any).user as { role: string };
+  const user = (session as AuthSession).user;
   if (user.role !== "DISPENSARY") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -37,7 +38,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (thcRanges.length > 0) {
-    const thcConditions: any[] = [];
+    const thcConditions: unknown[] = [];
     for (const range of thcRanges) {
       switch (range) {
         case "low":
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (priceRanges.length > 0) {
-    const priceConditions: any[] = [];
+    const priceConditions: unknown[] = [];
     for (const range of priceRanges) {
       switch (range) {
         case "budget":

@@ -86,7 +86,7 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
     redirect('/auth/sign_in');
   }
 
-  const user = (session as any).user as { role: string; growerId?: string; dispensaryId?: string };
+  const user = session.user as { role: string; growerId?: string; dispensaryId?: string };
 
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');

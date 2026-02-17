@@ -4,7 +4,7 @@ import { useEffect, useCallback } from 'react';
 
 interface KeyboardShortcutsOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  onSave?: (...args: any[]) => void | Promise<void>;
+  onSave?: (...args: unknown[]) => void | Promise<void>;
   onCancel?: () => void;
   isDirty?: boolean;
   enabled?: boolean;

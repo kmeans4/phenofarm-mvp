@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
+import { AuthSession } from "@/types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,7 +12,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const user = (session as any).user as { role: string };
+    const user = (session as AuthSession).user;
     
     if (user.role !== 'DISPENSARY') {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });

@@ -16,8 +16,8 @@ export async function GET() {
   try {
     // Verify admin
     const session = await getServerSession(authOptions);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!session || (session as any)?.user?.role !== 'ADMIN') {
+    // Session role check
+    if (!session || session.user?.role !== 'ADMIN') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

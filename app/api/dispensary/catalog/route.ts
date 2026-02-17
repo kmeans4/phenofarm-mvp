@@ -43,7 +43,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
     
     if (user.role !== 'DISPENSARY') {
       return NextResponse.json({ error: 'Forbidden - Dispensary access only' }, { status: 403 });
@@ -228,12 +228,12 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate trending score if needed and sort
-    let processedProducts: any[] = products;
+    let processedProducts: any = products;
     if (trendingSort) {
       processedProducts = products
         .map(p => ({
           ...p,
-          _orderVolume: (p as any).orderItems?.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0) || 0
+          _orderVolume: (p as { orderItems?: { quantity: number }[] }).orderItems?.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0) || 0
         }))
         .sort((a: any, b: any) => b._orderVolume - a._orderVolume)
         .slice(skip, skip + limit);

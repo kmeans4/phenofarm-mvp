@@ -25,7 +25,7 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
     
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -64,7 +64,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
@@ -183,7 +183,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
     if (user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

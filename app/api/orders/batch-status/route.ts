@@ -15,7 +15,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const user = (session as any).user as { role: string; growerId?: string };
+    const user = (session as AuthSession).user;
 
     if (user.role !== 'GROWER') {
       return NextResponse.json(

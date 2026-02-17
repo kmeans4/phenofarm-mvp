@@ -59,7 +59,7 @@ export default async function EditCustomerPage({ params }: PageProps) {
     redirect('/auth/sign_in');
   }
 
-  const user = (session as any).user as ExtendedUser;
+  const user = session.user as ExtendedUser;
 
   if (user.role !== 'GROWER') {
     redirect('/dashboard');

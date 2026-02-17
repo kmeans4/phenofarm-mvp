@@ -15,7 +15,7 @@ export default async function EditProductPage({ params }: PageProps) {
     redirect('/auth/sign_in');
   }
 
-  const user = (session as any).user;
+  const user = session.user;
   if (user?.role !== 'GROWER') {
     redirect('/dashboard');
   }
@@ -23,9 +23,9 @@ export default async function EditProductPage({ params }: PageProps) {
   const { id } = await params;
 
   let product: any = null;
-  let strains: any[] = [];
-  let batches: any[] = [];
-  let productTypeConfigs: any[] = [];
+  let strains: unknown[] = [];
+  let batches: unknown[] = [];
+  let productTypeConfigs: unknown[] = [];
 
   try {
     product = await db.product.findFirst({

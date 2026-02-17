@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
+import { AuthSession } from "@/types";
 
 const PAGE_SIZE = 12;
 
@@ -12,7 +13,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const user = (session as any).user as { role: string };
+  const user = (session as AuthSession).user;
   
   if (user.role !== "DISPENSARY") {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -70,7 +71,7 @@ export async function GET(request: NextRequest) {
       },
     }));
 
-    const groups = formattedProducts.reduce((acc: any[], product) => {
+    const groups = formattedProducts.reduce((acc: { growerId: string; growerName: string; products: unknown[] }[], product) => {
       const existingGroup = acc.find(g => g.growerId === product.grower.id);
       if (existingGroup) {
         existingGroup.products.push(product);

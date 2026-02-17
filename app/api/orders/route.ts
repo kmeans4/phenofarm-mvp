@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json({ error: 'Only growers can create orders' }, { status: 403 });
@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
     
     const orders = await db.order.findMany({
       where: user.role === 'GROWER' 

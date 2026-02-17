@@ -39,7 +39,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if ((session as any).user.role !== 'GROWER') {
+    if (session.user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if ((session as any).user.role !== 'GROWER') {
+    if (session.user.role !== 'GROWER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 

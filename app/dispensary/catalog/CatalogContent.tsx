@@ -231,7 +231,7 @@ export default function CatalogContent() {
       const stored = localStorage.getItem(PRICE_ALERTS_KEY);
       if (stored) {
         const alerts = JSON.parse(stored);
-        setPriceAlerts(alerts.map((a: any) => a.productId));
+        setPriceAlerts(alerts.map((a: { productId: string }) => a.productId));
       }
     } catch (e) {
       console.error("Failed to load price alerts:", e);

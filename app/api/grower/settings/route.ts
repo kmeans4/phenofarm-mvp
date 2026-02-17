@@ -26,7 +26,7 @@ export async function GET() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
 
     if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
@@ -83,7 +83,7 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
 
     if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
