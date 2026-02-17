@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
+import { AuthSession } from "@/types";
 
 export default async function GrowerReportsPage() {
   const session = await getServerSession(authOptions);
@@ -11,7 +12,7 @@ export default async function GrowerReportsPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = (session as any).user as { role: string; growerId?: string };
+  const user = (session as AuthSession).user;
   
   if (user.role !== 'GROWER' || !user.growerId) {
     redirect('/dashboard');

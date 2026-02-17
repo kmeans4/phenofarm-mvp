@@ -1,7 +1,9 @@
+import { UserRole } from "@prisma/client";
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import type { NextAuthOptions, User } from 'next-auth';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not configured');
@@ -12,7 +14,18 @@ if (!process.env.AUTH_SECRET) {
 
 // Note: User type extensions are in types/next-auth.d.ts
 
-export const authOptions: any = {
+interface TokenPayload {
+  id: string;
+  role: string;
+  email: string;
+  growerId?: string;
+  dispensaryId?: string;
+  name?: string;
+  picture?: string;
+  sub?: string;
+}
+
+export const authOptions: NextAuthOptions = {
   debug: true,
   providers: [
     CredentialsProvider({
@@ -58,7 +71,7 @@ export const authOptions: any = {
             email: user.email,
             role: user.role,
             growerId: user.growerId || undefined,
-          };
+          } as User;
         } catch (error) {
           console.error('Auth error:', error);
           return null;
@@ -71,11 +84,11 @@ export const authOptions: any = {
     error: '/auth/error',
   },
   session: {
-    strategy: 'jwt' as const,
+    strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
-    async jwt({ token, user }: { token: Record<string, unknown>; user?: any }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -84,12 +97,13 @@ export const authOptions: any = {
       }
       return token;
     },
-    async session({ session, token }: { session: any; token: Record<string, unknown> }) {
+    async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.email = token.email as string;
-        session.user.growerId = token.growerId as string;
+        const typedToken = token as TokenPayload;
+        session.user.id = typedToken.id;
+        session.user.role = typedToken.role as UserRole;
+        session.user.email = typedToken.email;
+        session.user.growerId = typedToken.growerId;
       }
       return session;
     },

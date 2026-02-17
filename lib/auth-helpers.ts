@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
+import type { Session } from 'next-auth';
 
 export interface SessionUser {
   id: string;
@@ -32,19 +33,21 @@ export async function requireAuth(): Promise<TypedSession> {
 export async function requireGrowerRole(): Promise<SessionUser> {
   const session = await requireAuth();
   
-  if ((session as any).user.role !== 'GROWER') {
+  const typedSession = session as Session;
+  if (typedSession.user?.role !== 'GROWER') {
     redirect('/dashboard');
   }
 
-  return (session as any).user;
+  return typedSession.user as SessionUser;
 }
 
 export async function requireDispensaryRole(): Promise<SessionUser> {
   const session = await requireAuth();
   
-  if ((session as any).user.role !== 'DISPENSARY') {
+  const typedSession = session as Session;
+  if (typedSession.user?.role !== 'DISPENSARY') {
     redirect('/dashboard');
   }
 
-  return (session as any).user;
+  return typedSession.user as SessionUser;
 }

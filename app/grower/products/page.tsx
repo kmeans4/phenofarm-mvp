@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExtendedUser } from '@/types';
+import { ExtendedUser, AuthSession } from '@/types';
 import { Button } from '@/app/components/ui/Button';
 
 type FilterType = 'all' | 'byProductType' | 'byStrain' | 'byBatch';
@@ -72,7 +72,7 @@ export default function GrowerProductsPage() {
       return;
     }
 
-    const user = (session as any).user as ExtendedUser;
+    const user = (session as AuthSession).user;
     if (user.role !== 'GROWER') {
       router.push('/dashboard');
       return;
