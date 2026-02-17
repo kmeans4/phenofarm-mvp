@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#0a0a0f">
+    <title>Cron Calendar - Mission Control</title>
+    <link rel="stylesheet" href="cron-calendar.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Standalone page styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #14141c;
+            --bg-tertiary: #1a1a24;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --border-color: #2a2a3a;
+            --accent-primary: #3b82f6;
+            --accent-secondary: #10b981;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        [data-theme="light"] {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f3f4f6;
+            --bg-tertiary: #e5e7eb;
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-muted: #9ca3af;
+            --border-color: #d1d5db;
+        }
+        
+        body {
+            font-family: var(--font-family);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+        
+        .standalone-header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .standalone-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        
+        .standalone-logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            border: 1px solid var(--border-color);
+        }
+        
+        .standalone-logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .standalone-logo-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            line-height: 1.2;
+        }
+        
+        .standalone-logo-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+        
+        .standalone-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .standalone-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.625rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .standalone-nav-btn:hover {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+        
+        .standalone-nav-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            color: white;
+        }
+        
+        .standalone-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            transition: all 0.2s;
+        }
+        
+        .btn-icon:hover {
+            background: var(--bg-secondary);
+            border-color: var(--accent-primary);
+        }
+        
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        
+        /* Help panel */
+        .help-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .help-panel h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+        
+        .help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+        
+        .help-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .help-key {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.7rem;
+        }
+        
+        /* Loading overlay */
+        .loader-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-primary);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            z-index: 9999;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        
+        .loader-overlay.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+        
+        .loader-spinner {
+            width: 48px;
+            height: 48px;
+            border: 3px solid var(--border-color);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .standalone-header {
+                padding: 0.875rem 1rem;
+                flex-wrap: wrap;
+            }
+            
+            .standalone-logo-text {
+                display: none;
+            }
+            
+            .standalone-nav {
+                order: 3;
+                width: 100%;
+                justify-content: center;
+                margin-top: 0.5rem;
+            }
+            
+            .standalone-nav-btn {
+                flex: 1;
+                justify-content: center;
+                font-size: 0.8rem;
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .btn-text {
+                display: none;
+            }
+            
+            .main-content {
+                padding: 0.75rem;
+            }
+            
+            .help-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div id="loader" class="loader-overlay">
+        <div class="loader-spinner"></div>
+        <span style="color: var(--text-secondary);">Loading cron calendar...</span>
+    </div>
+    
+    <!-- Header -->
+    <header class="standalone-header">
+        <a href="index.html" class="standalone-logo">
+            <div class="standalone-logo-icon">⏰</div>
+            <div class="standalone-logo-text">
+                <span class="standalone-logo-title">Cron Calendar</span>
+                <span class="standalone-logo-subtitle">Mission Control</span>
+            </div>
+        </a>
+        
+        <navi class="standalone-nav">
+            <a href="index.html" class="standalone-nav-btn">📊 Dashboard</a>
+            <a href="#" class="standalone-nav-btn active">⏰ Cron Jobs</a>
+        </navi>
+        
+        <div class="standalone-actions">
+            <button class="btn-icon" id="theme-toggle" title="Toggle theme">🌙</button>
+            <button class="btn-icon" id="refresh-btn" title="Refresh (⌘R)">↻</button>
+        </div>
+    </header>
+    
+    <main class="main-content">
+        <!-- Help Panel -->
+        <div class="help-panel">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <div class="help-grid">
+                <div class="help-item">
+                    <span class="help-key">⌘/Ctrl + R</span>
+                    <span>Refresh jobs</span>
+                </div>
+                <div class="help-item">
+                    <span class="help-key">Esc</span>
+                    <span>Close modals</span>
+                </div>
+                <div class="help-item">
+                    <span class="help-key">Click job</span>
+                    <span>Edit job</span>
+                </div>
+                <div class="help-item">
+                    <span class="help-key">+ Add Job</span>
+                    <span>Create new cron job</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cron Calendar Container -->
+        <div id="cron-calendar-container" data-cron-calendar></div>
+    </main>
+    
+    <script src="cron-calendar.js"></script>
+    <script>
+        // Initialize cron calendar
+        let cronCalendar;
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hide loader
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 500);
+            
+            // Initialize calendar
+            cronCalendar = new CronCalendar('cron-calendar-container', {
+                apiEndpoint: '/api/cron',
+                refreshInterval: 30000
+            });
+            
+            // Theme toggle
+            const themeToggle = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+            
+            themeToggle.addEventListener('click', () => {
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                html.setAttribute('data-theme', newTheme);
+                themeToggle.textContent = newTheme === 'dark' ? '🌙' : '☀️';
+            });
+            
+            // Refresh button
+            document.getElementById('refresh-btn').addEventListener('click', () => {
+                if (cronCalendar) {
+                    cronCalendar.loadJobs();
+                }
+            });
+            
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                // Cmd/Ctrl + R to refresh
+                if ((e.metaKey || e.ctrlKey) && e.key === 'r') {
+                    e.preventDefault();
+                    if (cronCalendar) cronCalendar.loadJobs();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
