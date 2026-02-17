@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script>
+    // SPA redirect for GitHub Pages
+    const path = window.location.pathname;
+    const base = '/phenofarm-mvp/';
+    if (path.startsWith(base)) {
+      window.location.replace(base + '#' + path.slice(base.length));
+    } else {
+      window.location.replace(base);
+    }
+  </script>
+</head>
+<body>Redirecting...</body>
+</html>
