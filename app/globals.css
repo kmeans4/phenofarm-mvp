@@ -143,6 +143,25 @@ aside .absolute {
   z-index: 9999 !important;
 }
 
+/* Fix for sidebar search popup - targeting the specific structure */
+aside .bg-white.rounded-xl.shadow-2xl,
+aside [class*="shadow-2xl"],
+aside div[class*="rounded-xl"][class*="shadow"] {
+  z-index: 10000 !important;
+}
+
+/* Ensure search popup appears above all page content */
+aside > div > div > div[class*="overflow-hidden"],
+aside > div > div[class*="bg-white"] {
+  z-index: 10001 !important;
+}
+
+/* Isolate main content to prevent z-index bleeding */
+main {
+  isolation: isolate;
+  z-index: 1;
+}
+
 [role="dialog"] > div,
 [role="alertdialog"] > div,
 [data-radix-dialog-content] {
