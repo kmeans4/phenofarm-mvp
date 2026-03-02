@@ -239,7 +239,7 @@ export async function GET(request: NextRequest) {
         .slice(skip, skip + limit);
     }
 
-    const serializedProducts = processedProducts.map((p) => ({
+    const serializedProducts = processedProducts.map((p: any) => ({
       id: p.id,
       name: p.name,
       price: parseFloat(String(p.price)),
