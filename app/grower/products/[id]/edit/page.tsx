@@ -15,7 +15,7 @@ export default async function EditProductPage({ params }: PageProps) {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user;
+  const user = (session as any).user;
   if (user?.role !== 'GROWER') {
     redirect('/dashboard');
   }

@@ -11,7 +11,7 @@ export default async function GrowerMarketplacePage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user;
+  const user = (session as any).user;
   
   if (!user?.growerId) {
     redirect('/dashboard');

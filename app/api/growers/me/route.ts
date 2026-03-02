@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = session.user;
+    const user = (session as any).user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });

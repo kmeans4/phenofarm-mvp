@@ -32,7 +32,7 @@ export default async function AdminGrowersPage() {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userRole = session.user.role as string;
+  const userRole = (session as any).user.role as string;
   
   if (userRole !== 'ADMIN') {
     redirect('/dashboard');

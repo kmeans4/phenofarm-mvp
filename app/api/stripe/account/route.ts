@@ -13,7 +13,7 @@ export async function GET() {
     }
 
     const user = await db.user.findUnique({
-      where: { id: session.user?.id },
+      where: { id: (session as any).user?.id },
       select: { growerId: true },
     });
 

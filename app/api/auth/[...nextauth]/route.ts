@@ -87,12 +87,12 @@ export const authOptions: any = {
       return token;
     },
     async session({ session, token }: { session: Session; token: Record<string, unknown> }) {
-      if (session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as UserRole;
-        session.user.email = token.email as string;
-        session.user.growerId = token.growerId as string;
-        session.user.dispensaryId = token.dispensaryId as string;
+      if ((session as any).user) {
+        (session as any).user.id = token.id as string;
+        (session as any).user.role = token.role as UserRole;
+        (session as any).user.email = token.email as string;
+        (session as any).user.growerId = token.growerId as string;
+        (session as any).user.dispensaryId = token.dispensaryId as string;
       }
       return session;
     },

@@ -12,7 +12,7 @@ export default async function GrowerDashboardPage() {
   }
 
   const user = await db.user.findUnique({
-    where: { email: session.user?.email as string },
+    where: { email: (session as any).user?.email as string },
     include: { grower: true }
   });
 
