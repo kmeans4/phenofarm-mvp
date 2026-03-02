@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { MobileNav } from "./components/MobileNav";
 import { ClientNav } from "./components/ClientNav";
 import { SignOutButton } from "@/app/components/SignOutButton";
+import { SearchDialog } from "@/app/components/SearchDialog";
 
 export default async function GrowerLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -49,6 +50,9 @@ export default async function GrowerLayout({ children }: { children: React.React
           <div className="p-4 border-b border-gray-200">
             <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
             <p className="text-sm text-gray-500">Grower Portal</p>
+            <div className="mt-3">
+              <SearchDialog />
+            </div>
           </div>
           
           <ClientNav links={navLinks} />
