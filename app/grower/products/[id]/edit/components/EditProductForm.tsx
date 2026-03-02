@@ -350,7 +350,9 @@ export default function EditProductForm({
 
   // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
   useKeyboardShortcuts({
-    onSave: handleSubmit,
+    onSave: async () => {
+      await handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+    },
     onCancel: () => router.push("/grower/products"),
     isDirty,
     enabled: true

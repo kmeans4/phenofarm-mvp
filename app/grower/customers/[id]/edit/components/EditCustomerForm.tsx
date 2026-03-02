@@ -261,7 +261,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
 
   // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
   useKeyboardShortcuts({
-    onSave: handleSubmit,
+    onSave: async () => {
+      await handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+    },
     onCancel: () => router.push("/grower/customers"),
     isDirty,
     enabled: true

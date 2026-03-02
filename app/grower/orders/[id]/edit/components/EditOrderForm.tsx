@@ -287,7 +287,9 @@ export default function EditOrderForm({ order }: { order: Order }) {
 
   // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
   useKeyboardShortcuts({
-    onSave: handleSubmit,
+    onSave: async () => {
+      await handleSubmit({ preventDefault: () => {} } as React.FormEvent);
+    },
     onCancel: () => router.push("/grower/orders"),
     isDirty,
     enabled: true
