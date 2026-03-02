@@ -121,6 +121,34 @@ input[type="number"] {
   }
 }
 
+/* Fix for modal/dialog overlays - ensures they appear above page content */
+[data-portal],
+[data-radix-popper-content-wrapper],
+[role="dialog"],
+[role="alertdialog"],
+[data-radix-dialog-overlay] {
+  z-index: 9999 !important;
+}
+
+[role="dialog"] > div,
+[role="alertdialog"] > div,
+[data-radix-dialog-content] {
+  z-index: 10000 !important;
+}
+
+/* Ensure sidebar search/command components show above main content */
+aside [role="dialog"],
+aside .fixed,
+aside .absolute {
+  z-index: 9999 !important;
+}
+
+[role="dialog"] > div,
+[role="alertdialog"] > div,
+[data-radix-dialog-content] {
+  z-index: 10000 !important;
+}
+
 /* Scrollbar Hide Utility */
 .scrollbar-hide {
   -ms-overflow-style: none;

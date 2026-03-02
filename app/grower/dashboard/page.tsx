@@ -17,7 +17,7 @@ interface StatCardProps {
 
 function StatCard({ title, value, trend, trendUp, isEmpty }: StatCardProps) {
   return (
-    <div className={`bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow ${isEmpty ? 'opacity-75' : ''}`}>
+    <div className={`bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative z-0 ${isEmpty ? 'opacity-75' : ''}`}>
       <p className="text-xs sm:text-sm text-gray-600">{title}</p>
       <div className="flex items-baseline gap-1 sm:gap-2 mt-1">
         <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
