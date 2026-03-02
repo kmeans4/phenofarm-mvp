@@ -1,52 +1,116 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, X } from 'lucide-react';
+import { Search, X, Package, ShoppingCart, Users, Leaf, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface SearchResult {
   id: string;
   type: 'product' | 'order' | 'customer' | 'strain';
   title: string;
   subtitle?: string;
+  href: string;
 }
 
+const typeIcons = {
+  product: Package,
+  order: ShoppingCart,
+  customer: Users,
+  strain: Leaf,
+};
+
+const typeLabels = {
+  product: 'Product',
+  order: 'Order',
+  customer: 'Customer',
+  strain: 'Strain',
+};
+
 export function SearchDialog() {
+  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const debounceRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Handle keyboard shortcut (Cmd+K or Ctrl+K)
+  // Fetch search results
+  const search = useCallback(async (q: string) => {
+    if (q.length < 2) {
+      setResults([]);
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
+      const data = await res.json();
+      setResults(data.results || []);
+    } catch (error) {
+      console.error('Search error:', error);
+      setResults([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Debounced search
+  useEffect(() => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = setTimeout(() => {
+      search(query);
+    }, 200);
+    
+    return () => {
+      if (debounceRef.current) {
+        clearTimeout(debounceRef.current);
+      }
+    };
+  }, [query, search]);
+
+  // Handle keyboard shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
       setIsOpen(true);
     }
-    if (e.key === 'Escape' && isOpen) {
-      setIsOpen(false);
-    }
-  }, [isOpen]);
+  }, []);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  // Prevent body scroll when modal is open
+  // Focus input when modal opens
   useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
+    if (isOpen && inputRef.current) {
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
-    return () => {
-      document.body.style.overflow = '';
-    };
   }, [isOpen]);
+
+  // Close modal on escape
+  const handleModalKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      setIsOpen(false);
+    }
+  };
+
+  // Handle result click
+  const handleResultClick = (href: string) => {
+    setIsOpen(false);
+    setQuery('');
+    setResults([]);
+    router.push(href);
+  };
 
   const modalContent = isOpen ? (
     <div 
@@ -68,12 +132,14 @@ export function SearchDialog() {
       <div 
         className="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden"
         style={{ zIndex: 100000 }}
+        onKeyDown={handleModalKeyDown}
       >
         {/* Header */}
         <div className="flex items-center justify-between gap-3 px-4 py-3 border-b">
           <div className="flex items-center gap-3 flex-1">
             <Search className="w-5 h-5 text-gray-400" />
             <input
+              ref={inputRef}
               type="text"
               placeholder="Search products, orders, customers..."
               className="flex-1 text-lg outline-none placeholder:text-gray-400"
@@ -96,20 +162,63 @@ export function SearchDialog() {
 
         {/* Results Area */}
         <div className="max-h-96 overflow-y-auto">
-          <div className="px-4 py-8 text-center text-gray-400">
-            <p className="text-sm">Start typing to search...</p>
-            <div className="flex flex-wrap justify-center gap-2 mt-4">
-              <span className="px-2 py-1 text-xs bg-gray-100 rounded">Products</span>
-              <span className="px-2 py-1 text-xs bg-gray-100 rounded">Orders</span>
-              <span className="px-2 py-1 text-xs bg-gray-100 rounded">Customers</span>
-              <span className="px-2 py-1 text-xs bg-gray-100 rounded">Strains</span>
+          {loading ? (
+            <div className="px-4 py-8 text-center text-gray-400">
+              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+              <p className="text-sm">Searching...</p>
             </div>
-          </div>
+          ) : query.length < 2 ? (
+            <div className="px-4 py-8 text-center text-gray-400">
+              <p className="text-sm">Start typing to search...</p>
+              <div className="flex flex-wrap justify-center gap-2 mt-4">
+                <span className="px-2 py-1 text-xs bg-gray-100 rounded">Products</span>
+                <span className="px-2 py-1 text-xs bg-gray-100 rounded">Orders</span>
+                <span className="px-2 py-1 text-xs bg-gray-100 rounded">Customers</span>
+                <span className="px-2 py-1 text-xs bg-gray-100 rounded">Strains</span>
+              </div>
+            </div>
+          ) : results.length === 0 ? (
+            <div className="px-4 py-8 text-center text-gray-400">
+              <p className="text-sm">No results found</p>
+            </div>
+          ) : (
+            <div className="divide-y">
+              {results.map((result) => {
+                const Icon = typeIcons[result.type];
+                return (
+                  <button
+                    key={`${result.type}-${result.id}`}
+                    onClick={() => handleResultClick(result.href)}
+                    className="w-full px-4 py-3 flex items-start gap-3 hover:bg-gray-50 text-left transition-colors"
+                  >
+                    <div className="flex-shrink-0">
+                      <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
+                        <Icon className="w-4 h-4 text-gray-600" />
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {result.title}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {result.subtitle}
+                      </p>
+                    </div>
+                    <div className="flex-shrink-0">
+                      <span className="text-xs text-gray-400 capitalize">
+                        {typeLabels[result.type]}
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* Footer */}
         <div className="px-4 py-2 bg-gray-50 border-t text-xs text-gray-500 flex justify-between">
-          <span>0 results</span>
+          <span>{results.length} results</span>
           <span>Press ESC to close</span>
         </div>
       </div>
@@ -133,7 +242,7 @@ export function SearchDialog() {
         </kbd>
       </button>
 
-      {/* Modal rendered via portal to document.body */}
+      {/* Modal rendered via portal */}
       {mounted && modalContent && createPortal(modalContent, document.body)}
     </>
   );
