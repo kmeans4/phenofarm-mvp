@@ -101,7 +101,7 @@ export default async function EditProductPage({ params }: PageProps) {
     cbd: product.cbdLegacy ? Number(product.cbdLegacy) : null,
   };
 
-  const productTypes = productTypeConfigs.map(c => c.type);
+  const productTypes = productTypeConfigs.map((c: any) => c.type);
   const uniqueProductTypes = [...new Set(productTypes)];
 
   return (
