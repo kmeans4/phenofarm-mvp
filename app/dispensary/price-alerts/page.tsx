@@ -15,7 +15,7 @@ export default async function PriceAlertsPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = (session as any).user as { role: string };
+  const user = session.user as { role: string };
   
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');

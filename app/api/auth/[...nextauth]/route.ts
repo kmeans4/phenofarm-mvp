@@ -1,8 +1,9 @@
-import NextAuth, { DefaultSession, Session, User } from 'next-auth';
+import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { UserRole } from '@prisma/client';
+import type { NextAuthOptions } from 'next-auth';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not configured');
@@ -11,8 +12,7 @@ if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET is not configured');
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const authOptions: any = {
+export const authOptions: NextAuthOptions = {
   debug: true,
   providers: [
     CredentialsProvider({
@@ -72,11 +72,11 @@ export const authOptions: any = {
     error: '/auth/error',
   },
   session: {
-    strategy: 'jwt' as const,
+    strategy: 'jwt',
     maxAge: 30 * 24 * 60 * 60,
   },
   callbacks: {
-    async jwt({ token, user }: { token: Record<string, unknown>; user?: User }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.role = user.role;
@@ -86,13 +86,13 @@ export const authOptions: any = {
       }
       return token;
     },
-    async session({ session, token }: { session: Session; token: Record<string, unknown> }) {
-      if ((session as any).user) {
-        (session as any).user.id = token.id as string;
-        (session as any).user.role = token.role as UserRole;
-        (session as any).user.email = token.email as string;
-        (session as any).user.growerId = token.growerId as string;
-        (session as any).user.dispensaryId = token.dispensaryId as string;
+    async session({ session, token }) {
+      if (session.user) {
+        session.user.id = token.id;
+        session.user.role = token.role as UserRole;
+        session.user.email = token.email;
+        session.user.growerId = token.growerId;
+        session.user.dispensaryId = token.dispensaryId;
       }
       return session;
     },

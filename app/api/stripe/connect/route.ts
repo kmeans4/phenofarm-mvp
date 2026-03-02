@@ -13,7 +13,7 @@ export async function POST() {
     }
 
     const user = await db.user.findUnique({
-      where: { id: (session as any).user?.id },
+      where: { id: session.user?.id },
       select: { growerId: true, email: true, name: true },
     });
 

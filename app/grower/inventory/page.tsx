@@ -11,7 +11,7 @@ export default async function GrowerInventoryPage() {
     redirect('/auth/sign_in');
   }
 
-  const sessionUser = (session as any).user as { growerId?: string };
+  const sessionUser = session.user as { growerId?: string };
   
   // Fetch products for this grower with strain info
   const rawProducts = await db.product.findMany({

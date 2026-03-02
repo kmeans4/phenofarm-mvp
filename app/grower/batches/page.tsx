@@ -44,7 +44,7 @@ export default function BatchesPage() {
       return;
     }
 
-    const user = (session as any).user as ExtendedUser;
+    const user = session.user as ExtendedUser;
     if (user.role !== 'GROWER') {
       router.push('/dashboard');
       return;

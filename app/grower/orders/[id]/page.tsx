@@ -114,7 +114,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       redirect('/auth/sign_in');
     }
 
-    const user = (session as any).user as { role: string; growerId?: string };
+    const user = session.user as { role: string; growerId?: string };
 
     if (user.role !== 'GROWER') {
       redirect('/dashboard');

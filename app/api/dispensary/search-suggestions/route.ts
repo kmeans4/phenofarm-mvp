@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = (session as any).user;
+    const user = session.user;
     
     if (user.role !== 'DISPENSARY') {
       return NextResponse.json({ error: 'Forbidden - Dispensary access only' }, { status: 403 });

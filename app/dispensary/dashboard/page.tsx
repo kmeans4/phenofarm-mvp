@@ -95,7 +95,7 @@ function StatCardEmpty({ title, value }: { title: string; value: string | number
 export default async function DispensaryDashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect('/auth/sign_in');
-  const user = (session as any).user as { role: string; growerId?: string; dispensaryId?: string };
+  const user = session.user as { role: string; growerId?: string; dispensaryId?: string };
   if (user.role !== 'DISPENSARY') redirect('/dashboard');
 
   const data = await fetchDispensaryDashboardData(user.dispensaryId!);
