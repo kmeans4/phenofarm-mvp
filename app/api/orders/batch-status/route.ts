@@ -15,7 +15,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const user = (session as AuthSession).user;
+    const user = (session as any).user;
 
     if (user.role !== 'GROWER') {
       return NextResponse.json(
