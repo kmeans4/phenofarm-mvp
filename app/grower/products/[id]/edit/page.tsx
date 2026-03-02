@@ -3,9 +3,27 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import EditProductForm from "./components/EditProductForm";
+import type { Strain, Batch, ProductTypeConfig } from "@prisma/client";
 
 interface PageProps {
   params: Promise<{ id: string }>;
+}
+
+// Define partial types based on what's selected
+interface StrainSelect {
+  id: string;
+  name: string;
+}
+
+interface BatchSelect {
+  id: string;
+  batchNumber: string;
+  strain: { name: string } | null;
+}
+
+interface ProductTypeConfigSelect {
+  type: string;
+  subTypes: string[];
 }
 
 export default async function EditProductPage({ params }: PageProps) {
@@ -23,9 +41,9 @@ export default async function EditProductPage({ params }: PageProps) {
   const { id } = await params;
 
   let product: any = null;
-  let strains: unknown[] = [];
-  let batches: unknown[] = [];
-  let productTypeConfigs: unknown[] = [];
+  let strains: StrainSelect[] = [];
+  let batches: BatchSelect[] = [];
+  let productTypeConfigs: ProductTypeConfigSelect[] = [];
 
   try {
     product = await db.product.findFirst({
