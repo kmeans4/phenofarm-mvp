@@ -34,7 +34,7 @@ export default async function DispensaryLayout({ children }: { children: React.R
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as SessionUser;
+  const user = (session as any).user as SessionUser;
   
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');
