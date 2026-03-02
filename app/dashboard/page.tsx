@@ -13,7 +13,7 @@ export default async function DashboardPage() {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as SessionUser;
+  const user = (session as any).user as SessionUser;
   
   // Redirect to role-specific dashboard
   if (user.role === 'GROWER') {
