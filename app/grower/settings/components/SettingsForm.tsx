@@ -73,9 +73,9 @@ const validateLicenseNumber = (license: string): string | undefined => {
 const formatPhoneNumber = (value: string): string => {
   const digitsOnly = value.replace(/\D/g, '');
   if (digitsOnly.length <= 3) return digitsOnly;
-  if (digitsOnly.length <= 6) return `($\{digitsOnly.slice(0, 3)}) $\{digitsOnly.slice(3)}`;
-  if (digitsOnly.length <= 10) return `($\{digitsOnly.slice(0, 3)}) $\{digitsOnly.slice(3, 6)}-$\{digitsOnly.slice(6)}`;
-  return `($\{digitsOnly.slice(0, 3)}) $\{digitsOnly.slice(3, 6)}-$\{digitsOnly.slice(6, 10)}`;
+  if (digitsOnly.length <= 6) return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3)}`;
+  if (digitsOnly.length <= 10) return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6)}`;
+  return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`;
 };
 
 const DEFAULT_FORM_DATA: SettingsData = {

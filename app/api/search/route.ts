@@ -110,8 +110,8 @@ export async function GET(request: NextRequest) {
           id: c.id,
           type: 'customer',
           title: c.businessName,
-          subtitle: `${c.city}, ${c.state}`,
-          href: `/grower/customers/${c.id}`,
+          subtitle: [c.city, c.state].filter(Boolean).join(', ') || 'Customer',
+          href: `/grower/customers/${c.id}/edit`,
         });
       });
 
