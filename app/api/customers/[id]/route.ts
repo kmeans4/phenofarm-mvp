@@ -3,6 +3,11 @@ import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { Prisma } from '@prisma/client';
 
+const normalizeOptionalString = (value?: string | null) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : '';
+};
+
 // GET single customer
 export async function GET(
   request: NextRequest,
@@ -75,16 +80,38 @@ export async function PUT(
     const body = await request.json();
     const { businessName, contactName, email, phone, address, city, state, zipCode, licenseNumber, website, description } = body;
 
+    if (businessName !== undefined && !businessName.trim()) {
+      return NextResponse.json({ error: 'Business name is required' }, { status: 400 });
+    }
+
+    if (email !== undefined) {
+      const normalizedEmail = email.trim().toLowerCase();
+      if (!normalizedEmail) {
+        return NextResponse.json({ error: 'Email is required' }, { status: 400 });
+      }
+
+      const existingUser = await db.user.findFirst({
+        where: {
+          email: normalizedEmail,
+          NOT: { id: existingDispensary.userId },
+        },
+      });
+
+      if (existingUser) {
+        return NextResponse.json({ error: 'Email already exists' }, { status: 409 });
+      }
+    }
+
     const updateData: Prisma.DispensaryUpdateInput = {};
-    if (businessName !== undefined) updateData.businessName = businessName;
-    if (phone !== undefined) updateData.phone = phone;
-    if (address !== undefined) updateData.address = address;
-    if (city !== undefined) updateData.city = city;
-    if (state !== undefined) updateData.state = state;
-    if (zipCode !== undefined) updateData.zip = zipCode;
-    if (licenseNumber !== undefined) updateData.licenseNumber = licenseNumber;
-    if (website !== undefined) updateData.website = website;
-    if (description !== undefined) updateData.description = description;
+    if (businessName !== undefined) updateData.businessName = businessName.trim();
+    if (phone !== undefined) updateData.phone = normalizeOptionalString(phone);
+    if (address !== undefined) updateData.address = normalizeOptionalString(address);
+    if (city !== undefined) updateData.city = normalizeOptionalString(city);
+    if (state !== undefined) updateData.state = normalizeOptionalString(state) || 'VT';
+    if (zipCode !== undefined) updateData.zip = normalizeOptionalString(zipCode);
+    if (licenseNumber !== undefined) updateData.licenseNumber = normalizeOptionalString(licenseNumber);
+    if (website !== undefined) updateData.website = normalizeOptionalString(website);
+    if (description !== undefined) updateData.description = normalizeOptionalString(description);
 
     await db.dispensary.update({
       where: { id: customerId },

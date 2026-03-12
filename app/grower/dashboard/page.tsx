@@ -13,24 +13,40 @@ interface StatCardProps {
   trend?: string;
   trendUp?: boolean;
   isEmpty?: boolean;
+  href: string;
+  helperText?: string;
 }
 
-function StatCard({ title, value, trend, trendUp, isEmpty }: StatCardProps) {
+function StatCard({ title, value, trend, trendUp, isEmpty, href, helperText }: StatCardProps) {
   return (
-    <div className={`bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow relative z-0 ${isEmpty ? 'opacity-75' : ''}`}>
-      <p className="text-xs sm:text-sm text-gray-600">{title}</p>
-      <div className="flex items-baseline gap-1 sm:gap-2 mt-1">
-        <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
-        {trend && !isEmpty && (
-          <span className={`text-xs sm:text-sm font-medium ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
-            {trend}
-          </span>
-        )}
+    <Link
+      href={href}
+      className={`group block bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-gray-300 transition-all focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 ${isEmpty ? 'opacity-75' : ''}`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs sm:text-sm text-gray-600">{title}</p>
+          <div className="flex items-baseline gap-1 sm:gap-2 mt-1">
+            <p className="text-xl sm:text-2xl font-bold text-gray-900">{value}</p>
+            {trend && !isEmpty && (
+              <span className={`text-xs sm:text-sm font-medium ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
+                {trend}
+              </span>
+            )}
+          </div>
+          {isEmpty ? (
+            <p className="text-xs text-gray-400 mt-1">No data yet</p>
+          ) : helperText ? (
+            <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+          ) : null}
+        </div>
+        <span className="mt-1 inline-flex h-7 w-7 items-center justify-center rounded-full bg-gray-100 text-gray-400 transition-colors group-hover:bg-green-50 group-hover:text-green-600">
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </span>
       </div>
-      {isEmpty && (
-        <p className="text-xs text-gray-400 mt-1">No data yet</p>
-      )}
-    </div>
+    </Link>
   );
 }
 
@@ -215,21 +231,11 @@ export default async function GrowerDashboardPage() {
   return (
     <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Grower Dashboard
-          </h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Welcome back! Here&apos;s your overview.</p>
-        </div>
-        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
-          <button className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-xs sm:text-sm font-medium transition-colors">
-            Download Report
-          </button>
-          <Link href="/grower/products/add" className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-xs sm:text-sm font-medium transition-colors text-center">
-            + New Product
-          </Link>
-        </div>
+      <div className="space-y-1">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          Grower Dashboard
+        </h1>
+        <p className="text-sm sm:text-base text-gray-600">Welcome back! Here&apos;s your overview.</p>
       </div>
 
       {/* Stats Cards */}
@@ -237,28 +243,36 @@ export default async function GrowerDashboardPage() {
         <StatCard 
           title="Total Orders" 
           value={stats.totalOrders} 
-          trend={stats.totalOrders > 0 ? "+12%" : undefined} 
+          trend={stats.totalOrders > 0 ? '+12%' : undefined} 
           trendUp={true} 
           isEmpty={stats.totalOrders === 0}
+          href="/grower/orders"
+          helperText={stats.pendingOrders > 0 ? `${stats.pendingOrders} pending review` : 'View order history'}
         />
         <StatCard 
           title="Total Revenue" 
           value={isNaN(stats.totalRevenue) ? '$0.00' : `\u0024${Number(stats.totalRevenue).toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-          trend={stats.totalRevenue > 0 ? "+8.5%" : undefined}
+          trend={stats.totalRevenue > 0 ? '+8.5%' : undefined}
           trendUp={true}
           isEmpty={stats.totalRevenue === 0}
+          href="/grower/reports"
+          helperText="Open revenue reports"
         />
         <StatCard 
           title="Active Customers" 
           value={stats.activeCustomers} 
-          trend={stats.activeCustomers > 0 ? "+3" : undefined} 
+          trend={stats.activeCustomers > 0 ? '+3' : undefined} 
           trendUp={true} 
           isEmpty={stats.activeCustomers === 0}
+          href="/grower/customers"
+          helperText={stats.activeCustomers > 0 ? 'Manage dispensary relationships' : 'Add or review customer accounts'}
         />
         <StatCard 
           title="Active Products" 
           value={stats.activeProducts}
           isEmpty={stats.activeProducts === 0}
+          href="/grower/products"
+          helperText={stats.activeProducts > 0 ? 'Manage your catalog' : 'Start building your catalog'}
         />
       </div>
 
@@ -272,7 +286,7 @@ export default async function GrowerDashboardPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           }
-          description={stats.activeProducts > 0 ? `${stats.activeProducts} active products` : "No products yet — add your first one"}
+          description={stats.activeProducts > 0 ? `${stats.activeProducts} active products` : 'No products yet — add your first one'}
           color="blue"
         />
         <QuickAction
@@ -356,13 +370,16 @@ export default async function GrowerDashboardPage() {
 
       {/* Recent Activity with Date Filter */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Activity Feed</h2>
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex flex-col gap-2 sm:flex-row sm:justify-between sm:items-center">
+          <div>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Activity Feed</h2>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">Track new orders by timeframe without leaving the dashboard.</p>
+          </div>
           <Link href="/grower/orders" className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium">
             View All Orders
           </Link>
         </div>
-        <div className="px-4 sm:px-6 pb-4 sm:pb-6">
+        <div className="px-4 sm:px-6 py-4 sm:py-6">
           <ActivityFeed orders={serializedOrders} />
         </div>
       </div>
