@@ -362,7 +362,7 @@ export default function CatalogContent() {
     
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/dispensary/search-suggestions?q=\${encodeURIComponent(query)}&limit=8`);
+      const response = await fetch(`/api/dispensary/search-suggestions?q=${encodeURIComponent(query)}&limit=8`);
       if (response.ok) {
         const data = await response.json();
         setSuggestions(data.suggestions || []);
@@ -507,7 +507,7 @@ export default function CatalogContent() {
       if (sortBy !== 'default') params.set('sortBy', sortBy);
       if (filters.recentlyAdded) params.set('recentlyAdded', 'true');
       
-      const response = await fetch(`/api/dispensary/catalog?\${params.toString()}`);
+      const response = await fetch(`/api/dispensary/catalog?${params.toString()}`);
       
       if (!response.ok) {
         throw new Error('Failed to fetch products');
@@ -592,11 +592,11 @@ export default function CatalogContent() {
     });
     filters.thcRanges.forEach(rangeId => {
       const range = THC_RANGES.find(r => r.id === rangeId);
-      if (range) chips.push({ label: `THC: \${range.label}`, category: 'thcRanges', value: rangeId });
+      if (range) chips.push({ label: `THC: ${range.label}`, category: 'thcRanges', value: rangeId });
     });
     filters.priceRanges.forEach(rangeId => {
       const range = PRICE_RANGES.find(r => r.id === rangeId);
-      if (range) chips.push({ label: `Price: \${range.label}`, category: 'priceRanges', value: rangeId });
+      if (range) chips.push({ label: `Price: ${range.label}`, category: 'priceRanges', value: rangeId });
     });
     return chips;
   };
@@ -737,9 +737,9 @@ export default function CatalogContent() {
                   </div>
                   {suggestions.map((suggestion, index) => (
                     <button
-                      key={`suggestion-\${suggestion.text}-\${index}`}
+                      key={`suggestion-${suggestion.text}-${index}`}
                       onClick={() => handleSearchSubmit(suggestion.text)}
-                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
                         highlightedIndex === index ? 'bg-green-50' : ''
                       }`}
                     >
@@ -765,9 +765,9 @@ export default function CatalogContent() {
                   </div>
                   {recentSearches.map((search, index) => (
                     <button
-                      key={`recent-\${search}-\${index}`}
+                      key={`recent-${search}-${index}`}
                       onClick={() => handleSearchSubmit(search)}
-                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
                         highlightedIndex === suggestions.length + index ? 'bg-green-50' : ''
                       }`}
                     >
@@ -787,9 +787,9 @@ export default function CatalogContent() {
                   </div>
                   {popularSearches.map((popular, index) => (
                     <button
-                      key={`popular-\${popular.text}-\${index}`}
+                      key={`popular-${popular.text}-${index}`}
                       onClick={() => handleSearchSubmit(popular.text)}
-                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left \${
+                      className={`w-full px-4 py-2.5 flex items-center gap-3 hover:bg-gray-50 transition-colors text-left ${
                         highlightedIndex === suggestions.length + recentSearches.length + index ? 'bg-green-50' : ''
                       }`}
                     >
@@ -843,7 +843,7 @@ export default function CatalogContent() {
                 setShowFilters(!showFilters);
               }
             }}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors \${
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
               showFilters 
                 ? 'bg-green-600 text-white border-green-600' 
                 : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
@@ -862,7 +862,7 @@ export default function CatalogContent() {
           <div className="flex rounded-lg border border-gray-300 overflow-hidden">
             <button
               onClick={() => setViewMode('grid')}
-              className={`px-3 py-2 flex items-center gap-2 transition-colors \${
+              className={`px-3 py-2 flex items-center gap-2 transition-colors ${
                 viewMode === 'grid' 
                   ? 'bg-green-600 text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -875,7 +875,7 @@ export default function CatalogContent() {
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`px-3 py-2 flex items-center gap-2 transition-colors \${
+              className={`px-3 py-2 flex items-center gap-2 transition-colors ${
                 viewMode === 'list' 
                   ? 'bg-green-600 text-white' 
                   : 'bg-white text-gray-600 hover:bg-gray-50'
@@ -912,7 +912,7 @@ export default function CatalogContent() {
           )}
           {getFilterChips().map((chip, idx) => (
             <span 
-              key={`\${chip.category}-\${chip.value}`}
+              key={`${chip.category}-${chip.value}`}
               className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full"
             >
               {chip.label}
@@ -945,8 +945,8 @@ export default function CatalogContent() {
 
       {/* Results count */}
       <div className="flex items-center justify-between text-sm text-gray-600">
-        <span>{isInitialLoading ? 'Loading...' : `\${products.length} of \${totalProducts} product\${totalProducts !== 1 ? 's' : ''}`}</span>
-        <span className="text-xs text-gray-500">View: {viewMode === 'grid' ? 'Grid' : 'List'}{sortBy !== 'default' && ` • Sorted: \${SORT_OPTIONS.find(o => o.value === sortBy)?.label}`}</span>
+        <span>{isInitialLoading ? 'Loading...' : `${products.length} of ${totalProducts} product${totalProducts !== 1 ? 's' : ''}`}</span>
+        <span className="text-xs text-gray-500">View: {viewMode === 'grid' ? 'Grid' : 'List'}{sortBy !== 'default' && ` • Sorted: ${SORT_OPTIONS.find(o => o.value === sortBy)?.label}`}</span>
       </div>
 
       {/* Main Content Area */}
@@ -1123,8 +1123,8 @@ export default function CatalogContent() {
           ) : groupedProducts.length > 0 ? (
             <div className="space-y-8">
               {groupedProducts.map(group => (
-                <div key={group.growerId} className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden \${sortBy !== 'default' ? 'border-green-200 ring-1 ring-green-100' : ''}`}>
-                  <div className={`px-6 py-4 border-b border-gray-200 \${sortBy !== 'default' ? 'bg-green-50' : 'bg-gray-50'}`}>
+                <div key={group.growerId} className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden ${sortBy !== 'default' ? 'border-green-200 ring-1 ring-green-100' : ''}`}>
+                  <div className={`px-6 py-4 border-b border-gray-200 ${sortBy !== 'default' ? 'bg-green-50' : 'bg-gray-50'}`}>
                     <div className="flex items-center justify-between">
                       <div>
                         <h2 className="text-xl font-semibold text-gray-900">
@@ -1139,7 +1139,7 @@ export default function CatalogContent() {
                       </div>
                       {group.growerId !== 'all' && (
                         <Link 
-                          href={`/dispensary/grower/\${group.growerId}`}
+                          href={`/dispensary/grower/${group.growerId}`}
                           className="text-sm text-green-600 hover:text-green-700 font-medium"
                         >
                           View Shop →
@@ -1445,14 +1445,14 @@ function CompareModal({
   };
 
   const comparisonAttributes = [
-    { label: 'Price', key: 'price', format: (p: Product) => `\$\${p.price.toFixed(2)}` },
-    { label: 'THC', key: 'thc', format: (p: Product) => p.thc ? `\${p.thc}%` : 'N/A' },
-    { label: 'CBD', key: 'cbd', format: (p: Product) => p.cbd ? `\${p.cbd}%` : 'N/A' },
+    { label: 'Price', key: 'price', format: (p: Product) => `\$${p.price.toFixed(2)}` },
+    { label: 'THC', key: 'thc', format: (p: Product) => p.thc ? `${p.thc}%` : 'N/A' },
+    { label: 'CBD', key: 'cbd', format: (p: Product) => p.cbd ? `${p.cbd}%` : 'N/A' },
     { label: 'Strain Type', key: 'strainType', format: (p: Product) => p.strainType || 'N/A' },
     { label: 'Strain', key: 'strain', format: (p: Product) => p.strain || 'N/A' },
     { label: 'Product Type', key: 'productType', format: (p: Product) => p.productType || 'N/A' },
     { label: 'Unit', key: 'unit', format: (p: Product) => p.unit || 'unit' },
-    { label: 'Stock', key: 'inventoryQty', format: (p: Product) => `\${p.inventoryQty} units` },
+    { label: 'Stock', key: 'inventoryQty', format: (p: Product) => `${p.inventoryQty} units` },
     { label: 'Grower', key: 'grower', format: (p: Product) => p.grower.businessName },
   ];
 
@@ -1488,7 +1488,7 @@ function CompareModal({
 
         {/* Comparison Content */}
         <div className="flex-1 overflow-auto p-6">
-          <div className={`grid gap-4 \${products.length === 2 ? 'grid-cols-2' : products.length === 3 ? 'grid-cols-3' : 'grid-cols-1'}`}>
+          <div className={`grid gap-4 ${products.length === 2 ? 'grid-cols-2' : products.length === 3 ? 'grid-cols-3' : 'grid-cols-1'}`}>
             {products.map(product => (
               <div key={product.id} className="bg-gray-50 rounded-xl overflow-hidden">
                 {/* Product Header */}
@@ -1508,7 +1508,7 @@ function CompareModal({
                   </div>
                   <h3 className="font-bold text-gray-900 text-lg leading-tight">{product.name}</h3>
                   <Link 
-                    href={`/dispensary/grower/\${product.grower.id}`}
+                    href={`/dispensary/grower/${product.grower.id}`}
                     className="text-sm text-green-600 hover:underline"
                   >
                     {product.grower.businessName}
@@ -1524,8 +1524,8 @@ function CompareModal({
                     </div>
                     <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
                       <div 
-                        className={`h-full \${getThcColor(product.thc)} transition-all duration-500`}
-                        style={{ width: `\${Math.min(product.thc, 35) / 35 * 100}%` }}
+                        className={`h-full ${getThcColor(product.thc)} transition-all duration-500`}
+                        style={{ width: `${Math.min(product.thc, 35) / 35 * 100}%` }}
                       />
                     </div>
                   </div>
@@ -1536,7 +1536,7 @@ function CompareModal({
                   {comparisonAttributes.map(attr => (
                     <div key={attr.key} className="px-4 py-3 flex items-center justify-between">
                       <span className="text-sm text-gray-500">{attr.label}</span>
-                      <span className={`text-sm font-medium \${
+                      <span className={`text-sm font-medium ${
                         attr.key === 'price' ? 'text-green-700 text-lg' : 
                         attr.key === 'thc' ? 'text-gray-900' :
                         attr.key === 'strainType' ? 'px-2 py-0.5 rounded-full ' + getStrainTypeColor(product.strainType) :
@@ -1579,9 +1579,9 @@ function CompareModal({
                       <div className="flex-1 h-8 bg-gray-200 rounded-lg overflow-hidden">
                         <div 
                           className="h-full bg-green-500 flex items-center justify-end pr-2"
-                          style={{ width: `\${percentage}%` }}
+                          style={{ width: `${percentage}%` }}
                         >
-                          <span className="text-white text-sm font-bold">\${product.price.toFixed(2)}</span>
+                          <span className="text-white text-sm font-bold">${product.price.toFixed(2)}</span>
                         </div>
                       </div>
                     </div>
@@ -1653,7 +1653,7 @@ function ProductCard({
       return { text: 'Out of Stock', color: 'bg-red-100 text-red-700 border-red-200', dotColor: 'bg-red-500' };
     }
     if (product.inventoryQty <= 10) {
-      return { text: `Low Stock (\${product.inventoryQty})`, color: 'bg-orange-100 text-orange-700 border-orange-200', dotColor: 'bg-orange-500' };
+      return { text: `Low Stock (${product.inventoryQty})`, color: 'bg-orange-100 text-orange-700 border-orange-200', dotColor: 'bg-orange-500' };
     }
     return { text: 'In Stock', color: 'bg-green-100 text-green-700 border-green-200', dotColor: 'bg-green-500' };
   };
@@ -1709,7 +1709,7 @@ function ProductCard({
               onCompareToggle();
             }}
             disabled={compareDisabled && !isInCompare}
-            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all \${
+            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               isInCompare 
                 ? 'bg-green-600 text-white shadow-lg' 
                 : compareDisabled 
@@ -1745,9 +1745,9 @@ function ProductCard({
           <div 
             className="w-full h-full bg-cover bg-center transition-transform duration-300"
             style={{ 
-              backgroundImage: `url(\${product.images[0]})`,
+              backgroundImage: `url(${product.images[0]})`,
               transform: imageHovered ? 'scale(1.5)' : 'scale(1)',
-              transformOrigin: `\${imagePosition.x}% \${imagePosition.y}%`
+              transformOrigin: `${imagePosition.x}% ${imagePosition.y}%`
             }}
           />
         ) : (
@@ -1762,7 +1762,7 @@ function ProductCard({
         )}
         
         {/* Magnify Overlay on Hover */}
-        <div className={`absolute inset-0 bg-black/10 flex items-center justify-center transition-all duration-300 \${imageHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div className={`absolute inset-0 bg-black/10 flex items-center justify-center transition-all duration-300 ${imageHovered ? 'opacity-100' : 'opacity-0'}`}>
           <div className="bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-lg transform scale-110">
             <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
@@ -1771,8 +1771,8 @@ function ProductCard({
         </div>
         
         {/* Stock Status Badge */}
-        <div className={`absolute top-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 \${stockStatus.color}`}>
-          <span className={`w-1.5 h-1.5 rounded-full \${stockStatus.dotColor}`}></span>
+        <div className={`absolute top-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${stockStatus.color}`}>
+          <span className={`w-1.5 h-1.5 rounded-full ${stockStatus.dotColor}`}></span>
           {stockStatus.text}
         </div>
         
@@ -1797,13 +1797,13 @@ function ProductCard({
         
         {/* Grower Name */}
         <p className="text-sm text-gray-500 mb-2">
-          by <Link href={`/dispensary/grower/\${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link>
+          by <Link href={`/dispensary/grower/${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link>
         </p>
         
         {/* Strain Type Badge */}
         {strainType && (
           <div className="mb-2">
-            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border \${getStrainTypeColor(product.strain, strainType)}`}>
+            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(product.strain, strainType)}`}>
               {strainType}
             </span>
           </div>
@@ -1812,7 +1812,7 @@ function ProductCard({
         {/* THC & CBD Badges */}
         <div className="flex flex-wrap gap-2 mb-3">
           {product.thc && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border \${getThcBadgeColor(product.thc)} flex items-center gap-1`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)} flex items-center gap-1`}>
               <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                 <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.616a1 1 0 01.894-1.79l1.599.8L9 4.323V3a1 1 0 011-1z"/>
               </svg>
@@ -1820,7 +1820,7 @@ function ProductCard({
             </span>
           )}
           {product.cbd && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border \${getCbdBadgeColor(product.cbd)} flex items-center gap-1`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getCbdBadgeColor(product.cbd)} flex items-center gap-1`}>
               <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M7 2a1 1 0 00-.707 1.707L7 4.414v3.758a1 1 0 01-.293.707l-2 2A1 1 0 004 11v5a1 1 0 001 1h10a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0013 8.171V4.414l.707-.707A1 1 0 0013 2H7zm2 6.172V4h2v4.172a3 3 0 00.879 2.12l1.027 1.028a4 4 0 00-2.171.102l-.47.156a4 4 0 01-2.53 0l-.563-.187a4 4 0 00-2.17-.102l1.027-1.028A3 3 0 009 8.172z" clipRule="evenodd"/>
               </svg>
@@ -1849,7 +1849,7 @@ function ProductCard({
         {/* Price & Add to Cart */}
         <div className="flex items-center justify-between pt-3 border-t border-gray-100">
           <div>
-            <span className="text-xl font-bold text-green-700">\${product.price.toFixed(2)}</span>
+            <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
             <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
           </div>
           <AddToCartButton 
@@ -1934,7 +1934,7 @@ function ProductListItem({
       <button
         onClick={onCompareToggle}
         disabled={compareDisabled && !isInCompare}
-        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all \${
+        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
           isInCompare 
             ? 'bg-green-600 text-white' 
             : compareDisabled 
@@ -1996,7 +1996,7 @@ function ProductListItem({
               )}
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-gray-600">
-              <span>by <Link href={`/dispensary/grower/\${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link></span>
+              <span>by <Link href={`/dispensary/grower/${product.grower.id}`} className="text-green-600 hover:underline">{product.grower.businessName}</Link></span>
               {product.strain && (
                 <span><span className="font-medium">Strain:</span> {product.strain}</span>
               )}
@@ -2013,12 +2013,12 @@ function ProductListItem({
         {/* Mobile Badges */}
         <div className="flex flex-wrap gap-2 mt-2 md:hidden">
           {strainType && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium \${getStrainTypeColor(strainType, strainType)}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStrainTypeColor(strainType, strainType)}`}>
               {strainType}
             </span>
           )}
           {product.thc && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium \${getThcBadgeColor(product.thc)}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getThcBadgeColor(product.thc)}`}>
               THC {product.thc}%
             </span>
           )}
@@ -2030,7 +2030,7 @@ function ProductListItem({
 
       {/* Desktop: THC Badge */}
       {product.thc && (
-        <div className={`hidden md:flex flex-col items-center px-3 py-1.5 rounded-lg \${getThcBadgeColor(product.thc)}`}>
+        <div className={`hidden md:flex flex-col items-center px-3 py-1.5 rounded-lg ${getThcBadgeColor(product.thc)}`}>
           <span className="text-xs font-medium">THC</span>
           <span className="text-sm font-bold">{product.thc}%</span>
         </div>
@@ -2038,14 +2038,14 @@ function ProductListItem({
 
       {/* Desktop: Strain Type */}
       {strainType && (
-        <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-lg \${getStrainTypeColor(strainType, strainType)}`}>
+        <div className={`hidden lg:flex items-center px-3 py-1.5 rounded-lg ${getStrainTypeColor(strainType, strainType)}`}>
           <span className="text-sm font-medium">{strainType}</span>
         </div>
       )}
 
       {/* Stock Status */}
-      <div className={`hidden md:flex items-center px-3 py-1.5 rounded-lg \${stockStatus.bg}`}>
-        <span className={`text-sm font-medium \${stockStatus.color}`}>{stockStatus.text}</span>
+      <div className={`hidden md:flex items-center px-3 py-1.5 rounded-lg ${stockStatus.bg}`}>
+        <span className={`text-sm font-medium ${stockStatus.color}`}>{stockStatus.text}</span>
       </div>
       
       {/* MOQ */}
@@ -2056,7 +2056,7 @@ function ProductListItem({
 
       {/* Price */}
       <div className="text-right min-w-[100px]">
-        <div className="text-lg font-bold text-green-700">\${product.price.toFixed(2)}</div>
+        <div className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</div>
         <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
       </div>
 

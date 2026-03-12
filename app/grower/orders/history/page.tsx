@@ -22,12 +22,12 @@ export default async function GrowerOrdersHistoryPage() {
     redirect('/dashboard');
   }
 
-  // Fetch all completed orders (DELIVERED or CANCELLED)
+  // Fetch historical orders only (DELIVERED or CANCELLED)
   const orders = await db.order.findMany({
     where: {
       growerId: user.growerId,
       status: {
-        in: ['DELIVERED', 'CANCELLED', 'SHIPPED'],
+        in: ['DELIVERED', 'CANCELLED'],
       },
     },
     include: {
@@ -38,25 +38,23 @@ export default async function GrowerOrdersHistoryPage() {
       },
     },
     orderBy: {
-      createdAt: 'desc',
+      updatedAt: 'desc',
     },
   });
 
-  const statusLabels = {
-    PENDING: 'Pending',
-    CONFIRMED: 'Confirmed',
-    PROCESSING: 'Processing',
-    SHIPPED: 'Shipped',
-    DELIVERED: 'Delivered',
-    CANCELLED: 'Cancelled',
-  };
+  const deliveredOrders = orders.filter((order) => order.status === 'DELIVERED');
+  const cancelledOrders = orders.filter((order) => order.status === 'CANCELLED');
+  const deliveredRevenue = deliveredOrders.reduce(
+    (sum: number, order: any) => sum + Number(order.totalAmount),
+    0
+  );
 
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Order History</h1>
-          <p className="text-gray-600 mt-1">View past orders and export reports</p>
+          <p className="text-gray-600 mt-1">View delivered and cancelled orders only</p>
         </div>
         <div className="flex gap-3">
           <Button variant="secondary" className="bg-white border-gray-300 hover:bg-gray-50 text-sm">
@@ -69,34 +67,30 @@ export default async function GrowerOrdersHistoryPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Orders</p>
+            <p className="text-sm text-gray-600 mb-1">Historical Orders</p>
             <p className="text-3xl font-bold text-gray-900">{orders.length}</p>
           </CardContent>
         </Card>
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Pending</p>
-            <p className="text-3xl font-bold text-yellow-600">
-              {orders.filter((o) => o.status === 'PENDING').length}
-            </p>
+            <p className="text-sm text-gray-600 mb-1">Delivered</p>
+            <p className="text-3xl font-bold text-green-600">{deliveredOrders.length}</p>
           </CardContent>
         </Card>
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Shipped</p>
-            <p className="text-3xl font-bold text-orange-600">
-              {orders.filter((o) => o.status === 'SHIPPED').length}
-            </p>
+            <p className="text-sm text-gray-600 mb-1">Cancelled</p>
+            <p className="text-3xl font-bold text-red-600">{cancelledOrders.length}</p>
           </CardContent>
         </Card>
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
+            <p className="text-sm text-gray-600 mb-1">Delivered Revenue</p>
             <p className="text-3xl font-bold text-gray-900">
-              ${orders.reduce((sum: number, order: any) => sum + Number(order.totalAmount), 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              ${deliveredRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
           </CardContent>
         </Card>
@@ -104,13 +98,13 @@ export default async function GrowerOrdersHistoryPage() {
 
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">All Orders</CardTitle>
+          <CardTitle className="text-lg font-semibold text-gray-900">Delivered & Cancelled Orders</CardTitle>
         </CardHeader>
         <CardContent>
           {orders.length === 0 ? (
             <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl">
               <p className="text-gray-600 mb-4">No order history yet</p>
-              <p className="text-sm text-gray-500">Completed orders will appear here</p>
+              <p className="text-sm text-gray-500">Delivered and cancelled orders will appear here</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -119,7 +113,7 @@ export default async function GrowerOrdersHistoryPage() {
                   <tr className="border-b border-gray-200">
                     <th className="px-4 py-3 text-sm font-medium text-gray-700">Order #</th>
                     <th className="px-4 py-3 text-sm font-medium text-gray-700">Customer</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Date</th>
+                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Closed</th>
                     <th className="px-4 py-3 text-sm font-medium text-gray-700">Total</th>
                     <th className="px-4 py-3 text-sm font-medium text-gray-700">Status</th>
                     <th className="px-4 py-3 text-sm font-medium text-gray-700">Actions</th>
@@ -135,19 +129,14 @@ export default async function GrowerOrdersHistoryPage() {
                         {order.dispensary.businessName}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-600">
-                        {format(order.createdAt, 'MMM d, yyyy')}
+                        {format(order.updatedAt, 'MMM d, yyyy')}
                       </td>
                       <td className="px-4 py-3 text-sm font-bold text-gray-900">
                         ${Number(order.totalAmount).toFixed(2)}
                       </td>
                       <td className="px-4 py-3">
-                        <Badge variant={
-                          order.status === 'DELIVERED' ? 'success' :
-                          order.status === 'CANCELLED' ? 'error' :
-                          order.status === 'SHIPPED' ? 'warning' :
-                          'default'
-                        }>
-                          {statusLabels[order.status as keyof typeof statusLabels]}
+                        <Badge variant={order.status === 'DELIVERED' ? 'success' : 'error'}>
+                          {order.status === 'DELIVERED' ? 'Delivered' : 'Cancelled'}
                         </Badge>
                       </td>
                       <td className="px-4 py-3">

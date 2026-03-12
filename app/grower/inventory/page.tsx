@@ -62,7 +62,7 @@ export default async function GrowerInventoryPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h2 className="text-lg font-semibold text-gray-900">Product Inventory</h2>
         </div>
@@ -72,45 +72,82 @@ export default async function GrowerInventoryPage() {
             <Link href="/grower/products/add" className="text-green-600 hover:underline mt-2 inline-block">Add your first product</Link>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inventory</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {products.map((product) => (
-                  <tr key={product?.id}>
-                    <td className="px-6 py-4">
+          <>
+            <div className="space-y-3 p-4 sm:hidden">
+              {products.map((product) => (
+                <div key={product?.id} className="rounded-xl border border-gray-200 p-4 shadow-sm">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
                       <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>
-                      {product?.strainName && <div className="text-xs text-gray-500">{product.strainName}</div>}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">
-                      {product?.productType ? `${product.productType}${product.subType ? ` - ${product.subType}` : ''}` : (product?.categoryLegacy || '-')}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">${product?.price?.toFixed(2) || '0.00'}/{product?.unit || 'unit'}</td>
-                    <td className="px-6 py-4 text-sm">
-                      <span className={(product?.inventoryQty || 0) <= 10 ? 'text-red-600 font-medium' : 'text-gray-900'}>
+                      {product?.strainName && <div className="text-xs text-gray-500 mt-1 truncate">{product.strainName}</div>}
+                    </div>
+                    {product?.isAvailable ? (
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Available</span>
+                    ) : (
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Unavailable</span>
+                    )}
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <p className="text-gray-500">Type</p>
+                      <p className="text-gray-900">{product?.productType ? `${product.productType}${product.subType ? ` - ${product.subType}` : ''}` : (product?.categoryLegacy || '-')}</p>
+                    </div>
+                    <div>
+                      <p className="text-gray-500">Price</p>
+                      <p className="text-gray-900">${product?.price?.toFixed(2) || '0.00'}/{product?.unit || 'unit'}</p>
+                    </div>
+                    <div className="col-span-2">
+                      <p className="text-gray-500">Inventory</p>
+                      <p className={(product?.inventoryQty || 0) <= 10 ? 'text-red-600 font-medium' : 'text-gray-900'}>
                         {product?.inventoryQty || 0} {product?.unit || 'unit'}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      {product?.isAvailable ? (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Available</span>
-                      ) : (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Unavailable</span>
-                      )}
-                    </td>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="hidden overflow-x-auto sm:block">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Inventory</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {products.map((product) => (
+                    <tr key={product?.id}>
+                      <td className="px-6 py-4">
+                        <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>
+                        {product?.strainName && <div className="text-xs text-gray-500">{product.strainName}</div>}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">
+                        {product?.productType ? `${product.productType}${product.subType ? ` - ${product.subType}` : ''}` : (product?.categoryLegacy || '-')}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">${product?.price?.toFixed(2) || '0.00'}/{product?.unit || 'unit'}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <span className={(product?.inventoryQty || 0) <= 10 ? 'text-red-600 font-medium' : 'text-gray-900'}>
+                          {product?.inventoryQty || 0} {product?.unit || 'unit'}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        {product?.isAvailable ? (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Available</span>
+                        ) : (
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Unavailable</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -11,7 +11,7 @@ const footerLinks = {
     { label: 'Pricing', href: '#pricing' },
   ],
   dispensaries: [
-    { label: 'Browse Products', href: '/dispensary/marketplace' },
+    { label: 'Browse Products', href: '/dispensary/catalog' },
     { label: 'Dispensary Dashboard', href: '/dispensary/dashboard' },
     { label: 'Pricing', href: '#pricing' },
   ],

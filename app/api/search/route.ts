@@ -157,7 +157,12 @@ export async function GET(request: NextRequest) {
           name: true,
           productType: true,
           price: true,
-          grower: { select: { businessName: true } },
+          grower: {
+            select: {
+              id: true,
+              businessName: true,
+            },
+          },
         },
         take: 5,
       });

@@ -120,7 +120,7 @@ export function MobileNav({ links }: { links: NavLink[] }) {
 
         {/* Footer */}
         <div className="absolute bottom-0 left-0 right-0 px-4 py-4 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center">PhenoFarm Dispensary</p>
+          <p className="text-xs text-gray-500 text-center">PhenoFarm Grower</p>
         </div>
       </div>
     </>
