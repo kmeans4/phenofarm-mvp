@@ -226,8 +226,9 @@ export function SettingsForm() {
   };
 
   const handleLogoUpload = async (logoBase64: string) => {
-    setFormData(prev => ({ ...prev, logo: logoBase64 }));
-    await handleSave(true);
+    const nextData = { ...formData, logo: logoBase64 };
+    setFormData(nextData);
+    await handleSave(true, nextData);
   };
 
   const handleChange = (field: keyof SettingsData) => (
@@ -251,7 +252,7 @@ export function SettingsForm() {
     validateField(field, formData[field] as string);
   };
 
-  const handleSave = useCallback(async (isLogoSave = false) => {
+  const handleSave = useCallback(async (isLogoSave = false, dataOverride?: SettingsData) => {
     if (!isLogoSave) {
       const errors: FieldErrors = {
         businessName: validateBusinessName(formData.businessName),
@@ -276,6 +277,8 @@ export function SettingsForm() {
       }
     }
 
+    const payload = dataOverride ?? formData;
+
     setSaving(true);
     setError('');
     if (!isLogoSave) setSaved(false);
@@ -287,7 +290,7 @@ export function SettingsForm() {
         fetch('/api/grower/settings', {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData),
+          body: JSON.stringify(payload),
         }).then(async (res) => {
           if (!res.ok) {
             const data = await res.json();
@@ -298,11 +301,12 @@ export function SettingsForm() {
         { duration: 3000 }
       );
 
+      setInitialData(payload);
+      resetDirtyState();
+
       if (!isLogoSave) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
-        setInitialData(formData);
-        resetDirtyState();
       }
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to save settings';

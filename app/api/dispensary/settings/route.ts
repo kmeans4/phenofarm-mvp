@@ -17,6 +17,11 @@ interface DispensarySettingsBody {
   logo: string;
 }
 
+const normalizeOptionalString = (value?: string | null) => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : null;
+};
+
 // GET - Fetch dispensary settings
 export async function GET() {
   try {
@@ -110,40 +115,19 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Business name is required' }, { status: 400 });
     }
 
-    // Parse address components if full address provided
-    const addressData: Record<string, string> = {};
-    if (address) {
-      const parts = address.split(',').map((p) => p.trim());
-      if (parts.length >= 2) {
-        addressData.address = parts[0];
-        const cityStateZip = parts[parts.length - 1].split(' ');
-        if (cityStateZip.length >= 2) {
-          addressData.city = parts.length >= 3 ? parts[1] : '';
-          addressData.state = cityStateZip[cityStateZip.length - 2] || 'VT';
-          addressData.zip = cityStateZip[cityStateZip.length - 1] || '';
-        }
-      } else {
-        addressData.address = address;
-      }
-    }
-
     // Build update data
-    const updateData: any = {
-      businessName,
-      licenseNumber: licenseNumber || null,
-      contactName: contactName || null,
-      phone: phone || null,
-      website: website || null,
-      description: description || null,
+    const updateData = {
+      businessName: businessName.trim(),
+      licenseNumber: normalizeOptionalString(licenseNumber),
+      contactName: normalizeOptionalString(contactName),
+      phone: normalizeOptionalString(phone),
+      address: normalizeOptionalString(address),
+      city: normalizeOptionalString(city),
+      state: normalizeOptionalString(state) || 'VT',
+      zip: normalizeOptionalString(zip),
+      website: normalizeOptionalString(website),
+      description: normalizeOptionalString(description),
     };
-
-    // Only update address if provided
-    if (address) {
-      updateData.address = addressData.address || null;
-      updateData.city = addressData.city || null;
-      updateData.state = addressData.state || 'VT';
-      updateData.zip = addressData.zip || null;
-    }
 
     // Update logo if provided
     if (logo !== undefined) {

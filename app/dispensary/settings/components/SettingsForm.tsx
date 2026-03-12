@@ -96,11 +96,14 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
   };
 
   const handleLogoUpload = async (logoBase64: string) => {
-    setFormData(prev => ({ ...prev, logo: logoBase64 }));
-    await handleSave(true);
+    const nextData = { ...formData, logo: logoBase64 };
+    setFormData(nextData);
+    await handleSave(true, nextData);
   };
 
-  const handleSave = async (isLogoSave = false) => {
+  const handleSave = async (isLogoSave = false, dataOverride?: SettingsData) => {
+    const payload = dataOverride ?? formData;
+
     setSaving(true);
     setError('');
     if (!isLogoSave) setSaved(false);
@@ -109,7 +112,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
       const res = await fetch('/api/dispensary/settings', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -117,11 +120,12 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         throw new Error(data.error || 'Failed to save');
       }
 
+      setInitialData(payload);
+      resetDirtyState();
+
       if (!isLogoSave) {
         setSaved(true);
         setTimeout(() => setSaved(false), 3000);
-        setInitialData(formData);
-        resetDirtyState();
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to save settings');
