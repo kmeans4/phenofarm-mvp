@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
 
 interface DispensarySettingsBody {
   businessName: string;
@@ -116,7 +117,7 @@ export async function PUT(request: NextRequest) {
     }
 
     // Build update data
-    const updateData = {
+    const updateData: Prisma.DispensaryUpdateInput = {
       businessName: businessName.trim(),
       licenseNumber: normalizeOptionalString(licenseNumber),
       contactName: normalizeOptionalString(contactName),
