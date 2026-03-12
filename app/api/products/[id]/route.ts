@@ -127,6 +127,7 @@ export async function PUT(
     }
 
     const updateData: any = {};
+    const parsedInventoryQty = inventoryQty !== undefined ? parseInt(inventoryQty, 10) : undefined;
     
     if (name !== undefined) updateData.name = name;
     if (productType !== undefined) updateData.productType = productType || null;
@@ -134,7 +135,7 @@ export async function PUT(
     if (strainId !== undefined) updateData.strainId = strainId || null;
     if (batchId !== undefined) updateData.batchId = batchId || null;
     if (price !== undefined) updateData.price = parseFloat(price);
-    if (inventoryQty !== undefined) updateData.inventoryQty = parseInt(inventoryQty);
+    if (parsedInventoryQty !== undefined) updateData.inventoryQty = parsedInventoryQty;
     if (unit !== undefined) updateData.unit = unit;
     if (description !== undefined) updateData.description = description || null;
     if (images !== undefined) updateData.images = images;
@@ -150,6 +151,14 @@ export async function PUT(
     if (subcategoryLegacy !== undefined) updateData.subcategoryLegacy = subcategoryLegacy || null;
     if (thcLegacy !== undefined) updateData.thcLegacy = thcLegacy !== null ? parseFloat(thcLegacy) : null;
     if (cbdLegacy !== undefined) updateData.cbdLegacy = cbdLegacy !== null ? parseFloat(cbdLegacy) : null;
+
+    if (parsedInventoryQty !== undefined && parsedInventoryQty <= 0) {
+      updateData.isAvailable = false;
+    } else if (parsedInventoryQty !== undefined && isAvailable === undefined) {
+      updateData.isAvailable = existingProduct.isAvailable;
+    } else if (parsedInventoryQty === undefined && isAvailable === true && existingProduct.inventoryQty <= 0) {
+      updateData.isAvailable = false;
+    }
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });

@@ -52,7 +52,8 @@ export default function GrowerProductsPage() {
 
   // Load view mode from localStorage on mount
   useEffect(() => {
-    const saved = localStorage.getItem('productViewMode');
+    if (typeof window === 'undefined') return;
+    const saved = window.localStorage.getItem('productViewMode');
     if (saved === 'card' || saved === 'list') {
       setViewMode(saved);
     }
@@ -61,7 +62,9 @@ export default function GrowerProductsPage() {
   // Save view mode to localStorage when changed
   const handleViewModeChange = (mode: 'card' | 'list') => {
     setViewMode(mode);
-    localStorage.setItem('productViewMode', mode);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem('productViewMode', mode);
+    }
   };
 
   useEffect(() => {
@@ -117,6 +120,13 @@ export default function GrowerProductsPage() {
   };
 
   const toggleAvailability = async (productId: string, currentStatus: boolean) => {
+    const product = products.find((item) => item.id === productId);
+
+    if (product && product.inventoryQty <= 0 && !currentStatus) {
+      alert('Add inventory before enabling this product. Zero-inventory products stay unavailable.');
+      return;
+    }
+
     try {
       const response = await fetch('/api/products/' + productId, {
         method: 'PUT',
@@ -195,7 +205,7 @@ export default function GrowerProductsPage() {
 
   const totalProducts = products?.length || 0;
   const totalValue = products?.reduce((sum, p) => sum + ((p?.price || 0) * (p?.inventoryQty || 0)), 0) || 0;
-  const availableCount = products?.filter(p => p?.isAvailable)?.length || 0;
+  const availableCount = products?.filter(p => p?.isAvailable && (p?.inventoryQty || 0) > 0)?.length || 0;
 
   const filterTabs = [
     { key: 'all', label: 'All', icon: 'M4 6h16M4 12h16M4 18h16' },
@@ -233,12 +243,14 @@ export default function GrowerProductsPage() {
             </div>
             <span 
               className={'px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ' + (
-                product?.isAvailable 
-                  ? 'bg-green-100 text-green-700 border border-green-200' 
-                  : 'bg-gray-100 text-gray-700 border border-gray-200'
+                (product?.inventoryQty || 0) <= 0
+                  ? 'bg-red-100 text-red-700 border border-red-200'
+                  : product?.isAvailable 
+                    ? 'bg-green-100 text-green-700 border border-green-200' 
+                    : 'bg-gray-100 text-gray-700 border border-gray-200'
               )}
             >
-              {product?.isAvailable ? 'Available' : 'Unavailable'}
+              {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : product?.isAvailable ? 'Available' : 'Unavailable'}
             </span>
           </div>
         </div>
@@ -271,7 +283,7 @@ export default function GrowerProductsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
             <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
-              {product?.inventoryQty || 0} in stock
+              {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : `${product?.inventoryQty || 0} in stock`}
             </span>
           </div>
 
@@ -291,8 +303,9 @@ export default function GrowerProductsPage() {
               size="sm"
               onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
               className="flex-1"
+              disabled={(product?.inventoryQty || 0) <= 0 && !product?.isAvailable}
             >
-              {product?.isAvailable ? 'Disable' : 'Enable'}
+              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of stock' : product?.isAvailable ? 'Disable' : 'Enable'}
             </Button>
             
             <Button 
@@ -325,11 +338,13 @@ export default function GrowerProductsPage() {
         </td>
         <td className="px-4 py-3">
           <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-            product?.isAvailable 
-              ? 'bg-green-100 text-green-700' 
-              : 'bg-gray-100 text-gray-700'
+            (product?.inventoryQty || 0) <= 0
+              ? 'bg-red-100 text-red-700'
+              : product?.isAvailable 
+                ? 'bg-green-100 text-green-700' 
+                : 'bg-gray-100 text-gray-700'
           }`}>
-            {product?.isAvailable ? 'Available' : 'Unavailable'}
+            {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : product?.isAvailable ? 'Available' : 'Unavailable'}
           </span>
         </td>
         <td className="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -337,7 +352,7 @@ export default function GrowerProductsPage() {
         </td>
         <td className="px-4 py-3 text-sm text-gray-600">
           <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
-            {product?.inventoryQty || 0} {product?.unit}
+            {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : `${product?.inventoryQty || 0} ${product?.unit}`}
           </span>
         </td>
         <td className="px-4 py-3">
@@ -349,8 +364,9 @@ export default function GrowerProductsPage() {
               variant="secondary" 
               size="sm"
               onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
+              disabled={(product?.inventoryQty || 0) <= 0 && !product?.isAvailable}
             >
-              {product?.isAvailable ? 'Disable' : 'Enable'}
+              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of stock' : product?.isAvailable ? 'Disable' : 'Enable'}
             </Button>
             <Button 
               variant="destructive" 
@@ -399,7 +415,7 @@ export default function GrowerProductsPage() {
           <p className="text-gray-600 mt-1">Manage your cannabis product catalog</p>
         </div>
         <Button variant="primary" asChild>
-          <Link href="/grower/products/add">+ Add Product</Link>
+          <Link href="/grower/products/add" className="inline-flex w-full sm:w-auto">+ Add Product</Link>
         </Button>
       </div>
 
@@ -457,7 +473,7 @@ export default function GrowerProductsPage() {
           {/* View Mode Toggle */}
           <div className="flex items-center gap-1 border-t border-gray-200 pt-2 sm:border-t-0 sm:border-l sm:border-gray-200 sm:pt-0 sm:pl-3">
             <button
-              onClick={() => setViewMode('card')}
+              onClick={() => handleViewModeChange('card')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 viewMode === 'card'
                   ? 'bg-green-600 text-white shadow-sm'
@@ -471,7 +487,7 @@ export default function GrowerProductsPage() {
               <span className="hidden sm:inline">Cards</span>
             </button>
             <button
-              onClick={() => setViewMode('list')}
+              onClick={() => handleViewModeChange('list')}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 viewMode === 'list'
                   ? 'bg-green-600 text-white shadow-sm'

@@ -98,7 +98,7 @@ const INPUT_ERROR_CLASSES = "w-full h-10 px-4 py-2 border border-red-500 rounded
 interface ProductFormProps {
   growerBrand?: string;
   initialData?: Partial<ProductFormData>;
-  onSubmit: (data: ProductFormData) => void;
+  onSubmit: (data: ProductFormData) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
@@ -261,7 +261,7 @@ export function ProductForm({
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     const allTouched: Record<string, boolean> = {};
@@ -275,10 +275,15 @@ export function ProductForm({
       return;
     }
     
-    onSubmit({
-      ...formData,
-      images: getBase64Images(),
-    });
+    try {
+      await onSubmit({
+        ...formData,
+        images: getBase64Images(),
+      });
+      resetDirtyState();
+    } catch {
+      // Parent handles user-facing submit errors.
+    }
   };
 
   const router = useRouter();

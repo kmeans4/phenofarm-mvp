@@ -206,6 +206,9 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    const parsedInventoryQty = parseInt(inventoryQty, 10);
+    const normalizedIsAvailable = parsedInventoryQty > 0 ? isAvailable : false;
+
     const product = await db.product.create({
       data: {
         growerId,
@@ -221,11 +224,11 @@ export async function POST(request: NextRequest) {
         thcLegacy: thcLegacy !== undefined ? parseFloat(thcLegacy) : null,
         cbdLegacy: cbdLegacy !== undefined ? parseFloat(cbdLegacy) : null,
         price: parseFloat(price),
-        inventoryQty: parseInt(inventoryQty),
+        inventoryQty: parsedInventoryQty,
         unit,
         description: description || null,
         images: images || [],
-        isAvailable,
+        isAvailable: normalizedIsAvailable,
         sku: sku || null,
         brand: brand || null,
         ingredients: ingredients || null,
