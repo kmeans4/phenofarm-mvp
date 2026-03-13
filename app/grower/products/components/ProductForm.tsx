@@ -124,7 +124,7 @@ export function ProductForm({
     isAvailable: initialData.isAvailable !== undefined ? initialData.isAvailable : true,
     images: initialData.images || [],
     sku: initialData.sku || '',
-    brand: initialData.brand || '',
+    brand: initialData.brand || growerBrand || '',
     ingredients: initialData.ingredients || '',
     isFeatured: initialData.isFeatured || false,
   });
@@ -149,7 +149,7 @@ export function ProductForm({
     isAvailable: initialData?.isAvailable !== undefined ? initialData.isAvailable : true,
     images: initialData?.images || [],
     sku: initialData?.sku || '',
-    brand: initialData?.brand || '',
+    brand: initialData?.brand || growerBrand || '',
     ingredients: initialData?.ingredients || '',
     isFeatured: initialData?.isFeatured || false,
   };
