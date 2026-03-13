@@ -154,7 +154,7 @@ export function ProductForm({
   };
 
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
-    enabled: true,
+    enabled: !!initialData.id,
     message: 'You have unsaved changes in this product. Are you sure you want to leave?',
   });
 
@@ -163,6 +163,16 @@ export function ProductForm({
     setIsDirty(hasChanges);
   }, [formData, setIsDirty]);
 
+  useEffect(() => {
+    if (!initialData.id && typeof window !== 'undefined') {
+      const hasDraft = JSON.stringify(formData) !== JSON.stringify(initialDataState);
+      if (hasDraft) {
+        window.sessionStorage.setItem('addProductDraft', JSON.stringify({ ...formData, images: imagePreviews }));
+      } else {
+        window.sessionStorage.removeItem('addProductDraft');
+      }
+    }
+  }, [formData, imagePreviews, initialData.id]);
 
   const validateForm = (): boolean => {
     const newErrors: FieldErrors = {
@@ -280,6 +290,9 @@ export function ProductForm({
         ...formData,
         images: getBase64Images(),
       });
+      if (!initialData.id && typeof window !== 'undefined') {
+        window.sessionStorage.removeItem('addProductDraft');
+      }
       resetDirtyState();
     } catch {
       // Parent handles user-facing submit errors.
@@ -298,7 +311,7 @@ export function ProductForm({
     enabled: true
   });
 
-  const hasErrors = Object.keys(errors).length > 0;
+  const hasErrors = Object.values(errors).some(Boolean);
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -317,12 +330,21 @@ export function ProductForm({
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-          {isDirty && (
+          {initialData.id && isDirty && (
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
               <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
               <span>You have unsaved changes. Don&apos;t forget to save before leaving.</span>
+            </div>
+          )}
+
+          {!initialData.id && isDirty && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 flex items-start gap-3">
+              <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 112 0v4a1 1 0 11-2 0V6zm1 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
+              </svg>
+              <span>Unsaved product draft is being kept for this session if you leave this page.</span>
             </div>
           )}
 

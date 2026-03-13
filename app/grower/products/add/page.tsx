@@ -34,6 +34,11 @@ export default function AddProductPage() {
   const [growerInfo, setGrowerInfo] = useState<GrowerInfo | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const [initialData, setInitialData] = useState<Partial<ProductFormData>>({
+    strainId: prefillStrainId || undefined,
+    batchId: prefillBatchId || undefined,
+  });
+
   useEffect(() => {
     const fetchGrowerInfo = async () => {
       try {
@@ -41,6 +46,23 @@ export default function AddProductPage() {
         if (response.ok) {
           const data = await response.json();
           setGrowerInfo(data);
+        }
+
+        if (typeof window !== 'undefined') {
+          const savedDraft = window.sessionStorage.getItem('addProductDraft');
+          if (savedDraft) {
+            try {
+              const parsed = JSON.parse(savedDraft);
+              const shouldRestore = window.confirm('You have an unsaved product draft. Restore it?');
+              if (shouldRestore) {
+                setInitialData(parsed);
+              } else {
+                window.sessionStorage.removeItem('addProductDraft');
+              }
+            } catch {
+              window.sessionStorage.removeItem('addProductDraft');
+            }
+          }
         }
       } catch (error) {
         console.error('Error fetching grower info:', error);
@@ -50,7 +72,7 @@ export default function AddProductPage() {
     };
 
     fetchGrowerInfo();
-  }, []);
+  }, [prefillStrainId, prefillBatchId]);
 
   const handleSubmit = async (formData: ProductFormData) => {
     try {
@@ -110,10 +132,7 @@ export default function AddProductPage() {
         onSubmit={handleSubmit} 
         onCancel={() => router.push('/grower/products')}
         growerBrand={growerInfo?.businessName}
-        initialData={{
-          strainId: prefillStrainId || undefined,
-          batchId: prefillBatchId || undefined,
-        }}
+        initialData={initialData}
       />
     </div>
   );
