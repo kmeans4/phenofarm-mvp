@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
+import { getSubTypesForProductType } from '@/lib/product-types';
 
 interface ProductTypeConfig {
   id: string;
@@ -49,7 +50,12 @@ export function ProductTypeSelector({
   }, []);
 
   const selectedConfig = configs.find(c => c.type === productType);
-  const subTypes = selectedConfig?.subTypes || [];
+  const subTypes = useMemo(() => {
+    const configSubTypes = selectedConfig?.subTypes || [];
+    const defaultSubTypes = getSubTypesForProductType(productType);
+    const merged = [...new Set([...(configSubTypes || []), ...(defaultSubTypes || [])])];
+    return merged;
+  }, [selectedConfig, productType]);
   const hasSubTypes = subTypes.length > 0;
 
   useEffect(() => {
