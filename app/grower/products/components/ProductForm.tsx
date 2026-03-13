@@ -350,15 +350,6 @@ export function ProductForm({
 
   return (
     <div className="max-w-3xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">
-          {initialData.id ? 'Edit Product' : 'Add New Product'}
-        </h1>
-        <p className="text-gray-600 mt-1">
-          {initialData.id ? 'Update your product details' : 'List a new cannabis product for your inventory'}
-        </p>
-      </div>
-
       <Card>
         <CardHeader>
           <CardTitle>Product Details</CardTitle>
