@@ -251,19 +251,31 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
                 </div>
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Strain *</label>
-                  <select
-                    value={formData.strainId}
-                    onChange={(e) => setFormData(prev => ({ ...prev, strainId: e.target.value }))}
-                    className={INPUT_CLASSES}
-                    disabled={!!strainId}
-                  >
-                    <option value="">Select a strain</option>
-                    {strains.map(strain => (
-                      <option key={strain.id} value={strain.id}>
-                        {strain.name} {strain.genetics ? `(${strain.genetics})` : ''}
-                      </option>
-                    ))}
-                  </select>
+                  {strainId ? (
+                    <div className="space-y-2">
+                      <div className="w-full h-10 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 flex items-center">
+                        {strains.find((strain) => strain.id === formData.strainId)?.name || 'Selected strain'}
+                        {(() => {
+                          const selected = strains.find((strain) => strain.id === formData.strainId);
+                          return selected?.genetics ? ` (${selected.genetics})` : '';
+                        })()}
+                      </div>
+                      <p className="text-xs text-gray-500">Batch strain is locked to the strain selected on this product.</p>
+                    </div>
+                  ) : (
+                    <select
+                      value={formData.strainId}
+                      onChange={(e) => setFormData(prev => ({ ...prev, strainId: e.target.value }))}
+                      className={INPUT_CLASSES}
+                    >
+                      <option value="">Select a strain</option>
+                      {strains.map(strain => (
+                        <option key={strain.id} value={strain.id}>
+                          {strain.name} {strain.genetics ? `(${strain.genetics})` : ''}
+                        </option>
+                      ))}
+                    </select>
+                  )}
                 </div>
               </div>
 
