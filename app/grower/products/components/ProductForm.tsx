@@ -132,6 +132,7 @@ export function ProductForm({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [imagePreviews, setImagePreviews] = useState<string[]>(initialData.images || []);
+  const [showExitPrompt, setShowExitPrompt] = useState(false);
   const { showToast } = useToast();
 
   const initialDataState = {
@@ -173,6 +174,19 @@ export function ProductForm({
       }
     }
   }, [formData, imagePreviews, initialData.id]);
+
+  useEffect(() => {
+    if (initialData.id || !isDirty) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+      return '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [initialData.id, isDirty]);
 
   const validateForm = (): boolean => {
     const newErrors: FieldErrors = {
@@ -301,12 +315,33 @@ export function ProductForm({
 
   const router = useRouter();
 
+  const handleLeavePage = () => {
+    setShowExitPrompt(false);
+    onCancel();
+  };
+
+  const handleSaveDraftAndExit = () => {
+    if (typeof window !== 'undefined') {
+      window.sessionStorage.setItem('addProductDraft', JSON.stringify({ ...formData, images: imagePreviews }));
+    }
+    setShowExitPrompt(false);
+    onCancel();
+  };
+
+  const handleCancelRequest = () => {
+    if (!initialData.id && isDirty) {
+      setShowExitPrompt(true);
+      return;
+    }
+    onCancel();
+  };
+
   // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
   useKeyboardShortcuts({
     onSave: async () => {
       await handleSubmit({ preventDefault: () => {} } as React.FormEvent);
     },
-    onCancel: onCancel || (() => router.push("/grower/products")),
+    onCancel: handleCancelRequest,
     isDirty,
     enabled: true
   });
@@ -607,7 +642,7 @@ export function ProductForm({
               <Button 
                 type="button" 
                 variant="outline"
-                onClick={onCancel}
+                onClick={handleCancelRequest}
               >
                 Cancel
               </Button>
@@ -615,6 +650,41 @@ export function ProductForm({
           </form>
         </CardContent>
       </Card>
+
+      {showExitPrompt && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+            <div className="border-b border-gray-200 px-6 py-4">
+              <h3 className="text-lg font-semibold text-gray-900">Leave product creation?</h3>
+              <p className="text-sm text-gray-600 mt-1">You have unsaved changes on this new product.</p>
+            </div>
+            <div className="p-6 space-y-3 text-sm text-gray-700">
+              <p>Choose what you want to do:</p>
+              <ul className="list-disc pl-5 space-y-1 text-gray-600">
+                <li><strong>Save draft & exit</strong> keeps your progress for this session.</li>
+                <li><strong>Exit without saving</strong> clears this draft.</li>
+                <li><strong>Continue editing</strong> stays on this page.</li>
+              </ul>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 px-6 py-4 border-t border-gray-200">
+              <Button type="button" variant="primary" onClick={handleSaveDraftAndExit}>
+                Save draft & exit
+              </Button>
+              <Button type="button" variant="destructive" onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.sessionStorage.removeItem('addProductDraft');
+                }
+                handleLeavePage();
+              }}>
+                Exit without saving
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setShowExitPrompt(false)}>
+                Continue editing
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
