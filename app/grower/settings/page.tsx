@@ -15,15 +15,15 @@ export default async function GrowerSettingsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Grower Settings</h1>
-        <p className="text-gray-600 mt-1">Manage your account and preferences</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Grower Settings</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your account and preferences</p>
       </div>
       
       {/* Subscription Billing Section */}
       <SubscriptionBilling />
       
       {/* Settings Form */}
-      <div className="mt-8">
+      <div className="mt-6 sm:mt-8">
         <SettingsForm />
       </div>
     </div>

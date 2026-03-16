@@ -13,10 +13,10 @@ export default async function DispensarySettingsPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Dispensary Settings</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dispensary Settings</h1>
       </div>
       
-      <div className="mt-8">
+      <div className="mt-6 sm:mt-8">
         <SettingsForm defaultValues={{
           businessName: '',
           licenseNumber: '',

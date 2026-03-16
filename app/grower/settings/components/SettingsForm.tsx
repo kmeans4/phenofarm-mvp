@@ -326,8 +326,8 @@ export function SettingsForm() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4 text-xs text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="hidden sm:flex items-center gap-4 text-xs text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
         <span className="flex items-center gap-1">
           <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Ctrl</kbd>
           <span>+</span>
@@ -368,12 +368,12 @@ export function SettingsForm() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-900">Company Logo</h2>
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Company Logo</h2>
           </div>
-          <div className="p-6">
+          <div className="p-4 sm:p-6">
             <LogoUpload 
               currentLogo={formData.logo} 
               onUpload={handleLogoUpload} 
@@ -382,10 +382,10 @@ export function SettingsForm() {
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-900">Business Information</h2>
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Business Information</h2>
           </div>
-          <div className="p-6 space-y-4">
+          <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Name <span className="text-red-500">*</span>
@@ -559,11 +559,11 @@ export function SettingsForm() {
         </div>
       </div>
 
-      <div className="flex justify-end pt-4">
+      <div className="flex justify-end pt-2 sm:pt-4">
         <button 
           onClick={() => handleSave(false)}
           disabled={saving}
-          className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full sm:w-auto bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {saving ? (
             <span className="flex items-center gap-2">
