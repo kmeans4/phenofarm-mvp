@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
+import { expandProductTypeFilters } from '@/lib/product-types';
 
 /**
  * Dispensary Catalog API
@@ -101,7 +102,7 @@ export async function GET(request: NextRequest) {
 
     // Product type filter
     if (productTypes && productTypes.length > 0) {
-      where.productType = { in: productTypes };
+      where.productType = { in: expandProductTypeFilters(productTypes) };
     }
 
     // Build THC range filter

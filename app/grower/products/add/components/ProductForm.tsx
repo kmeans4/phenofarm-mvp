@@ -2,7 +2,7 @@
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/app/components/ui/Button';
-import { mergeProductTypeOptions } from '@/lib/product-types';
+import { canonicalizeProductType, mergeProductTypeOptions } from '@/lib/product-types';
 
 interface Strain {
   id: string;
@@ -79,16 +79,18 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
     [productTypeConfigs]
   );
 
+  const normalizedCategory = useMemo(() => canonicalizeProductType(category) || '', [category]);
+
   const categoryOptions = useMemo(() => {
     const types = mergedProductTypes.map((config) => config.type);
-    if (category && !types.includes(category)) {
-      return [category, ...types];
+    if (normalizedCategory && !types.includes(normalizedCategory)) {
+      return [normalizedCategory, ...types];
     }
     return types;
-  }, [mergedProductTypes, category]);
+  }, [mergedProductTypes, normalizedCategory]);
 
   const availableSubtypes = useMemo(() => {
-    const selected = mergedProductTypes.find((config) => config.type === category);
+    const selected = mergedProductTypes.find((config) => config.type === normalizedCategory);
     const subTypes = selected?.subTypes || [];
 
     if (subcategory && !subTypes.includes(subcategory)) {
@@ -96,7 +98,7 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
     }
 
     return subTypes;
-  }, [mergedProductTypes, category, subcategory]);
+  }, [mergedProductTypes, normalizedCategory, subcategory]);
   
   // Strains and batches for dropdowns
   const [strains, setStrains] = useState<Strain[]>([]);
@@ -149,6 +151,12 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
     fetchBatches();
     fetchProductTypes();
   }, []);
+
+  useEffect(() => {
+    if (category && normalizedCategory && category !== normalizedCategory) {
+      setCategory(normalizedCategory);
+    }
+  }, [category, normalizedCategory]);
 
   // Update filtered batches when strain changes
   const filteredBatches = selectedStrainId
@@ -238,7 +246,7 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
       strain: selectedStrainId ? strains.find(s => s.id === selectedStrainId)?.name || '' : '',
       strainId: selectedStrainId || null,
       batchId: selectedBatchId || null,
-      category,
+      category: normalizedCategory || category,
       subcategory,
       price,
       inventoryQty,
@@ -280,7 +288,7 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
           <select
             id="category"
             required
-            value={category}
+            value={normalizedCategory}
             onChange={(e) => { setCategory(e.target.value); setSubcategory(''); }}
             className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
           >
@@ -356,8 +364,8 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
               type="text"
               value={subcategory}
               onChange={(e) => setSubcategory(e.target.value)}
-              placeholder={category ? "No subtypes available - enter custom" : "Select a category first"}
-              disabled={!category}
+              placeholder={normalizedCategory ? "No subtypes available - enter custom" : "Select a category first"}
+              disabled={!normalizedCategory}
               className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed"
             />
           )}

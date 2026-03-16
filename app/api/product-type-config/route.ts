@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { mergeProductTypeOptions } from '@/lib/product-types';
+import { canonicalizeProductType, mergeProductTypeOptions } from '@/lib/product-types';
 
 // GET product type configs (global defaults + grower's custom configs)
 export async function GET(request: NextRequest) {

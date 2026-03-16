@@ -1,4 +1,4 @@
-import { getSubTypesForProductType } from '@/lib/product-types';
+import { canonicalizeProductType, getSubTypesForProductType } from '@/lib/product-types';
 
 export const PRODUCT_STATUS = {
   DRAFT: 'DRAFT',
@@ -56,8 +56,7 @@ export function normalizeSubtype(productType?: unknown, subType?: unknown): stri
 
 export function normalizeProductType(productType?: unknown): string | null {
   if (typeof productType !== 'string') return null;
-  const trimmed = productType.trim();
-  return trimmed || null;
+  return canonicalizeProductType(productType);
 }
 
 export function normalizeOptionalString(value?: unknown): string | null {

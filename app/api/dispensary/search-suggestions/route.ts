@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
+import { getAllProductTypes } from '@/lib/product-types';
 
 /**
  * Search Suggestions API
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
       });
 
       // Get matching product types from a static list
-      const PRODUCT_TYPES = ['Flower', 'Edibles', 'Cartridge', 'Concentrate', 'Pre-roll', 'Tincture', 'Topical', 'Drink'];
+      const PRODUCT_TYPES = getAllProductTypes();
       PRODUCT_TYPES.filter(pt => pt.toLowerCase().includes(query.toLowerCase()))
         .slice(0, 2)
         .forEach(pt => {
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
       { text: 'Blue Dream', type: 'strain' },
       { text: 'OG Kush', type: 'strain' },
       { text: 'Flower', type: 'category' },
-      { text: 'Pre-roll', type: 'category' },
+      { text: 'Preroll', type: 'category' },
     ];
 
     return NextResponse.json({

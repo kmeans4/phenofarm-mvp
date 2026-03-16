@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { mergeProductTypeOptions } from '@/lib/product-types';
+import { canonicalizeProductType, mergeProductTypeOptions } from '@/lib/product-types';
 
 interface ProductTypeConfig {
   id: string;
@@ -51,16 +51,18 @@ export function ProductTypeSelector({
 
   const mergedConfigs = useMemo(() => mergeProductTypeOptions(configs), [configs]);
 
+  const normalizedProductType = useMemo(() => canonicalizeProductType(productType) || '', [productType]);
+
   const typeOptions = useMemo(() => {
     const mergedTypes = mergedConfigs.map((config) => config.type);
-    if (productType && !mergedTypes.includes(productType)) {
-      return [productType, ...mergedTypes];
+    if (normalizedProductType && !mergedTypes.includes(normalizedProductType)) {
+      return [normalizedProductType, ...mergedTypes];
     }
     return mergedTypes;
-  }, [mergedConfigs, productType]);
+  }, [mergedConfigs, normalizedProductType]);
 
   const subTypes = useMemo(() => {
-    const selected = mergedConfigs.find((config) => config.type === productType);
+    const selected = mergedConfigs.find((config) => config.type === normalizedProductType);
     const mergedSubTypes = selected?.subTypes || [];
 
     // Preserve older/custom existing product records even if subtype is no longer in config.
@@ -69,17 +71,23 @@ export function ProductTypeSelector({
     }
 
     return mergedSubTypes;
-  }, [mergedConfigs, productType, subType]);
+  }, [mergedConfigs, normalizedProductType, subType]);
 
   const hasSubTypes = subTypes.length > 0;
 
   useEffect(() => {
+    if (productType && normalizedProductType && productType !== normalizedProductType) {
+      onProductTypeChange(normalizedProductType);
+    }
+  }, [productType, normalizedProductType, onProductTypeChange]);
+
+  useEffect(() => {
     // Check if current subType is not in the list (custom)
-    if (productType && subType && !subTypes.includes(subType) && subType !== 'Other' && subType !== '') {
+    if (normalizedProductType && subType && !subTypes.includes(subType) && subType !== 'Other' && subType !== '') {
       setShowOtherInput(true);
       setCustomSubType(subType);
     }
-  }, [productType, subType, subTypes]);
+  }, [normalizedProductType, subType, subTypes]);
 
   const handleProductTypeChange = (type: string) => {
     onProductTypeChange(type);
@@ -119,7 +127,7 @@ export function ProductTypeSelector({
           </label>
           <select
             id="productType"
-            value={productType}
+            value={normalizedProductType}
             onChange={(e) => handleProductTypeChange(e.target.value)}
             className={INPUT_CLASSES}
           >
@@ -131,7 +139,7 @@ export function ProductTypeSelector({
         </div>
 
         {/* Sub Type - Only show if product type has subtypes */}
-        {productType && hasSubTypes && (
+        {normalizedProductType && hasSubTypes && (
           <div className="space-y-2">
             <label htmlFor="subType" className="block text-sm font-medium text-gray-700">
               Sub Type
@@ -162,7 +170,7 @@ export function ProductTypeSelector({
         )}
 
         {/* Show placeholder when product type selected but no subtypes */}
-        {productType && !hasSubTypes && (
+        {normalizedProductType && !hasSubTypes && (
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-400">
               Sub Type
@@ -177,7 +185,7 @@ export function ProductTypeSelector({
         )}
 
         {/* Placeholder when no product type selected */}
-        {!productType && (
+        {!normalizedProductType && (
           <div className="space-y-2">
             <label htmlFor="subType" className="block text-sm font-medium text-gray-700">
               Sub Type

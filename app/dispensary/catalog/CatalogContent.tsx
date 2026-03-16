@@ -7,6 +7,7 @@ import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 import MobileFilterSheet from "./components/MobileFilterSheet";
+import { getAllProductTypes } from '@/lib/product-types';
 
 interface Product {
   id: string;
@@ -55,7 +56,7 @@ interface SearchSuggestion {
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'thc-asc' | 'thc-desc' | 'name-asc' | 'name-desc';
 
-const PRODUCT_TYPES = ['Flower', 'Edibles', 'Cartridge', 'Concentrate', 'Pre-roll', 'Tincture', 'Topical', 'Drink'];
+const PRODUCT_TYPES = getAllProductTypes();
 
 const THC_RANGES = [
   { label: '< 15%', min: 0, max: 15, id: 'low' },

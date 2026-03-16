@@ -2,6 +2,7 @@
 
 import { X, SlidersHorizontal, Clock } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { getAllProductTypes } from '@/lib/product-types';
 
 interface FilterState {
   trending: boolean;
@@ -19,7 +20,7 @@ interface MobileFilterSheetProps {
   activeFilterCount: number;
 }
 
-const PRODUCT_TYPES = ['Flower', 'Edibles', 'Cartridge', 'Concentrate', 'Pre-roll', 'Tincture', 'Topical', 'Drink'];
+const PRODUCT_TYPES = getAllProductTypes();
 
 const THC_RANGES = [
   { label: '< 15%', min: 0, max: 15, id: 'low' },

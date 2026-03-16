@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types";
+import { expandProductTypeFilters } from "@/lib/product-types";
 
 const PRODUCTS_PER_PAGE = 12;
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
   };
 
   if (productTypes.length > 0) {
-    where.productType = { in: productTypes };
+    where.productType = { in: expandProductTypeFilters(productTypes) };
   }
 
   if (thcRanges.length > 0) {
