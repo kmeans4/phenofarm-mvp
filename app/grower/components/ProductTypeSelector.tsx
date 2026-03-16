@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { getSubTypesForProductType } from '@/lib/product-types';
+import { mergeProductTypeOptions } from '@/lib/product-types';
 
 interface ProductTypeConfig {
   id: string;
@@ -49,13 +49,28 @@ export function ProductTypeSelector({
     fetchConfigs();
   }, []);
 
-  const selectedConfig = configs.find(c => c.type === productType);
+  const mergedConfigs = useMemo(() => mergeProductTypeOptions(configs), [configs]);
+
+  const typeOptions = useMemo(() => {
+    const mergedTypes = mergedConfigs.map((config) => config.type);
+    if (productType && !mergedTypes.includes(productType)) {
+      return [productType, ...mergedTypes];
+    }
+    return mergedTypes;
+  }, [mergedConfigs, productType]);
+
   const subTypes = useMemo(() => {
-    const configSubTypes = selectedConfig?.subTypes || [];
-    const defaultSubTypes = getSubTypesForProductType(productType);
-    const merged = [...new Set([...(configSubTypes || []), ...(defaultSubTypes || [])])];
-    return merged;
-  }, [selectedConfig, productType]);
+    const selected = mergedConfigs.find((config) => config.type === productType);
+    const mergedSubTypes = selected?.subTypes || [];
+
+    // Preserve older/custom existing product records even if subtype is no longer in config.
+    if (subType && !mergedSubTypes.includes(subType) && subType !== 'Other') {
+      return [subType, ...mergedSubTypes];
+    }
+
+    return mergedSubTypes;
+  }, [mergedConfigs, productType, subType]);
+
   const hasSubTypes = subTypes.length > 0;
 
   useEffect(() => {
@@ -109,8 +124,8 @@ export function ProductTypeSelector({
             className={INPUT_CLASSES}
           >
             <option value="">Select a product type</option>
-            {configs.map(config => (
-              <option key={config.id} value={config.type}>{config.type}</option>
+            {typeOptions.map((type) => (
+              <option key={type} value={type}>{type}</option>
             ))}
           </select>
         </div>

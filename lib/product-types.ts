@@ -119,17 +119,48 @@ export const PRODUCT_TYPES_WITH_SUBTYPES = {
   ],
 } as const;
 
+export interface ProductTypeOption {
+  type: string;
+  subTypes: string[];
+}
+
 // Type for product type names
 export type ProductTypeName = keyof typeof PRODUCT_TYPES_WITH_SUBTYPES;
 
 // Type for subtypes of a given product type
-export type SubTypeFor<T extends ProductTypeName> = 
-  (typeof PRODUCT_TYPES_WITH_SUBTYPES)[T] extends readonly string[] 
-    ? (typeof PRODUCT_TYPES_WITH_SUBTYPES)[T][number] 
+export type SubTypeFor<T extends ProductTypeName> =
+  (typeof PRODUCT_TYPES_WITH_SUBTYPES)[T] extends readonly string[]
+    ? (typeof PRODUCT_TYPES_WITH_SUBTYPES)[T][number]
     : never;
 
 // Union type of all product types
 export const PRODUCT_TYPE_NAMES = Object.keys(PRODUCT_TYPES_WITH_SUBTYPES) as ProductTypeName[];
+
+// Canonical defaults represented in API config shape
+export function getDefaultProductTypeOptions(): ProductTypeOption[] {
+  return PRODUCT_TYPE_NAMES.map((type) => ({
+    type,
+    subTypes: [...PRODUCT_TYPES_WITH_SUBTYPES[type]],
+  }));
+}
+
+export function mergeProductTypeOptions(configs: ProductTypeOption[] = []): ProductTypeOption[] {
+  const byType = new Map<string, string[]>();
+
+  for (const option of getDefaultProductTypeOptions()) {
+    byType.set(option.type, [...option.subTypes]);
+  }
+
+  for (const option of configs) {
+    if (!option?.type) continue;
+
+    const existing = byType.get(option.type) || [];
+    const incoming = Array.isArray(option.subTypes) ? option.subTypes : [];
+    byType.set(option.type, [...new Set([...existing, ...incoming])]);
+  }
+
+  return Array.from(byType.entries()).map(([type, subTypes]) => ({ type, subTypes }));
+}
 
 // Helper function to get subtypes for a product type
 export function getSubTypesForProductType(

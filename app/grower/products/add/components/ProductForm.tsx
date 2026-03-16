@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Button } from '@/app/components/ui/Button';
-import { PRODUCT_TYPE_NAMES, getSubTypesForProductType } from '@/lib/product-types';
+import { mergeProductTypeOptions } from '@/lib/product-types';
 
 interface Strain {
   id: string;
@@ -42,7 +42,10 @@ interface ProductFormProps {
   growerBrand?: string;
 }
 
-const CATEGORY_OPTIONS = PRODUCT_TYPE_NAMES;
+interface ProductTypeConfig {
+  type: string;
+  subTypes: string[];
+}
 
 export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, initialStrainId, initialBatchId }: ProductFormProps) {
   const [name, setName] = useState(initialData?.name || '');
@@ -69,7 +72,31 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   
-  const availableSubtypes = category ? getSubTypesForProductType(category) : [];
+  const [productTypeConfigs, setProductTypeConfigs] = useState<ProductTypeConfig[]>([]);
+
+  const mergedProductTypes = useMemo(
+    () => mergeProductTypeOptions(productTypeConfigs),
+    [productTypeConfigs]
+  );
+
+  const categoryOptions = useMemo(() => {
+    const types = mergedProductTypes.map((config) => config.type);
+    if (category && !types.includes(category)) {
+      return [category, ...types];
+    }
+    return types;
+  }, [mergedProductTypes, category]);
+
+  const availableSubtypes = useMemo(() => {
+    const selected = mergedProductTypes.find((config) => config.type === category);
+    const subTypes = selected?.subTypes || [];
+
+    if (subcategory && !subTypes.includes(subcategory)) {
+      return [subcategory, ...subTypes];
+    }
+
+    return subTypes;
+  }, [mergedProductTypes, category, subcategory]);
   
   // Strains and batches for dropdowns
   const [strains, setStrains] = useState<Strain[]>([]);
@@ -106,8 +133,21 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
       }
     };
 
+    const fetchProductTypes = async () => {
+      try {
+        const response = await fetch('/api/product-type-config');
+        if (response.ok) {
+          const data = await response.json();
+          setProductTypeConfigs(data);
+        }
+      } catch (err) {
+        console.error('Error fetching product type configs:', err);
+      }
+    };
+
     fetchStrains();
     fetchBatches();
+    fetchProductTypes();
   }, []);
 
   // Update filtered batches when strain changes
@@ -245,7 +285,7 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
             className="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-green-500 focus:ring-green-500"
           >
             <option value="">Select a category</option>
-            {CATEGORY_OPTIONS.map((cat) => (
+            {categoryOptions.map((cat) => (
               <option key={cat} value={cat}>{cat}</option>
             ))}
           </select>

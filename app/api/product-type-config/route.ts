@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
+import { mergeProductTypeOptions } from '@/lib/product-types';
 
 // GET product type configs (global defaults + grower's custom configs)
 export async function GET(request: NextRequest) {
@@ -19,18 +20,46 @@ export async function GET(request: NextRequest) {
 
     const growerId = user.growerId;
 
-    // Get global configs and grower's custom configs
+    // Get global configs and grower's custom configs, then merge with code defaults.
+    // This keeps API output aligned with lib/product-types.ts while preserving custom records.
     const configs = await db.productTypeConfig.findMany({
       where: {
         OR: [
-          { growerId: null }, // Global defaults
+          { growerId: null }, // Global defaults (legacy)
           { growerId }        // Grower's custom configs
         ]
       },
       orderBy: { type: 'asc' }
     });
 
-    return NextResponse.json(configs, { status: 200 });
+    const merged = mergeProductTypeOptions(configs.map((config) => ({
+      type: config.type,
+      subTypes: config.subTypes,
+    })));
+
+    const mergedByType = new Map(merged.map((config) => [config.type, config.subTypes]));
+
+    const normalizedConfigs = configs.map((config) => ({
+      ...config,
+      subTypes: mergedByType.get(config.type) || config.subTypes,
+    }));
+
+    for (const config of merged) {
+      if (!normalizedConfigs.some((existing) => existing.type === config.type)) {
+        normalizedConfigs.push({
+          id: `default-${config.type}`,
+          type: config.type,
+          subTypes: config.subTypes,
+          growerId: null,
+          isCustom: false,
+          createdAt: new Date(0),
+        });
+      }
+    }
+
+    normalizedConfigs.sort((a, b) => a.type.localeCompare(b.type));
+
+    return NextResponse.json(normalizedConfigs, { status: 200 });
   } catch (error) {
     console.error('Error fetching product type configs:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
