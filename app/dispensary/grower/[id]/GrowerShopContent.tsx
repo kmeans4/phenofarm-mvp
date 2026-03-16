@@ -364,7 +364,7 @@ function ProductCard({
 }) {
   const thcValue = product.batch?.thc || product.thcLegacy;
   const stockStatus = product.inventoryQty === 0 
-    ? { text: 'Out of stock', color: 'text-red-600' }
+    ? { text: 'Out of Stock', color: 'text-red-600' }
     : product.inventoryQty <= 10 
       ? { text: `Only ${product.inventoryQty} left!`, color: 'text-orange-600' }
       : { text: 'In Stock', color: 'text-green-600' };
@@ -454,7 +454,7 @@ function ProductListItem({
 }) {
   const thcValue = product.batch?.thc || product.thcLegacy;
   const stockStatus = product.inventoryQty === 0 
-    ? { text: 'Out of stock', color: 'text-red-600', bg: 'bg-red-50' }
+    ? { text: 'Out of Stock', color: 'text-red-600', bg: 'bg-red-50' }
     : product.inventoryQty <= 10 
       ? { text: 'Low Stock', color: 'text-orange-600', bg: 'bg-orange-50' }
       : { text: 'In Stock', color: 'text-green-600', bg: 'bg-green-50' };

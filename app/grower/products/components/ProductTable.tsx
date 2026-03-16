@@ -133,7 +133,7 @@ export function ProductTable({
                   </td>
                   <td className="px-4 py-3">
                     <Badge variant={product.isAvailable ? 'success' : 'error'}>
-                      {product.isAvailable ? 'Available' : 'Unavailable'}
+                      {product.isAvailable ? 'Available' : 'Out of Stock'}
                     </Badge>
                   </td>
                   <td className="px-4 py-3">
@@ -150,7 +150,7 @@ export function ProductTable({
                         className="text-xs py-1"
                         onClick={() => onToggleAvailability(product.id)}
                       >
-                        {product.isAvailable ? 'Disable' : 'Enable'}
+                        {product.isAvailable ? 'Disable Listing' : 'Enable Listing'}
                       </Button>
                       <Button
                         variant="destructive"

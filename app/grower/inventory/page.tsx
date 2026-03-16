@@ -98,7 +98,7 @@ export default async function GrowerInventoryPage() {
                     {product?.isAvailable ? (
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Available</span>
                     ) : (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Unavailable</span>
+                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Out of Stock</span>
                     )}
                   </div>
 
@@ -153,7 +153,7 @@ export default async function GrowerInventoryPage() {
                         {product?.isAvailable ? (
                           <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Available</span>
                         ) : (
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Unavailable</span>
+                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Out of Stock</span>
                         )}
                       </td>
                     </tr>

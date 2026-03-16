@@ -250,7 +250,7 @@ export default function GrowerProductsPage() {
                     : 'bg-gray-100 text-gray-700 border border-gray-200'
               )}
             >
-              {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : product?.isAvailable ? 'Available' : 'Unavailable'}
+              {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Out of Stock'}
             </span>
           </div>
         </div>
@@ -283,7 +283,7 @@ export default function GrowerProductsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
             <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
-              {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : `${product?.inventoryQty || 0} in stock`}
+              {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} In Stock`}
             </span>
           </div>
 
@@ -352,7 +352,7 @@ export default function GrowerProductsPage() {
         </td>
         <td className="px-4 py-3 text-sm text-gray-600">
           <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
-            {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : `${product?.inventoryQty || 0} ${product?.unit}`}
+            {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} ${product?.unit}`}
           </span>
         </td>
         <td className="px-4 py-3">

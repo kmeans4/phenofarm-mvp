@@ -45,7 +45,7 @@ export function ProductCard({ product, onEdit, onDelete, onToggleAvailability }:
           <div className="text-right">
             <p className="text-lg font-bold text-gray-900">${product.price.toFixed(2)}</p>
             <Badge variant={product.isAvailable ? 'success' : 'error'}>
-              {product.isAvailable ? 'Available' : 'Unavailable'}
+              {product.isAvailable ? 'Available' : 'Out of Stock'}
             </Badge>
           </div>
         </div>
@@ -74,7 +74,7 @@ export function ProductCard({ product, onEdit, onDelete, onToggleAvailability }:
             className="text-sm py-2 flex-1"
             onClick={onToggleAvailability}
           >
-            {product.isAvailable ? 'Disable' : 'Enable'}
+            {product.isAvailable ? 'Disable Listing' : 'Enable Listing'}
           </Button>
           <Button
             variant="destructive"

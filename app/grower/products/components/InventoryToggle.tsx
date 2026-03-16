@@ -29,7 +29,7 @@ export function InventoryToggle({ isChecked, onChange, label = 'Availability' }:
         />
       </button>
       <Badge variant={isChecked ? 'success' : 'error'}>
-        {isChecked ? 'Available' : 'Unavailable'}
+        {isChecked ? 'Available' : 'Out of Stock'}
       </Badge>
     </div>
   );

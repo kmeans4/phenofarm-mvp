@@ -122,7 +122,7 @@ export default function AddToCartButton({
                 : 'bg-green-600 text-white hover:bg-green-700 hover:scale-105 hover:shadow-md active:scale-95'
           }
         `}
-        title={isOutOfStock ? 'Out of Stock' : `Quick Add (1 unit) • ${product.inventoryQty} in stock`}
+        title={isOutOfStock ? 'Out of Stock' : `Quick Add (1 unit) • ${product.inventoryQty} In Stock`}
       >
         {loading ? (
           <Loader2 size={20} className="animate-spin" />
@@ -209,7 +209,7 @@ export default function AddToCartButton({
       
       <div className="flex items-center justify-center gap-2">
         <span className={`text-xs ${isOutOfStock ? 'text-red-500' : isLowStock ? 'text-orange-500' : 'text-gray-500'}`}>
-          {isOutOfStock ? 'Unavailable' : isLowStock ? `Only ${product.inventoryQty} left!` : `${product.inventoryQty} available`}
+          {isOutOfStock ? 'Out of Stock' : isLowStock ? `Only ${product.inventoryQty} left!` : `${product.inventoryQty} Available`}
         </span>
       </div>
     </div>
