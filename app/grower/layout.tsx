@@ -38,8 +38,11 @@ export default async function GrowerLayout({ children }: { children: React.React
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
             <h1 className="text-lg font-bold text-green-600">PhenoFarm</h1>
-            {/* MobileNav includes hamburger button - placed on right */}
-            <MobileNav links={navLinks} />
+            <div className="flex items-center gap-2">
+              <SearchDialog variant="icon" />
+              {/* MobileNav includes hamburger button - placed on right */}
+              <MobileNav links={navLinks} />
+            </div>
           </div>
         </div>
       </div>

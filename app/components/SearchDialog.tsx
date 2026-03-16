@@ -27,7 +27,12 @@ const typeLabels = {
   strain: 'Strain',
 };
 
-export function SearchDialog() {
+interface SearchDialogProps {
+  variant?: 'default' | 'icon';
+  className?: string;
+}
+
+export function SearchDialog({ variant = 'default', className = '' }: SearchDialogProps) {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
@@ -228,19 +233,30 @@ export function SearchDialog() {
   return (
     <>
       {/* Search Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-700 transition-colors group"
-        aria-label="Open search"
-      >
-        <div className="flex items-center gap-2">
-          <Search className="w-4 h-4" />
-          <span className="text-sm">Search...</span>
-        </div>
-        <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs bg-white border border-gray-200 rounded text-gray-400">
-          ⌘K
-        </kbd>
-      </button>
+      {variant === 'icon' ? (
+        <button
+          onClick={() => setIsOpen(true)}
+          className={`flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-800 transition-colors ${className}`}
+          aria-label="Open search"
+          title="Search"
+        >
+          <Search className="w-5 h-5" />
+        </button>
+      ) : (
+        <button
+          onClick={() => setIsOpen(true)}
+          className={`w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-700 transition-colors group ${className}`}
+          aria-label="Open search"
+        >
+          <div className="flex items-center gap-2">
+            <Search className="w-4 h-4" />
+            <span className="text-sm">Search...</span>
+          </div>
+          <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs bg-white border border-gray-200 rounded text-gray-400">
+            ⌘K
+          </kbd>
+        </button>
+      )
 
       {/* Modal rendered via portal */}
       {mounted && modalContent && createPortal(modalContent, document.body)}

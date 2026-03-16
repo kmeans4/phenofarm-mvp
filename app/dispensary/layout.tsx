@@ -58,9 +58,12 @@ export default async function DispensaryLayout({ children }: { children: React.R
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
             <h1 className="text-lg font-bold text-green-600">PhenoFarm</h1>
-            <SignOutButton />
+            <div className="flex items-center gap-2">
+              <SearchDialog variant="icon" />
+              <MobileNav links={navLinks} />
+              <SignOutButton />
+            </div>
           </div>
-          <MobileNav links={navLinks} />
         </div>
       </div>
 
