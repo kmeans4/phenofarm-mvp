@@ -69,40 +69,40 @@ export default async function GrowerOrdersPage() {
   }));
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
-          <p className="text-gray-600 mt-1">Manage and process customer orders</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Orders</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage and process customer orders</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline" asChild>
+        <div className="flex w-full sm:w-auto gap-2 sm:gap-3">
+          <Button variant="outline" asChild className="flex-1 sm:flex-none">
             <Link href="/grower/orders/history">View History</Link>
           </Button>
-          <Button variant="primary" asChild>
+          <Button variant="primary" asChild className="flex-1 sm:flex-none">
             <Link href="/grower/orders/add">+ New Order</Link>
           </Button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-sm text-gray-600">Total Orders</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <p className="text-xs sm:text-sm text-gray-600">Total Orders</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-sm text-gray-600">Active Orders</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{activeCount}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <p className="text-xs sm:text-sm text-gray-600">Active Orders</p>
+          <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">{activeCount}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-sm text-gray-600">Pending</p>
-          <p className="text-2xl font-bold text-yellow-600 mt-1">{pendingCount}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <p className="text-xs sm:text-sm text-gray-600">Pending</p>
+          <p className="text-xl sm:text-2xl font-bold text-yellow-600 mt-1">{pendingCount}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-sm text-gray-600">Total Revenue</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <p className="text-xs sm:text-sm text-gray-600">Total Revenue</p>
+          <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">
             ${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </p>
         </div>
@@ -112,10 +112,10 @@ export default async function GrowerOrdersPage() {
       <OrdersList initialOrders={serializedOrders} />
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
         <Link 
           href="/grower/orders/add"
-          className="bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-4 transition-colors group"
+          className="bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-3 sm:p-4 transition-colors group"
         >
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 group-hover:scale-105 transition-transform">
@@ -132,7 +132,7 @@ export default async function GrowerOrdersPage() {
 
         <Link 
           href="/grower/orders/history"
-          className="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-4 transition-colors group"
+          className="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-3 sm:p-4 transition-colors group"
         >
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-105 transition-transform">
