@@ -56,14 +56,11 @@ export default async function GrowerOrdersHistoryPage() {
           <h1 className="text-3xl font-bold text-gray-900">Order History</h1>
           <p className="text-gray-600 mt-1">View delivered and cancelled orders only</p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="secondary" className="bg-white border-gray-300 hover:bg-gray-50 text-sm">
-            Export CSV
+        <Link href="/grower/orders">
+          <Button variant="outline" className="bg-white border-gray-300 hover:bg-gray-50 text-sm">
+            Back to Active Orders
           </Button>
-          <Button variant="secondary" className="bg-white border-gray-300 hover:bg-gray-50 text-sm">
-            Export PDF
-          </Button>
-        </div>
+        </Link>
       </div>
 
       {/* Stats Cards */}
@@ -156,14 +153,7 @@ export default async function GrowerOrdersHistoryPage() {
         </CardContent>
       </Card>
 
-      {/* Pagination (placeholder) */}
-      {orders.length > 0 && (
-        <div className="flex justify-center items-center gap-2">
-          <Button variant="outline" size="sm" disabled>Previous</Button>
-          <span className="text-sm text-gray-700">Page 1 of 1</span>
-          <Button variant="outline" size="sm" disabled>Next</Button>
-        </div>
-      )}
+
     </div>
   );
 }
