@@ -3,6 +3,7 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ProductForm } from '../components/ProductForm';
+import { buildProductRequestPayload, PRODUCT_STATUS } from '@/lib/product-payload';
 
 interface ProductFormData {
   name: string;
@@ -74,38 +75,37 @@ export default function AddProductPage() {
     fetchGrowerInfo();
   }, [prefillStrainId, prefillBatchId]);
 
+  const saveProduct = async (formData: ProductFormData, status: 'DRAFT' | 'PUBLISHED') => {
+    const payload = buildProductRequestPayload(formData as unknown as Record<string, unknown>, status);
+
+    const response = await fetch('/api/products', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      throw new Error(data.error || 'Failed to save product');
+    }
+
+    return response.json();
+  };
+
   const handleSubmit = async (formData: ProductFormData) => {
     try {
-      const productData = {
-        name: formData.name,
-        productType: formData.productType || null,
-        subType: formData.subType || null,
-        strainId: formData.strainId || null,
-        batchId: formData.batchId || null,
-        price: parseFloat(formData.price),
-        inventoryQty: parseInt(formData.inventoryQty),
-        unit: formData.unit,
-        description: formData.description || null,
-        images: formData.images || [],
-        isAvailable: formData.isAvailable,
-        sku: formData.sku || null,
-        brand: formData.brand || null,
-        ingredients: formData.ingredients || null,
-        isFeatured: formData.isFeatured || false,
-      };
-
-      const response = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to create product');
-      }
-
+      await saveProduct(formData, PRODUCT_STATUS.PUBLISHED);
       alert('Product created successfully!');
+      router.push('/grower/products');
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
+  const handleSaveDraft = async (formData: ProductFormData) => {
+    try {
+      await saveProduct(formData, PRODUCT_STATUS.DRAFT);
+      alert('Draft saved successfully!');
       router.push('/grower/products');
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'An error occurred');
@@ -129,7 +129,8 @@ export default function AddProductPage() {
         </div>
       </div>
       <ProductForm 
-        onSubmit={handleSubmit} 
+        onSubmit={handleSubmit}
+        onSaveDraft={handleSaveDraft}
         onCancel={() => router.push('/grower/products')}
         growerBrand={growerInfo?.businessName}
         initialData={initialData}

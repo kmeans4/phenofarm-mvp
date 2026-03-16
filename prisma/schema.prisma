@@ -162,6 +162,7 @@ model ProductTypeConfig {
 model Product {
   id                     String    @id @default(cuid())
   growerId               String
+  status                 ProductStatus @default(PUBLISHED)
   
   // New flexible type/subtype system
   productType            String?   // "Flower", "Edibles", etc.
@@ -253,6 +254,11 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
 }
 
 model Session {

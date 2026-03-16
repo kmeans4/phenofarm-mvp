@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { ProductForm } from '@/app/grower/products/components/ProductForm';
+import { buildProductRequestPayload, PRODUCT_STATUS } from '@/lib/product-payload';
 
 interface ProductFormData {
   id?: string;
@@ -32,28 +33,15 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
 
   const handleSubmit = async (formData: ProductFormData) => {
     try {
-      const productData = {
-        name: formData.name,
-        productType: formData.productType || null,
-        subType: formData.subType || null,
-        strainId: formData.strainId || null,
-        batchId: formData.batchId || null,
-        price: parseFloat(formData.price),
-        inventoryQty: parseInt(formData.inventoryQty, 10),
-        unit: formData.unit,
-        description: formData.description || null,
-        images: formData.images || [],
-        isAvailable: formData.isAvailable,
-        sku: formData.sku || null,
-        brand: formData.brand || null,
-        ingredients: formData.ingredients || null,
-        isFeatured: formData.isFeatured || false,
-      };
+      const payload = buildProductRequestPayload(
+        formData as unknown as Record<string, unknown>,
+        PRODUCT_STATUS.PUBLISHED
+      );
 
       const response = await fetch(`/api/products/${productId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -62,6 +50,32 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
       }
 
       alert('Product updated successfully!');
+      router.push('/grower/products');
+      router.refresh();
+    } catch (err: unknown) {
+      alert(err instanceof Error ? err.message : 'An error occurred');
+    }
+  };
+
+  const handleSaveDraft = async (formData: ProductFormData) => {
+    try {
+      const payload = buildProductRequestPayload(
+        formData as unknown as Record<string, unknown>,
+        PRODUCT_STATUS.DRAFT
+      );
+
+      const response = await fetch(`/api/products/${productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to save draft');
+      }
+
+      alert('Draft saved successfully!');
       router.push('/grower/products');
       router.refresh();
     } catch (err: unknown) {
@@ -80,6 +94,7 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
 
       <ProductForm
         onSubmit={handleSubmit}
+        onSaveDraft={handleSaveDraft}
         onCancel={() => router.push('/grower/products')}
         initialData={initialData}
       />

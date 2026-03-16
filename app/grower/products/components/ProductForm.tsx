@@ -99,13 +99,15 @@ interface ProductFormProps {
   growerBrand?: string;
   initialData?: Partial<ProductFormData>;
   onSubmit: (data: ProductFormData) => Promise<void>;
+  onSaveDraft?: (data: ProductFormData) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
 }
 
 export function ProductForm({ 
   initialData = {}, 
-  onSubmit, 
+  onSubmit,
+  onSaveDraft,
   onCancel,
   growerBrand,
   isSubmitting = false 
@@ -347,6 +349,20 @@ export function ProductForm({
   });
 
   const hasErrors = Object.values(errors).some(Boolean);
+
+  const handleSaveDraft = async () => {
+    if (!onSaveDraft) return;
+    try {
+      await onSaveDraft({
+        ...formData,
+        images: getBase64Images(),
+      });
+      showToast('success', 'Draft saved');
+      resetDirtyState();
+    } catch {
+      // Parent handles errors
+    }
+  };
 
   return (
     <div className="max-w-3xl mx-auto">
@@ -622,7 +638,7 @@ export function ProductForm({
               )}
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-gray-200">
+            <div className="flex gap-4 pt-4 border-t border-gray-200 flex-wrap">
               <Button 
                 type="submit" 
                 variant="primary" 
@@ -630,6 +646,11 @@ export function ProductForm({
               >
                 {isSubmitting ? 'Saving...' : (initialData.id ? 'Update Product' : 'Create Product')}
               </Button>
+              {onSaveDraft && (
+                <Button type="button" variant="secondary" onClick={handleSaveDraft} disabled={isSubmitting}>
+                  Save Draft
+                </Button>
+              )}
               <Button 
                 type="button" 
                 variant="outline"

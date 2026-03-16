@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
+import { parseProductPayload } from '@/lib/product-payload';
 
-// Helper to serialize product from Prisma
 function serializeProduct(product: any) {
   if (!product) return product;
   return {
@@ -13,38 +13,24 @@ function serializeProduct(product: any) {
   };
 }
 
-// GET a single product by ID
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession();
-
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const user = session.user;
-    
-    if (user.role !== 'GROWER') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    if (user.role !== 'GROWER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const productId = (await context.params).id;
-
     const product = await db.product.findFirst({
       where: { id: productId, growerId: user.growerId },
-      include: {
-        strain: true,
-        batch: true
-      }
+      include: { strain: true, batch: true },
     });
 
-    if (!product) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
-    }
-
+    if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     return NextResponse.json(serializeProduct(product), { status: 200 });
   } catch (error) {
     console.error('Error fetching product:', error);
@@ -52,112 +38,80 @@ export async function GET(
   }
 }
 
-// PUT update a product
 export async function PUT(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession();
-
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const user = session.user;
-    if (user.role !== 'GROWER') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    if (user.role !== 'GROWER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const productId = (await context.params).id;
-
-    const existingProduct = await db.product.findFirst({
-      where: { id: productId, growerId: user.growerId },
-    });
-
-    if (!existingProduct) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
-    }
+    const existingProduct = await db.product.findFirst({ where: { id: productId, growerId: user.growerId } });
+    if (!existingProduct) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
 
     const body = await request.json();
-    
-    const {
-      name,
-      productType,
-      subType,
-      strainId,
-      batchId,
-      price,
-      inventoryQty,
-      unit,
-      description,
-      images,
-      isAvailable,
-      sku,
-      brand,
-      ingredients,
-      ingredientsDocumentUrl,
-      isFeatured,
-      // Legacy fields
-      strainLegacy,
-      categoryLegacy,
-      subcategoryLegacy,
-      thcLegacy,
-      cbdLegacy,
-    } = body;
+    const parsed = parseProductPayload(body, {
+      partial: true,
+      defaultStatus: existingProduct.status as any,
+    });
 
-    // Verify strain belongs to grower if provided
-    if (strainId) {
-      const strain = await db.strain.findFirst({
-        where: { id: strainId, growerId: user.growerId }
-      });
-      if (!strain) {
-        return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
-      }
+    if (!parsed.ok) {
+      return NextResponse.json({ error: parsed.errors.join(', ') }, { status: 400 });
     }
 
-    // Verify batch belongs to grower if provided
-    if (batchId) {
-      const batch = await db.batch.findFirst({
-        where: { id: batchId, growerId: user.growerId }
-      });
-      if (!batch) {
-        return NextResponse.json({ error: 'Batch not found' }, { status: 404 });
-      }
+    const data = parsed.data;
+
+    if (data.strainId) {
+      const strain = await db.strain.findFirst({ where: { id: data.strainId, growerId: user.growerId } });
+      if (!strain) return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
+    }
+
+    if (data.batchId) {
+      const batch = await db.batch.findFirst({ where: { id: data.batchId, growerId: user.growerId } });
+      if (!batch) return NextResponse.json({ error: 'Batch not found' }, { status: 404 });
     }
 
     const updateData: any = {};
-    const parsedInventoryQty = inventoryQty !== undefined ? parseInt(inventoryQty, 10) : undefined;
-    
-    if (name !== undefined) updateData.name = name;
-    if (productType !== undefined) updateData.productType = productType || null;
-    if (subType !== undefined) updateData.subType = subType || null;
-    if (strainId !== undefined) updateData.strainId = strainId || null;
-    if (batchId !== undefined) updateData.batchId = batchId || null;
-    if (price !== undefined) updateData.price = parseFloat(price);
-    if (parsedInventoryQty !== undefined) updateData.inventoryQty = parsedInventoryQty;
-    if (unit !== undefined) updateData.unit = unit;
-    if (description !== undefined) updateData.description = description || null;
-    if (images !== undefined) updateData.images = images;
-    if (isAvailable !== undefined) updateData.isAvailable = isAvailable;
-    if (sku !== undefined) updateData.sku = sku || null;
-    if (brand !== undefined) updateData.brand = brand || null;
-    if (ingredients !== undefined) updateData.ingredients = ingredients || null;
-    if (ingredientsDocumentUrl !== undefined) updateData.ingredientsDocumentUrl = ingredientsDocumentUrl || null;
-    if (isFeatured !== undefined) updateData.isFeatured = isFeatured;
-    // Legacy fields
-    if (strainLegacy !== undefined) updateData.strainLegacy = strainLegacy || null;
-    if (categoryLegacy !== undefined) updateData.categoryLegacy = categoryLegacy || null;
-    if (subcategoryLegacy !== undefined) updateData.subcategoryLegacy = subcategoryLegacy || null;
-    if (thcLegacy !== undefined) updateData.thcLegacy = thcLegacy !== null ? parseFloat(thcLegacy) : null;
-    if (cbdLegacy !== undefined) updateData.cbdLegacy = cbdLegacy !== null ? parseFloat(cbdLegacy) : null;
 
-    if (parsedInventoryQty !== undefined && parsedInventoryQty <= 0) {
+    if (body.name !== undefined) updateData.name = data.name || 'Untitled Draft Product';
+    if (body.productType !== undefined) updateData.productType = data.productType;
+    if (body.subType !== undefined) updateData.subType = data.subType;
+    if (body.strainId !== undefined) updateData.strainId = data.strainId;
+    if (body.batchId !== undefined) updateData.batchId = data.batchId;
+    if (body.price !== undefined && data.price !== null) updateData.price = data.price;
+    if (body.inventoryQty !== undefined && data.inventoryQty !== null) updateData.inventoryQty = data.inventoryQty;
+    if (body.unit !== undefined && data.unit) updateData.unit = data.unit;
+    if (body.description !== undefined) updateData.description = data.description;
+    if (body.images !== undefined) updateData.images = data.images || [];
+    if (body.sku !== undefined) updateData.sku = data.sku;
+    if (body.brand !== undefined) updateData.brand = data.brand;
+    if (body.ingredients !== undefined) updateData.ingredients = data.ingredients;
+    if (body.ingredientsDocumentUrl !== undefined) updateData.ingredientsDocumentUrl = data.ingredientsDocumentUrl;
+    if (body.isFeatured !== undefined) updateData.isFeatured = data.isFeatured;
+
+    if (body.strainLegacy !== undefined) updateData.strainLegacy = data.strainLegacy;
+    if (body.categoryLegacy !== undefined) updateData.categoryLegacy = data.categoryLegacy;
+    if (body.subcategoryLegacy !== undefined) updateData.subcategoryLegacy = data.subcategoryLegacy;
+    if (body.thcLegacy !== undefined) updateData.thcLegacy = data.thcLegacy;
+    if (body.cbdLegacy !== undefined) updateData.cbdLegacy = data.cbdLegacy;
+
+    if (body.status !== undefined) {
+      updateData.status = data.status;
+    }
+
+    const effectiveInventory = updateData.inventoryQty ?? existingProduct.inventoryQty;
+    const status = updateData.status ?? existingProduct.status;
+
+    if (status === 'DRAFT') {
       updateData.isAvailable = false;
-    } else if (parsedInventoryQty !== undefined && isAvailable === undefined) {
-      updateData.isAvailable = existingProduct.isAvailable;
-    } else if (parsedInventoryQty === undefined && isAvailable === true && existingProduct.inventoryQty <= 0) {
-      updateData.isAvailable = false;
+    } else if (body.isAvailable !== undefined) {
+      updateData.isAvailable = effectiveInventory > 0 ? Boolean(body.isAvailable) : false;
+    } else if (updateData.inventoryQty !== undefined) {
+      updateData.isAvailable = effectiveInventory > 0 ? existingProduct.isAvailable : false;
     }
 
     if (Object.keys(updateData).length === 0) {
@@ -167,10 +121,7 @@ export async function PUT(
     const updatedProduct = await db.product.update({
       where: { id: productId },
       data: updateData,
-      include: {
-        strain: true,
-        batch: true
-      }
+      include: { strain: true, batch: true },
     });
 
     return NextResponse.json(serializeProduct(updatedProduct), { status: 200 });
@@ -180,41 +131,24 @@ export async function PUT(
   }
 }
 
-// DELETE a product (soft delete)
 export async function DELETE(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getAuthSession();
-
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
+    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const user = session.user;
-    if (user.role !== 'GROWER') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    if (user.role !== 'GROWER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const productId = (await context.params).id;
+    const existingProduct = await db.product.findFirst({ where: { id: productId, growerId: user.growerId } });
+    if (!existingProduct) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
 
-    const existingProduct = await db.product.findFirst({
-      where: { id: productId, growerId: user.growerId },
-    });
-
-    if (!existingProduct) {
-      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
-    }
-
-    // Soft delete instead of hard delete to handle FK constraints
     await db.product.update({
       where: { id: productId },
-      data: { 
-        isDeleted: true,
-        deletedAt: new Date(),
-        isAvailable: false // Also make unavailable when deleted
-      },
+      data: { isDeleted: true, deletedAt: new Date(), isAvailable: false },
     });
 
     return NextResponse.json({ message: 'Product deleted successfully' }, { status: 200 });
