@@ -67,9 +67,23 @@ export default async function GrowerInventoryPage() {
           <h2 className="text-lg font-semibold text-gray-900">Product Inventory</h2>
         </div>
         {!products || products.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">
-            <p>No products yet.</p>
-            <Link href="/grower/products/add" className="text-green-600 hover:underline mt-2 inline-block">Add your first product</Link>
+          <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 mx-6 mb-6">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+              <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No inventory yet</h3>
+            <p className="text-gray-500 mb-2 max-w-md mx-auto">
+              Add your first product to start tracking stock, pricing, and availability in one place.
+            </p>
+            <p className="text-sm text-gray-500 mb-6">Next step: create a product in your catalog.</p>
+            <Link href="/grower/products/add" className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
+              <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              Add your first product
+            </Link>
           </div>
         ) : (
           <>

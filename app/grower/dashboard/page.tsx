@@ -229,9 +229,9 @@ export default async function GrowerDashboardPage() {
   }));
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
       {/* Header */}
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
           Grower Dashboard
         </h1>
@@ -239,7 +239,7 @@ export default async function GrowerDashboardPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard 
           title="Total Orders" 
           value={stats.totalOrders} 
@@ -277,7 +277,7 @@ export default async function GrowerDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <QuickAction
           title="View Product Catalog"
           href="/grower/products"
@@ -314,7 +314,7 @@ export default async function GrowerDashboardPage() {
       </div>
 
       {/* Revenue Chart - Improved Mobile Responsiveness */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-5">
         <div className="flex items-center justify-between mb-3 sm:mb-4">
           <h2 className="text-base sm:text-lg font-semibold text-gray-900">Revenue Overview (Last 7 Days)</h2>
           <span className="text-xs text-gray-400 sm:hidden">← swipe →</span>
@@ -390,7 +390,8 @@ export default async function GrowerDashboardPage() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-green-900">🌱 Welcome to PhenoFarm!</h3>
-              <p className="text-sm text-green-700 mt-1">Get started by adding your first product to your catalog.</p>
+              <p className="text-sm text-green-700 mt-1">You are all set to launch — add your first product to start receiving orders.</p>
+              <p className="text-xs sm:text-sm text-green-700/90 mt-1">Next step: build your catalog, then publish listings in the marketplace.</p>
             </div>
             <Link 
               href="/grower/products/add" 

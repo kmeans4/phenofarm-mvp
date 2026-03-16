@@ -219,9 +219,10 @@ export default function BatchesPage() {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No batches yet</h3>
-          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+          <p className="text-gray-500 mb-2 max-w-sm mx-auto">
             Create your first batch to track harvest data and lab results.
           </p>
+          <p className="text-sm text-gray-500 mb-6">Next step: attach products to the batch so inventory can be listed.</p>
           <Button variant="primary" asChild>
             <Link href="/grower/batches/add">Create your first batch</Link>
           </Button>

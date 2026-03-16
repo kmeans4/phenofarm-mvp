@@ -161,15 +161,16 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No active orders</h3>
-              <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                All orders have been completed or cancelled.
+              <p className="text-gray-500 mb-2 max-w-md mx-auto">
+                You do not have any pending, confirmed, processing, or shipped orders right now.
               </p>
+              <p className="text-sm text-gray-500 mb-6">Next step: create a new order to start your fulfillment workflow.</p>
               <Button variant="primary" asChild>
                 <Link href="/grower/orders/add">
                   <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Create New Order
+                  Create your first order
                 </Link>
               </Button>
             </div>

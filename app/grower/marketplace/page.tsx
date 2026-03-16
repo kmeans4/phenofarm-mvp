@@ -65,10 +65,22 @@ export default async function GrowerMarketplacePage() {
         
         <div className="p-6">
           {products.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500 mb-4">No products listed yet</p>
-              <Link href="/grower/products/add" className="text-green-600 hover:text-green-700 font-medium">
-                + Add your first product to the marketplace
+            <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7h18M5 7l1 12h12l1-12M9 7V5a3 3 0 016 0v2" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No active listings yet</h3>
+              <p className="text-gray-500 mb-2 max-w-md mx-auto">
+                Your marketplace is empty. List a product so dispensaries can discover and order from you.
+              </p>
+              <p className="text-sm text-gray-500 mb-6">Next step: choose a product and publish its listing details.</p>
+              <Link href="/grower/products/add" className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium">
+                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                </svg>
+                List your first product
               </Link>
             </div>
           ) : (

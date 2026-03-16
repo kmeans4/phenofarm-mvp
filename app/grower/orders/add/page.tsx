@@ -242,9 +242,18 @@ export default function AddOrderPage() {
           </div>
           <div className="p-4">
             {products.length === 0 ? (
-              <p className="text-gray-600 text-center py-8">No products available.</p>
+              <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+                <p className="text-gray-700 font-medium mb-2">No products available to add</p>
+                <p className="text-sm text-gray-500 mb-4">Next step: create at least one product before building an order.</p>
+                <Link href="/grower/products/add" className="text-green-600 hover:text-green-700 font-medium">
+                  Add a product
+                </Link>
+              </div>
             ) : formData.items.length === 0 ? (
-              <p className="text-gray-600 text-center py-8">No items. Click &quot;Add&quot; to start.</p>
+              <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
+                <p className="text-gray-700 font-medium mb-2">No items in this order yet</p>
+                <p className="text-sm text-gray-500">Click <span className="font-medium text-gray-700">Add</span> above to include your first line item.</p>
+              </div>
             ) : (
               <div className="space-y-4">
                 {formData.items.map((item, index: number) => (

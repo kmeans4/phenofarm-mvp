@@ -293,9 +293,10 @@ export default function StrainsPage() {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No strains yet</h3>
-          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+          <p className="text-gray-500 mb-2 max-w-sm mx-auto">
             Start building your genetics library by adding your first strain.
           </p>
+          <p className="text-sm text-gray-500 mb-6">Next step: use your strain when creating batches and products.</p>
           <Button variant="primary" asChild>
             <Link href="/grower/strains/add">Add your first strain</Link>
           </Button>

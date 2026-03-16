@@ -305,7 +305,7 @@ export default function GrowerProductsPage() {
               className="flex-1"
               disabled={(product?.inventoryQty || 0) <= 0 && !product?.isAvailable}
             >
-              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of stock' : product?.isAvailable ? 'Disable' : 'Enable'}
+              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of Stock' : product?.isAvailable ? 'Disable Listing' : 'Enable Listing'}
             </Button>
             
             <Button 
@@ -344,7 +344,7 @@ export default function GrowerProductsPage() {
                 ? 'bg-green-100 text-green-700' 
                 : 'bg-gray-100 text-gray-700'
           }`}>
-            {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : product?.isAvailable ? 'Available' : 'Unavailable'}
+            {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Out of Stock'}
           </span>
         </td>
         <td className="px-4 py-3 text-sm text-gray-900 font-medium">
@@ -366,7 +366,7 @@ export default function GrowerProductsPage() {
               onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
               disabled={(product?.inventoryQty || 0) <= 0 && !product?.isAvailable}
             >
-              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of stock' : product?.isAvailable ? 'Disable' : 'Enable'}
+              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of Stock' : product?.isAvailable ? 'Disable Listing' : 'Enable Listing'}
             </Button>
             <Button 
               variant="destructive" 
@@ -407,31 +407,31 @@ export default function GrowerProductsPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Product Management</h1>
-          <p className="text-gray-600 mt-1">Manage your cannabis product catalog</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Product Management</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your cannabis product catalog</p>
         </div>
-        <Button variant="primary" asChild>
+        <Button variant="primary" asChild className="w-full sm:w-auto">
           <Link href="/grower/products/add" className="inline-flex w-full sm:w-auto">+ Add Product</Link>
         </Button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-sm text-gray-600">Total Products</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{totalProducts}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <p className="text-xs sm:text-sm text-gray-600">Total Products</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{totalProducts}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-sm text-gray-600">Total Value</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <p className="text-xs sm:text-sm text-gray-600">Total Value</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-sm text-gray-600">Available</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">{availableCount}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+          <p className="text-xs sm:text-sm text-gray-600">Available</p>
+          <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">{availableCount}</p>
         </div>
       </div>
 
@@ -506,9 +506,9 @@ export default function GrowerProductsPage() {
 
       {/* Products Display */}
       {products?.length > 0 ? (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {groupOrder.map((groupName) => (
-            <div key={groupName} className="space-y-4">
+            <div key={groupName} className="space-y-3 sm:space-y-4">
               {/* Group Header */}
               <div className="flex items-center gap-4">
                 <div className="h-px flex-1 bg-gray-200"></div>
@@ -523,7 +523,7 @@ export default function GrowerProductsPage() {
 
               {/* Products Display based on view mode */}
               {viewMode === 'card' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   {groups[groupName]?.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
@@ -542,10 +542,11 @@ export default function GrowerProductsPage() {
             </svg>
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No products yet</h3>
-          <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+          <p className="text-gray-500 mb-2 max-w-sm mx-auto">
             Start building your product catalog by adding your first cannabis product.
           </p>
-          <Button variant="primary" asChild>
+          <p className="text-sm text-gray-500 mb-6">Next step: set pricing and inventory so your listing is ready for orders.</p>
+          <Button variant="primary" asChild className="w-full sm:w-auto">
             <Link href="/grower/products/add">
               <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
