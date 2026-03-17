@@ -256,7 +256,7 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
             ⌘K
           </kbd>
         </button>
-      )
+      )}
 
       {/* Modal rendered via portal */}
       {mounted && modalContent && createPortal(modalContent, document.body)}
