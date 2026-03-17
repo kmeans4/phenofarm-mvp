@@ -159,15 +159,9 @@ model ProductTypeConfig {
   @@map("product_type_configs")
 }
 
-enum ProductStatus {
-  DRAFT
-  PUBLISHED
-}
-
 model Product {
   id                     String    @id @default(cuid())
   growerId               String
-  status                 ProductStatus @default(PUBLISHED)
   
   // New flexible type/subtype system
   productType            String?   // "Flower", "Edibles", etc.
