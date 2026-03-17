@@ -150,9 +150,3 @@ export async function DELETE(
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
-oduct deleted successfully' }, { status: 200 });
-  } catch (error) {
-    console.error('Error deleting product:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
-}
