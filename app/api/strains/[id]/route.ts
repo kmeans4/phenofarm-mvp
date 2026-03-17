@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
+import { normalizeStrainType } from '@/lib/strain-types';
 
 // GET single strain by ID
 export async function GET(
@@ -68,6 +69,7 @@ export async function PUT(
     const growerId = user.growerId;
     const body = await request.json();
     const { name, genetics, description, growerNotes } = body;
+    const strainType = normalizeStrainType(body?.strainType);
 
     // Verify ownership
     const existing = await db.strain.findFirst({
@@ -76,6 +78,10 @@ export async function PUT(
 
     if (!existing) {
       return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
+    }
+
+    if (body?.strainType !== undefined && body?.strainType !== null && !strainType) {
+      return NextResponse.json({ error: 'strainType must be one of: INDICA, SATIVA, HYBRID' }, { status: 400 });
     }
 
     // Check for duplicate name if changing
@@ -92,6 +98,7 @@ export async function PUT(
       where: { id },
       data: {
         ...(name && { name }),
+        ...(body?.strainType !== undefined && { strainType }),
         ...(genetics !== undefined && { genetics }),
         ...(description !== undefined && { description }),
         ...(growerNotes !== undefined && { growerNotes })

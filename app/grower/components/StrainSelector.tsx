@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/app/components/ui/Button';
+import { STRAIN_TYPES, STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 
 interface Strain {
   id: string;
   name: string;
+  strainType: StrainTypeValue | null;
   genetics: string | null;
 }
 
@@ -23,6 +25,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newStrainName, setNewStrainName] = useState('');
+  const [newStrainType, setNewStrainType] = useState<StrainTypeValue | ''>('');
   const [newStrainGenetics, setNewStrainGenetics] = useState('');
   const [creating, setCreating] = useState(false);
 
@@ -45,7 +48,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
   }, []);
 
   const handleCreateStrain = async () => {
-    if (!newStrainName.trim()) return;
+    if (!newStrainName.trim() || !newStrainType) return;
     
     try {
       setCreating(true);
@@ -54,6 +57,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: newStrainName.trim(),
+          strainType: newStrainType,
           genetics: newStrainGenetics.trim() || null
         })
       });
@@ -64,6 +68,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
         onStrainChange(newStrain.id, newStrain.name);
         setShowCreateForm(false);
         setNewStrainName('');
+        setNewStrainType('');
         setNewStrainGenetics('');
       } else {
         const err = await response.json();
@@ -93,7 +98,9 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
           <option value="">Select a strain (optional)</option>
           {strains.map(strain => (
             <option key={strain.id} value={strain.id}>
-              {strain.name} {strain.genetics ? `(${strain.genetics})` : ''}
+              {strain.name}
+              {strain.strainType ? ` • ${STRAIN_TYPE_LABELS[strain.strainType]}` : ''}
+              {strain.genetics ? ` (${strain.genetics})` : ''}
             </option>
           ))}
         </select>
@@ -126,6 +133,16 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
             placeholder="Strain name *"
             className={SMALL_INPUT_CLASSES}
           />
+          <select
+            value={newStrainType}
+            onChange={(e) => setNewStrainType(e.target.value as StrainTypeValue)}
+            className={SMALL_INPUT_CLASSES}
+          >
+            <option value="">Select strain type *</option>
+            {STRAIN_TYPES.map((type) => (
+              <option key={type} value={type}>{STRAIN_TYPE_LABELS[type]}</option>
+            ))}
+          </select>
           <input
             type="text"
             value={newStrainGenetics}

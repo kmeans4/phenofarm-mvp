@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
+import { normalizeStrainType } from '@/lib/strain-types';
 
 // GET all strains for the authenticated grower
 export async function GET(request: NextRequest) {
@@ -57,9 +58,14 @@ export async function POST(request: NextRequest) {
     const growerId = user.growerId;
     const body = await request.json();
     const { name, genetics, description, growerNotes } = body;
+    const strainType = normalizeStrainType(body?.strainType);
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    }
+
+    if (body?.strainType !== undefined && body?.strainType !== null && !strainType) {
+      return NextResponse.json({ error: 'strainType must be one of: INDICA, SATIVA, HYBRID' }, { status: 400 });
     }
 
     // Check for duplicate name
@@ -75,6 +81,7 @@ export async function POST(request: NextRequest) {
       data: {
         growerId,
         name,
+        strainType,
         genetics: genetics || null,
         description: description || null,
         growerNotes: growerNotes || null

@@ -4,9 +4,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { STRAIN_TYPES, STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 
 interface StrainFormData {
   name: string;
+  strainType: StrainTypeValue | '';
   genetics: string;
   description: string;
   growerNotes: string;
@@ -20,6 +22,7 @@ export default function AddStrainPage() {
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<StrainFormData>({
     name: '',
+    strainType: '',
     genetics: '',
     description: '',
     growerNotes: ''
@@ -37,6 +40,11 @@ export default function AddStrainPage() {
       return;
     }
 
+    if (!formData.strainType) {
+      setError('Strain type is required');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
@@ -46,6 +54,7 @@ export default function AddStrainPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name.trim(),
+          strainType: formData.strainType,
           genetics: formData.genetics.trim() || null,
           description: formData.description.trim() || null,
           growerNotes: formData.growerNotes.trim() || null
@@ -104,6 +113,24 @@ export default function AddStrainPage() {
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="e.g., Blueberries NF, OG Kush, Sour Diesel"
               />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="strainType" className="block text-sm font-medium text-gray-700">
+                Strain Type *
+              </label>
+              <select
+                id="strainType"
+                required
+                value={formData.strainType}
+                onChange={(e) => handleChange('strainType', e.target.value as StrainTypeValue)}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              >
+                <option value="">Select strain type</option>
+                {STRAIN_TYPES.map((type) => (
+                  <option key={type} value={type}>{STRAIN_TYPE_LABELS[type]}</option>
+                ))}
+              </select>
             </div>
 
             <div className="space-y-2">

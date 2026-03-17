@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ExtendedUser, AuthSession } from '@/types';
 import { Button } from '@/app/components/ui/Button';
+import { STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 
 interface Strain {
   id: string;
   name: string;
   genetics: string | null;
+  strainType: StrainTypeValue | null;
   description: string | null;
   growerNotes: string | null;
   createdAt: string;
@@ -190,6 +192,9 @@ export default function StrainsPage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-semibold text-gray-900">{strain.name}</h3>
+                      {strain.strainType && (
+                        <p className="text-xs text-gray-500 mt-1">{STRAIN_TYPE_LABELS[strain.strainType]}</p>
+                      )}
                       {strain.genetics && (
                         <p className="text-sm text-gray-500 mt-1">{strain.genetics}</p>
                       )}
@@ -249,6 +254,9 @@ export default function StrainsPage() {
                     <tr key={strain.id} className="hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3">
                         <div className="font-medium text-gray-900">{strain.name}</div>
+                        {strain.strainType && (
+                          <div className="text-xs text-gray-500">{STRAIN_TYPE_LABELS[strain.strainType]}</div>
+                        )}
                         {strain.description && (
                           <div className="text-sm text-gray-500 line-clamp-1">{strain.description}</div>
                         )}
