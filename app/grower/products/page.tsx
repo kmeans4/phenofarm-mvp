@@ -6,11 +6,13 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ExtendedUser, AuthSession } from '@/types';
 import { Button } from '@/app/components/ui/Button';
+import { STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 
 type FilterType = 'all' | 'byProductType' | 'byStrain' | 'byBatch';
 interface Strain {
   id: string;
   name: string;
+  strainType: StrainTypeValue | null;
   genetics: string | null;
 }
 
@@ -151,6 +153,12 @@ export default function GrowerProductsPage() {
     return '';
   };
 
+
+  const getStrainTypeLabel = (product: Product): string => {
+    if (!product.strain?.strainType) return '';
+    return STRAIN_TYPE_LABELS[product.strain.strainType] || '';
+  };
+
   // Group products based on active filter
   const getGroupedProducts = (): { groups: GroupedProducts; groupOrder: string[] } => {
     const groups: GroupedProducts = {};
@@ -229,6 +237,7 @@ export default function GrowerProductsPage() {
 
   const ProductCard = ({ product }: { product: Product }) => {
     const strainName = getStrainName(product);
+    const strainTypeLabel = getStrainTypeLabel(product);
     
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200">
@@ -238,7 +247,12 @@ export default function GrowerProductsPage() {
             <div className="min-w-0 flex-1">
               <p className="font-semibold text-gray-900 truncate">{product?.name || 'Unnamed Product'}</p>
               {strainName && (
-                <p className="text-sm text-gray-500 truncate">{strainName}</p>
+                <div className="flex items-center gap-2 min-w-0">
+                  <p className="text-sm text-gray-500 truncate">{strainName}</p>
+                  {strainTypeLabel && (
+                    <span className="text-[11px] uppercase tracking-wide text-gray-400">{strainTypeLabel}</span>
+                  )}
+                </div>
               )}
             </div>
             <span 
@@ -326,12 +340,18 @@ export default function GrowerProductsPage() {
   // Product Row component for list view
   const ProductRow = ({ product }: { product: Product }) => {
     const strainName = getStrainName(product);
+    const strainTypeLabel = getStrainTypeLabel(product);
     
     return (
       <tr className="hover:bg-gray-50 transition-colors">
         <td className="px-4 py-3">
           <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>
-          {strainName && <div className="text-sm text-gray-500">{strainName}</div>}
+          {strainName && (
+            <div className="flex items-center gap-2">
+              <div className="text-sm text-gray-500">{strainName}</div>
+              {strainTypeLabel && <span className="text-[11px] uppercase tracking-wide text-gray-400">{strainTypeLabel}</span>}
+            </div>
+          )}
         </td>
         <td className="px-4 py-3 text-sm text-gray-600">
           {product?.productType || product?.categoryLegacy || '-'}
