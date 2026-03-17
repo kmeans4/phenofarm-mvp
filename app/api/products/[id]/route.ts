@@ -56,7 +56,7 @@ export async function PUT(
     const body = await request.json();
     const parsed = parseProductPayload(body, {
       partial: true,
-      defaultStatus: existingProduct.status as any,
+      defaultStatus: 'PUBLISHED' as any,
     });
 
     if (!parsed.ok) {

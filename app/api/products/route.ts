@@ -29,7 +29,6 @@ export async function GET(request: NextRequest) {
     const strainId = searchParams.get('strainId');
     const batchId = searchParams.get('batchId');
     const isAvailable = searchParams.get('isAvailable');
-    const status = searchParams.get('status');
     const search = searchParams.get('search');
     const sortBy = searchParams.get('sortBy') || 'createdAt';
     const sortOrder = searchParams.get('sortOrder') || 'desc';
@@ -41,7 +40,7 @@ export async function GET(request: NextRequest) {
       ...(strainId && { strainId }),
       ...(batchId && { batchId }),
       ...(isAvailable !== null && { isAvailable: isAvailable === 'true' }),
-      ...(status && { status: status as any }),
+      // NOTE: status filtering disabled for DB compatibility until ProductStatus migration is guaranteed applied.
       ...(search && {
         OR: [
           { name: { contains: search, mode: 'insensitive' } },

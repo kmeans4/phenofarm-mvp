@@ -256,11 +256,6 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum ProductStatus {
-  DRAFT
-  PUBLISHED
-}
-
 model Session {
   id            String    @id @default(cuid())
   sessionToken  String    @unique
