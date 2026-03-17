@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { parseProductPayload } from '@/lib/product-payload';
+import { parseProductPayload, PRODUCT_STATUS } from '@/lib/product-payload';
 
 function serializeProduct(product: any) {
   if (!product) return product;
@@ -56,7 +56,7 @@ export async function PUT(
     const body = await request.json();
     const parsed = parseProductPayload(body, {
       partial: true,
-      defaultStatus: 'PUBLISHED' as any,
+      defaultStatus: PRODUCT_STATUS.PUBLISHED,
     });
 
     if (!parsed.ok) {

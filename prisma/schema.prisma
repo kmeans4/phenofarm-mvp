@@ -159,6 +159,11 @@ model ProductTypeConfig {
   @@map("product_type_configs")
 }
 
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+}
+
 model Product {
   id                     String    @id @default(cuid())
   growerId               String
