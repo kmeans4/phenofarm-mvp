@@ -99,16 +99,9 @@ export async function PUT(
     if (body.thcLegacy !== undefined) updateData.thcLegacy = data.thcLegacy;
     if (body.cbdLegacy !== undefined) updateData.cbdLegacy = data.cbdLegacy;
 
-    if (body.status !== undefined) {
-      updateData.status = data.status;
-    }
-
     const effectiveInventory = updateData.inventoryQty ?? existingProduct.inventoryQty;
-    const status = updateData.status ?? existingProduct.status;
 
-    if (status === 'DRAFT') {
-      updateData.isAvailable = false;
-    } else if (body.isAvailable !== undefined) {
+    if (body.isAvailable !== undefined) {
       updateData.isAvailable = effectiveInventory > 0 ? Boolean(body.isAvailable) : false;
     } else if (updateData.inventoryQty !== undefined) {
       updateData.isAvailable = effectiveInventory > 0 ? existingProduct.isAvailable : false;
@@ -152,6 +145,12 @@ export async function DELETE(
     });
 
     return NextResponse.json({ message: 'Product deleted successfully' }, { status: 200 });
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+oduct deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error deleting product:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

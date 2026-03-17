@@ -16,8 +16,21 @@ export default async function GrowerInventoryPage() {
   // Fetch products for this grower with strain info
   const rawProducts = await db.product.findMany({
     where: { growerId: sessionUser.growerId },
-    include: {
-      strain: { select: { id: true, name: true } }
+    select: {
+      id: true,
+      name: true,
+      productType: true,
+      subType: true,
+      categoryLegacy: true,
+      price: true,
+      inventoryQty: true,
+      unit: true,
+      isAvailable: true,
+      thcLegacy: true,
+      cbdLegacy: true,
+      strainLegacy: true,
+      strain: { select: { id: true, name: true } },
+      createdAt: true,
     },
     orderBy: { createdAt: 'desc' },
   });

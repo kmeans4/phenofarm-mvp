@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
       data: {
         growerId: user.growerId,
         isDeleted: false,
-        status: data.status,
+        // status intentionally omitted until ProductStatus migration is guaranteed applied
         name: data.name || 'Untitled Draft Product',
         productType: data.productType,
         subType: data.subType,
@@ -147,5 +147,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating product:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+error' }, { status: 500 });
   }
 }
