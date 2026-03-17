@@ -40,6 +40,12 @@ enum UserRole {
   DISPENSARY
 }
 
+enum StrainType {
+  INDICA
+  SATIVA
+  HYBRID
+}
+
 model Grower {
   id                String    @id @default(cuid())
   userId            String    @unique
@@ -105,10 +111,11 @@ model Dispensary {
 
 // Strain model - represents cannabis genetics
 model Strain {
-  id          String    @id @default(uuid())
+  id          String     @id @default(uuid())
   name        String
-  genetics    String?   // parent strains
-  description String?   // NEW - strain description
+  strainType  StrainType?
+  genetics    String?    // parent strains
+  description String?    // NEW - strain description
   growerNotes String?
   growerId    String
   grower      Grower    @relation(fields: [growerId], references: [id], onDelete: Cascade)
