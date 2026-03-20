@@ -107,7 +107,7 @@ export async function GET(
 
 // PUT update a strain
 export async function PUT(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
