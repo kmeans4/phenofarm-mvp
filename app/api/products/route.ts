@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     const products = await db.product.findMany({
       where,
       include: {
-        strain: { select: { id: true, name: true, strainType: true, genetics: true } },
+        strain: { select: { id: true, name: true, genetics: true } },
         batch: {
           select: {
             id: true,
