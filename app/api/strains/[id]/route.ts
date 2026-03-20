@@ -1,7 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { normalizeStrainType } from '@/lib/strain-types';
+
+function isMissingStrainTypeColumnError(error: unknown): boolean {
+  if (error instanceof Prisma.PrismaClientKnownRequestError) {
+    if (error.code === 'P2022' && String(error.meta?.column ?? '').includes('strainType')) {
+      return true;
+    }
+
+    if (error.code === 'P2010') {
+      const message = String(error.message ?? '').toLowerCase();
+      if (message.includes('straintype') && message.includes('does not exist')) {
+        return true;
+      }
+    }
+  }
+
+  const message = (error instanceof Error ? error.message : String(error)).toLowerCase();
+  return message.includes('straintype') && (message.includes('does not exist') || message.includes('unknown column'));
+}
+
+function withNullStrainType<T extends object>(strain: T): T & { strainType: null } {
+  return {
+    ...strain,
+    strainType: null
+  };
+}
 
 // GET single strain by ID
 export async function GET(
@@ -24,23 +50,55 @@ export async function GET(
     const { id } = await params;
     const growerId = user.growerId;
 
-    const strain = await db.strain.findFirst({
-      where: { id, growerId },
-      include: {
-        batches: {
-          orderBy: { harvestDate: 'desc' }
-        },
-        _count: {
-          select: { products: true, batches: true }
+    try {
+      const strain = await db.strain.findFirst({
+        where: { id, growerId },
+        include: {
+          batches: {
+            orderBy: { harvestDate: 'desc' }
+          },
+          _count: {
+            select: { products: true, batches: true }
+          }
         }
+      });
+
+      if (!strain) {
+        return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
       }
-    });
 
-    if (!strain) {
-      return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
+      return NextResponse.json(strain, { status: 200 });
+    } catch (error) {
+      if (!isMissingStrainTypeColumnError(error)) {
+        throw error;
+      }
+
+      const strain = await db.strain.findFirst({
+        where: { id, growerId },
+        select: {
+          id: true,
+          name: true,
+          genetics: true,
+          description: true,
+          growerNotes: true,
+          growerId: true,
+          createdAt: true,
+          updatedAt: true,
+          batches: {
+            orderBy: { harvestDate: 'desc' }
+          },
+          _count: {
+            select: { products: true, batches: true }
+          }
+        }
+      });
+
+      if (!strain) {
+        return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
+      }
+
+      return NextResponse.json(withNullStrainType(strain), { status: 200 });
     }
-
-    return NextResponse.json(strain, { status: 200 });
   } catch (error) {
     console.error('Error fetching strain:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -49,7 +107,7 @@ export async function GET(
 
 // PUT update a strain
 export async function PUT(
-  request: NextRequest,
+  _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -73,7 +131,8 @@ export async function PUT(
 
     // Verify ownership
     const existing = await db.strain.findFirst({
-      where: { id, growerId }
+      where: { id, growerId },
+      select: { id: true, name: true }
     });
 
     if (!existing) {
@@ -87,25 +146,54 @@ export async function PUT(
     // Check for duplicate name if changing
     if (name && name !== existing.name) {
       const duplicate = await db.strain.findFirst({
-        where: { growerId, name }
+        where: { growerId, name },
+        select: { id: true }
       });
       if (duplicate) {
         return NextResponse.json({ error: 'A strain with this name already exists' }, { status: 409 });
       }
     }
 
-    const strain = await db.strain.update({
-      where: { id },
-      data: {
-        ...(name && { name }),
-        ...(body?.strainType !== undefined && { strainType }),
-        ...(genetics !== undefined && { genetics }),
-        ...(description !== undefined && { description }),
-        ...(growerNotes !== undefined && { growerNotes })
-      }
-    });
+    try {
+      const strain = await db.strain.update({
+        where: { id },
+        data: {
+          ...(name && { name }),
+          ...(body?.strainType !== undefined && { strainType }),
+          ...(genetics !== undefined && { genetics }),
+          ...(description !== undefined && { description }),
+          ...(growerNotes !== undefined && { growerNotes })
+        }
+      });
 
-    return NextResponse.json(strain, { status: 200 });
+      return NextResponse.json(strain, { status: 200 });
+    } catch (error) {
+      if (!isMissingStrainTypeColumnError(error)) {
+        throw error;
+      }
+
+      const strain = await db.strain.update({
+        where: { id },
+        data: {
+          ...(name && { name }),
+          ...(genetics !== undefined && { genetics }),
+          ...(description !== undefined && { description }),
+          ...(growerNotes !== undefined && { growerNotes })
+        },
+        select: {
+          id: true,
+          name: true,
+          genetics: true,
+          description: true,
+          growerNotes: true,
+          growerId: true,
+          createdAt: true,
+          updatedAt: true
+        }
+      });
+
+      return NextResponse.json(withNullStrainType(strain), { status: 200 });
+    }
   } catch (error) {
     console.error('Error updating strain:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -136,7 +224,8 @@ export async function DELETE(
     // Verify ownership and check for related data
     const existing = await db.strain.findFirst({
       where: { id, growerId },
-      include: {
+      select: {
+        id: true,
         _count: { select: { products: true, batches: true } }
       }
     });
@@ -153,7 +242,8 @@ export async function DELETE(
     }
 
     await db.strain.delete({
-      where: { id }
+      where: { id },
+      select: { id: true }
     });
 
     return NextResponse.json({ message: 'Strain deleted successfully' }, { status: 200 });
