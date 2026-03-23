@@ -43,6 +43,18 @@ interface GroupedProducts {
   [key: string]: Product[];
 }
 
+const formatInventoryUnit = (unit: string | null | undefined, qty: number): string => {
+  const trimmed = (unit || '').trim();
+  if (!trimmed) return 'units';
+  if (qty === 1) return trimmed;
+
+  const lower = trimmed.toLowerCase();
+  if (lower === 'oz' || lower === 'ml') return trimmed;
+  if (lower.endsWith('s')) return trimmed;
+
+  return `${trimmed}s`;
+};
+
 export default function GrowerProductsPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -372,7 +384,7 @@ export default function GrowerProductsPage() {
         </td>
         <td className="px-4 py-3 text-sm text-gray-600">
           <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
-            {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} ${product?.unit}`}
+            {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} ${formatInventoryUnit(product?.unit, product?.inventoryQty || 0)}`}
           </span>
         </td>
         <td className="px-4 py-3">

@@ -4,6 +4,18 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 
+const formatInventoryUnit = (unit: string | null | undefined, qty: number): string => {
+  const trimmed = (unit || '').trim();
+  if (!trimmed) return 'units';
+  if (qty === 1) return trimmed;
+
+  const lower = trimmed.toLowerCase();
+  if (lower === 'oz' || lower === 'ml') return trimmed;
+  if (lower.endsWith('s')) return trimmed;
+
+  return `${trimmed}s`;
+};
+
 export default async function GrowerInventoryPage() {
   const session = await getServerSession(authOptions);
   
@@ -127,7 +139,7 @@ export default async function GrowerInventoryPage() {
                     <div className="col-span-2">
                       <p className="text-gray-500">Inventory</p>
                       <p className={(product?.inventoryQty || 0) <= 10 ? 'text-red-600 font-medium' : 'text-gray-900'}>
-                        {product?.inventoryQty || 0} {product?.unit || 'unit'}
+                        {product?.inventoryQty || 0} {formatInventoryUnit(product?.unit, product?.inventoryQty || 0)}
                       </p>
                     </div>
                   </div>
@@ -159,7 +171,7 @@ export default async function GrowerInventoryPage() {
                       <td className="px-6 py-4 text-sm text-gray-600">${product?.price?.toFixed(2) || '0.00'}/{product?.unit || 'unit'}</td>
                       <td className="px-6 py-4 text-sm">
                         <span className={(product?.inventoryQty || 0) <= 10 ? 'text-red-600 font-medium' : 'text-gray-900'}>
-                          {product?.inventoryQty || 0} {product?.unit || 'unit'}
+                          {product?.inventoryQty || 0} {formatInventoryUnit(product?.unit, product?.inventoryQty || 0)}
                         </span>
                       </td>
                       <td className="px-6 py-4">
