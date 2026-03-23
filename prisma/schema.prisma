@@ -44,6 +44,8 @@ enum StrainType {
   INDICA
   SATIVA
   HYBRID
+  SATIVA_DOM_HYBRID
+  INDICA_DOM_HYBRID
 }
 
 model Grower {

@@ -1,4 +1,4 @@
-export const STRAIN_TYPES = ['INDICA', 'SATIVA', 'HYBRID'] as const;
+export const STRAIN_TYPES = ['INDICA', 'SATIVA', 'HYBRID', 'SATIVA_DOM_HYBRID', 'INDICA_DOM_HYBRID'] as const;
 
 export type StrainTypeValue = typeof STRAIN_TYPES[number];
 
@@ -6,6 +6,8 @@ export const STRAIN_TYPE_LABELS: Record<StrainTypeValue, string> = {
   INDICA: 'Indica',
   SATIVA: 'Sativa',
   HYBRID: 'Hybrid',
+  SATIVA_DOM_HYBRID: 'Sativa Dom. Hybrid',
+  INDICA_DOM_HYBRID: 'Indica Dom. Hybrid',
 };
 
 export function isStrainType(value: unknown): value is StrainTypeValue {
