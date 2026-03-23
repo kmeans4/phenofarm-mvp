@@ -100,7 +100,10 @@ export async function POST(request: NextRequest) {
     const data = parsed.data;
 
     if (data.strainId) {
-      const strain = await db.strain.findFirst({ where: { id: data.strainId, growerId: user.growerId } });
+      const strain = await db.strain.findFirst({
+        where: { id: data.strainId, growerId: user.growerId },
+        select: { id: true },
+      });
       if (!strain) return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
     }
 
@@ -137,7 +140,7 @@ export async function POST(request: NextRequest) {
         isFeatured: data.isFeatured,
       },
       include: {
-        strain: { select: { id: true, name: true, strainType: true, genetics: true } },
+        strain: { select: { id: true, name: true, genetics: true } },
         batch: { select: { id: true, batchNumber: true, harvestDate: true, thc: true, cbd: true, totalCannabinoids: true } },
       },
     });

@@ -27,7 +27,10 @@ export async function GET(
     const productId = (await context.params).id;
     const product = await db.product.findFirst({
       where: { id: productId, growerId: user.growerId },
-      include: { strain: true, batch: true },
+      include: {
+        strain: { select: { id: true, name: true, genetics: true } },
+        batch: true,
+      },
     });
 
     if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
@@ -66,7 +69,10 @@ export async function PUT(
     const data = parsed.data;
 
     if (data.strainId) {
-      const strain = await db.strain.findFirst({ where: { id: data.strainId, growerId: user.growerId } });
+      const strain = await db.strain.findFirst({
+        where: { id: data.strainId, growerId: user.growerId },
+        select: { id: true },
+      });
       if (!strain) return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
     }
 
@@ -114,7 +120,10 @@ export async function PUT(
     const updatedProduct = await db.product.update({
       where: { id: productId },
       data: updateData,
-      include: { strain: true, batch: true },
+      include: {
+        strain: { select: { id: true, name: true, genetics: true } },
+        batch: true,
+      },
     });
 
     return NextResponse.json(serializeProduct(updatedProduct), { status: 200 });
