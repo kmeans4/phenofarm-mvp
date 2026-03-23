@@ -31,6 +31,8 @@ interface ProductFormData {
   isFeatured: boolean;
 }
 
+type DirtyBaseline = Omit<ProductFormData, 'id'> & { id: string | undefined };
+
 interface FieldErrors {
   name?: string;
   price?: string;
@@ -137,8 +139,8 @@ export function ProductForm({
   const [showExitPrompt, setShowExitPrompt] = useState(false);
   const { showToast } = useToast();
 
-  const initialDataState: ProductFormData = {
-    id: initialData?.id,
+  const initialDataState: DirtyBaseline = {
+    id: initialData?.id ?? undefined,
     name: initialData?.name || '',
     productType: initialData?.productType || '',
     subType: initialData?.subType || '',
@@ -156,7 +158,7 @@ export function ProductForm({
     isFeatured: initialData?.isFeatured || false,
   };
 
-  const [dirtyBaseline, setDirtyBaseline] = useState<ProductFormData>(initialDataState);
+  const [dirtyBaseline, setDirtyBaseline] = useState<DirtyBaseline>(initialDataState);
 
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: !!initialData.id,
@@ -314,7 +316,7 @@ export function ProductForm({
       if (!initialData.id && typeof window !== 'undefined') {
         window.sessionStorage.removeItem('addProductDraft');
       }
-      setDirtyBaseline({ ...formData });
+      setDirtyBaseline({ ...formData, id: formData.id ?? undefined });
       resetDirtyState();
     } catch {
       if (wasDirty) setIsDirty(true);
@@ -368,7 +370,7 @@ export function ProductForm({
         images: getBase64Images(),
       });
       showToast('success', 'Draft saved');
-      setDirtyBaseline({ ...formData });
+      setDirtyBaseline({ ...formData, id: formData.id ?? undefined });
       resetDirtyState();
     } catch {
       if (wasDirty) setIsDirty(true);
