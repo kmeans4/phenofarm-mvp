@@ -15,7 +15,6 @@ interface Strain {
 interface Batch {
   id: string;
   batchNumber: string;
-  lotNumber: string | null;
   harvestDate: string;
   strainId: string;
   strain: Strain;
@@ -172,9 +171,6 @@ export default function BatchesPage() {
                   <tr key={batch.id} className="hover:bg-gray-50">
                     <td className="px-4 py-3">
                       <span className="font-medium text-gray-900">{batch.batchNumber}</span>
-                      {batch.lotNumber && (
-                        <span className="text-gray-500 text-sm ml-2">Lot: {batch.lotNumber}</span>
-                      )}
                     </td>
                     <td className="px-4 py-3 text-gray-600">{batch.strain?.name || 'N/A'}</td>
                     <td className="px-4 py-3 text-gray-600">{formatDate(batch.harvestDate)}</td>

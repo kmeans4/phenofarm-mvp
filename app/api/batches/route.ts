@@ -81,7 +81,8 @@ export async function POST(request: NextRequest) {
 
     // Verify strain belongs to grower
     const strain = await db.strain.findFirst({
-      where: { id: strainId, growerId }
+      where: { id: strainId, growerId },
+      select: { id: true }
     });
 
     if (!strain) {

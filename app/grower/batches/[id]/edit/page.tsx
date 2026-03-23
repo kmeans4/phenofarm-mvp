@@ -28,7 +28,6 @@ interface Batch {
 
 interface BatchFormData {
   batchNumber: string;
-  lotNumber: string;
   harvestDate: string;
   strainId: string;
   thc: string;
@@ -51,7 +50,6 @@ export default function EditBatchPage() {
   const [strains, setStrains] = useState<Strain[]>([]);
   const [formData, setFormData] = useState<BatchFormData>({
     batchNumber: '',
-    lotNumber: '',
     harvestDate: '',
     strainId: '',
     thc: '',
@@ -80,7 +78,6 @@ export default function EditBatchPage() {
           setBatch(data);
           setFormData({
             batchNumber: data.batchNumber || '',
-            lotNumber: data.lotNumber || '',
             harvestDate: data.harvestDate ? data.harvestDate.split('T')[0] : '',
             strainId: data.strainId || '',
             thc: data.thc?.toString() || '',
@@ -137,7 +134,6 @@ export default function EditBatchPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           batchNumber: formData.batchNumber.trim(),
-          lotNumber: formData.lotNumber.trim() || null,
           harvestDate: formData.harvestDate,
           strainId: formData.strainId,
           thc: formData.thc.trim() || null,
@@ -201,35 +197,19 @@ export default function EditBatchPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
-                <label htmlFor="batchNumber" className="block text-sm font-medium text-gray-700">
-                  Batch Number *
-                </label>
-                <input
-                  id="batchNumber"
-                  type="text"
-                  required
-                  value={formData.batchNumber}
-                  onChange={(e) => handleChange('batchNumber', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="e.g., OGK-2024-001"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label htmlFor="lotNumber" className="block text-sm font-medium text-gray-700">
-                  Lot Number
-                </label>
-                <input
-                  id="lotNumber"
-                  type="text"
-                  value={formData.lotNumber}
-                  onChange={(e) => handleChange('lotNumber', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                  placeholder="Optional lot number"
-                />
-              </div>
+            <div className="space-y-2">
+              <label htmlFor="batchNumber" className="block text-sm font-medium text-gray-700">
+                Batch Number *
+              </label>
+              <input
+                id="batchNumber"
+                type="text"
+                required
+                value={formData.batchNumber}
+                onChange={(e) => handleChange('batchNumber', e.target.value)}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="e.g., OGK-2024-001"
+              />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -26,7 +26,7 @@ export async function GET(
     const batch = await db.batch.findFirst({
       where: { id, growerId },
       include: {
-        strain: true,
+        strain: { select: { id: true, name: true, genetics: true } },
         products: {
           select: { id: true, name: true, inventoryQty: true, price: true }
         },
@@ -105,7 +105,8 @@ export async function PUT(
     // Verify strain if being changed
     if (strainId && strainId !== existing.strainId) {
       const strain = await db.strain.findFirst({
-        where: { id: strainId, growerId }
+        where: { id: strainId, growerId },
+        select: { id: true }
       });
       if (!strain) {
         return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
