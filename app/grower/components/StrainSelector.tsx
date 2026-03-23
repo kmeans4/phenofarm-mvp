@@ -94,7 +94,13 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
       <div className="flex items-center gap-2">
         <select
           value={strainId}
-          onChange={(e) => onStrainChange(e.target.value || null)}
+          onChange={(e) => {
+            const selectedValue = e.target.value || null;
+            onStrainChange(selectedValue);
+            if (selectedValue) {
+              setShowCreateForm(false);
+            }
+          }}
           className={INPUT_CLASSES}
         >
           <option value="">Select a strain (optional)</option>
