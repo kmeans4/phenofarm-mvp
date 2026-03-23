@@ -94,7 +94,6 @@ function RevenueChartEmpty() {
       }
       title="No revenue data yet"
       description="Start adding products and receiving orders to see your revenue trend here."
-      action={{ label: 'Add Your First Product', href: '/grower/products/add' }}
     />
   );
 }
@@ -113,7 +112,7 @@ export default async function GrowerDashboardPage() {
   }
 
   // Fetch grower dashboard data
-  const [recentOrders, recentCustomers, activeProducts, syncStatus] = await Promise.all([
+  const [recentOrders, recentCustomers, activeProducts] = await Promise.all([
     // Recent orders (last 100 for client-side filtering)
     db.$queryRaw<{ orderId: string; dispensaryName: string; totalAmount: number; status: string; createdAt: Date }[]>`
       SELECT 
@@ -149,15 +148,6 @@ export default async function GrowerDashboardPage() {
       SELECT COUNT(*)::int as count
       FROM "products"
       WHERE "growerId" = ${user.growerId}
-    `,
-
-    // Latest sync status
-    db.$queryRaw<{ success: boolean; recordsSynced: number; errorMessage: string | null; createdAt: Date }[]>`
-      SELECT "success", "recordsSynced", "errorMessage", "createdAt"
-      FROM "metrc_sync_logs"
-      WHERE "growerId" = ${user.growerId}
-      ORDER BY "createdAt" DESC
-      LIMIT 1
     `,
   ]);
 
@@ -204,17 +194,6 @@ export default async function GrowerDashboardPage() {
       revenue: dayData ? Number(dayData.revenue) : 0,
     };
   });
-
-  // Get sync status
-  const latestSync = syncStatus[0];
-  const syncStatusDisplay = latestSync 
-    ? latestSync.success 
-      ? { status: 'success', message: `Last sync: ${format(latestSync.createdAt, 'MMM d, h:mm a')}` }
-      : { status: 'error', message: latestSync.errorMessage || 'Sync failed' }
-    : { status: 'pending', message: 'Never synced' };
-
-  const statusColor = syncStatusDisplay.status === 'success' ? 'green' :
-                      syncStatusDisplay.status === 'error' ? 'red' : 'yellow';
 
   // Calculate max revenue for chart, avoid division by zero
   const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
@@ -277,7 +256,7 @@ export default async function GrowerDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <QuickAction
           title="View Product Catalog"
           href="/grower/products"
@@ -289,17 +268,7 @@ export default async function GrowerDashboardPage() {
           description={stats.activeProducts > 0 ? `${stats.activeProducts} active products` : 'No products yet — add your first one'}
           color="blue"
         />
-        <QuickAction
-          title="Check Metrc Sync"
-          href="/grower/metrc-sync"
-          icon={
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-            </svg>
-          }
-          description={syncStatusDisplay.message}
-          color={statusColor}
-        />
+
         <QuickAction
           title="Add New Product"
           href="/grower/products/add"
