@@ -137,7 +137,7 @@ export function ProductForm({
   const [showExitPrompt, setShowExitPrompt] = useState(false);
   const { showToast } = useToast();
 
-  const initialDataState = {
+  const initialDataState: ProductFormData = {
     id: initialData?.id,
     name: initialData?.name || '',
     productType: initialData?.productType || '',
@@ -156,7 +156,7 @@ export function ProductForm({
     isFeatured: initialData?.isFeatured || false,
   };
 
-  const [dirtyBaseline, setDirtyBaseline] = useState(initialDataState);
+  const [dirtyBaseline, setDirtyBaseline] = useState<ProductFormData>(initialDataState);
 
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: !!initialData.id,
