@@ -28,6 +28,18 @@ interface ProductCardProps {
   onToggleAvailability: () => void;
 }
 
+const formatUnitLabel = (unit: string, qty: number): string => {
+  const trimmed = (unit || '').trim();
+  if (!trimmed) return '';
+  if (qty === 1) return trimmed;
+
+  const lower = trimmed.toLowerCase();
+  if (lower === 'oz' || lower === 'ml') return trimmed;
+  if (lower.endsWith('s')) return trimmed;
+
+  return `${trimmed}s`;
+};
+
 export function ProductCard({ product, onEdit, onDelete, onToggleAvailability }: ProductCardProps) {
   return (
     <Card className="bg-white shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
@@ -53,7 +65,7 @@ export function ProductCard({ product, onEdit, onDelete, onToggleAvailability }:
         <div className="flex items-center gap-4 text-sm text-gray-600 mt-4">
           <div>
             <span className="text-gray-500">Inventory: </span>
-            <span className="font-medium text-gray-900">{product.inventoryQty} {product.unit}</span>
+            <span className="font-medium text-gray-900">{product.inventoryQty} {formatUnitLabel(product.unit, product.inventoryQty)}</span>
           </div>
           <div>
             <span className="text-gray-500">Added: </span>

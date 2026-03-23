@@ -39,6 +39,18 @@ const columns = [
   { key: 'isAvailable', label: 'Status' },
 ];
 
+const formatUnitLabel = (unit: string, qty: number): string => {
+  const trimmed = (unit || '').trim();
+  if (!trimmed) return '';
+  if (qty === 1) return trimmed;
+
+  const lower = trimmed.toLowerCase();
+  if (lower === 'oz' || lower === 'ml') return trimmed;
+  if (lower.endsWith('s')) return trimmed;
+
+  return `${trimmed}s`;
+};
+
 export function ProductTable({ 
   products, 
   onEdit, 
@@ -128,7 +140,7 @@ export function ProductTable({
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
                       <span className="font-medium text-gray-900">{product.inventoryQty}</span>
-                      <span className="text-xs text-gray-500">{product.unit}</span>
+                      <span className="text-xs text-gray-500">{formatUnitLabel(product.unit, product.inventoryQty)}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
