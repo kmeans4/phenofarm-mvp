@@ -49,7 +49,6 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
         throw new Error(data.error || 'Failed to update product');
       }
 
-      alert('Product updated successfully!');
       router.push('/grower/products');
       router.refresh();
     } catch (err: unknown) {
@@ -75,7 +74,6 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
         throw new Error(data.error || 'Failed to save draft');
       }
 
-      alert('Draft saved successfully!');
       router.push('/grower/products');
       router.refresh();
     } catch (err: unknown) {

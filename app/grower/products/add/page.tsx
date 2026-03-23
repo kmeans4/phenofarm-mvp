@@ -95,7 +95,6 @@ export default function AddProductPage() {
   const handleSubmit = async (formData: ProductFormData) => {
     try {
       await saveProduct(formData, PRODUCT_STATUS.PUBLISHED);
-      alert('Product created successfully!');
       router.push('/grower/products');
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'An error occurred');
@@ -105,7 +104,6 @@ export default function AddProductPage() {
   const handleSaveDraft = async (formData: ProductFormData) => {
     try {
       await saveProduct(formData, PRODUCT_STATUS.DRAFT);
-      alert('Draft saved successfully!');
       router.push('/grower/products');
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'An error occurred');

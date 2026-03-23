@@ -156,15 +156,17 @@ export function ProductForm({
     isFeatured: initialData?.isFeatured || false,
   };
 
+  const [dirtyBaseline, setDirtyBaseline] = useState(initialDataState);
+
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: !!initialData.id,
     message: 'You have unsaved changes in this product. Are you sure you want to leave?',
   });
 
   useEffect(() => {
-    const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialDataState);
+    const hasChanges = JSON.stringify(formData) !== JSON.stringify(dirtyBaseline);
     setIsDirty(hasChanges);
-  }, [formData, setIsDirty]);
+  }, [formData, dirtyBaseline, setIsDirty]);
 
   useEffect(() => {
     if (!initialData.id && typeof window !== 'undefined') {
@@ -301,6 +303,9 @@ export function ProductForm({
       return;
     }
     
+    const wasDirty = isDirty;
+    setIsDirty(false);
+
     try {
       await onSubmit({
         ...formData,
@@ -309,8 +314,10 @@ export function ProductForm({
       if (!initialData.id && typeof window !== 'undefined') {
         window.sessionStorage.removeItem('addProductDraft');
       }
+      setDirtyBaseline({ ...formData });
       resetDirtyState();
     } catch {
+      if (wasDirty) setIsDirty(true);
       // Parent handles user-facing submit errors.
     }
   };
@@ -352,14 +359,19 @@ export function ProductForm({
 
   const handleSaveDraft = async () => {
     if (!onSaveDraft) return;
+    const wasDirty = isDirty;
+    setIsDirty(false);
+
     try {
       await onSaveDraft({
         ...formData,
         images: getBase64Images(),
       });
       showToast('success', 'Draft saved');
+      setDirtyBaseline({ ...formData });
       resetDirtyState();
     } catch {
+      if (wasDirty) setIsDirty(true);
       // Parent handles errors
     }
   };
