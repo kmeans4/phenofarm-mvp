@@ -155,7 +155,7 @@ export default function BatchesPage() {
         <>
           <div className="sm:hidden space-y-3">
             {batches.map((batch) => (
-              <div key={batch.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-3">
+              <div key={batch.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 space-y-2.5 sm:space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
                     <p className="text-xs text-gray-500">Batch #</p>
@@ -202,35 +202,35 @@ export default function BatchesPage() {
               <table className="w-full">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Batch #</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Strain</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Harvest Date</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">THC</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">CBD</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Products</th>
-                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-600">Batch #</th>
+                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-600">Strain</th>
+                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-600">Harvest Date</th>
+                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-600">THC</th>
+                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-600">CBD</th>
+                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-600">Products</th>
+                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-600">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
                   {batches.map((batch) => (
                     <tr key={batch.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3">
-                        <span className="font-medium text-gray-900">{batch.batchNumber}</span>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3">
+                        <span className="font-medium text-sm sm:text-base text-gray-900">{batch.batchNumber}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{batch.strain?.name || 'N/A'}</td>
-                      <td className="px-4 py-3 text-gray-600">{formatDate(batch.harvestDate)}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{batch.strain?.name || 'N/A'}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{formatDate(batch.harvestDate)}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                         {batch.thc ? (
                           <span className="text-green-600 font-medium">{batch.thc.toFixed(1)}%</span>
                         ) : <span className="text-gray-400">-</span>}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
                         {batch.cbd ? (
                           <span className="text-blue-600 font-medium">{batch.cbd.toFixed(1)}%</span>
                         ) : <span className="text-gray-400">-</span>}
                       </td>
-                      <td className="px-4 py-3 text-gray-600">{batch._count.products}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{batch._count.products}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3">
                         <div className="flex gap-2">
                           <Button variant="outline" size="sm" asChild>
                             <Link href={'/grower/batches/' + batch.id + '/edit'}>Edit</Link>

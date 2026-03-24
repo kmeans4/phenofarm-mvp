@@ -238,39 +238,39 @@ export default function StrainsPage() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[680px]">
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
+              <table className="w-full min-w-[620px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Strain</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genetics</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batches</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Strain</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Genetics</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Batches</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {strains.map((strain) => (
                     <tr key={strain.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="font-medium text-gray-900">{strain.name}</div>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3">
+                        <div className="font-medium text-sm sm:text-base text-gray-900">{strain.name}</div>
                         {strain.strainType && (
-                          <div className="text-xs text-gray-500">{STRAIN_TYPE_LABELS[strain.strainType]}</div>
+                          <div className="text-[11px] sm:text-xs text-gray-500">{STRAIN_TYPE_LABELS[strain.strainType]}</div>
                         )}
                         {strain.description && (
-                          <div className="text-sm text-gray-500 line-clamp-1">{strain.description}</div>
+                          <div className="text-xs sm:text-sm text-gray-500 line-clamp-1">{strain.description}</div>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
                         {strain.genetics || '-'}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
                         {strain._count.batches}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
                         {strain._count.products}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3">
                         <div className="flex flex-col sm:flex-row gap-2">
                           <Button variant="outline" size="sm" asChild>
                             <Link href={'/grower/strains/' + strain.id + '/edit'} className="whitespace-nowrap">Edit</Link>

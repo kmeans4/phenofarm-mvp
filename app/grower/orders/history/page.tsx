@@ -67,25 +67,25 @@ export default async function GrowerOrdersHistoryPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Historical Orders</p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-1">Historical Orders</p>
             <p className="text-3xl font-bold text-gray-900">{orders.length}</p>
           </CardContent>
         </Card>
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Delivered</p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-1">Delivered</p>
             <p className="text-3xl font-bold text-green-600">{deliveredOrders.length}</p>
           </CardContent>
         </Card>
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Cancelled</p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-1">Cancelled</p>
             <p className="text-3xl font-bold text-red-600">{cancelledOrders.length}</p>
           </CardContent>
         </Card>
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-sm text-gray-600 mb-1">Delivered Revenue</p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-1">Delivered Revenue</p>
             <p className="text-3xl font-bold text-gray-900">
               ${deliveredRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
@@ -118,42 +118,42 @@ export default async function GrowerOrdersHistoryPage() {
               </Link>
             </div>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto -mx-4 sm:mx-0">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Order #</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Customer</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Closed</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Total</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Status</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Actions</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Order #</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Customer</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Closed</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Total</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Status</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
                   {orders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3">
                         <div className="font-medium text-gray-900">#{order.orderId}</div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
                         {order.dispensary.businessName}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
                         {format(order.updatedAt, 'MMM d, yyyy')}
                       </td>
-                      <td className="px-4 py-3 text-sm font-bold text-gray-900">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-900">
                         ${Number(order.totalAmount).toFixed(2)}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3">
                         <Badge variant={order.status === 'DELIVERED' ? 'success' : 'error'}>
                           {order.status === 'DELIVERED' ? 'Delivered' : 'Cancelled'}
                         </Badge>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3">
                         <Link 
                           href={`/grower/orders/${order.id}`}
-                          className="text-green-600 hover:text-green-700 font-medium text-sm"
+                          className="text-green-600 hover:text-green-700 font-medium text-xs sm:text-sm"
                         >
                           View
                         </Link>

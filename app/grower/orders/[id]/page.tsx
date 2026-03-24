@@ -271,36 +271,36 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 <table className="w-full">
                   <thead className="bg-gray-50 border-b border-gray-200">
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Qty</th>
-                      <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
+                      <th className="px-3 sm:px-4 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
+                      <th className="px-3 sm:px-4 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Qty</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
                     {order.items.map((item) => (
                       <tr key={item.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4">
+                        <td className="px-3 sm:px-6 py-2.5 sm:py-4">
                           <div>
-                            <p className="font-medium text-gray-900">{item.product?.name || 'Unknown Product'}</p>
+                            <p className="font-medium text-sm sm:text-base text-gray-900">{item.product?.name || 'Unknown Product'}</p>
                             {item.product?.strain && (
-                              <p className="text-sm text-gray-500">{item.product.strain}</p>
+                              <p className="text-xs sm:text-sm text-gray-500">{item.product.strain}</p>
                             )}
                             {item.product?.productType && (
-                              <p className="text-xs text-gray-400 mt-0.5">
+                              <p className="text-[11px] text-gray-400 mt-0.5">
                                 {item.product.productType}
                                 {item.product.subType && ` - ${item.product.subType}`}
                               </p>
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-4 text-right text-gray-600">
+                        <td className="px-3 sm:px-4 py-2.5 sm:py-4 text-right text-xs sm:text-sm text-gray-600">
                           {formatCurrency(item.unitPrice)}/{item.product?.unit || 'unit'}
                         </td>
-                        <td className="px-4 py-4 text-right text-gray-900 font-medium">
+                        <td className="px-3 sm:px-4 py-2.5 sm:py-4 text-right text-sm sm:text-base text-gray-900 font-medium">
                           {item.quantity}
                         </td>
-                        <td className="px-6 py-4 text-right text-gray-900 font-semibold">
+                        <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-right text-sm sm:text-base text-gray-900 font-semibold">
                           {formatCurrency(item.totalPrice)}
                         </td>
                       </tr>
@@ -312,12 +312,12 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               {/* Mobile Card View */}
               <div className="sm:hidden divide-y divide-gray-100">
                 {order.items.map((item) => (
-                  <div key={item.id} className="p-4">
+                  <div key={item.id} className="p-3">
                     <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1 min-w-0 mr-4">
-                        <p className="font-medium text-gray-900">{item.product?.name || 'Unknown Product'}</p>
+                      <div className="flex-1 min-w-0 mr-3">
+                        <p className="font-medium text-sm text-gray-900">{item.product?.name || 'Unknown Product'}</p>
                         {item.product?.strain && (
-                          <p className="text-sm text-gray-500 truncate">{item.product.strain}</p>
+                          <p className="text-xs text-gray-500 truncate">{item.product.strain}</p>
                         )}
                       </div>
                       <p className="font-semibold text-gray-900 whitespace-nowrap">

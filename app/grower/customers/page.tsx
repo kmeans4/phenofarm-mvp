@@ -81,7 +81,7 @@ export default async function GrowerCustomersPage() {
           <>
           <div className="sm:hidden divide-y divide-gray-100">
             {customers.map((customer) => (
-              <div key={customer.id} className="p-4 space-y-3">
+              <div key={customer.id} className="p-3 sm:p-4 space-y-2.5 sm:space-y-3">
                 <div>
                   <p className="font-medium text-gray-900">{customer.businessName}</p>
                   {customer.licenseNumber && (
@@ -110,26 +110,26 @@ export default async function GrowerCustomersPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Business</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Contact</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Location</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Business</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Contact</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Email</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Phone</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Location</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {customers.map((customer) => (
                   <tr key={customer.id}>
-                    <td className="px-6 py-4">
-                      <div className="font-medium text-gray-900">{customer.businessName}</div>
-                      {customer.licenseNumber && <div className="text-xs text-gray-500">License: {customer.licenseNumber}</div>}
+                    <td className="px-3 sm:px-6 py-2.5 sm:py-4">
+                      <div className="font-medium text-sm sm:text-base text-gray-900">{customer.businessName}</div>
+                      {customer.licenseNumber && <div className="text-[11px] sm:text-xs text-gray-500">License: {customer.licenseNumber}</div>}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{customer.user?.name || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{customer.user?.email || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{customer.phone || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{customer.city}, {customer.state}</td>
-                    <td className="px-6 py-4">
+                    <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.user?.name || '-'}</td>
+                    <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.user?.email || '-'}</td>
+                    <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.phone || '-'}</td>
+                    <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.city}, {customer.state}</td>
+                    <td className="px-3 sm:px-6 py-2.5 sm:py-4">
                       <Link
                         href={'/grower/customers/' + customer.id + '/edit'}
                         className="text-blue-600 hover:text-blue-700 font-medium text-sm"

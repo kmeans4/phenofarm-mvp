@@ -360,20 +360,20 @@ export default function GrowerProductsPage() {
     
     return (
       <tr className="hover:bg-gray-50 transition-colors">
-        <td className="px-4 py-3">
-          <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>
+        <td className="px-3 sm:px-4 py-2 sm:py-3">
+          <div className="font-medium text-sm sm:text-base text-gray-900">{product?.name || 'Unnamed'}</div>
           {strainName && (
             <div className="flex items-center gap-2">
-              <div className="text-sm text-gray-500">{strainName}</div>
-              {strainTypeLabel && <span className="text-[11px] uppercase tracking-wide text-gray-400">{strainTypeLabel}</span>}
+              <div className="text-xs sm:text-sm text-gray-500">{strainName}</div>
+              {strainTypeLabel && <span className="text-[10px] sm:text-[11px] uppercase tracking-wide text-gray-400">{strainTypeLabel}</span>}
             </div>
           )}
         </td>
-        <td className="px-4 py-3 text-sm text-gray-600">
+        <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
           {product?.productType || product?.categoryLegacy || '-'}
         </td>
-        <td className="px-4 py-3">
-          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+        <td className="px-3 sm:px-4 py-2 sm:py-3">
+          <span className={`px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-medium ${
             (product?.inventoryQty || 0) <= 0
               ? 'bg-red-100 text-red-700'
               : product?.isAvailable 
@@ -383,15 +383,15 @@ export default function GrowerProductsPage() {
             {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Out of Stock'}
           </span>
         </td>
-        <td className="px-4 py-3 text-sm text-gray-900 font-medium">
+        <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-900 font-medium">
           ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
         </td>
-        <td className="px-4 py-3 text-sm text-gray-600">
+        <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
           <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
             {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} ${formatInventoryUnit(product?.unit, product?.inventoryQty || 0)}`}
           </span>
         </td>
-        <td className="px-4 py-3">
+        <td className="px-3 sm:px-4 py-2 sm:py-3">
           <div className="flex gap-2">
             <Button variant="outline" size="sm" asChild>
               <Link href={'/grower/products/' + product?.id + '/edit'}>Edit</Link>
@@ -420,16 +420,16 @@ export default function GrowerProductsPage() {
   // Product Table component for list view
   const ProductTable = ({ products }: { products: Product[] }) => (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <table className="w-full min-w-[640px]">
           <thead className="bg-gray-50 border-b border-gray-200">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Inventory</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Inventory</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">

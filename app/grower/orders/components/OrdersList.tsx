@@ -175,11 +175,11 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
               </Button>
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-6">
-              <table className="w-full text-left border-collapse min-w-[700px]">
+            <div className="overflow-x-auto -mx-4 sm:-mx-6">
+              <table className="w-full text-left border-collapse min-w-[640px]">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="px-4 py-3">
+                    <th className="px-3 sm:px-4 py-2 sm:py-3">
                       <input
                         type="checkbox"
                         checked={selectedOrders.size === orders.length && orders.length > 0}
@@ -187,12 +187,12 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                         className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                       />
                     </th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Order #</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Dispensary</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Date</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Total</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Status</th>
-                    <th className="px-4 py-3 text-sm font-medium text-gray-700">Actions</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Order #</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Dispensary</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Date</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Total</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Status</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -203,7 +203,7 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                         key={order.id} 
                         className={`hover:bg-gray-50 transition-colors ${selectedOrders.has(order.id) ? 'bg-green-50/50' : ''}`}
                       >
-                        <td className="px-4 py-3">
+                        <td className="px-3 sm:px-4 py-2 sm:py-3">
                           <input
                             type="checkbox"
                             checked={selectedOrders.has(order.id)}
@@ -211,24 +211,24 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                             className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                           />
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 sm:px-4 py-2 sm:py-3">
                           <div className="font-medium text-gray-900">#{order.orderId}</div>
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
+                        <td className="px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-600">
                           {order.dispensary.businessName}
                         </td>
-                        <td className="px-4 py-3 text-sm text-gray-600">
+                        <td className="px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-600">
                           {format(new Date(order.createdAt), 'MMM d, yyyy')}
                         </td>
-                        <td className="px-4 py-3 text-sm font-bold text-gray-900">
+                        <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-900">
                           ${Number(order.totalAmount).toFixed(2)}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 sm:px-4 py-2 sm:py-3">
                           <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${colors.bg} ${colors.text} ${colors.border} border`}>
                             {STATUS_LABELS[order.status] || order.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 sm:px-4 py-2 sm:py-3">
                           <Button variant="ghost" size="sm" asChild>
                             <Link href={`/grower/orders/${order.id}`}>
                               View

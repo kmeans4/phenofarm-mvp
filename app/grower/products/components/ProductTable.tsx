@@ -81,7 +81,7 @@ export function ProductTable({
         <CardContent>
           <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl">
             <p className="text-gray-600 mb-4">No products found</p>
-            <p className="text-sm text-gray-500">Add your first product to get started</p>
+            <p className="text-xs sm:text-sm text-gray-500">Add your first product to get started</p>
           </div>
         </CardContent>
       </Card>
@@ -94,14 +94,14 @@ export function ProductTable({
         <CardTitle>Products</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <table className="w-full text-left border-collapse min-w-[640px]">
             <thead>
               <tr className="border-b border-gray-200">
                 {columns.map((col) => (
                   <th 
                     key={col.key}
-                    className="px-4 py-3 text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50"
+                    className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50"
                     onClick={() => handleSort(col.key)}
                   >
                     <div className="flex items-center gap-1">
@@ -114,41 +114,41 @@ export function ProductTable({
                     </div>
                   </th>
                 ))}
-                <th className="px-4 py-3 text-sm font-medium text-gray-700">Actions</th>
+                <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
               {filteredProducts.map((product) => (
                 <tr key={product.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
+                  <td className="px-3 sm:px-4 py-2 sm:py-3">
                     <div>
-                      <p className="font-medium text-gray-900">{product.name}</p>
+                      <p className="font-medium text-sm sm:text-base text-gray-900">{product.name}</p>
                       {product.strain && (
-                        <p className="text-sm text-gray-500">{product.strain}</p>
+                        <p className="text-xs sm:text-sm text-gray-500">{product.strain}</p>
                       )}
                       {product.category && (
                         <p className="text-xs text-gray-400 mt-1">{product.category}</p>
                       )}
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 sm:px-4 py-2 sm:py-3">
                     {product.category || '-'}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 sm:px-4 py-2 sm:py-3">
                     ${product.price.toFixed(2)}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 sm:px-4 py-2 sm:py-3">
                     <div className="flex items-center gap-1">
-                      <span className="font-medium text-gray-900">{product.inventoryQty}</span>
+                      <span className="font-medium text-sm sm:text-base text-gray-900">{product.inventoryQty}</span>
                       <span className="text-xs text-gray-500">{formatUnitLabel(product.unit, product.inventoryQty)}</span>
                     </div>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 sm:px-4 py-2 sm:py-3">
                     <Badge variant={product.isAvailable ? 'success' : 'error'}>
                       {product.isAvailable ? 'Available' : 'Out of Stock'}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-3 sm:px-4 py-2 sm:py-3">
                     <div className="flex gap-2">
                       <Button
                         variant="default"
