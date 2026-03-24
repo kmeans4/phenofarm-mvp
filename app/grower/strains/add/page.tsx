@@ -82,10 +82,10 @@ export default function AddStrainPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-5 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Add New Strain</h1>
-        <p className="text-gray-600 mt-1">Create a new cannabis genetics entry</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add New Strain</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Create a new cannabis genetics entry</p>
       </div>
 
       {error && (
@@ -175,13 +175,14 @@ export default function AddStrainPage() {
               />
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-gray-200">
-              <Button type="submit" variant="primary" disabled={loading}>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={loading}>
                 {loading ? 'Creating...' : 'Create Strain'}
               </Button>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 variant="outline"
+                className="w-full sm:w-auto"
                 onClick={() => router.push('/grower/strains')}
               >
                 Cancel

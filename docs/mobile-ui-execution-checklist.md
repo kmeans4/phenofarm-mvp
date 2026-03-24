@@ -38,7 +38,7 @@ _Last updated: 2026-03-23_
 | 4 | `/grower/products/add` | DONE | Product form action bar now stacks full-width primary/secondary/cancel buttons on mobile for easier tapping and fewer misclicks. |
 | 5 | `/grower/products/[id]/edit` | DONE | Added a clear mobile back affordance (“Back to Products”) and reduced heading scale for cleaner top-of-form hierarchy on small screens. |
 | 6 | `/grower/strains` | DONE | Made page header mobile-friendly (smaller title scale) and changed Add Strain CTA to full-width on mobile; view toggle now aligns left on mobile for easier reach. |
-| 7 | `/grower/strains/add` | TODO | — |
+| 7 | `/grower/strains/add` | DONE | Improved mobile hierarchy (smaller heading scale) and stacked Create/Cancel actions full-width for easier thumb use. |
 | 8 | `/grower/strains/[id]/edit` | TODO | — |
 | 9 | `/grower/batches` | TODO | — |
 | 10 | `/grower/batches/add` | TODO | — |
