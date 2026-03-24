@@ -33,7 +33,7 @@ _Last updated: 2026-03-23_
 | Order | Page | Status | Notes |
 |---|---|---|---|
 | 1 | `/grower` | DONE | Header now stacks/wraps on mobile; long grower business names no longer crowd title row. Cards/panels use tighter mobile padding for better readability. |
-| 2 | `/grower/dashboard` | TODO | — |
+| 2 | `/grower/dashboard` | DONE | Added top spacing and mobile stacking for Recent Activity date filter so dropdown is no longer tight against separator/header line. |
 | 3 | `/grower/products` | TODO | — |
 | 4 | `/grower/products/add` | TODO | — |
 | 5 | `/grower/products/[id]/edit` | TODO | — |

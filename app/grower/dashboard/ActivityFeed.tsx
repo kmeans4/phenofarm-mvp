@@ -74,9 +74,11 @@ export function ActivityFeed({ orders }: ActivityFeedProps) {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="pt-1 sm:pt-2 mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
-        <DateRangeFilter value={dateRange} onChange={setDateRange} />
+        <div className="self-start sm:self-auto">
+          <DateRangeFilter value={dateRange} onChange={setDateRange} />
+        </div>
       </div>
       
       {filteredOrders.length > 0 ? (
