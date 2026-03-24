@@ -217,17 +217,17 @@ export default function StrainsPage() {
                     <span>{strain._count.products} products</span>
                   </div>
 
-                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-100">
-                    <Button variant="outline" size="sm" asChild className="flex-1">
-                      <Link href={'/grower/strains/' + strain.id + '/edit'}>Edit</Link>
+                  <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-gray-100">
+                    <Button variant="outline" size="sm" asChild className="w-full sm:flex-1">
+                      <Link href={'/grower/strains/' + strain.id + '/edit'} className="inline-flex w-full justify-center">Edit</Link>
                     </Button>
                     <Button 
                       variant="primary" 
                       size="sm"
                       asChild
-                      className="flex-1"
+                      className="w-full sm:flex-1"
                     >
-                      <Link href={'/grower/products/add?strainId=' + strain.id}>
+                      <Link href={'/grower/products/add?strainId=' + strain.id} className="inline-flex w-full justify-center">
                         + Product
                       </Link>
                     </Button>
@@ -239,7 +239,7 @@ export default function StrainsPage() {
         ) : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
-              <table className="w-full">
+              <table className="w-full min-w-[680px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
                     <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Strain</th>
@@ -271,16 +271,16 @@ export default function StrainsPage() {
                         {strain._count.products}
                       </td>
                       <td className="px-4 py-3">
-                        <div className="flex gap-2">
+                        <div className="flex flex-col sm:flex-row gap-2">
                           <Button variant="outline" size="sm" asChild>
-                            <Link href={'/grower/strains/' + strain.id + '/edit'}>Edit</Link>
+                            <Link href={'/grower/strains/' + strain.id + '/edit'} className="whitespace-nowrap">Edit</Link>
                           </Button>
                           <Button 
                             variant="primary" 
                             size="sm"
                             asChild
                           >
-                            <Link href={'/grower/products/add?strainId=' + strain.id}>
+                            <Link href={'/grower/products/add?strainId=' + strain.id} className="whitespace-nowrap">
                               + Product
                             </Link>
                           </Button>
