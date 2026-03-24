@@ -6,6 +6,8 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Product } from '@/types';
 
+const LOW_STOCK_THRESHOLD = 10;
+
 export default function AddOrderPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
@@ -49,7 +51,7 @@ export default function AddOrderPage() {
       if (prodRes.ok) {
         const prodData = await prodRes.json();
         if (Array.isArray(prodData)) {
-          setProducts(prodData.filter((p) => (p?.inventoryQty || 0) > 0));
+          setProducts(prodData.filter((p) => (p?.inventoryQty || 0) > 0 && p?.isAvailable));
         }
       }
     } catch (err) {
@@ -57,6 +59,67 @@ export default function AddOrderPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const getProductById = (productId: string) => products.find((p) => p?.id === productId);
+
+  const getAllocatedQuantity = (
+    items: {productId: string; quantity: number; unitPrice: number}[],
+    productId: string,
+    excludeIndex?: number
+  ) => items.reduce((sum, item, index) => {
+    if (excludeIndex !== undefined && index === excludeIndex) return sum;
+    if (item.productId !== productId) return sum;
+    return sum + (Number.isFinite(item.quantity) ? item.quantity : 0);
+  }, 0);
+
+  const getRemainingForLine = (
+    items: {productId: string; quantity: number; unitPrice: number}[],
+    productId: string,
+    lineIndex: number
+  ) => {
+    const product = getProductById(productId);
+    const totalAvailable = Number(product?.inventoryQty || 0);
+    const allocatedElsewhere = getAllocatedQuantity(items, productId, lineIndex);
+    return Math.max(0, totalAvailable - allocatedElsewhere);
+  };
+
+  const getInventoryIssues = (items: {productId: string; quantity: number; unitPrice: number}[]) => {
+    const issues: { productName: string; requested: number; available: number }[] = [];
+
+    const byProduct = new Map<string, number>();
+    items.forEach((item) => {
+      if (!item.productId) return;
+      byProduct.set(item.productId, (byProduct.get(item.productId) || 0) + (Number(item.quantity) || 0));
+    });
+
+    for (const [productId, requested] of byProduct.entries()) {
+      const product = getProductById(productId);
+      const available = Number(product?.inventoryQty || 0);
+      if (!product || requested > available) {
+        issues.push({
+          productName: product?.name || 'Unknown product',
+          requested,
+          available,
+        });
+      }
+    }
+
+    return issues;
+  };
+
+  const handleSetMaxQuantity = (index: number) => {
+    setFormData((prev) => {
+      const newItems = [...prev.items];
+      const item = newItems[index];
+      if (!item) return prev;
+      const maxForLine = getRemainingForLine(newItems, item.productId, index);
+      newItems[index] = {
+        ...item,
+        quantity: maxForLine,
+      };
+      return { ...prev, items: newItems };
+    });
   };
 
   const handleAddItem = () => {
@@ -80,13 +143,36 @@ export default function AddOrderPage() {
   const handleItemChange = (index: number, field: string, value: string | number) => {
     setFormData((prev) => {
       const newItems = [...prev.items];
-      newItems[index] = { ...newItems[index], [field]: value };
+      const currentItem = newItems[index];
+      if (!currentItem) return prev;
+
+      newItems[index] = { ...currentItem, [field]: value };
+
       if (field === 'productId') {
         const product = products.find((p) => p?.id === value);
         if (product) {
           newItems[index].unitPrice = typeof product?.price === 'number' ? product.price : 0;
         }
+
+        const maxForLine = getRemainingForLine(newItems, String(value), index);
+        if (maxForLine <= 0) {
+          newItems[index].quantity = 0;
+        } else if (newItems[index].quantity > maxForLine || newItems[index].quantity <= 0) {
+          newItems[index].quantity = Math.min(Math.max(newItems[index].quantity || 1, 1), maxForLine);
+        }
       }
+
+      if (field === 'quantity') {
+        const requestedQty = Number(value) || 0;
+        const maxForLine = getRemainingForLine(newItems, newItems[index].productId, index);
+
+        if (maxForLine <= 0) {
+          newItems[index].quantity = 0;
+        } else {
+          newItems[index].quantity = Math.min(Math.max(requestedQty, 1), maxForLine);
+        }
+      }
+
       return { ...prev, items: newItems };
     });
   };
@@ -118,6 +204,20 @@ export default function AddOrderPage() {
       return;
     }
 
+    if (formData.items.some((item) => (Number(item.quantity) || 0) <= 0)) {
+      setError('Each line item must have a quantity of at least 1.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const inventoryIssues = getInventoryIssues(formData.items);
+    if (inventoryIssues.length > 0) {
+      const first = inventoryIssues[0];
+      setError(`Not enough inventory for ${first.productName} (requested ${first.requested}, available ${first.available}).`);
+      setIsSubmitting(false);
+      return;
+    }
+
     try {
       const response = await fetch('/api/orders', {
         method: 'POST',
@@ -135,9 +235,14 @@ export default function AddOrderPage() {
         setTimeout(() => router.push('/grower/orders'), 2000);
       } else {
         const errorData = await response.json().catch(() => ({}));
-        setError(errorData.message || 'Failed to create order');
+        if (response.status === 409 && Array.isArray(errorData.issues) && errorData.issues.length > 0) {
+          const first = errorData.issues[0];
+          setError(`Inventory changed for ${first.productName} (requested ${first.requested}, available ${first.available}). Please review quantities.`);
+        } else {
+          setError(errorData.error || errorData.message || 'Failed to create order');
+        }
       }
-    } catch (err) {
+    } catch {
       setError('Failed to create order');
     } finally {
       setIsSubmitting(false);
@@ -256,48 +361,89 @@ export default function AddOrderPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {formData.items.map((item, index: number) => (
-                  <div key={index} className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 bg-gray-50 rounded-lg border">
-                    <div className="flex-1">
-                      <label className="block text-xs text-gray-500 mb-1">Product</label>
-                      <select
-                        value={item.productId}
-                        onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      >
-                        {products.map((p) => (
-                          <option key={p.id} value={p.id}>
-                            {p.name} - ${typeof p.price === 'number' ? p.price.toFixed(2) : '0.00'}
-                          </option>
-                        ))}
-                      </select>
+                {formData.items.map((item, index: number) => {
+                  const product = getProductById(item.productId);
+                  const totalAvailable = Number(product?.inventoryQty || 0);
+                  const remainingForLine = getRemainingForLine(formData.items, item.productId, index);
+                  const isLowStock = totalAvailable > 0 && totalAvailable <= LOW_STOCK_THRESHOLD;
+                  const isOverLimit = item.quantity > remainingForLine;
+
+                  return (
+                    <div key={index} className="p-4 bg-gray-50 rounded-lg border space-y-3">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+                        <div className="flex-1">
+                          <label className="block text-xs text-gray-500 mb-1">Product</label>
+                          <select
+                            value={item.productId}
+                            onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          >
+                            {products.map((p) => {
+                              const remainingForOption = getRemainingForLine(formData.items, p.id, index);
+                              const disabled = remainingForOption <= 0 && p.id !== item.productId;
+                              return (
+                                <option key={p.id} value={p.id} disabled={disabled}>
+                                  {p.name} - ${typeof p.price === 'number' ? p.price.toFixed(2) : '0.00'} ({remainingForOption} available)
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                        <div className="w-full sm:w-28">
+                          <label className="block text-xs text-gray-500 mb-1">Qty</label>
+                          <div className="flex gap-2">
+                            <input
+                              type="number"
+                              min={remainingForLine > 0 ? 1 : 0}
+                              max={remainingForLine}
+                              value={item.quantity}
+                              onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 0)}
+                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleSetMaxQuantity(index)}
+                              className="px-3 py-2 text-xs font-medium border border-gray-300 rounded-lg hover:bg-gray-100"
+                              title="Use maximum available quantity"
+                            >
+                              Max
+                            </button>
+                          </div>
+                        </div>
+                        <div className="w-full sm:w-32">
+                          <label className="block text-xs text-gray-500 mb-1">Price</label>
+                          <input
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            value={item.unitPrice}
+                            onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                          />
+                        </div>
+                        <div className="flex items-end">
+                          <button type="button" onClick={() => handleRemoveItem(index)} className="w-full sm:w-auto text-left sm:text-right text-red-600">Remove</button>
+                        </div>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <span className="inline-flex items-center px-2 py-1 rounded bg-white border border-gray-200 text-gray-600">
+                          Available now: <span className="ml-1 font-semibold text-gray-900">{remainingForLine}</span>
+                        </span>
+                        {isLowStock && (
+                          <span className="inline-flex items-center px-2 py-1 rounded bg-amber-50 border border-amber-200 text-amber-700">
+                            Low stock ({totalAvailable} total remaining)
+                          </span>
+                        )}
+                        {isOverLimit && (
+                          <span className="inline-flex items-center px-2 py-1 rounded bg-red-50 border border-red-200 text-red-700">
+                            Requested quantity exceeds available stock
+                          </span>
+                        )}
+                      </div>
                     </div>
-                    <div className="w-full sm:w-24">
-                      <label className="block text-xs text-gray-500 mb-1">Qty</label>
-                      <input
-                        type="number"
-                        min="1"
-                        value={item.quantity}
-                        onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 1)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      />
-                    </div>
-                    <div className="w-full sm:w-32">
-                      <label className="block text-xs text-gray-500 mb-1">Price</label>
-                      <input
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        value={item.unitPrice}
-                        onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                      />
-                    </div>
-                    <div className="flex items-end">
-                      <button type="button" onClick={() => handleRemoveItem(index)} className="w-full sm:w-auto text-left sm:text-right text-red-600">Remove</button>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
 
                 <div className="mt-6 p-4 bg-gray-100 rounded-lg">
                   <div className="flex justify-between"><span>Subtotal:</span><span>${calculateSubtotal().toFixed(2)}</span></div>
