@@ -36,7 +36,7 @@ _Last updated: 2026-03-23_
 | 2 | `/grower/dashboard` | DONE | Added top spacing and mobile stacking for Recent Activity date filter so dropdown is no longer tight against separator/header line. |
 | 3 | `/grower/products` | DONE | Product-card action buttons now stack for mobile usability; Delete is a full-width labeled action instead of a tiny icon-only control. |
 | 4 | `/grower/products/add` | DONE | Product form action bar now stacks full-width primary/secondary/cancel buttons on mobile for easier tapping and fewer misclicks. |
-| 5 | `/grower/products/[id]/edit` | TODO | — |
+| 5 | `/grower/products/[id]/edit` | DONE | Added a clear mobile back affordance (“Back to Products”) and reduced heading scale for cleaner top-of-form hierarchy on small screens. |
 | 6 | `/grower/strains` | TODO | — |
 | 7 | `/grower/strains/add` | TODO | — |
 | 8 | `/grower/strains/[id]/edit` | TODO | — |

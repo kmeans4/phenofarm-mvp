@@ -82,11 +82,22 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div className="max-w-3xl mx-auto space-y-5 sm:space-y-6">
+      <div className="space-y-3">
+        <button
+          type="button"
+          onClick={() => router.push('/grower/products')}
+          className="inline-flex items-center gap-2 rounded-md px-1 py-1 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-green-50"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to Products
+        </button>
+
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
-          <p className="text-gray-600 mt-1">Update your product details</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Edit Product</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Update your product details</p>
         </div>
       </div>
 
