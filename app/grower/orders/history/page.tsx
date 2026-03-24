@@ -44,8 +44,8 @@ export default async function GrowerOrdersHistoryPage() {
 
   const deliveredOrders = orders.filter((order) => order.status === 'DELIVERED');
   const cancelledOrders = orders.filter((order) => order.status === 'CANCELLED');
-  const deliveredRevenue = deliveredOrders.reduce(
-    (sum: number, order: { totalAmount: number | string }) => sum + Number(order.totalAmount),
+  const deliveredRevenue = deliveredOrders.reduce<number>(
+    (sum, order) => sum + Number(order.totalAmount),
     0
   );
 
