@@ -109,15 +109,15 @@ export default function StrainsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Strain Management</h1>
-          <p className="text-gray-600 mt-1">Manage your cannabis genetics library</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Strain Management</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your cannabis genetics library</p>
         </div>
-        <Button variant="primary" asChild>
-          <Link href="/grower/strains/add">+ Add Strain</Link>
+        <Button variant="primary" asChild className="w-full sm:w-auto">
+          <Link href="/grower/strains/add" className="inline-flex w-full sm:w-auto justify-center">+ Add Strain</Link>
         </Button>
       </div>
 
@@ -149,7 +149,7 @@ export default function StrainsPage() {
       </div>
 
       {/* View Toggle */}
-      <div className="flex justify-end">
+      <div className="flex justify-start sm:justify-end">
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
           <button
             onClick={() => handleViewModeChange('card')}
