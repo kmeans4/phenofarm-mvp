@@ -62,10 +62,10 @@ export default function AddCustomerPage() {
   };
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-5 sm:space-y-6 p-4">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Add New Customer</h1>
-        <p className="text-gray-600 mt-1">Add a new dispensary customer</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add New Customer</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Add a new dispensary customer</p>
       </div>
 
       {error && (
@@ -131,7 +131,7 @@ export default function AddCustomerPage() {
               />
             </div>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
                 <input
@@ -174,12 +174,12 @@ export default function AddCustomerPage() {
           </div>
         </div>
 
-        <div className="flex gap-4">
-          <Link href="/grower/customers" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
-          <button 
-            type="submit" 
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link href="/grower/customers" className="w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
+          <button
+            type="submit"
             disabled={isSubmitting}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
+            className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
           >
             {isSubmitting ? 'Adding...' : 'Add Customer'}
           </button>

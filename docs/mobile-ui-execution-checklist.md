@@ -48,9 +48,9 @@ _Last updated: 2026-03-23_
 | 14 | `/grower/orders/[id]` | TODO | — |
 | 15 | `/grower/orders/[id]/edit` | DONE | Added mobile back affordance and hid desktop breadcrumb on small screens to reduce top-of-form clutter. |
 | 16 | `/grower/orders/history` | DONE | Improved mobile header hierarchy and made “Back to Active Orders” CTA full-width for easier reach/tap. |
-| 17 | `/grower/customers` | TODO | — |
-| 18 | `/grower/customers/add` | TODO | — |
-| 19 | `/grower/customers/[id]/edit` | TODO | — |
+| 17 | `/grower/customers` | DONE | Added mobile customer-card view to replace cramped table at small widths, with full-width edit actions. |
+| 18 | `/grower/customers/add` | DONE | Fixed mobile layout for City/State/ZIP and stacked Add/Cancel actions for reliable one-thumb use. |
+| 19 | `/grower/customers/[id]/edit` | DONE | Improved mobile hierarchy and converted footer actions to full-width stacked controls (Delete/Cancel/Save). |
 | 20 | `/grower/inventory` | TODO | — |
 | 21 | `/grower/inventory/add` | TODO | — |
 | 22 | `/grower/marketplace` | TODO | — |

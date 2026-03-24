@@ -293,14 +293,14 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <div className="space-y-6 p-4 max-w-3xl mx-auto">
+    <div className="space-y-5 sm:space-y-6 p-4 max-w-3xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <Link href="/grower/customers" className="text-sm text-gray-500 hover:text-gray-700">
             &larr; Back to Customers
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mt-2">Edit Customer</h1>
-          <p className="text-gray-600 mt-1">Update customer information</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">Edit Customer</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Update customer information</p>
         </div>
       </div>
 
@@ -514,26 +514,26 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           </div>
         </div>
 
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-4 border-t border-gray-200">
+        <div className="flex flex-col gap-3 pt-4 border-t border-gray-200">
           <button
             type="button"
             onClick={handleDelete}
-            className="px-6 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            className="w-full sm:w-auto sm:self-start px-6 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
           >
             Delete Customer
           </button>
-          
-          <div className="flex gap-3">
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:self-end w-full sm:w-auto">
             <Link
               href="/grower/customers"
-              className="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="w-full sm:w-auto text-center px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
             </Link>
             <button
               type="submit"
               disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="w-full sm:w-auto px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>

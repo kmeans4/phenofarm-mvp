@@ -78,7 +78,35 @@ export default async function GrowerCustomersPage() {
             </Button>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <>
+          <div className="sm:hidden divide-y divide-gray-100">
+            {customers.map((customer) => (
+              <div key={customer.id} className="p-4 space-y-3">
+                <div>
+                  <p className="font-medium text-gray-900">{customer.businessName}</p>
+                  {customer.licenseNumber && (
+                    <p className="text-xs text-gray-500 mt-1">License: {customer.licenseNumber}</p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 gap-1 text-sm text-gray-600">
+                  <p><span className="text-gray-500">Contact:</span> {customer.user?.name || '-'}</p>
+                  <p><span className="text-gray-500">Email:</span> {customer.user?.email || '-'}</p>
+                  <p><span className="text-gray-500">Phone:</span> {customer.phone || '-'}</p>
+                  <p><span className="text-gray-500">Location:</span> {customer.city || '-'}{customer.state ? `, ${customer.state}` : ''}</p>
+                </div>
+
+                <Link
+                  href={'/grower/customers/' + customer.id + '/edit'}
+                  className="inline-flex w-full justify-center px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                >
+                  Edit
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          <div className="hidden sm:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -114,6 +142,7 @@ export default async function GrowerCustomersPage() {
               </tbody>
             </table>
           </div>
+          </>
         )}
       </div>
     </div>
