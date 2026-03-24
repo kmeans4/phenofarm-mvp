@@ -652,22 +652,30 @@ export function ProductForm({
               )}
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-gray-200 flex-wrap">
-              <Button 
-                type="submit" 
-                variant="primary" 
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <Button
+                type="submit"
+                variant="primary"
+                className="w-full sm:w-auto"
                 disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
               >
                 {isSubmitting ? 'Saving...' : (initialData.id ? 'Update Product' : 'Create Product')}
               </Button>
               {onSaveDraft && (
-                <Button type="button" variant="secondary" onClick={handleSaveDraft} disabled={isSubmitting}>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  className="w-full sm:w-auto"
+                  onClick={handleSaveDraft}
+                  disabled={isSubmitting}
+                >
                   Save Draft
                 </Button>
               )}
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 variant="outline"
+                className="w-full sm:w-auto"
                 onClick={handleCancelRequest}
               >
                 Cancel
