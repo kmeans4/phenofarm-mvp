@@ -45,7 +45,7 @@ _Last updated: 2026-03-23_
 | 11 | `/grower/batches/[id]/edit` | DONE | Improved mobile heading hierarchy and stacked Save/Cancel buttons full-width for better edit-form usability. |
 | 12 | `/grower/orders` | DONE | Header actions now stack vertically on small screens so View History / New Order remain full-width and easy to tap. |
 | 13 | `/grower/orders/add` | DONE | Order-create header actions and line-item editor now stack for mobile to prevent cramped controls and accidental taps. |
-| 14 | `/grower/orders/[id]` | TODO | Partial only: print action now uses a visible mobile label/full-width behavior, but full page pass still pending. |
+| 14 | `/grower/orders/[id]` | DONE | Added mobile back affordance, hid breadcrumb on small screens, and converted top actions (All Orders/Edit/Print) to full-width labeled controls. |
 | 15 | `/grower/orders/[id]/edit` | DONE | Added mobile back affordance and hid desktop breadcrumb on small screens to reduce top-of-form clutter. |
 | 16 | `/grower/orders/history` | DONE | Improved mobile header hierarchy and made “Back to Active Orders” CTA full-width for easier reach/tap. |
 | 17 | `/grower/customers` | DONE | Added mobile customer-card view to replace cramped table at small widths, with full-width edit actions. |

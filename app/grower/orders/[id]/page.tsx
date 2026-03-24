@@ -107,21 +107,53 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function OrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const session = await getServerSession(authOptions);
+
+  if (!session) {
+    redirect('/auth/sign_in');
+  }
+
+  const user = session.user as { role: string; growerId?: string };
+
+  if (user.role !== 'GROWER') {
+    redirect('/dashboard');
+  }
+
+  const { id } = await params;
+  let order: Awaited<ReturnType<typeof fetchOrder>> = null;
+  let loadError = false;
+
   try {
-    const session = await getServerSession(authOptions);
+    order = await fetchOrder(id, user.growerId!);
+  } catch (error) {
+    console.error('Order detail page error:', error);
+    loadError = true;
+  }
 
-    if (!session) {
-      redirect('/auth/sign_in');
-    }
-
-    const user = session.user as { role: string; growerId?: string };
-
-    if (user.role !== 'GROWER') {
-      redirect('/dashboard');
-    }
-
-    const { id } = await params;
-    const order = await fetchOrder(id, user.growerId!);
+  if (loadError) {
+    return (
+      <div className="min-h-[50vh] flex flex-col items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
+          <p className="text-gray-600 mb-6">We couldn&apos;t load this order. Please try again.</p>
+          <Link
+            href="/grower/orders"
+            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          >
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Orders
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
     if (!order) {
     return (
@@ -150,8 +182,18 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="space-y-6 p-4 sm:p-6 max-w-7xl mx-auto">
+      <Link
+        href="/grower/orders"
+        className="sm:hidden inline-flex items-center gap-2 text-sm font-medium text-green-700 hover:text-green-800"
+      >
+        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to orders
+      </Link>
+
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500">
+      <nav className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
         <Link href="/grower/dashboard" className="hover:text-gray-700 transition-colors">
           Dashboard
         </Link>
@@ -183,24 +225,24 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           </div>
           
           {/* Action Buttons */}
-          <div className="flex flex-wrap gap-2 sm:gap-3">
-            <Link 
-              href="/grower/orders" 
-              className="inline-flex items-center px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors"
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+            <Link
+              href="/grower/orders"
+              className="inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-gray-700 text-sm font-medium transition-colors w-full sm:w-auto"
             >
-              <svg className="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              <span className="hidden sm:inline">All Orders</span>
+              All Orders
             </Link>
-            <Link 
+            <Link
               href={`/grower/orders/${order.id}/edit`}
-              className="inline-flex items-center px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors"
+              className="inline-flex items-center justify-center px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors w-full sm:w-auto"
             >
-              <svg className="w-4 h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              <span className="hidden sm:inline">Edit Order</span>
+              Edit Order
             </Link>
             <PrintButton />
           </div>
@@ -381,29 +423,4 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       </div>
     </div>
   );
-  } catch (error) {
-    console.error('Order detail page error:', error);
-    return (
-      <div className="min-h-[50vh] flex flex-col items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
-            <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
-          <p className="text-gray-600 mb-6">We couldn&apos;t load this order. Please try again.</p>
-          <Link 
-            href="/grower/orders" 
-            className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-          >
-            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Back to Orders
-          </Link>
-        </div>
-      </div>
-    );
-  }
 }
