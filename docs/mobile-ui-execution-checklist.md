@@ -40,9 +40,9 @@ _Last updated: 2026-03-23_
 | 6 | `/grower/strains` | DONE | Made page header mobile-friendly (smaller title scale) and changed Add Strain CTA to full-width on mobile; view toggle now aligns left on mobile for easier reach. |
 | 7 | `/grower/strains/add` | DONE | Improved mobile hierarchy (smaller heading scale) and stacked Create/Cancel actions full-width for easier thumb use. |
 | 8 | `/grower/strains/[id]/edit` | DONE | Updated mobile page hierarchy and stacked Save/Cancel controls full-width for better touch reliability on edit form. |
-| 9 | `/grower/batches` | TODO | — |
-| 10 | `/grower/batches/add` | TODO | — |
-| 11 | `/grower/batches/[id]/edit` | TODO | — |
+| 9 | `/grower/batches` | DONE | Added mobile-first batch cards (replacing cramped table at small screens), plus full-width mobile actions for Edit/+Product. |
+| 10 | `/grower/batches/add` | DONE | Improved mobile heading hierarchy and stacked Create/Cancel buttons full-width for easier touch interactions. |
+| 11 | `/grower/batches/[id]/edit` | DONE | Improved mobile heading hierarchy and stacked Save/Cancel buttons full-width for better edit-form usability. |
 | 12 | `/grower/orders` | TODO | — |
 | 13 | `/grower/orders/add` | TODO | — |
 | 14 | `/grower/orders/[id]` | TODO | — |

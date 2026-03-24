@@ -109,15 +109,15 @@ export default function BatchesPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Batch Management</h1>
-          <p className="text-gray-600 mt-1">Manage your harvest batches and lab results</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Batch Management</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your harvest batches and lab results</p>
         </div>
-        <Button variant="primary" asChild>
-          <Link href="/grower/batches/add">+ Add Batch</Link>
+        <Button variant="primary" asChild className="w-full sm:w-auto">
+          <Link href="/grower/batches/add" className="inline-flex w-full sm:w-auto justify-center">+ Add Batch</Link>
         </Button>
       </div>
 
@@ -150,63 +150,109 @@ export default function BatchesPage() {
         </div>
       </div>
 
-      {/* Batches Table */}
+      {/* Batches Display */}
       {batches.length > 0 ? (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Batch #</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Strain</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Harvest Date</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">THC</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">CBD</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Products</th>
-                  <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {batches.map((batch) => (
-                  <tr key={batch.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3">
-                      <span className="font-medium text-gray-900">{batch.batchNumber}</span>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">{batch.strain?.name || 'N/A'}</td>
-                    <td className="px-4 py-3 text-gray-600">{formatDate(batch.harvestDate)}</td>
-                    <td className="px-4 py-3">
-                      {batch.thc ? (
-                        <span className="text-green-600 font-medium">{batch.thc.toFixed(1)}%</span>
-                      ) : <span className="text-gray-400">-</span>}
-                    </td>
-                    <td className="px-4 py-3">
-                      {batch.cbd ? (
-                        <span className="text-blue-600 font-medium">{batch.cbd.toFixed(1)}%</span>
-                      ) : <span className="text-gray-400">-</span>}
-                    </td>
-                    <td className="px-4 py-3 text-gray-600">{batch._count.products}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" asChild>
-                          <Link href={'/grower/batches/' + batch.id + '/edit'}>Edit</Link>
-                        </Button>
-                        <Button 
-                          variant="primary" 
-                          size="sm"
-                          asChild
-                        >
-                          <Link href={'/grower/products/add?strainId=' + batch.strainId + '&batchId=' + batch.id}>
-                            + Product
-                          </Link>
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        <>
+          <div className="sm:hidden space-y-3">
+            {batches.map((batch) => (
+              <div key={batch.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 space-y-3">
+                <div className="flex items-start justify-between gap-2">
+                  <div>
+                    <p className="text-xs text-gray-500">Batch #</p>
+                    <p className="font-semibold text-gray-900">{batch.batchNumber}</p>
+                  </div>
+                  <span className="text-xs text-gray-500">{formatDate(batch.harvestDate)}</span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-500">Strain</p>
+                    <p className="text-gray-900 truncate">{batch.strain?.name || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Products</p>
+                    <p className="text-gray-900">{batch._count.products}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">THC</p>
+                    <p className="text-green-600 font-medium">{batch.thc ? `${batch.thc.toFixed(1)}%` : '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">CBD</p>
+                    <p className="text-blue-600 font-medium">{batch.cbd ? `${batch.cbd.toFixed(1)}%` : '-'}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
+                  <Button variant="outline" size="sm" asChild className="w-full">
+                    <Link href={'/grower/batches/' + batch.id + '/edit'}>Edit</Link>
+                  </Button>
+                  <Button variant="primary" size="sm" asChild className="w-full">
+                    <Link href={'/grower/products/add?strainId=' + batch.strainId + '&batchId=' + batch.id}>
+                      + Product
+                    </Link>
+                  </Button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          <div className="hidden sm:block bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Batch #</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Strain</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Harvest Date</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">THC</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">CBD</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Products</th>
+                    <th className="text-left px-4 py-3 text-sm font-medium text-gray-600">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100">
+                  {batches.map((batch) => (
+                    <tr key={batch.id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3">
+                        <span className="font-medium text-gray-900">{batch.batchNumber}</span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-600">{batch.strain?.name || 'N/A'}</td>
+                      <td className="px-4 py-3 text-gray-600">{formatDate(batch.harvestDate)}</td>
+                      <td className="px-4 py-3">
+                        {batch.thc ? (
+                          <span className="text-green-600 font-medium">{batch.thc.toFixed(1)}%</span>
+                        ) : <span className="text-gray-400">-</span>}
+                      </td>
+                      <td className="px-4 py-3">
+                        {batch.cbd ? (
+                          <span className="text-blue-600 font-medium">{batch.cbd.toFixed(1)}%</span>
+                        ) : <span className="text-gray-400">-</span>}
+                      </td>
+                      <td className="px-4 py-3 text-gray-600">{batch._count.products}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <Button variant="outline" size="sm" asChild>
+                            <Link href={'/grower/batches/' + batch.id + '/edit'}>Edit</Link>
+                          </Button>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            asChild
+                          >
+                            <Link href={'/grower/products/add?strainId=' + batch.strainId + '&batchId=' + batch.id}>
+                              + Product
+                            </Link>
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
       ) : (
         <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
           <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">

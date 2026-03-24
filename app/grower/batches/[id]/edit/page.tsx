@@ -21,7 +21,7 @@ interface Batch {
   thc: number | null;
   cbd: number | null;
   totalCannabinoids: number | null;
-  terpenes: any;
+  terpenes: unknown;
   coaDocumentUrl: string | null;
   notes: string | null;
 }
@@ -179,10 +179,10 @@ export default function EditBatchPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-5 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Edit Batch</h1>
-        <p className="text-gray-600 mt-1">Update batch details and lab results</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Edit Batch</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Update batch details and lab results</p>
       </div>
 
       {error && (
@@ -347,13 +347,14 @@ export default function EditBatchPage() {
               />
             </div>
 
-            <div className="flex gap-4 pt-4 border-t border-gray-200">
-              <Button type="submit" variant="primary" disabled={loading}>
+            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={loading}>
                 {loading ? 'Saving...' : 'Save Changes'}
               </Button>
-              <Button 
-                type="button" 
+              <Button
+                type="button"
                 variant="outline"
+                className="w-full sm:w-auto"
                 onClick={() => router.push('/grower/batches')}
               >
                 Cancel
