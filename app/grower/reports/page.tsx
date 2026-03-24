@@ -366,7 +366,7 @@ export default async function GrowerReportsPage() {
             No orders yet. Orders will appear here when customers place them.
           </div>
         ) : (
-          <div className="overflow-x-auto -mx-4 sm:mx-0">
+          <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>

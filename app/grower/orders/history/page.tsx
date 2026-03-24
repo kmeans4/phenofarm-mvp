@@ -118,7 +118,7 @@ export default async function GrowerOrdersHistoryPage() {
               </Link>
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-gray-200">

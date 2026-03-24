@@ -238,7 +238,7 @@ export default function StrainsPage() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-            <div className="overflow-x-auto -mx-4 sm:mx-0">
+            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
               <table className="w-full min-w-[620px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
