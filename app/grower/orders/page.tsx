@@ -76,11 +76,11 @@ export default async function GrowerOrdersPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Orders</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Manage and process customer orders</p>
         </div>
-        <div className="flex w-full sm:w-auto gap-2 sm:gap-3">
-          <Button variant="outline" asChild className="flex-1 sm:flex-none">
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
+          <Button variant="outline" asChild className="w-full sm:w-auto">
             <Link href="/grower/orders/history">View History</Link>
           </Button>
-          <Button variant="primary" asChild className="flex-1 sm:flex-none">
+          <Button variant="primary" asChild className="w-full sm:w-auto">
             <Link href="/grower/orders/add">+ New Order</Link>
           </Button>
         </div>

@@ -77,7 +77,7 @@ export default function AddOrderPage() {
     }));
   };
 
-  const handleItemChange = (index: number, field: string, value: any) => {
+  const handleItemChange = (index: number, field: string, value: string | number) => {
     setFormData((prev) => {
       const newItems = [...prev.items];
       newItems[index] = { ...newItems[index], [field]: value };
@@ -172,15 +172,15 @@ export default function AddOrderPage() {
   }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-5 sm:space-y-6 p-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Create New Order</h1>
-          <p className="text-gray-600 mt-1">Add items to fulfill a dispensary order</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Create New Order</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Add items to fulfill a dispensary order</p>
         </div>
-        <div className="flex gap-3">
-          <Link href="/grower/orders" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
-          <button onClick={handleSubmit} disabled={isSubmitting} className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50">
+        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
+          <Link href="/grower/orders" className="w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
+          <button onClick={handleSubmit} disabled={isSubmitting} className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50">
             {isSubmitting ? 'Creating...' : 'Create Order'}
           </button>
         </div>
@@ -257,7 +257,7 @@ export default function AddOrderPage() {
             ) : (
               <div className="space-y-4">
                 {formData.items.map((item, index: number) => (
-                  <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-lg border">
+                  <div key={index} className="flex flex-col sm:flex-row gap-3 sm:gap-4 p-4 bg-gray-50 rounded-lg border">
                     <div className="flex-1">
                       <label className="block text-xs text-gray-500 mb-1">Product</label>
                       <select
@@ -272,7 +272,7 @@ export default function AddOrderPage() {
                         ))}
                       </select>
                     </div>
-                    <div className="w-24">
+                    <div className="w-full sm:w-24">
                       <label className="block text-xs text-gray-500 mb-1">Qty</label>
                       <input
                         type="number"
@@ -282,7 +282,7 @@ export default function AddOrderPage() {
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                       />
                     </div>
-                    <div className="w-32">
+                    <div className="w-full sm:w-32">
                       <label className="block text-xs text-gray-500 mb-1">Price</label>
                       <input
                         type="number"
@@ -294,7 +294,7 @@ export default function AddOrderPage() {
                       />
                     </div>
                     <div className="flex items-end">
-                      <button type="button" onClick={() => handleRemoveItem(index)} className="text-red-600">Remove</button>
+                      <button type="button" onClick={() => handleRemoveItem(index)} className="w-full sm:w-auto text-left sm:text-right text-red-600">Remove</button>
                     </div>
                   </div>
                 ))}

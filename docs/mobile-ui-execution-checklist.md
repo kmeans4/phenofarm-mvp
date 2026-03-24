@@ -43,8 +43,8 @@ _Last updated: 2026-03-23_
 | 9 | `/grower/batches` | DONE | Added mobile-first batch cards (replacing cramped table at small screens), plus full-width mobile actions for Edit/+Product. |
 | 10 | `/grower/batches/add` | DONE | Improved mobile heading hierarchy and stacked Create/Cancel buttons full-width for easier touch interactions. |
 | 11 | `/grower/batches/[id]/edit` | DONE | Improved mobile heading hierarchy and stacked Save/Cancel buttons full-width for better edit-form usability. |
-| 12 | `/grower/orders` | TODO | — |
-| 13 | `/grower/orders/add` | TODO | — |
+| 12 | `/grower/orders` | DONE | Header actions now stack vertically on small screens so View History / New Order remain full-width and easy to tap. |
+| 13 | `/grower/orders/add` | DONE | Order-create header actions and line-item editor now stack for mobile to prevent cramped controls and accidental taps. |
 | 14 | `/grower/orders/[id]` | TODO | — |
 | 15 | `/grower/orders/[id]/edit` | TODO | — |
 | 16 | `/grower/orders/history` | TODO | — |
