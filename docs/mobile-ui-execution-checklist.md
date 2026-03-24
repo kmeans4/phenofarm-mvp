@@ -46,8 +46,8 @@ _Last updated: 2026-03-23_
 | 12 | `/grower/orders` | DONE | Header actions now stack vertically on small screens so View History / New Order remain full-width and easy to tap. |
 | 13 | `/grower/orders/add` | DONE | Order-create header actions and line-item editor now stack for mobile to prevent cramped controls and accidental taps. |
 | 14 | `/grower/orders/[id]` | TODO | — |
-| 15 | `/grower/orders/[id]/edit` | TODO | — |
-| 16 | `/grower/orders/history` | TODO | — |
+| 15 | `/grower/orders/[id]/edit` | DONE | Added mobile back affordance and hid desktop breadcrumb on small screens to reduce top-of-form clutter. |
+| 16 | `/grower/orders/history` | DONE | Improved mobile header hierarchy and made “Back to Active Orders” CTA full-width for easier reach/tap. |
 | 17 | `/grower/customers` | TODO | — |
 | 18 | `/grower/customers/add` | TODO | — |
 | 19 | `/grower/customers/[id]/edit` | TODO | — |

@@ -45,19 +45,19 @@ export default async function GrowerOrdersHistoryPage() {
   const deliveredOrders = orders.filter((order) => order.status === 'DELIVERED');
   const cancelledOrders = orders.filter((order) => order.status === 'CANCELLED');
   const deliveredRevenue = deliveredOrders.reduce(
-    (sum: number, order: any) => sum + Number(order.totalAmount),
+    (sum: number, order: { totalAmount: number | string }) => sum + Number(order.totalAmount),
     0
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Order History</h1>
-          <p className="text-gray-600 mt-1">View delivered and cancelled orders only</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order History</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">View delivered and cancelled orders only</p>
         </div>
-        <Link href="/grower/orders">
-          <Button variant="outline" className="bg-white border-gray-300 hover:bg-gray-50 text-sm">
+        <Link href="/grower/orders" className="w-full sm:w-auto">
+          <Button variant="outline" className="w-full sm:w-auto bg-white border-gray-300 hover:bg-gray-50 text-sm">
             Back to Active Orders
           </Button>
         </Link>

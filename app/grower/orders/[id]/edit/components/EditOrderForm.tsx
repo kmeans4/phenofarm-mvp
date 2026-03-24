@@ -300,8 +300,18 @@ export default function EditOrderForm({ order }: { order: Order }) {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+        <Link
+          href={`/grower/orders/${order.id}`}
+          className="sm:hidden inline-flex items-center gap-2 text-sm font-medium text-green-700 hover:text-green-800"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back to order
+        </Link>
+
         {/* Breadcrumb */}
-        <nav className="flex items-center gap-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-2">
+        <nav className="hidden sm:flex items-center gap-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-2">
           <Link href="/grower/dashboard" className="hover:text-gray-700 transition-colors flex-shrink-0">
             Dashboard
           </Link>
