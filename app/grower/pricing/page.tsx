@@ -22,10 +22,10 @@ export default function GrowerPricing() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Custom Pricing Tiers</h1>
-        <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+    <div className="space-y-5 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Custom Pricing Tiers</h1>
+        <button className="w-full sm:w-auto bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
           + Add New Tier
         </button>
       </div>
@@ -88,8 +88,8 @@ export default function GrowerPricing() {
               <textarea className="w-full rounded-lg border border-gray-300 px-4 py-2 h-32" placeholder="Enter each feature on a new line..." />
             </div>
           </div>
-          <div className="mt-4 flex justify-end">
-            <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">Create Tier</button>
+          <div className="mt-4 flex justify-stretch sm:justify-end">
+            <button className="w-full sm:w-auto bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700">Create Tier</button>
           </div>
         </div>
       </div>

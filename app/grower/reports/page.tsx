@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
+import Link from "next/link";
 import { AuthSession } from "@/types";
 
 export default async function GrowerReportsPage() {
@@ -158,11 +159,11 @@ export default async function GrowerReportsPage() {
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Analytics & Reports</h1>
           <p className="text-sm sm:text-base text-gray-600 mt-1">Track your sales performance and business metrics</p>
         </div>
-        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
-          <button className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-xs sm:text-sm font-medium transition-colors">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+          <button className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-xs sm:text-sm font-medium transition-colors">
             Export PDF
           </button>
-          <button className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-xs sm:text-sm font-medium transition-colors">
+          <button className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-xs sm:text-sm font-medium transition-colors">
             Export CSV
           </button>
         </div>
@@ -356,9 +357,9 @@ export default async function GrowerReportsPage() {
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-base sm:text-lg font-semibold">Recent Orders</h2>
-          <a href="/grower/orders" className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium">
+          <Link href="/grower/orders" className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium">
             View All
-          </a>
+          </Link>
         </div>
         {recentOrders.length === 0 ? (
           <div className="p-6 sm:p-12 text-center text-gray-500 text-sm">

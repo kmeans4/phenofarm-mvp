@@ -66,7 +66,7 @@ export default function AddToInventoryPage() {
         const data = await response.json();
         setError(data.error || 'Failed to add inventory');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred');
     } finally {
       setIsSubmitting(false);
@@ -82,10 +82,10 @@ export default function AddToInventoryPage() {
   }
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-5 sm:space-y-6 p-4">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Add to Inventory</h1>
-        <p className="text-gray-600 mt-1">Add stock to existing product inventory</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add to Inventory</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Add stock to existing product inventory</p>
       </div>
 
       {error && (
@@ -115,7 +115,7 @@ export default function AddToInventoryPage() {
               </select>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Quantity to Add *</label>
                 <input
@@ -152,7 +152,7 @@ export default function AddToInventoryPage() {
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Harvest Date</label>
                 <input
@@ -197,12 +197,12 @@ export default function AddToInventoryPage() {
           </div>
         </div>
 
-        <div className="flex gap-4">
-          <Link href="/grower/inventory" className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
-          <button 
-            type="submit" 
+        <div className="flex flex-col sm:flex-row gap-3">
+          <Link href="/grower/inventory" className="w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
+          <button
+            type="submit"
             disabled={isSubmitting || !formData.productId}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
+            className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
           >
             {isSubmitting ? 'Adding...' : 'Add to Inventory'}
           </button>

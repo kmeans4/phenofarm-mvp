@@ -68,15 +68,15 @@ export default async function GrowerMetrcSyncPage() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">METRC Sync Status</h1>
-        <Button variant="primary" className="bg-green-600 hover:bg-green-700 text-white" onClick={handleManualSync}>
+    <div className="space-y-5 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">METRC Sync Status</h1>
+        <Button variant="primary" className="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white" onClick={handleManualSync}>
           Sync Now
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         {/* Connection Status */}
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardHeader>
@@ -214,12 +214,12 @@ export default async function GrowerMetrcSyncPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div>
                 <p className="font-medium text-gray-900">Sync Frequency</p>
                 <p className="text-sm text-gray-500">How often to sync products</p>
               </div>
-              <select className="rounded-lg border border-gray-300 px-4 py-2" disabled>
+              <select className="w-full sm:w-auto rounded-lg border border-gray-300 px-4 py-2" disabled>
                 <option>Every 15 minutes</option>
                 <option>Every 30 minutes</option>
                 <option>Every hour</option>

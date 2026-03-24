@@ -45,16 +45,16 @@ _Last updated: 2026-03-23_
 | 11 | `/grower/batches/[id]/edit` | DONE | Improved mobile heading hierarchy and stacked Save/Cancel buttons full-width for better edit-form usability. |
 | 12 | `/grower/orders` | DONE | Header actions now stack vertically on small screens so View History / New Order remain full-width and easy to tap. |
 | 13 | `/grower/orders/add` | DONE | Order-create header actions and line-item editor now stack for mobile to prevent cramped controls and accidental taps. |
-| 14 | `/grower/orders/[id]` | TODO | — |
+| 14 | `/grower/orders/[id]` | TODO | Partial only: print action now uses a visible mobile label/full-width behavior, but full page pass still pending. |
 | 15 | `/grower/orders/[id]/edit` | DONE | Added mobile back affordance and hid desktop breadcrumb on small screens to reduce top-of-form clutter. |
 | 16 | `/grower/orders/history` | DONE | Improved mobile header hierarchy and made “Back to Active Orders” CTA full-width for easier reach/tap. |
 | 17 | `/grower/customers` | DONE | Added mobile customer-card view to replace cramped table at small widths, with full-width edit actions. |
 | 18 | `/grower/customers/add` | DONE | Fixed mobile layout for City/State/ZIP and stacked Add/Cancel actions for reliable one-thumb use. |
 | 19 | `/grower/customers/[id]/edit` | DONE | Improved mobile hierarchy and converted footer actions to full-width stacked controls (Delete/Cancel/Save). |
-| 20 | `/grower/inventory` | TODO | — |
-| 21 | `/grower/inventory/add` | TODO | — |
-| 22 | `/grower/marketplace` | TODO | — |
-| 23 | `/grower/reports` | TODO | — |
-| 24 | `/grower/settings` | TODO | — |
-| 25 | `/grower/pricing` | TODO | — |
-| 26 | `/grower/metrc-sync` | TODO | — |
+| 20 | `/grower/inventory` | DONE | Updated mobile header/CTA hierarchy and tightened stat cards for better readability and tap comfort on small screens. |
+| 21 | `/grower/inventory/add` | DONE | Converted quantity/date rows to single-column mobile stacks and made footer actions full-width for easier submission flow. |
+| 22 | `/grower/marketplace` | DONE | Updated mobile header scale and made primary listing CTA full-width to improve top-of-page action reachability. |
+| 23 | `/grower/reports` | DONE | Export actions now stack full-width on mobile instead of cramped side-by-side controls. |
+| 24 | `/grower/settings` | DONE | Verified page already mobile-compliant with responsive spacing/actions; no additional layout patch required in this pass. |
+| 25 | `/grower/pricing` | DONE | Mobile header and create actions now use full-width CTA behavior for clearer tap targets. |
+| 26 | `/grower/metrc-sync` | DONE | Header CTA now full-width on mobile and sync-frequency control stacks with full-width select to prevent crowding. |

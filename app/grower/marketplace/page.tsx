@@ -39,10 +39,10 @@ export default async function GrowerMarketplacePage() {
   const categories = ['Flower', 'Edibles', 'Cartridge', 'Bulk Extract', 'Drink', 'Merchandise', 'Prepack', 'Tincture', 'Topicals', 'Plant Material', 'Live Plant', 'Seed'];
 
   return (
-    <div className="space-y-6 p-4">
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Grower Marketplace</h1>
-        <Link href="/grower/products/add" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+    <div className="space-y-5 sm:space-y-6 p-4">
+      <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Grower Marketplace</h1>
+        <Link href="/grower/products/add" className="w-full sm:w-auto text-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
           + List New Product
         </Link>
       </div>

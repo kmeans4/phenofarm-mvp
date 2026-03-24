@@ -61,29 +61,29 @@ export default async function GrowerInventoryPage() {
   const lowStockCount = products?.filter((p: { inventoryQty: number }) => (p?.inventoryQty || 0) <= 10)?.length || 0;
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-5 sm:space-y-6 p-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-600 mt-1">Manage your product catalog</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Inventory</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage product stock, pricing, and availability</p>
         </div>
-        <Link href="/grower/products/add" className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
+        <Link href="/grower/products/add" className="w-full sm:w-auto text-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
           + Add Product
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Total Products</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{products?.length || 0}</p>
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs sm:text-sm text-gray-600">Total Products</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{products?.length || 0}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Total Value</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">${totalValue.toFixed(2)}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs sm:text-sm text-gray-600">Total Value</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">${totalValue.toFixed(2)}</p>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Low Stock</p>
-          <p className={`text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-red-600' : 'text-gray-900'}`}>{lowStockCount}</p>
+        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
+          <p className="text-xs sm:text-sm text-gray-600">Low Stock</p>
+          <p className={`text-xl sm:text-2xl font-bold mt-1 ${lowStockCount > 0 ? 'text-red-600' : 'text-gray-900'}`}>{lowStockCount}</p>
         </div>
       </div>
 
