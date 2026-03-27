@@ -1,11 +1,9 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Link from "next/link";
 import { 
   LayoutGrid, 
   List as ListIcon, 
-  SlidersHorizontal, 
   X, 
   ArrowUpDown,
   Search,
@@ -17,6 +15,7 @@ interface Product {
   id: string;
   name: string;
   price: Decimal;
+  isPriceVisible: boolean;
   strain: { name: string } | null;
   productType: string | null;
   subType: string | null;
@@ -59,6 +58,12 @@ export default function GrowerShopContent({
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
+  const [messageProduct, setMessageProduct] = useState<Product | null>(null);
+  const [messageMode, setMessageMode] = useState<'REQUEST_PRICING' | 'QUESTION'>('REQUEST_PRICING');
+  const [messageText, setMessageText] = useState('');
+  const [messageSending, setMessageSending] = useState(false);
+  const [messageError, setMessageError] = useState('');
 
   // Get unique product types for filter
   const productTypes = useMemo(() => {
@@ -116,6 +121,61 @@ export default function GrowerShopContent({
     setSortBy('default');
   };
 
+  const openMessageModal = (product: Product, mode: 'REQUEST_PRICING' | 'QUESTION') => {
+    const defaultMessage = mode === 'REQUEST_PRICING'
+      ? `Hi ${growerName}, can you send pricing for ${product.name}${product.unit ? ` (${product.unit})` : ''}?`
+      : `Hi ${growerName}, I have a question about ${product.name}.`;
+
+    setMessageMode(mode);
+    setMessageProduct(product);
+    setMessageText(defaultMessage);
+    setMessageError('');
+  };
+
+  const sendMessage = async () => {
+    if (!messageProduct) return;
+
+    const trimmed = messageText.trim();
+    if (!trimmed) {
+      setMessageError('Message is required.');
+      return;
+    }
+
+    setMessageSending(true);
+    setMessageError('');
+
+    try {
+      const response = await fetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          growerId,
+          productId: messageProduct.id,
+          messageType: messageMode === 'REQUEST_PRICING' ? 'PRICING_REQUEST' : 'TEXT',
+          body: trimmed,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      setMessageProduct(null);
+      setMessageText('');
+
+      window.dispatchEvent(
+        new CustomEvent('phenofarm-open-chat', {
+          detail: { conversationId: data.conversationId },
+        })
+      );
+    } catch (err) {
+      setMessageError(err instanceof Error ? err.message : 'Failed to send message');
+    } finally {
+      setMessageSending(false);
+    }
+  };
+
   const hasActiveFilters = searchQuery || selectedType || sortBy !== 'default';
 
   return (
@@ -124,7 +184,7 @@ export default function GrowerShopContent({
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">All Products</h2>
-          <p className="text-gray-600">Browse {growerName}'s full catalog</p>
+          <p className="text-gray-600">Browse {growerName}&apos;s full catalog</p>
         </div>
         
         {/* Controls */}
@@ -223,7 +283,7 @@ export default function GrowerShopContent({
           )}
           {searchQuery && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 text-sm rounded-full">
-              Search: "{searchQuery}"
+              Search: &quot;{searchQuery}&quot;
               <button onClick={() => setSearchQuery('')} className="hover:text-blue-900">
                 <X size={14} />
               </button>
@@ -313,6 +373,8 @@ export default function GrowerShopContent({
                   product={product} 
                   growerName={growerName}
                   growerId={growerId}
+                  onRequestPricing={() => openMessageModal(product, 'REQUEST_PRICING')}
+                  onMessageGrower={() => openMessageModal(product, 'QUESTION')}
                 />
               ))}
             </div>
@@ -324,6 +386,8 @@ export default function GrowerShopContent({
                   product={product} 
                   growerName={growerName}
                   growerId={growerId}
+                  onRequestPricing={() => openMessageModal(product, 'REQUEST_PRICING')}
+                  onMessageGrower={() => openMessageModal(product, 'QUESTION')}
                 />
               ))}
             </div>
@@ -348,6 +412,61 @@ export default function GrowerShopContent({
           )}
         </div>
       )}
+
+      {messageProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  {messageMode === 'REQUEST_PRICING' ? 'Request Pricing' : 'Message Grower'}
+                </h2>
+                <p className="text-sm text-gray-500 mt-0.5">{messageProduct.name} • {growerName}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setMessageProduct(null);
+                  setMessageError('');
+                }}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <label className="block text-sm font-medium text-gray-700">Message to grower</label>
+              <textarea
+                value={messageText}
+                onChange={(e) => setMessageText(e.target.value)}
+                rows={5}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Write your message..."
+              />
+              {messageError && <p className="text-sm text-red-600">{messageError}</p>}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setMessageProduct(null);
+                  setMessageError('');
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={sendMessage}
+                disabled={messageSending || !messageText.trim()}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {messageSending ? 'Sending…' : 'Send Message'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -356,11 +475,15 @@ export default function GrowerShopContent({
 function ProductCard({ 
   product, 
   growerName, 
-  growerId 
+  growerId,
+  onRequestPricing,
+  onMessageGrower,
 }: { 
   product: Product; 
   growerName: string; 
   growerId: string;
+  onRequestPricing: () => void;
+  onMessageGrower: () => void;
 }) {
   const thcValue = product.batch?.thc || product.thcLegacy;
   const stockStatus = product.inventoryQty === 0 
@@ -416,24 +539,44 @@ function ProductCard({
           <p className="text-sm text-gray-500 mb-3">{product.subType}</p>
         )}
 
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-          <div>
-            <span className="text-xl font-bold text-green-700">${product.price.toNumber().toFixed(2)}</span>
-            <span className="text-sm text-gray-500">/{product.unit || 'unit'}</span>
-          </div>
-          <AddToCartButton 
-            product={{
-              id: product.id,
-              name: product.name,
-              price: product.price.toNumber(),
-              strain: product.strain?.name || null,
-              unit: product.unit,
-              thc: thcValue || null,
-              inventoryQty: product.inventoryQty,
-            }}
-            growerName={growerName}
-            growerId={growerId}
-          />
+        <div className="mt-4 pt-3 border-t border-gray-100 space-y-2">
+          {product.isPriceVisible ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xl font-bold text-green-700">${product.price.toNumber().toFixed(2)}</span>
+                <span className="text-sm text-gray-500">/{product.unit || 'unit'}</span>
+              </div>
+              <AddToCartButton 
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  price: product.price.toNumber(),
+                  strain: product.strain?.name || null,
+                  unit: product.unit,
+                  thc: thcValue || null,
+                  inventoryQty: product.inventoryQty,
+                }}
+                growerName={growerName}
+                growerId={growerId}
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onRequestPricing}
+              className="w-full rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
+            >
+              Request Pricing
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onMessageGrower}
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+          >
+            Message Grower
+          </button>
         </div>
         
         <p className={`text-xs mt-2 ${stockStatus.color}`}>{stockStatus.text}</p>
@@ -446,11 +589,15 @@ function ProductCard({
 function ProductListItem({ 
   product, 
   growerName, 
-  growerId 
+  growerId,
+  onRequestPricing,
+  onMessageGrower,
 }: { 
   product: Product; 
   growerName: string; 
   growerId: string;
+  onRequestPricing: () => void;
+  onMessageGrower: () => void;
 }) {
   const thcValue = product.batch?.thc || product.thcLegacy;
   const stockStatus = product.inventoryQty === 0 
@@ -507,28 +654,49 @@ function ProductListItem({
         <span className={`text-sm font-medium ${stockStatus.color}`}>{stockStatus.text}</span>
       </div>
 
-      {/* Price */}
-      <div className="text-right min-w-[100px]">
-        <div className="text-lg font-bold text-green-700">${product.price.toNumber().toFixed(2)}</div>
-        <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
-      </div>
+      {/* Price / Request + Actions */}
+      <div className="flex-shrink-0 min-w-[180px] space-y-2">
+        {product.isPriceVisible ? (
+          <>
+            <div className="text-right">
+              <div className="text-lg font-bold text-green-700">${product.price.toNumber().toFixed(2)}</div>
+              <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
+            </div>
 
-      {/* Add to Cart */}
-      <div className="flex-shrink-0">
-        <AddToCartButton 
-          product={{
-            id: product.id,
-            name: product.name,
-            price: product.price.toNumber(),
-            strain: product.strain?.name || null,
-            unit: product.unit,
-            thc: thcValue || null,
-            inventoryQty: product.inventoryQty,
-          }}
-          growerName={growerName}
-          growerId={growerId}
-          compact
-        />
+            <div className="flex justify-end">
+              <AddToCartButton 
+                product={{
+                  id: product.id,
+                  name: product.name,
+                  price: product.price.toNumber(),
+                  strain: product.strain?.name || null,
+                  unit: product.unit,
+                  thc: thcValue || null,
+                  inventoryQty: product.inventoryQty,
+                }}
+                growerName={growerName}
+                growerId={growerId}
+                compact
+              />
+            </div>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={onRequestPricing}
+            className="w-full rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
+          >
+            Request Pricing
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={onMessageGrower}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+        >
+          Message Grower
+        </button>
       </div>
     </div>
   );

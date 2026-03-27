@@ -7,8 +7,10 @@ import { SignOutButton } from "@/app/components/SignOutButton";
 import { SearchDialog } from "@/app/components/SearchDialog";
 import { db } from "@/lib/db";
 import CartBadge from "./catalog/components/CartBadge";
+import { ChatDrawer } from "@/app/components/messaging/ChatDrawer";
 
 interface SessionUser {
+  id: string;
   role?: string;
   dispensaryId?: string;
 }
@@ -96,6 +98,11 @@ export default async function DispensaryLayout({ children }: { children: React.R
           </div>
         </main>
       </div>
+
+      <ChatDrawer
+        currentUserId={user.id}
+        currentRole="DISPENSARY"
+      />
     </div>
   );
 }

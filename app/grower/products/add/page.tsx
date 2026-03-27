@@ -16,6 +16,7 @@ interface ProductFormData {
   unit: string;
   description: string;
   isAvailable: boolean;
+  isPriceVisible: boolean;
   images: string[];
   sku: string;
   brand: string;

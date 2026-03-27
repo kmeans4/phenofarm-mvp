@@ -134,6 +134,8 @@ export function parseProductPayload(body: Record<string, unknown>, options: Prod
         ? false
         : (typeof body.isAvailable === 'boolean' ? body.isAvailable : true);
 
+  const normalizedIsPriceVisible = typeof body.isPriceVisible === 'boolean' ? body.isPriceVisible : true;
+
   return {
     ok: true as const,
     data: {
@@ -148,6 +150,7 @@ export function parseProductPayload(body: Record<string, unknown>, options: Prod
       description: normalizeOptionalString(body.description),
       images: Array.isArray(body.images) ? body.images.filter((v) => typeof v === 'string') : undefined,
       isAvailable: normalizedIsAvailable,
+      isPriceVisible: normalizedIsPriceVisible,
       sku: normalizeOptionalString(body.sku),
       brand: normalizeOptionalString(body.brand),
       ingredients: normalizeOptionalString(body.ingredients),
@@ -176,6 +179,7 @@ export function buildProductRequestPayload(formData: Record<string, unknown>, st
     description: normalizeOptionalString(formData.description),
     images: Array.isArray(formData.images) ? formData.images : [],
     isAvailable: Boolean(formData.isAvailable),
+    isPriceVisible: typeof formData.isPriceVisible === 'boolean' ? formData.isPriceVisible : true,
     sku: normalizeOptionalString(formData.sku),
     brand: normalizeOptionalString(formData.brand),
     ingredients: normalizeOptionalString(formData.ingredients),

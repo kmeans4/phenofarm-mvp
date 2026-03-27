@@ -13,6 +13,7 @@ interface Product {
   id: string;
   name: string;
   price: number;
+  isPriceVisible: boolean;
   strain: string | null;
   strainId: string | null;
   strainType: string | null;
@@ -125,6 +126,12 @@ export default function CatalogContent() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showSaveFilterModal, setShowSaveFilterModal] = useState(false);
   const [newFilterName, setNewFilterName] = useState('');
+
+  const [requestPricingProduct, setRequestPricingProduct] = useState<Product | null>(null);
+  const [requestPricingMessage, setRequestPricingMessage] = useState('');
+  const [requestPricingMode, setRequestPricingMode] = useState<'REQUEST_PRICING' | 'QUESTION'>('REQUEST_PRICING');
+  const [requestPricingSending, setRequestPricingSending] = useState(false);
+  const [requestPricingError, setRequestPricingError] = useState('');
 
   
   // Search autocomplete state
@@ -679,6 +686,63 @@ export default function CatalogContent() {
     setShowPriceAlertModal(false);
   };
 
+  const openPricingMessageModal = (product: Product, mode: 'REQUEST_PRICING' | 'QUESTION') => {
+    const defaultMessage = mode === 'REQUEST_PRICING'
+      ? `Hi ${product.grower.businessName}, can you send pricing for ${product.name}${product.unit ? ` (${product.unit})` : ''}?`
+      : `Hi ${product.grower.businessName}, I have a question about ${product.name}.`;
+
+    setRequestPricingMode(mode);
+    setRequestPricingProduct(product);
+    setRequestPricingMessage(defaultMessage);
+    setRequestPricingError('');
+  };
+
+  const sendPricingMessage = async () => {
+    if (!requestPricingProduct) return;
+
+    const message = requestPricingMessage.trim();
+    if (!message) {
+      setRequestPricingError('Message is required.');
+      return;
+    }
+
+    setRequestPricingSending(true);
+    setRequestPricingError('');
+
+    try {
+      const response = await fetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          growerId: requestPricingProduct.grower.id,
+          productId: requestPricingProduct.id,
+          messageType: requestPricingMode === 'REQUEST_PRICING' ? 'PRICING_REQUEST' : 'TEXT',
+          body: message,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to send message');
+      }
+
+      setRequestPricingProduct(null);
+      setRequestPricingMessage('');
+      setRequestPricingMode('REQUEST_PRICING');
+
+      window.dispatchEvent(
+        new CustomEvent('phenofarm-open-chat', {
+          detail: { conversationId: data.conversationId },
+        })
+      );
+    } catch (err) {
+      setRequestPricingError(err instanceof Error ? err.message : 'Failed to send message');
+    } finally {
+      setRequestPricingSending(false);
+    }
+  };
+
   return (
     <div className="space-y-6 relative">
       {/* Header */}
@@ -1164,6 +1228,8 @@ export default function CatalogContent() {
                             onFavoriteToggle={() => toggleFavorite(product.id)}
                             hasAlert={hasPriceAlert(product.id)}
                             onAlertToggle={() => openPriceAlertModal(product)}
+                            onRequestPricing={() => openPricingMessageModal(product, 'REQUEST_PRICING')}
+                            onMessageGrower={() => openPricingMessageModal(product, 'QUESTION')}
                           />
                         ))}
                       </div>
@@ -1181,6 +1247,8 @@ export default function CatalogContent() {
                             onFavoriteToggle={() => toggleFavorite(product.id)}
                             hasAlert={hasPriceAlert(product.id)}
                             onAlertToggle={() => openPriceAlertModal(product)}
+                            onRequestPricing={() => openPricingMessageModal(product, 'REQUEST_PRICING')}
+                            onMessageGrower={() => openPricingMessageModal(product, 'QUESTION')}
                           />
                         ))}
                       </div>
@@ -1398,6 +1466,118 @@ export default function CatalogContent() {
         </div>
       )}
 
+      {showPriceAlertModal && priceAlertProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="w-5 h-5 text-orange-500" />
+                <h2 className="text-lg font-bold text-gray-900">Set Price Alert</h2>
+              </div>
+              <button
+                onClick={() => setShowPriceAlertModal(false)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <p className="text-sm text-gray-600">
+                Alert me when <span className="font-semibold">{priceAlertProduct.name}</span> drops below your target.
+              </p>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Target price</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={targetPrice}
+                  onChange={(e) => setTargetPrice(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+                <p className="text-xs text-gray-500 mt-1">Current: ${priceAlertProduct.price.toFixed(2)}</p>
+              </div>
+              {alertError && <p className="text-sm text-red-600">{alertError}</p>}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={() => setShowPriceAlertModal(false)}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={savePriceAlert}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Save Alert
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {requestPricingProduct && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">
+                  {requestPricingMode === 'REQUEST_PRICING' ? 'Request Pricing' : 'Message Grower'}
+                </h2>
+                <p className="text-sm text-gray-500 mt-0.5">{requestPricingProduct.name} • {requestPricingProduct.grower.businessName}</p>
+              </div>
+              <button
+                onClick={() => {
+                  setRequestPricingProduct(null);
+                  setRequestPricingError('');
+                }}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <label className="block text-sm font-medium text-gray-700">
+                Message to grower
+              </label>
+              <textarea
+                value={requestPricingMessage}
+                onChange={(e) => setRequestPricingMessage(e.target.value)}
+                rows={5}
+                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Write your message..."
+              />
+              {requestPricingError && (
+                <p className="text-sm text-red-600">{requestPricingError}</p>
+              )}
+            </div>
+
+            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setRequestPricingProduct(null);
+                  setRequestPricingError('');
+                }}
+                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={sendPricingMessage}
+                disabled={requestPricingSending || !requestPricingMessage.trim()}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {requestPricingSending ? 'Sending…' : 'Send Message'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Mobile Filter Sheet */}
       <MobileFilterSheet
         isOpen={showMobileFilters}
@@ -1446,7 +1626,7 @@ function CompareModal({
   };
 
   const comparisonAttributes = [
-    { label: 'Price', key: 'price', format: (p: Product) => `\$${p.price.toFixed(2)}` },
+    { label: 'Price', key: 'price', format: (p: Product) => p.isPriceVisible ? `\$${p.price.toFixed(2)}` : 'Request pricing' },
     { label: 'THC', key: 'thc', format: (p: Product) => p.thc ? `${p.thc}%` : 'N/A' },
     { label: 'CBD', key: 'cbd', format: (p: Product) => p.cbd ? `${p.cbd}%` : 'N/A' },
     { label: 'Strain Type', key: 'strainType', format: (p: Product) => p.strainType || 'N/A' },
@@ -1562,32 +1742,36 @@ function CompareModal({
           </div>
 
           {/* Visual Comparison Charts */}
-          {products.length >= 2 && (
+          {products.filter((p) => p.isPriceVisible).length >= 2 && (
             <div className="mt-8 bg-gray-50 rounded-xl p-6">
               <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                 <BarChart3 className="w-5 h-5 text-green-600" />
                 Price Comparison
               </h3>
               <div className="space-y-4">
-                {products.map(product => {
-                  const maxPrice = Math.max(...products.map(p => p.price));
-                  const percentage = (product.price / maxPrice) * 100;
-                  return (
-                    <div key={product.id} className="flex items-center gap-4">
-                      <div className="w-32 truncate text-sm font-medium text-gray-700">
-                        {product.name}
-                      </div>
-                      <div className="flex-1 h-8 bg-gray-200 rounded-lg overflow-hidden">
-                        <div 
-                          className="h-full bg-green-500 flex items-center justify-end pr-2"
-                          style={{ width: `${percentage}%` }}
-                        >
-                          <span className="text-white text-sm font-bold">${product.price.toFixed(2)}</span>
+                {(() => {
+                  const priceVisibleProducts = products.filter((p) => p.isPriceVisible);
+                  const maxPrice = Math.max(...priceVisibleProducts.map((p) => p.price));
+
+                  return priceVisibleProducts.map((product) => {
+                    const percentage = maxPrice > 0 ? (product.price / maxPrice) * 100 : 0;
+                    return (
+                      <div key={product.id} className="flex items-center gap-4">
+                        <div className="w-32 truncate text-sm font-medium text-gray-700">
+                          {product.name}
+                        </div>
+                        <div className="flex-1 h-8 bg-gray-200 rounded-lg overflow-hidden">
+                          <div 
+                            className="h-full bg-green-500 flex items-center justify-end pr-2"
+                            style={{ width: `${percentage}%` }}
+                          >
+                            <span className="text-white text-sm font-bold">${product.price.toFixed(2)}</span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
             </div>
           )}
@@ -1628,7 +1812,9 @@ function ProductCard({
   isFav,
   onFavoriteToggle,
   hasAlert,
-  onAlertToggle
+  onAlertToggle,
+  onRequestPricing,
+  onMessageGrower,
 }: { 
   product: Product; 
   isInCompare: boolean;
@@ -1638,6 +1824,8 @@ function ProductCard({
   onFavoriteToggle: () => void;
   hasAlert?: boolean;
   onAlertToggle?: () => void;
+  onRequestPricing: () => void;
+  onMessageGrower: () => void;
 }) {
   const [imageHovered, setImageHovered] = useState(false);
   const [imagePosition, setImagePosition] = useState({ x: 50, y: 50 });
@@ -1690,7 +1878,7 @@ function ProductCard({
     (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
      product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
   
-  const moq = Math.max(1, Math.ceil(product.price / 50));
+  const moq = product.isPriceVisible ? Math.max(1, Math.ceil(product.price / 50)) : 1;
   const stockStatus = getStockStatus();
   
   return (
@@ -1741,6 +1929,26 @@ function ProductCard({
           </button>
         </div>
 
+        {/* Price Alert Button */}
+        {product.isPriceVisible && (
+          <div className="absolute top-2 right-2 z-10">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAlertToggle?.();
+              }}
+              className={`p-2 rounded-lg transition-all ${
+                hasAlert
+                  ? 'bg-orange-100 text-orange-600 shadow-md'
+                  : 'bg-white/90 backdrop-blur-sm text-gray-400 hover:text-orange-500 hover:bg-white shadow-sm'
+              }`}
+              title={hasAlert ? 'Price alert set' : 'Set price alert'}
+            >
+              {hasAlert ? <BellRing size={16} /> : <Bell size={16} />}
+            </button>
+          </div>
+        )}
+
         {/* Product Image or Placeholder */}
         {product.images && product.images.length > 0 ? (
           <div 
@@ -1772,7 +1980,7 @@ function ProductCard({
         </div>
         
         {/* Stock Status Badge */}
-        <div className={`absolute top-2 right-2 px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${stockStatus.color}`}>
+        <div className={`absolute top-12 right-2 px-2.5 py-1 rounded-full text-xs font-semibold border flex items-center gap-1.5 ${stockStatus.color}`}>
           <span className={`w-1.5 h-1.5 rounded-full ${stockStatus.dotColor}`}></span>
           {stockStatus.text}
         </div>
@@ -1847,17 +2055,37 @@ function ProductCard({
           </p>
         </div>
 
-        {/* Price & Add to Cart */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div>
-            <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
-            <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
-          </div>
-          <AddToCartButton 
-            product={product} 
-            growerName={product.grower.businessName}
-            growerId={product.grower.id}
-          />
+        {/* Price & Action */}
+        <div className="pt-3 border-t border-gray-100 space-y-2">
+          {product.isPriceVisible ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
+                <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
+              </div>
+              <AddToCartButton 
+                product={product} 
+                growerName={product.grower.businessName}
+                growerId={product.grower.id}
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={onRequestPricing}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
+            >
+              Request Pricing
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={onMessageGrower}
+            className="w-full inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+          >
+            Message Grower
+          </button>
         </div>
         
         {/* Test Results Link */}
@@ -1885,7 +2113,9 @@ function ProductListItem({
   isFav,
   onFavoriteToggle,
   hasAlert,
-  onAlertToggle
+  onAlertToggle,
+  onRequestPricing,
+  onMessageGrower,
 }: { 
   product: Product; 
   isInCompare: boolean;
@@ -1895,6 +2125,8 @@ function ProductListItem({
   onFavoriteToggle: () => void;
   hasAlert?: boolean;
   onAlertToggle?: () => void;
+  onRequestPricing: () => void;
+  onMessageGrower: () => void;
 }) {
   const stockStatus = product.inventoryQty === 0 
     ? { text: 'Out of Stock', color: 'text-red-600', bg: 'bg-red-50' }
@@ -1927,7 +2159,7 @@ function ProductListItem({
     return 'bg-red-50 text-red-700';
   };
   
-  const moq = Math.max(1, Math.ceil(product.price / 50));
+  const moq = product.isPriceVisible ? Math.max(1, Math.ceil(product.price / 50)) : 1;
 
   return (
     <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors bg-white">
@@ -1961,17 +2193,19 @@ function ProductListItem({
       </button>
 
       {/* Price Alert Button */}
-      <button
-        onClick={onAlertToggle}
-        className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
-          hasAlert
-            ? "bg-orange-100 text-orange-600"
-            : "bg-gray-100 text-gray-400 hover:text-orange-500 hover:bg-gray-200"
-        }`}
-        title={hasAlert ? "Price alert set" : "Set price alert"}
-      >
-        {hasAlert ? <BellRing size={16} /> : <Bell size={16} />}
-      </button>
+      {product.isPriceVisible && (
+        <button
+          onClick={onAlertToggle}
+          className={`flex-shrink-0 flex items-center justify-center w-8 h-8 rounded-lg transition-all ${
+            hasAlert
+              ? "bg-orange-100 text-orange-600"
+              : "bg-gray-100 text-gray-400 hover:text-orange-500 hover:bg-gray-200"
+          }`}
+          title={hasAlert ? "Price alert set" : "Set price alert"}
+        >
+          {hasAlert ? <BellRing size={16} /> : <Bell size={16} />}
+        </button>
+      )}
 
       {/* Product Image Thumbnail */}
       <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
@@ -2055,20 +2289,40 @@ function ProductListItem({
         <span className="text-sm font-bold text-blue-700">{moq}</span>
       </div>
 
-      {/* Price */}
-      <div className="text-right min-w-[100px]">
-        <div className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</div>
-        <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
-      </div>
+      {/* Price / Request + Actions */}
+      <div className="flex-shrink-0 min-w-[180px] space-y-2">
+        {product.isPriceVisible ? (
+          <>
+            <div className="text-right">
+              <div className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</div>
+              <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
+            </div>
+            <div className="flex justify-end">
+              <AddToCartButton 
+                product={product} 
+                growerName={product.grower.businessName}
+                growerId={product.grower.id}
+                compact
+              />
+            </div>
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={onRequestPricing}
+            className="w-full rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
+          >
+            Request Pricing
+          </button>
+        )}
 
-      {/* Add to Cart */}
-      <div className="flex-shrink-0">
-        <AddToCartButton 
-          product={product} 
-          growerName={product.grower.businessName}
-          growerId={product.grower.id}
-          compact
-        />
+        <button
+          type="button"
+          onClick={onMessageGrower}
+          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+        >
+          Message Grower
+        </button>
       </div>
     </div>
   );

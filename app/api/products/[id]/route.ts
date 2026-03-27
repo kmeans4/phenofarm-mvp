@@ -2,12 +2,21 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { parseProductPayload, PRODUCT_STATUS } from '@/lib/product-payload';
+import { Prisma } from '@prisma/client';
 
-function serializeProduct(product: any) {
+type ProductLike = {
+  price: Prisma.Decimal | number | null;
+  isPriceVisible?: boolean | null;
+  thcLegacy?: Prisma.Decimal | number | null;
+  cbdLegacy?: Prisma.Decimal | number | null;
+};
+
+function serializeProduct<T extends ProductLike>(product: T | null) {
   if (!product) return product;
   return {
     ...product,
     price: product.price ? parseFloat(product.price.toString()) : 0,
+    isPriceVisible: product.isPriceVisible ?? true,
     thcLegacy: product.thcLegacy ? parseFloat(product.thcLegacy.toString()) : null,
     cbdLegacy: product.cbdLegacy ? parseFloat(product.cbdLegacy.toString()) : null,
   };
@@ -81,7 +90,7 @@ export async function PUT(
       if (!batch) return NextResponse.json({ error: 'Batch not found' }, { status: 404 });
     }
 
-    const updateData: any = {};
+    const updateData: Prisma.ProductUncheckedUpdateInput = {};
 
     if (body.name !== undefined) updateData.name = data.name || 'Untitled Draft Product';
     if (body.productType !== undefined) updateData.productType = data.productType;
@@ -89,7 +98,8 @@ export async function PUT(
     if (body.strainId !== undefined) updateData.strainId = data.strainId;
     if (body.batchId !== undefined) updateData.batchId = data.batchId;
     if (body.price !== undefined && data.price !== null) updateData.price = data.price;
-    if (body.inventoryQty !== undefined && data.inventoryQty !== null) updateData.inventoryQty = data.inventoryQty;
+    const requestedInventory = body.inventoryQty !== undefined && data.inventoryQty !== null ? data.inventoryQty : null;
+    if (requestedInventory !== null) updateData.inventoryQty = requestedInventory;
     if (body.unit !== undefined && data.unit) updateData.unit = data.unit;
     if (body.description !== undefined) updateData.description = data.description;
     if (body.images !== undefined) updateData.images = data.images || [];
@@ -98,6 +108,7 @@ export async function PUT(
     if (body.ingredients !== undefined) updateData.ingredients = data.ingredients;
     if (body.ingredientsDocumentUrl !== undefined) updateData.ingredientsDocumentUrl = data.ingredientsDocumentUrl;
     if (body.isFeatured !== undefined) updateData.isFeatured = data.isFeatured;
+    if (body.isPriceVisible !== undefined) updateData.isPriceVisible = data.isPriceVisible;
 
     if (body.strainLegacy !== undefined) updateData.strainLegacy = data.strainLegacy;
     if (body.categoryLegacy !== undefined) updateData.categoryLegacy = data.categoryLegacy;
@@ -105,11 +116,11 @@ export async function PUT(
     if (body.thcLegacy !== undefined) updateData.thcLegacy = data.thcLegacy;
     if (body.cbdLegacy !== undefined) updateData.cbdLegacy = data.cbdLegacy;
 
-    const effectiveInventory = updateData.inventoryQty ?? existingProduct.inventoryQty;
+    const effectiveInventory = requestedInventory ?? existingProduct.inventoryQty;
 
     if (body.isAvailable !== undefined) {
       updateData.isAvailable = effectiveInventory > 0 ? Boolean(body.isAvailable) : false;
-    } else if (updateData.inventoryQty !== undefined) {
+    } else if (requestedInventory !== null) {
       updateData.isAvailable = effectiveInventory > 0 ? existingProduct.isAvailable : false;
     }
 

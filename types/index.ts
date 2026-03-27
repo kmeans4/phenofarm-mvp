@@ -31,6 +31,7 @@ export type Product = {
   thc?: number;
   cbd?: number;
   price: number;
+  isPriceVisible: boolean;
   inventoryQty: number;
   unit: string;
   isAvailable: boolean;

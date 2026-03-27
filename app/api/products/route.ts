@@ -4,10 +4,18 @@ import { getAuthSession } from '@/lib/auth-helpers';
 import { Prisma } from '@prisma/client';
 import { parseProductPayload, PRODUCT_STATUS } from '@/lib/product-payload';
 
-function serializeProduct(product: any) {
+type ProductLike = {
+  price: Prisma.Decimal | number | null;
+  isPriceVisible?: boolean | null;
+  thcLegacy?: Prisma.Decimal | number | null;
+  cbdLegacy?: Prisma.Decimal | number | null;
+};
+
+function serializeProduct<T extends ProductLike>(product: T) {
   return {
     ...product,
     price: product.price ? parseFloat(String(product.price)) : 0,
+    isPriceVisible: product.isPriceVisible ?? true,
     thcLegacy: product.thcLegacy ? parseFloat(String(product.thcLegacy)) : null,
     cbdLegacy: product.cbdLegacy ? parseFloat(String(product.cbdLegacy)) : null,
   };
@@ -133,6 +141,7 @@ export async function POST(request: NextRequest) {
         description: data.description,
         images: data.images || [],
         isAvailable: data.isAvailable,
+        isPriceVisible: data.isPriceVisible,
         sku: data.sku,
         brand: data.brand,
         ingredients: data.ingredients,

@@ -42,6 +42,7 @@ export default async function EditProductPage({ params }: PageProps) {
     unit: product.unit || 'Gram',
     description: product.description || '',
     isAvailable: product.isAvailable ?? true,
+    isPriceVisible: product.isPriceVisible ?? true,
     images: product.images || [],
     sku: product.sku || '',
     brand: product.brand || '',

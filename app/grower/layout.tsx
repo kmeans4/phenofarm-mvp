@@ -5,6 +5,7 @@ import { MobileNav } from "./components/MobileNav";
 import { ClientNav } from "./components/ClientNav";
 import { SignOutButton } from "@/app/components/SignOutButton";
 import { SearchDialog } from "@/app/components/SearchDialog";
+import { ChatDrawer } from "@/app/components/messaging/ChatDrawer";
 
 export default async function GrowerLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -13,7 +14,7 @@ export default async function GrowerLayout({ children }: { children: React.React
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as { role: string; growerId?: string; dispensaryId?: string };
+  const user = session.user as { id: string; role: string; growerId?: string; dispensaryId?: string };
   
   if (user.role !== 'GROWER') {
     redirect('/dashboard');
@@ -76,6 +77,11 @@ export default async function GrowerLayout({ children }: { children: React.React
           </div>
         </main>
       </div>
+
+      <ChatDrawer
+        currentUserId={user.id}
+        currentRole="GROWER"
+      />
     </div>
   );
 }

@@ -24,6 +24,7 @@ interface ProductFormData {
   unit: string;
   description: string;
   isAvailable: boolean;
+  isPriceVisible: boolean;
   images: string[];
   sku: string;
   brand: string;
@@ -126,6 +127,7 @@ export function ProductForm({
     unit: initialData.unit || 'Gram',
     description: initialData.description || '',
     isAvailable: initialData.isAvailable !== undefined ? initialData.isAvailable : true,
+    isPriceVisible: initialData.isPriceVisible !== undefined ? initialData.isPriceVisible : true,
     images: initialData.images || [],
     sku: initialData.sku || '',
     brand: initialData.brand || growerBrand || '',
@@ -151,6 +153,7 @@ export function ProductForm({
     unit: initialData?.unit || 'Gram',
     description: initialData?.description || '',
     isAvailable: initialData?.isAvailable !== undefined ? initialData.isAvailable : true,
+    isPriceVisible: initialData?.isPriceVisible !== undefined ? initialData.isPriceVisible : true,
     images: initialData?.images || [],
     sku: initialData?.sku || '',
     brand: initialData?.brand || growerBrand || '',
@@ -511,6 +514,39 @@ export function ProductForm({
                 {errors.unit && touched.unit && (
                   <p className="text-sm text-red-600 mt-1">{errors.unit}</p>
                 )}
+              </div>
+            </div>
+
+            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Pricing Display</label>
+                <p className="text-xs text-gray-500 mt-1">Choose whether dispensaries see your price or must request pricing via message.</p>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => handleChange('isPriceVisible', true)}
+                  className={`text-left px-3 py-2 rounded-lg border transition-colors ${
+                    formData.isPriceVisible
+                      ? 'border-green-600 bg-green-50 text-green-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="block text-sm font-medium">Show Price</span>
+                  <span className="block text-xs text-gray-500">Display public product price</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleChange('isPriceVisible', false)}
+                  className={`text-left px-3 py-2 rounded-lg border transition-colors ${
+                    !formData.isPriceVisible
+                      ? 'border-green-600 bg-green-50 text-green-700'
+                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  <span className="block text-sm font-medium">Request Pricing</span>
+                  <span className="block text-xs text-gray-500">Hide price and require inquiry</span>
+                </button>
               </div>
             </div>
 

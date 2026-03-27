@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types";
+import { Prisma } from "@prisma/client";
 
 const PAGE_SIZE = 12;
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
   const growerId = searchParams.get("growerId");
   
   try {
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       isAvailable: true,
       inventoryQty: { gt: 0 },
     };
@@ -56,6 +57,7 @@ export async function GET(request: NextRequest) {
       id: product.id,
       name: product.name,
       price: Number(product.price),
+      isPriceVisible: product.isPriceVisible ?? true,
       strain: product.strain?.name || null,
       strainId: product.strainId,
       productType: product.productType,

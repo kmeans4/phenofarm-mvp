@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { expandProductTypeFilters } from '@/lib/product-types';
+import { Prisma } from '@prisma/client';
 
 /**
  * Dispensary Catalog API
@@ -67,10 +68,11 @@ export async function GET(request: NextRequest) {
     const trending = searchParams.get('trending') === 'true';
 
     // Build where clause
-    const where: any = {
+    const where: Prisma.ProductWhereInput = {
       isAvailable: true,
       inventoryQty: { gt: 0 },
     };
+    const andClauses: Prisma.ProductWhereInput[] = [];
 
     // Recently Added filter (last 7 days)
     if (recentlyAdded) {
@@ -125,8 +127,7 @@ export async function GET(request: NextRequest) {
       }).filter(Boolean);
 
       if (thcConditions.length > 0) {
-        where.AND = where.AND || [];
-        where.AND.push({ OR: thcConditions });
+        andClauses.push({ OR: thcConditions as Prisma.ProductWhereInput[] });
       }
     }
 
@@ -141,13 +142,16 @@ export async function GET(request: NextRequest) {
       }).filter(Boolean);
 
       if (priceConditions.length > 0) {
-        where.AND = where.AND || [];
-        where.AND.push({ OR: priceConditions });
+        andClauses.push({ OR: priceConditions as Prisma.ProductWhereInput[] });
       }
     }
 
+    if (andClauses.length > 0) {
+      where.AND = andClauses;
+    }
+
     // Determine order by
-    let orderBy: any = {};
+    let orderBy: Prisma.ProductOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput[] = {};
     let trendingSort = false;
     
     if (trending) {
@@ -182,7 +186,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Build include object conditionally
-    const include: any = {
+    const include: Prisma.ProductInclude = {
       grower: {
         select: {
           id: true,
@@ -229,21 +233,22 @@ export async function GET(request: NextRequest) {
     });
 
     // Calculate trending score if needed and sort
-    let processedProducts: any = products;
+    let processedProducts = products;
     if (trendingSort) {
       processedProducts = products
-        .map(p => ({
+        .map((p) => ({
           ...p,
-          _orderVolume: (p as { orderItems?: { quantity: number }[] }).orderItems?.reduce((sum: number, item: any) => sum + (item.quantity || 0), 0) || 0
+          _orderVolume: (p.orderItems || []).reduce((sum, item) => sum + (item.quantity || 0), 0),
         }))
-        .sort((a: any, b: any) => b._orderVolume - a._orderVolume)
+        .sort((a, b) => b._orderVolume - a._orderVolume)
         .slice(skip, skip + limit);
     }
 
-    const serializedProducts = processedProducts.map((p: any) => ({
+    const serializedProducts = processedProducts.map((p) => ({
       id: p.id,
       name: p.name,
       price: parseFloat(String(p.price)),
+      isPriceVisible: p.isPriceVisible ?? true,
       strain: p.strain?.name || p.strainLegacy || null,
       strainId: p.strainId,
       strainType: p.strain?.genetics || null,
