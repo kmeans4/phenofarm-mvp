@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ExtendedUser, AuthSession } from '@/types';
 import { Button } from '@/app/components/ui/Button';
+import { ErrorState, LoadingState } from '@/app/components/ui/FetchState';
 import { STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 import {
   toSafeAvailability,
@@ -557,13 +558,6 @@ export default function GrowerProductsPage() {
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{error}</p>
-          <Button variant="secondary" onClick={fetchProducts} className="mt-2">Retry</Button>
-        </div>
-      )}
-
       {/* Filter Tabs & View Toggle */}
       <div className="bg-white p-2 sm:p-3 rounded-xl shadow-sm border border-gray-200">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -627,7 +621,18 @@ export default function GrowerProductsPage() {
       </div>
 
       {/* Products Display */}
-      {products?.length > 0 ? (
+      {loading ? (
+        <LoadingState
+          title="Loading product catalog"
+          description="Pulling your latest products, inventory, and availability status."
+        />
+      ) : error ? (
+        <ErrorState
+          title="Couldn&apos;t load products"
+          description={error}
+          onRetry={fetchProducts}
+        />
+      ) : products?.length > 0 ? (
         <div className="space-y-6 sm:space-y-8">
           {groupOrder.map((groupName) => (
             <div key={groupName} className="space-y-3 sm:space-y-4">

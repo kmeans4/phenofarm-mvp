@@ -7,6 +7,7 @@ import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 import MobileFilterSheet from "./components/MobileFilterSheet";
+import { ErrorState, LoadingState } from '@/app/components/ui/FetchState';
 import { getAllProductTypes } from '@/lib/product-types';
 import {
   toSafeAvailability,
@@ -207,6 +208,7 @@ export default function CatalogContent() {
   const [hasMore, setHasMore] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [totalProducts, setTotalProducts] = useState(0);
   
   // Refs
@@ -558,27 +560,28 @@ export default function CatalogContent() {
   // Fetch products from API
   const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
     if (isLoading) return;
-    
+
     setIsLoading(true);
-    
+    setFetchError(null);
+
     try {
       const params = new URLSearchParams();
       params.set('page', pageNum.toString());
       params.set('limit', ITEMS_PER_PAGE.toString());
-      
+
       if (searchQuery) params.set('search', searchQuery);
       if (filters.productTypes.length > 0) params.set('productTypes', filters.productTypes.join(','));
       if (filters.thcRanges.length > 0) params.set('thcRanges', filters.thcRanges.join(','));
       if (filters.priceRanges.length > 0) params.set('priceRanges', filters.priceRanges.join(','));
       if (sortBy !== 'default') params.set('sortBy', sortBy);
       if (filters.recentlyAdded) params.set('recentlyAdded', 'true');
-      
+
       const response = await fetch(`/api/dispensary/catalog?${params.toString()}`);
-      
+
       if (!response.ok) {
-        throw new Error('Failed to fetch products');
+        throw new Error(`Failed to fetch products (${response.status})`);
       }
-      
+
       const data = await response.json();
       const normalizedProducts = Array.isArray(data.products)
         ? (data.products as unknown[])
@@ -591,12 +594,13 @@ export default function CatalogContent() {
       } else {
         setProducts(normalizedProducts);
       }
-      
+
       setHasMore(Boolean(data.hasMore));
       setTotalProducts(toSafeNonNegativeInteger(data.total, 0));
       setPage(pageNum);
     } catch (error) {
       console.error('Error fetching products:', error);
+      setFetchError(error instanceof Error ? error.message : 'Failed to fetch products.');
     } finally {
       setIsLoading(false);
       setIsInitialLoading(false);
@@ -1073,7 +1077,13 @@ export default function CatalogContent() {
 
       {/* Results count */}
       <div className="flex items-center justify-between text-sm text-gray-600">
-        <span>{isInitialLoading ? 'Loading...' : `${products.length} of ${totalProducts} product${totalProducts !== 1 ? 's' : ''}`}</span>
+        <span>
+          {isInitialLoading
+            ? 'Loading...'
+            : fetchError
+              ? 'Catalog unavailable'
+              : `${products.length} of ${totalProducts} product${totalProducts !== 1 ? 's' : ''}`}
+        </span>
         <span className="text-xs text-gray-500">View: {viewMode === 'grid' ? 'Grid' : 'List'}{sortBy !== 'default' && ` • Sorted: ${SORT_OPTIONS.find(o => o.value === sortBy)?.label}`}</span>
       </div>
 
@@ -1243,11 +1253,16 @@ export default function CatalogContent() {
         {/* Product Grid/List */}
         <div className="flex-1 min-w-0">
           {isInitialLoading ? (
-            // Initial loading state
-            <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="w-10 h-10 text-green-600 animate-spin mb-4" />
-              <p className="text-gray-600">Loading products...</p>
-            </div>
+            <LoadingState
+              title="Loading catalog"
+              description="Fetching available products, growers, and current filters."
+            />
+          ) : fetchError ? (
+            <ErrorState
+              title="Couldn&apos;t load catalog"
+              description={fetchError}
+              onRetry={() => fetchProducts(1, false)}
+            />
           ) : groupedProducts.length > 0 ? (
             <div className="space-y-8">
               {groupedProducts.map(group => (
