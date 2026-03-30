@@ -3,6 +3,7 @@ import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { Prisma } from '@prisma/client';
 import { parseProductPayload, PRODUCT_STATUS } from '@/lib/product-payload';
+import { apiError, logApiError } from '@/lib/api-response';
 
 type ProductLike = {
   price: Prisma.Decimal | number | null;
@@ -25,11 +26,11 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getAuthSession();
 
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return apiError(401, 'UNAUTHORIZED', 'Unauthorized');
 
     const user = session.user;
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return apiError(403, 'FORBIDDEN', 'Forbidden');
     }
 
     const { searchParams } = new URL(request.url);
@@ -79,8 +80,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(products.map(serializeProduct), { status: 200 });
   } catch (error) {
-    console.error('Error fetching products:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logApiError('products.GET', error, { route: '/api/products' });
+    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Internal server error');
   }
 }
 
@@ -88,11 +89,11 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
 
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return apiError(401, 'UNAUTHORIZED', 'Unauthorized');
 
     const user = session.user;
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return apiError(403, 'FORBIDDEN', 'Forbidden');
     }
 
     const body = await request.json();
@@ -102,7 +103,9 @@ export async function POST(request: NextRequest) {
     });
 
     if (!parsed.ok) {
-      return NextResponse.json({ error: parsed.errors.join(', ') }, { status: 400 });
+      return apiError(400, 'VALIDATION_ERROR', parsed.errors.join(', '), {
+        details: parsed.errors,
+      });
     }
 
     const data = parsed.data;
@@ -112,12 +115,12 @@ export async function POST(request: NextRequest) {
         where: { id: data.strainId, growerId: user.growerId },
         select: { id: true },
       });
-      if (!strain) return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
+      if (!strain) return apiError(404, 'STRAIN_NOT_FOUND', 'Strain not found');
     }
 
     if (data.batchId) {
       const batch = await db.batch.findFirst({ where: { id: data.batchId, growerId: user.growerId } });
-      if (!batch) return NextResponse.json({ error: 'Batch not found' }, { status: 404 });
+      if (!batch) return apiError(404, 'BATCH_NOT_FOUND', 'Batch not found');
     }
 
     const product = await db.product.create({
@@ -156,7 +159,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(serializeProduct(product), { status: 201 });
   } catch (error) {
-    console.error('Error creating product:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logApiError('products.POST', error, { route: '/api/products' });
+    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Internal server error');
   }
 }

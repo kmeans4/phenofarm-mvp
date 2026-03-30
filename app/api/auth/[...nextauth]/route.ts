@@ -4,6 +4,7 @@ import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
 import { UserRole } from '@prisma/client';
 import type { NextAuthOptions } from 'next-auth';
+import { logApiError } from '@/lib/api-response';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not configured');
@@ -13,7 +14,7 @@ if (!process.env.AUTH_SECRET) {
 }
 
 export const authOptions: NextAuthOptions = {
-  debug: true,
+  debug: process.env.NODE_ENV === 'development',
   providers: [
     CredentialsProvider({
       name: 'Credentials',
@@ -22,10 +23,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        console.log('Auth attempt:', credentials?.email);
-        
         if (!credentials?.email || !credentials?.password) {
-          console.log('Missing credentials');
           return null;
         }
 
@@ -34,20 +32,11 @@ export const authOptions: NextAuthOptions = {
             where: { email: credentials.email },
           });
 
-          console.log('User found:', user ? 'YES' : 'NO');
-          console.log('Has passwordHash:', user?.passwordHash ? 'YES' : 'NO');
-          
-          if (!user) {
+          if (!user || !user.passwordHash) {
             return null;
           }
 
-          if (!user.passwordHash) {
-            console.log('No password hash stored');
-            return null;
-          }
-          
           const isValidPassword = await bcrypt.compare(credentials.password, user.passwordHash);
-          console.log('Password valid:', isValidPassword);
 
           if (!isValidPassword) {
             return null;
@@ -61,7 +50,7 @@ export const authOptions: NextAuthOptions = {
             dispensaryId: user.dispensaryId || undefined,
           };
         } catch (error) {
-          console.error('Auth error:', error);
+          logApiError('auth.credentials.authorize', error, { route: '/api/auth/session' });
           return null;
         }
       },
@@ -95,6 +84,25 @@ export const authOptions: NextAuthOptions = {
         session.user.dispensaryId = token.dispensaryId;
       }
       return session;
+    },
+  },
+  logger: {
+    error(code) {
+      logApiError('nextauth.error', new Error(code), { route: '/api/auth/session' });
+    },
+    warn(code) {
+      console.warn('[nextauth-warn]', {
+        code,
+        route: '/api/auth/session',
+      });
+    },
+    debug(code) {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[nextauth-debug]', {
+          code,
+          route: '/api/auth/session',
+        });
+      }
     },
   },
   secret: process.env.AUTH_SECRET,

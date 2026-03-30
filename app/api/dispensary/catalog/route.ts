@@ -3,12 +3,13 @@ import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { expandProductTypeFilters } from '@/lib/product-types';
 import { Prisma } from '@prisma/client';
+import { apiError, logApiError } from '@/lib/api-response';
 
 /**
  * Dispensary Catalog API
- * 
+ *
  * GET /api/dispensary/catalog?page=1&limit=20
- * 
+ *
  * Query Parameters:
  * - page (optional): Page number, defaults to 1
  * - limit (optional): Products per page, defaults to 20, max 50
@@ -19,7 +20,7 @@ import { Prisma } from '@prisma/client';
  * - sortBy (optional): Sort option (default, price-asc, price-desc, thc-asc, thc-desc, name-asc, name-desc)
  * - recentlyAdded (optional): Show only products added in last 7 days (true/false)
  * - trending (optional): Show trending products sorted by order volume (true/false)
- * 
+ *
  * Response: 200 OK - { products: [], hasMore: boolean, total: number }
  */
 
@@ -42,22 +43,22 @@ export async function GET(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return apiError(401, 'UNAUTHORIZED', 'Unauthorized');
     }
 
     const user = session.user;
-    
+
     if (user.role !== 'DISPENSARY') {
-      return NextResponse.json({ error: 'Forbidden - Dispensary access only' }, { status: 403 });
+      return apiError(403, 'FORBIDDEN', 'Forbidden - Dispensary access only');
     }
 
     const { searchParams } = new URL(request.url);
-    
+
     // Pagination params
     const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
     const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20')));
     const skip = (page - 1) * limit;
-    
+
     // Filter params
     const search = searchParams.get('search');
     const productTypes = searchParams.get('productTypes')?.split(',').filter(Boolean);
@@ -94,10 +95,10 @@ export async function GET(request: NextRequest) {
         { name: { contains: search, mode: 'insensitive' } },
         { strainLegacy: { contains: search, mode: 'insensitive' } },
         { productType: { contains: search, mode: 'insensitive' } },
-        { 
-          strain: { 
-            name: { contains: search, mode: 'insensitive' } 
-          } 
+        {
+          strain: {
+            name: { contains: search, mode: 'insensitive' },
+          },
         },
       ];
     }
@@ -109,22 +110,24 @@ export async function GET(request: NextRequest) {
 
     // Build THC range filter
     if (thcRanges && thcRanges.length > 0) {
-      const thcConditions = thcRanges.map(rangeId => {
-        const range = THC_RANGES[rangeId as keyof typeof THC_RANGES];
-        if (!range) return null;
-        return {
-          OR: [
-            { 
-              batch: { 
-                thc: { gte: range.min, lt: range.max } 
-              } 
-            },
-            { 
-              thcLegacy: { gte: range.min, lt: range.max } 
-            },
-          ],
-        };
-      }).filter(Boolean);
+      const thcConditions = thcRanges
+        .map((rangeId) => {
+          const range = THC_RANGES[rangeId as keyof typeof THC_RANGES];
+          if (!range) return null;
+          return {
+            OR: [
+              {
+                batch: {
+                  thc: { gte: range.min, lt: range.max },
+                },
+              },
+              {
+                thcLegacy: { gte: range.min, lt: range.max },
+              },
+            ],
+          };
+        })
+        .filter(Boolean);
 
       if (thcConditions.length > 0) {
         andClauses.push({ OR: thcConditions as Prisma.ProductWhereInput[] });
@@ -133,13 +136,15 @@ export async function GET(request: NextRequest) {
 
     // Build price range filter
     if (priceRanges && priceRanges.length > 0) {
-      const priceConditions = priceRanges.map(rangeId => {
-        const range = PRICE_RANGES[rangeId as keyof typeof PRICE_RANGES];
-        if (!range) return null;
-        return {
-          price: { gte: range.min, lt: range.max },
-        };
-      }).filter(Boolean);
+      const priceConditions = priceRanges
+        .map((rangeId) => {
+          const range = PRICE_RANGES[rangeId as keyof typeof PRICE_RANGES];
+          if (!range) return null;
+          return {
+            price: { gte: range.min, lt: range.max },
+          };
+        })
+        .filter(Boolean);
 
       if (priceConditions.length > 0) {
         andClauses.push({ OR: priceConditions as Prisma.ProductWhereInput[] });
@@ -153,7 +158,7 @@ export async function GET(request: NextRequest) {
     // Determine order by
     let orderBy: Prisma.ProductOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput[] = {};
     let trendingSort = false;
-    
+
     if (trending) {
       trendingSort = true;
       orderBy = { id: 'asc' }; // placeholder, will sort manually
@@ -178,10 +183,7 @@ export async function GET(request: NextRequest) {
           orderBy = { name: 'desc' };
           break;
         default:
-          orderBy = [
-            { grower: { businessName: 'asc' } },
-            { name: 'asc' },
-          ];
+          orderBy = [{ grower: { businessName: 'asc' } }, { name: 'asc' }];
       }
     }
 
@@ -216,7 +218,7 @@ export async function GET(request: NextRequest) {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
       include.orderItems = {
         where: { createdAt: { gte: thirtyDaysAgo } },
-        select: { quantity: true }
+        select: { quantity: true },
       };
     }
 
@@ -263,25 +265,30 @@ export async function GET(request: NextRequest) {
       grower: {
         id: p.grower.id,
         businessName: p.grower.businessName,
-        location: p.grower.city && p.grower.state ? `${p.grower.city}, ${p.grower.state}` : p.grower.city || p.grower.state || null,
+        location:
+          p.grower.city && p.grower.state
+            ? `${p.grower.city}, ${p.grower.state}`
+            : p.grower.city || p.grower.state || null,
         isVerified: p.grower.isVerified,
       },
     }));
 
     const hasMore = skip + products.length < total;
 
-    return NextResponse.json({
-      products: serializedProducts,
-      hasMore,
-      total,
-      page,
-      limit,
-      recentlyAdded,
-      trending,
-    }, { status: 200 });
-
+    return NextResponse.json(
+      {
+        products: serializedProducts,
+        hasMore,
+        total,
+        page,
+        limit,
+        recentlyAdded,
+        trending,
+      },
+      { status: 200 }
+    );
   } catch (error) {
-    console.error('Error fetching dispensary catalog:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    logApiError('dispensary.catalog.GET', error, { route: '/api/dispensary/catalog' });
+    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Internal server error');
   }
 }
