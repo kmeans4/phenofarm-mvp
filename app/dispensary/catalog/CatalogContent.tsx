@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from "next/link";
 import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, Check, Plus, BarChart3, AlertCircle } from "lucide-react";
 import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from "lucide-react";
@@ -641,40 +641,55 @@ export default function CatalogContent() {
   }, [hasMore, isLoading, page, fetchProducts]);
 
   // Filter products by favorites if needed
-  const filteredProducts = showFavoritesOnly
-    ? products.filter(p => favorites.includes(p.id))
-    : products;
+  const filteredProducts = useMemo(() => (
+    showFavoritesOnly ? products.filter((p) => favorites.includes(p.id)) : products
+  ), [showFavoritesOnly, products, favorites]);
 
   // Group products by grower when not sorting
-  const groupedProducts = sortBy === 'default' 
-    ? groupByGrower(filteredProducts)
-    : [{ growerId: 'all', growerName: 'All Products', products: filteredProducts }];
+  const groupedProducts = useMemo(() => (
+    sortBy === 'default'
+      ? groupByGrower(filteredProducts)
+      : [{ growerId: 'all', growerName: 'All Products', products: filteredProducts }]
+  ), [sortBy, filteredProducts]);
 
   // Get active filter count
-  const activeFilterCount = filters.productTypes.length + filters.thcRanges.length + filters.priceRanges.length + (filters.recentlyAdded ? 1 : 0) + (filters.trending ? 1 : 0) + (showFavoritesOnly ? 1 : 0);
+  const activeFilterCount = useMemo(() => (
+    filters.productTypes.length
+    + filters.thcRanges.length
+    + filters.priceRanges.length
+    + (filters.recentlyAdded ? 1 : 0)
+    + (filters.trending ? 1 : 0)
+    + (showFavoritesOnly ? 1 : 0)
+  ), [filters, showFavoritesOnly]);
 
   // Get active filter chips
-  const getFilterChips = () => {
+  const filterChips = useMemo(() => {
     const chips: { label: string; category: 'productTypes' | 'thcRanges' | 'priceRanges' | 'favorites' | 'recentlyAdded'; value: string }[] = [];
+
     if (showFavoritesOnly) {
       chips.push({ label: `Favorites (${favorites.length})`, category: 'favorites', value: 'favorites' });
     }
+
     if (filters.recentlyAdded) {
       chips.push({ label: 'Recently Added (7 days)', category: 'recentlyAdded', value: 'recentlyAdded' });
     }
-    filters.productTypes.forEach(type => {
+
+    filters.productTypes.forEach((type) => {
       chips.push({ label: type, category: 'productTypes', value: type });
     });
-    filters.thcRanges.forEach(rangeId => {
-      const range = THC_RANGES.find(r => r.id === rangeId);
+
+    filters.thcRanges.forEach((rangeId) => {
+      const range = THC_RANGES.find((r) => r.id === rangeId);
       if (range) chips.push({ label: `THC: ${range.label}`, category: 'thcRanges', value: rangeId });
     });
-    filters.priceRanges.forEach(rangeId => {
-      const range = PRICE_RANGES.find(r => r.id === rangeId);
+
+    filters.priceRanges.forEach((rangeId) => {
+      const range = PRICE_RANGES.find((r) => r.id === rangeId);
       if (range) chips.push({ label: `Price: ${range.label}`, category: 'priceRanges', value: rangeId });
     });
+
     return chips;
-  };
+  }, [showFavoritesOnly, favorites.length, filters]);
 
   // Get icon for suggestion type
   const getSuggestionIcon = (type: string) => {
@@ -816,7 +831,7 @@ export default function CatalogContent() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Product Catalog</h1>
-          <p className="text-gray-600 mt-1">Browse products from verified growers</p>
+          <p className="text-gray-600 mt-1">Compare verified grower listings, request pricing, and message growers directly.</p>
         </div>
         <CartBadge />
       </div>
@@ -826,23 +841,29 @@ export default function CatalogContent() {
         {/* Search with Autocomplete */}
         <div className="flex-1 relative" ref={suggestionsRef}>
           <div className="relative">
+            <label htmlFor="catalog-search" className="sr-only">Search catalog</label>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
+              id="catalog-search"
               ref={searchInputRef}
               type="text"
-              placeholder="Search by product, strain, grower, or type..."
+              placeholder="Search products, strain names, growers, or product type"
               value={searchQuery}
               onChange={handleSearchInput}
               onFocus={() => setShowSuggestions(true)}
               onKeyDown={handleKeyDown}
+              aria-autocomplete="list"
+              aria-controls="catalog-search-suggestions"
               className="w-full rounded-lg border border-gray-300 pl-10 pr-10 py-2.5 focus:ring-2 focus:ring-green-500 focus:border-transparent"
             />
             {searchQuery && (
               <button
+                type="button"
                 onClick={() => {
                   setSearchQuery('');
                   searchInputRef.current?.focus();
                 }}
+                aria-label="Clear search"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 <X size={18} />
@@ -852,7 +873,7 @@ export default function CatalogContent() {
           
           {/* Autocomplete Dropdown */}
           {showSuggestions && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+            <div id="catalog-search-suggestions" className="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
               {/* Loading State */}
               {isSearching && searchQuery.length >= 2 && (
                 <div className="px-4 py-3 flex items-center gap-2 text-gray-500">
@@ -955,6 +976,7 @@ export default function CatalogContent() {
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
+            aria-label="Sort catalog results"
             className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2.5 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer text-sm"
           >
             {SORT_OPTIONS.map(option => (
@@ -968,6 +990,7 @@ export default function CatalogContent() {
 
         <div className="flex gap-2">
           <button
+            type="button"
             onClick={() => {
               if (typeof window !== 'undefined' && window.innerWidth < 1024) {
                 setShowMobileFilters(true);
@@ -975,6 +998,8 @@ export default function CatalogContent() {
                 setShowFilters(!showFilters);
               }
             }}
+            aria-label="Toggle filters"
+            aria-expanded={showFilters}
             className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
               showFilters 
                 ? 'bg-green-600 text-white border-green-600' 
@@ -993,6 +1018,7 @@ export default function CatalogContent() {
           {/* View Mode Toggle */}
           <div className="flex rounded-lg border border-gray-300 overflow-hidden">
             <button
+              type="button"
               onClick={() => setViewMode('grid')}
               className={`px-3 py-2 flex items-center gap-2 transition-colors ${
                 viewMode === 'grid' 
@@ -1006,6 +1032,7 @@ export default function CatalogContent() {
               <span className="hidden sm:inline text-sm">Grid</span>
             </button>
             <button
+              type="button"
               onClick={() => setViewMode('list')}
               className={`px-3 py-2 flex items-center gap-2 transition-colors ${
                 viewMode === 'list' 
@@ -1023,7 +1050,7 @@ export default function CatalogContent() {
       </div>
 
       {/* Active Filter Chips */}
-      {(getFilterChips().length > 0 || searchQuery || sortBy !== 'default') && (
+      {(filterChips.length > 0 || searchQuery || sortBy !== 'default') && (
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-sm text-gray-500 mr-2">Active:</span>
           {sortBy !== 'default' && (
@@ -1042,7 +1069,7 @@ export default function CatalogContent() {
               </button>
             </span>
           )}
-          {getFilterChips().map((chip, idx) => (
+          {filterChips.map((chip) => (
             <span 
               key={`${chip.category}-${chip.value}`}
               className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full"
@@ -1064,7 +1091,7 @@ export default function CatalogContent() {
               </button>
             </span>
           ))}
-          {(getFilterChips().length > 0 || searchQuery || sortBy !== 'default') && (
+          {(filterChips.length > 0 || searchQuery || sortBy !== 'default') && (
             <button
               onClick={clearAllFilters}
               className="text-sm text-gray-500 hover:text-gray-700 underline ml-2"
@@ -1076,7 +1103,7 @@ export default function CatalogContent() {
       )}
 
       {/* Results count */}
-      <div className="flex items-center justify-between text-sm text-gray-600">
+      <div className="flex items-center justify-between text-sm text-gray-600" aria-live="polite">
         <span>
           {isInitialLoading
             ? 'Loading...'
@@ -1100,22 +1127,22 @@ export default function CatalogContent() {
                   Saved Filters
                 </h3>
                 <div className="space-y-2">
-                  {savedFilters.map(savedFilter => (
-                    <div key={savedFilter.id} className="group">
+                  {savedFilters.map((savedFilter) => (
+                    <div key={savedFilter.id} className="group flex items-center gap-2 rounded-lg bg-green-50 px-2 py-2 text-green-700">
                       <button
+                        type="button"
                         onClick={() => applySavedFilter(savedFilter)}
-                        className="w-full text-left px-3 py-2 text-sm bg-green-50 text-green-700 rounded-lg hover:bg-green-100 transition-colors flex items-center justify-between"
+                        className="min-w-0 flex-1 text-left px-2 py-1 text-sm rounded-md hover:bg-green-100 transition-colors"
                       >
-                        <span className="font-medium truncate">{savedFilter.name}</span>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteSavedFilter(savedFilter.id);
-                          }}
-                          className="text-green-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
-                        >
-                          <X size={14} />
-                        </button>
+                        <span className="font-medium truncate block">{savedFilter.name}</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteSavedFilter(savedFilter.id)}
+                        aria-label={`Delete saved filter ${savedFilter.name}`}
+                        className="text-green-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                      >
+                        <X size={14} />
                       </button>
                     </div>
                   ))}
@@ -1352,8 +1379,8 @@ export default function CatalogContent() {
             </div>
           ) : (
             <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No products found</h3>
-              <p className="text-gray-500 mb-4">Try adjusting your filters, search, or sort criteria</p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No matching products right now</h3>
+              <p className="text-gray-500 mb-4">Try adjusting filters or search terms to broaden your results.</p>
               <button
                 onClick={clearAllFilters}
                 className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -1384,7 +1411,13 @@ export default function CatalogContent() {
                 >
                   <div className="w-8 h-8 rounded bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center text-sm">
                     {product.images && product.images.length > 0 ? (
-                      <img src={product.images[0]} alt="" className="w-full h-full object-cover rounded" />
+                      <img
+                        src={product.images[0]}
+                        alt={`${product.name} thumbnail`}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover rounded"
+                      />
                     ) : (
                       <span className="opacity-50">🌿</span>
                     )}
@@ -1393,7 +1426,9 @@ export default function CatalogContent() {
                     {product.name}
                   </span>
                   <button
+                    type="button"
                     onClick={() => removeFromCompare(product.id)}
+                    aria-label={`Remove ${product.name} from compare`}
                     className="text-gray-400 hover:text-red-500"
                   >
                     <X size={16} />
@@ -1412,14 +1447,18 @@ export default function CatalogContent() {
                 Compare Now
               </button>
               <button
+                type="button"
                 onClick={clearCompare}
+                aria-label="Clear compare list"
                 className="p-2 text-gray-500 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 title="Clear all"
               >
                 <X size={20} />
               </button>
               <button
+                type="button"
                 onClick={() => setShowCompareBar(false)}
+                aria-label="Hide compare bar"
                 className="p-2 text-gray-400 hover:text-gray-600"
               >
                 <X size={18} />
@@ -1562,7 +1601,7 @@ export default function CatalogContent() {
 
             <div className="p-6 space-y-4">
               <p className="text-sm text-gray-600">
-                Alert me when <span className="font-semibold">{priceAlertProduct.name}</span> drops below your target.
+                Alert me when <span className="font-semibold">{priceAlertProduct.name}</span> drops below this target price. Alerts are saved on this device.
               </p>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Target price</label>
@@ -1754,7 +1793,13 @@ function CompareModal({
                 <div className="p-4 bg-white border-b border-gray-200">
                   <div className="relative h-32 bg-gradient-to-br from-green-50 to-emerald-100 rounded-lg mb-3 flex items-center justify-center overflow-hidden">
                     {product.images && product.images.length > 0 ? (
-                      <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <span className="text-5xl opacity-30">🌿</span>
                     )}
@@ -1860,22 +1905,23 @@ function CompareModal({
 }
 
 function groupByGrower(products: Product[]) {
-  const groups: { growerId: string; growerName: string; products: Product[] }[] = [];
-  
-  products.forEach(product => {
-    const existingGroup = groups.find(g => g.growerId === product.grower.id);
+  const groupsMap = new Map<string, { growerId: string; growerName: string; products: Product[] }>();
+
+  products.forEach((product) => {
+    const existingGroup = groupsMap.get(product.grower.id);
     if (existingGroup) {
       existingGroup.products.push(product);
-    } else {
-      groups.push({
-        growerId: product.grower.id,
-        growerName: product.grower.businessName,
-        products: [product],
-      });
+      return;
     }
+
+    groupsMap.set(product.grower.id, {
+      growerId: product.grower.id,
+      growerName: product.grower.businessName,
+      products: [product],
+    });
   });
-  
-  return groups;
+
+  return Array.from(groupsMap.values());
 }
 
 // ============== END PRICE ALERT FUNCTIONS ==================
@@ -1971,10 +2017,12 @@ function ProductCard({
         {/* Compare Checkbox Overlay */}
         <div className="absolute top-2 left-2 z-10">
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onCompareToggle();
             }}
+            aria-label={isInCompare ? 'Remove from compare' : 'Add to compare'}
             disabled={compareDisabled && !isInCompare}
             className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all ${
               isInCompare 
@@ -1992,10 +2040,12 @@ function ProductCard({
         {/* Favorite Button */}
         <div className="absolute top-2 right-12 z-10">
           <button
+            type="button"
             onClick={(e) => {
               e.stopPropagation();
               onFavoriteToggle();
             }}
+            aria-label={isFav ? 'Remove from favorites' : 'Add to favorites'}
             className={`p-2 rounded-lg transition-all ${
               isFav
                 ? "bg-red-100 text-red-500 shadow-md"
@@ -2011,10 +2061,12 @@ function ProductCard({
         {product.isPriceVisible && (
           <div className="absolute top-2 right-2 z-10">
             <button
+              type="button"
               onClick={(e) => {
                 e.stopPropagation();
                 onAlertToggle?.();
               }}
+              aria-label={hasAlert ? 'Price alert already set' : 'Set price alert'}
               className={`p-2 rounded-lg transition-all ${
                 hasAlert
                   ? 'bg-orange-100 text-orange-600 shadow-md'
@@ -2029,19 +2081,22 @@ function ProductCard({
 
         {/* Product Image or Placeholder */}
         {product.images && product.images.length > 0 ? (
-          <div 
-            className="w-full h-full bg-cover bg-center transition-transform duration-300"
-            style={{ 
-              backgroundImage: `url(${product.images[0]})`,
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover transition-transform duration-300"
+            style={{
               transform: imageHovered ? 'scale(1.5)' : 'scale(1)',
-              transformOrigin: `${imagePosition.x}% ${imagePosition.y}%`
+              transformOrigin: `${imagePosition.x}% ${imagePosition.y}%`,
             }}
           />
         ) : (
-          <div 
+          <div
             className="w-full h-full flex items-center justify-center transition-transform duration-300"
-            style={{ 
-              transform: imageHovered ? 'scale(1.3)' : 'scale(1)'
+            style={{
+              transform: imageHovered ? 'scale(1.3)' : 'scale(1)',
             }}
           >
             <span className="text-7xl opacity-30">🌿</span>
@@ -2166,15 +2221,12 @@ function ProductCard({
           </button>
         </div>
         
-        {/* Test Results Link */}
+        {/* Lab results trust note */}
         <div className="mt-3 pt-3 border-t border-gray-100">
-          <button 
-            className="w-full flex items-center justify-center gap-2 text-xs font-medium text-gray-500 hover:text-green-700 py-1 rounded-lg hover:bg-green-50 transition-colors"
-            title="View Certificate of Analysis"
-          >
+          <p className="w-full flex items-center justify-center gap-2 text-xs font-medium text-gray-500 py-1">
             <FileText size={14} />
-            View Lab Results (COA)
-          </button>
+            COA and lab results available from the grower on request
+          </p>
         </div>
       </div>
     </div>
@@ -2288,7 +2340,13 @@ function ProductListItem({
       {/* Product Image Thumbnail */}
       <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
         {product.images && product.images.length > 0 ? (
-          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+          <img
+            src={product.images[0]}
+            alt={product.name}
+            loading="lazy"
+            decoding="async"
+            className="w-full h-full object-cover"
+          />
         ) : (
           <span className="text-2xl opacity-30">🌿</span>
         )}

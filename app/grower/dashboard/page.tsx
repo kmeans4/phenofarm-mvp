@@ -214,7 +214,7 @@ export default async function GrowerDashboardPage() {
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
           Grower Dashboard
         </h1>
-        <p className="text-sm sm:text-base text-gray-600">Welcome back! Here&apos;s your overview.</p>
+        <p className="text-sm sm:text-base text-gray-600">Track orders, revenue, and catalog health from one place.</p>
       </div>
 
       {/* Stats Cards */}
@@ -265,7 +265,7 @@ export default async function GrowerDashboardPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           }
-          description={stats.activeProducts > 0 ? `${stats.activeProducts} active products` : 'No products yet — add your first one'}
+          description={stats.activeProducts > 0 ? `${stats.activeProducts} active products listed` : 'No products yet — add your first listing'}
           color="blue"
         />
 
@@ -277,7 +277,7 @@ export default async function GrowerDashboardPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
           }
-          description="List a new cannabis product for sale"
+          description="Create a new listing with clear pricing and inventory"
           color="green"
         />
       </div>

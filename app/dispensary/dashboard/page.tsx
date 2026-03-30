@@ -100,7 +100,8 @@ export default async function DispensaryDashboardPage() {
 
   const data = await fetchDispensaryDashboardData(user.dispensaryId!);
   const hasOrders = data.orders.length > 0;
-  const hasSpending = data.last7Days.some(d => d.revenue > 0);
+  const hasSpending = data.last7Days.some((d) => d.revenue > 0);
+  const maxDailySpend = Math.max(...data.last7Days.map((d) => d.revenue), 1);
 
   // Serialize orders for client component
   const serializedOrders = data.orders.map(order => ({
@@ -119,7 +120,7 @@ export default async function DispensaryDashboardPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Dispensary Dashboard</h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here&apos;s your overview.</p>
+          <p className="text-gray-600 mt-1">Track spend, monitor order progress, and quickly reorder trusted products.</p>
         </div>
         <Link href="/dispensary/catalog" className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 h-10 px-4 py-2">
           Browse Catalog
@@ -165,8 +166,8 @@ export default async function DispensaryDashboardPage() {
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Browse Catalogs</h3>
-              <p className="text-sm text-gray-600 mt-1">Browse grower catalogs with search</p>
+              <h3 className="font-semibold text-gray-900">Browse Catalog</h3>
+              <p className="text-sm text-gray-600 mt-1">Search verified grower listings and compare products side by side.</p>
             </div>
           </div>
         </Link>
@@ -176,8 +177,8 @@ export default async function DispensaryDashboardPage() {
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">View Cart</h3>
-              <p className="text-sm text-gray-600 mt-1">View your shopping cart</p>
+              <h3 className="font-semibold text-gray-900">Review Cart</h3>
+              <p className="text-sm text-gray-600 mt-1">Confirm quantities and pricing before placing orders.</p>
             </div>
           </div>
         </Link>
@@ -188,7 +189,7 @@ export default async function DispensaryDashboardPage() {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">My Orders</h3>
-              <p className="text-sm text-gray-600 mt-1">View and track orders</p>
+              <p className="text-sm text-gray-600 mt-1">Track status changes and follow up with growers when needed.</p>
             </div>
           </div>
         </Link>
@@ -255,7 +256,7 @@ export default async function DispensaryDashboardPage() {
                 {data.last7Days.map((day, index) => (
                   <div key={index} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[36px]">
                     <div className="w-full flex flex-col gap-1">
-                      <div className="w-full bg-green-500 rounded-t-lg" style={{ height: `${Math.min((day.revenue / 5000) * 100, 100)}%` }} />
+                      <div className="w-full bg-green-500 rounded-t-lg" style={{ height: `${Math.min((day.revenue / maxDailySpend) * 100, 100)}%` }} />
                     </div>
                     <span className="text-xs text-gray-500">{day.day}</span>
                     <span className="text-xs font-medium text-green-600">${Math.round(day.revenue)}</span>

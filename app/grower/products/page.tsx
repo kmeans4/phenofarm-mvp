@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExtendedUser, AuthSession } from '@/types';
+import { AuthSession } from '@/types';
 import { Button } from '@/app/components/ui/Button';
 import { ErrorState, LoadingState } from '@/app/components/ui/FetchState';
 import { STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
@@ -259,7 +259,7 @@ export default function GrowerProductsPage() {
   };
 
   // Group products based on active filter
-  const getGroupedProducts = (): { groups: GroupedProducts; groupOrder: string[] } => {
+  const { groups, groupOrder } = useMemo((): { groups: GroupedProducts; groupOrder: string[] } => {
     const groups: GroupedProducts = {};
     const groupOrder: string[] = [];
 
@@ -270,7 +270,7 @@ export default function GrowerProductsPage() {
     }
 
     if (activeFilter === 'byProductType') {
-      products.forEach(product => {
+      products.forEach((product) => {
         const type = product.productType || product.categoryLegacy || 'Uncategorized';
         if (!groups[type]) {
           groups[type] = [];
@@ -279,7 +279,7 @@ export default function GrowerProductsPage() {
         groups[type].push(product);
       });
     } else if (activeFilter === 'byStrain') {
-      products.forEach(product => {
+      products.forEach((product) => {
         const strainName = getStrainName(product) || 'Unknown Strain';
         if (!groups[strainName]) {
           groups[strainName] = [];
@@ -288,10 +288,10 @@ export default function GrowerProductsPage() {
         groups[strainName].push(product);
       });
     } else if (activeFilter === 'byBatch') {
-      products.forEach(product => {
-        const batchLabel = product.batch?.batchNumber 
+      products.forEach((product) => {
+        const batchLabel = product.batch?.batchNumber
           ? `Batch ${product.batch.batchNumber}`
-          : product.batchId 
+          : product.batchId
             ? `Batch ${product.batchId.slice(0, 8)}...`
             : 'No Batch';
         if (!groups[batchLabel]) {
@@ -302,17 +302,20 @@ export default function GrowerProductsPage() {
       });
     }
 
-    // Sort groupOrder alphabetically
     groupOrder.sort((a, b) => a.localeCompare(b));
 
     return { groups, groupOrder };
-  };
+  }, [activeFilter, products]);
 
-  const { groups, groupOrder } = getGroupedProducts();
-
-  const totalProducts = products?.length || 0;
-  const totalValue = products?.reduce((sum, p) => sum + ((p?.price || 0) * (p?.inventoryQty || 0)), 0) || 0;
-  const availableCount = products?.filter(p => p?.isAvailable && (p?.inventoryQty || 0) > 0)?.length || 0;
+  const totalProducts = products.length;
+  const totalValue = useMemo(
+    () => products.reduce((sum, p) => sum + ((p?.price || 0) * (p?.inventoryQty || 0)), 0),
+    [products],
+  );
+  const availableCount = useMemo(
+    () => products.filter((p) => p?.isAvailable && (p?.inventoryQty || 0) > 0).length,
+    [products],
+  );
 
   const filterTabs = [
     { key: 'all', label: 'All', icon: 'M4 6h16M4 12h16M4 18h16' },
@@ -320,19 +323,6 @@ export default function GrowerProductsPage() {
     { key: 'byStrain', label: 'By Strain', icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
     { key: 'byBatch', label: 'By Batch', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
   ] as const;
-
-  // View mode toggle icons
-  const CardViewIcon = () => (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-    </svg>
-  );
-
-  const ListViewIcon = () => (
-    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-    </svg>
-  );
 
   const ProductCard = ({ product }: { product: Product }) => {
     const strainName = getStrainName(product);
@@ -535,7 +525,7 @@ export default function GrowerProductsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Product Management</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your cannabis product catalog</p>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage listings, pricing, and stock visibility for dispensary buyers.</p>
         </div>
         <Button variant="primary" asChild className="w-full sm:w-auto">
           <Link href="/grower/products/add" className="inline-flex w-full sm:w-auto">+ Add Product</Link>
@@ -566,7 +556,9 @@ export default function GrowerProductsPage() {
             {filterTabs.map((tab) => (
               <button
                 key={tab.key}
+                type="button"
                 onClick={() => setActiveFilter(tab.key as FilterType)}
+                aria-pressed={activeFilter === tab.key}
                 className={`flex items-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
                   activeFilter === tab.key
                     ? 'bg-green-600 text-white shadow-sm'
@@ -589,7 +581,9 @@ export default function GrowerProductsPage() {
           {/* View Mode Toggle */}
           <div className="flex items-center gap-1 border-t border-gray-200 pt-2 sm:border-t-0 sm:border-l sm:border-gray-200 sm:pt-0 sm:pl-3">
             <button
+              type="button"
               onClick={() => handleViewModeChange('card')}
+              aria-pressed={viewMode === 'card'}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 viewMode === 'card'
                   ? 'bg-green-600 text-white shadow-sm'
@@ -603,7 +597,9 @@ export default function GrowerProductsPage() {
               <span className="hidden sm:inline">Cards</span>
             </button>
             <button
+              type="button"
               onClick={() => handleViewModeChange('list')}
+              aria-pressed={viewMode === 'list'}
               className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                 viewMode === 'list'
                   ? 'bg-green-600 text-white shadow-sm'
@@ -670,9 +666,9 @@ export default function GrowerProductsPage() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No products yet</h3>
           <p className="text-gray-500 mb-2 max-w-sm mx-auto">
-            Start building your product catalog by adding your first cannabis product.
+            Add your first product to make your catalog visible to dispensary buyers.
           </p>
-          <p className="text-sm text-gray-500 mb-6">Next step: set pricing and inventory so your listing is ready for orders.</p>
+          <p className="text-sm text-gray-500 mb-6">Tip: include clear pricing and accurate inventory so buyers can place orders confidently.</p>
           <Button variant="primary" asChild className="w-full sm:w-auto">
             <Link href="/grower/products/add">
               <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
