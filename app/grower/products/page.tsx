@@ -7,6 +7,15 @@ import Link from 'next/link';
 import { ExtendedUser, AuthSession } from '@/types';
 import { Button } from '@/app/components/ui/Button';
 import { STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
+import {
+  toSafeAvailability,
+  toSafeNonNegativeInteger,
+  toSafeNonNegativeNumber,
+  toSafeOptionalString,
+  toSafeProductName,
+  toSafeProductType,
+  toSafeUnit,
+} from '@/lib/product-serializers';
 
 type FilterType = 'all' | 'byProductType' | 'byStrain' | 'byBatch';
 interface Strain {
@@ -54,6 +63,63 @@ const formatInventoryUnit = (unit: string | null | undefined, qty: number): stri
 
   return `${trimmed}s`;
 };
+
+function normalizeFetchedProduct(raw: unknown): Product | null {
+  if (!raw || typeof raw !== 'object') return null;
+
+  const record = raw as Record<string, unknown>;
+  const id = toSafeOptionalString(record.id);
+  if (!id) return null;
+
+  const inventoryQty = toSafeNonNegativeInteger(record.inventoryQty, 0);
+
+  const rawStrain = record.strain;
+  const strainRecord = rawStrain && typeof rawStrain === 'object'
+    ? (rawStrain as Record<string, unknown>)
+    : null;
+
+  const strainId = strainRecord ? toSafeOptionalString(strainRecord.id) : null;
+  const strainName = strainRecord ? toSafeOptionalString(strainRecord.name) : null;
+
+  const strain: Strain | null = strainId && strainName
+    ? {
+        id: strainId,
+        name: strainName,
+        strainType: (toSafeOptionalString(strainRecord?.strainType) as StrainTypeValue | null) || null,
+        genetics: toSafeOptionalString(strainRecord?.genetics),
+      }
+    : null;
+
+  const rawBatch = record.batch;
+  const batchRecord = rawBatch && typeof rawBatch === 'object'
+    ? (rawBatch as Record<string, unknown>)
+    : null;
+
+  const batchId = batchRecord ? toSafeOptionalString(batchRecord.id) : null;
+  const batchNumber = batchRecord ? toSafeOptionalString(batchRecord.batchNumber) : null;
+
+  const batch: Batch | null = batchId && batchNumber
+    ? { id: batchId, batchNumber }
+    : null;
+
+  return {
+    id,
+    name: toSafeProductName(record.name),
+    strain,
+    strainLegacy: toSafeOptionalString(record.strainLegacy),
+    category: toSafeOptionalString(record.category),
+    categoryLegacy: toSafeOptionalString(record.categoryLegacy),
+    productType: toSafeProductType(record.productType, record.categoryLegacy),
+    subType: toSafeOptionalString(record.subType),
+    batchId: toSafeOptionalString(record.batchId),
+    batch,
+    price: toSafeNonNegativeNumber(record.price, 0),
+    inventoryQty,
+    unit: toSafeUnit(record.unit),
+    isAvailable: toSafeAvailability(record.isAvailable, inventoryQty),
+    createdAt: toSafeOptionalString(record.createdAt) || new Date(0).toISOString(),
+  };
+}
 
 export default function GrowerProductsPage() {
   const { data: session, status } = useSession();
@@ -106,7 +172,13 @@ export default function GrowerProductsPage() {
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {
-          setProducts(data);
+          setProducts(
+            data
+              .map(normalizeFetchedProduct)
+              .filter((item): item is Product => item !== null)
+          );
+        } else {
+          setProducts([]);
         }
       } else {
         const errData = await response.json().catch(() => ({}));
@@ -149,7 +221,21 @@ export default function GrowerProductsPage() {
       });
       if (response.ok) {
         const updated = await response.json();
-        setProducts(products.map(p => p.id === productId ? { ...p, isAvailable: updated.isAvailable } : p));
+        const updatedInventoryQty = toSafeNonNegativeInteger(
+          (updated as Record<string, unknown>)?.inventoryQty,
+          product?.inventoryQty ?? 0
+        );
+
+        setProducts(products.map(p => p.id === productId
+          ? {
+              ...p,
+              inventoryQty: updatedInventoryQty,
+              isAvailable: toSafeAvailability(
+                (updated as Record<string, unknown>)?.isAvailable,
+                updatedInventoryQty
+              ),
+            }
+          : p));
       } else {
         alert('Failed to update product');
       }

@@ -3,22 +3,57 @@ import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { parseProductPayload, PRODUCT_STATUS } from '@/lib/product-payload';
 import { Prisma } from '@prisma/client';
+import {
+  toSafeAvailability,
+  toSafeBoolean,
+  toSafeNonNegativeInteger,
+  toSafeNonNegativeNumber,
+  toSafeOptionalNumber,
+  toSafeOptionalString,
+  toSafeProductName,
+  toSafeProductType,
+  toSafeStringArray,
+  toSafeUnit,
+} from '@/lib/product-serializers';
 
 type ProductLike = {
+  name?: string | null;
+  productType?: string | null;
+  subType?: string | null;
+  categoryLegacy?: string | null;
+  subcategoryLegacy?: string | null;
+  strainLegacy?: string | null;
   price: Prisma.Decimal | number | null;
+  inventoryQty?: number | null;
+  unit?: string | null;
+  isAvailable?: boolean | null;
   isPriceVisible?: boolean | null;
+  images?: string[] | null;
   thcLegacy?: Prisma.Decimal | number | null;
   cbdLegacy?: Prisma.Decimal | number | null;
 };
 
 function serializeProduct<T extends ProductLike>(product: T | null) {
   if (!product) return product;
+
+  const inventoryQty = toSafeNonNegativeInteger(product.inventoryQty, 0);
+
   return {
     ...product,
-    price: product.price ? parseFloat(product.price.toString()) : 0,
-    isPriceVisible: product.isPriceVisible ?? true,
-    thcLegacy: product.thcLegacy ? parseFloat(product.thcLegacy.toString()) : null,
-    cbdLegacy: product.cbdLegacy ? parseFloat(product.cbdLegacy.toString()) : null,
+    name: toSafeProductName(product.name),
+    productType: toSafeProductType(product.productType, product.categoryLegacy),
+    subType: toSafeOptionalString(product.subType),
+    categoryLegacy: toSafeOptionalString(product.categoryLegacy),
+    subcategoryLegacy: toSafeOptionalString(product.subcategoryLegacy),
+    strainLegacy: toSafeOptionalString(product.strainLegacy),
+    price: toSafeNonNegativeNumber(product.price, 0),
+    inventoryQty,
+    unit: toSafeUnit(product.unit),
+    isAvailable: toSafeAvailability(product.isAvailable, inventoryQty),
+    isPriceVisible: toSafeBoolean(product.isPriceVisible, true),
+    images: toSafeStringArray(product.images),
+    thcLegacy: toSafeOptionalNumber(product.thcLegacy),
+    cbdLegacy: toSafeOptionalNumber(product.cbdLegacy),
   };
 }
 

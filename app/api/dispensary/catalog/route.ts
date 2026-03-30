@@ -4,6 +4,18 @@ import { getAuthSession } from '@/lib/auth-helpers';
 import { expandProductTypeFilters } from '@/lib/product-types';
 import { Prisma } from '@prisma/client';
 import { apiError, logApiError } from '@/lib/api-response';
+import {
+  toSafeAvailability,
+  toSafeBoolean,
+  toSafeNonNegativeInteger,
+  toSafeNonNegativeNumber,
+  toSafeOptionalNumber,
+  toSafeOptionalString,
+  toSafeProductName,
+  toSafeProductType,
+  toSafeStringArray,
+  toSafeUnit,
+} from '@/lib/product-serializers';
 
 /**
  * Dispensary Catalog API
@@ -246,34 +258,39 @@ export async function GET(request: NextRequest) {
         .slice(skip, skip + limit);
     }
 
-    const serializedProducts = processedProducts.map((p) => ({
-      id: p.id,
-      name: p.name,
-      price: parseFloat(String(p.price)),
-      isPriceVisible: p.isPriceVisible ?? true,
-      strain: p.strain?.name || p.strainLegacy || null,
-      strainId: p.strainId,
-      strainType: p.strain?.genetics || null,
-      productType: p.productType,
-      subType: p.subType,
-      unit: p.unit,
-      thc: p.batch?.thc ?? p.thcLegacy ?? null,
-      cbd: p.batch?.cbd ?? p.cbdLegacy ?? null,
-      images: p.images || [],
-      inventoryQty: p.inventoryQty,
-      createdAt: p.createdAt,
-      grower: {
-        id: p.grower.id,
-        businessName: p.grower.businessName,
-        location:
-          p.grower.city && p.grower.state
-            ? `${p.grower.city}, ${p.grower.state}`
-            : p.grower.city || p.grower.state || null,
-        isVerified: p.grower.isVerified,
-      },
-    }));
+    const serializedProducts = processedProducts.map((p) => {
+      const inventoryQty = toSafeNonNegativeInteger(p.inventoryQty, 0);
 
-    const hasMore = skip + products.length < total;
+      return {
+        id: p.id,
+        name: toSafeProductName(p.name),
+        price: toSafeNonNegativeNumber(p.price, 0),
+        isPriceVisible: toSafeBoolean(p.isPriceVisible, true),
+        strain: toSafeOptionalString(p.strain?.name || p.strainLegacy),
+        strainId: p.strainId,
+        strainType: toSafeOptionalString(p.strain?.genetics),
+        productType: toSafeProductType(p.productType, p.categoryLegacy),
+        subType: toSafeOptionalString(p.subType),
+        unit: toSafeUnit(p.unit),
+        thc: toSafeOptionalNumber(p.batch?.thc ?? p.thcLegacy),
+        cbd: toSafeOptionalNumber(p.batch?.cbd ?? p.cbdLegacy),
+        images: toSafeStringArray(p.images),
+        inventoryQty,
+        isAvailable: toSafeAvailability(p.isAvailable, inventoryQty),
+        createdAt: p.createdAt,
+        grower: {
+          id: p.grower.id,
+          businessName: toSafeOptionalString(p.grower.businessName) || 'Unknown Grower',
+          location:
+            p.grower.city && p.grower.state
+              ? `${p.grower.city}, ${p.grower.state}`
+              : p.grower.city || p.grower.state || null,
+          isVerified: toSafeBoolean(p.grower.isVerified, false),
+        },
+      };
+    });
+
+    const hasMore = skip + serializedProducts.length < total;
 
     return NextResponse.json(
       {

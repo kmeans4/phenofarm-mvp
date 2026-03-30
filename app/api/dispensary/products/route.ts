@@ -4,8 +4,48 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { db } from "@/lib/db";
 import { AuthSession } from "@/types";
 import { expandProductTypeFilters } from "@/lib/product-types";
+import {
+  toSafeAvailability,
+  toSafeBoolean,
+  toSafeNonNegativeInteger,
+  toSafeNonNegativeNumber,
+  toSafeOptionalNumber,
+  toSafeOptionalString,
+  toSafeProductName,
+  toSafeProductType,
+  toSafeStringArray,
+  toSafeUnit,
+} from "@/lib/product-serializers";
+import { Prisma } from "@prisma/client";
 
 const PRODUCTS_PER_PAGE = 12;
+
+type DispensaryProduct = {
+  id: string;
+  name: string;
+  price: number;
+  isPriceVisible: boolean;
+  strain: string | null;
+  strainId: string | null;
+  productType: string | null;
+  subType: string | null;
+  unit: string;
+  thc: number | null;
+  cbd: number | null;
+  images: string[];
+  inventoryQty: number;
+  isAvailable: boolean;
+  grower: {
+    id: string;
+    businessName: string;
+  };
+};
+
+type GrowerGroup = {
+  growerId: string;
+  growerName: string;
+  products: DispensaryProduct[];
+};
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -29,7 +69,7 @@ export async function GET(request: NextRequest) {
   const priceRanges = searchParams.get("priceRanges")?.split(",").filter(Boolean) || [];
 
   // Build where clause
-  const where: any = {
+  const where: Prisma.ProductWhereInput = {
     isAvailable: true,
     inventoryQty: { gt: 0 },
   };
@@ -39,7 +79,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (thcRanges.length > 0) {
-    const thcConditions: unknown[] = [];
+    const thcConditions: Prisma.ProductWhereInput[] = [];
     for (const range of thcRanges) {
       switch (range) {
         case "low":
@@ -62,7 +102,7 @@ export async function GET(request: NextRequest) {
   }
 
   if (priceRanges.length > 0) {
-    const priceConditions: unknown[] = [];
+    const priceConditions: Prisma.ProductWhereInput[] = [];
     for (const range of priceRanges) {
       switch (range) {
         case "budget":
@@ -94,7 +134,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Build orderBy
-  let orderBy: any = [];
+  let orderBy: Prisma.ProductOrderByWithRelationInput[] = [];
   switch (sortBy) {
     case "price-asc":
       orderBy = [{ price: "asc" }];
@@ -151,29 +191,35 @@ export async function GET(request: NextRequest) {
   ]);
 
   // Transform products to match frontend format
-  const transformedProducts = products.map((product) => ({
-    id: product.id,
-    name: product.name,
-    price: Number(product.price),
-    strain: product.strain?.name || product.strainLegacy,
-    strainId: product.strainId,
-    productType: product.productType,
-    subType: product.subType,
-    unit: product.unit,
-    thc: product.batch?.thc ?? product.thcLegacy ?? null,
-    cbd: product.batch?.cbd ?? product.cbdLegacy ?? null,
-    images: product.images || [],
-    inventoryQty: product.inventoryQty,
-    grower: {
-      id: product.grower.id,
-      businessName: product.grower.businessName,
-    },
-  }));
+  const transformedProducts: DispensaryProduct[] = products.map((product) => {
+    const inventoryQty = toSafeNonNegativeInteger(product.inventoryQty, 0);
+
+    return {
+      id: product.id,
+      name: toSafeProductName(product.name),
+      price: toSafeNonNegativeNumber(product.price, 0),
+      isPriceVisible: toSafeBoolean(product.isPriceVisible, true),
+      strain: toSafeOptionalString(product.strain?.name || product.strainLegacy),
+      strainId: product.strainId,
+      productType: toSafeProductType(product.productType, product.categoryLegacy),
+      subType: toSafeOptionalString(product.subType),
+      unit: toSafeUnit(product.unit),
+      thc: toSafeOptionalNumber(product.batch?.thc ?? product.thcLegacy),
+      cbd: toSafeOptionalNumber(product.batch?.cbd ?? product.cbdLegacy),
+      images: toSafeStringArray(product.images),
+      inventoryQty,
+      isAvailable: toSafeAvailability(product.isAvailable, inventoryQty),
+      grower: {
+        id: product.grower.id,
+        businessName: toSafeOptionalString(product.grower.businessName) || 'Unknown Grower',
+      },
+    };
+  });
 
   // Group by grower if default sort
-  let groupedData: any = transformedProducts;
+  let groupedData: GrowerGroup[] | DispensaryProduct[] = transformedProducts;
   if (sortBy === "default") {
-    const groups: Record<string, any> = {};
+    const groups: Record<string, GrowerGroup> = {};
     for (const product of transformedProducts) {
       const growerId = product.grower.id;
       if (!groups[growerId]) {

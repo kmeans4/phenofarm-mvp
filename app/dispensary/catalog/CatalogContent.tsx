@@ -8,6 +8,18 @@ import AddToCartButton from "./components/AddToCartButton";
 import CartBadge from "./components/CartBadge";
 import MobileFilterSheet from "./components/MobileFilterSheet";
 import { getAllProductTypes } from '@/lib/product-types';
+import {
+  toSafeAvailability,
+  toSafeBoolean,
+  toSafeNonNegativeInteger,
+  toSafeNonNegativeNumber,
+  toSafeOptionalNumber,
+  toSafeOptionalString,
+  toSafeProductName,
+  toSafeProductType,
+  toSafeStringArray,
+  toSafeUnit,
+} from '@/lib/product-serializers';
 
 interface Product {
   id: string;
@@ -93,6 +105,52 @@ const FAVORITES_KEY = 'phenofarm_favorites';
 const PRICE_ALERTS_KEY = 'phenofarm_price_alerts';
 const MAX_PRICE_ALERTS = 20;
 const MAX_SAVED_FILTERS = 5;
+
+function normalizeCatalogProduct(raw: unknown): Product | null {
+  if (!raw || typeof raw !== 'object') return null;
+
+  const record = raw as Record<string, unknown>;
+  const id = toSafeOptionalString(record.id);
+  if (!id) return null;
+
+  const inventoryQty = toSafeNonNegativeInteger(record.inventoryQty, 0);
+  const isAvailable = toSafeAvailability(record.isAvailable, inventoryQty);
+  if (!isAvailable) return null;
+
+  const rawGrower = record.grower;
+  const growerRecord = rawGrower && typeof rawGrower === 'object'
+    ? (rawGrower as Record<string, unknown>)
+    : null;
+
+  const growerId = growerRecord ? toSafeOptionalString(growerRecord.id) : null;
+  const growerName = growerRecord ? toSafeOptionalString(growerRecord.businessName) : null;
+
+  if (!growerId || !growerName) return null;
+
+  return {
+    id,
+    name: toSafeProductName(record.name),
+    price: toSafeNonNegativeNumber(record.price, 0),
+    isPriceVisible: toSafeBoolean(record.isPriceVisible, true),
+    strain: toSafeOptionalString(record.strain),
+    strainId: toSafeOptionalString(record.strainId),
+    strainType: toSafeOptionalString(record.strainType),
+    productType: toSafeProductType(record.productType),
+    subType: toSafeOptionalString(record.subType),
+    unit: toSafeUnit(record.unit),
+    thc: toSafeOptionalNumber(record.thc),
+    cbd: toSafeOptionalNumber(record.cbd),
+    images: toSafeStringArray(record.images),
+    inventoryQty,
+    createdAt: toSafeOptionalString(record.createdAt) || undefined,
+    grower: {
+      id: growerId,
+      businessName: growerName,
+      location: toSafeOptionalString(growerRecord?.location),
+      isVerified: toSafeBoolean(growerRecord?.isVerified, false),
+    },
+  };
+}
 
 export default function CatalogContent() {
   // State
@@ -522,15 +580,20 @@ export default function CatalogContent() {
       }
       
       const data = await response.json();
-      
+      const normalizedProducts = Array.isArray(data.products)
+        ? (data.products as unknown[])
+            .map(normalizeCatalogProduct)
+            .filter((item: Product | null): item is Product => item !== null)
+        : [];
+
       if (append) {
-        setProducts(prev => [...prev, ...data.products]);
+        setProducts(prev => [...prev, ...normalizedProducts]);
       } else {
-        setProducts(data.products);
+        setProducts(normalizedProducts);
       }
       
-      setHasMore(data.hasMore);
-      setTotalProducts(data.total);
+      setHasMore(Boolean(data.hasMore));
+      setTotalProducts(toSafeNonNegativeInteger(data.total, 0));
       setPage(pageNum);
     } catch (error) {
       console.error('Error fetching products:', error);
