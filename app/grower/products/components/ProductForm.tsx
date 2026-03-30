@@ -10,7 +10,6 @@ import { StrainSelector } from '../../components/StrainSelector';
 import { BatchSelector } from '../../components/BatchSelector';
 import { useToast } from '@/app/hooks/useToast';
 import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
-import { useRouter } from 'next/navigation';
 
 interface ProductFormData {
   id?: string;
@@ -296,6 +295,8 @@ export function ProductForm({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isSubmitting) return;
     
     const allTouched: Record<string, boolean> = {};
     Object.keys(formData).forEach(key => {
@@ -326,8 +327,6 @@ export function ProductForm({
       // Parent handles user-facing submit errors.
     }
   };
-
-  const router = useRouter();
 
   const handleLeavePage = () => {
     setShowExitPrompt(false);
@@ -363,7 +362,7 @@ export function ProductForm({
   const hasErrors = Object.values(errors).some(Boolean);
 
   const handleSaveDraft = async () => {
-    if (!onSaveDraft) return;
+    if (!onSaveDraft || isSubmitting) return;
     const wasDirty = isDirty;
     setIsDirty(false);
 
@@ -705,7 +704,7 @@ export function ProductForm({
                   onClick={handleSaveDraft}
                   disabled={isSubmitting}
                 >
-                  Save Draft
+                  {isSubmitting ? 'Saving...' : 'Save Draft'}
                 </Button>
               )}
               <Button
@@ -713,6 +712,7 @@ export function ProductForm({
                 variant="outline"
                 className="w-full sm:w-auto"
                 onClick={handleCancelRequest}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>

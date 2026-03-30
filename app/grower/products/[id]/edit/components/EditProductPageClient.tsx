@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import { ProductForm } from '@/app/grower/products/components/ProductForm';
 import { buildProductRequestPayload, PRODUCT_STATUS } from '@/lib/product-payload';
 
@@ -31,9 +32,11 @@ interface EditProductPageClientProps {
 
 export default function EditProductPageClient({ productId, initialData }: EditProductPageClientProps) {
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (formData: ProductFormData) => {
     try {
+      setIsSubmitting(true);
       const payload = buildProductRequestPayload(
         formData as unknown as Record<string, unknown>,
         PRODUCT_STATUS.PUBLISHED
@@ -54,11 +57,14 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
       router.refresh();
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleSaveDraft = async (formData: ProductFormData) => {
     try {
+      setIsSubmitting(true);
       const payload = buildProductRequestPayload(
         formData as unknown as Record<string, unknown>,
         PRODUCT_STATUS.DRAFT
@@ -79,6 +85,8 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
       router.refresh();
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -107,6 +115,7 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
         onSaveDraft={handleSaveDraft}
         onCancel={() => router.push('/grower/products')}
         initialData={initialData}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

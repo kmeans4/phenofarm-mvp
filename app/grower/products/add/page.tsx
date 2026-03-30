@@ -35,6 +35,7 @@ export default function AddProductPage() {
   const prefillBatchId = searchParams?.get('batchId');
   const [growerInfo, setGrowerInfo] = useState<GrowerInfo | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [initialData, setInitialData] = useState<Partial<ProductFormData>>({
     strainId: prefillStrainId || undefined,
@@ -95,19 +96,25 @@ export default function AddProductPage() {
 
   const handleSubmit = async (formData: ProductFormData) => {
     try {
+      setIsSubmitting(true);
       await saveProduct(formData, PRODUCT_STATUS.PUBLISHED);
       router.push('/grower/products');
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   const handleSaveDraft = async (formData: ProductFormData) => {
     try {
+      setIsSubmitting(true);
       await saveProduct(formData, PRODUCT_STATUS.DRAFT);
       router.push('/grower/products');
     } catch (err: unknown) {
       alert(err instanceof Error ? err.message : 'An error occurred');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -133,6 +140,7 @@ export default function AddProductPage() {
         onCancel={() => router.push('/grower/products')}
         growerBrand={growerInfo?.businessName}
         initialData={initialData}
+        isSubmitting={isSubmitting}
       />
     </div>
   );

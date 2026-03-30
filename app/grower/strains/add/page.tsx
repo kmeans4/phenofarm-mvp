@@ -30,20 +30,23 @@ export default function AddStrainPage() {
 
   const handleChange = (field: keyof StrainFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (error) setError(null);
   };
+
+  const canSubmit = !loading && formData.name.trim().length > 0 && Boolean(formData.strainType);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.name.trim()) {
-      setError('Strain name is required');
+
+    if (!canSubmit) {
+      if (!formData.name.trim()) {
+        setError('Strain name is required');
+      } else if (!formData.strainType) {
+        setError('Strain type is required');
+      }
       return;
     }
 
-    if (!formData.strainType) {
-      setError('Strain type is required');
-      return;
-    }
 
     try {
       setLoading(true);
@@ -176,7 +179,7 @@ export default function AddStrainPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-              <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={loading}>
+              <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={!canSubmit}>
                 {loading ? 'Creating...' : 'Create Strain'}
               </Button>
               <Button
@@ -184,6 +187,7 @@ export default function AddStrainPage() {
                 variant="outline"
                 className="w-full sm:w-auto"
                 onClick={() => router.push('/grower/strains')}
+                disabled={loading}
               >
                 Cancel
               </Button>

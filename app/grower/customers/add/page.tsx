@@ -1,9 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const isValidEmail = (value: string) => EMAIL_REGEX.test(value.trim());
+const isValidPhone = (value: string) => {
+  const digits = value.replace(/\D/g, '');
+  return digits.length >= 10 && digits.length <= 11;
+};
 
 export default function AddCustomerPage() {
   const { data: session, status } = useSession();
@@ -23,6 +31,16 @@ export default function AddCustomerPage() {
     licenseNumber: '',
   });
 
+  const canSubmit = useMemo(() => {
+    return (
+      !isSubmitting &&
+      formData.businessName.trim().length > 1 &&
+      formData.contactName.trim().length > 1 &&
+      isValidEmail(formData.email) &&
+      isValidPhone(formData.phone)
+    );
+  }, [formData, isSubmitting]);
+
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center h-64">
@@ -38,14 +56,38 @@ export default function AddCustomerPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!canSubmit) {
+      if (!isValidEmail(formData.email)) {
+        setError('Please enter a valid email address.');
+      } else if (!isValidPhone(formData.phone)) {
+        setError('Please enter a valid phone number.');
+      } else {
+        setError('Please complete all required fields before saving.');
+      }
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
+
+    const payload = {
+      businessName: formData.businessName.trim(),
+      contactName: formData.contactName.trim(),
+      email: formData.email.trim().toLowerCase(),
+      phone: formData.phone.trim(),
+      address: formData.address.trim(),
+      city: formData.city.trim(),
+      state: formData.state.trim().toUpperCase().slice(0, 2) || 'VT',
+      zipCode: formData.zipCode.trim(),
+      licenseNumber: formData.licenseNumber.trim(),
+    };
 
     try {
       const response = await fetch('/api/customers', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       if (response.ok) {
@@ -175,10 +217,15 @@ export default function AddCustomerPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link href="/grower/customers" className="w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
+          <Link
+            href="/grower/customers"
+            className={`w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
+          >
+            Cancel
+          </Link>
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={!canSubmit}
             className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
           >
             {isSubmitting ? 'Adding...' : 'Add Customer'}

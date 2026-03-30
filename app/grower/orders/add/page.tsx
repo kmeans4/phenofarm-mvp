@@ -188,44 +188,50 @@ export default function AddOrderPage() {
   const shippingFee = parseFloat(formData?.shippingFee || '0') || 0;
   const calculateTotal = () => calculateSubtotal() + calculateTax() + shippingFee;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const hasInvalidQuantities = formData.items.some((item) => (Number(item.quantity) || 0) <= 0);
+  const inventoryIssues = getInventoryIssues(formData.items);
+  const firstInventoryIssue = inventoryIssues[0];
+  const canSubmitOrder = (
+    !loading &&
+    !isSubmitting &&
+    Boolean(formData.dispensaryId) &&
+    formData.items.length > 0 &&
+    !hasInvalidQuantities &&
+    inventoryIssues.length === 0
+  );
+
+  const handleSubmit = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
+    if (!canSubmitOrder) {
+      if (!formData.dispensaryId) {
+        setError('Please select a dispensary');
+      } else if (formData.items.length === 0) {
+        setError('Please add at least one product');
+      } else if (hasInvalidQuantities) {
+        setError('Each line item must have a quantity of at least 1.');
+      } else if (firstInventoryIssue) {
+        setError(`Not enough inventory for ${firstInventoryIssue.productName} (requested ${firstInventoryIssue.requested}, available ${firstInventoryIssue.available}).`);
+      }
+      return;
+    }
+
     setError(null);
     setIsSubmitting(true);
 
-    if (!formData.dispensaryId) {
-      setError('Please select a dispensary');
-      setIsSubmitting(false);
-      return;
-    }
-    if (formData.items.length === 0) {
-      setError('Please add at least one product');
-      setIsSubmitting(false);
-      return;
-    }
-
-    if (formData.items.some((item) => (Number(item.quantity) || 0) <= 0)) {
-      setError('Each line item must have a quantity of at least 1.');
-      setIsSubmitting(false);
-      return;
-    }
-
-    const inventoryIssues = getInventoryIssues(formData.items);
-    if (inventoryIssues.length > 0) {
-      const first = inventoryIssues[0];
-      setError(`Not enough inventory for ${first.productName} (requested ${first.requested}, available ${first.available}).`);
-      setIsSubmitting(false);
-      return;
-    }
-
     try {
+      const sanitizedItems = formData.items.map((item) => ({
+        productId: item.productId,
+        quantity: Number(item.quantity),
+        unitPrice: Number(item.unitPrice),
+      }));
+
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           dispensaryId: formData.dispensaryId,
-          items: formData.items,
-          notes: formData.notes || null,
+          items: sanitizedItems,
+          notes: formData.notes.trim() || null,
           shippingFee: shippingFee,
         }),
       });
@@ -284,8 +290,18 @@ export default function AddOrderPage() {
           <p className="text-sm sm:text-base text-gray-600 mt-1">Add items to fulfill a dispensary order</p>
         </div>
         <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
-          <Link href="/grower/orders" className="w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
-          <button onClick={handleSubmit} disabled={isSubmitting} className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50">
+          <Link
+            href="/grower/orders"
+            className={`w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
+          >
+            Cancel
+          </Link>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={!canSubmitOrder}
+            className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
+          >
             {isSubmitting ? 'Creating...' : 'Create Order'}
           </button>
         </div>
@@ -343,7 +359,7 @@ export default function AddOrderPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 border-b border-gray-200 flex justify-between">
             <h2 className="font-semibold text-gray-900">Items</h2>
-            <button type="button" onClick={handleAddItem} className="px-3 py-1 border rounded hover:bg-gray-50">+ Add</button>
+            <button type="button" onClick={handleAddItem} disabled={isSubmitting} className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50">+ Add</button>
           </div>
           <div className="p-4">
             {products.length === 0 ? (

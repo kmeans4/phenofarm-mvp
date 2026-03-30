@@ -104,12 +104,15 @@ export default function EditBatchPage() {
 
   const handleChange = (field: keyof BatchFormData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    if (error) setError(null);
   };
+
+  const canSubmit = !loading && !fetching && Boolean(formData.batchNumber.trim() && formData.harvestDate && formData.strainId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!formData.batchNumber.trim() || !formData.harvestDate || !formData.strainId) {
+
+    if (!canSubmit) {
       setError('Batch number, harvest date, and strain are required');
       return;
     }
@@ -348,7 +351,7 @@ export default function EditBatchPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-              <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={loading}>
+              <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={!canSubmit}>
                 {loading ? 'Saving...' : 'Save Changes'}
               </Button>
               <Button
@@ -356,6 +359,7 @@ export default function EditBatchPage() {
                 variant="outline"
                 className="w-full sm:w-auto"
                 onClick={() => router.push('/grower/batches')}
+                disabled={loading}
               >
                 Cancel
               </Button>
