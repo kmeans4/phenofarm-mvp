@@ -86,6 +86,24 @@ export type ProductPayloadParseOptions = {
   defaultStatus?: ProductStatusValue;
 };
 
+function parseCannabinoidRange(min: unknown, max: unknown): { min: number | null; max: number | null } {
+  const minVal = min === undefined || min === null || min === '' ? null : Number.parseFloat(String(min));
+  const maxVal = max === undefined || max === null || max === '' ? null : Number.parseFloat(String(max));
+  
+  return {
+    min: (minVal !== null && !Number.isNaN(minVal) && minVal >= 0 && minVal <= 100) ? minVal : null,
+    max: (maxVal !== null && !Number.isNaN(maxVal) && maxVal >= 0 && maxVal <= 100) ? maxVal : null,
+  };
+}
+
+function parseHarvestDate(value: unknown): string | null {
+  if (typeof value !== 'string' || !value.trim()) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  if (date > new Date()) return null;
+  return value.trim();
+}
+
 export function parseProductPayload(body: Record<string, unknown>, options: ProductPayloadParseOptions = {}) {
   const { partial = false, defaultStatus = PRODUCT_STATUS.PUBLISHED } = options;
 
@@ -123,6 +141,45 @@ export function parseProductPayload(body: Record<string, unknown>, options: Prod
     if (inventoryQty === null && !isDraft) errors.push('inventoryQty must be a valid non-negative integer');
   }
 
+  // Validate THC/CBD ranges if provided
+  const thcMin = body.thcMin;
+  const thcMax = body.thcMax;
+  const cbdMin = body.cbdMin;
+  const cbdMax = body.cbdMax;
+  
+  if (!partial || body.thcMin !== undefined || body.thcMax !== undefined) {
+    const thcRange = parseCannabinoidRange(thcMin, thcMax);
+    if (thcMin !== undefined && thcMin !== null && thcMin !== '' && thcRange.min === null) {
+      errors.push('thcMin must be a number between 0 and 100');
+    }
+    if (thcMax !== undefined && thcMax !== null && thcMax !== '' && thcRange.max === null) {
+      errors.push('thcMax must be a number between 0 and 100');
+    }
+    if (thcRange.min !== null && thcRange.max !== null && thcRange.min > thcRange.max) {
+      errors.push('thcMax must be >= thcMin');
+    }
+  }
+
+  if (!partial || body.cbdMin !== undefined || body.cbdMax !== undefined) {
+    const cbdRange = parseCannabinoidRange(cbdMin, cbdMax);
+    if (cbdMin !== undefined && cbdMin !== null && cbdMin !== '' && cbdRange.min === null) {
+      errors.push('cbdMin must be a number between 0 and 100');
+    }
+    if (cbdMax !== undefined && cbdMax !== null && cbdMax !== '' && cbdRange.max === null) {
+      errors.push('cbdMax must be a number between 0 and 100');
+    }
+    if (cbdRange.min !== null && cbdRange.max !== null && cbdRange.min > cbdRange.max) {
+      errors.push('cbdMax must be >= cbdMin');
+    }
+  }
+
+  if (!partial || body.harvestDate !== undefined) {
+    const harvestDate = parseHarvestDate(body.harvestDate);
+    if (body.harvestDate !== undefined && body.harvestDate !== null && body.harvestDate !== '' && harvestDate === null) {
+      errors.push('harvestDate must be a valid date in the past');
+    }
+  }
+
   if (errors.length) {
     return { ok: false as const, errors };
   }
@@ -135,6 +192,10 @@ export function parseProductPayload(body: Record<string, unknown>, options: Prod
         : (typeof body.isAvailable === 'boolean' ? body.isAvailable : true);
 
   const normalizedIsPriceVisible = typeof body.isPriceVisible === 'boolean' ? body.isPriceVisible : true;
+
+  const thcRange = parseCannabinoidRange(body.thcMin, body.thcMax);
+  const cbdRange = parseCannabinoidRange(body.cbdMin, body.cbdMax);
+  const harvestDate = parseHarvestDate(body.harvestDate);
 
   return {
     ok: true as const,
@@ -161,12 +222,21 @@ export function parseProductPayload(body: Record<string, unknown>, options: Prod
       subcategoryLegacy: normalizeOptionalString(body.subcategoryLegacy),
       thcLegacy: body.thcLegacy === undefined || body.thcLegacy === null || body.thcLegacy === '' ? null : Number.parseFloat(String(body.thcLegacy)),
       cbdLegacy: body.cbdLegacy === undefined || body.cbdLegacy === null || body.cbdLegacy === '' ? null : Number.parseFloat(String(body.cbdLegacy)),
+      thcMin: thcRange.min,
+      thcMax: thcRange.max,
+      cbdMin: cbdRange.min,
+      cbdMax: cbdRange.max,
+      harvestDate,
       status,
     },
   };
 }
 
 export function buildProductRequestPayload(formData: Record<string, unknown>, status: ProductStatusValue = PRODUCT_STATUS.PUBLISHED) {
+  const thcRange = parseCannabinoidRange(formData.thcMin, formData.thcMax);
+  const cbdRange = parseCannabinoidRange(formData.cbdMin, formData.cbdMax);
+  const harvestDate = parseHarvestDate(formData.harvestDate);
+
   return {
     name: normalizeOptionalString(formData.name),
     productType: normalizeProductType(formData.productType),
@@ -184,6 +254,11 @@ export function buildProductRequestPayload(formData: Record<string, unknown>, st
     brand: normalizeOptionalString(formData.brand),
     ingredients: normalizeOptionalString(formData.ingredients),
     isFeatured: Boolean(formData.isFeatured),
+    thcMin: thcRange.min,
+    thcMax: thcRange.max,
+    cbdMin: cbdRange.min,
+    cbdMax: cbdRange.max,
+    harvestDate,
     status,
   };
 }

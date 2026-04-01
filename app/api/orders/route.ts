@@ -87,6 +87,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
+    // Verify dispensary license status
+    const dispensary = await db.dispensary.findUnique({
+      where: { id: dispensaryId },
+      select: { licenseStatus: true, businessName: true },
+    });
+
+    if (!dispensary) {
+      return NextResponse.json({ error: 'Dispensary not found' }, { status: 404 });
+    }
+
+    if (dispensary.licenseStatus !== 'verified') {
+      return NextResponse.json(
+        { 
+          error: 'License verification required. This dispensary must have a verified license to place orders.',
+          code: 'LICENSE_NOT_VERIFIED',
+          licenseStatus: dispensary.licenseStatus,
+        },
+        { status: 403 }
+      );
+    }
+
     const normalizedItems: OrderItemInput[] = items.map((item: Partial<OrderItemInput>) => ({
       productId: String(item.productId || ''),
       quantity: Number(item.quantity),

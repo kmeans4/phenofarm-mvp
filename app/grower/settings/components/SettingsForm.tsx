@@ -9,6 +9,7 @@ import { useToast } from '@/app/hooks/useToast';
 interface SettingsData {
   businessName: string;
   licenseNumber: string;
+  licenseExpiry: string;
   contactName: string;
   email: string;
   phone: string;
@@ -27,6 +28,7 @@ interface FieldErrors {
   phone?: string;
   website?: string;
   licenseNumber?: string;
+  licenseExpiry?: string;
 }
 
 const validateEmail = (email: string): string | undefined => {
@@ -70,6 +72,15 @@ const validateLicenseNumber = (license: string): string | undefined => {
   return undefined;
 };
 
+const validateLicenseExpiry = (expiry: string): string | undefined => {
+  if (!expiry) return 'License expiry date is required';
+  const expiryDate = new Date(expiry);
+  const now = new Date();
+  if (isNaN(expiryDate.getTime())) return 'Invalid date format';
+  if (expiryDate < now) return 'License expiry must be in the future';
+  return undefined;
+};
+
 const formatPhoneNumber = (value: string): string => {
   const digitsOnly = value.replace(/\D/g, '');
   if (digitsOnly.length <= 3) return digitsOnly;
@@ -81,6 +92,7 @@ const formatPhoneNumber = (value: string): string => {
 const DEFAULT_FORM_DATA: SettingsData = {
   businessName: '',
   licenseNumber: '',
+  licenseExpiry: '',
   contactName: '',
   email: '',
   phone: '',
@@ -147,6 +159,7 @@ export function SettingsForm() {
       phone: validatePhone(formData.phone),
       website: validateWebsite(formData.website),
       licenseNumber: validateLicenseNumber(formData.licenseNumber),
+      licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
     };
     
     setFieldErrors(errors);
@@ -171,6 +184,9 @@ export function SettingsForm() {
       case 'licenseNumber':
         error = validateLicenseNumber(value);
         break;
+      case 'licenseExpiry':
+        error = validateLicenseExpiry(value);
+        break;
     }
     setFieldErrors(prev => ({ ...prev, [field]: error }));
     return !error;
@@ -185,6 +201,7 @@ export function SettingsForm() {
           const loadedData: SettingsData = {
             businessName: data.businessName || '',
             licenseNumber: data.licenseNumber || '',
+            licenseExpiry: data.licenseExpiry ? new Date(data.licenseExpiry).toISOString().split('T')[0] : '',
             contactName: data.contactName || '',
             email: data.email || '',
             phone: data.phone || '',
@@ -260,6 +277,7 @@ export function SettingsForm() {
         phone: validatePhone(formData.phone),
         website: validateWebsite(formData.website),
         licenseNumber: validateLicenseNumber(formData.licenseNumber),
+        licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
       };
       setFieldErrors(errors);
       
@@ -270,6 +288,7 @@ export function SettingsForm() {
           phone: true,
           website: true,
           licenseNumber: true,
+          licenseExpiry: true,
         });
         setError('Please fix the errors above before saving.');
         showToast('error', 'Please fix validation errors before saving');
@@ -427,7 +446,7 @@ export function SettingsForm() {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business License Number <span className="text-gray-400 text-xs">(optional)</span>
+                Business License Number <span className="text-red-500">*</span>
               </label>
               <input 
                 type="text" 
@@ -447,6 +466,31 @@ export function SettingsForm() {
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
                   {fieldErrors.licenseNumber}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                License Expiry Date <span className="text-red-500">*</span>
+              </label>
+              <input 
+                type="date" 
+                value={formData.licenseExpiry}
+                onChange={handleChange('licenseExpiry')}
+                onBlur={handleBlur('licenseExpiry')}
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.licenseExpiry && fieldErrors.licenseExpiry
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
+              />
+              {touched.licenseExpiry && fieldErrors.licenseExpiry && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.licenseExpiry}
                 </p>
               )}
             </div>

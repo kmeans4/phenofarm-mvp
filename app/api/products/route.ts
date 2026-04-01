@@ -32,6 +32,11 @@ type ProductLike = {
   images?: string[] | null;
   thcLegacy?: Prisma.Decimal | number | null;
   cbdLegacy?: Prisma.Decimal | number | null;
+  thcMin?: Prisma.Decimal | number | null;
+  thcMax?: Prisma.Decimal | number | null;
+  cbdMin?: Prisma.Decimal | number | null;
+  cbdMax?: Prisma.Decimal | number | null;
+  harvestDate?: Date | string | null;
 };
 
 function serializeProduct<T extends ProductLike>(product: T) {
@@ -53,6 +58,11 @@ function serializeProduct<T extends ProductLike>(product: T) {
     images: toSafeStringArray(product.images),
     thcLegacy: toSafeOptionalNumber(product.thcLegacy),
     cbdLegacy: toSafeOptionalNumber(product.cbdLegacy),
+    thcMin: toSafeOptionalNumber(product.thcMin),
+    thcMax: toSafeOptionalNumber(product.thcMax),
+    cbdMin: toSafeOptionalNumber(product.cbdMin),
+    cbdMax: toSafeOptionalNumber(product.cbdMax),
+    harvestDate: product.harvestDate ? new Date(product.harvestDate).toISOString() : null,
   };
 }
 
@@ -172,6 +182,11 @@ export async function POST(request: NextRequest) {
         subcategoryLegacy: data.subcategoryLegacy,
         thcLegacy: data.thcLegacy,
         cbdLegacy: data.cbdLegacy,
+        thcMin: data.thcMin,
+        thcMax: data.thcMax,
+        cbdMin: data.cbdMin,
+        cbdMax: data.cbdMax,
+        harvestDate: data.harvestDate ? new Date(data.harvestDate) : null,
         price: data.price ?? 0,
         inventoryQty: data.inventoryQty ?? 0,
         unit: data.unit || 'Gram',

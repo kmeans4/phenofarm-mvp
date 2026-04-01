@@ -6,6 +6,7 @@ import { Prisma } from '@prisma/client';
 interface GrowerSettingsBody {
   businessName: string;
   licenseNumber: string;
+  licenseExpiry: string;
   contactName: string;
   email: string;
   phone: string;
@@ -43,6 +44,7 @@ export async function GET() {
       select: {
         businessName: true,
         licenseNumber: true,
+        licenseExpiry: true,
         contactName: true,
         phone: true,
         address: true,
@@ -63,6 +65,7 @@ export async function GET() {
     return NextResponse.json({
       businessName: grower.businessName,
       licenseNumber: grower.licenseNumber || '',
+      licenseExpiry: grower.licenseExpiry || '',
       contactName: grower.contactName || '',
       email: grower.user.email,
       phone: grower.phone || '',
@@ -99,6 +102,7 @@ export async function PUT(request: NextRequest) {
     const { 
       businessName, 
       licenseNumber, 
+      licenseExpiry,
       contactName, 
       email, 
       phone, 
@@ -115,11 +119,24 @@ export async function PUT(request: NextRequest) {
     if (!businessName) {
       return NextResponse.json({ error: 'Business name is required' }, { status: 400 });
     }
+    if (!licenseNumber) {
+      return NextResponse.json({ error: 'License number is required' }, { status: 400 });
+    }
+    if (!licenseExpiry) {
+      return NextResponse.json({ error: 'License expiry date is required' }, { status: 400 });
+    }
+
+    // Validate license expiry is in the future
+    const expiryDate = new Date(licenseExpiry);
+    if (isNaN(expiryDate.getTime()) || expiryDate < new Date()) {
+      return NextResponse.json({ error: 'License expiry must be a valid future date' }, { status: 400 });
+    }
 
     // Build update data object
     const updateData: Prisma.GrowerUpdateInput = {
       businessName: businessName.trim(),
-      licenseNumber: normalizeOptionalString(licenseNumber),
+      licenseNumber: licenseNumber.trim(),
+      licenseExpiry: expiryDate,
       contactName: normalizeOptionalString(contactName),
       phone: normalizeOptionalString(phone),
       address: normalizeOptionalString(address),

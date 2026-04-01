@@ -29,6 +29,11 @@ interface ProductFormData {
   brand: string;
   ingredients: string;
   isFeatured: boolean;
+  thcMin: string;
+  thcMax: string;
+  cbdMin: string;
+  cbdMax: string;
+  harvestDate: string;
 }
 
 type DirtyBaseline = Omit<ProductFormData, 'id'> & { id: string | undefined };
@@ -41,6 +46,11 @@ interface FieldErrors {
   unit?: string;
   sku?: string;
   description?: string;
+  thcMin?: string;
+  thcMax?: string;
+  cbdMin?: string;
+  cbdMax?: string;
+  harvestDate?: string;
 }
 
 const UNITS = ['Gram', 'Half Ounce', 'Ounce', 'Eighth', 'Quarter', 'Unit', 'Pack', 'Each', 'Lb'];
@@ -94,6 +104,49 @@ const validateDescription = (desc: string): string | undefined => {
   return undefined;
 };
 
+const validateThcRange = (min: string, max: string): { minError?: string; maxError?: string } => {
+  const errors: { minError?: string; maxError?: string } = {};
+  const minNum = parseFloat(min);
+  const maxNum = parseFloat(max);
+  
+  if (min && (isNaN(minNum) || minNum < 0 || minNum > 100)) {
+    errors.minError = 'THC min must be 0-100';
+  }
+  if (max && (isNaN(maxNum) || maxNum < 0 || maxNum > 100)) {
+    errors.maxError = 'THC max must be 0-100';
+  }
+  if (min && max && !isNaN(minNum) && !isNaN(maxNum) && minNum > maxNum) {
+    errors.maxError = 'THC max must be >= min';
+  }
+  return errors;
+};
+
+const validateCbdRange = (min: string, max: string): { minError?: string; maxError?: string } => {
+  const errors: { minError?: string; maxError?: string } = {};
+  const minNum = parseFloat(min);
+  const maxNum = parseFloat(max);
+  
+  if (min && (isNaN(minNum) || minNum < 0 || minNum > 100)) {
+    errors.minError = 'CBD min must be 0-100';
+  }
+  if (max && (isNaN(maxNum) || maxNum < 0 || maxNum > 100)) {
+    errors.maxError = 'CBD max must be 0-100';
+  }
+  if (min && max && !isNaN(minNum) && !isNaN(maxNum) && minNum > maxNum) {
+    errors.maxError = 'CBD max must be >= min';
+  }
+  return errors;
+};
+
+const validateHarvestDate = (date: string): string | undefined => {
+  if (!date) return undefined;
+  const harvestDate = new Date(date);
+  const now = new Date();
+  if (isNaN(harvestDate.getTime())) return 'Invalid date format';
+  if (harvestDate > now) return 'Harvest date cannot be in the future';
+  return undefined;
+};
+
 const INPUT_CLASSES = "w-full h-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
 const INPUT_ERROR_CLASSES = "w-full h-10 px-4 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
 
@@ -132,6 +185,11 @@ export function ProductForm({
     brand: initialData.brand || growerBrand || '',
     ingredients: initialData.ingredients || '',
     isFeatured: initialData.isFeatured || false,
+    thcMin: initialData.thcMin || '',
+    thcMax: initialData.thcMax || '',
+    cbdMin: initialData.cbdMin || '',
+    cbdMax: initialData.cbdMax || '',
+    harvestDate: initialData.harvestDate || '',
   });
 
   const [errors, setErrors] = useState<FieldErrors>({});
@@ -197,6 +255,9 @@ export function ProductForm({
   }, [initialData.id, isDirty]);
 
   const validateForm = (): boolean => {
+    const thcErrors = validateThcRange(formData.thcMin, formData.thcMax);
+    const cbdErrors = validateCbdRange(formData.cbdMin, formData.cbdMax);
+    
     const newErrors: FieldErrors = {
       name: validateName(formData.name),
       price: validatePrice(formData.price),
@@ -205,6 +266,11 @@ export function ProductForm({
       unit: validateUnit(formData.unit),
       sku: validateSku(formData.sku),
       description: validateDescription(formData.description),
+      thcMin: thcErrors.minError,
+      thcMax: thcErrors.maxError,
+      cbdMin: cbdErrors.minError,
+      cbdMax: cbdErrors.maxError,
+      harvestDate: validateHarvestDate(formData.harvestDate),
     };
     
     Object.keys(newErrors).forEach(key => {
@@ -620,6 +686,110 @@ export function ProductForm({
                   }`}
                 />
               </button>
+            </div>
+
+            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Cannabinoid Profile (Optional)</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label htmlFor="thcMin" className="block text-xs font-medium text-gray-600">
+                    THC Min (%)
+                  </label>
+                  <input
+                    id="thcMin"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    value={formData.thcMin}
+                    onChange={(e) => handleChange('thcMin', e.target.value)}
+                    onBlur={() => handleBlur('thcMin')}
+                    className={errors.thcMin && touched.thcMin ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    placeholder="e.g., 15"
+                  />
+                  {errors.thcMin && touched.thcMin && (
+                    <p className="text-xs text-red-600 mt-1">{errors.thcMin}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="thcMax" className="block text-xs font-medium text-gray-600">
+                    THC Max (%)
+                  </label>
+                  <input
+                    id="thcMax"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    value={formData.thcMax}
+                    onChange={(e) => handleChange('thcMax', e.target.value)}
+                    onBlur={() => handleBlur('thcMax')}
+                    className={errors.thcMax && touched.thcMax ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    placeholder="e.g., 25"
+                  />
+                  {errors.thcMax && touched.thcMax && (
+                    <p className="text-xs text-red-600 mt-1">{errors.thcMax}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="cbdMin" className="block text-xs font-medium text-gray-600">
+                    CBD Min (%)
+                  </label>
+                  <input
+                    id="cbdMin"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    value={formData.cbdMin}
+                    onChange={(e) => handleChange('cbdMin', e.target.value)}
+                    onBlur={() => handleBlur('cbdMin')}
+                    className={errors.cbdMin && touched.cbdMin ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    placeholder="e.g., 0"
+                  />
+                  {errors.cbdMin && touched.cbdMin && (
+                    <p className="text-xs text-red-600 mt-1">{errors.cbdMin}</p>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <label htmlFor="cbdMax" className="block text-xs font-medium text-gray-600">
+                    CBD Max (%)
+                  </label>
+                  <input
+                    id="cbdMax"
+                    type="number"
+                    step="0.1"
+                    min="0"
+                    max="100"
+                    value={formData.cbdMax}
+                    onChange={(e) => handleChange('cbdMax', e.target.value)}
+                    onBlur={() => handleBlur('cbdMax')}
+                    className={errors.cbdMax && touched.cbdMax ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    placeholder="e.g., 1"
+                  />
+                  {errors.cbdMax && touched.cbdMax && (
+                    <p className="text-xs text-red-600 mt-1">{errors.cbdMax}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="harvestDate" className="block text-sm font-medium text-gray-700">
+                Harvest Date
+              </label>
+              <input
+                id="harvestDate"
+                type="date"
+                max={new Date().toISOString().split('T')[0]}
+                value={formData.harvestDate}
+                onChange={(e) => handleChange('harvestDate', e.target.value)}
+                onBlur={() => handleBlur('harvestDate')}
+                className={errors.harvestDate && touched.harvestDate ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+              />
+              {errors.harvestDate && touched.harvestDate && (
+                <p className="text-sm text-red-600 mt-1">{errors.harvestDate}</p>
+              )}
             </div>
 
             <div className="space-y-2">

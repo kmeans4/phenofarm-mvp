@@ -6,6 +6,8 @@ import { Prisma } from '@prisma/client';
 interface DispensarySettingsBody {
   businessName: string;
   licenseNumber: string;
+  licenseExpiry: string;
+  licenseState: string;
   contactName: string;
   email: string;
   phone: string;
@@ -43,6 +45,9 @@ export async function GET() {
       select: {
         businessName: true,
         licenseNumber: true,
+        licenseExpiry: true,
+        licenseState: true,
+        licenseStatus: true,
         contactName: true,
         phone: true,
         address: true,
@@ -63,6 +68,9 @@ export async function GET() {
     return NextResponse.json({
       businessName: dispensary.businessName,
       licenseNumber: dispensary.licenseNumber || '',
+      licenseExpiry: dispensary.licenseExpiry || '',
+      licenseState: dispensary.licenseState || 'VT',
+      licenseStatus: dispensary.licenseStatus || 'pending_review',
       contactName: dispensary.contactName || '',
       email: dispensary.user.email,
       phone: dispensary.phone || '',
@@ -99,6 +107,8 @@ export async function PUT(request: NextRequest) {
     const { 
       businessName, 
       licenseNumber, 
+      licenseExpiry,
+      licenseState,
       contactName, 
       email, 
       phone, 
@@ -115,11 +125,28 @@ export async function PUT(request: NextRequest) {
     if (!businessName) {
       return NextResponse.json({ error: 'Business name is required' }, { status: 400 });
     }
+    if (!licenseNumber) {
+      return NextResponse.json({ error: 'License number is required' }, { status: 400 });
+    }
+    if (!licenseExpiry) {
+      return NextResponse.json({ error: 'License expiry date is required' }, { status: 400 });
+    }
+    if (!licenseState) {
+      return NextResponse.json({ error: 'License state is required' }, { status: 400 });
+    }
+
+    // Validate license expiry is in the future
+    const expiryDate = new Date(licenseExpiry);
+    if (isNaN(expiryDate.getTime()) || expiryDate < new Date()) {
+      return NextResponse.json({ error: 'License expiry must be a valid future date' }, { status: 400 });
+    }
 
     // Build update data
     const updateData: Prisma.DispensaryUpdateInput = {
       businessName: businessName.trim(),
-      licenseNumber: normalizeOptionalString(licenseNumber),
+      licenseNumber: licenseNumber.trim(),
+      licenseExpiry: expiryDate,
+      licenseState: licenseState.trim(),
       contactName: normalizeOptionalString(contactName),
       phone: normalizeOptionalString(phone),
       address: normalizeOptionalString(address),

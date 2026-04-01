@@ -40,6 +40,13 @@ enum UserRole {
   DISPENSARY
 }
 
+enum LicenseStatus {
+  pending_review
+  verified
+  expired
+  rejected
+}
+
 enum ConversationMessageType {
   TEXT
   PRICING_REQUEST
@@ -64,20 +71,21 @@ enum StrainType {
 }
 
 model Grower {
-  id            String  @id @default(cuid())
-  userId        String  @unique
+  id            String    @id @default(cuid())
+  userId        String    @unique
   businessName  String
   licenseNumber String?
+  licenseExpiry DateTime?
   phone         String?
   address       String?
   city          String?
-  state         String? @default("VT")
+  state         String?   @default("VT")
   zip           String?
   website       String?
   description   String?
   logo          String?
   contactName   String?
-  isVerified    Boolean @default(false)
+  isVerified    Boolean   @default(false)
 
   // Stripe Connect
   stripeAccountId     String?
@@ -103,20 +111,25 @@ model Grower {
 }
 
 model Dispensary {
-  id            String         @id @default(cuid())
-  userId        String         @unique
-  businessName  String
-  licenseNumber String?
-  phone         String?
-  address       String?
-  city          String?
-  state         String?        @default("VT")
-  zip           String?
-  website       String?
-  description   String?
-  logo          String?
-  contactName   String?
-  isVerified    Boolean        @default(false)
+  id                String         @id @default(cuid())
+  userId            String         @unique
+  businessName      String
+  licenseNumber     String?
+  licenseExpiry     DateTime?
+  licenseState      String?        @default("VT")
+  phone             String?
+  address           String?
+  city              String?
+  state             String?        @default("VT")
+  zip               String?
+  website           String?
+  description       String?
+  logo              String?
+  contactName       String?
+  isVerified        Boolean        @default(false)
+  licenseStatus     LicenseStatus  @default(pending_review)
+  licenseReviewNotes String?
+  verifiedAt        DateTime?
   orders        Order[]
   cart          Cart?
   conversations Conversation[]
@@ -224,6 +237,11 @@ model Product {
   createdAt              DateTime  @default(now())
   updatedAt              DateTime  @updatedAt
   lastSyncedAt           DateTime?
+  thcMin                 Decimal?  @db.Decimal(5, 2)
+  thcMax                 Decimal?  @db.Decimal(5, 2)
+  cbdMin                 Decimal?  @db.Decimal(5, 2)
+  cbdMax                 Decimal?  @db.Decimal(5, 2)
+  harvestDate            DateTime?
 
   grower     Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]

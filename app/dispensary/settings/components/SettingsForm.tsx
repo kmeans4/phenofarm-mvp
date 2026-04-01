@@ -8,6 +8,8 @@ import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 interface SettingsData {
   businessName: string;
   licenseNumber: string;
+  licenseExpiry: string;
+  licenseState: string;
   contactName: string;
   email: string;
   phone: string;
@@ -18,17 +20,94 @@ interface SettingsData {
   website: string;
   description: string;
   logo: string;
+  licenseStatus: 'pending_review' | 'verified' | 'expired' | 'rejected';
 }
 
 interface SettingsFormProps {
   defaultValues: SettingsData;
 }
 
+interface FieldErrors {
+  businessName?: string;
+  email?: string;
+  phone?: string;
+  website?: string;
+  licenseNumber?: string;
+  licenseExpiry?: string;
+  licenseState?: string;
+}
+
+const validateEmail = (email: string): string | undefined => {
+  if (!email) return 'Business email is required';
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) return 'Please enter a valid email address';
+  return undefined;
+};
+
+const validatePhone = (phone: string): string | undefined => {
+  if (!phone) return undefined;
+  const digitsOnly = phone.replace(/\D/g, '');
+  if (digitsOnly.length < 10) return 'Please enter a valid 10-digit phone number';
+  if (digitsOnly.length > 11) return 'Phone number is too long';
+  return undefined;
+};
+
+const validateWebsite = (website: string): string | undefined => {
+  if (!website) return undefined;
+  const urlRegex = /^https?:\/\/.+/;
+  if (!urlRegex.test(website)) return 'URL must start with http:// or https://';
+  try {
+    new URL(website);
+    return undefined;
+  } catch {
+    return 'Please enter a valid URL';
+  }
+};
+
+const validateBusinessName = (name: string): string | undefined => {
+  if (!name.trim()) return 'Business name is required';
+  if (name.trim().length < 2) return 'Business name must be at least 2 characters';
+  if (name.trim().length > 100) return 'Business name must be less than 100 characters';
+  return undefined;
+};
+
+const validateLicenseNumber = (license: string): string | undefined => {
+  if (!license.trim()) return 'License number is required';
+  if (license.trim().length < 3) return 'License number must be at least 3 characters';
+  if (license.trim().length > 50) return 'License number must be less than 50 characters';
+  return undefined;
+};
+
+const validateLicenseExpiry = (expiry: string): string | undefined => {
+  if (!expiry) return 'License expiry date is required';
+  const expiryDate = new Date(expiry);
+  const now = new Date();
+  if (isNaN(expiryDate.getTime())) return 'Invalid date format';
+  if (expiryDate < now) return 'License expiry must be in the future';
+  return undefined;
+};
+
+const validateLicenseState = (state: string): string | undefined => {
+  if (!state.trim()) return 'License state is required';
+  if (state.trim() !== 'VT') return 'Currently only VT licenses are supported';
+  return undefined;
+};
+
+const formatPhoneNumber = (value: string): string => {
+  const digitsOnly = value.replace(/\D/g, '');
+  if (digitsOnly.length <= 3) return digitsOnly;
+  if (digitsOnly.length <= 6) return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3)}`;
+  if (digitsOnly.length <= 10) return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6)}`;
+  return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`;
+};
+
 export function SettingsForm({ defaultValues }: SettingsFormProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   
   const [formData, setFormData] = useState<SettingsData>(defaultValues);
   const [initialData, setInitialData] = useState<SettingsData>(defaultValues);
@@ -56,6 +135,8 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
           const loadedData: SettingsData = {
             businessName: data.businessName || '',
             licenseNumber: data.licenseNumber || '',
+            licenseExpiry: data.licenseExpiry ? new Date(data.licenseExpiry).toISOString().split('T')[0] : '',
+            licenseState: data.licenseState || 'VT',
             contactName: data.contactName || '',
             email: data.email || '',
             phone: data.phone || '',
@@ -66,6 +147,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
             website: data.website || '',
             description: data.description || '',
             logo: data.logo || '',
+            licenseStatus: data.licenseStatus || 'pending_review',
           };
           setFormData(loadedData);
           setInitialData(loadedData);
@@ -77,6 +159,50 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
       }
     }
     fetchSettings();
+  }, []);
+
+  const validateForm = useCallback((): boolean => {
+    const errors: FieldErrors = {
+      businessName: validateBusinessName(formData.businessName),
+      email: validateEmail(formData.email),
+      phone: validatePhone(formData.phone),
+      website: validateWebsite(formData.website),
+      licenseNumber: validateLicenseNumber(formData.licenseNumber),
+      licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
+      licenseState: validateLicenseState(formData.licenseState),
+    };
+    
+    setFieldErrors(errors);
+    return !Object.values(errors).some(e => e !== undefined);
+  }, [formData]);
+
+  const validateField = useCallback((field: keyof FieldErrors, value: string) => {
+    let error: string | undefined;
+    switch (field) {
+      case 'businessName':
+        error = validateBusinessName(value);
+        break;
+      case 'email':
+        error = validateEmail(value);
+        break;
+      case 'phone':
+        error = validatePhone(value);
+        break;
+      case 'website':
+        error = validateWebsite(value);
+        break;
+      case 'licenseNumber':
+        error = validateLicenseNumber(value);
+        break;
+      case 'licenseExpiry':
+        error = validateLicenseExpiry(value);
+        break;
+      case 'licenseState':
+        error = validateLicenseState(value);
+        break;
+    }
+    setFieldErrors(prev => ({ ...prev, [field]: error }));
+    return !error;
   }, []);
 
   const handleAddressSelect = (address: {
@@ -101,7 +227,55 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     await handleSave(true, nextData);
   };
 
+  const handleChange = (field: keyof SettingsData) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
+    let value = e.target.value;
+    
+    if (field === 'phone') {
+      value = formatPhoneNumber(value);
+    }
+    
+    setFormData(prev => ({ ...prev, [field]: value }));
+    
+    if (touched[field as keyof FieldErrors]) {
+      validateField(field as keyof FieldErrors, value);
+    }
+  };
+
+  const handleBlur = (field: keyof FieldErrors) => () => {
+    setTouched(prev => ({ ...prev, [field]: true }));
+    validateField(field, formData[field] as string);
+  };
+
   const handleSave = async (isLogoSave = false, dataOverride?: SettingsData) => {
+    if (!isLogoSave) {
+      const errors: FieldErrors = {
+        businessName: validateBusinessName(formData.businessName),
+        email: validateEmail(formData.email),
+        phone: validatePhone(formData.phone),
+        website: validateWebsite(formData.website),
+        licenseNumber: validateLicenseNumber(formData.licenseNumber),
+        licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
+        licenseState: validateLicenseState(formData.licenseState),
+      };
+      setFieldErrors(errors);
+      
+      if (Object.values(errors).some(e => e !== undefined)) {
+        setTouched({
+          businessName: true,
+          email: true,
+          phone: true,
+          website: true,
+          licenseNumber: true,
+          licenseExpiry: true,
+          licenseState: true,
+        });
+        setError('Please fix the errors above before saving.');
+        return;
+      }
+    }
+
     const payload = dataOverride ?? formData;
 
     setSaving(true);
@@ -165,6 +339,32 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         </div>
       )}
 
+      {formData.licenseStatus && formData.licenseStatus !== 'verified' && (
+        <div className={`p-4 border rounded-lg flex items-start gap-3 ${
+          formData.licenseStatus === 'pending_review' 
+            ? 'bg-blue-50 border-blue-200 text-blue-700'
+            : formData.licenseStatus === 'expired'
+            ? 'bg-red-50 border-red-200 text-red-700'
+            : 'bg-orange-50 border-orange-200 text-orange-700'
+        }`}>
+          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+          </svg>
+          <div>
+            <p className="font-medium">
+              {formData.licenseStatus === 'pending_review' && 'License Pending Review'}
+              {formData.licenseStatus === 'expired' && 'License Expired'}
+              {formData.licenseStatus === 'rejected' && 'License Rejected'}
+            </p>
+            <p className="text-sm mt-1">
+              {formData.licenseStatus === 'pending_review' && 'Your license is being reviewed by our team. You will be notified once verified.'}
+              {formData.licenseStatus === 'expired' && 'Your license has expired. Please update your license information.'}
+              {formData.licenseStatus === 'rejected' && 'Your license was rejected. Please contact support for more information.'}
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
@@ -181,13 +381,29 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
           </div>
           <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Business Name <span className="text-red-500">*</span>
+              </label>
               <input 
                 type="text" 
                 value={formData.businessName}
-                onChange={(e) => setFormData({...formData, businessName: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                onChange={handleChange('businessName')}
+                onBlur={handleBlur('businessName')}
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.businessName && fieldErrors.businessName
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
+                placeholder="Your business name"
               />
+              {touched.businessName && fieldErrors.businessName && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.businessName}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -196,37 +412,134 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               <input 
                 type="text" 
                 value={formData.contactName}
-                onChange={(e) => setFormData({...formData, contactName: e.target.value})}
+                onChange={handleChange('contactName')}
                 placeholder="Primary contact person"
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Dispensary License Number</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Dispensary License Number <span className="text-red-500">*</span>
+              </label>
               <input 
                 type="text" 
                 value={formData.licenseNumber}
-                onChange={(e) => setFormData({...formData, licenseNumber: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                onChange={handleChange('licenseNumber')}
+                onBlur={handleBlur('licenseNumber')}
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.licenseNumber && fieldErrors.licenseNumber
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
+                placeholder="License number"
               />
+              {touched.licenseNumber && fieldErrors.licenseNumber && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.licenseNumber}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Business Email</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                License State <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.licenseState}
+                onChange={handleChange('licenseState')}
+                onBlur={handleBlur('licenseState')}
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.licenseState && fieldErrors.licenseState
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
+              >
+                <option value="VT">Vermont (VT)</option>
+              </select>
+              {touched.licenseState && fieldErrors.licenseState && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.licenseState}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                License Expiry Date <span className="text-red-500">*</span>
+              </label>
+              <input 
+                type="date" 
+                value={formData.licenseExpiry}
+                onChange={handleChange('licenseExpiry')}
+                onBlur={handleBlur('licenseExpiry')}
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.licenseExpiry && fieldErrors.licenseExpiry
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
+              />
+              {touched.licenseExpiry && fieldErrors.licenseExpiry && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.licenseExpiry}
+                </p>
+              )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Business Email <span className="text-red-500">*</span>
+              </label>
               <input 
                 type="email" 
                 value={formData.email}
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                onChange={handleChange('email')}
+                onBlur={handleBlur('email')}
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.email && fieldErrors.email
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
+                placeholder="your@email.com"
               />
+              {touched.email && fieldErrors.email && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Business Phone</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Business Phone <span className="text-gray-400 text-xs">(optional)</span>
+              </label>
               <input 
                 type="tel" 
                 value={formData.phone}
-                onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                onChange={handleChange('phone')}
+                onBlur={handleBlur('phone')}
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.phone && fieldErrors.phone
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
+                placeholder="(555) 123-4567"
               />
+              {touched.phone && fieldErrors.phone && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.phone}
+                </p>
+              )}
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
