@@ -1,37 +1,342 @@
-// @ts-nocheck
-/**
- * PhenoFarm - Database Schema
- * B2B Cannabis Wholesale Marketplace MVP
- * Tech Stack: PostgreSQL + Prisma
- * Host: Neon (free tier)
- */
-
-datasource db {
-  url      = env("DATABASE_URL")
-  provider = "postgresql"
-}
-
 generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id           String   @id @default(cuid())
-  email        String   @unique
-  name         String?
-  role         UserRole @default(GROWER)
-  growerId     String?
-  dispensaryId String?
-  passwordHash String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
 
-  grower               Grower?
-  dispensary           Dispensary?
-  sessions             Session[]
+model User {
+  id                   String                @id @default(cuid())
+  email                String                @unique
+  name                 String?
+  role                 UserRole              @default(GROWER)
+  growerId             String?
+  dispensaryId         String?
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  passwordHash         String?
   conversationMessages ConversationMessage[]
+  dispensary           Dispensary?
+  grower               Grower?
+  sessions             Session[]
 
   @@map("users")
+}
+
+model Grower {
+  id                  String              @id @default(cuid())
+  userId              String              @unique
+  businessName        String
+  licenseNumber       String?
+  phone               String?
+  address             String?
+  city                String?
+  state               String?             @default("VT")
+  zip                 String?
+  website             String?
+  description         String?
+  logo                String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  connectOnboardedAt  DateTime?
+  isVerified          Boolean             @default(false)
+  stripeAccountId     String?
+  stripeAccountStatus String?             @default("pending")
+  contactName         String?
+  licenseExpiry       DateTime?
+  batches             Batch[]
+  cartItems           CartItem[]
+  conversations       Conversation[]
+  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  metrcSyncLogs       MetrcSyncLog[]
+  orderItems          OrderItem[]
+  orders              Order[]
+  productTypeConfigs  ProductTypeConfig[]
+  products            Product[]
+  strains             Strain[]
+
+  @@map("growers")
+}
+
+model Dispensary {
+  id                 String         @id @default(cuid())
+  userId             String         @unique
+  businessName       String
+  licenseNumber      String?
+  phone              String?
+  address            String?
+  city               String?
+  state              String?        @default("VT")
+  zip                String?
+  website            String?
+  description        String?
+  logo               String?
+  createdAt          DateTime       @default(now())
+  updatedAt          DateTime       @updatedAt
+  isVerified         Boolean        @default(false)
+  contactName        String?
+  licenseExpiry      DateTime?
+  licenseReviewNotes String?
+  licenseState       String?        @default("VT")
+  licenseStatus      LicenseStatus  @default(pending_review)
+  verifiedAt         DateTime?
+  cart               Cart?
+  conversations      Conversation[]
+  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orders             Order[]
+
+  @@map("dispensaries")
+}
+
+model Strain {
+  id          String      @id @default(uuid())
+  name        String
+  genetics    String?
+  growerNotes String?
+  growerId    String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  description String?
+  strainType  StrainType?
+  batches     Batch[]
+  products    Product[]
+  grower      Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
+
+  @@unique([growerId, name])
+  @@map("strains")
+}
+
+model Batch {
+  id                String    @id @default(uuid())
+  batchNumber       String
+  lotNumber         String?
+  harvestDate       DateTime
+  strainId          String
+  thc               Float?
+  cbd               Float?
+  totalCannabinoids Float?
+  terpenes          Json?
+  coaDocumentUrl    String?
+  testResults       Json?
+  notes             String?
+  growerId          String
+  createdAt         DateTime  @default(now())
+  grower            Grower    @relation(fields: [growerId], references: [id], onDelete: Cascade)
+  strain            Strain    @relation(fields: [strainId], references: [id])
+  products          Product[]
+
+  @@unique([growerId, batchNumber])
+  @@map("batches")
+}
+
+model ProductTypeConfig {
+  id        String   @id @default(uuid())
+  type      String
+  subTypes  String[]
+  growerId  String?
+  isCustom  Boolean  @default(false)
+  createdAt DateTime @default(now())
+  grower    Grower?  @relation(fields: [growerId], references: [id])
+
+  @@unique([growerId, type])
+  @@map("product_type_configs")
+}
+
+model Product {
+  id                     String      @id @default(cuid())
+  growerId               String
+  name                   String
+  price                  Decimal     @db.Decimal(10, 2)
+  inventoryQty           Int         @default(0)
+  unit                   String      @default("gram")
+  isAvailable            Boolean     @default(true)
+  description            String?
+  images                 String[]
+  createdAt              DateTime    @default(now())
+  updatedAt              DateTime    @updatedAt
+  lastSyncedAt           DateTime?
+  sku                    String?
+  brand                  String?
+  ingredients            String?
+  batchId                String?
+  categoryLegacy         String?
+  cbdLegacy              Float?
+  ingredientsDocumentUrl String?
+  isFeatured             Boolean     @default(false)
+  productType            String?
+  strainId               String?
+  strainLegacy           String?
+  subType                String?
+  subcategoryLegacy      String?
+  thcLegacy              Float?
+  deletedAt              DateTime?
+  isDeleted              Boolean     @default(false)
+  isPriceVisible         Boolean     @default(true)
+  cbdMax                 Decimal?    @db.Decimal(5, 2)
+  cbdMin                 Decimal?    @db.Decimal(5, 2)
+  harvestDate            DateTime?
+  thcMax                 Decimal?    @db.Decimal(5, 2)
+  thcMin                 Decimal?    @db.Decimal(5, 2)
+  cartItems              CartItem[]
+  orderItems             OrderItem[]
+  batch                  Batch?      @relation(fields: [batchId], references: [id])
+  grower                 Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
+  strain                 Strain?     @relation(fields: [strainId], references: [id])
+
+  @@map("products")
+}
+
+model Order {
+  id           String      @id @default(cuid())
+  orderId      String      @unique @default(cuid())
+  growerId     String
+  dispensaryId String
+  status       OrderStatus @default(PENDING)
+  totalAmount  Decimal     @db.Decimal(10, 2)
+  subtotal     Decimal     @db.Decimal(10, 2)
+  tax          Decimal     @default(0) @db.Decimal(10, 2)
+  shippingFee  Decimal     @default(0) @db.Decimal(10, 2)
+  notes        String?
+  shippedAt    DateTime?
+  deliveredAt  DateTime?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  items        OrderItem[]
+  dispensary   Dispensary  @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+  grower       Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
+  payments     Payment[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String   @id @default(cuid())
+  orderId    String
+  productId  String
+  growerId   String
+  quantity   Int      @default(1)
+  unitPrice  Decimal  @db.Decimal(10, 2)
+  totalPrice Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+  grower     Grower   @relation(fields: [growerId], references: [id])
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model MetrcSyncLog {
+  id            String   @id @default(cuid())
+  growerId      String
+  recordsSynced Int      @default(0)
+  success       Boolean  @default(true)
+  errorMessage  String?
+  createdAt     DateTime @default(now())
+  grower        Grower   @relation(fields: [growerId], references: [id])
+
+  @@map("metrc_sync_logs")
+}
+
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String
+  amount        Decimal       @db.Decimal(10, 2)
+  method        PaymentMethod
+  status        PaymentStatus @default(PENDING)
+  transactionId String?
+  paidAt        DateTime?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  order         Order         @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+model Cart {
+  id           String     @id @default(cuid())
+  dispensaryId String     @unique
+  subtotal     Decimal    @default(0) @db.Decimal(10, 2)
+  tax          Decimal    @default(0) @db.Decimal(10, 2)
+  total        Decimal    @default(0) @db.Decimal(10, 2)
+  itemCount    Int        @default(0)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  items        CartItem[]
+  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+
+  @@map("carts")
+}
+
+model CartItem {
+  id         String   @id @default(cuid())
+  cartId     String
+  productId  String
+  growerId   String
+  quantity   Int      @default(1)
+  unitPrice  Decimal  @db.Decimal(10, 2)
+  totalPrice Decimal  @db.Decimal(10, 2)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  grower     Grower   @relation(fields: [growerId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model Conversation {
+  id                   String                @id @default(cuid())
+  growerId             String
+  dispensaryId         String
+  productId            String?
+  createdByUserId      String
+  growerLastReadAt     DateTime?
+  dispensaryLastReadAt DateTime?
+  lastMessageAt        DateTime              @default(now())
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
+  messages             ConversationMessage[]
+  dispensary           Dispensary            @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+  grower               Grower                @relation(fields: [growerId], references: [id], onDelete: Cascade)
+
+  @@unique([growerId, dispensaryId])
+  @@index([growerId, lastMessageAt])
+  @@index([dispensaryId, lastMessageAt])
+  @@map("conversations")
+}
+
+model ConversationMessage {
+  id                   String                  @id @default(cuid())
+  conversationId       String
+  senderUserId         String
+  messageType          ConversationMessageType @default(TEXT)
+  body                 String
+  productId            String?
+  offerQuantity        Int?
+  offerUnitPrice       Decimal?                @db.Decimal(10, 2)
+  offerNote            String?
+  offerStatus          OfferStatus?
+  respondedToMessageId String?
+  createdAt            DateTime                @default(now())
+  conversation         Conversation            @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  sender               User                    @relation(fields: [senderUserId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@index([senderUserId])
+  @@map("conversation_messages")
 }
 
 enum UserRole {
@@ -70,227 +375,6 @@ enum StrainType {
   INDICA_DOM_HYBRID
 }
 
-model Grower {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  businessName  String
-  licenseNumber String?
-  licenseExpiry DateTime?
-  phone         String?
-  address       String?
-  city          String?
-  state         String?   @default("VT")
-  zip           String?
-  website       String?
-  description   String?
-  logo          String?
-  contactName   String?
-  isVerified    Boolean   @default(false)
-
-  // Stripe Connect
-  stripeAccountId     String?
-  stripeAccountStatus String?   @default("pending")
-  connectOnboardedAt  DateTime?
-
-  // Relations
-  strains            Strain[]
-  batches            Batch[]
-  products           Product[]
-  orders             Order[]
-  orderItems         OrderItem[]
-  cartItems          CartItem[]
-  metrcSyncLogs      MetrcSyncLog[]
-  productTypeConfigs ProductTypeConfig[]
-  conversations      Conversation[]
-  createdAt          DateTime            @default(now())
-  updatedAt          DateTime            @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("growers")
-}
-
-model Dispensary {
-  id                String         @id @default(cuid())
-  userId            String         @unique
-  businessName      String
-  licenseNumber     String?
-  licenseExpiry     DateTime?
-  licenseState      String?        @default("VT")
-  phone             String?
-  address           String?
-  city              String?
-  state             String?        @default("VT")
-  zip               String?
-  website           String?
-  description       String?
-  logo              String?
-  contactName       String?
-  isVerified        Boolean        @default(false)
-  licenseStatus     LicenseStatus  @default(pending_review)
-  licenseReviewNotes String?
-  verifiedAt        DateTime?
-  orders        Order[]
-  cart          Cart?
-  conversations Conversation[]
-  createdAt     DateTime       @default(now())
-  updatedAt     DateTime       @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("dispensaries")
-}
-
-// Strain model - represents cannabis genetics
-model Strain {
-  id          String      @id @default(uuid())
-  name        String
-  strainType  StrainType?
-  genetics    String? // parent strains
-  description String? // NEW - strain description
-  growerNotes String?
-  growerId    String
-  grower      Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
-  batches     Batch[]
-  products    Product[]
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-
-  @@unique([growerId, name])
-  @@map("strains")
-}
-
-// Batch model - harvest batch with lab results
-model Batch {
-  id                String    @id @default(uuid())
-  batchNumber       String // e.g., "OGK-2024-001"
-  lotNumber         String?
-  harvestDate       DateTime
-  strainId          String
-  strain            Strain    @relation(fields: [strainId], references: [id])
-  thc               Float? // percentage
-  cbd               Float? // percentage
-  totalCannabinoids Float?
-  terpenes          Json? // { myrcene: 0.5, limonene: 0.3, ... }
-  coaDocumentUrl    String? // COA PDF
-  testResults       Json? // full lab results
-  notes             String?
-  products          Product[]
-  growerId          String
-  grower            Grower    @relation(fields: [growerId], references: [id], onDelete: Cascade)
-  createdAt         DateTime  @default(now())
-
-  @@unique([growerId, batchNumber])
-  @@map("batches")
-}
-
-// Product Sub-Types (flexible system)
-model ProductTypeConfig {
-  id        String   @id @default(uuid())
-  type      String // "Flower", "Edibles", etc.
-  subTypes  String[] // ["By the Pound", "3.5g Jar", "7g Jar"]
-  growerId  String?
-  grower    Grower?  @relation(fields: [growerId], references: [id])
-  isCustom  Boolean  @default(false)
-  createdAt DateTime @default(now())
-
-  @@unique([growerId, type])
-  @@map("product_type_configs")
-}
-
-model Product {
-  id       String @id @default(cuid())
-  growerId String
-
-  // New flexible type/subtype system
-  productType String? // "Flower", "Edibles", etc.
-  subType     String? // "3.5g Jar", "By the Pound", etc.
-
-  // Strain & Batch relations
-  strainId String?
-  strain   Strain? @relation(fields: [strainId], references: [id])
-  batchId  String?
-  batch    Batch?  @relation(fields: [batchId], references: [id])
-
-  // Legacy fields (kept for backwards compatibility during migration)
-  name              String
-  strainLegacy      String? // Was "strain" - now strainId relation
-  categoryLegacy    String? // Was "category" - now productType
-  subcategoryLegacy String? // Was "subcategory" - now subType
-  thcLegacy         Float? // Was "thc" - now batch.thc
-  cbdLegacy         Float? // Was "cbd" - now batch.cbd
-
-  price                  Decimal   @db.Decimal(10, 2)
-  isPriceVisible         Boolean   @default(true)
-  inventoryQty           Int       @default(0)
-  unit                   String    @default("gram")
-  isAvailable            Boolean   @default(true)
-  description            String?
-  images                 String[]
-  sku                    String?
-  brand                  String?
-  ingredients            String?
-  ingredientsDocumentUrl String?
-  isFeatured             Boolean   @default(false)
-  isDeleted              Boolean   @default(false)
-  deletedAt              DateTime?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
-  lastSyncedAt           DateTime?
-  thcMin                 Decimal?  @db.Decimal(5, 2)
-  thcMax                 Decimal?  @db.Decimal(5, 2)
-  cbdMin                 Decimal?  @db.Decimal(5, 2)
-  cbdMax                 Decimal?  @db.Decimal(5, 2)
-  harvestDate            DateTime?
-
-  grower     Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
-  orderItems OrderItem[]
-  cartItems  CartItem[]
-
-  @@map("products")
-}
-
-model Order {
-  id           String      @id @default(cuid())
-  orderId      String      @unique @default(cuid())
-  growerId     String
-  dispensaryId String
-  status       OrderStatus @default(PENDING)
-  totalAmount  Decimal     @db.Decimal(10, 2)
-  subtotal     Decimal     @db.Decimal(10, 2)
-  tax          Decimal     @default(0) @db.Decimal(10, 2)
-  shippingFee  Decimal     @default(0) @db.Decimal(10, 2)
-  notes        String?
-  shippedAt    DateTime?
-  deliveredAt  DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-
-  grower     Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
-  dispensary Dispensary  @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
-  items      OrderItem[]
-  payments   Payment[]
-
-  @@map("orders")
-}
-
-model OrderItem {
-  id         String   @id @default(cuid())
-  orderId    String
-  productId  String
-  growerId   String
-  quantity   Int      @default(1)
-  unitPrice  Decimal  @db.Decimal(10, 2)
-  totalPrice Decimal  @db.Decimal(10, 2)
-  createdAt  DateTime @default(now())
-
-  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
-  grower  Grower  @relation(fields: [growerId], references: [id])
-
-  @@map("order_items")
-}
-
 enum OrderStatus {
   PENDING
   CONFIRMED
@@ -298,46 +382,6 @@ enum OrderStatus {
   SHIPPED
   DELIVERED
   CANCELLED
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
-}
-
-model MetrcSyncLog {
-  id            String   @id @default(cuid())
-  growerId      String
-  recordsSynced Int      @default(0)
-  success       Boolean  @default(true)
-  errorMessage  String?
-  createdAt     DateTime @default(now())
-
-  grower Grower @relation(fields: [growerId], references: [id])
-
-  @@map("metrc_sync_logs")
-}
-
-model Payment {
-  id            String        @id @default(cuid())
-  orderId       String
-  amount        Decimal       @db.Decimal(10, 2)
-  method        PaymentMethod
-  status        PaymentStatus @default(PENDING)
-  transactionId String?
-  paidAt        DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-
-  order Order @relation(fields: [orderId], references: [id])
-
-  @@map("payments")
 }
 
 enum PaymentMethod {
@@ -353,84 +397,4 @@ enum PaymentStatus {
   COMPLETED
   FAILED
   REFUNDED
-}
-
-// Cart model for dispensary shopping
-model Cart {
-  id           String   @id @default(cuid())
-  dispensaryId String   @unique
-  subtotal     Decimal  @default(0) @db.Decimal(10, 2)
-  tax          Decimal  @default(0) @db.Decimal(10, 2)
-  total        Decimal  @default(0) @db.Decimal(10, 2)
-  itemCount    Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  dispensary Dispensary @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
-  items      CartItem[]
-
-  @@map("carts")
-}
-
-model CartItem {
-  id         String   @id @default(cuid())
-  cartId     String
-  productId  String
-  growerId   String
-  quantity   Int      @default(1)
-  unitPrice  Decimal  @db.Decimal(10, 2)
-  totalPrice Decimal  @db.Decimal(10, 2)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-
-  cart    Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  product Product @relation(fields: [productId], references: [id])
-  grower  Grower  @relation(fields: [growerId], references: [id])
-
-  @@unique([cartId, productId])
-  @@map("cart_items")
-}
-
-model Conversation {
-  id                   String    @id @default(cuid())
-  growerId             String
-  dispensaryId         String
-  productId            String?
-  createdByUserId      String
-  growerLastReadAt     DateTime?
-  dispensaryLastReadAt DateTime?
-  lastMessageAt        DateTime  @default(now())
-  createdAt            DateTime  @default(now())
-  updatedAt            DateTime  @updatedAt
-
-  grower     Grower                @relation(fields: [growerId], references: [id], onDelete: Cascade)
-  dispensary Dispensary            @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
-  messages   ConversationMessage[]
-
-  @@unique([growerId, dispensaryId])
-  @@index([growerId, lastMessageAt])
-  @@index([dispensaryId, lastMessageAt])
-  @@map("conversations")
-}
-
-model ConversationMessage {
-  id                   String                  @id @default(cuid())
-  conversationId       String
-  senderUserId         String
-  messageType          ConversationMessageType @default(TEXT)
-  body                 String
-  productId            String?
-  offerQuantity        Int?
-  offerUnitPrice       Decimal?                @db.Decimal(10, 2)
-  offerNote            String?
-  offerStatus          OfferStatus?
-  respondedToMessageId String?
-  createdAt            DateTime                @default(now())
-
-  conversation Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  sender       User         @relation(fields: [senderUserId], references: [id], onDelete: Cascade)
-
-  @@index([conversationId, createdAt])
-  @@index([senderUserId])
-  @@map("conversation_messages")
 }

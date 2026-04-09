@@ -60,6 +60,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   const [offerNote, setOfferNote] = useState('');
   const [sending, setSending] = useState(false);
   const [counterTargetId, setCounterTargetId] = useState<string | null>(null);
+  const [requestingPricing, setRequestingPricing] = useState(false);
   const [counterPrice, setCounterPrice] = useState('');
   const [counterQty, setCounterQty] = useState('');
   const [counterNote, setCounterNote] = useState('');
@@ -257,6 +258,37 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
       setSending(false);
     }
   }, [activeConversationId, activeConversation?.productId, offerPrice, offerQty, offerNote, sending, fetchMessages, fetchConversations]);
+
+  const sendPricingRequest = useCallback(async () => {
+    if (!activeConversationId || requestingPricing) return;
+
+    setRequestingPricing(true);
+    setError('');
+
+    try {
+      const response = await fetch(`/api/messages/conversations/${activeConversationId}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messageType: 'PRICING_REQUEST',
+          body: 'Requesting pricing for this product. Please send an offer.',
+          productId: activeConversation?.productId || undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || 'Failed to send pricing request');
+      }
+
+      await fetchMessages(activeConversationId, false);
+      await fetchConversations();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send pricing request');
+    } finally {
+      setRequestingPricing(false);
+    }
+  }, [activeConversationId, activeConversation?.productId, requestingPricing, fetchMessages, fetchConversations]);
 
   const handleOfferAction = useCallback(async (messageId: string, action: 'ACCEPT' | 'REJECT') => {
     setActionLoadingId(messageId);
@@ -548,6 +580,23 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                                 </div>
                               )}
                             </div>
+                          ) : message.messageType === 'PRICING_REQUEST' ? (
+                            <div className={`rounded-md p-2 ${isMine ? 'bg-purple-700/70' : 'bg-purple-50 border border-purple-200'}`}>
+                              <div className="flex items-center gap-2">
+                                <BadgeDollarSign className={`w-4 h-4 ${isMine ? 'text-purple-200' : 'text-purple-700'}`} />
+                                <p className={`text-sm font-semibold ${isMine ? 'text-white' : 'text-purple-800'}`}>
+                                  Pricing Request
+                                </p>
+                              </div>
+                              <p className={`text-sm mt-1 ${isMine ? 'text-purple-100' : 'text-purple-900'}`}>
+                                {message.body}
+                              </p>
+                              {message.product?.name && (
+                                <p className={`text-xs mt-1 ${isMine ? 'text-purple-200' : 'text-purple-700'}`}>
+                                  For: {message.product.name}
+                                </p>
+                              )}
+                            </div>
                           ) : (
                             <p className="text-sm whitespace-pre-wrap">{message.body}</p>
                           )}
@@ -561,6 +610,12 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
 
               <div className="border-t border-gray-200 p-3 space-y-2 bg-white">
                 {error && <p className="text-xs text-red-600">{error}</p>}
+
+                {requestingPricing && (
+                  <div className="rounded-lg border border-purple-200 bg-purple-50 p-2 text-center">
+                    <p className="text-sm text-purple-800">Sending pricing request...</p>
+                  </div>
+                )}
 
                 {showOfferComposer && (
                   <div className="rounded-lg border border-blue-200 bg-blue-50 p-2 space-y-2">
@@ -622,6 +677,19 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                     title="Send a structured price offer"
                   >
                     <span className="inline-flex items-center gap-1"><BadgeDollarSign className="w-4 h-4" /> Offer</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={sendPricingRequest}
+                    disabled={requestingPricing || !activeConversationId}
+                    className={`h-10 px-3 rounded border text-sm font-medium ${
+                      requestingPricing
+                        ? 'border-purple-600 text-purple-700 bg-purple-50'
+                        : 'border-gray-300 text-gray-700 hover:bg-gray-100'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    title="Request pricing from the other party"
+                  >
+                    <span className="inline-flex items-center gap-1">Request Pricing</span>
                   </button>
                   <textarea
                     rows={1}
