@@ -50,39 +50,6 @@ function StatCard({ title, value, trend, trendUp, isEmpty, href, helperText }: S
   );
 }
 
-interface QuickActionProps {
-  title: string;
-  href: string;
-  icon: React.ReactNode;
-  description: string;
-  color: string;
-}
-
-function QuickAction({ title, href, icon, description, color }: QuickActionProps) {
-  const colorMap: Record<string, { bg: string; text: string; hoverBg: string }> = {
-    blue: { bg: 'bg-blue-100', text: 'text-blue-600', hoverBg: 'hover:bg-blue-50' },
-    green: { bg: 'bg-green-100', text: 'text-green-600', hoverBg: 'hover:bg-green-50' },
-    yellow: { bg: 'bg-yellow-100', text: 'text-yellow-600', hoverBg: 'hover:bg-yellow-50' },
-    red: { bg: 'bg-red-100', text: 'text-red-600', hoverBg: 'hover:bg-red-50' },
-  };
-
-  const colors = colorMap[color] || colorMap.blue;
-
-  return (
-    <Link href={href} className={`group block p-4 sm:p-5 rounded-xl border border-gray-200 hover:border-gray-300 hover:shadow-sm ${colors.hoverBg} transition-all touch-manipulation`}>
-      <div className="flex items-start gap-3 sm:gap-4">
-        <div className={`p-2 sm:p-3 rounded-lg ${colors.bg} ${colors.text} group-hover:scale-105 transition-transform flex-shrink-0`}>
-          {icon}
-        </div>
-        <div className="min-w-0 flex-1">
-          <h3 className="font-semibold text-gray-900 group-hover:text-gray-700 text-sm sm:text-base truncate">{title}</h3>
-          <p className="text-xs sm:text-sm text-gray-600 mt-1 line-clamp-2">{description}</p>
-        </div>
-      </div>
-    </Link>
-  );
-}
-
 // Revenue chart empty state component
 function RevenueChartEmpty() {
   return (
@@ -252,33 +219,6 @@ export default async function GrowerDashboardPage() {
           isEmpty={stats.activeProducts === 0}
           href="/grower/products"
           helperText={stats.activeProducts > 0 ? 'Manage your catalog' : 'Start building your catalog'}
-        />
-      </div>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <QuickAction
-          title="View Product Catalog"
-          href="/grower/products"
-          icon={
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          }
-          description={stats.activeProducts > 0 ? `${stats.activeProducts} active products listed` : 'No products yet — add your first listing'}
-          color="blue"
-        />
-
-        <QuickAction
-          title="Add New Product"
-          href="/grower/products/add"
-          icon={
-            <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-          }
-          description="Create a new listing with clear pricing and inventory"
-          color="green"
         />
       </div>
 
