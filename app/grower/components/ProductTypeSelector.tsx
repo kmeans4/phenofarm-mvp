@@ -19,6 +19,7 @@ interface ProductTypeSelectorProps {
 
 // Consistent input/select styles - h-10 matches text inputs
 const INPUT_CLASSES = "w-full h-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const ALLOWED_PRODUCT_TYPES = ['Bulk Extract', 'Flower', 'Cartridge'];
 
 export function ProductTypeSelector({
   productType,
@@ -54,10 +55,14 @@ export function ProductTypeSelector({
   const normalizedProductType = useMemo(() => canonicalizeProductType(productType) || '', [productType]);
 
   const typeOptions = useMemo(() => {
-    const mergedTypes = mergedConfigs.map((config) => config.type);
+    const mergedTypes = mergedConfigs
+      .map((config) => config.type)
+      .filter((type) => ALLOWED_PRODUCT_TYPES.includes(type));
+
     if (normalizedProductType && !mergedTypes.includes(normalizedProductType)) {
       return [normalizedProductType, ...mergedTypes];
     }
+
     return mergedTypes;
   }, [mergedConfigs, normalizedProductType]);
 

@@ -468,15 +468,6 @@ export function ProductForm({
             </div>
           )}
 
-          {!initialData.id && isDirty && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 flex items-start gap-3">
-              <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 112 0v4a1 1 0 11-2 0V6zm1 8a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" clipRule="evenodd" />
-              </svg>
-              <span>Unsaved product draft is being kept for this session if you leave this page.</span>
-            </div>
-          )}
-
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
                 Product Name *
