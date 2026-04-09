@@ -35,9 +35,10 @@ test.describe('Messaging Workflow', () => {
   async function createConversationFromCatalog(page: Page, note: string) {
     await page.goto('/dispensary/catalog');
     await expect(page.getByRole('heading', { name: 'Product Catalog' })).toBeVisible();
+    await expect(page.getByText('Purple Haze Flowers')).toBeVisible({ timeout: 15000 });
 
     const messageGrowerButton = page.getByRole('button', { name: 'Message Grower' }).first();
-    await expect(messageGrowerButton).toBeVisible();
+    await expect(messageGrowerButton).toBeVisible({ timeout: 15000 });
     await messageGrowerButton.click();
 
     await expect(page.getByRole('heading', { name: 'Message Grower' })).toBeVisible();
@@ -72,7 +73,12 @@ test.describe('Messaging Workflow', () => {
     await page.getByTestId('request-pricing').click();
 
     await expect(pricingRequests).toHaveCount(beforeCount + 1);
-    await expect(page.getByText('Requesting pricing for this product. Please send an offer.')).toBeVisible();
+    await expect(
+      page
+        .getByTestId('pricing-request-message')
+        .last()
+        .getByText('Requesting pricing for this product. Please send an offer.')
+    ).toBeVisible();
   });
 
   test('offer workflow: send → counter → accept', async ({ browser }) => {

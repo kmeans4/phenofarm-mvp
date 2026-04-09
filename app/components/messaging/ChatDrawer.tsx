@@ -161,7 +161,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   useEffect(() => {
     const conversationTimer = setInterval(() => {
       fetchConversations();
-    }, open ? 12000 : 30000);
+    }, open ? 12000 : 5000);
 
     return () => clearInterval(conversationTimer);
   }, [open, fetchConversations]);
