@@ -150,9 +150,8 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   }, [openFromEvent]);
 
   useEffect(() => {
-    if (!open) return;
     fetchConversations();
-  }, [open, fetchConversations]);
+  }, [fetchConversations]);
 
   useEffect(() => {
     if (!open || !activeConversationId) return;
@@ -160,11 +159,9 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   }, [open, activeConversationId, fetchMessages]);
 
   useEffect(() => {
-    if (!open) return;
-
     const conversationTimer = setInterval(() => {
       fetchConversations();
-    }, 12000);
+    }, open ? 12000 : 30000);
 
     return () => clearInterval(conversationTimer);
   }, [open, fetchConversations]);
@@ -380,10 +377,11 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
         onClick={() => setOpen(true)}
         className="fixed bottom-5 right-5 z-[70] h-12 w-12 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 flex items-center justify-center"
         title="Open messages"
+        data-testid="chat-button"
       >
         <MessageCircle className="w-5 h-5" />
         {totalUnread > 0 && (
-          <span className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
+          <span data-testid="unread-badge" className="absolute -top-1 -right-1 min-w-[20px] h-5 px-1 rounded-full bg-red-500 text-white text-xs font-bold flex items-center justify-center">
             {totalUnread > 99 ? '99+' : totalUnread}
           </span>
         )}
@@ -396,7 +394,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
             <div className={`w-full lg:w-[300px] border-r border-gray-200 flex flex-col ${!mobileListMode && 'hidden lg:flex'}`}>
               <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
                 <h2 className="font-semibold text-gray-900">Messages</h2>
-                <button className="text-gray-500 hover:text-gray-700" onClick={() => setOpen(false)}>
+                <button className="text-gray-500 hover:text-gray-700" onClick={() => setOpen(false)} data-testid="close-chat">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -416,6 +414,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                       className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 ${
                         conversation.id === activeConversationId ? 'bg-green-50' : ''
                       }`}
+                      data-testid="conversation-item"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
@@ -426,7 +425,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                           <p className="text-xs text-gray-500 truncate mt-1">{conversation.lastMessagePreview}</p>
                         </div>
                         {conversation.unreadCount > 0 && (
-                          <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-green-600 text-white text-[11px] flex items-center justify-center">
+                          <span data-testid="conversation-unread-badge" className="min-w-[18px] h-[18px] px-1 rounded-full bg-green-600 text-white text-[11px] flex items-center justify-center">
                             {conversation.unreadCount}
                           </span>
                         )}
@@ -456,7 +455,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                     )}
                   </div>
                 </div>
-                <button className="text-gray-500 hover:text-gray-700 lg:hidden" onClick={() => setOpen(false)}>
+                <button className="text-gray-500 hover:text-gray-700 lg:hidden" onClick={() => setOpen(false)} data-testid="close-chat-mobile">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -476,7 +475,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
 
                     return (
                       <div key={message.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`max-w-[85%] rounded-lg px-3 py-2 ${isMine ? 'bg-green-600 text-white' : 'bg-white border border-gray-200 text-gray-900'}`}>
+                        <div data-testid={isOffer ? 'offer-message' : message.messageType === 'PRICING_REQUEST' ? 'pricing-request-message' : 'message-bubble'} className={`max-w-[85%] rounded-lg px-3 py-2 ${isMine ? 'bg-green-600 text-white' : 'bg-white border border-gray-200 text-gray-900'}`}>
                           <p className={`text-[11px] mb-1 ${isMine ? 'text-green-100' : 'text-gray-500'}`}>
                             {isMine ? 'You' : message.sender?.name || message.sender?.email || 'User'} • {new Date(message.createdAt).toLocaleString()}
                           </p>
@@ -573,6 +572,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                                       onClick={() => submitCounterOffer(message.id)}
                                       disabled={actionLoadingId === message.id}
                                       className="px-2 py-1 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                                      data-testid="send-counter"
                                     >
                                       Send Counter
                                     </button>
@@ -658,6 +658,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                         onClick={sendOffer}
                         disabled={sending}
                         className="px-3 py-1.5 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
+                        data-testid="send-offer"
                       >
                         Send Offer
                       </button>
@@ -675,6 +676,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                         : 'border-gray-300 text-gray-700 hover:bg-gray-100'
                     }`}
                     title="Send a structured price offer"
+                    data-testid="toggle-offer-composer"
                   >
                     <span className="inline-flex items-center gap-1"><BadgeDollarSign className="w-4 h-4" /> Offer</span>
                   </button>
@@ -688,6 +690,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                         : 'border-gray-300 text-gray-700 hover:bg-gray-100'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                     title="Request pricing from the other party"
+                    data-testid="request-pricing"
                   >
                     <span className="inline-flex items-center gap-1">Request Pricing</span>
                   </button>

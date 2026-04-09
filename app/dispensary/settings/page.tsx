@@ -20,6 +20,8 @@ export default async function DispensarySettingsPage() {
         <SettingsForm defaultValues={{
           businessName: '',
           licenseNumber: '',
+          licenseExpiry: '',
+          licenseState: 'VT',
           contactName: '',
           email: '',
           phone: '',
@@ -30,6 +32,7 @@ export default async function DispensarySettingsPage() {
           website: '',
           description: '',
           logo: '',
+          licenseStatus: 'pending_review',
         }} />
       </div>
     </div>

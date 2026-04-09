@@ -1,91 +1,154 @@
-import { test, expect } from '@playwright/test';
-
-/**
- * Messaging System Workflow Tests
- * 
- * Tests the complete grower ↔ dispensary messaging flow:
- * 1. Conversation creation
- * 2. Text message exchange
- * 3. Pricing request UI
- * 4. Offer creation and response
- * 5. Counter-offer workflow
- * 6. Read status tracking
- */
+import { test, expect, type Browser, type Page } from '@playwright/test';
 
 test.describe('Messaging Workflow', () => {
+  test.describe.configure({ mode: 'serial' });
+
+  async function login(page: Page, role: 'grower' | 'dispensary') {
+    await page.goto('/auth/sign_in');
+
+    const credentials = role === 'grower'
+      ? { email: 'grower@vtnurseries.com', password: 'password123', destination: '**/grower/dashboard' }
+      : { email: 'dispensary@greenvermont.com', password: 'password123', destination: '**/dispensary/dashboard' };
+
+    await page.fill('input[name="email"]', credentials.email);
+    await page.fill('input[name="password"]', credentials.password);
+    await page.click('button[type="submit"]');
+    await page.waitForURL(credentials.destination);
+  }
+
+  async function openChat(page: Page) {
+    await page.getByTestId('chat-button').click();
+    await expect(page.getByRole('heading', { name: 'Messages' })).toBeVisible();
+  }
+
+  async function closeChat(page: Page) {
+    await page.getByTestId('close-chat').click();
+    await expect(page.getByRole('heading', { name: 'Messages' })).not.toBeVisible();
+  }
+
+  async function selectLatestConversation(page: Page) {
+    const firstConversation = page.getByTestId('conversation-item').first();
+    await expect(firstConversation).toBeVisible();
+    await firstConversation.click();
+  }
+
+  async function createConversationFromCatalog(page: Page, note: string) {
+    await page.goto('/dispensary/catalog');
+    await expect(page.getByRole('heading', { name: 'Product Catalog' })).toBeVisible();
+
+    const messageGrowerButton = page.getByRole('button', { name: 'Message Grower' }).first();
+    await expect(messageGrowerButton).toBeVisible();
+    await messageGrowerButton.click();
+
+    await expect(page.getByRole('heading', { name: 'Message Grower' })).toBeVisible();
+
+    const modalTextarea = page.locator('textarea').first();
+    await modalTextarea.fill(note);
+    await page.getByRole('button', { name: 'Send Message' }).click();
+
+    await expect(page.getByRole('heading', { name: 'Messages' })).toBeVisible();
+    await expect(page.getByText(note)).toBeVisible();
+  }
+
+  async function openLatestConversationAs(browser: Browser, role: 'grower' | 'dispensary') {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+    await login(page, role);
+    await openChat(page);
+    await selectLatestConversation(page);
+    return { context, page };
+  }
+
   test('pricing request UI: send and display', async ({ page }) => {
-    // Login as dispensary
-    await page.goto('http://localhost:3000/auth/signin');
-    await page.fill('input[name="email"]', 'dispensary@greenvermont.com');
-    await page.fill('input[name="password"]', 'password123');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('**/dispensary/dashboard');
+    const token = `pricing-${Date.now()}`;
+    const initialMessage = `Automated pricing check ${token}`;
 
-    // Open chat
-    await page.click('[data-testid="chat-button"]');
-    await expect(page.locator('h2:has-text("Messages")')).toBeVisible();
+    await login(page, 'dispensary');
+    await createConversationFromCatalog(page, initialMessage);
 
-    // Select a conversation
-    const conversationItem = page.locator('button').filter({ hasText: /grower|vt nurseries/i }).first();
-    if (await conversationItem.count() > 0) {
-      await conversationItem.click();
-      
-      // Click "Request Pricing" button
-      const requestPricingBtn = page.locator('button:has-text("Request Pricing")');
-      await expect(requestPricingBtn).toBeVisible();
-      await requestPricingBtn.click();
+    const pricingRequests = page.getByTestId('pricing-request-message');
+    const beforeCount = await pricingRequests.count();
 
-      // Verify pricing request message appears
-      await expect(page.locator('text=Pricing Request')).toBeVisible();
-      await expect(page.locator('text=Requesting pricing for this product')).toBeVisible();
-    }
+    await page.getByTestId('request-pricing').click();
 
-    await page.click('[data-testid="close-chat"]');
+    await expect(pricingRequests).toHaveCount(beforeCount + 1);
+    await expect(page.getByText('Requesting pricing for this product. Please send an offer.')).toBeVisible();
   });
 
-  test('offer workflow: send → counter → accept', async ({ page }) => {
-    // Login as dispensary
-    await page.goto('http://localhost:3000/auth/signin');
-    await page.fill('input[name="email"]', 'dispensary@greenvermont.com');
-    await page.fill('input[name="password"]', 'password123');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('**/dispensary/dashboard');
+  test('offer workflow: send → counter → accept', async ({ browser }) => {
+    const token = Date.now();
+    const initialMessage = `Automated offer setup ${token}`;
+    const offerNote = `Automated offer ${token}`;
+    const counterNote = `Automated counter ${token}`;
 
-    // Open existing conversation with offer
-    await page.click('[data-testid="chat-button"]');
-    
-    // Verify offer UI renders correctly
-    const offerElement = page.locator('[data-testid="offer-message"]');
-    if (await offerElement.count() > 0) {
-      // Check action buttons exist
-      await expect(page.locator('button:has-text("Accept")')).toBeVisible();
-      await expect(page.locator('button:has-text("Reject")')).toBeVisible();
-      await expect(page.locator('button:has-text("Counter")')).toBeVisible();
-    }
+    const dispensaryContext = await browser.newContext();
+    const dispensaryPage = await dispensaryContext.newPage();
+    await login(dispensaryPage, 'dispensary');
+    await createConversationFromCatalog(dispensaryPage, initialMessage);
+    await closeChat(dispensaryPage);
 
-    await page.click('[data-testid="close-chat"]');
+    const { context: growerContext, page: growerPage } = await openLatestConversationAs(browser, 'grower');
+    await growerPage.getByTestId('toggle-offer-composer').click();
+    await growerPage.locator('input[placeholder="Offer unit price"]').fill('125');
+    await growerPage.locator('input[placeholder="Qty (optional)"]').first().fill('10');
+    await growerPage.locator('input[placeholder="Offer note (optional)"]').fill(offerNote);
+    await growerPage.getByTestId('send-offer').click();
+    await expect(growerPage.getByText(offerNote)).toBeVisible();
+
+    await openChat(dispensaryPage);
+    await selectLatestConversation(dispensaryPage);
+
+    const incomingOffer = dispensaryPage.getByTestId('offer-message').filter({ hasText: offerNote }).first();
+    await expect(incomingOffer).toBeVisible();
+    await incomingOffer.getByRole('button', { name: 'Counter' }).click();
+    await dispensaryPage.locator('input[placeholder="Unit price"]').fill('115');
+    await dispensaryPage.locator('input[placeholder="Qty (optional)"]').last().fill('8');
+    await dispensaryPage.locator('input[placeholder="Counter note (optional)"]').fill(counterNote);
+    await dispensaryPage.getByTestId('send-counter').click();
+    await expect(dispensaryPage.getByText(counterNote)).toBeVisible();
+
+    await growerPage.reload();
+    await openChat(growerPage);
+    await selectLatestConversation(growerPage);
+
+    const counterOffer = growerPage.getByTestId('offer-message').filter({ hasText: counterNote }).first();
+    await expect(counterOffer).toBeVisible();
+    await counterOffer.getByRole('button', { name: 'Accept' }).click();
+    await expect(counterOffer.getByText('Accepted')).toBeVisible();
+
+    await growerContext.close();
+    await dispensaryContext.close();
   });
 
-  test('read status tracking', async ({ page }) => {
-    // This tests the unread badge functionality
-    await page.goto('http://localhost:3000/auth/signin');
-    await page.fill('input[name="email"]', 'grower@vtnurseries.com');
-    await page.fill('input[name="password"]', 'password123');
-    await page.click('button[type="submit"]');
-    await page.waitForURL('**/grower/dashboard');
+  test('read status tracking', async ({ browser }) => {
+    const token = `read-${Date.now()}`;
+    const readCheckMessage = `Automated unread check ${token}`;
 
-    // Check unread badge exists when there are unread messages
-    const unreadBadge = page.locator('[data-testid="unread-badge"]');
-    if (await unreadBadge.count() > 0) {
-      const count = await unreadBadge.textContent();
-      expect(parseInt(count || '0')).toBeGreaterThan(0);
-    }
+    const growerContext = await browser.newContext();
+    const growerPage = await growerContext.newPage();
+    await login(growerPage, 'grower');
 
-    // Open chat to mark as read
-    await page.click('[data-testid="chat-button"]');
-    await page.waitForTimeout(2000); // Allow read marker to fire
-    
-    // Badge should be cleared or reduced
-    await page.click('[data-testid="close-chat"]');
+    await openChat(growerPage);
+    await selectLatestConversation(growerPage);
+    await growerPage.waitForTimeout(1500);
+    await closeChat(growerPage);
+    await expect(growerPage.getByTestId('unread-badge')).not.toBeVisible();
+
+    const dispensaryContext = await browser.newContext();
+    const dispensaryPage = await dispensaryContext.newPage();
+    await login(dispensaryPage, 'dispensary');
+    await createConversationFromCatalog(dispensaryPage, readCheckMessage);
+    await closeChat(dispensaryPage);
+
+    await expect(growerPage.getByTestId('unread-badge')).toBeVisible({ timeout: 15000 });
+
+    await openChat(growerPage);
+    await selectLatestConversation(growerPage);
+    await expect(growerPage.getByTestId('conversation-unread-badge').first()).not.toBeVisible({ timeout: 10000 });
+    await closeChat(growerPage);
+    await expect(growerPage.getByTestId('unread-badge')).not.toBeVisible({ timeout: 10000 });
+
+    await dispensaryContext.close();
+    await growerContext.close();
   });
 });

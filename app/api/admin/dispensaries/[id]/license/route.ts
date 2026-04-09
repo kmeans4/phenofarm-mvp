@@ -93,11 +93,11 @@ export async function GET(
         verifiedAt: true,
         contactName: true,
         phone: true,
-        email: {
+        user: {
           select: {
-            email: true
-          }
-        }
+            email: true,
+          },
+        },
       }
     });
 
@@ -116,7 +116,7 @@ export async function GET(
       verifiedAt: dispensary.verifiedAt,
       contactName: dispensary.contactName,
       phone: dispensary.phone,
-      email: dispensary.email?.email,
+      email: dispensary.user?.email,
     });
   } catch (error) {
     console.error('Error fetching dispensary license info:', error);

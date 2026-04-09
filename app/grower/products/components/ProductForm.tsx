@@ -216,6 +216,11 @@ export function ProductForm({
     brand: initialData?.brand || growerBrand || '',
     ingredients: initialData?.ingredients || '',
     isFeatured: initialData?.isFeatured || false,
+    thcMin: initialData?.thcMin || '',
+    thcMax: initialData?.thcMax || '',
+    cbdMin: initialData?.cbdMin || '',
+    cbdMax: initialData?.cbdMax || '',
+    harvestDate: initialData?.harvestDate || '',
   };
 
   const [dirtyBaseline, setDirtyBaseline] = useState<DirtyBaseline>(initialDataState);
