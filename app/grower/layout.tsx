@@ -47,9 +47,9 @@ export default async function GrowerLayout({ children }: { children: React.React
         </div>
       </div>
 
-      <div className="flex min-h-screen">
+      <div className="flex min-h-screen items-stretch">
         {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:grid lg:grid-rows-[auto,minmax(0,1fr),auto] flex-shrink-0 lg:h-screen lg:sticky lg:top-0 overflow-hidden self-stretch">
+        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:grid lg:grid-rows-[auto,minmax(0,1fr)] flex-shrink-0 min-h-screen lg:min-h-screen lg:sticky lg:top-0 overflow-hidden self-stretch">
           <div className="px-4 pt-4 pb-3 border-b border-gray-200 flex-shrink-0">
             <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
             <p className="text-sm text-gray-500">Grower Portal</p>
