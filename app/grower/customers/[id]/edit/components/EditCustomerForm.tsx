@@ -114,7 +114,8 @@ const formatPhoneNumber = (value: string): string => {
 
 const INPUT_CLASSES = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
 const INPUT_ERROR_CLASSES = "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
-const READONLY_VALUE_CLASSES = "min-h-[42px] w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700";
+const READONLY_VALUE_CLASSES = "w-full rounded-lg bg-gray-50 px-0 py-2 text-base text-gray-900";
+const READONLY_LABEL_CLASSES = "block text-sm font-medium text-gray-500 mb-1";
 
 export default function EditCustomerForm({ customer }: { customer: Customer }) {
   const router = useRouter();
@@ -324,23 +325,23 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           {isPlatformManaged ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                <label className={READONLY_LABEL_CLASSES}>Business Name</label>
                 <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.businessName)}</div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                  <label className={READONLY_LABEL_CLASSES}>License Number</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.licenseNumber)}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                  <label className={READONLY_LABEL_CLASSES}>Website</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.website)}</div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className={READONLY_LABEL_CLASSES}>Description</label>
                 <div className={`${READONLY_VALUE_CLASSES} whitespace-pre-wrap`}>{displayValue(formData.description)}</div>
               </div>
             </div>
@@ -430,17 +431,17 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                  <label className={READONLY_LABEL_CLASSES}>Contact Person</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.contactName)}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className={READONLY_LABEL_CLASSES}>Email</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.email)}</div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <label className={READONLY_LABEL_CLASSES}>Phone</label>
                 <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.phone)}</div>
               </div>
             </div>
@@ -503,21 +504,21 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           {isPlatformManaged ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                <label className={READONLY_LABEL_CLASSES}>Street Address</label>
                 <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.address)}</div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <label className={READONLY_LABEL_CLASSES}>City</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.city)}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                  <label className={READONLY_LABEL_CLASSES}>State</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.state)}</div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                  <label className={READONLY_LABEL_CLASSES}>ZIP Code</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.zipCode)}</div>
                 </div>
               </div>
