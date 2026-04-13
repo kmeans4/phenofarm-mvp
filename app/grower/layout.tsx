@@ -3,7 +3,6 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { redirect } from "next/navigation";
 import { MobileNav } from "./components/MobileNav";
 import { ClientNav } from "./components/ClientNav";
-import { SignOutButton } from "@/app/components/SignOutButton";
 import { SearchDialog } from "@/app/components/SearchDialog";
 import { ChatDrawer } from "@/app/components/messaging/ChatDrawer";
 
@@ -63,9 +62,6 @@ export default async function GrowerLayout({ children }: { children: React.React
             <ClientNav links={navLinks} />
           </div>
           
-          <div className="border-t border-gray-200 bg-white">
-            <SignOutButton variant="sidebar" />
-          </div>
         </aside>
 
         {/* Main Content */}
