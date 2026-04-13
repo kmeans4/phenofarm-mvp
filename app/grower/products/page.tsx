@@ -391,9 +391,9 @@ export default function GrowerProductsPage() {
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col sm:flex-row gap-2">
-            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-1">
-              <Button variant="outline" size="sm" asChild className="w-full sm:flex-1">
+          <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col gap-2 xl:flex-row">
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:flex xl:flex-1">
+              <Button variant="outline" size="sm" asChild className="w-full xl:flex-1">
                 <Link href={'/grower/products/' + product?.id + '/edit'}>
                   <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -406,7 +406,7 @@ export default function GrowerProductsPage() {
                 variant="secondary"
                 size="sm"
                 onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
-                className="w-full sm:flex-1"
+                className="w-full xl:flex-1"
                 disabled={(product?.inventoryQty || 0) <= 0 && !product?.isAvailable}
               >
                 {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of Stock' : product?.isAvailable ? 'Disable Listing' : 'Enable Listing'}
@@ -417,7 +417,7 @@ export default function GrowerProductsPage() {
               variant="destructive"
               size="sm"
               onClick={() => deleteProduct(product?.id)}
-              className="w-full sm:w-auto"
+              className="w-full xl:w-auto"
             >
               <svg className="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
