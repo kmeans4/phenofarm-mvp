@@ -47,9 +47,9 @@ export default async function GrowerLayout({ children }: { children: React.React
         </div>
       </div>
 
-      <div className="flex min-h-screen items-stretch">
+      <div className="min-h-screen md:pl-56 lg:pl-64">
         {/* Tablet/Desktop Sidebar */}
-        <aside className="hidden md:flex md:w-56 lg:w-64 md:min-h-screen md:flex-col md:self-stretch md:bg-white md:border-r md:border-gray-200 md:sticky md:top-0">
+        <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:w-56 lg:w-64 md:flex-col md:bg-white md:border-r md:border-gray-200">
           <div className="px-4 pt-4 pb-3 border-b border-gray-200 flex-shrink-0">
             <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
             <p className="text-sm text-gray-500">Grower Portal</p>
@@ -57,15 +57,14 @@ export default async function GrowerLayout({ children }: { children: React.React
               <SearchDialog />
             </div>
           </div>
-          
+
           <div className="min-h-0 flex-1 overflow-y-auto py-2">
             <ClientNav links={navLinks} />
           </div>
-          
         </aside>
 
         {/* Main Content */}
-        <main className="flex flex-1 flex-col pt-20 md:pt-0 w-full min-w-0 min-h-screen bg-gray-50">
+        <main className="flex min-h-screen flex-col pt-20 md:pt-0 w-full min-w-0 bg-gray-50">
           <div className="flex flex-1 flex-col p-4 md:p-5 lg:p-6 max-w-7xl mx-auto w-full">
             {children}
           </div>
