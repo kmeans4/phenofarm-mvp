@@ -115,37 +115,37 @@ export default async function DispensaryDashboardPage() {
   }));
 
   return (
-    <div className="space-y-6 p-4">
+    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Dispensary Dashboard</h1>
-          <p className="text-gray-600 mt-1">Track spend, monitor order progress, and quickly reorder trusted products.</p>
+        <div className="space-y-1.5">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dispensary Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-600">Track spend, monitor order progress, and quickly reorder trusted products.</p>
         </div>
-        <Link href="/dispensary/catalog" className="inline-flex items-center justify-center rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 h-10 px-4 py-2">
+        <Link href="/dispensary/catalog" className="inline-flex w-full sm:w-auto items-center justify-center rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 h-10 px-4 py-2">
           Browse Catalog
         </Link>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {hasOrders ? (
           <>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-sm text-gray-600">Total Spent</p>
-              <p className="text-2xl font-bold text-gray-900 mt-1">${data.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+            <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <p className="text-xs sm:text-sm text-gray-600">Total Spent</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">${data.totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-sm text-gray-600">Pending Orders</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{data.pendingOrders}</p>
+            <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <p className="text-xs sm:text-sm text-gray-600">Pending Orders</p>
+              <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">{data.pendingOrders}</p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-sm text-gray-600">Active Growers</p>
-              <p className="text-2xl font-bold text-yellow-600 mt-1">{data.activeGrowers}</p>
+            <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <p className="text-xs sm:text-sm text-gray-600">Active Growers</p>
+              <p className="text-xl sm:text-2xl font-bold text-yellow-600 mt-1">{data.activeGrowers}</p>
             </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-              <p className="text-sm text-gray-600">Active Orders</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">{data.activeOrders}</p>
+            <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+              <p className="text-xs sm:text-sm text-gray-600">Active Orders</p>
+              <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">{data.activeOrders}</p>
             </div>
           </>
         ) : (
@@ -159,8 +159,8 @@ export default async function DispensaryDashboardPage() {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Link href="/dispensary/catalog" className="group block p-5 rounded-xl border-2 border-transparent hover:border-gray-200 hover:bg-blue-50 transition-all bg-white shadow-sm border border-gray-200">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+        <Link href="/dispensary/catalog" className="group block p-4 sm:p-5 rounded-xl border-2 border-transparent hover:border-gray-200 hover:bg-blue-50 transition-all bg-white shadow-sm border border-gray-200">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-blue-100 text-blue-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
@@ -171,7 +171,7 @@ export default async function DispensaryDashboardPage() {
             </div>
           </div>
         </Link>
-        <Link href="/dispensary/cart" className="group block p-5 rounded-xl border-2 border-transparent hover:border-gray-200 hover:bg-green-50 transition-all bg-white shadow-sm border border-gray-200">
+        <Link href="/dispensary/cart" className="group block p-4 sm:p-5 rounded-xl border-2 border-transparent hover:border-gray-200 hover:bg-green-50 transition-all bg-white shadow-sm border border-gray-200">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-green-100 text-green-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
@@ -182,7 +182,7 @@ export default async function DispensaryDashboardPage() {
             </div>
           </div>
         </Link>
-        <Link href="/dispensary/orders" className="group block p-5 rounded-xl border-2 border-transparent hover:border-gray-200 hover:bg-yellow-50 transition-all bg-white shadow-sm border border-gray-200">
+        <Link href="/dispensary/orders" className="group block p-4 sm:p-5 rounded-xl border-2 border-transparent hover:border-gray-200 hover:bg-yellow-50 transition-all bg-white shadow-sm border border-gray-200">
           <div className="flex items-start gap-4">
             <div className="p-3 rounded-lg bg-yellow-100 text-yellow-600">
               <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
@@ -203,7 +203,7 @@ export default async function DispensaryDashboardPage() {
       </Card>
 
       {/* Featured Products & 7-Day Spending */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardHeader>
             <h3 className="text-lg font-semibold text-gray-900">Recently Ordered</h3>
