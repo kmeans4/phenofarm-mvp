@@ -34,7 +34,7 @@ export default async function GrowerLayout({ children }: { children: React.React
   return (
     <div className="min-h-screen bg-gray-50 w-full">
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
             <h1 className="text-lg font-bold text-green-600">PhenoFarm</h1>
@@ -48,8 +48,8 @@ export default async function GrowerLayout({ children }: { children: React.React
       </div>
 
       <div className="flex min-h-screen items-stretch">
-        {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:grid lg:grid-rows-[auto,minmax(0,1fr)] flex-shrink-0 min-h-screen lg:min-h-screen lg:sticky lg:top-0 overflow-hidden self-stretch">
+        {/* Tablet/Desktop Sidebar */}
+        <aside className="hidden md:flex md:w-56 lg:w-64 md:min-h-screen md:flex-col md:self-stretch md:bg-white md:border-r md:border-gray-200 md:sticky md:top-0">
           <div className="px-4 pt-4 pb-3 border-b border-gray-200 flex-shrink-0">
             <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
             <p className="text-sm text-gray-500">Grower Portal</p>
@@ -58,15 +58,15 @@ export default async function GrowerLayout({ children }: { children: React.React
             </div>
           </div>
           
-          <div className="min-h-0 overflow-y-auto py-1">
+          <div className="min-h-0 flex-1 overflow-y-auto py-2">
             <ClientNav links={navLinks} />
           </div>
           
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 pt-20 lg:pt-0 w-full min-w-0 min-h-screen bg-gray-50">
-          <div className="p-4 lg:p-6 max-w-7xl mx-auto min-h-full">
+        <main className="flex-1 pt-20 md:pt-0 w-full min-w-0 min-h-screen bg-gray-50">
+          <div className="p-4 md:p-5 lg:p-6 max-w-7xl mx-auto min-h-full">
             {children}
           </div>
         </main>
