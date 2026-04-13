@@ -409,7 +409,7 @@ export default function GrowerProductsPage() {
                 className="w-full xl:flex-1"
                 disabled={(product?.inventoryQty || 0) <= 0 && !product?.isAvailable}
               >
-                {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of Stock' : product?.isAvailable ? 'Disable Listing' : 'Enable Listing'}
+                {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of Stock' : product?.isAvailable ? 'Disable' : 'Enable'}
               </Button>
             </div>
 
@@ -479,7 +479,7 @@ export default function GrowerProductsPage() {
               onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
               disabled={(product?.inventoryQty || 0) <= 0 && !product?.isAvailable}
             >
-              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of Stock' : product?.isAvailable ? 'Disable Listing' : 'Enable Listing'}
+              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of Stock' : product?.isAvailable ? 'Disable' : 'Enable'}
             </Button>
             <Button 
               variant="destructive" 
