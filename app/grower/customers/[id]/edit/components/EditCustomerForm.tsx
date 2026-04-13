@@ -20,6 +20,7 @@ interface Customer {
   description: string | null;
   email?: string;
   contactName?: string;
+  isPlatformManaged: boolean;
 }
 
 interface FieldErrors {
@@ -113,6 +114,7 @@ const formatPhoneNumber = (value: string): string => {
 
 const INPUT_CLASSES = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
 const INPUT_ERROR_CLASSES = "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
+const INPUT_DISABLED_CLASSES = "w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed";
 
 export default function EditCustomerForm({ customer }: { customer: Customer }) {
   const router = useRouter();
@@ -291,6 +293,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
   };
 
   const hasErrors = Object.keys(errors).length > 0;
+  const isPlatformManaged = customer.isPlatformManaged;
 
   return (
     <div className="space-y-5 sm:space-y-6 p-4 max-w-3xl mx-auto">
@@ -303,6 +306,18 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           <p className="text-sm sm:text-base text-gray-600 mt-1">Update customer information</p>
         </div>
       </div>
+
+      {isPlatformManaged && (
+        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 flex items-start gap-3">
+          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10A8 8 0 114 3.46V2a1 1 0 10-2 0v4a1 1 0 001 1h4a1 1 0 100-2H5.26A6 6 0 1018 10zm-7-3a1 1 0 10-2 0v3a1 1 0 00.293.707l2 2a1 1 0 101.414-1.414L11 9.586V7z" clipRule="evenodd" />
+          </svg>
+          <div>
+            <p className="font-medium">This customer is already a PhenoFarm dispensary.</p>
+            <p className="text-sm mt-1 text-blue-700">Their business details are synced from their PhenoFarm account and can’t be edited here by a grower.</p>
+          </div>
+        </div>
+      )}
 
       {isDirty && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-center gap-2">
@@ -327,8 +342,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 value={formData.businessName}
                 onChange={(e) => handleChange('businessName', e.target.value)}
                 onBlur={() => handleBlur('businessName')}
-                className={errors.businessName && touched.businessName ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.businessName && touched.businessName ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                 placeholder="Enter business name"
+                disabled={isPlatformManaged}
               />
               {errors.businessName && touched.businessName && (
                 <p className="text-sm text-red-600 mt-1">{errors.businessName}</p>
@@ -345,8 +361,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   value={formData.licenseNumber}
                   onChange={(e) => handleChange('licenseNumber', e.target.value)}
                   onBlur={() => handleBlur('licenseNumber')}
-                  className={errors.licenseNumber && touched.licenseNumber ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.licenseNumber && touched.licenseNumber ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="License #"
+                  disabled={isPlatformManaged}
                 />
                 {errors.licenseNumber && touched.licenseNumber && (
                   <p className="text-sm text-red-600 mt-1">{errors.licenseNumber}</p>
@@ -361,8 +378,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   value={formData.website}
                   onChange={(e) => handleChange('website', e.target.value)}
                   onBlur={() => handleBlur('website')}
-                  className={errors.website && touched.website ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.website && touched.website ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="https://..."
+                  disabled={isPlatformManaged}
                 />
                 {errors.website && touched.website && (
                   <p className="text-sm text-red-600 mt-1">{errors.website}</p>
@@ -379,10 +397,13 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
                 onBlur={() => handleBlur('description')}
-                className={errors.description && touched.description 
+                className={isPlatformManaged
+                  ? INPUT_DISABLED_CLASSES
+                  : errors.description && touched.description 
                   ? "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50" 
                   : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"}
                 placeholder="Brief description..."
+                disabled={isPlatformManaged}
               />
               {errors.description && touched.description && (
                 <p className="text-sm text-red-600 mt-1">{errors.description}</p>
@@ -407,8 +428,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   type="text"
                   value={formData.contactName}
                   onChange={(e) => handleChange('contactName', e.target.value)}
-                  className={INPUT_CLASSES}
+                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : INPUT_CLASSES}
                   placeholder="Full name"
+                  disabled={isPlatformManaged}
                 />
               </div>
               <div>
@@ -420,8 +442,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   value={formData.email}
                   onChange={(e) => handleChange('email', e.target.value)}
                   onBlur={() => handleBlur('email')}
-                  className={errors.email && touched.email ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.email && touched.email ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="email@example.com"
+                  disabled={isPlatformManaged}
                 />
                 {errors.email && touched.email && (
                   <p className="text-sm text-red-600 mt-1">{errors.email}</p>
@@ -438,8 +461,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 value={formData.phone}
                 onChange={(e) => handlePhoneChange(e.target.value)}
                 onBlur={() => handleBlur('phone')}
-                className={errors.phone && touched.phone ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.phone && touched.phone ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                 placeholder="(555) 123-4567"
+                disabled={isPlatformManaged}
               />
               {errors.phone && touched.phone && (
                 <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
@@ -460,8 +484,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 type="text"
                 value={formData.address}
                 onChange={(e) => handleChange('address', e.target.value)}
-                className={INPUT_CLASSES}
+                className={isPlatformManaged ? INPUT_DISABLED_CLASSES : INPUT_CLASSES}
                 placeholder="123 Main St"
+                disabled={isPlatformManaged}
               />
             </div>
 
@@ -474,8 +499,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   type="text"
                   value={formData.city}
                   onChange={(e) => handleChange('city', e.target.value)}
-                  className={INPUT_CLASSES}
+                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : INPUT_CLASSES}
                   placeholder="City"
+                  disabled={isPlatformManaged}
                 />
               </div>
               <div>
@@ -485,7 +511,8 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 <select
                   value={formData.state}
                   onChange={(e) => handleChange('state', e.target.value)}
-                  className={INPUT_CLASSES}
+                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : INPUT_CLASSES}
+                  disabled={isPlatformManaged}
                 >
                   {US_STATES.map((state) => (
                     <option key={state.code} value={state.code}>
@@ -503,8 +530,9 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   value={formData.zipCode}
                   onChange={(e) => handleChange('zipCode', e.target.value)}
                   onBlur={() => handleBlur('zipCode')}
-                  className={errors.zipCode && touched.zipCode ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.zipCode && touched.zipCode ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="12345"
+                  disabled={isPlatformManaged}
                 />
                 {errors.zipCode && touched.zipCode && (
                   <p className="text-sm text-red-600 mt-1">{errors.zipCode}</p>
@@ -515,13 +543,15 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
         </div>
 
         <div className="flex flex-col gap-3 pt-4 border-t border-gray-200">
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="w-full sm:w-auto sm:self-start px-6 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-          >
-            Delete Customer
-          </button>
+          {!isPlatformManaged && (
+            <button
+              type="button"
+              onClick={handleDelete}
+              className="w-full sm:w-auto sm:self-start px-6 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            >
+              Delete Customer
+            </button>
+          )}
 
           <div className="flex flex-col sm:flex-row gap-3 sm:self-end w-full sm:w-auto">
             <Link
@@ -530,13 +560,15 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
             >
               Cancel
             </Link>
-            <button
-              type="submit"
-              disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
-              className="w-full sm:w-auto px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
-            </button>
+            {!isPlatformManaged && (
+              <button
+                type="submit"
+                disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
+                className="w-full sm:w-auto px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
+              </button>
+            )}
           </div>
         </div>
       </form>

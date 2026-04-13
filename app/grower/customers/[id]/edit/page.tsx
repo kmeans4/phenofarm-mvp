@@ -18,6 +18,7 @@ interface CustomerData {
   description: string | null;
   email?: string;
   contactName?: string;
+  isPlatformManaged: boolean;
 }
 
 async function fetchCustomer(id: string): Promise<CustomerData | null> {
@@ -45,6 +46,7 @@ async function fetchCustomer(id: string): Promise<CustomerData | null> {
     description: dispensary.description,
     email: dispensary.user?.email || undefined,
     contactName: dispensary.user?.name || undefined,
+    isPlatformManaged: Boolean(dispensary.userId),
   };
 }
 

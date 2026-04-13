@@ -17,6 +17,12 @@ export default async function GrowerCustomersPage() {
       user: {
         select: { email: true, name: true },
       },
+      orders: {
+        where: {
+          growerId: (session.user as { growerId?: string }).growerId,
+        },
+        select: { id: true },
+      },
     },
     orderBy: {
       businessName: 'asc',
@@ -96,17 +102,30 @@ export default async function GrowerCustomersPage() {
                   <p><span className="text-gray-500">Location:</span> {customer.city || '-'}{customer.state ? `, ${customer.state}` : ''}</p>
                 </div>
 
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  {customer.userId && (
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 font-medium text-blue-700">
+                      PhenoFarm member
+                    </span>
+                  )}
+                  {customer.orders.length > 0 && (
+                    <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 font-medium text-green-700">
+                      {customer.orders.length} order{customer.orders.length === 1 ? '' : 's'}
+                    </span>
+                  )}
+                </div>
+
                 <Link
                   href={'/grower/customers/' + customer.id + '/edit'}
                   className="inline-flex w-full justify-center px-3 py-2 rounded-lg border border-gray-300 text-sm font-medium text-blue-600 hover:bg-blue-50"
                 >
-                  Edit
+                  {customer.userId ? 'View Details' : 'Edit'}
                 </Link>
               </div>
             ))}
           </div>
 
-          <div className="hidden sm:block overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -115,6 +134,7 @@ export default async function GrowerCustomersPage() {
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Phone</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Location</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
@@ -130,11 +150,25 @@ export default async function GrowerCustomersPage() {
                     <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.phone || '-'}</td>
                     <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.city}, {customer.state}</td>
                     <td className="px-3 sm:px-6 py-2.5 sm:py-4">
+                      <div className="flex flex-wrap gap-2">
+                        {customer.userId && (
+                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-700">
+                            PhenoFarm member
+                          </span>
+                        )}
+                        {customer.orders.length > 0 && (
+                          <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
+                            {customer.orders.length} order{customer.orders.length === 1 ? '' : 's'}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-3 sm:px-6 py-2.5 sm:py-4">
                       <Link
                         href={'/grower/customers/' + customer.id + '/edit'}
                         className="text-blue-600 hover:text-blue-700 font-medium text-sm"
                       >
-                        Edit
+                        {customer.userId ? 'View Details' : 'Edit'}
                       </Link>
                     </td>
                   </tr>
@@ -143,6 +177,51 @@ export default async function GrowerCustomersPage() {
             </table>
           </div>
           </>
+        )}
+
+        {customers.length > 0 && (
+          <div className="hidden sm:block md:hidden divide-y divide-gray-100">
+            {customers.map((customer) => (
+              <div key={customer.id} className="p-4 space-y-3">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="font-medium text-gray-900">{customer.businessName}</p>
+                    <p className="text-sm text-gray-500 mt-1">{customer.user?.name || '-'} • {customer.user?.email || '-'}</p>
+                  </div>
+                  <Link
+                    href={'/grower/customers/' + customer.id + '/edit'}
+                    className="shrink-0 text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  >
+                    {customer.userId ? 'View' : 'Edit'}
+                  </Link>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-400">Phone</p>
+                    <p className="mt-1">{customer.phone || '-'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs uppercase tracking-wide text-gray-400">Location</p>
+                    <p className="mt-1">{customer.city || '-'}{customer.state ? `, ${customer.state}` : ''}</p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 text-xs">
+                  {customer.userId && (
+                    <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 font-medium text-blue-700">
+                      PhenoFarm member
+                    </span>
+                  )}
+                  {customer.orders.length > 0 && (
+                    <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 font-medium text-green-700">
+                      {customer.orders.length} order{customer.orders.length === 1 ? '' : 's'}
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -79,12 +79,13 @@ export async function PUT(
 
     const body = await request.json();
     const { businessName, contactName, email, phone, address, city, state, zipCode, licenseNumber, website, description } = body;
+    const isPlatformManaged = Boolean(existingDispensary.userId);
 
-    if (businessName !== undefined && !businessName.trim()) {
+    if (!isPlatformManaged && businessName !== undefined && !businessName.trim()) {
       return NextResponse.json({ error: 'Business name is required' }, { status: 400 });
     }
 
-    if (email !== undefined) {
+    if (!isPlatformManaged && email !== undefined) {
       const normalizedEmail = email.trim().toLowerCase();
       if (!normalizedEmail) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
@@ -103,24 +104,26 @@ export async function PUT(
     }
 
     const updateData: Prisma.DispensaryUpdateInput = {};
-    if (businessName !== undefined) updateData.businessName = businessName.trim();
-    if (phone !== undefined) updateData.phone = normalizeOptionalString(phone);
-    if (address !== undefined) updateData.address = normalizeOptionalString(address);
-    if (city !== undefined) updateData.city = normalizeOptionalString(city);
-    if (state !== undefined) updateData.state = normalizeOptionalString(state) || 'VT';
-    if (zipCode !== undefined) updateData.zip = normalizeOptionalString(zipCode);
-    if (licenseNumber !== undefined) updateData.licenseNumber = normalizeOptionalString(licenseNumber);
-    if (website !== undefined) updateData.website = normalizeOptionalString(website);
-    if (description !== undefined) updateData.description = normalizeOptionalString(description);
+    if (!isPlatformManaged && businessName !== undefined) updateData.businessName = businessName.trim();
+    if (!isPlatformManaged && phone !== undefined) updateData.phone = normalizeOptionalString(phone);
+    if (!isPlatformManaged && address !== undefined) updateData.address = normalizeOptionalString(address);
+    if (!isPlatformManaged && city !== undefined) updateData.city = normalizeOptionalString(city);
+    if (!isPlatformManaged && state !== undefined) updateData.state = normalizeOptionalString(state) || 'VT';
+    if (!isPlatformManaged && zipCode !== undefined) updateData.zip = normalizeOptionalString(zipCode);
+    if (!isPlatformManaged && licenseNumber !== undefined) updateData.licenseNumber = normalizeOptionalString(licenseNumber);
+    if (!isPlatformManaged && website !== undefined) updateData.website = normalizeOptionalString(website);
+    if (!isPlatformManaged && description !== undefined) updateData.description = normalizeOptionalString(description);
 
-    await db.dispensary.update({
-      where: { id: customerId },
-      data: updateData,
-    });
+    if (Object.keys(updateData).length > 0) {
+      await db.dispensary.update({
+        where: { id: customerId },
+        data: updateData,
+      });
+    }
 
-    if (email !== undefined || contactName !== undefined) {
+    if (!isPlatformManaged && (email !== undefined || contactName !== undefined)) {
       const userUpdateData: Prisma.UserUpdateInput = {};
-      if (email !== undefined) userUpdateData.email = email;
+      if (email !== undefined) userUpdateData.email = email.trim().toLowerCase();
       if (contactName !== undefined) userUpdateData.name = contactName;
       
       await db.user.update({
