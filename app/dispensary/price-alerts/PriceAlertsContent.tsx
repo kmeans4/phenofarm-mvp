@@ -152,11 +152,11 @@ export default function PriceAlertsContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-gray-50 pb-20 sm:pb-24">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
               <Link 
                 href="/dispensary/catalog"
@@ -182,7 +182,7 @@ export default function PriceAlertsContent() {
             {alerts.length > 0 && (
               <button
                 onClick={() => setShowClearConfirm(true)}
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
                 <Trash2 size={18} />
                 <span className="hidden sm:inline">Clear All</span>
@@ -195,7 +195,7 @@ export default function PriceAlertsContent() {
         {alerts.length > 0 && (
           <div className="border-t border-gray-100">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-              <div className="flex flex-wrap items-center gap-6 text-sm">
+              <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <BellRing className="text-green-600" size={16} />
                   <span className="text-gray-600">
@@ -219,7 +219,7 @@ export default function PriceAlertsContent() {
                 <button
                   onClick={refreshPrices}
                   disabled={refreshing}
-                  className="flex items-center gap-2 ml-auto text-green-700 hover:text-green-800"
+                  className="flex items-center gap-2 sm:ml-auto text-green-700 hover:text-green-800"
                 >
                   <RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />
                   <span className="hidden sm:inline">{refreshing ? 'Refreshing...' : 'Refresh Prices'}</span>
@@ -232,7 +232,7 @@ export default function PriceAlertsContent() {
         {/* Tabs */}
         <div className="border-t border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex gap-1">
+            <div className="flex gap-1 overflow-x-auto">
               {(['active', 'triggered', 'history'] as AlertTab[]).map((tab) => (
                 <button
                   key={tab}
@@ -262,7 +262,7 @@ export default function PriceAlertsContent() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
         {filteredAlerts.length === 0 ? (
           <EmptyState 
             type={activeTab} 
@@ -423,11 +423,11 @@ function AlertCard({
             )}
 
             {/* Actions */}
-            <div className="flex items-center gap-2 ml-auto">
+            <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto">
               {alert.isTriggered && (
                 <Link
                   href={`/dispensary/catalog?search=${encodeURIComponent(alert.productName)}`}
-                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
+                  className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-sm font-medium"
                 >
                   <Check size={16} />
                   Buy Now

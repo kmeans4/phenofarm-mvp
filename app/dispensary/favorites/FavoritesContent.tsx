@@ -142,10 +142,10 @@ export default function FavoritesContent() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 pb-20 sm:pb-24">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <Link 
             href="/dispensary/catalog" 
             className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 mb-4 transition-colors"
@@ -153,9 +153,9 @@ export default function FavoritesContent() {
             <ArrowLeft size={18} />
             Back to Catalog
           </Link>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
                 <Heart className="w-8 h-8 text-red-500" fill="currentColor" />
                 My Favorites
               </h1>
@@ -166,7 +166,7 @@ export default function FavoritesContent() {
             {favoriteProducts.length > 0 && (
               <button
                 onClick={() => setShowClearConfirm(true)}
-                className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
                 <Trash2 size={18} />
                 Clear All
@@ -177,10 +177,10 @@ export default function FavoritesContent() {
 
         {/* Controls */}
         {favoriteProducts.length > 0 && (
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex items-center gap-4">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
               {/* Sort Dropdown */}
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
                 <span className="text-sm text-gray-500">Sort by:</span>
                 <select
                   value={sortBy}
@@ -195,7 +195,7 @@ export default function FavoritesContent() {
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+            <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg self-start lg:self-auto">
               <button
                 onClick={() => setViewMode('grid')}
                 className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors ${
@@ -226,7 +226,7 @@ export default function FavoritesContent() {
           </div>
         ) : favoriteProducts.length === 0 ? (
           /* Empty State */
-          <div className="text-center py-20 bg-white rounded-2xl shadow-sm border border-gray-200">
+          <div className="text-center py-16 sm:py-20 bg-white rounded-2xl shadow-sm border border-gray-200">
             <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
               <Heart className="w-10 h-10 text-red-300" />
             </div>
