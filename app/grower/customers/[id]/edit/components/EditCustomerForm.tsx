@@ -114,7 +114,7 @@ const formatPhoneNumber = (value: string): string => {
 
 const INPUT_CLASSES = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
 const INPUT_ERROR_CLASSES = "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
-const INPUT_DISABLED_CLASSES = "w-full px-3 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500 cursor-not-allowed";
+const READONLY_VALUE_CLASSES = "min-h-[42px] w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-gray-700";
 
 export default function EditCustomerForm({ customer }: { customer: Customer }) {
   const router = useRouter();
@@ -294,6 +294,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
 
   const hasErrors = Object.keys(errors).length > 0;
   const isPlatformManaged = customer.isPlatformManaged;
+  const displayValue = (value?: string | null) => value?.trim() ? value : '—';
 
   return (
     <div className="space-y-5 sm:space-y-6 p-4 max-w-3xl mx-auto">
@@ -306,18 +307,6 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           <p className="text-sm sm:text-base text-gray-600 mt-1">Update customer information</p>
         </div>
       </div>
-
-      {isPlatformManaged && (
-        <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800 flex items-start gap-3">
-          <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10A8 8 0 114 3.46V2a1 1 0 10-2 0v4a1 1 0 001 1h4a1 1 0 100-2H5.26A6 6 0 1018 10zm-7-3a1 1 0 10-2 0v3a1 1 0 00.293.707l2 2a1 1 0 101.414-1.414L11 9.586V7z" clipRule="evenodd" />
-          </svg>
-          <div>
-            <p className="font-medium">This customer is already a PhenoFarm dispensary.</p>
-            <p className="text-sm mt-1 text-blue-700">Their business details are synced from their PhenoFarm account and can’t be edited here by a grower.</p>
-          </div>
-        </div>
-      )}
 
       {isDirty && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-center gap-2">
@@ -332,214 +321,270 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Information</h2>
           
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Name *
-              </label>
-              <input
-                type="text"
-                value={formData.businessName}
-                onChange={(e) => handleChange('businessName', e.target.value)}
-                onBlur={() => handleBlur('businessName')}
-                className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.businessName && touched.businessName ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                placeholder="Enter business name"
-                disabled={isPlatformManaged}
-              />
-              {errors.businessName && touched.businessName && (
-                <p className="text-sm text-red-600 mt-1">{errors.businessName}</p>
-              )}
-            </div>
+          {isPlatformManaged ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Business Name</label>
+                <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.businessName)}</div>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                  <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.licenseNumber)}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                  <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.website)}</div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <div className={`${READONLY_VALUE_CLASSES} whitespace-pre-wrap`}>{displayValue(formData.description)}</div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  License Number
+                  Business Name *
                 </label>
                 <input
                   type="text"
-                  value={formData.licenseNumber}
-                  onChange={(e) => handleChange('licenseNumber', e.target.value)}
-                  onBlur={() => handleBlur('licenseNumber')}
-                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.licenseNumber && touched.licenseNumber ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                  placeholder="License #"
-                  disabled={isPlatformManaged}
+                  value={formData.businessName}
+                  onChange={(e) => handleChange('businessName', e.target.value)}
+                  onBlur={() => handleBlur('businessName')}
+                  className={errors.businessName && touched.businessName ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                  placeholder="Enter business name"
                 />
-                {errors.licenseNumber && touched.licenseNumber && (
-                  <p className="text-sm text-red-600 mt-1">{errors.licenseNumber}</p>
+                {errors.businessName && touched.businessName && (
+                  <p className="text-sm text-red-600 mt-1">{errors.businessName}</p>
                 )}
               </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    License Number
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.licenseNumber}
+                    onChange={(e) => handleChange('licenseNumber', e.target.value)}
+                    onBlur={() => handleBlur('licenseNumber')}
+                    className={errors.licenseNumber && touched.licenseNumber ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    placeholder="License #"
+                  />
+                  {errors.licenseNumber && touched.licenseNumber && (
+                    <p className="text-sm text-red-600 mt-1">{errors.licenseNumber}</p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Website
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.website}
+                    onChange={(e) => handleChange('website', e.target.value)}
+                    onBlur={() => handleBlur('website')}
+                    className={errors.website && touched.website ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    placeholder="https://..."
+                  />
+                  {errors.website && touched.website && (
+                    <p className="text-sm text-red-600 mt-1">{errors.website}</p>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Website
+                  Description
                 </label>
-                <input
-                  type="url"
-                  value={formData.website}
-                  onChange={(e) => handleChange('website', e.target.value)}
-                  onBlur={() => handleBlur('website')}
-                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.website && touched.website ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                  placeholder="https://..."
-                  disabled={isPlatformManaged}
+                <textarea
+                  rows={3}
+                  value={formData.description}
+                  onChange={(e) => handleChange('description', e.target.value)}
+                  onBlur={() => handleBlur('description')}
+                  className={errors.description && touched.description 
+                    ? "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50" 
+                    : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"}
+                  placeholder="Brief description..."
                 />
-                {errors.website && touched.website && (
-                  <p className="text-sm text-red-600 mt-1">{errors.website}</p>
+                {errors.description && touched.description && (
+                  <p className="text-sm text-red-600 mt-1">{errors.description}</p>
                 )}
+                <p className="text-xs text-gray-500 text-right mt-1">
+                  {formData.description.length}/500 characters
+                </p>
               </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description
-              </label>
-              <textarea
-                rows={3}
-                value={formData.description}
-                onChange={(e) => handleChange('description', e.target.value)}
-                onBlur={() => handleBlur('description')}
-                className={isPlatformManaged
-                  ? INPUT_DISABLED_CLASSES
-                  : errors.description && touched.description 
-                  ? "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50" 
-                  : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"}
-                placeholder="Brief description..."
-                disabled={isPlatformManaged}
-              />
-              {errors.description && touched.description && (
-                <p className="text-sm text-red-600 mt-1">{errors.description}</p>
-              )}
-              <p className="text-xs text-gray-500 text-right mt-1">
-                {formData.description.length}/500 characters
-              </p>
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
           
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Contact Person
-                </label>
-                <input
-                  type="text"
-                  value={formData.contactName}
-                  onChange={(e) => handleChange('contactName', e.target.value)}
-                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : INPUT_CLASSES}
-                  placeholder="Full name"
-                  disabled={isPlatformManaged}
-                />
+          {isPlatformManaged ? (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Contact Person</label>
+                  <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.contactName)}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.email)}</div>
+                </div>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.phone)}</div>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Contact Person
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.contactName}
+                    onChange={(e) => handleChange('contactName', e.target.value)}
+                    className={INPUT_CLASSES}
+                    placeholder="Full name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Email
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => handleChange('email', e.target.value)}
+                    onBlur={() => handleBlur('email')}
+                    className={errors.email && touched.email ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    placeholder="email@example.com"
+                  />
+                  {errors.email && touched.email && (
+                    <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Email
+                  Phone
                 </label>
                 <input
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleChange('email', e.target.value)}
-                  onBlur={() => handleBlur('email')}
-                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.email && touched.email ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                  placeholder="email@example.com"
-                  disabled={isPlatformManaged}
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handlePhoneChange(e.target.value)}
+                  onBlur={() => handleBlur('phone')}
+                  className={errors.phone && touched.phone ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                  placeholder="(555) 123-4567"
                 />
-                {errors.email && touched.email && (
-                  <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                {errors.phone && touched.phone && (
+                  <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
                 )}
               </div>
             </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Phone
-              </label>
-              <input
-                type="tel"
-                value={formData.phone}
-                onChange={(e) => handlePhoneChange(e.target.value)}
-                onBlur={() => handleBlur('phone')}
-                className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.phone && touched.phone ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                placeholder="(555) 123-4567"
-                disabled={isPlatformManaged}
-              />
-              {errors.phone && touched.phone && (
-                <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
-              )}
-            </div>
-          </div>
+          )}
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-4">Address</h2>
           
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Street Address
-              </label>
-              <input
-                type="text"
-                value={formData.address}
-                onChange={(e) => handleChange('address', e.target.value)}
-                className={isPlatformManaged ? INPUT_DISABLED_CLASSES : INPUT_CLASSES}
-                placeholder="123 Main St"
-                disabled={isPlatformManaged}
-              />
-            </div>
+          {isPlatformManaged ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.address)}</div>
+              </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  City
-                </label>
-                <input
-                  type="text"
-                  value={formData.city}
-                  onChange={(e) => handleChange('city', e.target.value)}
-                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : INPUT_CLASSES}
-                  placeholder="City"
-                  disabled={isPlatformManaged}
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  State
-                </label>
-                <select
-                  value={formData.state}
-                  onChange={(e) => handleChange('state', e.target.value)}
-                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : INPUT_CLASSES}
-                  disabled={isPlatformManaged}
-                >
-                  {US_STATES.map((state) => (
-                    <option key={state.code} value={state.code}>
-                      {state.name}
-                    </option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  ZIP Code
-                </label>
-                <input
-                  type="text"
-                  value={formData.zipCode}
-                  onChange={(e) => handleChange('zipCode', e.target.value)}
-                  onBlur={() => handleBlur('zipCode')}
-                  className={isPlatformManaged ? INPUT_DISABLED_CLASSES : errors.zipCode && touched.zipCode ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                  placeholder="12345"
-                  disabled={isPlatformManaged}
-                />
-                {errors.zipCode && touched.zipCode && (
-                  <p className="text-sm text-red-600 mt-1">{errors.zipCode}</p>
-                )}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                  <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.city)}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                  <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.state)}</div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">ZIP Code</label>
+                  <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.zipCode)}</div>
+                </div>
               </div>
             </div>
-          </div>
+          ) : (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Street Address
+                </label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => handleChange('address', e.target.value)}
+                  className={INPUT_CLASSES}
+                  placeholder="123 Main St"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    City
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.city}
+                    onChange={(e) => handleChange('city', e.target.value)}
+                    className={INPUT_CLASSES}
+                    placeholder="City"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    State
+                  </label>
+                  <select
+                    value={formData.state}
+                    onChange={(e) => handleChange('state', e.target.value)}
+                    className={INPUT_CLASSES}
+                  >
+                    {US_STATES.map((state) => (
+                      <option key={state.code} value={state.code}>
+                        {state.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    ZIP Code
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.zipCode}
+                    onChange={(e) => handleChange('zipCode', e.target.value)}
+                    onBlur={() => handleBlur('zipCode')}
+                    className={errors.zipCode && touched.zipCode ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    placeholder="12345"
+                  />
+                  {errors.zipCode && touched.zipCode && (
+                    <p className="text-sm text-red-600 mt-1">{errors.zipCode}</p>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col gap-3 pt-4 border-t border-gray-200">
