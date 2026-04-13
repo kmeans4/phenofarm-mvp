@@ -64,10 +64,6 @@ export default async function GrowerLayout({ children }: { children: React.React
           </div>
           
           <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0">
-            <div className="bg-green-50 rounded-lg p-4 mb-3">
-              <p className="text-sm font-medium text-green-900 mb-1">Subscription</p>
-              <p className="text-xs text-green-700">Active until Dec 31, 2024</p>
-            </div>
             <SignOutButton variant="sidebar" />
           </div>
         </aside>

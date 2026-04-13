@@ -24,14 +24,14 @@ export function ClientNav({ links }: { links: NavLink[] }) {
   };
 
   return (
-    <nav className="p-4 space-y-1 flex-1">
+    <nav className="p-3 lg:p-4 space-y-0.5 lg:space-y-1 flex-1">
       {links.map((link) => {
         const active = isActive(link.href);
         return (
           <Link 
             key={link.href}
             href={link.href}
-            className={`flex items-center justify-between px-4 py-3 rounded-lg transition-colors ${
+            className={`flex items-center justify-between px-3 py-2.5 lg:px-4 lg:py-3 rounded-lg transition-colors text-sm ${
               active 
                 ? 'bg-green-100 text-green-700 font-medium border-l-4 border-green-600' 
                 : 'text-gray-700 hover:bg-green-50 hover:text-green-600'
