@@ -65,8 +65,8 @@ export default async function GrowerLayout({ children }: { children: React.React
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 pt-20 md:pt-0 w-full min-w-0 min-h-screen bg-gray-50">
-          <div className="p-4 md:p-5 lg:p-6 max-w-7xl mx-auto min-h-full">
+        <main className="flex flex-1 flex-col pt-20 md:pt-0 w-full min-w-0 min-h-screen bg-gray-50">
+          <div className="flex flex-1 flex-col p-4 md:p-5 lg:p-6 max-w-7xl mx-auto w-full">
             {children}
           </div>
         </main>
