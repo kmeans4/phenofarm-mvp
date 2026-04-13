@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
 import { LogoUpload } from '@/app/components/settings/LogoUpload';
+import { SignOutButton } from '@/app/components/SignOutButton';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useToast } from '@/app/hooks/useToast';
 
@@ -599,6 +600,18 @@ export function SettingsForm() {
               />
               <p className="text-xs text-gray-500 mt-1 text-right">{formData.description.length}/500</p>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">Account</h2>
+            <p className="mt-1 text-sm text-gray-600">Sign out of your grower account from this device.</p>
+          </div>
+          <div className="self-start sm:self-auto">
+            <SignOutButton />
           </div>
         </div>
       </div>
