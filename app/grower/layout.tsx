@@ -63,7 +63,7 @@ export default async function GrowerLayout({ children }: { children: React.React
             <ClientNav links={navLinks} />
           </div>
           
-          <div className="mt-auto p-2 border-t border-gray-200 bg-white flex-shrink-0">
+          <div className="mt-auto border-t border-gray-200 bg-white flex-shrink-0">
             <SignOutButton variant="sidebar" />
           </div>
         </aside>
