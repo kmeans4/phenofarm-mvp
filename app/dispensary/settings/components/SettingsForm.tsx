@@ -3,7 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
 import { LogoUpload } from '@/app/components/settings/LogoUpload';
+import { SignOutButton } from '@/app/components/SignOutButton';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
+import { useToast } from '@/app/hooks/useToast';
 
 interface SettingsData {
   businessName: string;
@@ -108,24 +110,91 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
   const [error, setError] = useState('');
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  
+
   const [formData, setFormData] = useState<SettingsData>(defaultValues);
   const [initialData, setInitialData] = useState<SettingsData>(defaultValues);
+  const { update, showToast } = useToast();
 
-  // Set up unsaved changes warning
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: true,
     message: 'You have unsaved changes in your settings. Are you sure you want to leave?',
   });
 
-  // Track dirty state when formData changes
   useEffect(() => {
     if (loading) return;
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
   }, [formData, initialData, loading, setIsDirty]);
 
-  // Fetch settings on mount
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (!saving && !loading) {
+          handleSave(false);
+        }
+      }
+
+      if (e.key === 'Escape' && !loading) {
+        setFormData(initialData);
+        setTouched({});
+        setFieldErrors({});
+        setError('');
+        setIsDirty(false);
+        showToast('info', 'Changes discarded');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [saving, loading, initialData, setIsDirty, showToast]);
+
+  const validateForm = useCallback((): boolean => {
+    const errors: FieldErrors = {
+      businessName: validateBusinessName(formData.businessName),
+      email: validateEmail(formData.email),
+      phone: validatePhone(formData.phone),
+      website: validateWebsite(formData.website),
+      licenseNumber: validateLicenseNumber(formData.licenseNumber),
+      licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
+      licenseState: validateLicenseState(formData.licenseState),
+    };
+
+    setFieldErrors(errors);
+    return !Object.values(errors).some(e => e !== undefined);
+  }, [formData]);
+
+  const validateField = useCallback((field: keyof FieldErrors, value: string) => {
+    let fieldError: string | undefined;
+
+    switch (field) {
+      case 'businessName':
+        fieldError = validateBusinessName(value);
+        break;
+      case 'email':
+        fieldError = validateEmail(value);
+        break;
+      case 'phone':
+        fieldError = validatePhone(value);
+        break;
+      case 'website':
+        fieldError = validateWebsite(value);
+        break;
+      case 'licenseNumber':
+        fieldError = validateLicenseNumber(value);
+        break;
+      case 'licenseExpiry':
+        fieldError = validateLicenseExpiry(value);
+        break;
+      case 'licenseState':
+        fieldError = validateLicenseState(value);
+        break;
+    }
+
+    setFieldErrors(prev => ({ ...prev, [field]: fieldError }));
+    return !fieldError;
+  }, []);
+
   useEffect(() => {
     async function fetchSettings() {
       try {
@@ -154,56 +223,14 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         }
       } catch (err) {
         console.error('Failed to load settings:', err);
+        showToast('error', 'Failed to load settings');
       } finally {
         setLoading(false);
       }
     }
+
     fetchSettings();
-  }, []);
-
-  const validateForm = useCallback((): boolean => {
-    const errors: FieldErrors = {
-      businessName: validateBusinessName(formData.businessName),
-      email: validateEmail(formData.email),
-      phone: validatePhone(formData.phone),
-      website: validateWebsite(formData.website),
-      licenseNumber: validateLicenseNumber(formData.licenseNumber),
-      licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
-      licenseState: validateLicenseState(formData.licenseState),
-    };
-    
-    setFieldErrors(errors);
-    return !Object.values(errors).some(e => e !== undefined);
-  }, [formData]);
-
-  const validateField = useCallback((field: keyof FieldErrors, value: string) => {
-    let error: string | undefined;
-    switch (field) {
-      case 'businessName':
-        error = validateBusinessName(value);
-        break;
-      case 'email':
-        error = validateEmail(value);
-        break;
-      case 'phone':
-        error = validatePhone(value);
-        break;
-      case 'website':
-        error = validateWebsite(value);
-        break;
-      case 'licenseNumber':
-        error = validateLicenseNumber(value);
-        break;
-      case 'licenseExpiry':
-        error = validateLicenseExpiry(value);
-        break;
-      case 'licenseState':
-        error = validateLicenseState(value);
-        break;
-    }
-    setFieldErrors(prev => ({ ...prev, [field]: error }));
-    return !error;
-  }, []);
+  }, [showToast]);
 
   const handleAddressSelect = (address: {
     fullAddress: string;
@@ -231,13 +258,13 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     let value = e.target.value;
-    
+
     if (field === 'phone') {
       value = formatPhoneNumber(value);
     }
-    
+
     setFormData(prev => ({ ...prev, [field]: value }));
-    
+
     if (touched[field as keyof FieldErrors]) {
       validateField(field as keyof FieldErrors, value);
     }
@@ -248,20 +275,10 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     validateField(field, formData[field] as string);
   };
 
-  const handleSave = async (isLogoSave = false, dataOverride?: SettingsData) => {
+  const handleSave = useCallback(async (isLogoSave = false, dataOverride?: SettingsData) => {
     if (!isLogoSave) {
-      const errors: FieldErrors = {
-        businessName: validateBusinessName(formData.businessName),
-        email: validateEmail(formData.email),
-        phone: validatePhone(formData.phone),
-        website: validateWebsite(formData.website),
-        licenseNumber: validateLicenseNumber(formData.licenseNumber),
-        licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
-        licenseState: validateLicenseState(formData.licenseState),
-      };
-      setFieldErrors(errors);
-      
-      if (Object.values(errors).some(e => e !== undefined)) {
+      const isValid = validateForm();
+      if (!isValid) {
         setTouched({
           businessName: true,
           email: true,
@@ -272,6 +289,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
           licenseState: true,
         });
         setError('Please fix the errors above before saving.');
+        showToast('error', 'Please fix validation errors before saving');
         return;
       }
     }
@@ -283,16 +301,22 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     if (!isLogoSave) setSaved(false);
 
     try {
-      const res = await fetch('/api/dispensary/settings', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || 'Failed to save');
-      }
+      const itemName = isLogoSave ? 'Logo' : 'Settings';
+      await update(
+        itemName,
+        fetch('/api/dispensary/settings', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        }).then(async (res) => {
+          if (!res.ok) {
+            const data = await res.json();
+            throw new Error(data.error || 'Failed to save');
+          }
+          return res.json();
+        }),
+        { duration: 3000 }
+      );
 
       setInitialData(payload);
       resetDirtyState();
@@ -302,11 +326,13 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         setTimeout(() => setSaved(false), 3000);
       }
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save settings');
+      const msg = err instanceof Error ? err.message : 'Failed to save settings';
+      setError(msg);
+      showToast('error', 'Failed to save', { description: msg });
     } finally {
       setSaving(false);
     }
-  };
+  }, [formData, resetDirtyState, showToast, update, validateForm]);
 
   if (loading) {
     return (
@@ -318,15 +344,35 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
 
   return (
     <div className="space-y-4 sm:space-y-6">
+      <div className="hidden sm:flex items-center gap-4 text-xs text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
+        <span className="flex items-center gap-1">
+          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Ctrl</kbd>
+          <span>+</span>
+          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">S</kbd>
+          <span className="ml-1">to save</span>
+        </span>
+        <span className="text-gray-300">|</span>
+        <span className="flex items-center gap-1">
+          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Esc</kbd>
+          <span className="ml-1">to cancel</span>
+        </span>
+      </div>
+
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
-          {error}
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start gap-3">
+          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+          </svg>
+          <span>{error}</span>
         </div>
       )}
-      
+
       {saved && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-600">
-          Settings saved successfully!
+        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-600 flex items-start gap-3">
+          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+          </svg>
+          <span>Settings saved successfully!</span>
         </div>
       )}
 
@@ -335,13 +381,13 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
-          <span>You have unsaved changes. Do not forget to save before leaving.</span>
+          <span>You have unsaved changes. Don&apos;t forget to save before leaving.</span>
         </div>
       )}
 
       {formData.licenseStatus && formData.licenseStatus !== 'verified' && (
         <div className={`p-4 border rounded-lg flex items-start gap-3 ${
-          formData.licenseStatus === 'pending_review' 
+          formData.licenseStatus === 'pending_review'
             ? 'bg-blue-50 border-blue-200 text-blue-700'
             : formData.licenseStatus === 'expired'
             ? 'bg-red-50 border-red-200 text-red-700'
@@ -365,7 +411,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
             <h2 className="text-base sm:text-lg font-semibold text-gray-900">Company Logo</h2>
@@ -384,8 +430,8 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Name <span className="text-red-500">*</span>
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={formData.businessName}
                 onChange={handleChange('businessName')}
                 onBlur={handleBlur('businessName')}
@@ -405,24 +451,26 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 </p>
               )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Contact Name <span className="text-gray-400 text-xs">(optional)</span>
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={formData.contactName}
                 onChange={handleChange('contactName')}
                 placeholder="Primary contact person"
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
               />
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Dispensary License Number <span className="text-red-500">*</span>
               </label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 value={formData.licenseNumber}
                 onChange={handleChange('licenseNumber')}
                 onBlur={handleBlur('licenseNumber')}
@@ -442,6 +490,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 </p>
               )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 License State <span className="text-red-500">*</span>
@@ -467,12 +516,13 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 </p>
               )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 License Expiry Date <span className="text-red-500">*</span>
               </label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 value={formData.licenseExpiry}
                 onChange={handleChange('licenseExpiry')}
                 onBlur={handleBlur('licenseExpiry')}
@@ -491,12 +541,13 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 </p>
               )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Email <span className="text-red-500">*</span>
               </label>
-              <input 
-                type="email" 
+              <input
+                type="email"
                 value={formData.email}
                 onChange={handleChange('email')}
                 onBlur={handleBlur('email')}
@@ -516,12 +567,13 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 </p>
               )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Phone <span className="text-gray-400 text-xs">(optional)</span>
               </label>
-              <input 
-                type="tel" 
+              <input
+                type="tel"
                 value={formData.phone}
                 onChange={handleChange('phone')}
                 onBlur={handleBlur('phone')}
@@ -541,48 +593,92 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 </p>
               )}
             </div>
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Business Address <span className="text-green-600 text-xs font-medium">(Autocomplete)</span>
               </label>
               <AddressAutocomplete
                 value={formData.address}
-                onChange={(value) => setFormData({...formData, address: value})}
+                onChange={(value) => setFormData(prev => ({ ...prev, address: value }))}
                 onSelect={handleAddressSelect}
                 placeholder="Type your address..."
               />
               <p className="text-xs text-gray-500 mt-1">Type 3+ characters to see suggestions (includes city, state, ZIP)</p>
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-              <input 
-                type="url" 
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Website <span className="text-gray-400 text-xs">(optional)</span>
+              </label>
+              <input
+                type="url"
                 value={formData.website}
-                onChange={(e) => setFormData({...formData, website: e.target.value})}
-                placeholder="https://"
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                onChange={handleChange('website')}
+                onBlur={handleBlur('website')}
+                placeholder="https://yourbusiness.com"
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.website && fieldErrors.website
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
               />
+              {touched.website && fieldErrors.website && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.website}
+                </p>
+              )}
             </div>
+
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Business Description</label>
-              <textarea 
-                rows={3} 
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Business Description <span className="text-gray-400 text-xs">(optional)</span>
+              </label>
+              <textarea
+                rows={3}
                 value={formData.description}
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500" 
+                onChange={handleChange('description')}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                placeholder="Tell growers about your business..."
               />
+              <p className="text-xs text-gray-500 mt-1 text-right">{formData.description.length}/500</p>
             </div>
           </div>
         </div>
       </div>
 
+      <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-base font-semibold text-gray-900">Account</h2>
+            <p className="mt-1 text-sm text-gray-600">Sign out of your dispensary account from this device.</p>
+          </div>
+          <div className="self-start sm:self-auto">
+            <SignOutButton />
+          </div>
+        </div>
+      </div>
+
       <div className="flex justify-end pt-2 sm:pt-4">
-        <button 
+        <button
           onClick={() => handleSave(false)}
           disabled={saving}
-          className="w-full sm:w-auto bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition disabled:opacity-50"
+          className="w-full sm:w-auto bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {saving ? 'Saving...' : 'Save Changes'}
+          {saving ? (
+            <span className="flex items-center gap-2">
+              <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+              </svg>
+              Saving...
+            </span>
+          ) : (
+            'Save Changes'
+          )}
         </button>
       </div>
     </div>

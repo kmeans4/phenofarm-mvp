@@ -3,7 +3,6 @@ import { authOptions } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { MobileNav } from "@/app/dispensary/_components/MobileNav";
 import { ClientNav } from "@/app/grower/components/ClientNav";
-import { SignOutButton } from "@/app/components/SignOutButton";
 import { SearchDialog } from "@/app/components/SearchDialog";
 import { db } from "@/lib/db";
 import CartBadge from "./catalog/components/CartBadge";
@@ -56,44 +55,37 @@ export default async function DispensaryLayout({ children }: { children: React.R
   return (
     <div className="min-h-screen bg-gray-50 w-full">
       {/* Mobile Header with Hamburger Menu */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-50">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
             <h1 className="text-lg font-bold text-green-600">PhenoFarm</h1>
             <div className="flex items-center gap-2">
               <SearchDialog variant="icon" />
               <MobileNav links={navLinks} />
-              <SignOutButton />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="flex">
-        {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:block flex-shrink-0">
-          <div className="p-4 border-b border-gray-200">
+      <div className="min-h-screen md:pl-56 lg:pl-64">
+        {/* Tablet/Desktop Sidebar */}
+        <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:w-56 lg:w-64 md:flex-col md:bg-white md:border-r md:border-gray-200">
+          <div className="px-4 pt-4 pb-3 border-b border-gray-200 flex-shrink-0">
             <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
             <p className="text-sm text-gray-500">Dispensary Portal</p>
             <div className="mt-3">
               <SearchDialog />
             </div>
           </div>
-          
-          <ClientNav links={navLinks} />
-          
-          <div className="p-4 border-t border-gray-200">
-            <div className="bg-blue-50 rounded-lg p-4 mb-3">
-              <p className="text-sm font-medium text-blue-900 mb-1">Membership</p>
-              <p className="text-xs text-blue-700">Active until Dec 31, 2024</p>
-            </div>
-            <SignOutButton variant="sidebar" />
+
+          <div className="min-h-0 flex-1 overflow-y-auto py-2">
+            <ClientNav links={navLinks} />
           </div>
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 pt-20 lg:pt-0 w-full min-w-0">
-          <div className="p-4 lg:p-6">
+        <main className="flex min-h-screen flex-col pt-20 md:pt-0 w-full min-w-0 bg-gray-50">
+          <div className="flex flex-1 flex-col p-4 md:p-5 lg:p-6 max-w-7xl mx-auto w-full">
             {children}
           </div>
         </main>

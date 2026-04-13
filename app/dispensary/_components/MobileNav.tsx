@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
+import { signOut } from 'next-auth/react';
 import { Badge } from '@/app/components/ui/Badge';
 import { Menu, X } from 'lucide-react';
 
@@ -21,6 +22,10 @@ export function MobileNav({ links }: { links: NavLink[] }) {
       return pathname === href || pathname === href.replace('/dashboard', '') || pathname === href.replace('/dispensary/dashboard', '/dispensary');
     }
     return pathname === href || pathname.startsWith(`${href}/`);
+  };
+
+  const handleSignOut = () => {
+    signOut({ callbackUrl: '/auth/sign_in' });
   };
 
   return (
@@ -44,7 +49,7 @@ export function MobileNav({ links }: { links: NavLink[] }) {
 
       {/* Slide-out Drawer from Left */}
       <div 
-        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-out ${
+        className={`fixed top-0 left-0 h-full w-64 bg-white shadow-xl z-50 transform transition-transform duration-300 ease-out flex flex-col ${
           isOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
@@ -61,7 +66,7 @@ export function MobileNav({ links }: { links: NavLink[] }) {
         </div>
 
         {/* Navigation Links */}
-        <nav className="py-4">
+        <nav className="py-4 flex-1 overflow-y-auto">
           {links.map((link) => {
             const active = isActive(link.href);
             return (
@@ -84,9 +89,25 @@ export function MobileNav({ links }: { links: NavLink[] }) {
           })}
         </nav>
 
-        {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 px-4 py-4 border-t border-gray-200">
-          <p className="text-xs text-gray-500 text-center">PhenoFarm Dispensary</p>
+        <div className="border-t border-gray-200 mt-auto">
+          <div className="px-4 pt-4 pb-3">
+            <button
+              onClick={() => {
+                setIsOpen(false);
+                handleSignOut();
+              }}
+              className="w-full flex items-center px-4 py-3 text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+            >
+              <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              Sign Out
+            </button>
+          </div>
+
+          <div className="px-4 py-4 border-t border-gray-200">
+            <p className="text-xs text-gray-500 text-center">PhenoFarm Dispensary</p>
+          </div>
         </div>
       </div>
     </>

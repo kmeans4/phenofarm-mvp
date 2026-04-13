@@ -11,12 +11,13 @@ export default async function DispensarySettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
+      <div className="space-y-1">
         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dispensary Settings</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your account and preferences</p>
       </div>
       
-      <div className="mt-6 sm:mt-8">
+      <div className="mt-5 sm:mt-6">
         <SettingsForm defaultValues={{
           businessName: '',
           licenseNumber: '',
