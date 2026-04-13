@@ -134,7 +134,6 @@ export default async function GrowerCustomersPage() {
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Email</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Phone</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Location</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
               </thead>
@@ -149,20 +148,6 @@ export default async function GrowerCustomersPage() {
                     <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.user?.email || '-'}</td>
                     <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.phone || '-'}</td>
                     <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-600">{customer.city}, {customer.state}</td>
-                    <td className="px-3 sm:px-6 py-2.5 sm:py-4">
-                      <div className="flex flex-wrap gap-2">
-                        {customer.userId && (
-                          <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 text-[11px] font-medium text-blue-700">
-                            PhenoFarm member
-                          </span>
-                        )}
-                        {customer.orders.length > 0 && (
-                          <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-[11px] font-medium text-green-700">
-                            {customer.orders.length} order{customer.orders.length === 1 ? '' : 's'}
-                          </span>
-                        )}
-                      </div>
-                    </td>
                     <td className="px-3 sm:px-6 py-2.5 sm:py-4">
                       <Link
                         href={'/grower/customers/' + customer.id + '/edit'}
