@@ -69,6 +69,8 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   const [mobileListMode, setMobileListMode] = useState(true);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const conversationPollRef = useRef<number | null>(null);
+  const messagePollRef = useRef<number | null>(null);
 
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) || null,
@@ -159,21 +161,36 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   }, [open, activeConversationId, fetchMessages]);
 
   useEffect(() => {
-    const conversationTimer = setInterval(() => {
+    const poll = () => {
+      if (document.hidden) return;
       fetchConversations();
-    }, open ? 12000 : 5000);
+    };
 
-    return () => clearInterval(conversationTimer);
+    poll();
+    conversationPollRef.current = window.setInterval(poll, open ? 15000 : 30000);
+
+    return () => {
+      if (conversationPollRef.current !== null) {
+        window.clearInterval(conversationPollRef.current);
+      }
+    };
   }, [open, fetchConversations]);
 
   useEffect(() => {
     if (!open || !activeConversationId) return;
 
-    const messageTimer = setInterval(() => {
+    const poll = () => {
+      if (document.hidden) return;
       fetchMessages(activeConversationId, false);
-    }, 6000);
+    };
 
-    return () => clearInterval(messageTimer);
+    messagePollRef.current = window.setInterval(poll, 12000);
+
+    return () => {
+      if (messagePollRef.current !== null) {
+        window.clearInterval(messagePollRef.current);
+      }
+    };
   }, [open, activeConversationId, fetchMessages]);
 
   const sendMessage = useCallback(async () => {

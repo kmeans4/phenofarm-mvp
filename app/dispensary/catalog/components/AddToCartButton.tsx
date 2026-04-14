@@ -88,7 +88,7 @@ export default function AddToCartButton({
       }
       
       cart.subtotal = cart.items.reduce((sum: number, item: CartItem) => sum + item.price * item.quantity, 0);
-      cart.tax = cart.subtotal * 0.1;
+      cart.tax = cart.subtotal * 0.06;
       cart.total = cart.subtotal + cart.tax;
       
       localStorage.setItem('phenofarm-cart', JSON.stringify(cart));
