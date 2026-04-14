@@ -63,6 +63,7 @@ export default function GrowerShopContent({
   const [messageMode, setMessageMode] = useState<'REQUEST_PRICING' | 'QUESTION'>('REQUEST_PRICING');
   const [messageText, setMessageText] = useState('');
   const [messageSending, setMessageSending] = useState(false);
+  const [messageSuccess, setMessageSuccess] = useState('');
   const [messageError, setMessageError] = useState('');
 
   // Get unique product types for filter
@@ -129,6 +130,7 @@ export default function GrowerShopContent({
     setMessageMode(mode);
     setMessageProduct(product);
     setMessageText(defaultMessage);
+    setMessageSuccess('');
     setMessageError('');
   };
 
@@ -161,7 +163,11 @@ export default function GrowerShopContent({
         throw new Error(data.error || 'Failed to send message');
       }
 
-      setMessageProduct(null);
+      setMessageSuccess(
+        messageMode === 'REQUEST_PRICING'
+          ? `Pricing request sent to ${growerName}. Opening conversation...`
+          : `Message sent to ${growerName}. Opening conversation...`
+      );
       setMessageText('');
 
       window.dispatchEvent(
@@ -169,7 +175,13 @@ export default function GrowerShopContent({
           detail: { conversationId: data.conversationId },
         })
       );
+
+      window.setTimeout(() => {
+        setMessageProduct(null);
+        setMessageSuccess('');
+      }, 600);
     } catch (err) {
+      setMessageSuccess('');
       setMessageError(err instanceof Error ? err.message : 'Failed to send message');
     } finally {
       setMessageSending(false);
@@ -426,6 +438,7 @@ export default function GrowerShopContent({
               <button
                 onClick={() => {
                   setMessageProduct(null);
+                  setMessageSuccess('');
                   setMessageError('');
                 }}
                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -443,6 +456,7 @@ export default function GrowerShopContent({
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 placeholder="Write your message..."
               />
+              {messageSuccess && <p className="text-sm text-green-700">{messageSuccess}</p>}
               {messageError && <p className="text-sm text-red-600">{messageError}</p>}
             </div>
 
@@ -450,6 +464,7 @@ export default function GrowerShopContent({
               <button
                 onClick={() => {
                   setMessageProduct(null);
+                  setMessageSuccess('');
                   setMessageError('');
                 }}
                 className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"

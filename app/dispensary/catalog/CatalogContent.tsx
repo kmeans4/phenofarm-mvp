@@ -809,7 +809,11 @@ export default function CatalogContent() {
         throw new Error(data.error || 'Failed to send message');
       }
 
-      setRequestPricingProduct(null);
+      setRequestPricingError(
+        requestPricingMode === 'REQUEST_PRICING'
+          ? `Pricing request sent to ${requestPricingProduct.grower.businessName}. Opening conversation...`
+          : `Message sent to ${requestPricingProduct.grower.businessName}. Opening conversation...`
+      );
       setRequestPricingMessage('');
       setRequestPricingMode('REQUEST_PRICING');
 
@@ -818,6 +822,11 @@ export default function CatalogContent() {
           detail: { conversationId: data.conversationId },
         })
       );
+
+      window.setTimeout(() => {
+        setRequestPricingProduct(null);
+        setRequestPricingError('');
+      }, 600);
     } catch (err) {
       setRequestPricingError(err instanceof Error ? err.message : 'Failed to send message');
     } finally {
