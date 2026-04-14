@@ -38,6 +38,7 @@ export default function DispensaryCartPage() {
   const [checkingOut, setCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
   const [checkoutIssues, setCheckoutIssues] = useState<CheckoutIssue[]>([]);
+  const [inventoryAdjustmentNotice, setInventoryAdjustmentNotice] = useState('');
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
   useEffect(() => {
@@ -99,11 +100,49 @@ export default function DispensaryCartPage() {
     });
   };
 
+  const applyInventoryAdjustments = (issues: CheckoutIssue[]) => {
+    if (issues.length === 0) return;
+
+    setCart((prev) => {
+      let changedCount = 0;
+      const nextItems = prev.items.flatMap((item) => {
+        const issue = issues.find((entry) => entry.productId === item.id);
+        if (!issue) return [item];
+
+        const adjustedQuantity = Math.max(0, Math.min(item.quantity, issue.available));
+        if (adjustedQuantity === item.quantity) return [item];
+
+        changedCount += 1;
+
+        if (adjustedQuantity < 1) {
+          return [];
+        }
+
+        return [{
+          ...item,
+          quantity: adjustedQuantity,
+          maxQty: issue.available,
+        }];
+      });
+
+      if (changedCount > 0) {
+        setInventoryAdjustmentNotice(
+          changedCount === 1
+            ? '1 item quantity was adjusted to match currently available inventory.'
+            : `${changedCount} item quantities were adjusted to match currently available inventory.`
+        );
+      }
+
+      return { items: nextItems, ...calculateTotals(nextItems) };
+    });
+  };
+
   const handleCheckout = async () => {
     // Order confirmation - proceed directly without warning
     setCheckingOut(true);
     setCheckoutError('');
     setCheckoutIssues([]);
+    setInventoryAdjustmentNotice('');
 
     try {
       const response = await fetch('/api/checkout', {
@@ -113,12 +152,16 @@ export default function DispensaryCartPage() {
       });
 
       const data = await response.json();
+      const issues = Array.isArray(data.issues) ? data.issues : [];
+
       if (!response.ok) {
-        setCheckoutIssues(Array.isArray(data.issues) ? data.issues : []);
+        setCheckoutIssues(issues);
+        applyInventoryAdjustments(issues);
         throw new Error(data.error || 'Checkout failed');
       }
 
-      setCheckoutIssues(Array.isArray(data.issues) ? data.issues : []);
+      setCheckoutIssues(issues);
+      applyInventoryAdjustments(issues);
 
       localStorage.removeItem('phenofarm-cart');
       setCart({ items: [], subtotal: 0, tax: 0, total: 0 });
@@ -150,17 +193,24 @@ export default function DispensaryCartPage() {
     <div className="p-4 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
 
-      {checkoutError && (
+      {(checkoutError || inventoryAdjustmentNotice) && (
         <div className="mb-4 space-y-3">
-          <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">{checkoutError}</div>
+          {checkoutError && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">{checkoutError}</div>
+          )}
+          {inventoryAdjustmentNotice && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
+              {inventoryAdjustmentNotice}
+            </div>
+          )}
           {checkoutIssues.length > 0 && (
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm font-semibold text-amber-900 mb-2">Inventory issues</p>
+              <p className="text-sm font-semibold text-amber-900 mb-2">Inventory changes applied</p>
               <ul className="space-y-2 text-sm text-amber-900">
                 {checkoutIssues.map((issue) => (
                   <li key={`${issue.productId}-${issue.requested}`} className="rounded-md bg-white/70 border border-amber-100 px-3 py-2">
                     <span className="font-medium">{issue.productName}</span>
-                    <span className="text-amber-800">, requested {issue.requested}, available {issue.available}</span>
+                    <span className="text-amber-800"> was adjusted from {issue.requested} to {issue.available} due to current inventory availability.</span>
                   </li>
                 ))}
               </ul>
