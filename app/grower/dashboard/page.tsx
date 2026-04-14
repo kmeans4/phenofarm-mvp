@@ -296,18 +296,10 @@ export default async function GrowerDashboardPage() {
       {/* Getting Started Banner - only show when no data */}
       {!hasData && (
         <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4">
-            <div>
-              <h3 className="text-base sm:text-lg font-semibold text-green-900">🌱 Welcome to PhenoFarm!</h3>
-              <p className="text-sm text-green-700 mt-1">You are all set to launch — add your first product to start receiving orders.</p>
-              <p className="text-xs sm:text-sm text-green-700/90 mt-1">Next step: build your catalog, then publish listings in the marketplace.</p>
-            </div>
-            <Link 
-              href="/grower/products/add" 
-              className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium transition-colors text-center whitespace-nowrap"
-            >
-              Add First Product
-            </Link>
+          <div>
+            <h3 className="text-base sm:text-lg font-semibold text-green-900">🌱 Welcome to PhenoFarm!</h3>
+            <p className="text-sm text-green-700 mt-1">You are all set to launch once your first products and orders start coming in.</p>
+            <p className="text-xs sm:text-sm text-green-700/90 mt-1">Use the Products area when you are ready to build your catalog and publish listings.</p>
           </div>
         </div>
       )}
