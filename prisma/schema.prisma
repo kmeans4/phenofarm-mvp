@@ -312,7 +312,8 @@ model Conversation {
   dispensary           Dispensary            @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
   grower               Grower                @relation(fields: [growerId], references: [id], onDelete: Cascade)
 
-  @@unique([growerId, dispensaryId])
+  @@index([growerId, dispensaryId])
+  @@index([growerId, dispensaryId, productId])
   @@index([growerId, lastMessageAt])
   @@index([dispensaryId, lastMessageAt])
   @@map("conversations")

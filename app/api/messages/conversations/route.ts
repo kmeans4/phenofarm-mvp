@@ -197,12 +197,14 @@ export async function POST(request: NextRequest) {
     }
 
     const now = new Date();
-    const existing = await db.conversation.findUnique({
+    const existing = await db.conversation.findFirst({
       where: {
-        growerId_dispensaryId: {
-          growerId,
-          dispensaryId,
-        },
+        growerId,
+        dispensaryId,
+        ...(productId ? { productId } : { productId: null }),
+      },
+      orderBy: {
+        updatedAt: 'desc',
       },
     });
 
@@ -210,7 +212,6 @@ export async function POST(request: NextRequest) {
       ? await db.conversation.update({
           where: { id: existing.id },
           data: {
-            ...(productId && !existing.productId ? { productId } : {}),
             ...(user.role === 'GROWER' ? { growerLastReadAt: now } : { dispensaryLastReadAt: now }),
             updatedAt: now,
           },
