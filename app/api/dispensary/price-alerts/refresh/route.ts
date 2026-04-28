@@ -5,6 +5,15 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+interface PriceAlertPayload {
+  productId: string;
+  targetPrice: number | string;
+  currentPrice: number | string;
+  originalPrice?: number | string | null;
+  isTriggered?: boolean;
+  triggeredAt?: string | null;
+}
+
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -14,7 +23,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const { alerts } = await request.json();
+    const { alerts } = await request.json() as { alerts?: PriceAlertPayload[] };
 
     if (!alerts || !Array.isArray(alerts)) {
       return NextResponse.json({ error: "Invalid alerts data" }, { status: 400 });
@@ -27,7 +36,7 @@ export async function POST(request: NextRequest) {
       select: { id: true, price: true, inventoryQty: true },
     });
 
-    const updatedAlerts = alerts.map((alert: any) => {
+    const updatedAlerts = alerts.map((alert) => {
       const product = products.find(p => p.id === alert.productId);
       if (!product) return alert;
 

@@ -37,7 +37,7 @@ export async function POST() {
     }
 
     // Create Stripe Connect account
-    const account: any = await stripe.accounts.create({
+    const account = await stripe.accounts.create({
       type: 'standard',
       email: user.email || undefined,
       business_type: 'company',
@@ -53,7 +53,7 @@ export async function POST() {
         growerId: grower.id,
         platform: 'phenofarm',
       },
-    });
+    }) as { id: string };
 
     await db.grower.update({
       where: { id: grower.id },
@@ -63,12 +63,12 @@ export async function POST() {
       },
     });
 
-    const accountLink: any = await stripe.accountLinks.create({
+    const accountLink = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: STRIPE_CONFIG.getConnectRefreshUrl(),
       return_url: STRIPE_CONFIG.getConnectReturnUrl(),
       type: 'account_onboarding',
-    });
+    }) as { url: string };
 
     return NextResponse.json({
       success: true,

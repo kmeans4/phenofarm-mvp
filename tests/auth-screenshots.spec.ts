@@ -199,15 +199,21 @@ test.describe('Dispensary Auth Screenshots', () => {
     await page.goto('/dispensary/orders');
     await page.waitForLoadState('networkidle').catch(() => {});
     
-    // Try to find an order to view
-    const orderLink = await page.$('a[href*="/orders/"]');
-    if (orderLink) {
-      await orderLink.click();
-      await page.waitForLoadState('networkidle').catch(() => {});
-      await page.screenshot({ path: 'screenshots/dispensary-order-detail.png', fullPage: true });
-    } else {
-      console.log('No order links found on dispensary orders page');
+    // Try to find a visible order link to view
+    const orderLinks = page.locator('a[href*="/orders/"]');
+    const orderLinkCount = await orderLinks.count();
+
+    for (let i = 0; i < orderLinkCount; i++) {
+      const candidate = orderLinks.nth(i);
+      if (await candidate.isVisible()) {
+        await candidate.click();
+        await page.waitForLoadState('networkidle').catch(() => {});
+        await page.screenshot({ path: 'screenshots/dispensary-order-detail.png', fullPage: true });
+        return;
+      }
     }
+
+    console.log('No visible order links found on dispensary orders page');
   });
 });
 

@@ -15,6 +15,26 @@ interface Batch {
   strain?: { name: string } | null;
 }
 
+interface ProductFormSubmitData {
+  name: string;
+  strain: string;
+  strainId: string | null;
+  batchId: string | null;
+  category: string;
+  subcategory: string;
+  price: string;
+  inventoryQty: string;
+  unit: string;
+  description: string;
+  isAvailable: boolean;
+  sku: string;
+  brand: string;
+  ingredients: string;
+  ingredientsDocumentUrl: string;
+  images: string[];
+  isFeatured: boolean;
+}
+
 interface ProductFormProps {
   initialData?: {
     id?: string;
@@ -37,7 +57,7 @@ interface ProductFormProps {
   };
   initialStrainId?: string;
   initialBatchId?: string;
-  onSubmit: (data: any) => void;
+  onSubmit: (data: ProductFormSubmitData) => void;
   onCancel: () => void;
   growerBrand?: string;
 }
@@ -49,8 +69,7 @@ interface ProductTypeConfig {
 
 export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, initialStrainId, initialBatchId }: ProductFormProps) {
   const [name, setName] = useState(initialData?.name || '');
-  const [strain, setStrain] = useState(initialData?.strain || '');
-  const [category, setCategory] = useState(initialData?.category || '');
+  const [category, setCategory] = useState(canonicalizeProductType(initialData?.category || '') || initialData?.category || '');
   const [subcategory, setSubcategory] = useState(initialData?.subcategory || '');
       const [price, setPrice] = useState(initialData?.price || '');
   const [inventoryQty, setInventoryQty] = useState(initialData?.inventoryQty || '');
@@ -65,12 +84,10 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
   const [isFeatured, setIsFeatured] = useState(initialData?.isFeatured || false);
   
   // File uploads
-  const [ingredientDocFile, setIngredientDocFile] = useState<File | null>(null);
   const [ingredientDocName, setIngredientDocName] = useState<string>('');
   const [ingredientDocBase64, setIngredientDocBase64] = useState<string>('');
   const [productImages, setProductImages] = useState<string[]>(initialData?.images || []);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
-  const [isUploading, setIsUploading] = useState(false);
   
   const [productTypeConfigs, setProductTypeConfigs] = useState<ProductTypeConfig[]>([]);
 
@@ -152,12 +169,6 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
     fetchProductTypes();
   }, []);
 
-  useEffect(() => {
-    if (category && normalizedCategory && category !== normalizedCategory) {
-      setCategory(normalizedCategory);
-    }
-  }, [category, normalizedCategory]);
-
   // Update filtered batches when strain changes
   const filteredBatches = selectedStrainId
     ? batches.filter(b => b.strain?.name === strains.find(s => s.id === selectedStrainId)?.name)
@@ -219,7 +230,6 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
       setIngredientDocName(file.name);
     };
     reader.readAsDataURL(file);
-    setIngredientDocFile(file);
   };
 
   const removeImage = (index: number) => {
@@ -230,7 +240,6 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
   };
 
   const removeDocument = () => {
-    setIngredientDocFile(null);
     setIngredientDocName('');
     setIngredientDocBase64('');
     if (docInputRef.current) {
@@ -598,8 +607,8 @@ export function ProductForm({ initialData, onSubmit, onCancel, growerBrand, init
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit" variant="primary" disabled={isUploading}>
-          {isUploading ? 'Creating...' : (initialData?.id ? 'Update Product' : 'Create Product')}
+        <Button type="submit" variant="primary">
+          {initialData?.id ? 'Update Product' : 'Create Product'}
         </Button>
       </div>
     </form>

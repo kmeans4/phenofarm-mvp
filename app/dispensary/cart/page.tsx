@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
@@ -31,6 +31,16 @@ interface CheckoutIssue {
   available: number;
 }
 
+interface DispensaryProductGroup {
+  products?: Array<{ id: string; inventoryQty: number | null }>;
+}
+
+const calculateTotals = (items: CartItem[]) => {
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const tax = subtotal * 0.06;
+  return { subtotal, tax, total: subtotal + tax };
+};
+
 export default function DispensaryCartPage() {
   const router = useRouter();
   const [cart, setCart] = useState<Cart>({ items: [], subtotal: 0, tax: 0, total: 0 });
@@ -41,17 +51,78 @@ export default function DispensaryCartPage() {
   const [inventoryAdjustmentNotice, setInventoryAdjustmentNotice] = useState('');
   const [checkoutSuccess, setCheckoutSuccess] = useState(false);
 
+  const syncCartWithLiveInventory = useCallback(async (savedCart: Cart) => {
+    if (!savedCart.items.length) {
+      setCart(savedCart);
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/dispensary/products?limit=200');
+      if (!response.ok) {
+        setCart(savedCart);
+        return;
+      }
+
+      const data = await response.json();
+      const groups: DispensaryProductGroup[] = Array.isArray(data?.groups) ? data.groups : [];
+      const liveProducts = groups.flatMap((group) =>
+        Array.isArray(group.products) ? group.products : []
+      );
+      const inventoryByProductId = new Map(
+        liveProducts.map((product) => [product.id, product.inventoryQty ?? 0])
+      );
+
+      let changedCount = 0;
+      const syncedItems = savedCart.items.flatMap((item) => {
+        const liveInventory = inventoryByProductId.get(item.id);
+
+        if (liveInventory === undefined) {
+          changedCount += 1;
+          return [];
+        }
+
+        const nextMaxQty = Math.max(0, liveInventory);
+        const nextQuantity = Math.min(item.quantity, nextMaxQty);
+
+        if (nextQuantity !== item.quantity || nextMaxQty !== item.maxQty) {
+          changedCount += 1;
+        }
+
+        if (nextQuantity < 1) {
+          return [];
+        }
+
+        return [{ ...item, quantity: nextQuantity, maxQty: nextMaxQty }];
+      });
+
+      const nextCart = { items: syncedItems, ...calculateTotals(syncedItems) };
+      setCart(nextCart);
+
+      if (changedCount > 0) {
+        setInventoryAdjustmentNotice(
+          changedCount === 1
+            ? '1 cart item was refreshed to match current inventory.'
+            : `${changedCount} cart items were refreshed to match current inventory.`
+        );
+      }
+    } catch {
+      setCart(savedCart);
+    }
+  }, []);
+
   useEffect(() => {
     setMounted(true);
     const saved = localStorage.getItem('phenofarm-cart');
     if (saved) {
       try {
-        setCart(JSON.parse(saved));
+        const parsedCart = JSON.parse(saved);
+        void syncCartWithLiveInventory(parsedCart);
       } catch {
         setCart({ items: [], subtotal: 0, tax: 0, total: 0 });
       }
     }
-  }, []);
+  }, [syncCartWithLiveInventory]);
 
   useEffect(() => {
     if (mounted) {
@@ -59,11 +130,6 @@ export default function DispensaryCartPage() {
     }
   }, [cart, mounted]);
 
-  const calculateTotals = (items: CartItem[]) => {
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const tax = subtotal * 0.06;
-    return { subtotal, tax, total: subtotal + tax };
-  };
 
   const updateQuantity = (id: string, delta: number) => {
     setCart(prev => {

@@ -53,20 +53,17 @@ export const COMPARE_STORAGE_KEY = 'phenofarm_compare_products';
 // ============================================
 
 export function useCompare(): CompareState {
-  const [compareList, setCompareList] = useState<Product[]>([]);
+  const [compareList, setCompareList] = useState<Product[]>(() => {
+    if (typeof window === 'undefined') return [];
 
-  // Load compare list from localStorage on mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
     try {
       const stored = localStorage.getItem(COMPARE_STORAGE_KEY);
-      if (stored) {
-        setCompareList(JSON.parse(stored));
-      }
+      return stored ? JSON.parse(stored) : [];
     } catch (e) {
       console.error('Failed to load compare list:', e);
+      return [];
     }
-  }, []);
+  });
 
   // Save compare list to localStorage when it changes
   useEffect(() => {
@@ -129,7 +126,6 @@ interface ProductCompareCheckboxProps {
 }
 
 export function ProductCompareCheckbox({
-  product,
   isInCompare,
   onCompareToggle,
   compareDisabled,

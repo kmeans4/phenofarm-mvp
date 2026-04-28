@@ -37,7 +37,10 @@ export async function GET() {
     }
 
     // Check Stripe account status
-    const account: any = await stripe.accounts.retrieve(grower.stripeAccountId);
+    const account = await stripe.accounts.retrieve(grower.stripeAccountId) as {
+      charges_enabled?: boolean;
+      payouts_enabled?: boolean;
+    };
     
     return NextResponse.json({
       connected: true,

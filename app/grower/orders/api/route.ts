@@ -3,8 +3,9 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { db } from '@/lib/db';
 import { ExtendedUser } from '@/types';
+import { OrderStatus, Prisma } from '@prisma/client';
 
-const validStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
+const validStatuses: OrderStatus[] = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -25,10 +26,10 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get('limit') || '20');
     const offset = parseInt(searchParams.get('skip') || '0');
 
-    const where: any = { growerId: user.growerId };
+    const where: Prisma.OrderWhereInput = { growerId: user.growerId };
 
-    if (status && validStatuses.includes(status)) {
-      where.status = status;
+    if (status && validStatuses.includes(status as OrderStatus)) {
+      where.status = status as OrderStatus;
     }
 
     const orders = await db.order.findMany({

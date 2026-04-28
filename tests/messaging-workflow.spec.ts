@@ -53,7 +53,9 @@ test.describe('Messaging Workflow', () => {
     await page.getByRole('button', { name: 'Send Message' }).click();
 
     await expect(page.getByRole('heading', { name: 'Messages' })).toBeVisible();
-    await expect(page.getByTestId('conversation-item').first()).toContainText(note);
+    const conversation = page.getByTestId('conversation-item').filter({ hasText: note }).first();
+    await expect(conversation).toBeVisible({ timeout: 15000 });
+    await conversation.click();
     await expect(page.getByTestId('message-bubble').filter({ hasText: note }).last()).toBeVisible({ timeout: 15000 });
   }
 

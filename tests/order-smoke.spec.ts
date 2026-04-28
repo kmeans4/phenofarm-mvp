@@ -25,7 +25,6 @@ test.describe('Order smoke test', () => {
     await page.evaluate(() => window.localStorage.removeItem('phenofarm-cart'));
 
     const productCard = page.locator('[class*="group"]').filter({ has: page.getByRole('button', { name: /add to cart/i }) }).first();
-    const productName = (await productCard.getByRole('heading').first().textContent())?.trim() || 'Unknown product';
     await productCard.getByRole('button', { name: /add to cart/i }).click();
 
     await expect
@@ -62,8 +61,8 @@ test.describe('Order smoke test', () => {
 
     const orderRow = page.locator('table tbody tr').first();
     await expect(orderRow).toBeVisible({ timeout: 15000 });
-    const afterRows = await page.locator('table tbody tr').count();
-    expect(afterRows).toBeGreaterThanOrEqual(beforeRows);
+    const afterRows = await page.locator('a[href^="/dispensary/orders/"]').count();
+    expect(afterRows).toBeGreaterThanOrEqual(Math.max(1, beforeRows));
 
     const pageText = await page.locator('main').innerText();
     expect(pageText).toMatch(/My Orders|Order History/);

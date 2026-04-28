@@ -297,6 +297,11 @@ export function ProductForm({
       case 'unit': return validateUnit(value);
       case 'sku': return validateSku(value);
       case 'description': return validateDescription(value);
+      case 'thcMin': return validateThcRange(value, formData.thcMax).minError;
+      case 'thcMax': return validateThcRange(formData.thcMin, value).maxError;
+      case 'cbdMin': return validateCbdRange(value, formData.cbdMax).minError;
+      case 'cbdMax': return validateCbdRange(formData.cbdMin, value).maxError;
+      case 'harvestDate': return validateHarvestDate(value);
       default: return undefined;
     }
   };
@@ -431,6 +436,9 @@ export function ProductForm({
   });
 
   const hasErrors = Object.values(errors).some(Boolean);
+  const liveThcErrors = validateThcRange(formData.thcMin, formData.thcMax);
+  const liveCbdErrors = validateCbdRange(formData.cbdMin, formData.cbdMax);
+  const liveHarvestDateError = validateHarvestDate(formData.harvestDate);
 
   const handleSaveDraft = async () => {
     if (!onSaveDraft || isSubmitting) return;
@@ -700,11 +708,11 @@ export function ProductForm({
                     value={formData.thcMin}
                     onChange={(e) => handleChange('thcMin', e.target.value)}
                     onBlur={() => handleBlur('thcMin')}
-                    className={errors.thcMin && touched.thcMin ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    className={liveThcErrors.minError ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                     placeholder="e.g., 15"
                   />
-                  {errors.thcMin && touched.thcMin && (
-                    <p className="text-xs text-red-600 mt-1">{errors.thcMin}</p>
+                  {liveThcErrors.minError && (
+                    <p className="text-xs text-red-600 mt-1">{liveThcErrors.minError}</p>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -720,11 +728,11 @@ export function ProductForm({
                     value={formData.thcMax}
                     onChange={(e) => handleChange('thcMax', e.target.value)}
                     onBlur={() => handleBlur('thcMax')}
-                    className={errors.thcMax && touched.thcMax ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    className={liveThcErrors.maxError ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                     placeholder="e.g., 25"
                   />
-                  {errors.thcMax && touched.thcMax && (
-                    <p className="text-xs text-red-600 mt-1">{errors.thcMax}</p>
+                  {liveThcErrors.maxError && (
+                    <p className="text-xs text-red-600 mt-1">{liveThcErrors.maxError}</p>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -740,11 +748,11 @@ export function ProductForm({
                     value={formData.cbdMin}
                     onChange={(e) => handleChange('cbdMin', e.target.value)}
                     onBlur={() => handleBlur('cbdMin')}
-                    className={errors.cbdMin && touched.cbdMin ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    className={liveCbdErrors.minError ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                     placeholder="e.g., 0"
                   />
-                  {errors.cbdMin && touched.cbdMin && (
-                    <p className="text-xs text-red-600 mt-1">{errors.cbdMin}</p>
+                  {liveCbdErrors.minError && (
+                    <p className="text-xs text-red-600 mt-1">{liveCbdErrors.minError}</p>
                   )}
                 </div>
                 <div className="space-y-2">
@@ -760,11 +768,11 @@ export function ProductForm({
                     value={formData.cbdMax}
                     onChange={(e) => handleChange('cbdMax', e.target.value)}
                     onBlur={() => handleBlur('cbdMax')}
-                    className={errors.cbdMax && touched.cbdMax ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                    className={liveCbdErrors.maxError ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                     placeholder="e.g., 1"
                   />
-                  {errors.cbdMax && touched.cbdMax && (
-                    <p className="text-xs text-red-600 mt-1">{errors.cbdMax}</p>
+                  {liveCbdErrors.maxError && (
+                    <p className="text-xs text-red-600 mt-1">{liveCbdErrors.maxError}</p>
                   )}
                 </div>
               </div>
@@ -781,7 +789,7 @@ export function ProductForm({
                 value={formData.harvestDate}
                 onChange={(e) => handleChange('harvestDate', e.target.value)}
                 onBlur={() => handleBlur('harvestDate')}
-                className={errors.harvestDate && touched.harvestDate ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                className={liveHarvestDateError ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
               />
               {errors.harvestDate && touched.harvestDate && (
                 <p className="text-sm text-red-600 mt-1">{errors.harvestDate}</p>

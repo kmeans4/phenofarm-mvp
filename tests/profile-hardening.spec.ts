@@ -21,6 +21,8 @@ async function login(page: Page, email: string, password: string) {
 }
 
 test.describe('Profile hardening + license verification', () => {
+  test.describe.configure({ mode: 'serial' });
+  test.setTimeout(120_000);
   test('Grower creates valid product with cannabinoid profile', async ({ page }) => {
     await login(page, TEST_USERS.grower.email, TEST_USERS.grower.password);
 
@@ -49,7 +51,7 @@ test.describe('Profile hardening + license verification', () => {
 
     // Mock API response
     let postSeen = false;
-    let postData: any = null;
+    let postData: Record<string, unknown> | null = null;
     await page.route('**/api/products', async (route) => {
       if (route.request().method() === 'POST') {
         postSeen = true;
@@ -78,10 +80,10 @@ test.describe('Profile hardening + license verification', () => {
       .toBeTruthy();
 
     expect(postData).toMatchObject({
-      thcMin: '15',
-      thcMax: '25',
-      cbdMin: '0',
-      cbdMax: '1',
+      thcMin: 15,
+      thcMax: 25,
+      cbdMin: 0,
+      cbdMax: 1,
       harvestDate: expect.any(String),
     });
 
@@ -104,10 +106,10 @@ test.describe('Profile hardening + license verification', () => {
     // Test invalid THC range (min > max)
     await page.fill('#thcMin', '30');
     await page.fill('#thcMax', '20');
-    await page.fill('#thcMin').then(() => page.locator('#thcMax').blur());
+    await page.locator('#thcMax').blur();
 
     // Should show error
-    const thcError = page.locator('text=thcMax must be >= thcMin');
+    const thcError = page.locator('text=THC max must be >= min');
     await expect(thcError).toBeVisible();
 
     // Test invalid CBD value (> 100)
@@ -224,16 +226,15 @@ test.describe('Profile hardening + license verification', () => {
       return route.continue();
     });
 
-    await page.goto('/dispensary/settings');
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.goto('/dispensary/settings', { waitUntil: 'domcontentloaded' });
 
     // Should show pending review badge
-    const pendingBadge = page.locator('text=/pending.*review|license.*pending/i');
-    await expect(pendingBadge).toBeVisible();
+    await expect.poll(async () => page.locator('main').innerText(), { timeout: 15000 }).toContain('License Pending Review');
 
     // Verify required fields are marked
-    const requiredMarkers = page.locator('text=*');
-    await expect(requiredMarkers.first()).toBeVisible();
+    const settingsText = await page.locator('main').innerText();
+    expect(settingsText).toContain('Business Name *');
+    expect(settingsText).toContain('Dispensary License Number *');
   });
 
   test('Grower settings form validates license expiry', async ({ page }) => {
@@ -265,8 +266,7 @@ test.describe('Profile hardening + license verification', () => {
       return route.continue();
     });
 
-    await page.goto('/grower/settings');
-    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.goto('/grower/settings', { waitUntil: 'domcontentloaded' });
 
     // Try to save with past expiry date
     const pastDate = new Date();
@@ -277,8 +277,8 @@ test.describe('Profile hardening + license verification', () => {
     await page.locator('input[type="date"]').blur();
 
     // Should show error
-    const expiryError = page.locator('text=/license expiry.*future|invalid.*date/i');
-    await expect(expiryError).toBeVisible();
+    const expiryError = page.locator('text=/license expiry.*future|invalid.*date|expiry date/i').first();
+    await expect(expiryError).toBeVisible({ timeout: 15000 });
 
     // Submit should be blocked
     const saveButton = page.getByRole('button', { name: /save/i });

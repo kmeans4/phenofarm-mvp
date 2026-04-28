@@ -11,7 +11,7 @@ interface FilterSidebarProps {
     priceRange: { min: number | null; max: number | null };
     inStockOnly: boolean;
   };
-  onFilterChange: (filters: any) => void;
+  onFilterChange: (filters: FilterSidebarProps['filters']) => void;
   availableProductTypes: string[];
   totalProducts: number;
   filteredCount: number;
@@ -116,7 +116,7 @@ export default function FilterSidebar({
     (filters.priceRange.min !== null ? 1 : 0) +
     (filters.inStockOnly ? 1 : 0);
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <div className="h-full flex flex-col">
       {/* Header */}
       <div className="p-4 border-b border-gray-200 flex items-center justify-between">
@@ -329,7 +329,7 @@ export default function FilterSidebar({
       {/* Desktop sidebar (fixed width) */}
       <div className="hidden lg:block w-72 flex-shrink-0">
         <div className="sticky top-4 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden max-h-[calc(100vh-2rem)]">
-          <SidebarContent />
+          {sidebarContent}
         </div>
       </div>
 
@@ -341,7 +341,7 @@ export default function FilterSidebar({
             onClick={onClose}
           />
           <div className="lg:hidden fixed inset-y-0 left-0 w-80 bg-white shadow-xl z-50">
-            <SidebarContent />
+            {sidebarContent}
           </div>
         </>
       )}
