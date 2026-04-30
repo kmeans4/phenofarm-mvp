@@ -29,8 +29,6 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
   const [newStrainGenetics, setNewStrainGenetics] = useState('');
   const [creating, setCreating] = useState(false);
 
-  const selectedStrain = strains.find((strain) => strain.id === strainId);
-
   useEffect(() => {
     const fetchStrains = async () => {
       try {
@@ -121,13 +119,6 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
           + New
         </Button>
       </div>
-
-      {selectedStrain?.strainType && (
-        <p className="text-xs text-gray-500">
-          Selected strain type: <span className="font-medium text-gray-600">{STRAIN_TYPE_LABELS[selectedStrain.strainType]}</span>
-          {selectedStrain.genetics ? <span className="text-gray-400"> • {selectedStrain.genetics}</span> : null}
-        </p>
-      )}
 
       {showCreateForm && (
         <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
