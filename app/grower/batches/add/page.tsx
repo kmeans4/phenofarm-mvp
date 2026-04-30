@@ -24,7 +24,6 @@ interface BatchFormData {
   thc: string;
   cbd: string;
   totalCannabinoids: string;
-  terpenes: string;
   labDocuments: BatchLabDocuments;
   notes: string;
 }
@@ -44,7 +43,6 @@ export default function AddBatchPage() {
     thc: '',
     cbd: '',
     totalCannabinoids: '',
-    terpenes: '',
     labDocuments: createEmptyBatchLabDocuments(),
     notes: ''
   });
@@ -86,8 +84,6 @@ export default function AddBatchPage() {
       setLoading(true);
       setError(null);
 
-      // Terpenes stored as plain text
-
       const response = await fetch('/api/batches', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -98,7 +94,6 @@ export default function AddBatchPage() {
           thc: formData.thc.trim() || null,
           cbd: formData.cbd.trim() || null,
           totalCannabinoids: formData.totalCannabinoids.trim() || null,
-          terpenes: formData.terpenes.trim() || null,
           coaDocumentUrl: null,
           testResults: hasBatchLabDocuments(formData.labDocuments)
             ? { labDocuments: formData.labDocuments }
@@ -272,20 +267,6 @@ export default function AddBatchPage() {
                   />
                 </div>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="terpenes" className="block text-sm font-medium text-gray-700">
-                Terpenes
-              </label>
-              <textarea
-                id="terpenes"
-                rows={3}
-                value={formData.terpenes}
-                onChange={(e) => handleChange('terpenes', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono text-sm"
-                placeholder='{"myrcene": 0.5, "limonene": 0.3, "caryophyllene": 0.2}'
-              />
             </div>
 
             <BatchLabDocumentUploaders

@@ -38,7 +38,6 @@ interface BatchFormData {
   thc: string;
   cbd: string;
   totalCannabinoids: string;
-  terpenes: string;
   labDocuments: BatchLabDocuments;
   notes: string;
 }
@@ -61,7 +60,6 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
     thc: '',
     cbd: '',
     totalCannabinoids: '',
-    terpenes: '',
     labDocuments: createEmptyBatchLabDocuments(),
     notes: ''
   });
@@ -129,7 +127,6 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
           thc: formData.thc.trim() || null,
           cbd: formData.cbd.trim() || null,
           totalCannabinoids: formData.totalCannabinoids.trim() || null,
-          terpenes: formData.terpenes.trim() || null,
           coaDocumentUrl: null,
           testResults: hasBatchLabDocuments(formData.labDocuments)
             ? { labDocuments: formData.labDocuments }
@@ -155,7 +152,6 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
         thc: '',
         cbd: '',
         totalCannabinoids: '',
-        terpenes: '',
         labDocuments: createEmptyBatchLabDocuments(),
         notes: ''
       });
@@ -304,11 +300,6 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
                     <input type="number" step="0.01" min="0" max="100" value={formData.totalCannabinoids} onChange={(e) => setFormData(prev => ({ ...prev, totalCannabinoids: e.target.value }))} className={INPUT_CLASSES} placeholder="e.g., 22.0" />
                   </div>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Terpenes</label>
-                <textarea value={formData.terpenes} onChange={(e) => setFormData(prev => ({ ...prev, terpenes: e.target.value }))} className={TEXTAREA_CLASSES} rows={3} placeholder='{"myrcene": 0.5, "limonene": 0.3}' />
               </div>
 
               <BatchLabDocumentUploaders
