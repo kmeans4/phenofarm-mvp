@@ -2,6 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/app/components/ui/Button';
+import {
+  BatchLabDocumentUploaders,
+  BatchLabDocuments,
+  createEmptyBatchLabDocuments,
+  hasBatchLabDocuments
+} from '@/app/grower/components/BatchLabDocumentUploaders';
 
 interface Strain {
   id: string;
@@ -33,7 +39,7 @@ interface BatchFormData {
   cbd: string;
   totalCannabinoids: string;
   terpenes: string;
-  coaDocumentUrl: string;
+  labDocuments: BatchLabDocuments;
   notes: string;
 }
 
@@ -56,7 +62,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
     cbd: '',
     totalCannabinoids: '',
     terpenes: '',
-    coaDocumentUrl: '',
+    labDocuments: createEmptyBatchLabDocuments(),
     notes: ''
   });
 
@@ -124,7 +130,10 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
           cbd: formData.cbd.trim() || null,
           totalCannabinoids: formData.totalCannabinoids.trim() || null,
           terpenes: formData.terpenes.trim() || null,
-          coaDocumentUrl: formData.coaDocumentUrl.trim() || null,
+          coaDocumentUrl: null,
+          testResults: hasBatchLabDocuments(formData.labDocuments)
+            ? { labDocuments: formData.labDocuments }
+            : null,
           notes: formData.notes.trim() || null
         })
       });
@@ -147,7 +156,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
         cbd: '',
         totalCannabinoids: '',
         terpenes: '',
-        coaDocumentUrl: '',
+        labDocuments: createEmptyBatchLabDocuments(),
         notes: ''
       });
     } catch (err) {
@@ -302,10 +311,11 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
                 <textarea value={formData.terpenes} onChange={(e) => setFormData(prev => ({ ...prev, terpenes: e.target.value }))} className={TEXTAREA_CLASSES} rows={3} placeholder='{"myrcene": 0.5, "limonene": 0.3}' />
               </div>
 
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">COA Document URL</label>
-                <input type="url" value={formData.coaDocumentUrl} onChange={(e) => setFormData(prev => ({ ...prev, coaDocumentUrl: e.target.value }))} className={INPUT_CLASSES} placeholder="https://..." />
-              </div>
+              <BatchLabDocumentUploaders
+                value={formData.labDocuments}
+                onChange={(documents) => setFormData(prev => ({ ...prev, labDocuments: documents }))}
+                onError={setError}
+              />
 
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Notes</label>

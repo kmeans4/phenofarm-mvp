@@ -4,6 +4,12 @@ import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import {
+  BatchLabDocumentUploaders,
+  BatchLabDocuments,
+  createEmptyBatchLabDocuments,
+  hasBatchLabDocuments
+} from '@/app/grower/components/BatchLabDocumentUploaders';
 
 interface Strain {
   id: string;
@@ -23,6 +29,7 @@ interface Batch {
   totalCannabinoids: number | null;
   terpenes: unknown;
   coaDocumentUrl: string | null;
+  testResults: { labDocuments?: BatchLabDocuments } | null;
   notes: string | null;
 }
 
@@ -34,7 +41,7 @@ interface BatchFormData {
   cbd: string;
   totalCannabinoids: string;
   terpenes: string;
-  coaDocumentUrl: string;
+  labDocuments: BatchLabDocuments;
   notes: string;
 }
 
@@ -56,7 +63,7 @@ export default function EditBatchPage() {
     cbd: '',
     totalCannabinoids: '',
     terpenes: '',
-    coaDocumentUrl: '',
+    labDocuments: createEmptyBatchLabDocuments(),
     notes: ''
   });
 
@@ -84,7 +91,7 @@ export default function EditBatchPage() {
             cbd: data.cbd?.toString() || '',
             totalCannabinoids: data.totalCannabinoids?.toString() || '',
             terpenes: data.terpenes ? JSON.stringify(data.terpenes, null, 2) : '',
-            coaDocumentUrl: data.coaDocumentUrl || '',
+            labDocuments: data.testResults?.labDocuments || createEmptyBatchLabDocuments(),
             notes: data.notes || ''
           });
         } else {
@@ -102,7 +109,7 @@ export default function EditBatchPage() {
     }
   }, [batchId]);
 
-  const handleChange = (field: keyof BatchFormData, value: string) => {
+  const handleChange = <K extends keyof BatchFormData>(field: K, value: BatchFormData[K]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (error) setError(null);
   };
@@ -143,7 +150,10 @@ export default function EditBatchPage() {
           cbd: formData.cbd.trim() || null,
           totalCannabinoids: formData.totalCannabinoids.trim() || null,
           terpenes: terpenesParsed,
-          coaDocumentUrl: formData.coaDocumentUrl.trim() || null,
+          coaDocumentUrl: null,
+          testResults: hasBatchLabDocuments(formData.labDocuments)
+            ? { labDocuments: formData.labDocuments }
+            : null,
           notes: formData.notes.trim() || null
         })
       });
@@ -322,19 +332,11 @@ export default function EditBatchPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="coaDocumentUrl" className="block text-sm font-medium text-gray-700">
-                COA Document URL
-              </label>
-              <input
-                id="coaDocumentUrl"
-                type="url"
-                value={formData.coaDocumentUrl}
-                onChange={(e) => handleChange('coaDocumentUrl', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="https://..."
-              />
-            </div>
+            <BatchLabDocumentUploaders
+              value={formData.labDocuments}
+              onChange={(documents) => handleChange('labDocuments', documents)}
+              onError={setError}
+            />
 
             <div className="space-y-2">
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
