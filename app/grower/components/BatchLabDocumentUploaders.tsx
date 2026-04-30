@@ -15,15 +15,15 @@ export interface BatchLabDocument {
 export type BatchLabDocuments = Partial<Record<BatchLabDocumentKey, BatchLabDocument>>;
 
 export const BATCH_LAB_DOCUMENT_LABELS: Record<BatchLabDocumentKey, string> = {
-  cannabinoids: 'Cannabinoid Potency Report',
-  pesticides: 'Pesticide Screening Report',
-  microbials: 'Microbial Testing Report'
+  cannabinoids: 'Potency Test',
+  pesticides: 'Pesticide Test',
+  microbials: 'Microbial Test'
 };
 
 const BATCH_LAB_DOCUMENT_HELPER_TEXT: Record<BatchLabDocumentKey, string> = {
-  cannabinoids: 'Upload the cannabinoids/potency COA showing THC, CBD, and total cannabinoids.',
-  pesticides: 'Upload the pesticide screening report for this harvest batch.',
-  microbials: 'Upload the microbial testing report for this harvest batch.'
+  cannabinoids: 'Upload the PDF showing THC, CBD, and total cannabinoids.',
+  pesticides: 'Upload the pesticide test PDF for this batch.',
+  microbials: 'Upload the microbial test PDF for this batch.'
 };
 
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024;
