@@ -1,5 +1,6 @@
 'use client';
 
+import { useCallback, useMemo } from 'react';
 import { toast } from 'sonner';
 
 // Toast types for CRUD operations
@@ -45,7 +46,7 @@ export const toastMessages = {
 
 // Hook for standardized CRUD toasts
 export function useToast() {
-  const showToast = (type: ToastType, message: string, options?: ToastOptions) => {
+  const showToast = useCallback((type: ToastType, message: string, options?: ToastOptions) => {
     switch (type) {
       case 'success':
         return toast.success(message, options);
@@ -60,9 +61,9 @@ export function useToast() {
       default:
         return toast(message, options);
     }
-  };
+  }, []);
 
-  const create = async <T,>(
+  const create = useCallback(async <T,>(
     item: string,
     promise: Promise<T>,
     options?: ToastOptions
@@ -83,9 +84,9 @@ export function useToast() {
       });
       throw error;
     }
-  };
+  }, []);
 
-  const update = async <T,>(
+  const update = useCallback(async <T,>(
     item: string,
     promise: Promise<T>,
     options?: ToastOptions
@@ -106,9 +107,9 @@ export function useToast() {
       });
       throw error;
     }
-  };
+  }, []);
 
-  const remove = async <T,>(
+  const remove = useCallback(async <T,>(
     item: string,
     promise: Promise<T>,
     options?: ToastOptions
@@ -129,9 +130,9 @@ export function useToast() {
       });
       throw error;
     }
-  };
+  }, []);
 
-  const fetch = async <T,>(
+  const fetchToast = useCallback(async <T,>(
     item: string,
     promise: Promise<T>,
     options?: { errorOptions?: ToastOptions }
@@ -146,9 +147,9 @@ export function useToast() {
       });
       throw error;
     }
-  };
+  }, []);
 
-  const upload = async <T,>(
+  const upload = useCallback(async <T,>(
     item: string,
     promise: Promise<T>,
     options?: ToastOptions
@@ -169,22 +170,22 @@ export function useToast() {
       });
       throw error;
     }
-  };
+  }, []);
 
-  const dismiss = (toastId?: string | number) => {
+  const dismiss = useCallback((toastId?: string | number) => {
     toast.dismiss(toastId);
-  };
+  }, []);
 
-  return {
+  return useMemo(() => ({
     showToast,
     create,
     update,
     remove,
-    fetch,
+    fetch: fetchToast,
     upload,
     dismiss,
     toast,
-  };
+  }), [showToast, create, update, remove, fetchToast, upload, dismiss]);
 }
 
 export { toast };
