@@ -214,6 +214,7 @@ export default function CatalogContent() {
   // Refs
   const loadMoreRef = useRef<HTMLDivElement>(null);
   const isFirstRender = useRef(true);
+  const fetchControllerRef = useRef<AbortController | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   // Load compare list from localStorage on mount
@@ -576,7 +577,13 @@ export default function CatalogContent() {
       if (sortBy !== 'default') params.set('sortBy', sortBy);
       if (filters.recentlyAdded) params.set('recentlyAdded', 'true');
 
-      const response = await fetch(`/api/dispensary/catalog?${params.toString()}`);
+      fetchControllerRef.current?.abort();
+      const controller = new AbortController();
+      fetchControllerRef.current = controller;
+
+      const response = await fetch(`/api/dispensary/catalog?${params.toString()}`, {
+        signal: controller.signal,
+      });
 
       if (!response.ok) {
         throw new Error(`Failed to fetch products (${response.status})`);
@@ -599,13 +606,22 @@ export default function CatalogContent() {
       setTotalProducts(toSafeNonNegativeInteger(data.total, 0));
       setPage(pageNum);
     } catch (error) {
-      console.error('Error fetching products:', error);
+      if (error instanceof Error && error.name === 'AbortError') {
+        return;
+      }
       setFetchError(error instanceof Error ? error.message : 'Failed to fetch products.');
     } finally {
       setIsLoading(false);
       setIsInitialLoading(false);
     }
   }, [searchQuery, filters, sortBy, isLoading]);
+
+  // Cancel in-flight catalog requests when leaving this page.
+  useEffect(() => {
+    return () => {
+      fetchControllerRef.current?.abort();
+    };
+  }, []);
 
   // Initial load
   useEffect(() => {

@@ -2,18 +2,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
-import { format } from 'date-fns';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { Badge } from '@/app/components/ui/Badge';
 import { Button } from '@/app/components/ui/Button';
 import { OrdersTable } from '../components/OrdersTable';
-
-interface StatusLabelMap {
-  [key: string]: string;
-}
-
-type BadgeVariant = 'info' | 'error' | 'default' | 'success' | 'secondary' | 'warning' | 'danger' | null;
 
 export default async function DispensaryOrdersPage() {
   const session = await getServerSession(authOptions);
@@ -45,14 +37,26 @@ export default async function DispensaryOrdersPage() {
     },
   });
 
+  const serializedOrders = orders.map((order) => ({
+    ...order,
+    createdAt: order.createdAt.toISOString(),
+    updatedAt: order.updatedAt.toISOString(),
+    shippedAt: order.shippedAt ? order.shippedAt.toISOString() : null,
+    deliveredAt: order.deliveredAt ? order.deliveredAt.toISOString() : null,
+    totalAmount: Number(order.totalAmount),
+    subtotal: Number(order.subtotal),
+    tax: Number(order.tax),
+    shippingFee: Number(order.shippingFee),
+  }));
+
   // Calculate stats
-  const totalOrders = orders.length;
-  const activeOrders = orders.filter(o => 
+  const totalOrders = serializedOrders.length;
+  const activeOrders = serializedOrders.filter(o =>
     ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(o.status)
   );
   const activeCount = activeOrders.length;
-  const pendingCount = orders.filter(o => o.status === 'PENDING').length;
-  const totalSpent = orders.reduce((sum: number, o: { totalAmount: unknown }) => sum + Number(o.totalAmount), 0);
+  const pendingCount = serializedOrders.filter(o => o.status === 'PENDING').length;
+  const totalSpent = serializedOrders.reduce((sum: number, o: { totalAmount: number }) => sum + o.totalAmount, 0);
 
   return (
     <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
@@ -120,7 +124,7 @@ export default async function DispensaryOrdersPage() {
               </Button>
             </div>
           ) : (
-            <OrdersTable orders={orders} />
+            <OrdersTable orders={serializedOrders} />
           )}
         </CardContent>
       </Card>

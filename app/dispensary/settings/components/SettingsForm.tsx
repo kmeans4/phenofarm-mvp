@@ -196,9 +196,14 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
+    let isActive = true;
+
     async function fetchSettings() {
       try {
-        const res = await fetch('/api/dispensary/settings');
+        const res = await fetch('/api/dispensary/settings', { signal: controller.signal });
+        if (!isActive) return;
+
         if (res.ok) {
           const data = await res.json();
           const loadedData: SettingsData = {
@@ -222,14 +227,23 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
           setInitialData(loadedData);
         }
       } catch (err) {
-        console.error('Failed to load settings:', err);
-        showToast('error', 'Failed to load settings');
+        if (err instanceof Error && err.name === 'AbortError') return;
+        if (isActive) {
+          showToast('error', 'Failed to load settings');
+        }
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     }
 
     fetchSettings();
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
   }, [showToast]);
 
   const handleAddressSelect = (address: {

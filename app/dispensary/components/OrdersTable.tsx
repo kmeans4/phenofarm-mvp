@@ -9,8 +9,8 @@ interface Order {
   id: string;
   orderId: string;
   status: string;
-  createdAt: Date;
-  totalAmount: unknown;
+  createdAt: string | Date;
+  totalAmount: number;
   grower: { businessName: string } | null;
 }
 

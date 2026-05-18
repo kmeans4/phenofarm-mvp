@@ -30,21 +30,35 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
   const [creating, setCreating] = useState(false);
 
   useEffect(() => {
+    const controller = new AbortController();
+    let isActive = true;
+
     const fetchStrains = async () => {
       try {
-        const response = await fetch('/api/strains');
+        const response = await fetch('/api/strains', { signal: controller.signal });
+        if (!isActive) return;
+
         if (response.ok) {
           const data = await response.json();
-          setStrains(data);
+          if (isActive) {
+            setStrains(data);
+          }
         }
       } catch (err) {
-        console.error('Error fetching strains:', err);
+        if (err instanceof Error && err.name === 'AbortError') return;
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
 
     fetchStrains();
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
   }, []);
 
   const handleCreateStrain = async () => {

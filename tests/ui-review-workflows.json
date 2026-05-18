@@ -1,0 +1,98 @@
+{
+  "routes": [
+    {
+      "name": "landing",
+      "path": "/",
+      "expectVisible": "main",
+      "allowRequestFailures": [
+        "_rsc=.*ERR_ABORTED"
+      ]
+    },
+    {
+      "name": "sign-in",
+      "path": "/auth/sign_in",
+      "expectVisible": "form",
+      "allowRequestFailures": [
+        "_rsc=.*ERR_ABORTED"
+      ]
+    }
+  ],
+  "workflows": [
+    {
+      "name": "grower core navigation",
+      "allowRequestFailures": [
+        "_rsc=.*ERR_ABORTED",
+        "_next/static/chunks/.*ERR_ABORTED",
+        "api/messages/conversations.*ERR_ABORTED",
+        "api/product-type-config.*ERR_ABORTED",
+        "api/strains.*ERR_ABORTED"
+      ],
+      "steps": [
+        { "goto": "/auth/sign_in" },
+        { "waitForLoadState": "load" },
+        { "fill": { "selector": "#email", "value": "grower@vtnurseries.com" } },
+        { "fill": { "selector": "#password", "value": "password123" } },
+        { "click": "button[type='submit']" },
+        { "waitForURL": "grower|dashboard|/$" },
+        { "goto": "/grower/dashboard" },
+        { "waitForLoadState": "load" },
+        { "expectText": "Grower Dashboard" },
+        { "screenshot": "grower-dashboard" },
+        { "goto": "/grower/products" },
+        { "waitForLoadState": "load" },
+        { "expectText": "Product Management" },
+        { "screenshot": "grower-products" },
+        { "goto": "/grower/products/add" },
+        { "waitForLoadState": "load" },
+        { "waitForSelector": "#name" },
+        { "expectVisible": "#name" },
+        { "expectText": "Add New Product" },
+        { "screenshot": "grower-add-product" },
+        { "goto": "/grower/customers" },
+        { "waitForLoadState": "load" },
+        { "expectText": "Manage your dispensary customers" },
+        { "screenshot": "grower-customers" },
+        { "goto": "/grower/settings" },
+        { "waitForLoadState": "load" },
+        { "expectText": "Grower Settings" },
+        { "screenshot": "grower-settings" }
+      ]
+    },
+    {
+      "name": "dispensary core navigation",
+      "allowRequestFailures": [
+        "_rsc=.*ERR_ABORTED",
+        "_next/static/chunks/.*ERR_ABORTED",
+        "api/messages/conversations.*ERR_ABORTED"
+      ],
+      "steps": [
+        { "goto": "/auth/sign_in" },
+        { "waitForLoadState": "load" },
+        { "fill": { "selector": "#email", "value": "dispensary@greenvermont.com" } },
+        { "fill": { "selector": "#password", "value": "password123" } },
+        { "click": "button[type='submit']" },
+        { "waitForURL": "dispensary|dashboard|/$" },
+        { "goto": "/dispensary/dashboard" },
+        { "waitForLoadState": "load" },
+        { "expectText": "Dispensary Dashboard" },
+        { "screenshot": "dispensary-dashboard" },
+        { "goto": "/dispensary/catalog" },
+        { "waitForLoadState": "load" },
+        { "expectText": "Product Catalog" },
+        { "screenshot": "dispensary-catalog" },
+        { "goto": "/dispensary/orders" },
+        { "waitForLoadState": "load" },
+        { "expectVisible": "main h1" },
+        { "screenshot": "dispensary-orders" },
+        { "goto": "/dispensary/cart" },
+        { "waitForLoadState": "load" },
+        { "expectVisible": "main h1" },
+        { "screenshot": "dispensary-cart" },
+        { "goto": "/dispensary/settings" },
+        { "waitForLoadState": "load" },
+        { "expectVisible": "main h1" },
+        { "screenshot": "dispensary-settings" }
+      ]
+    }
+  ]
+}

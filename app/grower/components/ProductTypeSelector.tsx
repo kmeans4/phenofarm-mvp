@@ -33,21 +33,35 @@ export function ProductTypeSelector({
   const [customSubType, setCustomSubType] = useState('');
 
   useEffect(() => {
+    const controller = new AbortController();
+    let isActive = true;
+
     const fetchConfigs = async () => {
       try {
-        const response = await fetch('/api/product-type-config');
+        const response = await fetch('/api/product-type-config', { signal: controller.signal });
+        if (!isActive) return;
+
         if (response.ok) {
           const data = await response.json();
-          setConfigs(data);
+          if (isActive) {
+            setConfigs(data);
+          }
         }
       } catch (err) {
-        console.error('Error fetching product type configs:', err);
+        if (err instanceof Error && err.name === 'AbortError') return;
       } finally {
-        setLoading(false);
+        if (isActive) {
+          setLoading(false);
+        }
       }
     };
 
     fetchConfigs();
+
+    return () => {
+      isActive = false;
+      controller.abort();
+    };
   }, []);
 
   const mergedConfigs = useMemo(() => mergeProductTypeOptions(configs), [configs]);
