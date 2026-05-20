@@ -1,0 +1,52 @@
+{
+  "appName": "PhenoFarm",
+  "repoPath": "/Users/sam/.openclaw/workspace/phenofarm-mvp",
+  "defaultBranch": "main",
+  "github": {
+    "remoteUrl": "https://github.com/kmeans4/phenofarm-mvp.git",
+    "status": "configured"
+  },
+  "vercel": {
+    "teamName": "Kevin Means' projects",
+    "teamId": "team_APmavOTWRi3vWAznGnDEny9T",
+    "projectName": "phenofarm-mvp",
+    "projectId": "prj_9pLewagwNf3uOA2sle3r0O3RlQkv",
+    "latestProductionDeploymentUrl": "phenofarm-ohtolskyn-kevin-means-projects.vercel.app",
+    "productionDomains": [
+      "phenofarm-mvp.vercel.app",
+      "phenofarm-mvp-kevin-means-projects.vercel.app",
+      "phenofarm-mvp-kevin-means-4766-kevin-means-projects.vercel.app"
+    ]
+  },
+  "neon": {
+    "envFiles": [
+      ".env.local",
+      ".env.production",
+      ".env"
+    ],
+    "localHost": "localhost",
+    "localDatabaseName": "phenofarm",
+    "productionPooledHost": "ep-delicate-math-ai8g76ti-pooler.c-4.us-east-1.aws.neon.tech",
+    "productionDatabaseName": "neondb",
+    "expectedEnvVars": [
+      "DATABASE_URL",
+      "NEXTAUTH_URL",
+      "AUTH_SECRET",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_PUBLISHABLE_KEY",
+      "STRIPE_WEBHOOK_SECRET",
+      "NEXT_PUBLIC_API_URL"
+    ]
+  },
+  "commands": {
+    "install": "npm install",
+    "dev": "npm run dev",
+    "build": "npm run build",
+    "lint": "npm run lint",
+    "test": "npm run test",
+    "testHeaded": "npm run test:headed",
+    "prismaGenerate": "npm run prisma:generate",
+    "prismaMigrate": "npm run prisma:migrate",
+    "prismaStudio": "npm run prisma:studio"
+  }
+}
