@@ -1,162 +1,70 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { DollarSign, Lock, Globe, CheckCircle2 } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
-const problems = [
+const comparisons = [
   {
-    icon: DollarSign,
-    title: 'Unclear Platform Costs',
-    description: 'Wholesale teams need predictable software costs without confusing marketplace settlement fees.',
-    color: 'red',
+    before: 'Spreadsheets, texts, and voicemail for every wholesale request',
+    after: 'A single request pipeline from submission to delivery, with status everyone can see',
   },
   {
-    icon: Globe,
-    title: 'Limited Access',
-    description: 'Regional discovery is still fragmented, making it harder to find licensed partners and available products.',
-    color: 'red',
+    before: 'License checks handled over email, partner by partner',
+    after: 'Verification gates ordering itself — unverified buyers cannot submit requests',
   },
   {
-    icon: Lock,
-    title: 'Walled Gardens',
-    description: 'Teams need clearer license, product, and fulfillment context before they trust a new wholesale relationship.',
-    color: 'red',
-  },
-];
-
-const solutions = [
-  {
-    icon: CheckCircle2,
-    title: 'Subscription Pricing',
-    description: 'Cultivators pay PhenoFarm for software access. Buyer-seller wholesale settlement stays direct.',
-    color: 'green',
+    before: 'Pricing negotiated in scattered threads with no record',
+    after: 'Quote requests, counters, and acceptances captured in one conversation per partner',
   },
   {
-    icon: Globe,
-    title: 'Open Marketplace',
-    description: 'Browse verified growers and dispensaries with clearer product, license, and availability context.',
-    color: 'green',
-  },
-  {
-    icon: CheckCircle2,
-    title: 'Direct Relationships',
-    description: 'Build direct partnerships with verified partners. No middleman, no hidden fees.',
-    color: 'green',
+    before: 'Marketplace platforms that intermediate your payments and your relationships',
+    after: 'Your terms, your invoices, your relationships — settlement never touches the platform',
   },
 ];
 
 export function ProblemSolution() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
-
   return (
-    <section 
-      ref={ref} 
-      className="py-24 md:py-32 bg-gray-950 relative overflow-hidden min-h-[900px]"
-      style={{ contentVisibility: 'auto', contain: 'layout style paint' }}
-    >
-      {/* Background pattern */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(34,197,94,1),transparent_70%)]" />
-      </div>
+    <section className="relative border-t border-white/[0.06] bg-[#070908] py-28 md:py-36">
+      <div className="mx-auto max-w-6xl px-6">
+        <div className="grid gap-16 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
+          {/* Editorial intro */}
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.4 }}
+            transition={{ duration: 0.6 }}
+            className="lg:sticky lg:top-28 lg:self-start"
+          >
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+              Why teams switch
+            </p>
+            <h2 className="text-balance text-3xl font-semibold tracking-tight text-white md:text-[2.6rem] md:leading-[1.15]">
+              Wholesale runs on trust. The tools should keep up.
+            </h2>
+            <p className="mt-5 max-w-md text-pretty leading-relaxed text-gray-400">
+              Licensed operators don&apos;t need another intermediary — they need shared context.
+              PhenoFarm replaces the patchwork around discovery, verification, and request
+              follow-up without inserting itself into the money.
+            </p>
+          </motion.div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        {/* Problems */}
-        <motion.div
-          layout="position"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-2 h-8 bg-red-500 rounded-full" />
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">The Problem</h2>
+          {/* Before / after rows */}
+          <div className="space-y-3">
+            {comparisons.map((row, index) => (
+              <motion.div
+                key={row.before}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.4 }}
+                transition={{ duration: 0.5, delay: index * 0.08 }}
+                className="group grid gap-4 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-6 transition-colors hover:border-emerald-500/20 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-center"
+              >
+                <p className="text-sm leading-relaxed text-gray-500">{row.before}</p>
+                <ArrowRight className="hidden h-4 w-4 shrink-0 text-emerald-500/60 sm:block" aria-hidden />
+                <p className="text-sm font-medium leading-relaxed text-gray-200">{row.after}</p>
+              </motion.div>
+            ))}
           </div>
-          <p className="text-gray-300 text-lg max-w-2xl">
-            Cannabis wholesale teams still juggle fragmented discovery, license checks, and request follow-up across too many tools.
-          </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-6 mb-20">
-          {problems.map((problem, index) => (
-            <motion.div
-              key={problem.title}
-              layout="position"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
-              className="group p-8 rounded-2xl bg-gray-900/50 border border-red-500/20 hover:border-red-500/40 transition-all"
-              style={{ willChange: 'transform, opacity' }}
-            >
-              <div className="w-14 h-14 rounded-xl bg-red-500/10 flex items-center justify-center mb-5 group-hover:bg-red-500/20 transition-colors">
-                <problem.icon className="w-7 h-7 text-red-400" />
-              </div>
-              <h3 className="text-xl font-semibold text-white mb-3">{problem.title}</h3>
-              <p className="text-gray-300 leading-relaxed">{problem.description}</p>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Transform Arrow */}
-        <motion.div 
-          layout="position"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={isInView ? { opacity: 1, scale: 1 } : {}}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="flex justify-center my-16"
-        >
-          <div className="flex items-center gap-4">
-            <div className="h-px w-16 bg-gradient-to-r from-transparent to-green-500" />
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30">
-              <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </div>
-            <div className="h-px w-16 bg-gradient-to-l from-transparent to-green-500" />
-          </div>
-        </motion.div>
-
-        {/* Solutions */}
-        <motion.div
-          layout="position"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          className="mb-16"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-2 h-8 bg-green-500 rounded-full" />
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">The Solution: PhenoFarm</h2>
-          </div>
-          <p className="text-gray-300 text-lg max-w-2xl">
-            A focused marketplace workspace for discovery, order requests, fulfillment coordination, and direct business relationships.
-          </p>
-        </motion.div>
-
-        <div className="grid md:grid-cols-3 gap-6">
-          {solutions.map((solution, index) => (
-            <motion.div
-              key={solution.title}
-              layout="position"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.7 + index * 0.1 }}
-              className="group p-8 rounded-2xl bg-green-950/30 border border-green-500/20 hover:border-green-500/50 transition-all relative overflow-hidden"
-              style={{ willChange: 'transform, opacity' }}
-            >
-              <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-              <div className="relative z-10">
-                <div className="w-14 h-14 rounded-xl bg-green-500/10 flex items-center justify-center mb-5 group-hover:bg-green-500/20 transition-colors">
-                  <solution.icon className="w-7 h-7 text-green-400" />
-                </div>
-                <h3 className="text-xl font-semibold text-white mb-3">{solution.title}</h3>
-                <p className="text-gray-300 leading-relaxed">{solution.description}</p>
-              </div>
-            </motion.div>
-          ))}
         </div>
       </div>
     </section>

@@ -52,6 +52,13 @@ model Grower {
   subscriptionCancelAtPeriodEnd Boolean   @default(false)
   contactName         String?
   licenseExpiry       DateTime?
+  commercialMinimumOrder String?
+  commercialFulfillmentMethods String?
+  commercialFulfillmentRegion String?
+  commercialPaymentTerms String?
+  commercialResponseWindow String?
+  commercialContactNote String?
+  commercialTermsUpdatedAt DateTime?
   batches             Batch[]
   cartItems           CartItem[]
   conversations       Conversation[]

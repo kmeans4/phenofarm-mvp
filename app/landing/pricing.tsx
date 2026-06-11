@@ -1,8 +1,8 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useRef, useState } from 'react';
-import { Check, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useState } from 'react';
+import { Check } from 'lucide-react';
 import Link from 'next/link';
 
 // Tier names match the in-app cultivator subscription plans (Free / Pro / Business)
@@ -14,9 +14,9 @@ const plans = [
     features: [
       'Demo and review access',
       'Catalog and request workflow preview',
-      'Standard support',
       'Up to 50 product listings',
       'Basic marketplace records',
+      'Standard support',
     ],
     cta: 'Create Account',
     highlighted: false,
@@ -29,9 +29,9 @@ const plans = [
       'Everything in Free',
       'Unlimited product listings',
       'Advanced analytics',
-      'Priority support',
       'CSV bulk upload',
       'Metrc integration ready',
+      'Priority support',
     ],
     cta: 'Create Account',
     highlighted: true,
@@ -52,128 +52,112 @@ const plans = [
 ];
 
 export function Pricing() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
-    <section 
-      id="pricing" 
-      ref={ref} 
-      className="py-24 md:py-32 bg-gray-950 relative min-h-[700px]"
-      style={{ contentVisibility: 'auto', contain: 'layout style paint' }}
-    >
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="pricing" className="relative border-t border-white/[0.06] bg-[#070908] py-28 md:py-36">
+      <div className="mx-auto max-w-6xl px-6">
         <motion.div
-          layout="position"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="mx-auto mb-14 max-w-2xl text-center"
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
-            Simple, Transparent Pricing
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">Pricing</p>
+          <h2 className="text-balance text-3xl font-semibold tracking-tight text-white md:text-[2.6rem] md:leading-[1.15]">
+            One flat subscription. Zero take rate.
           </h2>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8">
-            Choose a cultivator software subscription for catalog, request, and fulfillment coordination.
+          <p className="mt-5 text-pretty leading-relaxed text-gray-400">
+            Cultivators pay for software, not per transaction. Wholesale value moves directly
+            between businesses — PhenoFarm never touches it.
           </p>
 
-          {/* Billing Toggle */}
-          <div className="inline-flex items-center gap-4 p-1 bg-gray-800 rounded-xl">
-            <button
-              onClick={() => setIsAnnual(false)}
-              aria-label="Monthly billing"
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                !isAnnual
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-300 hover:text-white'
-              }`}
-            >
-              Monthly
-            </button>
-            <button
-              onClick={() => setIsAnnual(true)}
-              aria-label="Annual billing, save 20 percent"
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                isAnnual
-                  ? 'bg-green-600 text-white'
-                  : 'text-gray-300 hover:text-white'
-              }`}
-            >
-              Annual
-              {' '}
-              <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full">
-                Save 20%
-              </span>
-            </button>
+          {/* Billing toggle */}
+          <div className="mt-9 inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.03] p-1">
+            {(
+              [
+                { id: false, label: 'Monthly' },
+                { id: true, label: 'Annual · save 20%' },
+              ] as const
+            ).map((option) => (
+              <button
+                key={String(option.id)}
+                onClick={() => setIsAnnual(option.id)}
+                aria-pressed={isAnnual === option.id}
+                className={`relative rounded-full px-5 py-2 text-sm font-medium transition-colors ${
+                  isAnnual === option.id ? 'text-gray-950' : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                {isAnnual === option.id && (
+                  <motion.span
+                    layoutId="billing-toggle"
+                    className="absolute inset-0 rounded-full bg-white"
+                    transition={{ type: 'spring', bounce: 0.18, duration: 0.5 }}
+                  />
+                )}
+                <span className="relative z-10">{option.label}</span>
+              </button>
+            ))}
           </div>
         </motion.div>
 
-        {/* Pricing Cards */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div className="grid gap-4 lg:grid-cols-3">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
-              layout="position"
-              initial={{ opacity: 0, y: 30 }}
-              animate={isInView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.5, delay: 0.1 + index * 0.1 }}
-              className={`relative p-8 rounded-2xl ${
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.55, delay: index * 0.08 }}
+              className={`relative flex flex-col rounded-2xl p-8 ${
                 plan.highlighted
-                  ? 'bg-gradient-to-br from-green-900/50 to-gray-900 border-2 border-green-500/50 shadow-xl shadow-green-500/10'
-                  : 'bg-gray-900/50 border border-gray-800 hover:border-gray-700'
+                  ? 'border border-emerald-500/30 bg-gradient-to-b from-emerald-500/[0.07] to-transparent shadow-[0_0_60px_-20px_rgba(16,185,129,0.35)]'
+                  : 'border border-white/[0.06] bg-white/[0.02]'
               }`}
-              style={{ willChange: 'transform, opacity' }}
             >
               {plan.highlighted && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span className="inline-flex items-center gap-1 px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-sm font-semibold rounded-full shadow-lg">
-                    <Sparkles className="w-4 h-4" />
-                    MOST POPULAR
-                  </span>
-                </div>
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-emerald-500 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-white">
+                  Most popular
+                </span>
               )}
 
-              <div className="text-center mb-8">
-                <h3 className="text-xl font-semibold text-white mb-2">{plan.name}</h3>
-                <p className="text-gray-300 text-sm">{plan.description}</p>
+              <div className="mb-7">
+                <h3 className="text-lg font-semibold tracking-tight text-white">{plan.name}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-gray-500">{plan.description}</p>
               </div>
 
-              <div className="text-center mb-8">
+              <div className="mb-7 flex items-baseline gap-1.5">
                 {plan.price.monthly === null ? (
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-4xl font-bold text-white">Custom</span>
-                  </div>
+                  <span className="text-4xl font-semibold tracking-tight text-white">Custom</span>
                 ) : (
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-5xl font-bold text-white">
+                  <>
+                    <span className="text-5xl font-semibold tracking-tight text-white">
                       ${isAnnual ? plan.price.annual : plan.price.monthly}
                     </span>
-                    <span className="text-gray-300">/mo</span>
-                  </div>
+                    <span className="text-sm text-gray-500">/mo</span>
+                  </>
                 )}
                 {isAnnual && (plan.price.monthly ?? 0) > 0 && (
-                  <p className="text-gray-500 text-sm mt-2">
-                    Billed ${(plan.price.annual ?? 0) * 12}/year
-                  </p>
+                  <span className="ml-2 text-xs text-gray-600">billed ${(plan.price.annual ?? 0) * 12}/yr</span>
                 )}
               </div>
 
-              <ul className="space-y-4 mb-8">
+              <ul className="mb-9 space-y-3">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-green-400 flex-shrink-0" />
-                    <span className="text-gray-300 text-sm">{feature}</span>
+                  <li key={feature} className="flex items-start gap-2.5 text-sm text-gray-300">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-400" aria-hidden />
+                    {feature}
                   </li>
                 ))}
               </ul>
 
               <Link
                 href={plan.cta === 'Contact Sales' ? 'mailto:support@phenofarm.com' : '/auth/sign_up'}
-                className={`block w-full py-4 rounded-xl text-center font-semibold transition-all ${
+                className={`mt-auto inline-flex w-full items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold transition-all ${
                   plan.highlighted
-                    ? 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-600/25'
-                    : 'bg-gray-800 hover:bg-gray-700 text-white'
+                    ? 'bg-emerald-500 text-white shadow-[0_0_32px_rgba(16,185,129,0.25)] hover:bg-emerald-400'
+                    : 'border border-white/10 bg-white/[0.03] text-gray-200 hover:border-white/20 hover:bg-white/[0.06]'
                 }`}
               >
                 {plan.cta}

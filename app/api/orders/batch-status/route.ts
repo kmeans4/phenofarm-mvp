@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { OrderStatus } from '@prisma/client';
+import type { OrderStatus } from '@prisma/client';
+import {
+  canTransitionOrderStatus,
+  getInvalidOrderStatusTransitionMessage,
+  getOrderStatusLabel,
+  isOrderStatus,
+  ORDER_STATUS_VALUES,
+} from '@/lib/order-workflow';
 
 export async function PATCH(req: NextRequest) {
   try {
@@ -41,10 +48,9 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const validStatuses: OrderStatus[] = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
-    if (!validStatuses.includes(status as OrderStatus)) {
+    if (!isOrderStatus(status)) {
       return NextResponse.json(
-        { error: `Invalid status. Must be one of: ${validStatuses.join(', ')}` },
+        { error: `Invalid status. Must be one of: ${ORDER_STATUS_VALUES.join(', ')}` },
         { status: 400 }
       );
     }
@@ -73,7 +79,6 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    // Build update data
     const updateData: { status: OrderStatus; shippedAt?: Date | null; deliveredAt?: Date | null } = { 
       status: status as OrderStatus 
     };
@@ -85,31 +90,54 @@ export async function PATCH(req: NextRequest) {
       updateData.deliveredAt = new Date();
     }
 
+    const targetStatus = status;
+    const transitionableOrders = orders.filter((order) =>
+      order.status !== targetStatus && canTransitionOrderStatus(order.status, targetStatus)
+    );
+    const noOpCount = orders.filter((order) => order.status === targetStatus).length;
+    const skippedOrders = orders
+      .filter((order) => order.status !== targetStatus && !canTransitionOrderStatus(order.status, targetStatus))
+      .map((order) => ({
+        id: order.id,
+        status: order.status,
+        statusLabel: getOrderStatusLabel(order.status),
+        reason: getInvalidOrderStatusTransitionMessage(order.status, targetStatus),
+      }));
+
+    if (transitionableOrders.length === 0) {
+      return NextResponse.json(
+        {
+          error: skippedOrders.length > 0
+            ? `No selected requests can move to ${getOrderStatusLabel(targetStatus)}.`
+            : `Selected requests are already ${getOrderStatusLabel(targetStatus)}.`,
+          updatedCount: 0,
+          skippedCount: skippedOrders.length,
+          noOpCount,
+          skippedOrders,
+        },
+        { status: skippedOrders.length > 0 ? 409 : 200 }
+      );
+    }
+
+    const transitionableIds = transitionableOrders.map((order) => order.id);
+
     const result = await db.$transaction(async (tx) => {
       if (status === 'CANCELLED') {
-        // Only not-yet-final orders can be cancelled, and their reserved
-        // inventory has to be returned to the products.
-        const cancellableIds = orders
-          .filter((order) => order.status !== 'CANCELLED' && order.status !== 'DELIVERED')
-          .map((order) => order.id);
+        const items = await tx.orderItem.findMany({
+          where: { orderId: { in: transitionableIds } },
+          select: { productId: true, quantity: true },
+        });
 
-        if (cancellableIds.length > 0) {
-          const items = await tx.orderItem.findMany({
-            where: { orderId: { in: cancellableIds } },
-            select: { productId: true, quantity: true },
+        for (const item of items) {
+          await tx.product.updateMany({
+            where: { id: item.productId },
+            data: { inventoryQty: { increment: item.quantity } },
           });
-
-          for (const item of items) {
-            await tx.product.updateMany({
-              where: { id: item.productId },
-              data: { inventoryQty: { increment: item.quantity } },
-            });
-          }
         }
 
         return tx.order.updateMany({
           where: {
-            id: { in: cancellableIds },
+            id: { in: transitionableIds },
             growerId: growerId,
           },
           data: updateData,
@@ -118,7 +146,7 @@ export async function PATCH(req: NextRequest) {
 
       return tx.order.updateMany({
         where: {
-          id: { in: orderIds },
+          id: { in: transitionableIds },
           growerId: growerId,
         },
         data: updateData,
@@ -128,6 +156,10 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({
       success: true,
       updatedCount: result.count,
+      updatedOrderIds: transitionableIds,
+      skippedCount: skippedOrders.length,
+      noOpCount,
+      skippedOrders,
       status: status,
     });
 

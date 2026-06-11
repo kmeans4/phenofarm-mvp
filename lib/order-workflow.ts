@@ -7,6 +7,26 @@ export const ORDER_STATUS_LABELS: Record<string, string> = {
   CANCELLED: 'Cancelled',
 };
 
+export const ORDER_STATUS_VALUES = [
+  'PENDING',
+  'CONFIRMED',
+  'PROCESSING',
+  'SHIPPED',
+  'DELIVERED',
+  'CANCELLED',
+] as const;
+
+export type OrderStatusValue = (typeof ORDER_STATUS_VALUES)[number];
+
+export const ORDER_STATUS_TRANSITIONS: Record<OrderStatusValue, OrderStatusValue[]> = {
+  PENDING: ['CONFIRMED', 'CANCELLED'],
+  CONFIRMED: ['PROCESSING', 'CANCELLED'],
+  PROCESSING: ['SHIPPED', 'CANCELLED'],
+  SHIPPED: ['DELIVERED'],
+  DELIVERED: [],
+  CANCELLED: [],
+};
+
 export const ORDER_STATUS_HELP: Record<string, string> = {
   PENDING: 'Waiting for grower review',
   CONFIRMED: 'Grower accepted the request',
@@ -48,6 +68,27 @@ export function getOrderStatusLabel(status: string) {
 
 export function getOrderStatusHelp(status: string) {
   return ORDER_STATUS_HELP[status] || 'Review the order request details';
+}
+
+export function isOrderStatus(value: unknown): value is OrderStatusValue {
+  return typeof value === 'string' && ORDER_STATUS_VALUES.includes(value as OrderStatusValue);
+}
+
+export function getAllowedOrderStatusTransitions(status: string): OrderStatusValue[] {
+  return isOrderStatus(status) ? ORDER_STATUS_TRANSITIONS[status] : [];
+}
+
+export function canTransitionOrderStatus(currentStatus: string, nextStatus: string) {
+  if (currentStatus === nextStatus) return true;
+  return getAllowedOrderStatusTransitions(currentStatus).includes(nextStatus as OrderStatusValue);
+}
+
+export function getInvalidOrderStatusTransitionMessage(currentStatus: string, nextStatus: string) {
+  const allowed = getAllowedOrderStatusTransitions(currentStatus);
+  const allowedLabels = allowed.map(getOrderStatusLabel).join(', ');
+  return allowed.length > 0
+    ? `Cannot move request from ${getOrderStatusLabel(currentStatus)} to ${getOrderStatusLabel(nextStatus)}. Allowed next steps: ${allowedLabels}.`
+    : `Cannot move request from ${getOrderStatusLabel(currentStatus)} to ${getOrderStatusLabel(nextStatus)}.`;
 }
 
 export function buildOrderRequestNotes(fields: OrderRequestNoteFields) {

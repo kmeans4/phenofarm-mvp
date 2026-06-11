@@ -41,3 +41,4 @@ playwright-report/
 # Local agent tooling
 .claude/
 tsconfig.tsbuildinfo
+.codex/tmp/

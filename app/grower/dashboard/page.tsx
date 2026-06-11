@@ -136,6 +136,11 @@ export default async function GrowerDashboardPage() {
         city: true,
         state: true,
         zip: true,
+        commercialMinimumOrder: true,
+        commercialFulfillmentMethods: true,
+        commercialFulfillmentRegion: true,
+        commercialPaymentTerms: true,
+        commercialResponseWindow: true,
       },
     }),
 
@@ -184,7 +189,13 @@ export default async function GrowerDashboardPage() {
   const hasProfile = Boolean(growerProfile?.businessName && growerProfile.phone && growerProfile.address);
   const hasLicense = Boolean(growerProfile?.licenseNumber && growerProfile.licenseExpiry && new Date(growerProfile.licenseExpiry) > new Date());
   const hasSubscription = growerProfile?.subscriptionStatus === 'active' || growerProfile?.subscriptionPlan === 'pro' || growerProfile?.subscriptionPlan === 'business';
-  const hasCommercialTerms = Boolean(growerProfile?.city || growerProfile?.state || growerProfile?.zip);
+  const hasCommercialTerms = Boolean(
+    growerProfile?.commercialMinimumOrder &&
+    growerProfile.commercialFulfillmentMethods &&
+    growerProfile.commercialFulfillmentRegion &&
+    growerProfile.commercialPaymentTerms &&
+    growerProfile.commercialResponseWindow
+  );
 
   // Revenue chart data (last 7 days)
   const last7Days = Array.from({ length: 7 }, (_, i) => {
@@ -286,7 +297,7 @@ export default async function GrowerDashboardPage() {
     },
     {
       label: 'Commercial terms',
-      description: hasCommercialTerms ? 'Fulfillment region is present; keep defaults current.' : 'Set fulfillment and direct-settlement defaults.',
+      description: hasCommercialTerms ? 'MOQ, fulfillment, response, and direct-payment defaults are saved.' : 'Set MOQ, fulfillment, region, response, and direct-payment defaults.',
       href: '/grower/settings',
       complete: hasCommercialTerms,
       cta: 'Set terms',

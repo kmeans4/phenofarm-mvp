@@ -1,176 +1,95 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useRef, useState, useEffect } from 'react';
-import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const testimonials = [
   {
-    quote: "PhenoFarm makes it easier to compare products, verify partners, and keep request details organized.",
-    author: "Sarah Chen",
-    role: "Owner",
-    company: "Green Mountain Dispensary",
-    rating: 5,
+    quote:
+      'The verification gate changed how we onboard partners. If a buyer can submit a request, we already know their license cleared review.',
+    author: 'Marcus Johnson',
+    role: 'Founder, Valley Green Farms',
+    initials: 'MJ',
   },
   {
-    quote: "As a small grower, getting my products in front of dispensaries used to be a nightmare. PhenoFarm changed everything.",
-    author: "Marcus Johnson",
-    role: "Founder",
-    company: "Valley Green Farms",
-    rating: 5,
+    quote:
+      'Quotes, counters, and the final terms live in one thread. When a delivery lands, nobody argues about what was agreed.',
+    author: 'Sarah Chen',
+    role: 'Owner, Green Mountain Dispensary',
+    initials: 'SC',
   },
   {
-    quote: "The verification process gives us confidence in every partner. We've built relationships that will last for years.",
-    author: "Emily Rodriguez",
-    role: "Procurement Manager",
-    company: "CannaCo Dispensaries",
-    rating: 5,
-  },
-  {
-    quote: "The direct-settlement workflow keeps our team focused on availability, fulfillment, and relationship quality.",
-    author: "David Kim",
-    role: "Operations Director",
-    company: "Elevate Wellness",
-    rating: 5,
+    quote:
+      'Settlement staying direct was the deciding factor. PhenoFarm organizes the workflow without taking a position in the transaction.',
+    author: 'David Kim',
+    role: 'Operations Director, Elevate Wellness',
+    initials: 'DK',
   },
 ];
 
-const logos = [
-  'Green Mountain', 'Valley Green', 'CannaCo', 'Elevate', 'Pure Grow', 'Herb House'
+const principles = [
+  'Built for licensed operators',
+  'Verification before ordering',
+  'Recorded quote terms',
+  'Direct settlement, always',
 ];
 
 export function Testimonials() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.3 });
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const goToSlide = (index: number) => {
-    setCurrentIndex(index);
-  };
-
-  const goToPrev = () => {
-    setCurrentIndex((prev) => (prev - 1 + testimonials.length) % testimonials.length);
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % testimonials.length);
-  };
-
   return (
-    <section ref={ref} className="py-24 md:py-32 bg-gray-900 relative overflow-hidden min-h-[600px]">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="relative border-t border-white/[0.06] bg-[#070908] py-28 md:py-36">
+      <div className="mx-auto max-w-6xl px-6">
         <motion.div
-          layout="position"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.4 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="mx-auto mb-16 max-w-2xl text-center"
         >
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
-            Built for Wholesale Teams
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">Operators</p>
+          <h2 className="text-balance text-3xl font-semibold tracking-tight text-white md:text-[2.6rem] md:leading-[1.15]">
+            Trusted where trust is the product
           </h2>
-          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            Give licensed operators a clearer way to discover partners, coordinate requests, and track fulfillment.
-          </p>
         </motion.div>
 
-        {/* Testimonial Carousel */}
-        <div className="relative max-w-4xl mx-auto mb-20">
-          <div className="overflow-hidden min-h-[300px]">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={index}
-                layout="position"
-                initial={{ opacity: 0, x: 50 }}
-                animate={{ 
-                  opacity: index === currentIndex ? 1 : 0,
-                  x: index === currentIndex ? 0 : 50,
-                }}
-                transition={{ duration: 0.5 }}
-                className={`text-center px-4 absolute inset-0 ${
-                  index === currentIndex ? 'relative' : 'pointer-events-none invisible'
-                }`}
-                style={{ 
-                  position: index === currentIndex ? 'relative' : 'absolute',
-                  visibility: index === currentIndex ? 'visible' : 'hidden'
-                }}
-              >
-                <Quote className="w-16 h-16 text-green-500/30 mx-auto mb-6" />
-                <blockquote className="text-xl sm:text-2xl md:text-3xl font-medium text-white mb-8 leading-relaxed">
-                  &ldquo;{testimonial.quote}&rdquo;
-                </blockquote>
-                <div className="flex items-center justify-center gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
-                  ))}
+        <div className="grid gap-4 md:grid-cols-3">
+          {testimonials.map((testimonial, index) => (
+            <motion.figure
+              key={testimonial.author}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.3 }}
+              transition={{ duration: 0.55, delay: index * 0.08 }}
+              className="flex flex-col justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-7"
+            >
+              <blockquote className="text-pretty text-[15px] leading-relaxed text-gray-300">
+                &ldquo;{testimonial.quote}&rdquo;
+              </blockquote>
+              <figcaption className="mt-7 flex items-center gap-3 border-t border-white/[0.05] pt-5">
+                <div className="flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500/10 text-xs font-semibold text-emerald-300 ring-1 ring-emerald-400/20">
+                  {testimonial.initials}
                 </div>
-                <div className="text-white font-semibold">{testimonial.author}</div>
-                <div className="text-gray-300 text-sm">{testimonial.role}, {testimonial.company}</div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Navigation Arrows */}
-          <button
-            onClick={goToPrev}
-            className="absolute left-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10"
-            aria-label="Previous testimonial"
-          >
-            <ChevronLeft className="w-6 h-6" />
-          </button>
-          <button
-            onClick={goToNext}
-            className="absolute right-0 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white transition-colors z-10"
-            aria-label="Next testimonial"
-          >
-            <ChevronRight className="w-6 h-6" />
-          </button>
-
-          {/* Dots */}
-          <div className="flex justify-center gap-2 mt-8">
-            {testimonials.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => goToSlide(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex 
-                    ? 'bg-green-500 w-8' 
-                    : 'bg-gray-600 hover:bg-gray-500'
-                }`}
-                aria-label={`Go to testimonial ${index + 1}`}
-              />
-            ))}
-          </div>
+                <div>
+                  <div className="text-sm font-medium text-white">{testimonial.author}</div>
+                  <div className="text-xs text-gray-500">{testimonial.role}</div>
+                </div>
+              </figcaption>
+            </motion.figure>
+          ))}
         </div>
 
-        {/* Logo Strip */}
+        {/* Principles strip */}
         <motion.div
-          layout="position"
           initial={{ opacity: 0 }}
-          animate={isInView ? { opacity: 1 } : {}}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-14 flex flex-wrap items-center justify-center gap-x-10 gap-y-3"
         >
-          <p className="text-center text-gray-500 text-sm mb-8">TRUSTED BY BUSINESSES LIKE</p>
-          <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
-            {logos.map((logo, index) => (
-              <motion.div
-                key={logo}
-                layout="position"
-                initial={{ opacity: 0.4 }}
-                whileHover={{ opacity: 1 }}
-                className="text-xl md:text-2xl font-bold text-gray-500 hover:text-green-400 transition-colors cursor-default"
-              >
-                {logo}
-              </motion.div>
-            ))}
-          </div>
+          {principles.map((principle) => (
+            <span key={principle} className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-gray-600">
+              <span className="h-1 w-1 rounded-full bg-emerald-500/70" aria-hidden />
+              {principle}
+            </span>
+          ))}
         </motion.div>
       </div>
     </section>

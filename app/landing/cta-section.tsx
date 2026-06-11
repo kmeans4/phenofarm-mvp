@@ -1,110 +1,75 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
+const assurances = [
+  'No wholesale payment processing',
+  'Cultivator subscriptions only',
+  'Demo access available',
+];
+
 export function CTASection() {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true, amount: 0.5 });
-
   return (
-    <section 
-      ref={ref} 
-      className="relative py-24 md:py-32 overflow-hidden min-h-[500px]"
-      style={{ contentVisibility: 'auto', contain: 'layout style paint' }}
-    >
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-green-800 to-emerald-900">
-        <motion.div 
-          layout="position"
-          className="absolute inset-0 opacity-40"
-          style={{
-            background: `
-              radial-gradient(at 40% 20%, rgba(34, 197, 94, 0.4) 0px, transparent 50%),
-              radial-gradient(at 80% 0%, rgba(16, 185, 129, 0.3) 0px, transparent 50%),
-              radial-gradient(at 0% 50%, rgba(20, 184, 166, 0.3) 0px, transparent 50%),
-              radial-gradient(at 80% 50%, rgba(34, 197, 94, 0.3) 0px, transparent 50%),
-              radial-gradient(at 0% 100%, rgba(16, 185, 129, 0.3) 0px, transparent 50%)
-            `
-          }}
-          animate={{
-            backgroundPosition: ['0% 0%', '100% 100%', '0% 0%'],
-          }}
-          transition={{
-            duration: 30,
-            repeat: Infinity,
-            ease: 'linear',
-          }}
-        />
-      </div>
+    <section className="relative border-t border-white/[0.06] bg-[#070908] px-6 py-28 md:py-36">
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.4 }}
+        transition={{ duration: 0.7 }}
+        className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-emerald-500/15 bg-[#0a0d0b] px-6 py-20 text-center md:py-24"
+      >
+        {/* Inner glow */}
+        <div aria-hidden className="absolute inset-0">
+          <div className="absolute left-1/2 top-0 h-72 w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/[0.12] blur-[100px]" />
+          <div
+            className="absolute inset-0 opacity-30"
+            style={{
+              backgroundImage:
+                'linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)',
+              backgroundSize: '56px 56px',
+              maskImage: 'radial-gradient(ellipse 70% 70% at 50% 0%, black 20%, transparent 70%)',
+              WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 0%, black 20%, transparent 70%)',
+            }}
+          />
+        </div>
 
-      <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <motion.div
-          layout="position"
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-            Ready to Manage Wholesale{' '}
-            <br />
-            <span className="bg-gradient-to-r from-green-300 to-emerald-200 bg-clip-text text-transparent">
-              Requests in One Place?
-            </span>
+        <div className="relative">
+          <h2 className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight text-white md:text-5xl md:leading-[1.1]">
+            Run wholesale like the rest of your business
           </h2>
-          
-          <p className="text-xl text-green-100 mb-10 max-w-2xl mx-auto">
-            Give your team one place to manage catalog discovery, order requests, fulfillment, and direct-settlement terms.
+          <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed text-gray-400">
+            Catalog, verification, quotes, and fulfillment in one workspace — with settlement
+            exactly where it belongs: between you and your partners.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-            <motion.div
-              layout="position"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+          <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              href="/auth/sign_up"
+              className="group inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_40px_rgba(16,185,129,0.3)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_56px_rgba(16,185,129,0.45)]"
             >
-              <Link 
-                href="/auth/sign_up"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-green-900 font-semibold rounded-xl transition-all shadow-xl hover:shadow-2xl hover:shadow-white/20"
-              >
-                Create Marketplace Account
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </motion.div>
-            
-            <motion.div
-              layout="position"
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
+              Create your account
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <Link
+              href="/contact"
+              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-gray-200 transition-colors hover:border-white/20 hover:bg-white/[0.06]"
             >
-              <Link 
-                href="/contact"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white font-semibold rounded-xl transition-all"
-              >
-                Contact Support
-              </Link>
-            </motion.div>
+              Talk to us
+            </Link>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-6 text-sm text-green-200">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-300" />
-              <span>No wholesale payment processing</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-300" />
-              <span>Demo access available</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-300" />
-              <span>Cultivator subscriptions only</span>
-            </div>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
+            {assurances.map((item) => (
+              <span key={item} className="flex items-center gap-2 text-xs text-gray-500">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400/80" aria-hidden />
+                {item}
+              </span>
+            ))}
           </div>
-        </motion.div>
-      </div>
+        </div>
+      </motion.div>
     </section>
   );
 }

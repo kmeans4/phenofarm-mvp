@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
-import { Order } from '@prisma/client';
-
-const ALLOWED_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'];
-const VALID_TRANSITIONS: Record<string, string[]> = {
-  PENDING: ['CONFIRMED', 'CANCELLED', 'PROCESSING', 'SHIPPED', 'DELIVERED'],
-  CONFIRMED: ['PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'],
-  PROCESSING: ['SHIPPED', 'DELIVERED', 'CANCELLED'],
-  SHIPPED: ['DELIVERED', 'CANCELLED'],
-  DELIVERED: [],
-  CANCELLED: []
-};
+import type { Order } from '@prisma/client';
+import {
+  canTransitionOrderStatus,
+  getInvalidOrderStatusTransitionMessage,
+  isOrderStatus,
+} from '@/lib/order-workflow';
 
 // Dispensaries may only withdraw their own not-yet-accepted requests;
 // growers own the rest of the fulfillment lifecycle.
@@ -33,7 +28,7 @@ export async function PATCH(
     const { id: orderId } = await params;
     const { status: newStatus } = await request.json() as { status: string };
 
-    if (!ALLOWED_STATUSES.includes(newStatus)) {
+    if (!isOrderStatus(newStatus)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
     }
 
@@ -68,11 +63,9 @@ export async function PATCH(
     }
 
     const currentStatus = order.status;
-    const allowedTransitions = VALID_TRANSITIONS[currentStatus] || [];
-
-    if (!allowedTransitions.includes(newStatus) && currentStatus !== newStatus) {
+    if (!canTransitionOrderStatus(currentStatus, newStatus)) {
       return NextResponse.json({
-        error: `Cannot go from ${currentStatus} to ${newStatus}`
+        error: getInvalidOrderStatusTransitionMessage(currentStatus, newStatus)
       }, { status: 400 });
     }
 

@@ -137,14 +137,26 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
 
       const result = await response.json();
       
-      // Update local state
-      setOrders(prev => prev.map(order => 
-        selectedOrders.has(order.id) ? { ...order, status: newStatus } : order
+      const updatedOrderIds = new Set<string>(
+        Array.isArray(result.updatedOrderIds)
+          ? result.updatedOrderIds.filter((id: unknown): id is string => typeof id === 'string')
+          : Array.from(selectedOrders)
+      );
+
+      setOrders(prev => prev.map(order =>
+        updatedOrderIds.has(order.id) ? { ...order, status: newStatus } : order
       ));
       
-      setMessage({ 
-        type: 'success', 
-        text: `Updated ${result.updatedCount} request${result.updatedCount !== 1 ? 's' : ''} to ${STATUS_LABELS[newStatus]}` 
+      const skippedCount = Number(result.skippedCount || 0);
+      const noOpCount = Number(result.noOpCount || 0);
+      const extraContext = [
+        skippedCount > 0 ? `${skippedCount} skipped because that move is not allowed` : '',
+        noOpCount > 0 ? `${noOpCount} already ${STATUS_LABELS[newStatus]}` : '',
+      ].filter(Boolean).join('; ');
+
+      setMessage({
+        type: 'success',
+        text: `Updated ${result.updatedCount} request${result.updatedCount !== 1 ? 's' : ''} to ${STATUS_LABELS[newStatus]}${extraContext ? `. ${extraContext}.` : ''}`,
       });
       setSelectedOrders(new Set());
     } catch (err) {
