@@ -127,20 +127,11 @@ export function HeroSection() {
   }, []);
 
   return (
-    <section className="relative overflow-hidden bg-[#070908]">
-      {/* Atmosphere: single restrained glow + hairline grid */}
+    <section className="relative overflow-hidden">
+      {/* Atmosphere: restrained static glow (the page-wide grid + cursor light
+          live in AmbientBackground) */}
       <div aria-hidden className="absolute inset-0">
         <div className="absolute left-1/2 top-[-20%] h-[640px] w-[1100px] -translate-x-1/2 rounded-full bg-emerald-500/[0.07] blur-[140px]" />
-        <div
-          className="absolute inset-0 opacity-[0.35]"
-          style={{
-            backgroundImage:
-              'linear-gradient(to right, rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.025) 1px, transparent 1px)',
-            backgroundSize: '72px 72px',
-            maskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%)',
-            WebkitMaskImage: 'radial-gradient(ellipse 80% 60% at 50% 0%, black 30%, transparent 75%)',
-          }}
-        />
       </div>
 
       {/* Navigation */}

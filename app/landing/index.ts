@@ -6,3 +6,4 @@ export { Testimonials } from './testimonials';
 export { Pricing } from './pricing';
 export { CTASection } from './cta-section';
 export { Footer } from './footer';
+export { AmbientBackground } from './ambient-background';

@@ -1,4 +1,5 @@
 import {
+  AmbientBackground,
   HeroSection,
   ProblemSolution,
   Features,
@@ -12,6 +13,7 @@ import {
 export default function LandingPage() {
   return (
     <main className="min-h-screen bg-[#070908]">
+      <AmbientBackground />
       <HeroSection />
       <ProblemSolution />
       <Features />

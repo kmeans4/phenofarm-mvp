@@ -56,7 +56,7 @@ export function HowItWorks() {
   const steps = flows[activeTab];
 
   return (
-    <section id="how-it-works" className="relative border-t border-white/[0.06] bg-[#070908] py-28 md:py-36">
+    <section id="how-it-works" className="relative border-t border-white/[0.06] py-28 md:py-36">
       <div className="mx-auto max-w-6xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}

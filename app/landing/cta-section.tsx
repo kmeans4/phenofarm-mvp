@@ -12,7 +12,7 @@ const assurances = [
 
 export function CTASection() {
   return (
-    <section className="relative border-t border-white/[0.06] bg-[#070908] px-6 py-28 md:py-36">
+    <section className="relative border-t border-white/[0.06] px-6 py-28 md:py-36">
       <motion.div
         initial={{ opacity: 0, y: 24 }}
         whileInView={{ opacity: 1, y: 0 }}

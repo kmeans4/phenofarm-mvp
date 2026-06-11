@@ -158,7 +158,7 @@ function AnalyticsVignette() {
 
 export function Features() {
   return (
-    <section id="features" className="relative border-t border-white/[0.06] bg-[#070908] py-28 md:py-36">
+    <section id="features" className="relative border-t border-white/[0.06] py-28 md:py-36">
       <div aria-hidden className="absolute inset-x-0 top-0 mx-auto h-px max-w-3xl bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
       <div className="mx-auto max-w-6xl px-6">
         <motion.div
