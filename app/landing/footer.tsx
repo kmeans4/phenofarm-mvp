@@ -1,8 +1,7 @@
 'use client';
 
-import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Twitter, Linkedin, Instagram, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 const footerLinks = {
   growers: [
@@ -17,16 +16,13 @@ const footerLinks = {
   ],
   company: [
     { label: 'Contact', href: 'mailto:support@phenofarm.com' },
-    { label: 'Help Center', href: '#' },
-    { label: 'Privacy Policy', href: '#' },
-    { label: 'Terms of Service', href: '#' },
+    { label: 'Help Center', href: '/help' },
+    { label: 'Privacy Policy', href: '/legal/privacy' },
+    { label: 'Terms of Service', href: '/legal/terms' },
   ],
 };
 
 const socialLinks = [
-  { icon: Twitter, href: '#', label: 'Twitter' },
-  { icon: Linkedin, href: '#', label: 'LinkedIn' },
-  { icon: Instagram, href: '#', label: 'Instagram' },
   { icon: Mail, href: 'mailto:support@phenofarm.com', label: 'Email' },
 ];
 
@@ -44,7 +40,7 @@ export function Footer() {
               <span className="text-xl font-bold text-white">PhenoFarm</span>
             </div>
             <p className="text-gray-300 text-sm mb-6 max-w-xs">
-              The affordable B2B marketplace connecting cannabis growers and dispensaries. Save 60% on platform costs.
+              The B2B marketplace connecting cannabis growers and dispensaries for requests, fulfillment, and direct settlement.
             </p>
             <div className="flex items-center gap-3">
               {socialLinks.map((social) => (
@@ -117,13 +113,13 @@ export function Footer() {
             &copy; {new Date().getFullYear()} PhenoFarm. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-sm">
-            <Link href="#" className="text-gray-500 hover:text-gray-300 transition-colors">
+            <Link href="/legal/privacy" className="text-gray-500 hover:text-gray-300 transition-colors">
               Privacy
             </Link>
-            <Link href="#" className="text-gray-500 hover:text-gray-300 transition-colors">
+            <Link href="/legal/terms" className="text-gray-500 hover:text-gray-300 transition-colors">
               Terms
             </Link>
-            <Link href="#" className="text-gray-500 hover:text-gray-300 transition-colors">
+            <Link href="/legal/cookies" className="text-gray-500 hover:text-gray-300 transition-colors">
               Cookies
             </Link>
           </div>

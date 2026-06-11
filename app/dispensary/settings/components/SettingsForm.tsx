@@ -6,6 +6,9 @@ import { LogoUpload } from '@/app/components/settings/LogoUpload';
 import { SignOutButton } from '@/app/components/SignOutButton';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useToast } from '@/app/hooks/useToast';
+import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
+import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
+import { useLocalDraft } from '@/app/hooks/useLocalDraft';
 
 interface SettingsData {
   businessName: string;
@@ -81,7 +84,7 @@ const validateLicenseNumber = (license: string): string | undefined => {
 };
 
 const validateLicenseExpiry = (expiry: string): string | undefined => {
-  if (!expiry) return 'License expiry date is required';
+  if (!expiry) return undefined;
   const expiryDate = new Date(expiry);
   const now = new Date();
   if (isNaN(expiryDate.getTime())) return 'Invalid date format';
@@ -120,34 +123,20 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     message: 'You have unsaved changes in your settings. Are you sure you want to leave?',
   });
 
+  const settingsDraft = useLocalDraft<SettingsData>({
+    key: 'phenofarm:draft:dispensary-settings',
+    value: formData,
+    enabled: !loading,
+    onRestore: (value) => setFormData((prev) => ({ ...prev, ...value })),
+    shouldSave: (value) => JSON.stringify(value) !== JSON.stringify(initialData),
+  });
+  const clearSettingsDraft = settingsDraft.clearDraft;
+
   useEffect(() => {
     if (loading) return;
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
   }, [formData, initialData, loading, setIsDirty]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        if (!saving && !loading) {
-          handleSave(false);
-        }
-      }
-
-      if (e.key === 'Escape' && !loading) {
-        setFormData(initialData);
-        setTouched({});
-        setFieldErrors({});
-        setError('');
-        setIsDirty(false);
-        showToast('info', 'Changes discarded');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [saving, loading, initialData, setIsDirty, showToast]);
 
   const validateForm = useCallback((): boolean => {
     const errors: FieldErrors = {
@@ -333,6 +322,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
       );
 
       setInitialData(payload);
+      clearSettingsDraft();
       resetDirtyState();
 
       if (!isLogoSave) {
@@ -346,7 +336,30 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     } finally {
       setSaving(false);
     }
-  }, [formData, resetDirtyState, showToast, update, validateForm]);
+  }, [clearSettingsDraft, formData, resetDirtyState, showToast, update, validateForm]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (!saving && !loading) {
+          handleSave(false);
+        }
+      }
+
+      if (e.key === 'Escape' && !loading) {
+        setFormData(initialData);
+        setTouched({});
+        setFieldErrors({});
+        setError('');
+        setIsDirty(false);
+        showToast('info', 'Changes discarded');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSave, saving, loading, initialData, setIsDirty, showToast]);
 
   if (loading) {
     return (
@@ -371,6 +384,19 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
           <span className="ml-1">to cancel</span>
         </span>
       </div>
+
+      <div className="rounded-lg border border-green-100 bg-green-50 px-4 py-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-green-800">Required first</p>
+        <p className="mt-1 text-sm text-green-900">
+          Finish business name, license state, license number, and email first. Expiry, logo, address, website, and description can be completed later.
+        </p>
+      </div>
+
+      <DraftAutosaveStatus
+        savedAt={settingsDraft.savedAt}
+        label="Settings browser draft"
+        onClear={settingsDraft.clearDraft}
+      />
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start gap-3">
@@ -399,9 +425,11 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         </div>
       )}
 
-      {formData.licenseStatus && formData.licenseStatus !== 'verified' && (
+      {formData.licenseStatus && (
         <div className={`p-4 border rounded-lg flex items-start gap-3 ${
-          formData.licenseStatus === 'pending_review'
+          formData.licenseStatus === 'verified'
+            ? 'bg-green-50 border-green-200 text-green-700'
+            : formData.licenseStatus === 'pending_review'
             ? 'bg-blue-50 border-blue-200 text-blue-700'
             : formData.licenseStatus === 'expired'
             ? 'bg-red-50 border-red-200 text-red-700'
@@ -412,11 +440,15 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
           </svg>
           <div>
             <p className="font-medium">
+              {formData.licenseStatus === 'verified' && 'License Verified'}
               {formData.licenseStatus === 'pending_review' && 'License Pending Review'}
               {formData.licenseStatus === 'expired' && 'License Expired'}
               {formData.licenseStatus === 'rejected' && 'License Rejected'}
             </p>
             <p className="text-sm mt-1">
+              {formData.licenseStatus === 'verified' && (formData.licenseExpiry
+                ? `Your license is verified through ${new Date(formData.licenseExpiry).toLocaleDateString()}.`
+                : 'Your license is verified. No expiry date is currently on file.')}
               {formData.licenseStatus === 'pending_review' && 'Your license is being reviewed by our team. You will be notified once verified.'}
               {formData.licenseStatus === 'expired' && 'Your license has expired. Please update your license information.'}
               {formData.licenseStatus === 'rejected' && 'Your license was rejected. Please contact support for more information.'}
@@ -532,10 +564,12 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                License Expiry Date <span className="text-red-500">*</span>
+              <label htmlFor="licenseExpiry" className="block text-sm font-medium text-gray-700 mb-1">
+                License Expiry Date <span className="text-gray-400 text-xs">(recommended)</span>
               </label>
               <input
+                id="licenseExpiry"
+                name="licenseExpiry"
                 type="date"
                 value={formData.licenseExpiry}
                 onChange={handleChange('licenseExpiry')}
@@ -695,6 +729,13 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
           )}
         </button>
       </div>
+
+      <StickyMobileActionBar
+        primaryLabel={saving ? 'Saving...' : 'Save settings'}
+        onPrimary={() => void handleSave(false)}
+        disabled={saving}
+        helperText="Settings drafts save in this browser."
+      />
     </div>
   );
 }

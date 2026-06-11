@@ -14,7 +14,7 @@ import AddToCartButton from "../../catalog/components/AddToCartButton";
 interface Product {
   id: string;
   name: string;
-  price: Decimal;
+  price: number;
   isPriceVisible: boolean;
   strain: { name: string } | null;
   productType: string | null;
@@ -25,10 +25,6 @@ interface Product {
   inventoryQty: number;
   images: string[];
   description: string | null;
-}
-
-interface Decimal {
-  toNumber(): number;
 }
 
 type ViewMode = 'grid' | 'list';
@@ -94,10 +90,10 @@ export default function GrowerShopContent({
     // Apply sorting
     switch (sortBy) {
       case 'price-asc':
-        result.sort((a, b) => a.price.toNumber() - b.price.toNumber());
+        result.sort((a, b) => a.price - b.price);
         break;
       case 'price-desc':
-        result.sort((a, b) => b.price.toNumber() - a.price.toNumber());
+        result.sort((a, b) => b.price - a.price);
         break;
       case 'thc-asc':
         result.sort((a, b) => ((a.batch?.thc || a.thcLegacy || 0) - (b.batch?.thc || b.thcLegacy || 0)));
@@ -558,14 +554,14 @@ function ProductCard({
           {product.isPriceVisible ? (
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xl font-bold text-green-700">${product.price.toNumber().toFixed(2)}</span>
+                <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
                 <span className="text-sm text-gray-500">/{product.unit || 'unit'}</span>
               </div>
               <AddToCartButton 
                 product={{
                   id: product.id,
                   name: product.name,
-                  price: product.price.toNumber(),
+                  price: product.price,
                   strain: product.strain?.name || null,
                   unit: product.unit,
                   thc: thcValue || null,
@@ -674,7 +670,7 @@ function ProductListItem({
         {product.isPriceVisible ? (
           <>
             <div className="text-right">
-              <div className="text-lg font-bold text-green-700">${product.price.toNumber().toFixed(2)}</div>
+              <div className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</div>
               <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
             </div>
 
@@ -683,7 +679,7 @@ function ProductListItem({
                 product={{
                   id: product.id,
                   name: product.name,
-                  price: product.price.toNumber(),
+                  price: product.price,
                   strain: product.strain?.name || null,
                   unit: product.unit,
                   thc: thcValue || null,

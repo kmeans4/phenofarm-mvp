@@ -84,6 +84,8 @@ export async function GET() {
             userId: dispensaryUser.id,
             businessName: 'Green Vermont Dispensary',
             licenseNumber: 'VT-D-2024-001',
+            licenseExpiry: new Date('2027-12-31T00:00:00.000Z'),
+            licenseStatus: 'verified',
             address: '456 Medical Ave',
             city: 'Montpelier',
             state: 'VT',

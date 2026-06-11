@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import Link from 'next/link';
@@ -56,20 +56,23 @@ export default async function DispensaryOrdersPage() {
   );
   const activeCount = activeOrders.length;
   const pendingCount = serializedOrders.filter(o => o.status === 'PENDING').length;
-  const totalSpent = serializedOrders.reduce((sum: number, o: { totalAmount: number }) => sum + o.totalAmount, 0);
+  // Cancelled requests carry no trackable value
+  const trackedOrderValue = serializedOrders
+    .filter(o => o.status !== 'CANCELLED')
+    .reduce((sum: number, o: { totalAmount: number }) => sum + o.totalAmount, 0);
 
   return (
     <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">My Orders</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">View and track your orders from growers</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order Requests</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">View submitted requests, fulfillment status, and direct grower follow-up</p>
         </div>
         <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
           <Button variant="primary" asChild className="w-full sm:w-auto">
             <Link href="/dispensary/catalog">
-              + New Order
+              Browse Catalog
             </Link>
           </Button>
         </div>
@@ -78,21 +81,21 @@ export default async function DispensaryOrdersPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Total Orders</p>
+          <p className="text-xs sm:text-sm text-gray-600">Total Requests</p>
           <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
         </div>
         <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Active Orders</p>
+          <p className="text-xs sm:text-sm text-gray-600">Active Requests</p>
           <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">{activeCount}</p>
         </div>
         <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Pending</p>
+          <p className="text-xs sm:text-sm text-gray-600">Waiting on Growers</p>
           <p className="text-xl sm:text-2xl font-bold text-yellow-600 mt-1">{pendingCount}</p>
         </div>
         <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Total Spent</p>
+          <p className="text-xs sm:text-sm text-gray-600">Estimated Request Value</p>
           <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">
-            ${totalSpent.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+            ${trackedOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </p>
         </div>
       </div>
@@ -100,7 +103,7 @@ export default async function DispensaryOrdersPage() {
       {/* Orders List */}
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">Order History</CardTitle>
+          <CardTitle className="text-lg font-semibold text-gray-900">Request Tracker</CardTitle>
         </CardHeader>
         <CardContent>
           {orders.length === 0 ? (
@@ -110,9 +113,9 @@ export default async function DispensaryOrdersPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No orders yet</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No requests yet</h3>
               <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                Browse our catalog to discover quality products from licensed growers.
+                Browse the catalog to discover products from licensed growers and submit your first request.
               </p>
               <Button variant="primary" asChild>
                 <Link href="/dispensary/catalog">
@@ -128,43 +131,6 @@ export default async function DispensaryOrdersPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-        <Link 
-          href="/dispensary/catalog"
-          className="bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg p-3 sm:p-4 transition-colors group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-600 group-hover:scale-105 transition-transform">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">Place New Order</p>
-              <p className="text-sm text-gray-600">Browse products from growers</p>
-            </div>
-          </div>
-        </Link>
-
-        <Link 
-          href="/dispensary/cart"
-          className="bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg p-3 sm:p-4 transition-colors group"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-105 transition-transform">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-              </svg>
-            </div>
-            <div>
-              <p className="font-medium text-gray-900">View Cart</p>
-              <p className="text-sm text-gray-600">Review items before checkout</p>
-            </div>
-          </div>
-        </Link>
-      </div>
     </div>
   );
 }

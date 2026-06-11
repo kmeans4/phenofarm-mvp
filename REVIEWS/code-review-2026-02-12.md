@@ -3,7 +3,7 @@
 **Date:** 2026-02-12  
 **Review Type:** Production Readiness Code Review  
 **Project:** PhenoFarm MVP  
-**Location:** /Users/sam/.openclaw/workspace/phenofarm-mvp
+**Location:** /Users/sam/dev/phenofarm-mvp
 
 ---
 

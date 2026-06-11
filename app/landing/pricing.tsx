@@ -5,37 +5,49 @@ import { useRef, useState } from 'react';
 import { Check, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
+// Tier names match the in-app cultivator subscription plans (Free / Pro / Business)
 const plans = [
   {
-    name: 'Free Trial',
-    description: 'Test our platform risk-free',
+    name: 'Free',
+    description: 'Evaluate the marketplace workflow before enabling paid plans',
     price: { monthly: 0, annual: 0 },
     features: [
-      '30-day free trial',
-      'Basic features included',
+      'Demo and review access',
+      'Catalog and request workflow preview',
       'Standard support',
       'Up to 50 product listings',
-      'Basic analytics',
+      'Basic marketplace records',
     ],
-    cta: 'Get Started',
+    cta: 'Create Account',
     highlighted: false,
   },
   {
-    name: 'Wholesale Pro',
-    description: 'Complete platform for serious businesses',
+    name: 'Pro',
+    description: 'Cultivator subscription for active wholesale teams',
     price: { monthly: 249, annual: 199 },
     features: [
-      'Everything in Free Trial',
+      'Everything in Free',
       'Unlimited product listings',
       'Advanced analytics',
       'Priority support',
       'CSV bulk upload',
       'Metrc integration ready',
+    ],
+    cta: 'Create Account',
+    highlighted: true,
+  },
+  {
+    name: 'Business',
+    description: 'For multi-license operations that need deeper integrations',
+    price: { monthly: null, annual: null },
+    features: [
+      'Everything in Pro',
       'API access',
       'Custom branding',
+      'Dedicated onboarding',
     ],
-    cta: 'Start Free Trial',
-    highlighted: true,
+    cta: 'Contact Sales',
+    highlighted: false,
   },
 ];
 
@@ -63,13 +75,14 @@ export function Pricing() {
             Simple, Transparent Pricing
           </h2>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto mb-8">
-            Choose the plan that works best for your business. Save 60% compared to traditional platforms.
+            Choose a cultivator software subscription for catalog, request, and fulfillment coordination.
           </p>
 
           {/* Billing Toggle */}
           <div className="inline-flex items-center gap-4 p-1 bg-gray-800 rounded-xl">
             <button
               onClick={() => setIsAnnual(false)}
+              aria-label="Monthly billing"
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                 !isAnnual
                   ? 'bg-green-600 text-white'
@@ -80,6 +93,7 @@ export function Pricing() {
             </button>
             <button
               onClick={() => setIsAnnual(true)}
+              aria-label="Annual billing, save 20 percent"
               className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
                 isAnnual
                   ? 'bg-green-600 text-white'
@@ -87,6 +101,7 @@ export function Pricing() {
               }`}
             >
               Annual
+              {' '}
               <span className="text-xs bg-amber-500 text-white px-2 py-0.5 rounded-full">
                 Save 20%
               </span>
@@ -95,7 +110,7 @@ export function Pricing() {
         </motion.div>
 
         {/* Pricing Cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {plans.map((plan, index) => (
             <motion.div
               key={plan.name}
@@ -125,15 +140,21 @@ export function Pricing() {
               </div>
 
               <div className="text-center mb-8">
-                <div className="flex items-baseline justify-center gap-1">
-                  <span className="text-5xl font-bold text-white">
-                    ${isAnnual ? plan.price.annual : plan.price.monthly}
-                  </span>
-                  <span className="text-gray-300">/mo</span>
-                </div>
-                {isAnnual && plan.price.monthly > 0 && (
+                {plan.price.monthly === null ? (
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-4xl font-bold text-white">Custom</span>
+                  </div>
+                ) : (
+                  <div className="flex items-baseline justify-center gap-1">
+                    <span className="text-5xl font-bold text-white">
+                      ${isAnnual ? plan.price.annual : plan.price.monthly}
+                    </span>
+                    <span className="text-gray-300">/mo</span>
+                  </div>
+                )}
+                {isAnnual && (plan.price.monthly ?? 0) > 0 && (
                   <p className="text-gray-500 text-sm mt-2">
-                    Billed ${plan.price.annual * 12}/year
+                    Billed ${(plan.price.annual ?? 0) * 12}/year
                   </p>
                 )}
               </div>
@@ -148,7 +169,7 @@ export function Pricing() {
               </ul>
 
               <Link
-                href="/auth/sign_up"
+                href={plan.cta === 'Contact Sales' ? 'mailto:support@phenofarm.com' : '/auth/sign_up'}
                 className={`block w-full py-4 rounded-xl text-center font-semibold transition-all ${
                   plan.highlighted
                     ? 'bg-green-600 hover:bg-green-500 text-white shadow-lg shadow-green-600/25'

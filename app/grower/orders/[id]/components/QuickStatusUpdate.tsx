@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getOrderStatusLabel } from '@/lib/order-workflow';
 
 interface QuickStatusUpdateProps {
   orderId: string;
@@ -10,43 +11,43 @@ interface QuickStatusUpdateProps {
 
 const STATUS_CONFIG = {
   PENDING: {
-    label: 'Pending',
+    label: getOrderStatusLabel('PENDING'),
     color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
     actions: [
-      { status: 'CONFIRMED', label: 'Confirm Order', color: 'bg-blue-600 hover:bg-blue-700' },
-      { status: 'CANCELLED', label: 'Cancel Order', color: 'bg-red-600 hover:bg-red-700' },
+      { status: 'CONFIRMED', label: 'Accept Request', color: 'bg-blue-600 hover:bg-blue-700' },
+      { status: 'CANCELLED', label: 'Cancel Request', color: 'bg-red-600 hover:bg-red-700' },
     ]
   },
   CONFIRMED: {
-    label: 'Confirmed',
+    label: getOrderStatusLabel('CONFIRMED'),
     color: 'bg-blue-100 text-blue-800 border-blue-200',
     actions: [
-      { status: 'PROCESSING', label: 'Start Processing', color: 'bg-purple-600 hover:bg-purple-700' },
-      { status: 'CANCELLED', label: 'Cancel Order', color: 'bg-red-600 hover:bg-red-700' },
+      { status: 'PROCESSING', label: 'Start Preparing', color: 'bg-purple-600 hover:bg-purple-700' },
+      { status: 'CANCELLED', label: 'Cancel Request', color: 'bg-red-600 hover:bg-red-700' },
     ]
   },
   PROCESSING: {
-    label: 'Processing',
+    label: getOrderStatusLabel('PROCESSING'),
     color: 'bg-purple-100 text-purple-800 border-purple-200',
     actions: [
-      { status: 'SHIPPED', label: 'Mark Shipped', color: 'bg-orange-600 hover:bg-orange-700' },
-      { status: 'CANCELLED', label: 'Cancel Order', color: 'bg-red-600 hover:bg-red-700' },
+      { status: 'SHIPPED', label: 'Mark Ready / In transit', color: 'bg-orange-600 hover:bg-orange-700' },
+      { status: 'CANCELLED', label: 'Cancel Request', color: 'bg-red-600 hover:bg-red-700' },
     ]
   },
   SHIPPED: {
-    label: 'Shipped',
+    label: getOrderStatusLabel('SHIPPED'),
     color: 'bg-orange-100 text-orange-800 border-orange-200',
     actions: [
       { status: 'DELIVERED', label: 'Mark Delivered', color: 'bg-green-600 hover:bg-green-700' },
     ]
   },
   DELIVERED: {
-    label: 'Delivered',
+    label: getOrderStatusLabel('DELIVERED'),
     color: 'bg-green-100 text-green-800 border-green-200',
     actions: []
   },
   CANCELLED: {
-    label: 'Cancelled',
+    label: getOrderStatusLabel('CANCELLED'),
     color: 'bg-red-100 text-red-800 border-red-200',
     actions: []
   },
@@ -98,11 +99,11 @@ export default function QuickStatusUpdate({ orderId, currentStatus }: QuickStatu
             {currentStatus === 'DELIVERED' ? '✅' : '❌'}
           </span>
           <div>
-            <p className="font-medium">Order {config.label}</p>
+            <p className="font-medium">Request {config.label}</p>
             <p className="text-sm opacity-75">
               {currentStatus === 'DELIVERED' 
-                ? 'This order has been completed successfully.' 
-                : 'This order has been cancelled and cannot be modified.'}
+                ? 'Fulfillment has been completed successfully.' 
+                : 'This order request has been cancelled and cannot be modified.'}
             </p>
           </div>
         </div>
@@ -115,7 +116,7 @@ export default function QuickStatusUpdate({ orderId, currentStatus }: QuickStatu
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
         <div>
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">Update Status</h3>
-          <p className="text-xs sm:text-sm text-gray-600">Quick actions to move order forward</p>
+          <p className="text-xs sm:text-sm text-gray-600">Quick actions to move fulfillment forward</p>
         </div>
         <span className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium border self-start ${config.color}`}>
           {config.label}

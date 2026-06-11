@@ -49,15 +49,15 @@ export function CTASection() {
           transition={{ duration: 0.6 }}
         >
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-6 leading-tight">
-            Ready to Transform Your
+            Ready to Manage Wholesale{' '}
             <br />
             <span className="bg-gradient-to-r from-green-300 to-emerald-200 bg-clip-text text-transparent">
-              Cannabis Wholesale Business?
+              Requests in One Place?
             </span>
           </h2>
           
           <p className="text-xl text-green-100 mb-10 max-w-2xl mx-auto">
-            Join 500+ businesses saving 60% on their platform costs with PhenoFarm.
+            Give your team one place to manage catalog discovery, order requests, fulfillment, and direct-settlement terms.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
@@ -70,7 +70,7 @@ export function CTASection() {
                 href="/auth/sign_up"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white text-green-900 font-semibold rounded-xl transition-all shadow-xl hover:shadow-2xl hover:shadow-white/20"
               >
-                Start Free Trial
+                Create Marketplace Account
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </motion.div>
@@ -84,7 +84,7 @@ export function CTASection() {
                 href="/contact"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white font-semibold rounded-xl transition-all"
               >
-                Talk to Sales
+                Contact Support
               </Link>
             </motion.div>
           </div>
@@ -92,15 +92,15 @@ export function CTASection() {
           <div className="flex flex-wrap justify-center gap-6 text-sm text-green-200">
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-300" />
-              <span>No credit card required</span>
+              <span>No wholesale payment processing</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-300" />
-              <span>30 days free</span>
+              <span>Demo access available</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5 text-green-300" />
-              <span>Cancel anytime</span>
+              <span>Cultivator subscriptions only</span>
             </div>
           </div>
         </motion.div>

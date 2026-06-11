@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { ProductForm } from '../components/ProductForm';
 import { buildProductRequestPayload, PRODUCT_STATUS } from '@/lib/product-payload';
+import { toast } from '@/app/hooks/useToast';
 
 interface ProductFormData {
   name: string;
@@ -36,6 +37,8 @@ export default function AddProductPage() {
   const [growerInfo, setGrowerInfo] = useState<GrowerInfo | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [draftToRestore, setDraftToRestore] = useState<Partial<ProductFormData> | null>(null);
+  const [formVersion, setFormVersion] = useState(0);
 
   const [initialData, setInitialData] = useState<Partial<ProductFormData>>({
     strainId: prefillStrainId || undefined,
@@ -56,12 +59,7 @@ export default function AddProductPage() {
           if (savedDraft) {
             try {
               const parsed = JSON.parse(savedDraft);
-              const shouldRestore = window.confirm('You have an unsaved product draft. Restore it?');
-              if (shouldRestore) {
-                setInitialData(parsed);
-              } else {
-                window.sessionStorage.removeItem('addProductDraft');
-              }
+              setDraftToRestore(parsed);
             } catch {
               window.sessionStorage.removeItem('addProductDraft');
             }
@@ -98,9 +96,10 @@ export default function AddProductPage() {
     try {
       setIsSubmitting(true);
       await saveProduct(formData, PRODUCT_STATUS.PUBLISHED);
+      toast.success('Product published');
       router.push('/grower/products');
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred');
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -110,9 +109,10 @@ export default function AddProductPage() {
     try {
       setIsSubmitting(true);
       await saveProduct(formData, PRODUCT_STATUS.DRAFT);
+      toast.success('Draft saved');
       router.push('/grower/products');
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred');
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -120,8 +120,14 @@ export default function AddProductPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-gray-500">Loading...</div>
+      <div className="mx-auto max-w-3xl space-y-4">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
+          <p className="mt-1 text-gray-600">Loading product form...</p>
+        </div>
+        <div className="flex min-h-[320px] items-center justify-center rounded-lg border border-gray-200 bg-white">
+          <div className="text-gray-500">Loading...</div>
+        </div>
       </div>
     );
   }
@@ -134,7 +140,42 @@ export default function AddProductPage() {
           <p className="text-gray-600 mt-1">Create a new cannabis product listing</p>
         </div>
       </div>
+      {draftToRestore && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-amber-900">Unsaved product draft found</p>
+              <p className="mt-1 text-sm text-amber-800">Restore the browser draft or discard it and start fresh.</p>
+            </div>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setInitialData(draftToRestore);
+                  setFormVersion((version) => version + 1);
+                  setDraftToRestore(null);
+                  toast.success('Draft restored');
+                }}
+                className="rounded-md bg-amber-700 px-3 py-2 text-sm font-semibold text-white hover:bg-amber-800"
+              >
+                Restore
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  window.sessionStorage.removeItem('addProductDraft');
+                  setDraftToRestore(null);
+                }}
+                className="rounded-md border border-amber-300 bg-white px-3 py-2 text-sm font-semibold text-amber-900 hover:bg-amber-100"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <ProductForm 
+        key={formVersion}
         onSubmit={handleSubmit}
         onSaveDraft={handleSaveDraft}
         onCancel={() => router.push('/grower/products')}

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Eye, EyeOff, Check } from 'lucide-react';
 
 export default function SignUpPage() {
@@ -80,8 +81,39 @@ export default function SignUpPage() {
     setLoading(true);
 
     try {
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      router.push('/auth/sign_in');
+      const response = await fetch('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          businessName: formData.businessName,
+          businessType: formData.businessType,
+        }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        setError(data?.error || 'Failed to create account. Please try again.');
+        setLoading(false);
+        return;
+      }
+
+      // Sign the new user in and route them to their dashboard
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+      });
+
+      if (result?.error) {
+        router.push('/auth/sign_in');
+        return;
+      }
+
+      router.push('/dashboard');
     } catch {
       setError('Failed to create account. Please try again.');
       setLoading(false);
@@ -101,9 +133,9 @@ export default function SignUpPage() {
           <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-lg">PF</span>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create your account
-          </h2>
+          </h1>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
             <Link href="/auth/sign_in" className="font-medium text-green-600 hover:text-green-500">
@@ -113,7 +145,7 @@ export default function SignUpPage() {
         </div>
 
         {/* Step Indicator */}
-        <div className="flex items-center justify-center gap-2">
+        <div className="flex items-center justify-center gap-2 sm:gap-3" aria-label={`Step ${step} of ${steps.length}: ${steps[step - 1].label}`}>
           {steps.map((s) => (
             <div key={s.number} className="flex items-center">
               <div
@@ -125,15 +157,18 @@ export default function SignUpPage() {
               >
                 {step > s.number ? <Check className="w-4 h-4" /> : s.number}
               </div>
-              <span className={`ml-2 text-sm ${step >= s.number ? 'text-green-600' : 'text-gray-400'}`}>
+              <span className={`ml-2 hidden text-sm sm:inline ${step >= s.number ? 'text-green-600' : 'text-gray-400'}`}>
                 {s.label}
               </span>
               {s.number < 3 && (
-                <div className={`w-8 h-0.5 mx-2 ${step > s.number ? 'bg-green-600' : 'bg-gray-200'}`} />
+                <div className={`mx-2 h-0.5 w-10 sm:w-8 ${step > s.number ? 'bg-green-600' : 'bg-gray-200'}`} />
               )}
             </div>
           ))}
         </div>
+        <p className="text-center text-sm font-medium text-gray-600 sm:hidden">
+          Step {step} of {steps.length}: {steps[step - 1].label}
+        </p>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
@@ -246,9 +281,6 @@ export default function SignUpPage() {
                 >
                   <option value="grower">Cannabis Grower</option>
                   <option value="dispensary">Dispensary/ Retailer</option>
-                  <option value="processor">Processor/ Manufacturer</option>
-                  <option value="distributor">Distributor</option>
-                  <option value="other">Other</option>
                 </select>
               </div>
 
@@ -366,8 +398,8 @@ export default function SignUpPage() {
             </div>
           </div>
           <div className="mt-2 flex justify-center space-x-6 text-sm text-gray-500">
-            <a href="#" className="hover:text-gray-900">Terms of Service</a>
-            <a href="#" className="hover:text-gray-900">Privacy Policy</a>
+            <Link href="/legal/terms" className="hover:text-gray-900">Terms of Service</Link>
+            <Link href="/legal/privacy" className="hover:text-gray-900">Privacy Policy</Link>
           </div>
         </div>
       </div>

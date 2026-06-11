@@ -25,9 +25,9 @@ function requireMessagingUser(session: Awaited<ReturnType<typeof getAuthSession>
 function buildOfferSummary(message: { offerQuantity: number | null; offerUnitPrice: Prisma.Decimal | string | number | null }) {
   const unitPrice = Number(message.offerUnitPrice || 0);
   const qty = message.offerQuantity || 0;
-  if (qty > 0 && unitPrice > 0) return `Offer: ${qty} @ $${unitPrice.toFixed(2)}`;
-  if (unitPrice > 0) return `Offer: $${unitPrice.toFixed(2)}`;
-  return 'Offer sent';
+  if (qty > 0 && unitPrice > 0) return `Quote: ${qty} @ $${unitPrice.toFixed(2)}`;
+  if (unitPrice > 0) return `Quote: $${unitPrice.toFixed(2)}`;
+  return 'Quote sent';
 }
 
 export async function GET() {

@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { toast } from '@/app/hooks/useToast';
 import {
   BatchLabDocumentUploaders,
   BatchLabDocuments,
@@ -108,7 +109,7 @@ export default function AddBatchPage() {
       }
 
       const newBatch = await response.json();
-      alert('Batch created successfully!');
+      toast.success('Batch created');
       if (returnUrl) {
         sessionStorage.setItem('newlyCreatedBatchId', newBatch.id || '');
         router.push(returnUrl);

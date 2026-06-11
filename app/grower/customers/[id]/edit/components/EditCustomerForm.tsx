@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
+import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
 
 interface Customer {
   id: string;
@@ -137,6 +138,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
   const initialData = {
     businessName: customer.businessName || '',
@@ -273,8 +275,6 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
   });
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this customer? This action cannot be undone.')) return;
-    
     try {
       const response = await fetch(`/api/customers/${customer.id}`, {
         method: 'DELETE',
@@ -592,7 +592,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           {!isPlatformManaged && (
             <button
               type="button"
-              onClick={handleDelete}
+              onClick={() => setDeleteConfirmOpen(true)}
               className="w-full sm:w-auto sm:self-start px-6 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
             >
               Delete Customer
@@ -618,6 +618,18 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           </div>
         </div>
       </form>
+      <ConfirmDialog
+        open={deleteConfirmOpen}
+        title="Delete customer?"
+        description="This removes the customer relationship from your grower workspace. This action cannot be undone from this screen."
+        confirmLabel="Delete customer"
+        intent="danger"
+        onCancel={() => setDeleteConfirmOpen(false)}
+        onConfirm={() => {
+          setDeleteConfirmOpen(false);
+          handleDelete();
+        }}
+      />
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Button } from '@/app/components/ui/Button';
+import { toast } from '@/app/hooks/useToast';
 import { STRAIN_TYPES, STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 
 interface Strain {
@@ -86,10 +87,11 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
         setNewStrainGenetics('');
       } else {
         const err = await response.json();
-        alert(err.error || 'Failed to create strain');
+        toast.error(err.error || 'Failed to create strain');
       }
     } catch (err) {
       console.error('Error creating strain:', err);
+      toast.error('Network error creating strain');
     } finally {
       setCreating(false);
     }

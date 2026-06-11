@@ -1,9 +1,16 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { Badge } from '@/app/components/ui/Badge';
+import {
+  readDensityPreference,
+  saveDensityPreference,
+  TableDensity,
+  TableDensityControl,
+} from '@/app/components/ux/TableDensityControl';
 import { format } from 'date-fns';
+import { getOrderStatusLabel } from '@/lib/order-workflow';
 
 interface Order {
   id: string;
@@ -25,12 +32,12 @@ interface OrdersTableProps {
 }
 
 const statusLabels: StatusLabelMap = {
-  PENDING: 'Pending',
-  CONFIRMED: 'Confirmed',
-  PROCESSING: 'Processing',
-  SHIPPED: 'Shipped',
-  DELIVERED: 'Delivered',
-  CANCELLED: 'Cancelled',
+  PENDING: getOrderStatusLabel('PENDING'),
+  CONFIRMED: getOrderStatusLabel('CONFIRMED'),
+  PROCESSING: getOrderStatusLabel('PROCESSING'),
+  SHIPPED: getOrderStatusLabel('SHIPPED'),
+  DELIVERED: getOrderStatusLabel('DELIVERED'),
+  CANCELLED: getOrderStatusLabel('CANCELLED'),
 };
 
 const getBadgeVariant = (status: string): BadgeVariant => {
@@ -44,16 +51,49 @@ const getBadgeVariant = (status: string): BadgeVariant => {
 
 type SortField = 'date' | 'status' | 'total' | 'orderId';
 type SortDirection = 'asc' | 'desc';
+type OrderView = 'all' | 'waiting-grower' | 'active' | 'delivered';
 
 export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [orderView, setOrderView] = useState<OrderView>('all');
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
+  const [tableDensity, setTableDensity] = useState<TableDensity>('comfortable');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setTableDensity(readDensityPreference('phenofarm:density:dispensary-orders'));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const handleDensityChange = (mode: TableDensity) => {
+    setTableDensity(mode);
+    saveDensityPreference('phenofarm:density:dispensary-orders', mode);
+  };
+
+  const orderViews = useMemo(
+    () => [
+      { key: 'all' as const, label: 'All', count: initialOrders.length },
+      { key: 'waiting-grower' as const, label: 'Waiting on grower', count: initialOrders.filter((order) => order.status === 'PENDING').length },
+      { key: 'active' as const, label: 'Active', count: initialOrders.filter((order) => ['CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(order.status)).length },
+      { key: 'delivered' as const, label: 'Delivered', count: initialOrders.filter((order) => order.status === 'DELIVERED').length },
+    ],
+    [initialOrders],
+  );
 
   // Filter orders based on search and status
   const filteredOrders = useMemo(() => {
     let result = [...initialOrders];
+
+    if (orderView === 'waiting-grower') {
+      result = result.filter((order) => order.status === 'PENDING');
+    } else if (orderView === 'active') {
+      result = result.filter((order) => ['CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(order.status));
+    } else if (orderView === 'delivered') {
+      result = result.filter((order) => order.status === 'DELIVERED');
+    }
 
     // Filter by status
     if (statusFilter !== 'all') {
@@ -92,7 +132,7 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
     });
 
     return result;
-  }, [initialOrders, searchQuery, statusFilter, sortField, sortDirection]);
+  }, [initialOrders, orderView, searchQuery, statusFilter, sortField, sortDirection]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -121,9 +161,45 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
       </svg>
     );
   };
+  const compactMode = tableDensity === 'compact';
+  const cellClass = compactMode ? 'px-4 py-1.5 text-xs' : 'px-4 py-3 text-sm';
+  const mobileCardClass = compactMode ? 'rounded-xl border border-gray-200 bg-white p-3 shadow-sm' : 'rounded-xl border border-gray-200 bg-white p-4 shadow-sm';
 
   return (
     <>
+      <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+        <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-semibold text-gray-900">Saved workflow views</p>
+          <p className="text-xs text-gray-500">Jump to the requests most likely to need your next action.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {orderViews.map((view) => (
+            <button
+              key={view.key}
+              type="button"
+              onClick={() => {
+                setOrderView(view.key);
+                setStatusFilter('all');
+              }}
+              aria-pressed={orderView === view.key}
+              aria-label={`${view.label}: ${view.count} requests`}
+              className={`rounded-lg px-3 py-2 text-sm font-medium ${
+                orderView === view.key
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              {view.label}
+              <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                orderView === view.key ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+              }`}>
+                {view.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <div className="relative flex-1">
@@ -132,7 +208,7 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
           </svg>
           <input
             type="text"
-            placeholder="Search orders..."
+            placeholder="Search requests..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -140,17 +216,23 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
         </div>
         <select 
           value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
+          onChange={(e) => {
+            setOrderView('all');
+            setStatusFilter(e.target.value);
+          }}
           className="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
         >
           <option value="all">All Status</option>
-          <option value="pending">Pending</option>
-          <option value="confirmed">Confirmed</option>
-          <option value="processing">Processing</option>
-          <option value="shipped">Shipped</option>
+          <option value="pending">Submitted</option>
+          <option value="confirmed">Accepted</option>
+          <option value="processing">Preparing</option>
+          <option value="shipped">Ready / In transit</option>
           <option value="delivered">Delivered</option>
           <option value="cancelled">Cancelled</option>
         </select>
+        <div className="sm:self-center">
+          <TableDensityControl value={tableDensity} onChange={handleDensityChange} />
+        </div>
       </div>
 
       {/* Mobile order cards */}
@@ -158,12 +240,12 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
         {filteredOrders.length === 0 ? (
           <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-gray-500">
             {searchQuery || statusFilter !== 'all'
-              ? 'No orders match your filters'
-              : 'No orders yet'}
+              ? 'No requests match your filters'
+              : 'No requests yet'}
           </div>
         ) : (
           filteredOrders.map((order) => (
-            <div key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+            <div key={order.id} className={mobileCardClass}>
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <p className="font-semibold text-gray-900">#{order.orderId}</p>
@@ -176,22 +258,22 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
                 </Badge>
               </div>
 
-              <div className="mt-4 grid grid-cols-2 gap-3 text-sm">
+              <div className={`${compactMode ? 'mt-3' : 'mt-4'} grid grid-cols-2 gap-3 text-sm`}>
                 <div>
                   <p className="text-gray-500">Date</p>
                   <p className="font-medium text-gray-900">{format(new Date(order.createdAt), 'MMM d, yyyy')}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Total</p>
+                  <p className="text-gray-500">Est. value</p>
                   <p className="font-semibold text-gray-900">${Number(order.totalAmount).toFixed(2)}</p>
                 </div>
               </div>
 
               <Link
                 href={'/dispensary/orders/' + order.id}
-                className="mt-4 inline-flex w-full items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50"
+                className={`${compactMode ? 'mt-3' : 'mt-4'} inline-flex w-full items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50`}
               >
-                View order
+                View request
               </Link>
             </div>
           ))
@@ -204,16 +286,16 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
           <thead>
             <tr className="border-b border-gray-200">
               <th 
-                className="px-4 py-3 text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50"
+                className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
                 onClick={() => handleSort('orderId')}
               >
                 <div className="flex items-center gap-1">
-                  Order # {getSortIcon('orderId')}
+                  Request # {getSortIcon('orderId')}
                 </div>
               </th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-700">Grower</th>
+              <th className={`${cellClass} font-medium text-gray-700`}>Grower</th>
               <th 
-                className="px-4 py-3 text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50"
+                className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
                 onClick={() => handleSort('date')}
               >
                 <div className="flex items-center gap-1">
@@ -221,22 +303,22 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50"
+                className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
                 onClick={() => handleSort('total')}
               >
                 <div className="flex items-center gap-1">
-                  Total {getSortIcon('total')}
+                  Est. value {getSortIcon('total')}
                 </div>
               </th>
               <th 
-                className="px-4 py-3 text-sm font-medium text-gray-700 cursor-pointer hover:bg-gray-50"
+                className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
                 onClick={() => handleSort('status')}
               >
                 <div className="flex items-center gap-1">
                   Status {getSortIcon('status')}
                 </div>
               </th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-700">Actions</th>
+              <th className={`${cellClass} font-medium text-gray-700`}>Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
@@ -244,31 +326,31 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                   {searchQuery || statusFilter !== 'all' 
-                    ? 'No orders match your filters' 
-                    : 'No orders yet'}
+                    ? 'No requests match your filters' 
+                    : 'No requests yet'}
                 </td>
               </tr>
             ) : (
               filteredOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
+                  <td className={cellClass}>
                     <div className="font-medium text-gray-900">#{order.orderId}</div>
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className={`${cellClass} text-gray-600`}>
                     {order.grower?.businessName || 'Unknown'}
                   </td>
-                  <td className="px-4 py-3 text-sm text-gray-600">
+                  <td className={`${cellClass} text-gray-600`}>
                     {format(new Date(order.createdAt), 'MMM d, yyyy')}
                   </td>
-                  <td className="px-4 py-3 text-sm font-bold text-gray-900">
+                  <td className={`${cellClass} font-bold text-gray-900`}>
                     ${Number(order.totalAmount).toFixed(2)}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className={cellClass}>
                     <Badge variant={getBadgeVariant(order.status)}>
                       {statusLabels[order.status] || order.status}
                     </Badge>
                   </td>
-                  <td className="px-4 py-3">
+                  <td className={cellClass}>
                     <Link 
                       href={'/dispensary/orders/' + order.id}
                       className="text-blue-600 hover:text-blue-700 font-medium text-sm"
@@ -286,7 +368,7 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
       {/* Results count */}
       {filteredOrders.length > 0 && (
         <div className="mt-4 text-sm text-gray-500">
-          Showing {filteredOrders.length} of {initialOrders.length} orders
+          Showing {filteredOrders.length} of {initialOrders.length} requests
         </div>
       )}
     </>

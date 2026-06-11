@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { Button } from "@/app/components/ui/Button";
@@ -12,15 +12,21 @@ export default async function GrowerCustomersPage() {
     redirect('/auth/sign_in');
   }
 
+  const growerId = (session.user as { growerId?: string }).growerId;
+
+  // Only dispensaries with order history with this grower are customers
   const customers = await db.dispensary.findMany({
+    where: {
+      orders: {
+        some: { growerId },
+      },
+    },
     include: {
       user: {
         select: { email: true, name: true },
       },
       orders: {
-        where: {
-          growerId: (session.user as { growerId?: string }).growerId,
-        },
+        where: { growerId },
         select: { id: true },
       },
     },
@@ -30,6 +36,7 @@ export default async function GrowerCustomersPage() {
   });
 
   const customerCount = customers.length;
+  const totalCustomerOrders = customers.reduce((sum, customer) => sum + customer.orders.length, 0);
 
   return (
     <div className="space-y-5 sm:space-y-6">
@@ -54,7 +61,7 @@ export default async function GrowerCustomersPage() {
         </div>
         <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200">
           <p className="text-xs sm:text-sm text-gray-600">Orders</p>
-          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">0</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{totalCustomerOrders}</p>
         </div>
       </div>
 

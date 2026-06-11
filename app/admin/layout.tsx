@@ -32,7 +32,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
-            <h1 className="text-lg font-bold text-green-600">PhenoFarm</h1>
+            <div className="text-lg font-bold text-green-600" aria-label="PhenoFarm admin panel">PhenoFarm</div>
             <SignOutButton />
           </div>
           <MobileNav links={navLinks} />
@@ -41,15 +41,17 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:block flex-shrink-0 h-screen sticky top-0">
-          <div className="p-4 border-b border-gray-200">
-            <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
+        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:flex lg:flex-col flex-shrink-0 h-screen sticky top-0">
+          <div className="p-4 border-b border-gray-200 flex-shrink-0">
+            <div className="text-xl font-bold text-green-600" aria-label="PhenoFarm admin panel">PhenoFarm</div>
             <p className="text-sm text-gray-500">Admin Panel</p>
           </div>
-          
-          <ClientNav links={navLinks} />
-          
-          <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 bg-white">
+
+          <div className="min-h-0 flex-1 overflow-y-auto">
+            <ClientNav links={navLinks} />
+          </div>
+
+          <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
             <div className="bg-green-50 rounded-lg p-4 mb-3">
               <p className="text-sm font-medium text-green-900 mb-1">Admin Access</p>
               <p className="text-xs text-green-700">Full system access</p>

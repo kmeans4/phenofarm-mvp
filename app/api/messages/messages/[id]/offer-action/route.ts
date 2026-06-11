@@ -32,12 +32,12 @@ export async function POST(
       include: { conversation: true },
     });
 
-    if (!message) return NextResponse.json({ error: 'Offer not found' }, { status: 404 });
+    if (!message) return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
     if (message.messageType !== ConversationMessageType.OFFER) {
-      return NextResponse.json({ error: 'Message is not an offer' }, { status: 400 });
+      return NextResponse.json({ error: 'Message is not a quote' }, { status: 400 });
     }
     if (message.offerStatus !== OfferStatus.PENDING) {
-      return NextResponse.json({ error: 'Offer is no longer pending' }, { status: 409 });
+      return NextResponse.json({ error: 'Quote is no longer pending' }, { status: 409 });
     }
 
     const conversation = message.conversation;
@@ -53,7 +53,7 @@ export async function POST(
     }
 
     if (message.senderUserId === user.id) {
-      return NextResponse.json({ error: 'You cannot respond to your own offer' }, { status: 400 });
+      return NextResponse.json({ error: 'You cannot respond to your own quote' }, { status: 400 });
     }
 
     const now = new Date();
@@ -93,14 +93,14 @@ export async function POST(
     const counterNote = typeof counter.note === 'string' ? counter.note.trim() : '';
 
     if (!Number.isFinite(counterUnitPrice) || counterUnitPrice <= 0) {
-      return NextResponse.json({ error: 'Counter unit price must be greater than zero' }, { status: 400 });
+      return NextResponse.json({ error: 'Counter quote unit price must be greater than zero' }, { status: 400 });
     }
 
     const normalizedQuantity = Number.isFinite(counterQuantity) && counterQuantity > 0
       ? Math.floor(counterQuantity)
       : message.offerQuantity || null;
 
-    const counterMessageBody = counterNote || 'Counter offer';
+    const counterMessageBody = counterNote || 'Counter quote';
 
     const result = await db.$transaction(async (tx) => {
       const updatedOriginal = await tx.conversationMessage.update({
@@ -147,7 +147,7 @@ export async function POST(
       { status: 200 }
     );
   } catch (error) {
-    console.error('Error handling offer action:', error);
+    console.error('Error handling quote action:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

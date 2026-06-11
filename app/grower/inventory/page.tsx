@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 
@@ -16,6 +16,16 @@ const formatInventoryUnit = (unit: string | null | undefined, qty: number): stri
   return `${trimmed}s`;
 };
 
+function InventoryStatusBadge({ isAvailable, quantity }: { isAvailable?: boolean; quantity?: number }) {
+  if (!isAvailable) {
+    return <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Unavailable</span>;
+  }
+  if ((quantity || 0) <= 0) {
+    return <span className="px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800">Out of Stock</span>;
+  }
+  return <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Available</span>;
+}
+
 export default async function GrowerInventoryPage() {
   const session = await getServerSession(authOptions);
   
@@ -27,7 +37,7 @@ export default async function GrowerInventoryPage() {
   
   // Fetch products for this grower with strain info
   const rawProducts = await db.product.findMany({
-    where: { growerId: sessionUser.growerId },
+    where: { growerId: sessionUser.growerId, isDeleted: false },
     select: {
       id: true,
       name: true,
@@ -61,7 +71,7 @@ export default async function GrowerInventoryPage() {
   const lowStockCount = products?.filter((p: { inventoryQty: number }) => (p?.inventoryQty || 0) <= 10)?.length || 0;
 
   return (
-    <div className="space-y-5 sm:space-y-6 p-4">
+    <div className="space-y-5 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Inventory</h1>
@@ -120,11 +130,7 @@ export default async function GrowerInventoryPage() {
                       <div className="font-medium text-gray-900">{product?.name || 'Unnamed'}</div>
                       {product?.strainName && <div className="text-xs text-gray-500 mt-1 truncate">{product.strainName}</div>}
                     </div>
-                    {product?.isAvailable ? (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Available</span>
-                    ) : (
-                      <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Out of Stock</span>
-                    )}
+                    <InventoryStatusBadge isAvailable={product?.isAvailable} quantity={product?.inventoryQty} />
                   </div>
 
                   <div className="mt-3 grid grid-cols-2 gap-2.5 text-xs sm:text-sm">
@@ -143,6 +149,13 @@ export default async function GrowerInventoryPage() {
                       </p>
                     </div>
                   </div>
+
+                  <Link
+                    href={`/grower/products/${product.id}/edit`}
+                    className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800"
+                  >
+                    Edit product
+                  </Link>
                 </div>
               ))}
             </div>
@@ -156,6 +169,7 @@ export default async function GrowerInventoryPage() {
                     <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Price</th>
                     <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Inventory</th>
                     <th className="px-3 sm:px-6 py-2 sm:py-3 text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Status</th>
+                    <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -175,11 +189,15 @@ export default async function GrowerInventoryPage() {
                         </span>
                       </td>
                       <td className="px-3 sm:px-6 py-2.5 sm:py-4">
-                        {product?.isAvailable ? (
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">Available</span>
-                        ) : (
-                          <span className="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">Out of Stock</span>
-                        )}
+                        <InventoryStatusBadge isAvailable={product?.isAvailable} quantity={product?.inventoryQty} />
+                      </td>
+                      <td className="px-3 sm:px-6 py-2.5 sm:py-4 text-right">
+                        <Link
+                          href={`/grower/products/${product.id}/edit`}
+                          className="text-xs sm:text-sm font-medium text-green-700 hover:text-green-800"
+                        >
+                          Edit
+                        </Link>
                       </td>
                     </tr>
                   ))}

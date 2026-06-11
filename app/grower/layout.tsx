@@ -1,10 +1,11 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { redirect } from "next/navigation";
 import { MobileNav } from "./components/MobileNav";
 import { ClientNav } from "./components/ClientNav";
 import { SearchDialog } from "@/app/components/SearchDialog";
 import { ChatDrawer } from "@/app/components/messaging/ChatDrawer";
+import { RecentActivityDrawer } from "@/app/components/ux/RecentActivityDrawer";
 
 export default async function GrowerLayout({ children }: { children: React.ReactNode }) {
   const session = await getServerSession(authOptions);
@@ -20,15 +21,17 @@ export default async function GrowerLayout({ children }: { children: React.React
   }
 
   const navLinks = [
-    { name: 'Dashboard', href: '/grower/dashboard' },
-    { name: 'Products', href: '/grower/products' },
-    { name: 'Strains', href: '/grower/strains' },
-    { name: 'Batches', href: '/grower/batches' },
-    { name: 'Orders', href: '/grower/orders' },
-    { name: 'Customers', href: '/grower/customers' },
-    { name: 'Inventory', href: '/grower/inventory' },
-    { name: 'Reports', href: '/grower/reports' },
-    { name: 'Settings', href: '/grower/settings' },
+    { name: 'Dashboard', href: '/grower/dashboard', group: 'Home' },
+    { name: 'Catalog', href: '/grower/catalog', group: 'Catalog' },
+    { name: 'Products', href: '/grower/products', group: 'Catalog' },
+    { name: 'Inventory', href: '/grower/inventory', group: 'Catalog' },
+    { name: 'Marketplace', href: '/grower/marketplace', group: 'Catalog' },
+    { name: 'Strains', href: '/grower/strains', group: 'Catalog' },
+    { name: 'Batches', href: '/grower/batches', group: 'Catalog' },
+    { name: 'Orders', href: '/grower/orders', group: 'Orders' },
+    { name: 'Customers', href: '/grower/customers', group: 'Relationships' },
+    { name: 'Reports', href: '/grower/reports', group: 'Reports' },
+    { name: 'Settings', href: '/grower/settings', group: 'Account' },
   ];
 
   return (
@@ -37,7 +40,7 @@ export default async function GrowerLayout({ children }: { children: React.React
       <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
-            <h1 className="text-lg font-bold text-green-600">PhenoFarm</h1>
+            <div className="text-lg font-bold text-green-600" aria-label="PhenoFarm grower portal">PhenoFarm</div>
             <div className="flex items-center gap-2">
               <SearchDialog variant="icon" />
               {/* MobileNav includes hamburger button - placed on right */}
@@ -51,7 +54,7 @@ export default async function GrowerLayout({ children }: { children: React.React
         {/* Tablet/Desktop Sidebar */}
         <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:w-56 lg:w-64 md:flex-col md:bg-white md:border-r md:border-gray-200">
           <div className="px-4 pt-4 pb-3 border-b border-gray-200 flex-shrink-0">
-            <h1 className="text-xl font-bold text-green-600">PhenoFarm</h1>
+            <div className="text-xl font-bold text-green-600" aria-label="PhenoFarm grower portal">PhenoFarm</div>
             <p className="text-sm text-gray-500">Grower Portal</p>
             <div className="mt-3">
               <SearchDialog />
@@ -75,6 +78,7 @@ export default async function GrowerLayout({ children }: { children: React.React
         currentUserId={user.id}
         currentRole="GROWER"
       />
+      <RecentActivityDrawer role="GROWER" />
     </div>
   );
 }

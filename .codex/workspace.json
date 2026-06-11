@@ -1,6 +1,6 @@
 {
   "appName": "PhenoFarm",
-  "repoPath": "/Users/sam/.openclaw/workspace/phenofarm-mvp",
+  "repoPath": "/Users/sam/dev/phenofarm-mvp",
   "defaultBranch": "main",
   "github": {
     "remoteUrl": "https://github.com/kmeans4/phenofarm-mvp.git",
@@ -47,6 +47,104 @@
     "testHeaded": "npm run test:headed",
     "prismaGenerate": "npm run prisma:generate",
     "prismaMigrate": "npm run prisma:migrate",
-    "prismaStudio": "npm run prisma:studio"
+    "prismaStudio": "npm run prisma:studio",
+    "verify": "npm run verify",
+    "envCheck": "npm run env:check",
+    "envCheckRuntime": "npm run env:check:runtime",
+    "smoke": "npm run smoke"
+  },
+  "runbooks": [
+    ".codex/provider-runbook.md"
+  ],
+  "skills": [
+    "kmeans-app-workflow",
+    "vercel:nextjs",
+    "vercel:react-best-practices",
+    "vercel:shadcn",
+    "vercel:env-vars",
+    "vercel:deployments-cicd",
+    "vercel:verification",
+    "vercel:payments",
+    "neon-postgres:neon-postgres",
+    "stripe:stripe-best-practices",
+    "stripe:upgrade-stripe",
+    "github:github",
+    "github:gh-fix-ci",
+    "github:yeet",
+    "linear:linear",
+    "browser:control-in-app-browser",
+    "chrome:control-chrome",
+    "spreadsheets:Spreadsheets",
+    "google-drive:google-sheets",
+    "documents:documents",
+    "vercel:geist",
+    "vercel:v0-dev",
+    "playwright-interactive",
+    "screenshot",
+    "vercel:swr",
+    "vercel:ai-elements",
+    "vercel:json-render",
+    "rtk-token-efficiency"
+  ],
+  "linear": {
+    "team": "Kmeans",
+    "projectName": "PhenoFarm",
+    "url": "https://linear.app/kmeans/project/phenofarm-84a18a3ae4fa"
+  },
+  "guardrails": [
+    "Run npm run env:check before provider, deployment, or CI work.",
+    "Run npm run env:check:runtime only after local or provider env vars are intentionally configured.",
+    "Use npm run smoke with SMOKE_BASE_URL after a dev server or preview deployment is available.",
+    "Use /Users/sam/Documents/Playground/scripts/codex-doctor.mjs for portfolio-wide setup audits.",
+    "Use /Users/sam/Documents/Playground/.codex/skill-routing.md to choose provider, browser, GitHub, Linear, docs, and data skills for this app.",
+    "For non-trivial UI work, use the UI defaults in skillRouting.uiDefaults and verify with browser/playwright/screenshot tooling.",
+    "Use RTK for noisy shell output; use raw commands or rtk proxy when exact output matters."
+  ],
+  "skillRouting": {
+    "source": "/Users/sam/Documents/Playground/.codex/skill-routing.md",
+    "default": "kmeans-app-workflow",
+    "note": "Use /Users/sam/Documents/Playground/.codex/skill-routing.md to choose provider, browser, GitHub, Linear, docs, and data skills for this app.",
+    "uiDefaults": [
+      "vercel:react-best-practices",
+      "vercel:shadcn",
+      "vercel:geist",
+      "vercel:v0-dev",
+      "browser:control-in-app-browser",
+      "playwright-interactive",
+      "screenshot",
+      "vercel:swr",
+      "vercel:ai-elements",
+      "vercel:json-render"
+    ],
+    "uiWorkflow": [
+      "Use vercel:shadcn for component and layout implementation.",
+      "Use vercel:react-best-practices after broad TSX edits.",
+      "Use vercel:geist for typography and visual hierarchy.",
+      "Use vercel:v0-dev for UI ideation or alternate screen drafts.",
+      "Use vercel:swr for client-side loading, revalidation, pagination, and optimistic UI.",
+      "Use vercel:ai-elements and vercel:json-render for AI/chat or structured output UI.",
+      "Verify UI work with browser:control-in-app-browser, playwright-interactive, or screenshot."
+    ],
+    "rtk": "Use rtk-token-efficiency and /Users/sam/Documents/Playground/.codex/rtk-workflow.md for noisy shell output."
+  },
+  "rtk": {
+    "installed": true,
+    "binary": "/opt/homebrew/bin/rtk",
+    "workflow": "/Users/sam/Documents/Playground/.codex/rtk-workflow.md",
+    "globalInstructions": "/Users/sam/.codex/RTK.md",
+    "config": "/Users/sam/Library/Application Support/rtk/config.toml",
+    "telemetry": "disabled",
+    "commands": {
+      "status": "rtk git status",
+      "diff": "rtk git diff",
+      "search": "rtk grep <pattern> .",
+      "find": "rtk find <pattern> .",
+      "verify": "rtk npm run verify",
+      "build": "rtk npm run build",
+      "test": "rtk npm run test",
+      "lint": "rtk npm run lint",
+      "gain": "rtk gain --history"
+    },
+    "rawOutputRule": "Use normal commands or rtk proxy <cmd> when exact full output matters."
   }
 }

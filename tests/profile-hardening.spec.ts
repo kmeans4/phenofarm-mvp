@@ -38,7 +38,11 @@ test.describe('Profile hardening + license verification', () => {
     await page.selectOption('#unit', 'Gram');
     await page.fill('#inventoryQty', '10');
     
-    // Fill cannabinoid profile
+    // Expand the optional profile/compliance section, then fill cannabinoids
+    const advancedSummary = page.locator('summary', { hasText: 'Optional profile, compliance, and images' });
+    if (!(await page.locator('#thcMin').isVisible().catch(() => false))) {
+      await advancedSummary.click();
+    }
     await page.fill('#thcMin', '15');
     await page.fill('#thcMax', '25');
     await page.fill('#cbdMin', '0');
@@ -102,6 +106,11 @@ test.describe('Profile hardening + license verification', () => {
     await page.fill('#price', '19.99');
     await page.selectOption('#unit', 'Gram');
     await page.fill('#inventoryQty', '10');
+
+    // Expand the optional profile/compliance section before testing ranges
+    if (!(await page.locator('#thcMin').isVisible().catch(() => false))) {
+      await page.locator('summary', { hasText: 'Optional profile, compliance, and images' }).click();
+    }
 
     // Test invalid THC range (min > max)
     await page.fill('#thcMin', '30');

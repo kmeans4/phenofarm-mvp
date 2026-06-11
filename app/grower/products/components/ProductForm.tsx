@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
@@ -10,6 +10,14 @@ import { StrainSelector } from '../../components/StrainSelector';
 import { BatchSelector } from '../../components/BatchSelector';
 import { useToast } from '@/app/hooks/useToast';
 import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
+import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
+import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
+import { useLocalDraft } from '@/app/hooks/useLocalDraft';
+import {
+  DEFAULT_PRODUCT_DEFAULTS,
+  PRODUCT_DEFAULTS_STORAGE_KEY,
+  ProductDefaults,
+} from '@/lib/ux-workflow';
 
 interface ProductFormData {
   id?: string;
@@ -54,6 +62,7 @@ interface FieldErrors {
 }
 
 const UNITS = ['Gram', 'Half Ounce', 'Ounce', 'Eighth', 'Quarter', 'Unit', 'Pack', 'Each', 'Lb'];
+const FORM_STEPS = ['Basics', 'Pricing', 'Inventory', 'Profile', 'Images'];
 
 // Validation functions
 const validateName = (name: string): string | undefined => {
@@ -196,9 +205,10 @@ export function ProductForm({
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [imagePreviews, setImagePreviews] = useState<string[]>(initialData.images || []);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
+  const [savedDefaults, setSavedDefaults] = useState<ProductDefaults | null>(null);
   const { showToast } = useToast();
 
-  const initialDataState: DirtyBaseline = {
+  const initialDataState = useMemo<DirtyBaseline>(() => ({
     id: initialData?.id ?? undefined,
     name: initialData?.name || '',
     productType: initialData?.productType || '',
@@ -221,13 +231,41 @@ export function ProductForm({
     cbdMin: initialData?.cbdMin || '',
     cbdMax: initialData?.cbdMax || '',
     harvestDate: initialData?.harvestDate || '',
-  };
+  }), [growerBrand, initialData]);
 
   const [dirtyBaseline, setDirtyBaseline] = useState<DirtyBaseline>(initialDataState);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const timer = window.setTimeout(() => {
+      try {
+        const parsed = JSON.parse(window.localStorage.getItem(PRODUCT_DEFAULTS_STORAGE_KEY) || 'null') as ProductDefaults | null;
+        setSavedDefaults(parsed);
+      } catch {
+        setSavedDefaults(null);
+      }
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: !!initialData.id,
     message: 'You have unsaved changes in this product. Are you sure you want to leave?',
+  });
+
+  const browserDraft = useLocalDraft<ProductFormData>({
+    key: initialData.id ? `phenofarm:draft:product:${initialData.id}` : 'phenofarm:draft:product:new',
+    value: { ...formData, images: imagePreviews },
+    onRestore: (value) => {
+      setFormData((prev) => ({
+        ...prev,
+        ...value,
+        id: prev.id ?? value.id,
+        images: value.images || [],
+      }));
+      setImagePreviews(value.images || []);
+    },
+    shouldSave: (value) => JSON.stringify(value) !== JSON.stringify(dirtyBaseline),
   });
 
   useEffect(() => {
@@ -244,7 +282,7 @@ export function ProductForm({
         window.sessionStorage.removeItem('addProductDraft');
       }
     }
-  }, [formData, imagePreviews, initialData.id]);
+  }, [formData, imagePreviews, initialData.id, initialDataState]);
 
   useEffect(() => {
     if (initialData.id || !isDirty) return;
@@ -321,6 +359,31 @@ export function ProductForm({
     }
   };
 
+  const persistProductDefaults = (source: ProductFormData) => {
+    const nextDefaults: ProductDefaults = {
+      productType: source.productType || DEFAULT_PRODUCT_DEFAULTS.productType,
+      unit: source.unit || DEFAULT_PRODUCT_DEFAULTS.unit,
+      price: source.price || '',
+      isPriceVisible: source.isPriceVisible,
+    };
+
+    setSavedDefaults(nextDefaults);
+    if (typeof window !== 'undefined') {
+      window.localStorage.setItem(PRODUCT_DEFAULTS_STORAGE_KEY, JSON.stringify(nextDefaults));
+    }
+  };
+
+  const applyProductDefaults = (defaults: ProductDefaults) => {
+    setFormData((prev) => ({
+      ...prev,
+      productType: defaults.productType || prev.productType,
+      unit: defaults.unit || prev.unit,
+      price: defaults.price || prev.price,
+      isPriceVisible: defaults.isPriceVisible,
+    }));
+    showToast('info', 'Product defaults applied');
+  };
+
   const handleBlur = (field: keyof FieldErrors) => {
     setTouched(prev => ({ ...prev, [field]: true }));
     const value = formData[field] as string;
@@ -393,6 +456,8 @@ export function ProductForm({
         ...formData,
         images: getBase64Images(),
       });
+      persistProductDefaults(formData);
+      browserDraft.clearDraft();
       if (!initialData.id && typeof window !== 'undefined') {
         window.sessionStorage.removeItem('addProductDraft');
       }
@@ -439,6 +504,16 @@ export function ProductForm({
   const liveThcErrors = validateThcRange(formData.thcMin, formData.thcMax);
   const liveCbdErrors = validateCbdRange(formData.cbdMin, formData.cbdMax);
   const liveHarvestDateError = validateHarvestDate(formData.harvestDate);
+  const shouldOpenAdvanced = Boolean(
+    initialData.id ||
+    formData.thcMin ||
+    formData.thcMax ||
+    formData.cbdMin ||
+    formData.cbdMax ||
+    formData.harvestDate ||
+    formData.description ||
+    imagePreviews.length
+  );
 
   const handleSaveDraft = async () => {
     if (!onSaveDraft || isSubmitting) return;
@@ -450,6 +525,8 @@ export function ProductForm({
         ...formData,
         images: getBase64Images(),
       });
+      persistProductDefaults(formData);
+      browserDraft.clearDraft();
       showToast('success', 'Draft saved');
       setDirtyBaseline({ ...formData, id: formData.id ?? undefined });
       resetDirtyState();
@@ -459,6 +536,15 @@ export function ProductForm({
     }
   };
 
+  const saveSummary = [
+    { label: 'Listing', value: formData.name.trim() || 'Unnamed product' },
+    { label: 'Type', value: formData.productType || 'Not selected' },
+    { label: 'Price', value: formData.price ? `$${formData.price}/${formData.unit || 'unit'}` : 'Not priced' },
+    { label: 'Inventory', value: `${formData.inventoryQty || '0'} ${formData.unit || 'units'}` },
+    { label: 'Visibility', value: formData.isAvailable ? 'Available to buyers' : 'Hidden from buyers' },
+    { label: 'Pricing display', value: formData.isPriceVisible ? 'Price visible' : 'Pricing by request' },
+  ];
+
   return (
     <div className="max-w-3xl mx-auto">
       <Card>
@@ -466,7 +552,59 @@ export function ProductForm({
           <CardTitle>Product Details</CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form id="product-form" onSubmit={handleSubmit} className="space-y-6">
+          <div className="rounded-xl border border-green-100 bg-green-50 p-3 sm:p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-green-800">Guided listing setup</p>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
+              {FORM_STEPS.map((step, index) => (
+                <div key={step} className="rounded-lg bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-green-100">
+                  <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-xs font-semibold text-white">
+                    {index + 1}
+                  </span>
+                  <span className="font-medium text-gray-800">{step}</span>
+                </div>
+              ))}
+            </div>
+            <p className="mt-3 text-xs text-green-800">
+              Fill the core listing first. Optional profile, lab, and image details stay grouped so mobile setup stays easier to scan.
+            </p>
+          </div>
+
+          <DraftAutosaveStatus
+            savedAt={browserDraft.savedAt}
+            label="Product browser draft"
+            onClear={browserDraft.clearDraft}
+          />
+
+          {!initialData.id && (
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">Smart defaults</p>
+                  <p className="text-xs text-gray-600">Reuse your last product type, unit, price, and pricing visibility.</p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {savedDefaults && (
+                    <button
+                      type="button"
+                      onClick={() => applyProductDefaults(savedDefaults)}
+                      className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                    >
+                      Use previous listing
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => applyProductDefaults(DEFAULT_PRODUCT_DEFAULTS)}
+                    className="rounded-lg border border-green-200 bg-white px-3 py-2 text-xs font-semibold text-green-800 hover:bg-green-50"
+                  >
+                    Use starter defaults
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {initialData.id && isDirty && (
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
               <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -475,6 +613,13 @@ export function ProductForm({
               <span>You have unsaved changes. Don&apos;t forget to save before leaving.</span>
             </div>
           )}
+
+            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Step 1</p>
+                <h3 className="text-base font-semibold text-gray-900">Basics</h3>
+                <p className="text-sm text-gray-500">Name the product and connect it to strain and batch context when available.</p>
+              </div>
 
             <div className="space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -536,6 +681,14 @@ export function ProductForm({
                 <p className="text-xs text-gray-500">Link to a harvest batch for lab results</p>
               </div>
             )}
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Step 2</p>
+                <h3 className="text-base font-semibold text-gray-900">Pricing</h3>
+                <p className="text-sm text-gray-500">Set the buyer-facing unit price or require a pricing request.</p>
+              </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-2">
@@ -618,6 +771,14 @@ export function ProductForm({
                 </button>
               </div>
             </div>
+            </div>
+
+            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Step 3</p>
+                <h3 className="text-base font-semibold text-gray-900">Inventory and status</h3>
+                <p className="text-sm text-gray-500">Add the starting quantity and decide whether this listing is available now.</p>
+              </div>
 
             <div className="space-y-2">
               <label htmlFor="inventoryQty" className="block text-sm font-medium text-gray-700">
@@ -675,11 +836,13 @@ export function ProductForm({
             <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
               <div>
                 <label className="text-sm font-medium text-gray-700">Availability Status</label>
-                <p className="text-sm text-gray-600">Make product available for purchase</p>
+                <p className="text-sm text-gray-600">Make product available for buyer requests</p>
               </div>
               <button
                 type="button"
                 onClick={() => handleChange('isAvailable', !formData.isAvailable)}
+                aria-label={formData.isAvailable ? 'Mark product unavailable' : 'Mark product available'}
+                aria-pressed={formData.isAvailable}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
                   formData.isAvailable ? 'bg-green-600' : 'bg-gray-300'
                 }`}
@@ -691,8 +854,21 @@ export function ProductForm({
                 />
               </button>
             </div>
+            </div>
 
-            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <details open={shouldOpenAdvanced} className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-sm">
+              <summary className="cursor-pointer list-none">
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Steps 4 and 5</p>
+                    <h3 className="text-base font-semibold text-gray-900">Optional profile, compliance, and images</h3>
+                    <p className="text-sm text-gray-500">Add cannabinoids, harvest details, descriptions, and product imagery when needed.</p>
+                  </div>
+                  <span className="rounded-full bg-white px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">Optional</span>
+                </div>
+              </summary>
+              <div className="mt-5 space-y-6">
+            <div className="p-4 border border-gray-200 rounded-lg bg-white">
               <h3 className="text-sm font-medium text-gray-700 mb-3">Cannabinoid Profile (Optional)</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -846,6 +1022,8 @@ export function ProductForm({
                       <Image
                         src={preview}
                         alt={`Preview ${index}`}
+                        width={80}
+                        height={80}
                         className="w-20 h-20 object-cover rounded-lg border border-gray-200"
                       />
                       <button
@@ -859,6 +1037,28 @@ export function ProductForm({
                   ))}
                 </div>
               )}
+            </div>
+              </div>
+            </details>
+
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
+              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Save summary</p>
+                  <h3 className="text-base font-semibold text-gray-900">Review before saving</h3>
+                </div>
+                <span className="rounded-full bg-white px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
+                  {formData.isAvailable ? 'Buyer visible' : 'Hidden'}
+                </span>
+              </div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                {saveSummary.map((item) => (
+                  <div key={item.label} className="rounded-lg bg-white px-3 py-2 ring-1 ring-gray-200">
+                    <p className="text-xs font-medium text-gray-500">{item.label}</p>
+                    <p className="mt-0.5 text-sm font-semibold text-gray-900">{item.value}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
@@ -897,9 +1097,14 @@ export function ProductForm({
 
       {showExitPrompt && (
         <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="leave-product-dialog-title"
+            className="w-full max-w-md rounded-xl bg-white shadow-2xl"
+          >
             <div className="border-b border-gray-200 px-6 py-4">
-              <h3 className="text-lg font-semibold text-gray-900">Leave product creation?</h3>
+              <h3 id="leave-product-dialog-title" className="text-lg font-semibold text-gray-900">Leave product creation?</h3>
               <p className="text-sm text-gray-600 mt-1">You have unsaved changes on this new product.</p>
             </div>
             <div className="p-6 space-y-3 text-sm text-gray-700">
@@ -929,6 +1134,23 @@ export function ProductForm({
           </div>
         </div>
       )}
+
+      <StickyMobileActionBar
+        primaryLabel={isSubmitting ? 'Saving...' : initialData.id ? 'Save product' : 'Publish product'}
+        primaryType="submit"
+        form="product-form"
+        disabled={isSubmitting || hasErrors}
+        helperText={hasErrors ? 'Fix highlighted fields before saving.' : 'Product drafts save in this browser.'}
+        secondary={
+          <button
+            type="button"
+            onClick={handleCancelRequest}
+            className="rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700"
+          >
+            Cancel
+          </button>
+        }
+      />
     </div>
   );
 }

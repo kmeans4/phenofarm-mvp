@@ -1,41 +1,87 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { stripe } from '@/lib/stripe';
+import { getSubscriptionPlanFromPrice, stripe } from '@/lib/stripe';
 import { db } from '@/lib/db';
 
-// Enable test mode when webhook secret is not configured (local dev)
-// or when explicitly set to "test"
-const isTestMode = !process.env.STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET === 'test';
+// Unsigned "test mode" payloads are only ever accepted outside production.
+// In production a missing webhook secret must fail closed, not skip verification.
+const isProduction = process.env.NODE_ENV === 'production';
+const isTestMode = !isProduction &&
+  (!process.env.STRIPE_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET === 'test');
 
 interface StripeWebhookEvent {
   type?: string;
   data?: { object?: unknown };
 }
 
-interface StripeAccountPayload {
-  id?: string;
-  details_submitted?: boolean;
-  charges_enabled?: boolean;
-  payouts_enabled?: boolean;
-}
-
-interface StripePaymentIntentPayload {
-  id?: string;
-  amount?: number;
-  last_payment_error?: { message?: string } | null;
-}
-
 interface StripeCheckoutSessionPayload {
   id?: string;
+  mode?: string | null;
+  customer?: string | { id?: string } | null;
+  subscription?: string | { id?: string } | null;
+  metadata?: {
+    growerId?: string;
+    plan?: string;
+  } | null;
 }
 
-interface StripePayoutPayload {
+interface StripeSubscriptionPayload {
   id?: string;
-  amount?: number;
-  failure_message?: string | null;
+  status?: string;
+  customer?: string | { id?: string } | null;
+  current_period_end?: number | null;
+  cancel_at_period_end?: boolean;
+  metadata?: {
+    growerId?: string;
+    plan?: string;
+  } | null;
+  items?: {
+    data?: Array<{
+      price?: { id?: string | null };
+    }>;
+  };
 }
 
 function asPayload<T extends object>(value: unknown): T {
   return (value && typeof value === 'object' ? value : {}) as T;
+}
+
+function getStripeId(value: string | { id?: string } | null | undefined) {
+  if (!value) return null;
+  return typeof value === 'string' ? value : value.id || null;
+}
+
+function getPeriodEnd(value?: number | null) {
+  return value ? new Date(value * 1000) : null;
+}
+
+async function updateGrowerSubscription(subscription: StripeSubscriptionPayload) {
+  const subscriptionId = subscription.id;
+  const customerId = getStripeId(subscription.customer);
+  const growerId = subscription.metadata?.growerId;
+  const priceId = subscription.items?.data?.[0]?.price?.id;
+  const plan = subscription.metadata?.plan || getSubscriptionPlanFromPrice(priceId);
+
+  const where = growerId
+    ? { id: growerId }
+    : subscriptionId
+      ? { stripeSubscriptionId: subscriptionId }
+      : customerId
+        ? { stripeCustomerId: customerId }
+        : null;
+
+  if (!where) return;
+
+  await db.grower.updateMany({
+    where,
+    data: {
+      stripeCustomerId: customerId || undefined,
+      stripeSubscriptionId: subscriptionId || undefined,
+      subscriptionPlan: plan,
+      subscriptionStatus: subscription.status || 'inactive',
+      subscriptionCurrentPeriodEnd: getPeriodEnd(subscription.current_period_end),
+      subscriptionCancelAtPeriodEnd: Boolean(subscription.cancel_at_period_end),
+    },
+  });
 }
 
 export async function POST(req: NextRequest) {
@@ -76,66 +122,42 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Handle account.updated - Stripe Connect onboarding status
-  if (event?.type === 'account.updated') {
-    const account = asPayload<StripeAccountPayload>(event.data?.object);
-
-    try {
-      const grower = account.id
-        ? await db.grower.findFirst({ where: { stripeAccountId: account.id } })
-        : null;
-
-      if (grower) {
-        const newStatus = account.details_submitted && account.charges_enabled && account.payouts_enabled
-          ? 'active'
-          : 'pending';
-
-        await db.grower.update({
-          where: { id: grower.id },
-          data: { stripeAccountStatus: newStatus },
-        });
-
-        console.log(`Account ${account.id} status updated to ${newStatus}`);
-      }
-    } catch (error) {
-      console.error('Error updating account status:', error);
+  if (event?.type === 'checkout.session.completed') {
+    const session = asPayload<StripeCheckoutSessionPayload>(event.data?.object);
+    if (session.mode === 'subscription' && session.metadata?.growerId) {
+      await db.grower.update({
+        where: { id: session.metadata.growerId },
+        data: {
+          stripeCustomerId: getStripeId(session.customer) || undefined,
+          stripeSubscriptionId: getStripeId(session.subscription) || undefined,
+          subscriptionPlan: session.metadata.plan || 'pro',
+          subscriptionStatus: 'active',
+        },
+      });
+      console.log(`Subscription checkout session ${session.id} completed for grower ${session.metadata.growerId}`);
+    } else {
+      console.log(`Ignored non-subscription checkout session ${session.id}`);
     }
   }
 
-  // Handle payment_intent.succeeded
-  if (event?.type === 'payment_intent.succeeded') {
-    const paymentIntent = asPayload<StripePaymentIntentPayload>(event.data?.object);
-    console.log(`Payment ${paymentIntent.id} succeeded for amount ${paymentIntent.amount}`);
-
-    // TODO: Update order status in database
+  if (
+    event?.type === 'customer.subscription.created' ||
+    event?.type === 'customer.subscription.updated' ||
+    event?.type === 'customer.subscription.deleted'
+  ) {
+    try {
+      await updateGrowerSubscription(asPayload<StripeSubscriptionPayload>(event.data?.object));
+    } catch (error) {
+      console.error('Error updating subscription status:', error);
+    }
   }
 
-  // Handle payment_intent.payment_failed
-  if (event?.type === 'payment_intent.payment_failed') {
-    const paymentIntent = asPayload<StripePaymentIntentPayload>(event.data?.object);
-    console.log(`Payment ${paymentIntent.id} failed: ${paymentIntent.last_payment_error?.message}`);
-
-    // TODO: Update order status, notify user
-  }
-
-  // Handle checkout.session.completed
-  if (event?.type === 'checkout.session.completed') {
-    const session = asPayload<StripeCheckoutSessionPayload>(event.data?.object);
-    console.log(`Checkout session ${session.id} completed`);
-
-    // TODO: Create order from checkout session
-  }
-
-  // Handle payout.paid
-  if (event?.type === 'payout.paid') {
-    const payout = asPayload<StripePayoutPayload>(event.data?.object);
-    console.log(`Payout ${payout.id} completed for amount ${payout.amount}`);
-  }
-
-  // Handle payout.failed
-  if (event?.type === 'payout.failed') {
-    const payout = asPayload<StripePayoutPayload>(event.data?.object);
-    console.log(`Payout ${payout.id} failed: ${payout.failure_message}`);
+  if (
+    event?.type?.startsWith('account.') ||
+    event?.type?.startsWith('payment_intent.') ||
+    event?.type?.startsWith('payout.')
+  ) {
+    console.log(`Ignored Stripe marketplace payment event ${event.type}; PhenoFarm only processes subscriptions.`);
   }
 
   return NextResponse.json({ received: true, mode: isTestMode ? 'test' : 'production' });

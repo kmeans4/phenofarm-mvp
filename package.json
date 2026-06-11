@@ -13,14 +13,18 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint",
+    "verify": "npm run env:check && npm run lint && npm run build",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy",
-    "prisma:studio": "prisma studio",
+    "prisma:migrate": "node scripts/prisma-env.mjs migrate deploy",
+    "prisma:studio": "node scripts/prisma-env.mjs studio",
     "test": "playwright test",
     "test:headed": "playwright test --headed",
     "test:debug": "playwright test --debug",
     "test:ui": "playwright test --ui",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "env:check": "node scripts/validate-env.mjs",
+    "env:check:runtime": "node scripts/validate-env.mjs --runtime",
+    "smoke": "npx playwright test --config=.codex/playwright-smoke.config.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",

@@ -6,7 +6,7 @@ import { Star, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
 const testimonials = [
   {
-    quote: "PhenoFarm cut our costs by 60% and the platform is incredibly intuitive. Best decision we made for our dispensary.",
+    quote: "PhenoFarm makes it easier to compare products, verify partners, and keep request details organized.",
     author: "Sarah Chen",
     role: "Owner",
     company: "Green Mountain Dispensary",
@@ -27,7 +27,7 @@ const testimonials = [
     rating: 5,
   },
   {
-    quote: "Saved $50K in the first year alone compared to our old platform. The features are actually better too.",
+    quote: "The direct-settlement workflow keeps our team focused on availability, fulfillment, and relationship quality.",
     author: "David Kim",
     role: "Operations Director",
     company: "Elevate Wellness",
@@ -74,10 +74,10 @@ export function Testimonials() {
           className="text-center mb-16"
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4">
-            Trusted by Industry Leaders
+            Built for Wholesale Teams
           </h2>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            Join hundreds of businesses transforming their wholesale operations.
+            Give licensed operators a clearer way to discover partners, coordinate requests, and track fulfillment.
           </p>
         </motion.div>
 

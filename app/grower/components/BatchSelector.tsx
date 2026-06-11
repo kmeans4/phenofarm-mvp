@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useCallback, useState, useEffect, useRef } from 'react';
 import { Button } from '@/app/components/ui/Button';
+import { useFocusTrap } from '@/app/hooks/useFocusTrap';
 import {
   BatchLabDocumentUploaders,
   BatchLabDocuments,
@@ -62,6 +63,25 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
     totalCannabinoids: '',
     labDocuments: createEmptyBatchLabDocuments(),
     notes: ''
+  });
+  const newBatchButtonRef = useRef<HTMLButtonElement>(null);
+  const closeCreateButtonRef = useRef<HTMLButtonElement>(null);
+  const createDialogRef = useRef<HTMLDivElement>(null);
+
+  const openCreateForm = useCallback(() => {
+    setShowCreateForm(true);
+  }, []);
+
+  const closeCreateForm = useCallback(() => {
+    setShowCreateForm(false);
+  }, []);
+
+  useFocusTrap({
+    active: showCreateForm,
+    containerRef: createDialogRef,
+    initialFocusRef: closeCreateButtonRef,
+    returnFocusRef: newBatchButtonRef,
+    onEscape: closeCreateForm,
   });
 
   const fetchBatches = async () => {
@@ -143,7 +163,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
       const newBatch = await response.json();
       await fetchBatches();
       onBatchChange(newBatch.id);
-      setShowCreateForm(false);
+      closeCreateForm();
       setFormData({
         batchNumber: '',
         lotNumber: '',
@@ -182,10 +202,11 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
           ))}
         </select>
         <Button 
+          ref={newBatchButtonRef}
           type="button" 
           variant="outline" 
           size="sm"
-          onClick={() => setShowCreateForm(!showCreateForm)}
+          onClick={() => (showCreateForm ? closeCreateForm() : openCreateForm())}
         >
           + New
         </Button>
@@ -198,17 +219,30 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
       )}
 
       {showCreateForm && (
-        <div className="fixed inset-0 z-[100000] flex items-start justify-center overflow-y-auto bg-black/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-3xl rounded-xl bg-white shadow-2xl my-8">
+        <div
+          className="fixed inset-0 z-[100000] flex items-start justify-center overflow-y-auto bg-black/40 backdrop-blur-sm p-4"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) closeCreateForm();
+          }}
+        >
+          <div
+            ref={createDialogRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="create-batch-dialog-title"
+            className="w-full max-w-3xl rounded-xl bg-white shadow-2xl my-8"
+          >
             <div className="flex items-center justify-between border-b border-gray-200 px-6 py-4">
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">Create New Batch</h3>
+                <h3 id="create-batch-dialog-title" className="text-xl font-semibold text-gray-900">Create New Batch</h3>
                 <p className="text-sm text-gray-600 mt-1">Add a batch without leaving product creation</p>
               </div>
               <button
+                ref={closeCreateButtonRef}
                 type="button"
-                onClick={() => setShowCreateForm(false)}
+                onClick={closeCreateForm}
                 className="text-gray-400 hover:text-gray-600 text-2xl leading-none"
+                aria-label="Close batch creation"
               >
                 ×
               </button>
@@ -318,7 +352,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
               <Button type="button" variant="primary" disabled={creating} onClick={handleCreateBatch}>
                 {creating ? 'Creating...' : 'Create Batch'}
               </Button>
-              <Button type="button" variant="outline" onClick={() => setShowCreateForm(false)}>
+              <Button type="button" variant="outline" onClick={closeCreateForm}>
                 Cancel
               </Button>
             </div>

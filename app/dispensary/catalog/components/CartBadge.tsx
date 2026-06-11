@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useCallback, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
 function getCartCount(): number {
   if (typeof window === 'undefined') return 0;
@@ -16,33 +16,25 @@ function getCartCount(): number {
   return 0;
 }
 
-const emptySubscribe = () => () => {};
+function subscribe(callback: () => void) {
+  if (typeof window === 'undefined') return () => {};
+
+  window.addEventListener('cart-updated', callback);
+  window.addEventListener('storage', callback);
+
+  return () => {
+    window.removeEventListener('cart-updated', callback);
+    window.removeEventListener('storage', callback);
+  };
+}
 
 export default function CartBadge() {
-  const count = useSyncExternalStore(emptySubscribe, getCartCount, () => 0);
-
-  const handleUpdate = useCallback(() => {
-    // Force re-render when cart changes
-    window.dispatchEvent(new Event('cart-badge-update'));
-  }, []);
-
-  useEffect(() => {
-    handleUpdate();
-    
-    // Listen for cart updates
-    window.addEventListener('cart-updated', handleUpdate);
-    window.addEventListener('storage', handleUpdate);
-    
-    return () => {
-      window.removeEventListener('cart-updated', handleUpdate);
-      window.removeEventListener('storage', handleUpdate);
-    };
-  }, [handleUpdate]);
+  const count = useSyncExternalStore(subscribe, getCartCount, () => 0);
 
   if (count === 0) return null;
 
   return (
-    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+    <span className="inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold leading-none text-white">
       {count > 99 ? '99+' : count}
     </span>
   );

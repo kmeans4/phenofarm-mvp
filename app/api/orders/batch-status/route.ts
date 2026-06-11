@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { OrderStatus } from '@prisma/client';
 
@@ -85,12 +85,44 @@ export async function PATCH(req: NextRequest) {
       updateData.deliveredAt = new Date();
     }
 
-    const result = await db.order.updateMany({
-      where: {
-        id: { in: orderIds },
-        growerId: growerId,
-      },
-      data: updateData,
+    const result = await db.$transaction(async (tx) => {
+      if (status === 'CANCELLED') {
+        // Only not-yet-final orders can be cancelled, and their reserved
+        // inventory has to be returned to the products.
+        const cancellableIds = orders
+          .filter((order) => order.status !== 'CANCELLED' && order.status !== 'DELIVERED')
+          .map((order) => order.id);
+
+        if (cancellableIds.length > 0) {
+          const items = await tx.orderItem.findMany({
+            where: { orderId: { in: cancellableIds } },
+            select: { productId: true, quantity: true },
+          });
+
+          for (const item of items) {
+            await tx.product.updateMany({
+              where: { id: item.productId },
+              data: { inventoryQty: { increment: item.quantity } },
+            });
+          }
+        }
+
+        return tx.order.updateMany({
+          where: {
+            id: { in: cancellableIds },
+            growerId: growerId,
+          },
+          data: updateData,
+        });
+      }
+
+      return tx.order.updateMany({
+        where: {
+          id: { in: orderIds },
+          growerId: growerId,
+        },
+        data: updateData,
+      });
     });
 
     return NextResponse.json({

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from "next/link";
 import { LayoutGrid, List as ListIcon, Heart, ArrowLeft, Trash2, ShoppingCart, Loader2 } from "lucide-react";
 import AddToCartButton from "../catalog/components/AddToCartButton";
@@ -9,6 +9,7 @@ interface Product {
   id: string;
   name: string;
   price: number;
+  isPriceVisible: boolean;
   strain: string | null;
   strainId: string | null;
   strainType: string | null;
@@ -39,25 +40,89 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'name-asc', label: 'Name: A-Z' },
 ];
 
-export default function FavoritesContent() {
+function getSortablePrice(product: Product) {
+  return product.isPriceVisible ? product.price : Number.POSITIVE_INFINITY;
+}
+
+function readFavoriteIds() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(FAVORITES_KEY) || '[]');
+    return Array.isArray(parsed)
+      ? Array.from(new Set(parsed.map((id) => String(id || '').trim()).filter(Boolean)))
+      : [];
+  } catch {
+    return [];
+  }
+}
+
+interface FavoritesContentProps {
+  embedded?: boolean;
+}
+
+export default function FavoritesContent({ embedded = false }: FavoritesContentProps) {
   const [favorites, setFavorites] = useState<string[]>([]);
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const favoritesReadyRef = useRef(false);
 
-  // Load favorites from localStorage
+  // Load favorites from localStorage, then merge account-backed favorites.
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(FAVORITES_KEY);
-      if (stored) {
-        setFavorites(JSON.parse(stored));
+    let cancelled = false;
+
+    const syncFavorites = async () => {
+      const localFavorites = readFavoriteIds();
+      if (!cancelled) setFavorites(localFavorites);
+
+      try {
+        const response = await fetch('/api/dispensary/favorites');
+        if (!response.ok) throw new Error('Failed to load account favorites');
+
+        const data = await response.json();
+        const serverFavorites = Array.isArray(data.productIds)
+          ? data.productIds.map((id: unknown) => String(id || '').trim()).filter(Boolean)
+          : [];
+        const merged = Array.from(new Set([...serverFavorites, ...localFavorites]));
+
+        if (!cancelled) {
+          setFavorites(merged);
+          localStorage.setItem(FAVORITES_KEY, JSON.stringify(merged));
+          favoritesReadyRef.current = true;
+        }
+
+        if (localFavorites.length > 0) {
+          await fetch('/api/dispensary/favorites', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productIds: merged }),
+          });
+        }
+      } catch (e) {
+        console.error('Failed to sync favorites:', e);
+        favoritesReadyRef.current = true;
       }
-    } catch (e) {
-      console.error('Failed to load favorites:', e);
-    }
+    };
+
+    syncFavorites();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  useEffect(() => {
+    if (!favoritesReadyRef.current) return;
+
+    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
+    fetch('/api/dispensary/favorites', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productIds: favorites }),
+    }).catch((error) => {
+      console.error('Failed to save favorites:', error);
+    });
+  }, [favorites]);
 
   // Fetch full product details for favorites
   useEffect(() => {
@@ -100,7 +165,6 @@ export default function FavoritesContent() {
   const removeFromFavorites = useCallback((productId: string) => {
     setFavorites(prev => {
       const updated = prev.filter(id => id !== productId);
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(updated));
       return updated;
     });
     setFavoriteProducts(prev => prev.filter(p => p.id !== productId));
@@ -110,15 +174,18 @@ export default function FavoritesContent() {
   const clearAllFavorites = useCallback(() => {
     setFavorites([]);
     setFavoriteProducts([]);
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify([]));
     setShowClearConfirm(false);
   }, []);
 
   // Sort products
   const sortedProducts = [...favoriteProducts].sort((a, b) => {
     switch (sortBy) {
-      case 'price-asc': return a.price - b.price;
-      case 'price-desc': return b.price - a.price;
+      case 'price-asc': return getSortablePrice(a) - getSortablePrice(b);
+      case 'price-desc': return getSortablePrice(a) === Number.POSITIVE_INFINITY
+        ? 1
+        : getSortablePrice(b) === Number.POSITIVE_INFINITY
+          ? -1
+          : b.price - a.price;
       case 'thc-desc': return (b.thc || 0) - (a.thc || 0);
       case 'thc-asc': return (a.thc || 0) - (b.thc || 0);
       case 'name-asc': return a.name.localeCompare(b.name);
@@ -140,25 +207,28 @@ export default function FavoritesContent() {
     if (lower.includes('sativa')) return 'bg-amber-100 text-amber-700';
     return 'bg-blue-100 text-blue-700';
   };
+  const HeadingTag = embedded ? 'h2' : 'h1';
 
   return (
-    <div className="bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 pb-20 sm:pb-24">
+    <div className={embedded ? "" : "bg-gray-50"}>
+      <div className={embedded ? "pb-4" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 pb-20 sm:pb-24"}>
         {/* Header */}
-        <div className="mb-6 sm:mb-8">
-          <Link 
-            href="/dispensary/catalog" 
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 mb-4 transition-colors"
-          >
-            <ArrowLeft size={18} />
-            Back to Catalog
-          </Link>
+        <div className={embedded ? "mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm" : "mb-6 sm:mb-8"}>
+          {!embedded && (
+            <Link 
+              href="/dispensary/catalog" 
+              className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 mb-4 transition-colors"
+            >
+              <ArrowLeft size={18} />
+              Back to Catalog
+            </Link>
+          )}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 flex items-center gap-3">
-                <Heart className="w-8 h-8 text-red-500" fill="currentColor" />
+              <HeadingTag className={`${embedded ? 'text-lg' : 'text-2xl sm:text-3xl'} font-bold text-gray-900 flex items-center gap-3`}>
+                <Heart className={`${embedded ? 'w-5 h-5' : 'w-8 h-8'} text-red-500`} fill="currentColor" />
                 My Favorites
-              </h1>
+              </HeadingTag>
               <p className="text-gray-600 mt-1">
                 {favoriteProducts.length} saved product{favoriteProducts.length !== 1 ? 's' : ''}
               </p>
@@ -384,16 +454,33 @@ function FavoriteCard({ product, onRemove }: { product: Product; onRemove: () =>
         )}
 
         {/* Price & Actions */}
-        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-          <div>
-            <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
-            <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
-          </div>
-          <AddToCartButton 
-            product={product}
-            growerName={product.grower.businessName}
-            growerId={product.grower.id}
-          />
+        <div className="pt-3 border-t border-gray-100">
+          {product.isPriceVisible ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
+                <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
+              </div>
+              <AddToCartButton
+                product={product}
+                growerName={product.grower.businessName}
+                growerId={product.grower.id}
+              />
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <div>
+                <span className="text-sm font-semibold text-gray-900">Request pricing</span>
+                <p className="text-xs text-gray-500">This grower shares pricing by request.</p>
+              </div>
+              <Link
+                href={`/dispensary/grower/${product.grower.id}?search=${encodeURIComponent(product.name)}`}
+                className="inline-flex w-full items-center justify-center rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
+              >
+                Request Pricing
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -446,7 +533,11 @@ function FavoriteListItem({ product, onRemove }: { product: Product; onRemove: (
             </p>
           </div>
           <div className="text-right">
-            <span className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</span>
+            {product.isPriceVisible ? (
+              <span className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</span>
+            ) : (
+              <span className="text-sm font-semibold text-gray-700">Request pricing</span>
+            )}
             <p className={`text-xs ${stockStatus.color}`}>{stockStatus.text}</p>
           </div>
         </div>
@@ -471,12 +562,21 @@ function FavoriteListItem({ product, onRemove }: { product: Product; onRemove: (
 
       {/* Actions */}
       <div className="flex items-center gap-2">
-        <AddToCartButton 
-          product={product}
-          growerName={product.grower.businessName}
-          growerId={product.grower.id}
-          compact
-        />
+        {product.isPriceVisible ? (
+          <AddToCartButton
+            product={product}
+            growerName={product.grower.businessName}
+            growerId={product.grower.id}
+            compact
+          />
+        ) : (
+          <Link
+            href={`/dispensary/grower/${product.grower.id}?search=${encodeURIComponent(product.name)}`}
+            className="rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
+          >
+            Request Pricing
+          </Link>
+        )}
         <button
           onClick={onRemove}
           className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"

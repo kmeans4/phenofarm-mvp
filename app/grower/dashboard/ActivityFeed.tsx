@@ -87,7 +87,7 @@ export function ActivityFeed({ orders }: ActivityFeedProps) {
             <ActivityItem
               key={order.orderId}
               type="order"
-              title={`Order #${order.orderId}`}
+              title={`Request #${order.orderId}`}
               subtitle={`From ${order.dispensaryName}`}
               timestamp={new Date(order.createdAt)}
             />
@@ -102,7 +102,7 @@ export function ActivityFeed({ orders }: ActivityFeedProps) {
               </svg>
             }
             title="No activity in selected period"
-            description={`No orders found for the selected date range (${dateRange === 'today' ? 'Today' : dateRange === 'last7days' ? 'Last 7 Days' : dateRange === 'last30days' ? 'Last 30 Days' : dateRange === 'thisMonth' ? 'This Month' : dateRange === 'lastMonth' ? 'Last Month' : 'All Time'}).`}
+            description={`No requests found for the selected date range (${dateRange === 'today' ? 'Today' : dateRange === 'last7days' ? 'Last 7 Days' : dateRange === 'last30days' ? 'Last 30 Days' : dateRange === 'thisMonth' ? 'This Month' : dateRange === 'lastMonth' ? 'Last Month' : 'All Time'}).`}
           />
         </div>
       )}

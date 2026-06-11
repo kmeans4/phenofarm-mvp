@@ -73,7 +73,7 @@ export function HeroSection() {
               href="/auth/sign_up"
               className="px-5 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-semibold rounded-lg transition-all shadow-lg shadow-green-600/25 hover:shadow-green-500/40"
             >
-              Get Started
+              Create Account
             </Link>
           </motion.div>
         </div>
@@ -99,8 +99,8 @@ export function HeroSection() {
           </h1>
           
           <p className="text-xl md:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed mb-10">
-            The affordable B2B marketplace for cannabis wholesale. Connect with verified growers and dispensaries. 
-            <span className="text-green-400 font-semibold"> Save 60% compared to traditional platforms.</span>
+            A B2B marketplace for cannabis wholesale requests. Connect with verified growers and dispensaries,
+            coordinate fulfillment, and keep settlement direct between businesses.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -113,7 +113,7 @@ export function HeroSection() {
                 href="/auth/sign_up"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-green-600 hover:bg-green-500 text-white font-semibold rounded-xl transition-all shadow-xl shadow-green-600/25 hover:shadow-green-500/40"
               >
-                Start Free Trial
+                Create Marketplace Account
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </motion.div>
@@ -128,7 +128,7 @@ export function HeroSection() {
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 hover:border-white/30 text-white font-semibold rounded-xl transition-all"
               >
                 <Play className="w-5 h-5" />
-                Watch Demo
+                See How It Works
               </a>
             </motion.div>
           </div>
@@ -160,7 +160,7 @@ export function HeroSection() {
                 </div>
               </div>
               <div className="text-gray-300 text-xs">
-                <span className="text-green-400 font-semibold">+47%</span> orders this month
+                <span className="text-green-400 font-semibold">+47%</span> requests this month
               </div>
             </div>
           </motion.div>
@@ -184,12 +184,12 @@ export function HeroSection() {
                   <span className="text-emerald-400">💰</span>
                 </div>
                 <div>
-                  <div className="text-white font-semibold text-sm">Cost Savings</div>
-                  <div className="text-gray-400 text-xs">This Month</div>
+                  <div className="text-white font-semibold text-sm">Request Value</div>
+                  <div className="text-gray-400 text-xs">Tracked only</div>
                 </div>
               </div>
               <div className="text-white font-bold text-xl">$4,200</div>
-              <div className="text-gray-400 text-xs">vs $10,500 on APEX</div>
+              <div className="text-gray-400 text-xs">settled directly by partners</div>
             </div>
           </motion.div>
 

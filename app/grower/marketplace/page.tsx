@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 
@@ -17,42 +17,60 @@ export default async function GrowerMarketplacePage() {
     redirect('/dashboard');
   }
 
-  // Fetch products with strain info
+  // Buyers only see available, non-deleted listings — preview the same set
   const rawProducts = await db.product.findMany({
-    where: { growerId: user.growerId },
+    where: { growerId: user.growerId, isDeleted: false, isAvailable: true },
     include: {
       strain: { select: { id: true, name: true } }
     },
     orderBy: { createdAt: 'desc' },
   });
 
-  // Convert Decimal prices to numbers and use new schema fields
+  // Convert Decimal prices to numbers, prefer new THC/CBD range fields
   const products = rawProducts.map((p) => ({
     ...p,
     price: Number(p.price) || 0,
-    thc: p.thcLegacy ? Number(p.thcLegacy) : null,
-    cbd: p.cbdLegacy ? Number(p.cbdLegacy) : null,
-    // Use strain relation or fallback to legacy
+    thc: p.thcMax != null ? Number(p.thcMax) : p.thcMin != null ? Number(p.thcMin) : p.thcLegacy ? Number(p.thcLegacy) : null,
+    cbd: p.cbdMax != null ? Number(p.cbdMax) : p.cbdMin != null ? Number(p.cbdMin) : p.cbdLegacy ? Number(p.cbdLegacy) : null,
     strainName: p.strain?.name || p.strainLegacy,
   }));
 
-  const categories = ['Flower', 'Edibles', 'Cartridge', 'Bulk Extract', 'Drink', 'Merchandise', 'Prepack', 'Tincture', 'Topicals', 'Plant Material', 'Live Plant', 'Seed'];
+  const activeListings = products.length;
+  const hiddenPriceListings = products.filter((product) => !product.isPriceVisible).length;
 
   return (
-    <div className="space-y-5 sm:space-y-6 p-4">
+    <div className="space-y-5 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 sm:gap-4">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Grower Marketplace</h1>
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Grower Marketplace</h1>
+          <p className="mt-1 text-sm text-gray-600">Manage how buyers discover your catalog, quote terms, and fulfillment readiness.</p>
+        </div>
         <Link href="/grower/products/add" className="w-full sm:w-auto text-center bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
           + List New Product
         </Link>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto pb-2">
-        {categories.map((category) => (
-          <button key={category} className="px-4 py-2 rounded-full border border-green-600 text-green-600 hover:bg-green-50 whitespace-nowrap">
-            {category}
-          </button>
-        ))}
+      <div className="grid gap-3 md:grid-cols-4">
+        <div className="rounded-lg border border-green-200 bg-green-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Active listings</p>
+          <p className="mt-1 text-2xl font-bold text-green-950">{activeListings}</p>
+          <p className="mt-1 text-xs text-green-800">Visible to verified buyers.</p>
+        </div>
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Quote-needed listings</p>
+          <p className="mt-1 text-2xl font-bold text-blue-950">{hiddenPriceListings}</p>
+          <p className="mt-1 text-xs text-blue-800">Buyers request quote terms before submitting.</p>
+        </div>
+        <div className="rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Commercial terms</p>
+          <p className="mt-1 text-sm font-semibold text-amber-950">Keep minimums and fulfillment notes current</p>
+          <p className="mt-1 text-xs text-amber-800">Use product descriptions for MOQ and availability notes.</p>
+        </div>
+        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">Settlement</p>
+          <p className="mt-1 text-sm font-semibold text-gray-950">Direct with buyers</p>
+          <p className="mt-1 text-xs text-gray-700">PhenoFarm does not process wholesale payments.</p>
+        </div>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -107,7 +125,7 @@ export default async function GrowerMarketplacePage() {
                       <span>{product.inventoryQty} available</span>
                       {product.thc && <span>THC: {product.thc}%</span>}
                     </div>
-                    <Link href={`/grower/products/${product.id}`} className="block w-full text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+                    <Link href={`/grower/products/${product.id}/edit`} className="block w-full text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
                       Manage Listing
                     </Link>
                   </div>

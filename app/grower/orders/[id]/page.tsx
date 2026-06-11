@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
@@ -9,6 +9,7 @@ import Link from 'next/link';
 import OrderStatusTimeline from './components/OrderStatusTimeline';
 import QuickStatusUpdate from './components/QuickStatusUpdate';
 import PrintButton from './components/PrintButton';
+import { getOrderStatusLabel, parseOrderRequestNotes } from '@/lib/order-workflow';
 
 interface OrderDetail {
   id: string;
@@ -101,7 +102,7 @@ function StatusBadge({ status }: { status: string }) {
 
   return (
     <Badge className={`${statusColors[status] || 'bg-gray-100 text-gray-800'} border`}>
-      {status}
+      {getOrderStatusLabel(status)}
     </Badge>
   );
 }
@@ -148,7 +149,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Orders
+            Back to Requests
           </Link>
         </div>
       </div>
@@ -173,15 +174,23 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Orders
+            Back to Requests
           </Link>
         </div>
       </div>
     );
   }
 
+  const requestNotes = parseOrderRequestNotes(order.notes);
+  const hasRequestDetails =
+    requestNotes.details.fulfillmentMethod ||
+    requestNotes.details.requestedWindow ||
+    requestNotes.details.paymentTerms ||
+    requestNotes.details.buyerNotes ||
+    requestNotes.legacyNotes;
+
   return (
-    <div className="space-y-6 p-4 sm:p-6 max-w-7xl mx-auto">
+    <div className="space-y-6 p-4 pb-24 sm:p-6 max-w-7xl mx-auto">
       <Link
         href="/grower/orders"
         className="sm:hidden inline-flex items-center gap-2 text-sm font-medium text-green-700 hover:text-green-800"
@@ -189,7 +198,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
         <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Back to orders
+        Back to requests
       </Link>
 
       {/* Breadcrumb */}
@@ -201,7 +210,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
         </svg>
         <Link href="/grower/orders" className="hover:text-gray-700 transition-colors">
-          Orders
+          Requests
         </Link>
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -215,12 +224,12 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-3 mb-2">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Order #{order.orderId}
+                Order Request #{order.orderId}
               </h1>
               <StatusBadge status={order.status} />
             </div>
             <p className="text-gray-600">
-              Placed on {format(new Date(order.createdAt), 'MMMM d, yyyy \'at\' h:mm a')}
+              Submitted on {format(new Date(order.createdAt), 'MMMM d, yyyy \'at\' h:mm a')}
             </p>
           </div>
           
@@ -233,7 +242,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              All Orders
+              All Requests
             </Link>
             <Link
               href={`/grower/orders/${order.id}/edit`}
@@ -242,7 +251,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
-              Edit Order
+              Edit Request
             </Link>
             <PrintButton />
           </div>
@@ -252,14 +261,14 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Order Items */}
+          {/* Requested Items */}
           <Card>
             <CardHeader className="border-b border-gray-100">
               <CardTitle className="flex items-center gap-2">
                 <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
-                Order Items
+                Requested Items
                 <span className="text-sm font-normal text-gray-500">
                   ({order.items.length} {order.items.length === 1 ? 'item' : 'items'})
                 </span>
@@ -274,7 +283,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                       <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Product</th>
                       <th className="px-3 sm:px-4 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Price</th>
                       <th className="px-3 sm:px-4 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Qty</th>
-                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Total</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-gray-600 uppercase tracking-wider">Line value</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-100">
@@ -336,39 +345,64 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <div className="border-t border-gray-200 bg-gray-50 p-4 sm:p-6">
                 <div className="max-w-xs ml-auto space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Subtotal</span>
+                    <span className="text-gray-600">Estimated item value</span>
                     <span className="text-gray-900">{formatCurrency(order.subtotal)}</span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Tax</span>
-                    <span className="text-gray-900">{formatCurrency(order.tax)}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Shipping</span>
-                    <span className="text-gray-900">{formatCurrency(order.shippingFee)}</span>
-                  </div>
+                  {order.tax > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Recorded tax</span>
+                      <span className="text-gray-900">{formatCurrency(order.tax)}</span>
+                    </div>
+                  )}
+                  {order.shippingFee > 0 && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Shipping estimate</span>
+                      <span className="text-gray-900">{formatCurrency(order.shippingFee)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-lg font-bold pt-2 border-t border-gray-200">
-                    <span className="text-gray-900">Total</span>
+                    <span className="text-gray-900">Estimated request value</span>
                     <span className="text-green-600">{formatCurrency(order.totalAmount)}</span>
                   </div>
+                  <p className="pt-1 text-xs text-gray-500">
+                    Settlement is handled directly with the dispensary outside PhenoFarm.
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Notes */}
-          {order.notes && (
+          {hasRequestDetails && (
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
                   </svg>
-                  Order Notes
+                  Request Details
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <p className="text-gray-700 whitespace-pre-wrap">{order.notes}</p>
+              <CardContent className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Fulfillment</p>
+                    <p className="text-sm text-gray-900">{requestNotes.details.fulfillmentMethod || 'Coordinate with buyer'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Requested Window</p>
+                    <p className="text-sm text-gray-900">{requestNotes.details.requestedWindow || 'Coordinate after acceptance'}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Direct Payment Terms</p>
+                    <p className="text-sm text-gray-900">{requestNotes.details.paymentTerms || 'Handled directly'}</p>
+                  </div>
+                </div>
+                {(requestNotes.details.buyerNotes || requestNotes.legacyNotes) && (
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Notes</p>
+                    <p className="text-gray-700 whitespace-pre-wrap">{requestNotes.details.buyerNotes || requestNotes.legacyNotes}</p>
+                  </div>
+                )}
               </CardContent>
             </Card>
           )}
@@ -380,7 +414,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <QuickStatusUpdate orderId={order.id} currentStatus={order.status} />
 
           {/* Status Timeline */}
-          <OrderStatusTimeline currentStatus={order.status} orderId={order.id} />
+          <OrderStatusTimeline currentStatus={order.status} orderId={order.orderId} />
 
           {/* Customer Info */}
           <Card>
@@ -419,6 +453,23 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               )}
             </CardContent>
           </Card>
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-10px_25px_rgba(15,23,42,0.08)] backdrop-blur sm:hidden">
+        <div className="flex gap-2">
+          <Link
+            href="/grower/orders"
+            className="rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700"
+          >
+            All orders
+          </Link>
+          <Link
+            href={`/grower/orders/${order.id}/edit`}
+            className="flex-1 rounded-lg bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
+          >
+            Edit request
+          </Link>
         </div>
       </div>
     </div>

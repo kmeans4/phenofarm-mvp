@@ -1,11 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import Link from 'next/link';
-import { Badge } from '@/app/components/ui/Badge';
 import { Button } from '@/app/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import {
+  readDensityPreference,
+  saveDensityPreference,
+  TableDensity,
+  TableDensityControl,
+} from '@/app/components/ux/TableDensityControl';
+import { getOrderStatusLabel } from '@/lib/order-workflow';
 
 interface Order {
   id: string;
@@ -22,13 +28,15 @@ interface OrdersListProps {
   initialOrders: Order[];
 }
 
+type OrderWorkflowView = 'all' | 'needs-review' | 'accepted' | 'preparing' | 'ready' | 'delivered';
+
 const STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Pending',
-  CONFIRMED: 'Confirmed',
-  PROCESSING: 'Processing',
-  SHIPPED: 'Shipped',
-  DELIVERED: 'Delivered',
-  CANCELLED: 'Cancelled',
+  PENDING: getOrderStatusLabel('PENDING'),
+  CONFIRMED: getOrderStatusLabel('CONFIRMED'),
+  PROCESSING: getOrderStatusLabel('PROCESSING'),
+  SHIPPED: getOrderStatusLabel('SHIPPED'),
+  DELIVERED: getOrderStatusLabel('DELIVERED'),
+  CANCELLED: getOrderStatusLabel('CANCELLED'),
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
@@ -40,19 +48,59 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }
   CANCELLED: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
 };
 
-const STATUS_FLOW = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
-
 export default function OrdersList({ initialOrders }: OrdersListProps) {
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
   const [isUpdating, setIsUpdating] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [workflowView, setWorkflowView] = useState<OrderWorkflowView>('all');
+  const [tableDensity, setTableDensity] = useState<TableDensity>('comfortable');
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setTableDensity(readDensityPreference('phenofarm:density:grower-orders'));
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  const handleDensityChange = (mode: TableDensity) => {
+    setTableDensity(mode);
+    saveDensityPreference('phenofarm:density:grower-orders', mode);
+  };
+
+  const visibleOrders = useMemo(() => {
+    if (workflowView === 'needs-review') return orders.filter((order) => order.status === 'PENDING');
+    if (workflowView === 'accepted') return orders.filter((order) => order.status === 'CONFIRMED');
+    if (workflowView === 'preparing') return orders.filter((order) => order.status === 'PROCESSING');
+    if (workflowView === 'ready') return orders.filter((order) => order.status === 'SHIPPED');
+    if (workflowView === 'delivered') return orders.filter((order) => order.status === 'DELIVERED');
+    return orders;
+  }, [orders, workflowView]);
+
+  const workflowViews = useMemo(
+    () => [
+      { key: 'all' as const, label: 'All', count: orders.length },
+      { key: 'needs-review' as const, label: 'Needs review', count: orders.filter((order) => order.status === 'PENDING').length },
+      { key: 'accepted' as const, label: 'Accepted', count: orders.filter((order) => order.status === 'CONFIRMED').length },
+      { key: 'preparing' as const, label: 'Preparing', count: orders.filter((order) => order.status === 'PROCESSING').length },
+      { key: 'ready' as const, label: 'Ready', count: orders.filter((order) => order.status === 'SHIPPED').length },
+      { key: 'delivered' as const, label: 'Delivered', count: orders.filter((order) => order.status === 'DELIVERED').length },
+    ],
+    [orders],
+  );
 
   const toggleSelectAll = () => {
-    if (selectedOrders.size === orders.length) {
-      setSelectedOrders(new Set());
+    const visibleIds = visibleOrders.map((order) => order.id);
+    const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedOrders.has(id));
+
+    if (allVisibleSelected) {
+      setSelectedOrders((prev) => {
+        const next = new Set(prev);
+        visibleIds.forEach((id) => next.delete(id));
+        return next;
+      });
     } else {
-      setSelectedOrders(new Set(orders.map(o => o.id)));
+      setSelectedOrders((prev) => new Set([...Array.from(prev), ...visibleIds]));
     }
   };
 
@@ -84,7 +132,7 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to update orders');
+        throw new Error(data.error || 'Failed to update requests');
       }
 
       const result = await response.json();
@@ -96,7 +144,7 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
       
       setMessage({ 
         type: 'success', 
-        text: `Updated ${result.updatedCount} order${result.updatedCount !== 1 ? 's' : ''} to ${STATUS_LABELS[newStatus]}` 
+        text: `Updated ${result.updatedCount} request${result.updatedCount !== 1 ? 's' : ''} to ${STATUS_LABELS[newStatus]}` 
       });
       setSelectedOrders(new Set());
     } catch (err) {
@@ -109,18 +157,14 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
     }
   };
 
-  const getNextStatuses = (currentStatus: string): string[] => {
-    const currentIndex = STATUS_FLOW.indexOf(currentStatus);
-    if (currentIndex === -1) return [];
-    return STATUS_FLOW.slice(currentIndex + 1);
-  };
-
   const canCancel = Array.from(selectedOrders).some(id => {
     const order = orders.find(o => o.id === id);
     return order && order.status !== 'DELIVERED' && order.status !== 'CANCELLED';
   });
 
   const hasSelection = selectedOrders.size > 0;
+  const compactMode = tableDensity === 'compact';
+  const cellClass = compactMode ? 'px-3 sm:px-4 py-1.5 text-xs' : 'px-3 sm:px-4 py-2 sm:py-3 text-sm';
 
   return (
     <div className="relative">
@@ -139,71 +183,116 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
         </div>
       )}
 
+      <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+        <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm font-semibold text-gray-900">Saved workflow views</p>
+          <p className="text-xs text-gray-500">Start with the next request state before selecting batch actions.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {workflowViews.map((view) => (
+            <button
+              key={view.key}
+              type="button"
+              onClick={() => setWorkflowView(view.key)}
+              aria-pressed={workflowView === view.key}
+              aria-label={`${view.label}: ${view.count} requests`}
+              className={`rounded-lg px-3 py-2 text-sm font-medium ${
+                workflowView === view.key
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              {view.label}
+              <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                workflowView === view.key ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+              }`}>
+                {view.count}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
+
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <CardTitle className="text-lg font-semibold text-gray-900">
-              Active Orders ({orders.length})
+              Active Requests ({visibleOrders.length})
             </CardTitle>
-            {hasSelection && (
-              <span className="text-sm text-gray-600">
-                {selectedOrders.size} selected
-              </span>
-            )}
+            <div className="flex flex-wrap items-center gap-3">
+              <TableDensityControl value={tableDensity} onChange={handleDensityChange} />
+              {hasSelection && (
+                <span className="text-sm text-gray-600">
+                  {selectedOrders.size} selected
+                </span>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent>
-          {orders.length === 0 ? (
+          {visibleOrders.length === 0 ? (
             <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
                 <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No active orders</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {orders.length === 0 ? 'No active order requests' : 'No requests in this view'}
+              </h3>
               <p className="text-gray-500 mb-2 max-w-md mx-auto">
-                You do not have any pending, confirmed, processing, or shipped orders right now.
+                {orders.length === 0
+                  ? 'You do not have any submitted, accepted, preparing, or ready/in-transit requests right now.'
+                  : 'Switch workflow views to see other request states.'}
               </p>
-              <p className="text-sm text-gray-500 mb-6">Next step: create a new order to start your fulfillment workflow.</p>
-              <Button variant="primary" asChild>
-                <Link href="/grower/orders/add">
-                  <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Create your first order
-                </Link>
-              </Button>
+              {orders.length === 0 ? (
+                <>
+                  <p className="text-sm text-gray-500 mb-6">Next step: record a direct request or wait for buyer requests.</p>
+                  <Button variant="primary" asChild>
+                    <Link href="/grower/orders/add">
+                      <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      Record direct request
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <Button type="button" variant="secondary" onClick={() => setWorkflowView('all')}>
+                  Show all requests
+                </Button>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
               <table className="w-full text-left border-collapse min-w-[640px]">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="px-3 sm:px-4 py-2 sm:py-3">
+                    <th className={cellClass}>
                       <input
                         type="checkbox"
-                        checked={selectedOrders.size === orders.length && orders.length > 0}
+                        checked={visibleOrders.length > 0 && visibleOrders.every((order) => selectedOrders.has(order.id))}
                         onChange={toggleSelectAll}
                         className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                       />
                     </th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Order #</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Dispensary</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Date</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Total</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Status</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Actions</th>
+                    <th className={`${cellClass} font-medium text-gray-700`}>Request #</th>
+                    <th className={`${cellClass} font-medium text-gray-700`}>Dispensary</th>
+                    <th className={`${cellClass} font-medium text-gray-700`}>Date</th>
+                    <th className={`${cellClass} font-medium text-gray-700`}>Est. value</th>
+                    <th className={`${cellClass} font-medium text-gray-700`}>Status</th>
+                    <th className={`${cellClass} font-medium text-gray-700`}>Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {orders.map((order) => {
+                  {visibleOrders.map((order) => {
                     const colors = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
                     return (
                       <tr 
                         key={order.id} 
                         className={`hover:bg-gray-50 transition-colors ${selectedOrders.has(order.id) ? 'bg-green-50/50' : ''}`}
                       >
-                        <td className="px-3 sm:px-4 py-2 sm:py-3">
+                        <td className={cellClass}>
                           <input
                             type="checkbox"
                             checked={selectedOrders.has(order.id)}
@@ -211,24 +300,24 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                             className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                           />
                         </td>
-                        <td className="px-3 sm:px-4 py-2 sm:py-3">
+                        <td className={cellClass}>
                           <div className="font-medium text-gray-900">#{order.orderId}</div>
                         </td>
-                        <td className="px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-600">
+                        <td className={`${cellClass} text-gray-600`}>
                           {order.dispensary.businessName}
                         </td>
-                        <td className="px-3 sm:px-4 py-2 sm:py-3 text-sm text-gray-600">
+                        <td className={`${cellClass} text-gray-600`}>
                           {format(new Date(order.createdAt), 'MMM d, yyyy')}
                         </td>
-                        <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-900">
+                        <td className={`${cellClass} font-bold text-gray-900`}>
                           ${Number(order.totalAmount).toFixed(2)}
                         </td>
-                        <td className="px-3 sm:px-4 py-2 sm:py-3">
+                        <td className={cellClass}>
                           <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${colors.bg} ${colors.text} ${colors.border} border`}>
                             {STATUS_LABELS[order.status] || order.status}
                           </span>
                         </td>
-                        <td className="px-3 sm:px-4 py-2 sm:py-3">
+                        <td className={cellClass}>
                           <Button variant="ghost" size="sm" asChild>
                             <Link href={`/grower/orders/${order.id}`}>
                               View
@@ -251,7 +340,7 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
           <div className="bg-gray-900 text-white rounded-xl shadow-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <span className="font-medium">
-                {selectedOrders.size} order{selectedOrders.size !== 1 ? 's' : ''} selected
+                {selectedOrders.size} request{selectedOrders.size !== 1 ? 's' : ''} selected
               </span>
               <button
                 onClick={() => setSelectedOrders(new Set())}
@@ -267,21 +356,21 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                 disabled={isUpdating}
                 className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
               >
-                Confirm
+                Accept
               </button>
               <button
                 onClick={() => handleBatchUpdate('PROCESSING')}
                 disabled={isUpdating}
                 className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
               >
-                Process
+                Prepare
               </button>
               <button
                 onClick={() => handleBatchUpdate('SHIPPED')}
                 disabled={isUpdating}
                 className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
               >
-                Ship
+                Ready / In transit
               </button>
               <button
                 onClick={() => handleBatchUpdate('DELIVERED')}

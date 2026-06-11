@@ -1,28 +1,16 @@
-import { UserRole } from "@prisma/client";
 import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import { db } from '@/lib/db';
 import bcrypt from 'bcryptjs';
-import type { NextAuthOptions, User } from 'next-auth';
+import { UserRole } from '@prisma/client';
+import type { NextAuthOptions } from 'next-auth';
+import { logApiError } from '@/lib/api-response';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not configured');
 }
 if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET is not configured');
-}
-
-// Note: User type extensions are in types/next-auth.d.ts
-
-interface TokenPayload {
-  id: string;
-  role: string;
-  email: string;
-  growerId?: string;
-  dispensaryId?: string;
-  name?: string;
-  picture?: string;
-  sub?: string;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -35,10 +23,7 @@ export const authOptions: NextAuthOptions = {
         password: { label: 'Password', type: 'password' },
       },
       async authorize(credentials) {
-        console.log('Auth attempt:', credentials?.email);
-        
         if (!credentials?.email || !credentials?.password) {
-          console.log('Missing credentials');
           return null;
         }
 
@@ -47,20 +32,11 @@ export const authOptions: NextAuthOptions = {
             where: { email: credentials.email },
           });
 
-          console.log('User found:', user ? 'YES' : 'NO');
-          console.log('Has passwordHash:', user?.passwordHash ? 'YES' : 'NO');
-          
-          if (!user) {
+          if (!user || !user.passwordHash) {
             return null;
           }
 
-          if (!user.passwordHash) {
-            console.log('No password hash stored');
-            return null;
-          }
-          
           const isValidPassword = await bcrypt.compare(credentials.password, user.passwordHash);
-          console.log('Password valid:', isValidPassword);
 
           if (!isValidPassword) {
             return null;
@@ -71,9 +47,10 @@ export const authOptions: NextAuthOptions = {
             email: user.email,
             role: user.role,
             growerId: user.growerId || undefined,
-          } as User;
+            dispensaryId: user.dispensaryId || undefined,
+          };
         } catch (error) {
-          console.error('Auth error:', error);
+          logApiError('auth.credentials.authorize', error, { route: '/api/auth/session' });
           return null;
         }
       },
@@ -94,23 +71,41 @@ export const authOptions: NextAuthOptions = {
         token.role = user.role;
         token.email = user.email;
         token.growerId = user.growerId;
+        token.dispensaryId = user.dispensaryId;
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        const typedToken = token as TokenPayload;
-        session.user.id = typedToken.id;
-        session.user.role = typedToken.role as UserRole;
-        session.user.email = typedToken.email;
-        session.user.growerId = typedToken.growerId;
+        session.user.id = token.id;
+        session.user.role = token.role as UserRole;
+        session.user.email = token.email;
+        session.user.growerId = token.growerId;
+        session.user.dispensaryId = token.dispensaryId;
       }
       return session;
+    },
+  },
+  logger: {
+    error(code) {
+      logApiError('nextauth.error', new Error(code), { route: '/api/auth/session' });
+    },
+    warn(code) {
+      console.warn('[nextauth-warn]', {
+        code,
+        route: '/api/auth/session',
+      });
+    },
+    debug(code) {
+      if (process.env.NODE_ENV === 'development') {
+        console.debug('[nextauth-debug]', {
+          code,
+          route: '/api/auth/session',
+        });
+      }
     },
   },
   secret: process.env.AUTH_SECRET,
 };
 
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST };
+export const nextAuthHandler = NextAuth(authOptions);

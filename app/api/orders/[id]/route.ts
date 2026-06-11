@@ -34,7 +34,6 @@ export async function GET(
             product: true,
           },
         },
-        payments: true,
       },
     });
 
@@ -101,22 +100,40 @@ export async function PUT(
       }
     }
 
-    // Update the order
-    const updatedOrder = await db.order.update({
-      where: { id: orderId },
-      data: {
-        status,
-        notes: notes !== undefined ? notes : existingOrder.notes,
-        shippedAt: shippedAt !== undefined ? new Date(shippedAt) : existingOrder.shippedAt,
-      },
-      include: {
-        dispensary: true,
-        items: {
-          include: {
-            product: true,
+    const isCancellation = status === 'CANCELLED' && existingOrder.status !== 'CANCELLED';
+
+    const updatedOrder = await db.$transaction(async (tx) => {
+      if (isCancellation) {
+        // Return the inventory that was reserved when the request was created
+        const items = await tx.orderItem.findMany({
+          where: { orderId },
+          select: { productId: true, quantity: true },
+        });
+
+        for (const item of items) {
+          await tx.product.updateMany({
+            where: { id: item.productId },
+            data: { inventoryQty: { increment: item.quantity } },
+          });
+        }
+      }
+
+      return tx.order.update({
+        where: { id: orderId },
+        data: {
+          status,
+          notes: notes !== undefined ? notes : existingOrder.notes,
+          shippedAt: shippedAt !== undefined ? new Date(shippedAt) : existingOrder.shippedAt,
+        },
+        include: {
+          dispensary: true,
+          items: {
+            include: {
+              product: true,
+            },
           },
         },
-      },
+      });
     });
 
     return NextResponse.json(updatedOrder, { status: 200 });
@@ -186,7 +203,7 @@ export async function DELETE(
       where: { id: orderId },
     });
 
-    return NextResponse.json({ message: 'Order cancelled successfully' }, { status: 200 });
+    return NextResponse.json({ message: 'Order request cancelled successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error deleting order:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

@@ -3,14 +3,15 @@ import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
 
 /**
- * Checkout API Endpoint
+ * Order request API endpoint
  * 
  * Base path: /api/checkout
  * Authentication: Required (DISPENSARY role)
  * 
- * This endpoint processes cart checkout for dispensaries, creating orders
- * from multiple growers. Handles inventory deduction and order splitting
- * when cart contains products from different growers.
+ * This compatibility endpoint submits wholesale order requests for dispensaries,
+ * creating one request per grower. PhenoFarm does not process wholesale payment;
+ * item value is tracked for operational reporting and settlement happens
+ * directly between buyer and grower.
  */
 
 interface CartItem {
@@ -47,26 +48,26 @@ class CheckoutConflictError extends Error {
 /**
  * POST /api/checkout
  * 
- * Processes checkout from a dispensary's shopping cart.
- * Creates one order per grower when cart contains items from multiple growers.
+ * Submits an order request from a dispensary's request draft.
+ * Creates one order request per grower when the draft contains items from multiple growers.
  * 
  * Request Body:
  * - items (required): Array of cart items, each containing:
  *   - id (string): Product ID
  *   - growerId (string): ID of the grower selling the product
  *   - price (number): Unit price
- *   - quantity (number): Quantity to purchase
- * - notes (optional): Order notes or special instructions
+ *   - quantity (number): Quantity requested
+ * - notes (optional): Request notes, logistics, and direct payment terms
  * 
  * Business Logic:
  * - Items are automatically grouped by growerId
  * - One order is created per unique grower in the cart
- * - Inventory is deducted atomically during order creation
+ * - Inventory is reserved atomically during request creation to avoid overselling
  * - Orders with insufficient inventory are skipped and reported as errors
- * - Tax is calculated at 6% per order subtotal
+ * - Tax is not calculated or collected by PhenoFarm
  * - Order IDs are auto-generated as 'ORD-{timestamp}-{sequence}'
  * 
- * Response: 200 OK - Checkout result with:
+ * Response: 200 OK - Request result with:
  *   - success (boolean): true if at least one order created
  *   - orders (array): Created orders with id and orderId
  *   - orderCount (number): Number of orders created
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
 
     const user = session.user;
     if (user.role !== 'DISPENSARY') {
-      return NextResponse.json({ error: 'Only dispensaries can checkout' }, { status: 403 });
+      return NextResponse.json({ error: 'Only dispensaries can submit order requests' }, { status: 403 });
     }
 
     if (!user.dispensaryId) {
@@ -108,7 +109,7 @@ export async function POST(request: NextRequest) {
     if (dispensary.licenseStatus !== 'verified') {
       return NextResponse.json(
         {
-          error: 'License verification required. This dispensary must have a verified license to place orders.',
+          error: 'License verification required. This dispensary must have a verified license to submit order requests.',
           code: 'LICENSE_NOT_VERIFIED',
           licenseStatus: dispensary.licenseStatus,
         },
@@ -119,7 +120,7 @@ export async function POST(request: NextRequest) {
     const { items, notes } = await request.json();
 
     if (!items?.length) {
-      return NextResponse.json({ error: 'Cart is empty' }, { status: 400 });
+      return NextResponse.json({ error: 'Order request draft is empty' }, { status: 400 });
     }
 
     const normalizedItems: CartItem[] = (Array.isArray(items) ? items : []).map((item: Partial<CartItem>) => ({
@@ -168,6 +169,7 @@ export async function POST(request: NextRequest) {
         select: {
           id: true,
           name: true,
+          price: true,
           inventoryQty: true,
           isAvailable: true,
         },
@@ -228,25 +230,28 @@ export async function POST(request: NextRequest) {
               ]);
             }
 
-            const total = item.quantity * item.price;
+            // Always record the grower's current catalog price; the
+            // client-side cart price is display-only and untrusted.
+            const serverPrice = Number(productById.get(item.id)?.price ?? item.price);
+            const total = item.quantity * serverPrice;
             subtotal += total;
             orderItems.push({
               productId: item.id,
               growerId,
               quantity: item.quantity,
-              unitPrice: item.price,
+              unitPrice: serverPrice,
               totalPrice: total,
             });
           }
 
-          const tax = subtotal * 0.06;
+          const tax = 0;
           return tx.order.create({
             data: {
               growerId,
               dispensaryId,
               orderId: `ORD-${Date.now()}-${orders.length + 1}`,
               status: 'PENDING',
-              totalAmount: subtotal + tax,
+              totalAmount: subtotal,
               subtotal,
               tax,
               notes,
@@ -268,7 +273,7 @@ export async function POST(request: NextRequest) {
     if (orders.length === 0) {
       return NextResponse.json(
         {
-          error: 'Unable to create orders from the current cart',
+          error: 'Unable to create order requests from the current draft',
           issues,
         },
         { status: 409 }
@@ -292,7 +297,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.error('Checkout error:', error);
+    console.error('Order request error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }

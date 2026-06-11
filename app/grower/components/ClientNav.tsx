@@ -8,6 +8,7 @@ import { Badge } from '@/app/components/ui/Badge';
 interface NavLink {
   name: string;
   href: string;
+  group?: string;
   badge?: number | null;
   badgeComponent?: React.ReactNode;
 }
@@ -25,25 +26,34 @@ export function ClientNav({ links }: { links: NavLink[] }) {
 
   return (
     <nav className="px-3 py-2 md:px-2 md:py-3 lg:px-4 lg:py-3 space-y-1">
-      {links.map((link) => {
+      {links.map((link, index) => {
         const active = isActive(link.href);
+        const group = link.group || 'Main';
+        const previousGroup = links[index - 1]?.group || 'Main';
+        const showGroup = group !== previousGroup;
         return (
-          <Link 
-            key={link.href}
-            href={link.href}
-            className={`flex items-center justify-between px-3 py-2.5 md:px-3 md:py-2.5 lg:px-4 lg:py-2.5 rounded-lg transition-colors text-sm ${
-              active 
-                ? 'bg-green-100 text-green-700 font-medium border-l-4 border-green-600' 
-                : 'text-gray-700 hover:bg-green-50 hover:text-green-600'
-            }`}
-          >
-            <span>{link.name}</span>
-            {(link.badge && link.badge > 0) ? (
-              <Badge variant="warning" className="ml-2">{link.badge}</Badge>
-            ) : link.badgeComponent ? (
-              <span className="ml-2">{link.badgeComponent}</span>
-            ) : null}
-          </Link>
+          <React.Fragment key={link.href}>
+            {showGroup && (
+              <div className="px-3 pb-1 pt-3 first:pt-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                {group}
+              </div>
+            )}
+            <Link
+              href={link.href}
+              className={`flex items-center justify-between px-3 py-2.5 md:px-3 md:py-2.5 lg:px-4 lg:py-2.5 rounded-lg transition-colors text-sm ${
+                active
+                  ? 'bg-green-100 text-green-700 font-medium border-l-4 border-green-600'
+                  : 'text-gray-700 hover:bg-green-50 hover:text-green-600'
+              }`}
+            >
+              <span>{link.name}</span>
+              {(link.badge && link.badge > 0) ? (
+                <Badge variant="warning" className="ml-2">{link.badge}</Badge>
+              ) : link.badgeComponent ? (
+                <span className="ml-2">{link.badgeComponent}</span>
+              ) : null}
+            </Link>
+          </React.Fragment>
         );
       })}
     </nav>

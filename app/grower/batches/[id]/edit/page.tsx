@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { toast } from '@/app/hooks/useToast';
 import {
   BatchLabDocumentUploaders,
   BatchLabDocuments,
@@ -163,7 +164,7 @@ export default function EditBatchPage() {
         throw new Error(data.error || 'Failed to update batch');
       }
 
-      alert('Batch updated successfully!');
+      toast.success('Batch updated');
       router.push('/grower/batches');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred');

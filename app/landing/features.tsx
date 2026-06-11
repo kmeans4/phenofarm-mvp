@@ -29,7 +29,7 @@ const features = [
   {
     icon: Shield,
     title: 'Bank-Level Security',
-    description: 'Your data and transactions are protected with enterprise-grade security.',
+    description: 'Your account, license, marketplace, and request records are protected with enterprise-grade security.',
   },
   {
     icon: Smartphone,
@@ -38,8 +38,8 @@ const features = [
   },
   {
     icon: TrendingDown,
-    title: '60% Cost Savings',
-    description: '$249/mo vs $600+ on traditional platforms. More features, less cost.',
+    title: 'Subscription-Only Billing',
+    description: 'Cultivator software subscriptions are handled in PhenoFarm; wholesale settlement stays direct.',
   },
   {
     icon: FileSpreadsheet,
@@ -82,7 +82,7 @@ export function Features() {
             Why PhenoFarm?
           </h2>
           <p className="text-gray-300 text-lg max-w-2xl mx-auto">
-            Everything you need to thrive in cannabis wholesale. Premium features at half the price.
+            The core tools teams need to manage catalog discovery, request workflows, direct settlement context, and marketplace records.
           </p>
         </motion.div>
 

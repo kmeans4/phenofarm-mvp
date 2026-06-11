@@ -184,7 +184,7 @@ export default function AddOrderPage() {
       return total + (qty * price);
     }, 0);
 
-  const calculateTax = () => calculateSubtotal() * 0.06;
+  const calculateTax = () => 0;
   const shippingFee = parseFloat(formData?.shippingFee || '0') || 0;
   const calculateTotal = () => calculateSubtotal() + calculateTax() + shippingFee;
 
@@ -275,7 +275,7 @@ export default function AddOrderPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Order Created!</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Direct Request Recorded</h2>
           <p className="text-gray-600">Redirecting...</p>
         </div>
       </div>
@@ -286,8 +286,8 @@ export default function AddOrderPage() {
     <div className="space-y-5 sm:space-y-6 p-4">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Create New Order</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Add items to fulfill a dispensary order</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Record Direct Request</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Record a request coordinated directly with a dispensary outside PhenoFarm payment rails</p>
         </div>
         <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
           <Link
@@ -302,7 +302,7 @@ export default function AddOrderPage() {
             disabled={!canSubmitOrder}
             className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
           >
-            {isSubmitting ? 'Creating...' : 'Create Order'}
+            {isSubmitting ? 'Creating...' : 'Record Direct Request'}
           </button>
         </div>
       </div>
@@ -316,7 +316,7 @@ export default function AddOrderPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 border-b border-gray-200">
-            <h2 className="font-semibold text-gray-900">Order Details</h2>
+            <h2 className="font-semibold text-gray-900">Request Details</h2>
           </div>
           <div className="p-4 space-y-4">
             <div>
@@ -343,7 +343,7 @@ export default function AddOrderPage() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Shipping ($)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Shipping estimate ($)</label>
               <input
                 type="number"
                 min="0"
@@ -372,7 +372,7 @@ export default function AddOrderPage() {
               </div>
             ) : formData.items.length === 0 ? (
               <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-                <p className="text-gray-700 font-medium mb-2">No items in this order yet</p>
+                <p className="text-gray-700 font-medium mb-2">No items in this direct request yet</p>
                 <p className="text-sm text-gray-500">Click <span className="font-medium text-gray-700">Add</span> above to include your first line item.</p>
               </div>
             ) : (
@@ -462,10 +462,11 @@ export default function AddOrderPage() {
                 })}
 
                 <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-                  <div className="flex justify-between"><span>Subtotal:</span><span>${calculateSubtotal().toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Tax (6%):</span><span>${calculateTax().toFixed(2)}</span></div>
-                  <div className="flex justify-between"><span>Shipping:</span><span>${shippingFee.toFixed(2)}</span></div>
-                  <div className="flex justify-between pt-2 border-t font-bold"><span>Total:</span><span className="text-green-600">${calculateTotal().toFixed(2)}</span></div>
+                  <div className="flex justify-between"><span>Estimated item value:</span><span>${calculateSubtotal().toFixed(2)}</span></div>
+                  {calculateTax() > 0 && <div className="flex justify-between"><span>Tax estimate:</span><span>${calculateTax().toFixed(2)}</span></div>}
+                  <div className="flex justify-between"><span>Shipping estimate:</span><span>${shippingFee.toFixed(2)}</span></div>
+                  <div className="flex justify-between pt-2 border-t font-bold"><span>Estimated request value:</span><span className="text-green-600">${calculateTotal().toFixed(2)}</span></div>
+                  <p className="pt-2 text-xs text-gray-500">PhenoFarm records value for operations only. Wholesale settlement is handled directly with the dispensary.</p>
                 </div>
               </div>
             )}

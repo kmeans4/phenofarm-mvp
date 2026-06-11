@@ -120,7 +120,7 @@ export async function POST(
 
     if (messageType === ConversationMessageType.OFFER) {
       if (!isOfferPayload(body.offer)) {
-        return NextResponse.json({ error: 'Offer payload is required for offer messages' }, { status: 400 });
+        return NextResponse.json({ error: 'Quote payload is required for quote messages' }, { status: 400 });
       }
 
       const offer = body.offer as { quantity?: number; unitPrice?: number; note?: string };
@@ -129,7 +129,7 @@ export async function POST(
       const note = typeof offer.note === 'string' ? offer.note.trim() : '';
 
       if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
-        return NextResponse.json({ error: 'Offer unit price must be greater than zero' }, { status: 400 });
+        return NextResponse.json({ error: 'Quote unit price must be greater than zero' }, { status: 400 });
       }
 
       if (Number.isFinite(quantity) && quantity > 0) {
@@ -140,7 +140,7 @@ export async function POST(
       offerNote = note || null;
 
       if (!messageBody) {
-        messageBody = note || 'Pricing offer';
+        messageBody = note || 'Quote terms';
       }
     }
 

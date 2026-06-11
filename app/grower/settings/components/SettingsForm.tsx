@@ -6,6 +6,9 @@ import { LogoUpload } from '@/app/components/settings/LogoUpload';
 import { SignOutButton } from '@/app/components/SignOutButton';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useToast } from '@/app/hooks/useToast';
+import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
+import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
+import { useLocalDraft } from '@/app/hooks/useLocalDraft';
 
 interface SettingsData {
   businessName: string;
@@ -124,34 +127,20 @@ export function SettingsForm() {
     message: 'You have unsaved changes in your settings. Are you sure you want to leave?',
   });
 
+  const settingsDraft = useLocalDraft<SettingsData>({
+    key: 'phenofarm:draft:grower-settings',
+    value: formData,
+    enabled: !loading,
+    onRestore: (value) => setFormData((prev) => ({ ...prev, ...value })),
+    shouldSave: (value) => JSON.stringify(value) !== JSON.stringify(initialData),
+  });
+  const clearSettingsDraft = settingsDraft.clearDraft;
+
   useEffect(() => {
     if (loading) return;
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
   }, [formData, initialData, loading, setIsDirty]);
-
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        if (!saving && !loading) {
-          handleSave(false);
-        }
-      }
-      
-      if (e.key === 'Escape' && !loading) {
-        setFormData(initialData);
-        setTouched({});
-        setFieldErrors({});
-        setError('');
-        setIsDirty(false);
-        showToast('info', 'Changes discarded');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [saving, loading, initialData, setIsDirty, showToast]);
 
   const validateForm = useCallback((): boolean => {
     const errors: FieldErrors = {
@@ -194,9 +183,12 @@ export function SettingsForm() {
   }, []);
 
   useEffect(() => {
+    const controller = new AbortController();
+    let isMounted = true;
+
     async function fetchSettings() {
       try {
-        const res = await fetch('/api/grower/settings');
+        const res = await fetch('/api/grower/settings', { signal: controller.signal });
         if (res.ok) {
           const data = await res.json();
           const loadedData: SettingsData = {
@@ -214,17 +206,26 @@ export function SettingsForm() {
             description: data.description || '',
             logo: data.logo || '',
           };
+          if (!isMounted) return;
           setFormData(loadedData);
           setInitialData(loadedData);
         }
       } catch (err) {
+        if (controller.signal.aborted) return;
         console.error('Failed to load settings:', err);
         showToast('error', 'Failed to load settings');
       } finally {
-        setLoading(false);
+        if (isMounted && !controller.signal.aborted) {
+          setLoading(false);
+        }
       }
     }
     fetchSettings();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
   }, [showToast]);
 
   const handleAddressSelect = (address: {
@@ -272,17 +273,9 @@ export function SettingsForm() {
 
   const handleSave = useCallback(async (isLogoSave = false, dataOverride?: SettingsData) => {
     if (!isLogoSave) {
-      const errors: FieldErrors = {
-        businessName: validateBusinessName(formData.businessName),
-        email: validateEmail(formData.email),
-        phone: validatePhone(formData.phone),
-        website: validateWebsite(formData.website),
-        licenseNumber: validateLicenseNumber(formData.licenseNumber),
-        licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
-      };
-      setFieldErrors(errors);
-      
-      if (Object.values(errors).some(e => e !== undefined)) {
+      const isValid = validateForm();
+
+      if (!isValid) {
         setTouched({
           businessName: true,
           email: true,
@@ -322,6 +315,7 @@ export function SettingsForm() {
       );
 
       setInitialData(payload);
+      clearSettingsDraft();
       resetDirtyState();
 
       if (!isLogoSave) {
@@ -335,7 +329,30 @@ export function SettingsForm() {
     } finally {
       setSaving(false);
     }
-  }, [formData, resetDirtyState, update, showToast]);
+  }, [clearSettingsDraft, formData, resetDirtyState, update, showToast, validateForm]);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+        e.preventDefault();
+        if (!saving && !loading) {
+          handleSave(false);
+        }
+      }
+      
+      if (e.key === 'Escape' && !loading) {
+        setFormData(initialData);
+        setTouched({});
+        setFieldErrors({});
+        setError('');
+        setIsDirty(false);
+        showToast('info', 'Changes discarded');
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleSave, saving, loading, initialData, setIsDirty, showToast]);
 
   if (loading) {
     return (
@@ -360,6 +377,19 @@ export function SettingsForm() {
           <span className="ml-1">to cancel</span>
         </span>
       </div>
+
+      <div className="rounded-lg border border-green-100 bg-green-50 px-4 py-3">
+        <p className="text-xs font-semibold uppercase tracking-wide text-green-800">Required first</p>
+        <p className="mt-1 text-sm text-green-900">
+          Finish business name, license, expiry date, and email first. Logo, address, website, and description can be completed later.
+        </p>
+      </div>
+
+      <DraftAutosaveStatus
+        savedAt={settingsDraft.savedAt}
+        label="Settings browser draft"
+        onClear={settingsDraft.clearDraft}
+      />
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start gap-3">
@@ -635,6 +665,13 @@ export function SettingsForm() {
           )}
         </button>
       </div>
+
+      <StickyMobileActionBar
+        primaryLabel={saving ? 'Saving...' : 'Save settings'}
+        onPrimary={() => void handleSave(false)}
+        disabled={saving}
+        helperText="Settings drafts save in this browser."
+      />
     </div>
   );
 }

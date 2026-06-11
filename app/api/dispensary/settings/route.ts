@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client';
 interface DispensarySettingsBody {
   businessName: string;
   licenseNumber: string;
-  licenseExpiry: string;
+  licenseExpiry?: string;
   licenseState: string;
   contactName: string;
   email: string;
@@ -128,24 +128,24 @@ export async function PUT(request: NextRequest) {
     if (!licenseNumber) {
       return NextResponse.json({ error: 'License number is required' }, { status: 400 });
     }
-    if (!licenseExpiry) {
-      return NextResponse.json({ error: 'License expiry date is required' }, { status: 400 });
-    }
     if (!licenseState) {
       return NextResponse.json({ error: 'License state is required' }, { status: 400 });
     }
 
-    // Validate license expiry is in the future
-    const expiryDate = new Date(licenseExpiry);
-    if (isNaN(expiryDate.getTime()) || expiryDate < new Date()) {
-      return NextResponse.json({ error: 'License expiry must be a valid future date' }, { status: 400 });
+    const normalizedLicenseExpiry = normalizeOptionalString(licenseExpiry);
+    let expiryDate: Date | null = null;
+
+    if (normalizedLicenseExpiry) {
+      expiryDate = new Date(normalizedLicenseExpiry);
+      if (isNaN(expiryDate.getTime()) || expiryDate < new Date()) {
+        return NextResponse.json({ error: 'License expiry must be a valid future date' }, { status: 400 });
+      }
     }
 
     // Build update data
     const updateData: Prisma.DispensaryUpdateInput = {
       businessName: businessName.trim(),
       licenseNumber: licenseNumber.trim(),
-      licenseExpiry: expiryDate,
       licenseState: licenseState.trim(),
       contactName: normalizeOptionalString(contactName),
       phone: normalizeOptionalString(phone),
@@ -156,6 +156,10 @@ export async function PUT(request: NextRequest) {
       website: normalizeOptionalString(website),
       description: normalizeOptionalString(description),
     };
+
+    if (normalizedLicenseExpiry) {
+      updateData.licenseExpiry = expiryDate;
+    }
 
     // Update logo if provided
     if (logo !== undefined) {

@@ -1,5 +1,5 @@
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { ExtendedUser } from '@/types';
@@ -44,7 +44,7 @@ export default async function GrowerOrdersHistoryPage() {
 
   const deliveredOrders = orders.filter((order) => order.status === 'DELIVERED');
   const cancelledOrders = orders.filter((order) => order.status === 'CANCELLED');
-  const deliveredRevenue = deliveredOrders.reduce<number>(
+  const deliveredWholesaleValue = deliveredOrders.reduce<number>(
     (sum, order) => sum + Number(order.totalAmount),
     0
   );
@@ -53,12 +53,12 @@ export default async function GrowerOrdersHistoryPage() {
     <div className="space-y-5 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order History</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">View delivered and cancelled orders only</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Request History</h1>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">View delivered and cancelled requests only</p>
         </div>
         <Link href="/grower/orders" className="w-full sm:w-auto">
           <Button variant="outline" className="w-full sm:w-auto bg-white border-gray-300 hover:bg-gray-50 text-sm">
-            Back to Active Orders
+            Back to Active Requests
           </Button>
         </Link>
       </div>
@@ -67,7 +67,7 @@ export default async function GrowerOrdersHistoryPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-xs sm:text-sm text-gray-600 mb-1">Historical Orders</p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-1">Historical Requests</p>
             <p className="text-3xl font-bold text-gray-900">{orders.length}</p>
           </CardContent>
         </Card>
@@ -85,9 +85,9 @@ export default async function GrowerOrdersHistoryPage() {
         </Card>
         <Card className="bg-white shadow-sm border border-gray-200">
           <CardContent className="p-6">
-            <p className="text-xs sm:text-sm text-gray-600 mb-1">Delivered Revenue</p>
+            <p className="text-xs sm:text-sm text-gray-600 mb-1">Delivered Request Value</p>
             <p className="text-3xl font-bold text-gray-900">
-              ${deliveredRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              ${deliveredWholesaleValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
             </p>
           </CardContent>
         </Card>
@@ -95,7 +95,7 @@ export default async function GrowerOrdersHistoryPage() {
 
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">Delivered & Cancelled Orders</CardTitle>
+          <CardTitle className="text-lg font-semibold text-gray-900">Delivered & Cancelled Requests</CardTitle>
         </CardHeader>
         <CardContent>
           {orders.length === 0 ? (
@@ -105,16 +105,16 @@ export default async function GrowerOrdersHistoryPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No order history yet</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">No request history yet</h3>
               <p className="text-gray-500 mb-2 max-w-md mx-auto">
-                Delivered and cancelled orders will appear here once active orders are closed out.
+                Delivered and cancelled requests will appear here once active requests are closed out.
               </p>
-              <p className="text-sm text-gray-500 mb-6">Next step: review your active orders and update statuses as they progress.</p>
+              <p className="text-sm text-gray-500 mb-6">Next step: review your active requests and update statuses as they progress.</p>
               <Link
                 href="/grower/orders"
                 className="inline-flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium"
               >
-                Go to active orders
+                Go to active requests
               </Link>
             </div>
           ) : (
@@ -122,10 +122,10 @@ export default async function GrowerOrdersHistoryPage() {
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b border-gray-200">
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Order #</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Request #</th>
                     <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Customer</th>
                     <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Closed</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Total</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Est. value</th>
                     <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Status</th>
                     <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Actions</th>
                   </tr>

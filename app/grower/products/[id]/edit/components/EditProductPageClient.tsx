@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ProductForm } from '@/app/grower/products/components/ProductForm';
 import { buildProductRequestPayload, PRODUCT_STATUS } from '@/lib/product-payload';
+import { toast } from '@/app/hooks/useToast';
 
 interface ProductFormData {
   id?: string;
@@ -53,10 +54,11 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
         throw new Error(data.error || 'Failed to update product');
       }
 
+      toast.success('Product updated');
       router.push('/grower/products');
       router.refresh();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred');
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSubmitting(false);
     }
@@ -81,10 +83,11 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
         throw new Error(data.error || 'Failed to save draft');
       }
 
+      toast.success('Draft saved');
       router.push('/grower/products');
       router.refresh();
     } catch (err: unknown) {
-      alert(err instanceof Error ? err.message : 'An error occurred');
+      toast.error(err instanceof Error ? err.message : 'An error occurred');
     } finally {
       setIsSubmitting(false);
     }

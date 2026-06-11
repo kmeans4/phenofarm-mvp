@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from "next/link";
+import { useSearchParams } from 'next/navigation';
 import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, Check, Plus, BarChart3, AlertCircle } from "lucide-react";
 import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
@@ -68,6 +69,23 @@ interface SearchSuggestion {
   id?: string;
 }
 
+interface StoredPriceAlert {
+  id: string;
+  productId: string;
+  productName: string;
+  productImage?: string;
+  growerName: string;
+  growerId: string;
+  targetPrice: number;
+  currentPrice: number;
+  thc: number | null;
+  productType: string | null;
+  unit: string | null;
+  createdAt: string;
+  isTriggered: boolean;
+  triggeredAt?: string;
+}
+
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'thc-asc' | 'thc-desc' | 'name-asc' | 'name-desc';
 
 const PRODUCT_TYPES = getAllProductTypes();
@@ -106,6 +124,52 @@ const FAVORITES_KEY = 'phenofarm_favorites';
 const PRICE_ALERTS_KEY = 'phenofarm_price_alerts';
 const MAX_PRICE_ALERTS = 20;
 const MAX_SAVED_FILTERS = 5;
+
+function readStoredArray<T>(key: string): T[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(key) || '[]');
+    return Array.isArray(parsed) ? parsed as T[] : [];
+  } catch {
+    return [];
+  }
+}
+
+function writeStoredArray<T>(key: string, value: T[]) {
+  if (typeof window === 'undefined') return;
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+
+function uniqueIds(ids: string[]) {
+  return Array.from(new Set(ids.map((id) => String(id || '').trim()).filter(Boolean)));
+}
+
+function mergeSavedFilters(localFilters: SavedFilter[], serverFilters: SavedFilter[]) {
+  const byKey = new Map<string, SavedFilter>();
+  [...serverFilters, ...localFilters].forEach((filter) => {
+    const key = `${filter.name.trim().toLowerCase()}-${JSON.stringify(filter.filters)}-${filter.searchQuery}-${filter.sortBy}`;
+    if (!byKey.has(key)) byKey.set(key, filter);
+  });
+
+  return Array.from(byKey.values())
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, MAX_SAVED_FILTERS);
+}
+
+function mergePriceAlerts(localAlerts: StoredPriceAlert[], serverAlerts: StoredPriceAlert[]) {
+  const byProduct = new Map<string, StoredPriceAlert>();
+  [...serverAlerts, ...localAlerts].forEach((alert) => {
+    if (!alert.productId) return;
+    const existing = byProduct.get(alert.productId);
+    if (!existing || new Date(alert.createdAt).getTime() > new Date(existing.createdAt).getTime()) {
+      byProduct.set(alert.productId, alert);
+    }
+  });
+
+  return Array.from(byProduct.values())
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, MAX_PRICE_ALERTS);
+}
 
 function normalizeCatalogProduct(raw: unknown): Product | null {
   if (!raw || typeof raw !== 'object') return null;
@@ -154,18 +218,24 @@ function normalizeCatalogProduct(raw: unknown): Product | null {
 }
 
 export default function CatalogContent() {
+  const searchParams = useSearchParams();
+  const initialSearchQuery = searchParams.get('search') || '';
+  const initialSortBy = SORT_OPTIONS.some((option) => option.value === searchParams.get('sortBy'))
+    ? (searchParams.get('sortBy') as SortOption)
+    : 'default';
+
   // State
   const [products, setProducts] = useState<Product[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showFilters, setShowFilters] = useState(true);
-  const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [showFilters, setShowFilters] = useState(false);
+  const [sortBy, setSortBy] = useState<SortOption>(initialSortBy);
   const [filters, setFilters] = useState<FilterState>({
-    productTypes: [],
-    thcRanges: [],
-    priceRanges: [],
-    recentlyAdded: false,
-    trending: false,
+    productTypes: searchParams.get('productTypes')?.split(',').filter(Boolean) || [],
+    thcRanges: searchParams.get('thcRanges')?.split(',').filter(Boolean) || [],
+    priceRanges: searchParams.get('priceRanges')?.split(',').filter(Boolean) || [],
+    recentlyAdded: searchParams.get('recentlyAdded') === 'true',
+    trending: searchParams.get('trending') === 'true',
   });
   
   // Mobile filter sheet state
@@ -177,6 +247,7 @@ export default function CatalogContent() {
   const [showCompareBar, setShowCompareBar] = useState(true);  // Saved filters state
   const [savedFilters, setSavedFilters] = useState<SavedFilter[]>([]);
   const [priceAlerts, setPriceAlerts] = useState<string[]>([]);
+  const [storedPriceAlerts, setStoredPriceAlerts] = useState<StoredPriceAlert[]>([]);
   const [showPriceAlertModal, setShowPriceAlertModal] = useState(false);
   const [priceAlertProduct, setPriceAlertProduct] = useState<Product | null>(null);
   const [targetPrice, setTargetPrice] = useState('');
@@ -185,6 +256,7 @@ export default function CatalogContent() {
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showSaveFilterModal, setShowSaveFilterModal] = useState(false);
   const [newFilterName, setNewFilterName] = useState('');
+  const [savedFilterError, setSavedFilterError] = useState('');
 
   const [requestPricingProduct, setRequestPricingProduct] = useState<Product | null>(null);
   const [requestPricingMessage, setRequestPricingMessage] = useState('');
@@ -216,6 +288,31 @@ export default function CatalogContent() {
   const isFirstRender = useRef(true);
   const fetchControllerRef = useRef<AbortController | null>(null);
   const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+  const savedFiltersReadyRef = useRef(false);
+  const favoritesReadyRef = useRef(false);
+  const priceAlertsReadyRef = useRef(false);
+
+  useEffect(() => {
+    const nextSearch = searchParams.get('search') || '';
+    const nextSort = SORT_OPTIONS.some((option) => option.value === searchParams.get('sortBy'))
+      ? (searchParams.get('sortBy') as SortOption)
+      : 'default';
+
+    setSearchQuery((current) => (current === nextSearch ? current : nextSearch));
+    setSortBy((current) => (current === nextSort ? current : nextSort));
+    setFilters((current) => {
+      const nextFilters = {
+        productTypes: searchParams.get('productTypes')?.split(',').filter(Boolean) || [],
+        thcRanges: searchParams.get('thcRanges')?.split(',').filter(Boolean) || [],
+        priceRanges: searchParams.get('priceRanges')?.split(',').filter(Boolean) || [],
+        recentlyAdded: searchParams.get('recentlyAdded') === 'true',
+        trending: searchParams.get('trending') === 'true',
+      };
+
+      return JSON.stringify(current) === JSON.stringify(nextFilters) ? current : nextFilters;
+    });
+    setShowSuggestions(false);
+  }, [searchParams]);
 
   // Load compare list from localStorage on mount
   useEffect(() => {
@@ -237,46 +334,112 @@ export default function CatalogContent() {
       console.error('Failed to save compare list:', e);
     }
   }, [compareList]);
-  // Load saved filters from localStorage on mount
+  // Load saved filters from localStorage, then merge account-backed filters.
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(SAVED_FILTERS_KEY);
-      if (stored) {
-        setSavedFilters(JSON.parse(stored));
+    let cancelled = false;
+
+    const syncSavedFilters = async () => {
+      const localFilters = readStoredArray<SavedFilter>(SAVED_FILTERS_KEY);
+      if (!cancelled) setSavedFilters(localFilters);
+
+      try {
+        const response = await fetch('/api/dispensary/saved-filters');
+        if (!response.ok) throw new Error('Failed to load saved filters');
+        const data = await response.json();
+        const serverFilters = Array.isArray(data.filters) ? data.filters as SavedFilter[] : [];
+        const merged = mergeSavedFilters(localFilters, serverFilters);
+
+        if (!cancelled) {
+          setSavedFilters(merged);
+          writeStoredArray(SAVED_FILTERS_KEY, merged);
+          savedFiltersReadyRef.current = true;
+        }
+
+        if (localFilters.length > 0) {
+          await fetch('/api/dispensary/saved-filters', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ filters: merged }),
+          });
+        }
+      } catch (e) {
+        console.error('Failed to sync saved filters:', e);
+        savedFiltersReadyRef.current = true;
       }
-    } catch (e) {
-      console.error('Failed to load saved filters:', e);
-    }
+    };
+
+    syncSavedFilters();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Save saved filters to localStorage when they change
+  // Save saved filters locally and to the account after initial sync.
   useEffect(() => {
-    try {
-      localStorage.setItem(SAVED_FILTERS_KEY, JSON.stringify(savedFilters));
-    } catch (e) {
+    if (!savedFiltersReadyRef.current) return;
+
+    writeStoredArray(SAVED_FILTERS_KEY, savedFilters);
+    fetch('/api/dispensary/saved-filters', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filters: savedFilters }),
+    }).catch((e) => {
       console.error('Failed to save filters:', e);
-    }
+    });
   }, [savedFilters]);
 
-  // Load favorites from localStorage on mount
+  // Load favorites from localStorage, then merge account-backed favorites.
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(FAVORITES_KEY);
-      if (stored) {
-        setFavorites(JSON.parse(stored));
+    let cancelled = false;
+
+    const syncFavorites = async () => {
+      const localFavorites = uniqueIds(readStoredArray<string>(FAVORITES_KEY));
+      if (!cancelled) setFavorites(localFavorites);
+
+      try {
+        const response = await fetch('/api/dispensary/favorites');
+        if (!response.ok) throw new Error('Failed to load favorites');
+        const data = await response.json();
+        const serverFavorites = uniqueIds(Array.isArray(data.productIds) ? data.productIds : []);
+        const merged = uniqueIds([...serverFavorites, ...localFavorites]);
+
+        if (!cancelled) {
+          setFavorites(merged);
+          writeStoredArray(FAVORITES_KEY, merged);
+          favoritesReadyRef.current = true;
+        }
+
+        if (localFavorites.length > 0) {
+          await fetch('/api/dispensary/favorites', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productIds: merged }),
+          });
+        }
+      } catch (e) {
+        console.error('Failed to sync favorites:', e);
+        favoritesReadyRef.current = true;
       }
-    } catch (e) {
-      console.error('Failed to load favorites:', e);
-    }
+    };
+
+    syncFavorites();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  // Save favorites to localStorage when they change
+  // Save favorites locally and to the account after initial sync.
   useEffect(() => {
-    try {
-      localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-    } catch (e) {
+    if (!favoritesReadyRef.current) return;
+
+    writeStoredArray(FAVORITES_KEY, favorites);
+    fetch('/api/dispensary/favorites', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ productIds: favorites }),
+    }).catch((e) => {
       console.error('Failed to save favorites:', e);
-    }
+    });
   }, [favorites]);
 
   // Toggle favorite status
@@ -294,18 +457,64 @@ export default function CatalogContent() {
     return favorites.includes(productId);
   }, [favorites]);
 
-  // Load price alerts from localStorage on mount
+  // Load price alerts from localStorage, then merge account-backed alerts.
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(PRICE_ALERTS_KEY);
-      if (stored) {
-        const alerts = JSON.parse(stored);
-        setPriceAlerts(alerts.map((a: { productId: string }) => a.productId));
+    let cancelled = false;
+
+    const syncPriceAlerts = async () => {
+      const localAlerts = readStoredArray<StoredPriceAlert>(PRICE_ALERTS_KEY);
+      if (!cancelled) {
+        setStoredPriceAlerts(localAlerts);
+        setPriceAlerts(uniqueIds(localAlerts.map((alert) => alert.productId)));
       }
-    } catch (e) {
-      console.error("Failed to load price alerts:", e);
-    }
+
+      try {
+        const response = await fetch('/api/dispensary/price-alerts');
+        if (!response.ok) throw new Error('Failed to load price alerts');
+        const data = await response.json();
+        const serverAlerts = Array.isArray(data.alerts) ? data.alerts as StoredPriceAlert[] : [];
+        const merged = mergePriceAlerts(localAlerts, serverAlerts);
+
+        if (!cancelled) {
+          setStoredPriceAlerts(merged);
+          setPriceAlerts(uniqueIds(merged.map((alert) => alert.productId)));
+          writeStoredArray(PRICE_ALERTS_KEY, merged);
+          priceAlertsReadyRef.current = true;
+        }
+
+        if (localAlerts.length > 0) {
+          await fetch('/api/dispensary/price-alerts', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ alerts: merged }),
+          });
+        }
+      } catch (e) {
+        console.error("Failed to sync price alerts:", e);
+        priceAlertsReadyRef.current = true;
+      }
+    };
+
+    syncPriceAlerts();
+    return () => {
+      cancelled = true;
+    };
   }, []);
+
+  // Save price alerts locally and to the account after initial sync.
+  useEffect(() => {
+    if (!priceAlertsReadyRef.current) return;
+
+    writeStoredArray(PRICE_ALERTS_KEY, storedPriceAlerts);
+    setPriceAlerts(uniqueIds(storedPriceAlerts.map((alert) => alert.productId)));
+    fetch('/api/dispensary/price-alerts', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alerts: storedPriceAlerts }),
+    }).catch((e) => {
+      console.error('Failed to save price alerts:', e);
+    });
+  }, [storedPriceAlerts]);
 
   // Check if product has price alert
   const hasPriceAlert = useCallback((productId: string) => {
@@ -351,7 +560,7 @@ export default function CatalogContent() {
                              sortBy !== 'default';
     
     if (!hasActiveFilters) {
-      alert('No active filters to save. Apply some filters first!');
+      setSavedFilterError('Apply at least one filter, search term, or sort option before saving.');
       return;
     }
     
@@ -370,6 +579,7 @@ export default function CatalogContent() {
     });
     
     setNewFilterName('');
+    setSavedFilterError('');
     setShowSaveFilterModal(false);
   }, [filters, searchQuery, sortBy, newFilterName]);
 
@@ -576,6 +786,7 @@ export default function CatalogContent() {
       if (filters.priceRanges.length > 0) params.set('priceRanges', filters.priceRanges.join(','));
       if (sortBy !== 'default') params.set('sortBy', sortBy);
       if (filters.recentlyAdded) params.set('recentlyAdded', 'true');
+      if (filters.trending) params.set('trending', 'true');
 
       fetchControllerRef.current?.abort();
       const controller = new AbortController();
@@ -636,7 +847,7 @@ export default function CatalogContent() {
     if (!isFirstRender.current) {
       fetchProducts(1, false);
     }
-  }, [searchQuery, filters.productTypes, filters.thcRanges, filters.priceRanges, filters.recentlyAdded, sortBy]);
+  }, [searchQuery, filters.productTypes, filters.thcRanges, filters.priceRanges, filters.recentlyAdded, filters.trending, sortBy]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
@@ -735,8 +946,14 @@ export default function CatalogContent() {
 
   // ============ PRICE ALERT FUNCTIONS ============
   const openPriceAlertModal = (product: Product) => {
+    const existingAlert = storedPriceAlerts.find((alert) => alert.productId === product.id);
+
     setPriceAlertProduct(product);
-    setTargetPrice((product.price * 0.9).toFixed(2));
+    setTargetPrice(
+      existingAlert
+        ? existingAlert.targetPrice.toFixed(2)
+        : (product.price * 0.9).toFixed(2)
+    );
     setAlertError('');
     setShowPriceAlertModal(true);
   };
@@ -755,15 +972,15 @@ export default function CatalogContent() {
       return;
     }
     
-    const existingAlerts = JSON.parse(localStorage.getItem(PRICE_ALERTS_KEY) || '[]');
+    const existingAlert = storedPriceAlerts.find((alert) => alert.productId === priceAlertProduct.id);
     
-    if (existingAlerts.length >= MAX_PRICE_ALERTS) {
+    if (!existingAlert && storedPriceAlerts.length >= MAX_PRICE_ALERTS) {
       setAlertError(`Maximum ${MAX_PRICE_ALERTS} alerts allowed. Remove some first.`);
       return;
     }
     
-    const newAlert = {
-      id: Date.now().toString(),
+    const newAlert: StoredPriceAlert = {
+      id: existingAlert?.id || Date.now().toString(),
       productId: priceAlertProduct.id,
       productName: priceAlertProduct.name,
       productImage: priceAlertProduct.images?.[0],
@@ -774,13 +991,16 @@ export default function CatalogContent() {
       thc: priceAlertProduct.thc,
       productType: priceAlertProduct.productType,
       unit: priceAlertProduct.unit,
-      createdAt: new Date().toISOString(),
+      createdAt: existingAlert?.createdAt || new Date().toISOString(),
       isTriggered: false,
     };
     
-    const updated = [...existingAlerts, newAlert];
-    localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(updated));
-    setPriceAlerts(prev => [...prev, priceAlertProduct.id]);
+    const updated = [
+      ...storedPriceAlerts.filter((alert) => alert.productId !== priceAlertProduct.id),
+      newAlert,
+    ];
+    setStoredPriceAlerts(updated);
+    setPriceAlerts(Array.from(new Set(updated.map((alert) => alert.productId))));
     setShowPriceAlertModal(false);
   };
 
@@ -1143,7 +1363,7 @@ export default function CatalogContent() {
       <div className="flex gap-6">
         {/* Filters Sidebar */}
         {showFilters && (
-          <div className="w-64 flex-shrink-0 space-y-6">
+          <div className="hidden w-64 flex-shrink-0 space-y-6 lg:block">
             {/* Saved Filters Section */}
             {savedFilters.length > 0 && (
               <div className="bg-white rounded-lg border border-gray-200 p-4">
@@ -1178,7 +1398,10 @@ export default function CatalogContent() {
             {/* Save Filter Button */}
             {(filters.productTypes.length > 0 || filters.thcRanges.length > 0 || filters.priceRanges.length > 0 || searchQuery || sortBy !== 'default') && (
               <button
-                onClick={() => setShowSaveFilterModal(true)}
+                onClick={() => {
+                  setSavedFilterError('');
+                  setShowSaveFilterModal(true);
+                }}
                 className="w-full py-2 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
               >
                 <Bookmark size={16} />
@@ -1439,6 +1662,7 @@ export default function CatalogContent() {
                       <img
                         src={product.images[0]}
                         alt={`${product.name} thumbnail`}
+                        onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }}
                         loading="lazy"
                         decoding="async"
                         className="w-full h-full object-cover rounded"
@@ -1500,6 +1724,8 @@ export default function CatalogContent() {
           onClose={() => setShowCompareModal(false)}
           onRemove={removeFromCompare}
           onClear={clearCompare}
+          onRequestPricing={(product) => openPricingMessageModal(product, 'REQUEST_PRICING')}
+          onMessageGrower={(product) => openPricingMessageModal(product, 'QUESTION')}
         />
       )}
       {/* Save Filter Modal */}
@@ -1542,6 +1768,11 @@ export default function CatalogContent() {
                   }}
                   autoFocus
                 />
+                {savedFilterError && (
+                  <p className="mt-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                    {savedFilterError}
+                  </p>
+                )}
               </div>
               
               {/* Preview of what will be saved */}
@@ -1738,12 +1969,16 @@ function CompareModal({
   products, 
   onClose, 
   onRemove, 
-  onClear 
+  onClear,
+  onRequestPricing,
+  onMessageGrower,
 }: { 
   products: Product[]; 
   onClose: () => void; 
   onRemove: (id: string) => void;
   onClear: () => void;
+  onRequestPricing: (product: Product) => void;
+  onMessageGrower: (product: Product) => void;
 }) {
   // Prevent body scroll when modal is open
   useEffect(() => {
@@ -1821,6 +2056,7 @@ function CompareModal({
                       <img
                         src={product.images[0]}
                         alt={product.name}
+                        onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }}
                         loading="lazy"
                         decoding="async"
                         className="w-full h-full object-cover"
@@ -1878,12 +2114,29 @@ function CompareModal({
                 </div>
 
                 {/* Action Button */}
-                <div className="p-4 bg-white border-t border-gray-200">
-                  <AddToCartButton 
-                    product={product}
-                    growerName={product.grower.businessName}
-                    growerId={product.grower.id}
-                  />
+                <div className="p-4 bg-white border-t border-gray-200 space-y-2">
+                  {product.isPriceVisible ? (
+                    <AddToCartButton
+                      product={product}
+                      growerName={product.grower.businessName}
+                      growerId={product.grower.id}
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => onRequestPricing(product)}
+                      className="w-full inline-flex items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
+                    >
+                      Request Pricing
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => onMessageGrower(product)}
+                    className="w-full inline-flex items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
+                  >
+                    Message Grower
+                  </button>
                 </div>
               </div>
             ))}
@@ -2109,6 +2362,7 @@ function ProductCard({
           <img
             src={product.images[0]}
             alt={product.name}
+            onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }}
             loading="lazy"
             decoding="async"
             className="w-full h-full object-cover transition-transform duration-300"
@@ -2368,6 +2622,7 @@ function ProductListItem({
           <img
             src={product.images[0]}
             alt={product.name}
+            onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }}
             loading="lazy"
             decoding="async"
             className="w-full h-full object-cover"

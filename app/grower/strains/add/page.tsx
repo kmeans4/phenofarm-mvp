@@ -4,6 +4,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { toast } from '@/app/hooks/useToast';
 import { STRAIN_TYPES, STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 
 interface StrainFormData {
@@ -70,7 +71,7 @@ export default function AddStrainPage() {
       }
 
       const newStrain = await response.json();
-      alert('Strain created successfully!');
+      toast.success('Strain created');
       if (returnUrl) {
         sessionStorage.setItem('newlyCreatedStrainId', newStrain.id || '');
         router.push(returnUrl);

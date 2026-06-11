@@ -44,6 +44,12 @@ model Grower {
   isVerified          Boolean             @default(false)
   stripeAccountId     String?
   stripeAccountStatus String?             @default("pending")
+  stripeCustomerId    String?
+  stripeSubscriptionId String?
+  subscriptionPlan    String?             @default("free")
+  subscriptionStatus  String?             @default("inactive")
+  subscriptionCurrentPeriodEnd DateTime?
+  subscriptionCancelAtPeriodEnd Boolean   @default(false)
   contactName         String?
   licenseExpiry       DateTime?
   batches             Batch[]
@@ -84,6 +90,9 @@ model Dispensary {
   verifiedAt         DateTime?
   cart               Cart?
   conversations      Conversation[]
+  favoriteProducts   DispensaryFavoriteProduct[]
+  priceAlerts        DispensaryPriceAlert[]
+  savedFilters       DispensarySavedFilter[]
   user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders             Order[]
 
@@ -180,7 +189,9 @@ model Product {
   thcMax                 Decimal?    @db.Decimal(5, 2)
   thcMin                 Decimal?    @db.Decimal(5, 2)
   cartItems              CartItem[]
+  favoriteProducts       DispensaryFavoriteProduct[]
   orderItems             OrderItem[]
+  priceAlerts            DispensaryPriceAlert[]
   batch                  Batch?      @relation(fields: [batchId], references: [id])
   grower                 Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
   strain                 Strain?     @relation(fields: [strainId], references: [id])
@@ -262,6 +273,55 @@ model Payment {
   order         Order         @relation(fields: [orderId], references: [id])
 
   @@map("payments")
+}
+
+model DispensaryFavoriteProduct {
+  id           String     @id @default(cuid())
+  dispensaryId String
+  productId    String
+  createdAt    DateTime   @default(now())
+  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+  product      Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([dispensaryId, productId])
+  @@index([dispensaryId, createdAt])
+  @@index([productId])
+  @@map("dispensary_favorite_products")
+}
+
+model DispensarySavedFilter {
+  id           String     @id @default(cuid())
+  dispensaryId String
+  name         String
+  filters      Json
+  searchQuery  String     @default("")
+  sortBy       String     @default("default")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+
+  @@index([dispensaryId, createdAt])
+  @@map("dispensary_saved_filters")
+}
+
+model DispensaryPriceAlert {
+  id            String     @id @default(cuid())
+  dispensaryId  String
+  productId     String
+  targetPrice   Decimal    @db.Decimal(10, 2)
+  currentPrice  Decimal    @db.Decimal(10, 2)
+  originalPrice Decimal?   @db.Decimal(10, 2)
+  isTriggered   Boolean    @default(false)
+  triggeredAt   DateTime?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  dispensary    Dispensary @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+  product       Product    @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([dispensaryId, productId])
+  @@index([dispensaryId, createdAt])
+  @@index([productId])
+  @@map("dispensary_price_alerts")
 }
 
 model Cart {

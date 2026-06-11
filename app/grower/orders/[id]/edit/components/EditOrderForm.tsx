@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
+import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
 
 interface OrderItem {
   id: string;
@@ -103,6 +104,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [removeCandidate, setRemoveCandidate] = useState<OrderItem | null>(null);
 
   const initialData = {
     status: order.status,
@@ -116,7 +118,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
 
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
     enabled: true,
-    message: 'You have unsaved changes in this order. Are you sure you want to leave?',
+    message: 'You have unsaved changes in this request. Are you sure you want to leave?',
   });
 
   useEffect(() => {
@@ -222,9 +224,8 @@ export default function EditOrderForm({ order }: { order: Order }) {
   };
 
   const removeItem = (itemId: string) => {
-    if (!confirm('Remove this item from the order?')) return;
     setItems(items.filter(item => item.id !== itemId));
-    showToast('info', 'Item has been removed from the order');
+    showToast('info', 'Item has been removed from the request');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -276,7 +277,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
         }, 1500);
       } else {
         const data = await response.json();
-        showToast('error', data.error || 'Failed to update order');
+        showToast('error', data.error || 'Failed to update request');
       }
     } catch {
       showToast('error', 'An error occurred while updating');
@@ -307,7 +308,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Back to order
+          Back to request
         </Link>
 
         {/* Breadcrumb */}
@@ -319,7 +320,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
           <Link href="/grower/orders" className="hover:text-gray-700 transition-colors flex-shrink-0">
-            Orders
+            Requests
           </Link>
           <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -338,7 +339,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
             <div className="min-w-0 flex-1">
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Edit Order #{order.orderId}
+                Edit Request #{order.orderId}
               </h1>
               <p className="text-gray-600 mt-1">
                 Customer: {order.dispensary.businessName}
@@ -408,13 +409,13 @@ export default function EditOrderForm({ order }: { order: Order }) {
             </div>
           </div>
 
-          {/* Order Items */}
+          {/* Request items */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
-              Order Items
+              Request Items
               <span className="text-sm font-normal text-gray-500">({items.length})</span>
             </h2>
 
@@ -460,7 +461,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
 
                     <button
                       type="button"
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => setRemoveCandidate(item)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                       title="Remove item"
                     >
@@ -490,7 +491,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
                     </div>
                     <button
                       type="button"
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => setRemoveCandidate(item)}
                       className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors -mr-2 -mt-2"
                       title="Remove item"
                     >
@@ -531,7 +532,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
                 <svg className="w-12 h-12 mx-auto mb-3 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                <p className="font-medium">No items in this order</p>
+                <p className="font-medium">No items in this request</p>
                 <p className="text-sm mt-1">Add items before saving</p>
               </div>
             )}
@@ -595,7 +596,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
 
             <div className="mt-6">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Order Notes
+                Request Notes
               </label>
               <textarea
                 rows={3}
@@ -622,13 +623,13 @@ export default function EditOrderForm({ order }: { order: Order }) {
             </div>
           </div>
 
-          {/* Order Summary */}
+          {/* Request summary */}
           <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 sm:p-6">
             <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2">
               <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
-              Order Summary
+              Request Summary
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
@@ -684,6 +685,20 @@ export default function EditOrderForm({ order }: { order: Order }) {
           </div>
         </form>
       </div>
+      <ConfirmDialog
+        open={Boolean(removeCandidate)}
+        title="Remove item?"
+        description={`Remove ${removeCandidate?.product?.name || 'this item'} from the request record.`}
+        confirmLabel="Remove item"
+        intent="danger"
+        onCancel={() => setRemoveCandidate(null)}
+        onConfirm={() => {
+          if (removeCandidate) {
+            removeItem(removeCandidate.id);
+          }
+          setRemoveCandidate(null);
+        }}
+      />
     </div>
   );
 }

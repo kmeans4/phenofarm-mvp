@@ -57,6 +57,24 @@ async function getGrowerWithProducts(id: string) {
   return grower;
 }
 
+function serializeShopProducts(products: NonNullable<Awaited<ReturnType<typeof getGrowerWithProducts>>>['products']) {
+  return products.map((product) => ({
+    id: product.id,
+    name: product.name,
+    price: Number(product.price),
+    isPriceVisible: product.isPriceVisible,
+    strain: product.strain ? { name: product.strain.name } : null,
+    productType: product.productType,
+    subType: product.subType,
+    unit: product.unit,
+    batch: product.batch ? { thc: product.batch.thc ?? null } : null,
+    thcLegacy: product.thcLegacy,
+    inventoryQty: product.inventoryQty,
+    images: product.images,
+    description: product.description,
+  }));
+}
+
 export default async function GrowerPage({ params }: GrowerPageProps) {
   const { id } = await params;
   const grower = await getGrowerWithProducts(id);
@@ -213,10 +231,41 @@ export default async function GrowerPage({ params }: GrowerPageProps) {
         </div>
       </div>
 
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+          <div className="grid gap-3 md:grid-cols-4">
+            <div className="rounded-lg border border-green-200 bg-green-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-green-700">License</p>
+              <p className="mt-1 text-sm font-medium text-green-950">
+                {grower.isVerified ? 'Verified grower' : 'Verification pending'}
+              </p>
+              <p className="mt-1 text-xs text-green-800">{grower.licenseNumber || 'License number not provided'}</p>
+            </div>
+            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Fulfillment Region</p>
+              <p className="mt-1 text-sm font-medium text-blue-950">
+                {[grower.city, grower.state].filter(Boolean).join(', ') || 'Coordinate with grower'}
+              </p>
+              <p className="mt-1 text-xs text-blue-800">Pickup or delivery terms are confirmed per request.</p>
+            </div>
+            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Order Minimums</p>
+              <p className="mt-1 text-sm font-medium text-amber-950">Shown by product when available</p>
+              <p className="mt-1 text-xs text-amber-800">Use quote messaging for hidden prices or custom terms.</p>
+            </div>
+            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">Settlement</p>
+              <p className="mt-1 text-sm font-medium text-gray-950">Direct between businesses</p>
+              <p className="mt-1 text-xs text-gray-700">PhenoFarm tracks requests and fulfillment only.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <GrowerShopContent 
-          products={grower.products} 
+          products={serializeShopProducts(grower.products)}
           growerName={grower.businessName}
           growerId={grower.id}
         />

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getOrderStatusLabel } from '@/lib/order-workflow';
 
 interface StatusStep {
   status: string;
@@ -10,11 +11,11 @@ interface StatusStep {
 }
 
 const STATUS_FLOW: StatusStep[] = [
-  { status: 'PENDING', label: 'Pending', description: 'Order received', icon: '📋' },
-  { status: 'CONFIRMED', label: 'Confirmed', description: 'Payment confirmed', icon: '✅' },
-  { status: 'PROCESSING', label: 'Processing', description: 'Preparing order', icon: '📦' },
-  { status: 'SHIPPED', label: 'Shipped', description: 'In transit', icon: '🚚' },
-  { status: 'DELIVERED', label: 'Delivered', description: 'Order complete', icon: '🎉' },
+  { status: 'PENDING', label: getOrderStatusLabel('PENDING'), description: 'Buyer request received', icon: '📋' },
+  { status: 'CONFIRMED', label: getOrderStatusLabel('CONFIRMED'), description: 'Request accepted by grower', icon: '✅' },
+  { status: 'PROCESSING', label: getOrderStatusLabel('PROCESSING'), description: 'Preparing requested items', icon: '📦' },
+  { status: 'SHIPPED', label: getOrderStatusLabel('SHIPPED'), description: 'Ready, picked up, or in transit', icon: '🚚' },
+  { status: 'DELIVERED', label: getOrderStatusLabel('DELIVERED'), description: 'Fulfillment complete', icon: '🎉' },
 ];
 
 interface OrderStatusTimelineProps {
@@ -81,8 +82,8 @@ export default function OrderStatusTimeline({
         <div className="flex items-center gap-3">
           <span className="text-4xl">❌</span>
           <div>
-            <h3 className="text-lg font-semibold text-red-800">Order Cancelled</h3>
-            <p className="text-red-600">This order has been cancelled and cannot be modified.</p>
+            <h3 className="text-lg font-semibold text-red-800">Request Cancelled</h3>
+            <p className="text-red-600">This order request has been cancelled and cannot be modified.</p>
           </div>
         </div>
       </div>
@@ -92,8 +93,8 @@ export default function OrderStatusTimeline({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-gray-900">Order Progress</h2>
-        <p className="text-sm text-gray-600">Order #{orderId}</p>
+        <h2 className="text-lg font-semibold text-gray-900">Fulfillment Progress</h2>
+        <p className="text-sm text-gray-600">Order request #{orderId}</p>
       </div>
       
       {/* Timeline */}

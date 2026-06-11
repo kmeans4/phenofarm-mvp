@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Check, ShoppingCart, Loader2 } from "lucide-react";
+import { Plus, Check, ClipboardList, Loader2 } from "lucide-react";
+import { toast } from '@/app/hooks/useToast';
 
 interface ProductData {
   id: string;
@@ -43,7 +44,7 @@ export default function AddToCartButton({
 
   const addToCart = (qty: number = quantity) => {
     if (qty < 1 || qty > product.inventoryQty) {
-      alert(`Please select quantity between 1 and ${product.inventoryQty}`);
+      toast.warning(`Select quantity between 1 and ${product.inventoryQty}`);
       return;
     }
     
@@ -67,7 +68,9 @@ export default function AddToCartButton({
       if (existingIndex >= 0) {
         const newQty = cart.items[existingIndex].quantity + qty;
         if (newQty > product.inventoryQty) {
-          alert(`Cannot add ${qty} more. Only ${product.inventoryQty - cart.items[existingIndex].quantity} available.`);
+          toast.warning(`Cannot add ${qty} more`, {
+            description: `Only ${product.inventoryQty - cart.items[existingIndex].quantity} available.`,
+          });
           setLoading(false);
           return;
         }
@@ -122,14 +125,14 @@ export default function AddToCartButton({
                 : 'bg-green-600 text-white hover:bg-green-700 hover:scale-105 hover:shadow-md active:scale-95'
           }
         `}
-        title={isOutOfStock ? 'Out of Stock' : `Quick Add (1 unit) • ${product.inventoryQty} In Stock`}
+        title={isOutOfStock ? 'Out of Stock' : `Add 1 unit to request draft • ${product.inventoryQty} in stock`}
       >
         {loading ? (
           <Loader2 size={20} className="animate-spin" />
         ) : added ? (
           <Check size={20} className="animate-bounce" />
         ) : isOutOfStock ? (
-          <ShoppingCart size={20} className="opacity-50" />
+          <ClipboardList size={20} className="opacity-50" />
         ) : (
           <Plus size={20} />
         )}
@@ -192,17 +195,17 @@ export default function AddToCartButton({
         ) : added ? (
           <>
             <Check size={18} />
-            <span>Added to Cart!</span>
+            <span>Added to Request</span>
           </>
         ) : isOutOfStock ? (
           <>
-            <ShoppingCart size={18} />
+            <ClipboardList size={18} />
             <span>Out of Stock</span>
           </>
         ) : (
           <>
             <Plus size={18} />
-            <span>Add to Cart</span>
+            <span>Add to Request</span>
           </>
         )}
       </button>

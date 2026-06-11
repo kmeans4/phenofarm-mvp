@@ -13,7 +13,7 @@ export function InventoryToggle({ isChecked, onChange, label = 'Availability' }:
     <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
       <div>
         <label className="text-sm font-medium text-gray-700">{label} Status</label>
-        <p className="text-sm text-gray-600">Make product available for purchase</p>
+        <p className="text-sm text-gray-600">Make product available for buyer requests</p>
       </div>
       <button
         type="button"

@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion';
 import { useInView } from 'framer-motion';
 import { useRef, useState } from 'react';
-import { Package, ShoppingCart, Truck, ClipboardList, Store, DollarSign } from 'lucide-react';
+import { Package, ShoppingCart, Truck, ClipboardList, Store, Handshake } from 'lucide-react';
 
 const growerSteps = [
   {
@@ -14,8 +14,8 @@ const growerSteps = [
   },
   {
     number: 2,
-    title: 'Receive Orders',
-    description: 'Get orders from verified dispensaries looking for quality products.',
+    title: 'Receive Requests',
+    description: 'Get requests from verified dispensaries looking for quality products.',
     icon: ShoppingCart,
   },
   {
@@ -26,9 +26,9 @@ const growerSteps = [
   },
   {
     number: 4,
-    title: 'Get Paid',
-    description: 'Receive secure payments directly to your account. No delays.',
-    icon: DollarSign,
+    title: 'Settle Directly',
+    description: 'Coordinate quote terms and fulfillment in PhenoFarm, then invoice or settle directly with the buyer.',
+    icon: Handshake,
   },
 ];
 
@@ -41,14 +41,14 @@ const dispensarySteps = [
   },
   {
     number: 2,
-    title: 'Place Orders',
-    description: 'Order with flexible quantities. Track order status in real-time.',
+    title: 'Submit Requests',
+    description: 'Build wholesale order requests with flexible quantities and track fulfillment status in real time.',
     icon: ShoppingCart,
   },
   {
     number: 3,
     title: 'Manage Inventory',
-    description: 'Keep track of wholesale purchases and sales data effortlessly.',
+    description: 'Keep track of request history, fulfillment, and estimated request value effortlessly.',
     icon: ClipboardList,
   },
   {

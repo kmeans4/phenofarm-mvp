@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from "next/link";
 import { 
   Bell, 
@@ -41,31 +41,103 @@ type AlertTab = 'active' | 'triggered' | 'history';
 const PRICE_ALERTS_KEY = 'phenofarm_price_alerts';
 const MAX_ALERTS = 20;
 
-export default function PriceAlertsContent() {
+function readStoredAlerts() {
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(PRICE_ALERTS_KEY) || '[]') as PriceAlert[];
+    if (!Array.isArray(parsed)) return [];
+
+    return Array.from(
+      parsed.reduce((map, alert) => {
+        if (alert?.productId) map.set(alert.productId, alert);
+        return map;
+      }, new Map<string, PriceAlert>()).values()
+    );
+  } catch {
+    return [];
+  }
+}
+
+function mergeAlerts(localAlerts: PriceAlert[], serverAlerts: PriceAlert[]) {
+  const byProduct = new Map<string, PriceAlert>();
+  [...serverAlerts, ...localAlerts].forEach((alert) => {
+    if (!alert.productId) return;
+    const existing = byProduct.get(alert.productId);
+    if (!existing || new Date(alert.createdAt).getTime() > new Date(existing.createdAt).getTime()) {
+      byProduct.set(alert.productId, alert);
+    }
+  });
+
+  return Array.from(byProduct.values())
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, MAX_ALERTS);
+}
+
+interface PriceAlertsContentProps {
+  embedded?: boolean;
+}
+
+export default function PriceAlertsContent({ embedded = false }: PriceAlertsContentProps) {
   const [alerts, setAlerts] = useState<PriceAlert[]>([]);
   const [activeTab, setActiveTab] = useState<AlertTab>('active');
   const [isLoading, setIsLoading] = useState(true);
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const alertsReadyRef = useRef(false);
 
-  // Load alerts from localStorage
+  // Load alerts from localStorage, then merge account-backed alerts.
   useEffect(() => {
-    loadAlerts();
+    let cancelled = false;
+
+    const syncAlerts = async () => {
+      const localAlerts = readStoredAlerts();
+      if (!cancelled) setAlerts(localAlerts);
+
+      try {
+        const response = await fetch('/api/dispensary/price-alerts');
+        if (!response.ok) throw new Error('Failed to load account price alerts');
+        const data = await response.json();
+        const serverAlerts = Array.isArray(data.alerts) ? data.alerts as PriceAlert[] : [];
+        const merged = mergeAlerts(localAlerts, serverAlerts);
+
+        if (!cancelled) {
+          setAlerts(merged);
+          localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(merged));
+          alertsReadyRef.current = true;
+        }
+
+        if (localAlerts.length > 0) {
+          await fetch('/api/dispensary/price-alerts', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ alerts: merged }),
+          });
+        }
+      } catch (e) {
+        console.error('Failed to sync price alerts:', e);
+        alertsReadyRef.current = true;
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    };
+
+    syncAlerts();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
-  const loadAlerts = () => {
-    try {
-      const stored = localStorage.getItem(PRICE_ALERTS_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        setAlerts(parsed);
-      }
-    } catch (e) {
-      console.error('Failed to load price alerts:', e);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    if (!alertsReadyRef.current) return;
+
+    localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(alerts));
+    fetch('/api/dispensary/price-alerts', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ alerts }),
+    }).catch((error) => {
+      console.error('Failed to save price alerts:', error);
+    });
+  }, [alerts]);
 
   // Refresh current prices
   const refreshPrices = useCallback(async () => {
@@ -73,27 +145,23 @@ export default function PriceAlertsContent() {
     try {
       const response = await fetch('/api/dispensary/price-alerts/refresh', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ alerts }),
       });
 
       if (response.ok) {
         const data = await response.json();
         setAlerts(data.alerts);
-        localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(data.alerts));
       }
     } catch (error) {
       console.error('Failed to refresh prices:', error);
     } finally {
       setRefreshing(false);
     }
-  }, [alerts]);
+  }, []);
 
   // Remove single alert
   const removeAlert = useCallback((alertId: string) => {
     setAlerts(prev => {
       const updated = prev.filter(a => a.id !== alertId);
-      localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(updated));
       return updated;
     });
   }, []);
@@ -104,9 +172,8 @@ export default function PriceAlertsContent() {
       const updated = prev.filter(a => {
         if (activeTab === 'active') return a.isTriggered;
         if (activeTab === 'triggered') return !a.isTriggered;
-        return true; // history - clear all
+        return false;
       });
-      localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(updated));
       return updated;
     });
     setShowClearConfirm(false);
@@ -118,7 +185,6 @@ export default function PriceAlertsContent() {
       const updated = prev.map(a => 
         a.id === alertId ? { ...a, isTriggered: false, triggeredAt: undefined } : a
       );
-      localStorage.setItem(PRICE_ALERTS_KEY, JSON.stringify(updated));
       return updated;
     });
   }, []);
@@ -137,12 +203,11 @@ export default function PriceAlertsContent() {
   const totalSavings = alerts
     .filter(a => a.isTriggered && a.originalPrice)
     .reduce((sum, a) => sum + ((a.originalPrice || 0) - a.currentPrice), 0);
-
-  const triggeredAlerts = alerts.filter(a => a.isTriggered);
+  const HeadingTag = embedded ? 'h2' : 'h1';
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className={`${embedded ? 'min-h-48 rounded-xl border border-gray-200 bg-white' : 'min-h-screen bg-gray-50'} flex items-center justify-center`}>
         <div className="flex items-center gap-3 text-green-700">
           <Loader2 className="animate-spin" size={24} />
           <span className="text-lg">Loading your price alerts...</span>
@@ -152,26 +217,30 @@ export default function PriceAlertsContent() {
   }
 
   return (
-    <div className="bg-gray-50 pb-20 sm:pb-24">
+    <div className={embedded ? "pb-4" : "bg-gray-50 pb-20 sm:pb-24"}>
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div className={embedded ? "rounded-xl border border-gray-200 bg-white shadow-sm" : "bg-white border-b border-gray-200 sticky top-0 z-10"}>
+        <div className={embedded ? "p-4" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4"}>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Link 
-                href="/dispensary/catalog"
-                className="flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors"
-              >
-                <ArrowLeft size={20} />
-                <span className="hidden sm:inline">Back to Catalog</span>
-              </Link>
-              <div className="h-6 w-px bg-gray-300 hidden sm:block" />
+              {!embedded && (
+                <>
+                  <Link 
+                    href="/dispensary/catalog"
+                    className="flex items-center gap-2 text-gray-600 hover:text-green-700 transition-colors"
+                  >
+                    <ArrowLeft size={20} />
+                    <span className="hidden sm:inline">Back to Catalog</span>
+                  </Link>
+                  <div className="h-6 w-px bg-gray-300 hidden sm:block" />
+                </>
+              )}
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <Bell className="text-green-700" size={24} />
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">Price Alerts</h1>
+                  <HeadingTag className="text-xl font-bold text-gray-900">Price Alerts</HeadingTag>
                   <p className="text-sm text-gray-500 hidden sm:block">
                     {activeCount} active, {triggeredCount} triggered
                   </p>
@@ -194,7 +263,7 @@ export default function PriceAlertsContent() {
         {/* Stats Bar */}
         {alerts.length > 0 && (
           <div className="border-t border-gray-100">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+            <div className={embedded ? "px-4 py-3" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3"}>
               <div className="flex flex-col sm:flex-row sm:flex-wrap sm:items-center gap-3 sm:gap-6 text-sm">
                 <div className="flex items-center gap-2">
                   <BellRing className="text-green-600" size={16} />
@@ -231,7 +300,7 @@ export default function PriceAlertsContent() {
 
         {/* Tabs */}
         <div className="border-t border-gray-100">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className={embedded ? "px-4" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"}>
             <div className="flex gap-1 overflow-x-auto">
               {(['active', 'triggered', 'history'] as AlertTab[]).map((tab) => (
                 <button
@@ -262,7 +331,7 @@ export default function PriceAlertsContent() {
       </div>
 
       {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6">
+      <div className={embedded ? "py-4" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6"}>
         {filteredAlerts.length === 0 ? (
           <EmptyState 
             type={activeTab} 

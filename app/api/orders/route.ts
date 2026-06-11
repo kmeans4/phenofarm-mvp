@@ -9,9 +9,9 @@ import { db } from '@/lib/db';
  * Base path: /api/orders
  * Authentication: Required (GROWER or DISPENSARY role)
  * 
- * This endpoint manages cannabis product orders between growers and dispensaries.
- * Growers can create orders and view their outgoing orders.
- * Dispensaries can view their incoming orders.
+ * This endpoint manages wholesale order records between growers and dispensaries.
+ * PhenoFarm tracks operational value and fulfillment status only; wholesale
+ * payment settlement happens directly between the businesses.
  */
 
 interface OrderItemInput {
@@ -53,8 +53,8 @@ class InventoryConflictError extends Error {
  * 
  * Business Logic:
  * - Subtotal is calculated from items (quantity * unitPrice)
- * - Tax is automatically calculated as 6% of subtotal
- * - Total amount = subtotal + tax + shippingFee
+ * - Tax is not calculated or collected by PhenoFarm
+ * - Total amount = subtotal + optional shipping estimate
  * - Order status is set to 'PENDING' on creation
  * - Order ID is auto-generated as 'ORD-{timestamp}'
  * 
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Only growers can create orders' }, { status: 403 });
+      return NextResponse.json({ error: 'Only growers can create direct order records' }, { status: 403 });
     }
 
     const growerId = user.growerId;
@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     if (dispensary.licenseStatus !== 'verified') {
       return NextResponse.json(
         { 
-          error: 'License verification required. This dispensary must have a verified license to place orders.',
+          error: 'License verification required. This dispensary must have a verified license before direct order records can be created.',
           code: 'LICENSE_NOT_VERIFIED',
           licenseStatus: dispensary.licenseStatus,
         },
@@ -183,7 +183,7 @@ export async function POST(request: NextRequest) {
     const subtotal = normalizedItems.reduce((sum: number, item: OrderItemInput) =>
       sum + (item.quantity * item.unitPrice), 0
     );
-    const tax = subtotal * 0.06;
+    const tax = 0;
     const safeShippingFee = Number(shippingFee) || 0;
 
     const order = await db.$transaction(async (tx) => {

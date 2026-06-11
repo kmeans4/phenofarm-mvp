@@ -8,8 +8,7 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+
   if (!session || session?.user?.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -17,7 +16,6 @@ export async function POST(
   const { id } = await params;
 
   try {
-    // Get current verification status
     const dispensary = await db.dispensary.findUnique({
       where: { id },
       select: { isVerified: true }
@@ -27,10 +25,15 @@ export async function POST(
       return NextResponse.json({ error: 'Dispensary not found' }, { status: 404 });
     }
 
-    // Toggle verification status
+    const verifying = !dispensary.isVerified;
+
+    // Order submission gates on licenseStatus, so verification has to keep
+    // both fields in sync — toggling isVerified alone leaves buyers blocked.
     await db.dispensary.update({
       where: { id },
-      data: { isVerified: !dispensary.isVerified }
+      data: verifying
+        ? { isVerified: true, licenseStatus: 'verified', verifiedAt: new Date() }
+        : { isVerified: false, licenseStatus: 'pending_review', verifiedAt: null }
     });
 
     return NextResponse.redirect(new URL('/admin/dispensaries', request.url));

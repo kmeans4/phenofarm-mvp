@@ -2,6 +2,10 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MessageCircle, X, Send, BadgeDollarSign, Check, XCircle, Repeat2, Loader2, ArrowLeft } from 'lucide-react';
+import { useFocusTrap } from '@/app/hooks/useFocusTrap';
+import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
+import { useLocalDraft } from '@/app/hooks/useLocalDraft';
+import { MESSAGE_TEMPLATE_GROUPS } from '@/lib/ux-workflow';
 
 type Counterparty = {
   id: string;
@@ -39,11 +43,34 @@ type ConversationMessage = {
 
 type OpenChatEventDetail = {
   conversationId?: string;
+  context?: Array<{ label: string; value: string }>;
+  /** Prefill the composer without sending — the user reviews and sends. */
+  draft?: string;
 };
+
+interface MessageDraft {
+  messageInput: string;
+  offerPrice: string;
+  offerQty: string;
+  offerNote: string;
+}
 
 interface ChatDrawerProps {
   currentUserId: string;
   currentRole: 'GROWER' | 'DISPENSARY';
+}
+
+function getConversationPurpose(conversation: ConversationSummary, currentRole: 'GROWER' | 'DISPENSARY') {
+  const preview = conversation.lastMessagePreview.toLowerCase();
+
+  if (conversation.product?.name) {
+    return currentRole === 'GROWER' ? 'Buyer product conversation' : 'Grower product conversation';
+  }
+
+  if (preview.includes('pricing') || preview.includes('quote') || preview.includes('offer')) return 'Quote follow-up';
+  if (preview.includes('cancel')) return 'Cancellation follow-up';
+  if (preview.includes('order') || preview.includes('ship')) return 'Order follow-up';
+  return 'General conversation';
 }
 
 export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
@@ -67,8 +94,12 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   const [actionLoadingId, setActionLoadingId] = useState<string | null>(null);
   const [error, setError] = useState('');
   const [mobileListMode, setMobileListMode] = useState(true);
+  const [conversationContexts, setConversationContexts] = useState<Record<string, Array<{ label: string; value: string }>>>({});
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const triggerButtonRef = useRef<HTMLButtonElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const drawerRef = useRef<HTMLElement | null>(null);
   const conversationPollRef = useRef<number | null>(null);
   const messagePollRef = useRef<number | null>(null);
 
@@ -76,6 +107,26 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     () => conversations.find((conversation) => conversation.id === activeConversationId) || null,
     [conversations, activeConversationId]
   );
+
+  const messageDraft = useLocalDraft<MessageDraft>({
+    key: `phenofarm:draft:message:${activeConversationId || 'none'}`,
+    value: { messageInput, offerPrice, offerQty, offerNote },
+    enabled: open && Boolean(activeConversationId),
+    onRestore: (value) => {
+      setMessageInput(value.messageInput || '');
+      setOfferPrice(value.offerPrice || '');
+      setOfferQty(value.offerQty || '');
+      setOfferNote(value.offerNote || '');
+    },
+    shouldSave: (value) =>
+      Boolean(
+        value.messageInput.trim() ||
+        value.offerPrice.trim() ||
+        value.offerQty.trim() ||
+        value.offerNote.trim()
+      ),
+  });
+  const clearMessageDraft = messageDraft.clearDraft;
 
   const totalUnread = useMemo(
     () => conversations.reduce((sum, conversation) => sum + (conversation.unreadCount || 0), 0),
@@ -86,24 +137,51 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, []);
 
-  const fetchConversations = useCallback(async () => {
-    setLoadingConversations(true);
-    try {
-      const response = await fetch('/api/messages/conversations');
-      if (!response.ok) throw new Error('Failed to load conversations');
-      const data = await response.json();
-      const list: ConversationSummary[] = data.conversations || [];
-      setConversations(list);
+  const openDrawer = useCallback(() => {
+    setOpen(true);
+  }, []);
 
-      if (!activeConversationId && list.length > 0) {
-        setActiveConversationId(list[0].id);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load conversations');
-    } finally {
-      setLoadingConversations(false);
+  const closeDrawer = useCallback(() => {
+    setOpen(false);
+  }, []);
+
+  useFocusTrap({
+    active: open,
+    containerRef: drawerRef,
+    initialFocusRef: closeButtonRef,
+    returnFocusRef: triggerButtonRef,
+    onEscape: closeDrawer,
+  });
+
+  const conversationsRequestRef = useRef<Promise<void> | null>(null);
+
+  // Stable identity + in-flight dedupe so layout remounts and the two pollers
+  // don't stack duplicate /api/messages/conversations requests.
+  const fetchConversations = useCallback(() => {
+    if (conversationsRequestRef.current) {
+      return conversationsRequestRef.current;
     }
-  }, [activeConversationId]);
+
+    setLoadingConversations(true);
+    const request = (async () => {
+      try {
+        const response = await fetch('/api/messages/conversations');
+        if (!response.ok) throw new Error('Failed to load conversations');
+        const data = await response.json();
+        const list: ConversationSummary[] = data.conversations || [];
+        setConversations(list);
+        setActiveConversationId((prev) => prev ?? (list.length > 0 ? list[0].id : null));
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load conversations');
+      } finally {
+        setLoadingConversations(false);
+        conversationsRequestRef.current = null;
+      }
+    })();
+
+    conversationsRequestRef.current = request;
+    return request;
+  }, []);
 
   const markConversationRead = useCallback(async (conversationId: string) => {
     try {
@@ -139,21 +217,26 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   const openFromEvent = useCallback((event: Event) => {
     const custom = event as CustomEvent<OpenChatEventDetail>;
     const detail = custom.detail || {};
-    setOpen(true);
+    openDrawer();
     if (detail.conversationId) {
       setActiveConversationId(detail.conversationId);
       setMobileListMode(false);
+      if (Array.isArray(detail.context) && detail.context.length > 0) {
+        setConversationContexts((prev) => ({
+          ...prev,
+          [detail.conversationId as string]: detail.context || [],
+        }));
+      }
     }
-  }, []);
+    if (typeof detail.draft === 'string' && detail.draft.trim()) {
+      setMessageInput(detail.draft);
+    }
+  }, [openDrawer]);
 
   useEffect(() => {
     window.addEventListener('phenofarm-open-chat', openFromEvent as EventListener);
     return () => window.removeEventListener('phenofarm-open-chat', openFromEvent as EventListener);
   }, [openFromEvent]);
-
-  useEffect(() => {
-    fetchConversations();
-  }, [fetchConversations]);
 
   useEffect(() => {
     if (!open || !activeConversationId) return;
@@ -166,7 +249,9 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
       fetchConversations();
     };
 
-    poll();
+    // Initial load is unconditional (background tabs still need the unread
+    // badge); only the recurring polls are visibility-gated.
+    fetchConversations();
     conversationPollRef.current = window.setInterval(poll, open ? 15000 : 30000);
 
     return () => {
@@ -216,6 +301,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
       }
 
       setMessageInput('');
+      clearMessageDraft();
       await fetchMessages(activeConversationId, false);
       await fetchConversations();
     } catch (err) {
@@ -223,14 +309,14 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     } finally {
       setSending(false);
     }
-  }, [activeConversationId, activeConversation?.productId, messageInput, sending, fetchMessages, fetchConversations]);
+  }, [activeConversationId, activeConversation?.productId, messageInput, sending, clearMessageDraft, fetchMessages, fetchConversations]);
 
   const sendOffer = useCallback(async () => {
     if (!activeConversationId || sending) return;
 
     const unitPrice = Number(offerPrice);
     if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
-      setError('Enter a valid offer unit price.');
+      setError('Enter a valid quote unit price.');
       return;
     }
 
@@ -245,7 +331,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messageType: 'OFFER',
-          body: offerNote.trim() || 'Pricing offer',
+          body: offerNote.trim() || 'Quote terms',
           productId: activeConversation?.productId || undefined,
           offer: {
             unitPrice,
@@ -257,21 +343,22 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to send offer');
+        throw new Error(data.error || 'Failed to send quote');
       }
 
       setOfferPrice('');
       setOfferQty('');
       setOfferNote('');
       setShowOfferComposer(false);
+      clearMessageDraft();
       await fetchMessages(activeConversationId, false);
       await fetchConversations();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to send offer');
+      setError(err instanceof Error ? err.message : 'Failed to send quote');
     } finally {
       setSending(false);
     }
-  }, [activeConversationId, activeConversation?.productId, offerPrice, offerQty, offerNote, sending, fetchMessages, fetchConversations]);
+  }, [activeConversationId, activeConversation?.productId, offerPrice, offerQty, offerNote, sending, clearMessageDraft, fetchMessages, fetchConversations]);
 
   const sendPricingRequest = useCallback(async () => {
     if (!activeConversationId || requestingPricing) return;
@@ -285,7 +372,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           messageType: 'PRICING_REQUEST',
-          body: 'Requesting pricing for this product. Please send an offer.',
+          body: 'Requesting pricing for this product. Please send quote terms.',
           productId: activeConversation?.productId || undefined,
         }),
       });
@@ -316,7 +403,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || `Failed to ${action.toLowerCase()} offer`);
+        throw new Error(data.error || `Failed to ${action.toLowerCase()} quote`);
       }
 
       if (activeConversationId) {
@@ -324,7 +411,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
       }
       await fetchConversations();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Offer action failed');
+      setError(err instanceof Error ? err.message : 'Quote action failed');
     } finally {
       setActionLoadingId(null);
     }
@@ -333,7 +420,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   const submitCounterOffer = useCallback(async (messageId: string) => {
     const unitPrice = Number(counterPrice);
     if (!Number.isFinite(unitPrice) || unitPrice <= 0) {
-      setError('Enter a valid counter offer price.');
+      setError('Enter a valid counter quote price.');
       return;
     }
 
@@ -358,7 +445,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to send counter offer');
+        throw new Error(data.error || 'Failed to send counter quote');
       }
 
       setCounterTargetId(null);
@@ -371,7 +458,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
       }
       await fetchConversations();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Counter offer failed');
+      setError(err instanceof Error ? err.message : 'Counter quote failed');
     } finally {
       setActionLoadingId(null);
     }
@@ -387,11 +474,42 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     return <span className={`${base} bg-gray-100 text-gray-700`}>{status}</span>;
   };
 
+  const messageTemplates = useMemo(() => {
+    const productName = activeConversation?.product?.name;
+    const templates = MESSAGE_TEMPLATE_GROUPS[currentRole];
+
+    return templates.map((template) => {
+      if (!productName) return template;
+
+      return {
+        ...template,
+        body: template.body
+          .replace('this item', productName)
+          .replace('this product', productName),
+      };
+    });
+  }, [activeConversation?.product?.name, currentRole]);
+
+  const contextChips = useMemo(() => {
+    if (!activeConversationId) return [];
+
+    const chips = [...(conversationContexts[activeConversationId] || [])];
+    if (activeConversation?.product?.name) {
+      chips.unshift({ label: 'Product', value: activeConversation.product.name });
+    }
+    chips.push({ label: 'Settlement', value: 'Direct outside PhenoFarm' });
+
+    return chips.filter((chip, index, list) =>
+      list.findIndex((candidate) => candidate.label === chip.label && candidate.value === chip.value) === index
+    );
+  }, [activeConversation?.product?.name, activeConversationId, conversationContexts]);
+
   return (
     <>
       <button
+        ref={triggerButtonRef}
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={openDrawer}
         className="fixed bottom-5 right-5 z-[70] h-12 w-12 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 flex items-center justify-center"
         title="Open messages"
         data-testid="chat-button"
@@ -406,12 +524,18 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
 
       {open && (
         <div className="fixed inset-0 z-[80]">
-          <button className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} aria-label="Close messages overlay" />
-          <aside className="absolute right-0 top-0 h-full w-full sm:w-[420px] lg:w-[760px] bg-white shadow-2xl border-l border-gray-200 flex">
+          <button className="absolute inset-0 bg-black/40" onClick={closeDrawer} aria-label="Close messages overlay" />
+          <aside
+            ref={drawerRef}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="messages-drawer-title"
+            className="absolute right-0 top-0 h-full w-full sm:w-[420px] lg:w-[760px] bg-white shadow-2xl border-l border-gray-200 flex"
+          >
             <div className={`w-full lg:w-[300px] border-r border-gray-200 flex flex-col ${!mobileListMode && 'hidden lg:flex'}`}>
               <div className="px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                <h2 className="font-semibold text-gray-900">Messages</h2>
-                <button className="text-gray-500 hover:text-gray-700" onClick={() => setOpen(false)} data-testid="close-chat">
+                <h2 id="messages-drawer-title" className="font-semibold text-gray-900">Messages</h2>
+                <button ref={closeButtonRef} className="text-gray-500 hover:text-gray-700" onClick={closeDrawer} data-testid="close-chat" aria-label="Close messages">
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -419,7 +543,12 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                 {loadingConversations ? (
                   <div className="p-4 text-sm text-gray-500 flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Loading...</div>
                 ) : conversations.length === 0 ? (
-                  <div className="p-4 text-sm text-gray-500">No conversations yet.</div>
+                  <div className="p-4 text-sm text-gray-500">
+                    <p className="font-medium text-gray-900">No conversations yet</p>
+                    <p className="mt-1">
+                      Start from a product, order, or grower profile so the other party knows what the message is about.
+                    </p>
+                  </div>
                 ) : (
                   conversations.map((conversation) => (
                     <button
@@ -439,6 +568,9 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                           {conversation.product?.name && (
                             <p className="text-xs text-gray-500 truncate">{conversation.product.name}</p>
                           )}
+                          <span className="mt-1 inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+                            {getConversationPurpose(conversation, currentRole)}
+                          </span>
                           <p className="text-xs text-gray-500 truncate mt-1">{conversation.lastMessagePreview}</p>
                         </div>
                         {conversation.unreadCount > 0 && (
@@ -467,23 +599,47 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                     <p className="font-semibold text-sm text-gray-900 truncate">
                       {activeConversation?.counterpart.name || 'Select a conversation'}
                     </p>
-                    {activeConversation?.product?.name && (
-                      <p className="text-xs text-gray-500 truncate">Context: {activeConversation.product.name}</p>
+                    {activeConversation && (
+                      <p className="text-xs text-gray-500 truncate">
+                        {getConversationPurpose(activeConversation, currentRole)}
+                        {activeConversation.product?.name ? ` - ${activeConversation.product.name}` : ''}
+                      </p>
                     )}
                   </div>
                 </div>
-                <button className="text-gray-500 hover:text-gray-700 lg:hidden" onClick={() => setOpen(false)} data-testid="close-chat-mobile">
+                <button className="text-gray-500 hover:text-gray-700 lg:hidden" onClick={closeDrawer} data-testid="close-chat-mobile" aria-label="Close messages">
                   <X className="w-5 h-5" />
                 </button>
               </div>
+
+              {contextChips.length > 0 && (
+                <div className="border-b border-gray-200 bg-white px-4 py-2">
+                  <div className="flex flex-wrap gap-2">
+                    {contextChips.map((chip) => (
+                      <span
+                        key={`${chip.label}-${chip.value}`}
+                        className="rounded-full bg-gray-100 px-2.5 py-1 text-[11px] font-medium text-gray-700"
+                      >
+                        <span className="text-gray-500">{chip.label}:</span> {chip.value}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
                 {loadingMessages ? (
                   <div className="text-sm text-gray-500 flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Loading messages...</div>
                 ) : !activeConversationId ? (
-                  <div className="text-sm text-gray-500">Select a conversation to view messages.</div>
+                  <div className="rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm text-gray-500">
+                    <p className="font-medium text-gray-900">Select a conversation</p>
+                    <p className="mt-1">Conversation context, pricing actions, and message templates will appear here.</p>
+                  </div>
                 ) : messages.length === 0 ? (
-                  <div className="text-sm text-gray-500">No messages yet. Start the conversation below.</div>
+                  <div className="rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm text-gray-500">
+                    <p className="font-medium text-gray-900">No messages yet</p>
+                    <p className="mt-1">Use a template below or write the first note with the product/order context already attached.</p>
+                  </div>
                 ) : (
                   messages.map((message) => {
                     const isMine = message.senderUserId === currentUserId;
@@ -502,7 +658,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                               <div className={`rounded-md p-2 ${isMine ? 'bg-green-700/70' : 'bg-green-50 border border-green-200'}`}>
                                 <div className="flex items-center justify-between gap-2">
                                   <p className={`text-sm font-semibold ${isMine ? 'text-white' : 'text-green-800'}`}>
-                                    Offer {message.product?.name ? `for ${message.product.name}` : ''}
+                                    Quote {message.product?.name ? `for ${message.product.name}` : ''}
                                   </p>
                                   {renderOfferStatus(message.offerStatus)}
                                 </div>
@@ -515,6 +671,12 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                                 )}
                               </div>
 
+                              {message.offerStatus === 'ACCEPTED' && (
+                                <p className={`text-xs ${isMine ? 'text-green-100' : 'text-green-700'}`}>
+                                  Quote terms accepted. Create or review an order request to coordinate fulfillment; payment is handled directly.
+                                </p>
+                              )}
+
                               {canRespondToOffer && (
                                 <div className="flex flex-wrap gap-2">
                                   <button
@@ -523,7 +685,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                                     disabled={actionLoadingId === message.id}
                                     className="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-600 text-white text-xs hover:bg-green-700 disabled:opacity-60"
                                   >
-                                    <Check className="w-3 h-3" /> Accept
+                                    <Check className="w-3 h-3" /> Accept quote
                                   </button>
                                   <button
                                     type="button"
@@ -557,7 +719,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                                       step="0.01"
                                       value={counterPrice}
                                       onChange={(e) => setCounterPrice(e.target.value)}
-                                      placeholder="Unit price"
+                                      placeholder="Quote unit price"
                                       className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
                                     />
                                     <input
@@ -573,7 +735,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                                     type="text"
                                     value={counterNote}
                                     onChange={(e) => setCounterNote(e.target.value)}
-                                    placeholder="Counter note (optional)"
+                                      placeholder="Counter terms note (optional)"
                                     className="w-full px-2 py-1 text-xs border border-gray-300 rounded"
                                   />
                                   <div className="flex justify-end gap-2">
@@ -628,6 +790,12 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
               <div className="border-t border-gray-200 p-3 space-y-2 bg-white">
                 {error && <p className="text-xs text-red-600">{error}</p>}
 
+                <DraftAutosaveStatus
+                  savedAt={messageDraft.savedAt}
+                  label="Message browser draft"
+                  onClear={messageDraft.clearDraft}
+                />
+
                 {requestingPricing && (
                   <div className="rounded-lg border border-purple-200 bg-purple-50 p-2 text-center">
                     <p className="text-sm text-purple-800">Sending pricing request...</p>
@@ -643,7 +811,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                         step="0.01"
                         value={offerPrice}
                         onChange={(e) => setOfferPrice(e.target.value)}
-                        placeholder="Offer unit price"
+                        placeholder="Quote unit price"
                         className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded"
                       />
                       <input
@@ -659,7 +827,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                       type="text"
                       value={offerNote}
                       onChange={(e) => setOfferNote(e.target.value)}
-                      placeholder="Offer note (optional)"
+                        placeholder="Quote terms note (optional)"
                       className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded"
                     />
                     <div className="flex justify-end gap-2">
@@ -677,8 +845,42 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                         className="px-3 py-1.5 text-xs rounded bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60"
                         data-testid="send-offer"
                       >
-                        Send Offer
+                        Send Quote
                       </button>
+                    </div>
+                  </div>
+                )}
+
+                {activeConversationId && !showOfferComposer && (
+                  <div className="space-y-2">
+                    {contextChips.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {contextChips.slice(0, 3).map((chip) => (
+                          <button
+                            key={`insert-${chip.label}-${chip.value}`}
+                            type="button"
+                            onClick={() => {
+                              const insert = `${chip.label}: ${chip.value}`;
+                              setMessageInput((prev) => prev.trim() ? `${prev.trim()}\n${insert}` : insert);
+                            }}
+                            className="rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                          >
+                            Add {chip.label.toLowerCase()}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex flex-wrap gap-2">
+                    {messageTemplates.map((template) => (
+                      <button
+                        key={template.label}
+                        type="button"
+                        onClick={() => setMessageInput(template.body)}
+                        className="rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                      >
+                        {template.label}
+                      </button>
+                    ))}
                     </div>
                   </div>
                 )}
@@ -692,10 +894,10 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                         ? 'border-blue-600 text-blue-700 bg-blue-50'
                         : 'border-gray-300 text-gray-700 hover:bg-gray-100'
                     }`}
-                    title="Send a structured price offer"
+                    title="Send structured quote terms"
                     data-testid="toggle-offer-composer"
                   >
-                    <span className="inline-flex items-center gap-1"><BadgeDollarSign className="w-4 h-4" /> Offer</span>
+                    <span className="inline-flex items-center gap-1"><BadgeDollarSign className="w-4 h-4" /> Quote</span>
                   </button>
                   <button
                     type="button"
@@ -735,7 +937,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                   </button>
                 </div>
                 <p className="text-[11px] text-gray-500">
-                  {currentRole === 'GROWER' ? 'You are messaging as Grower' : 'You are messaging as Dispensary'}
+                  {currentRole === 'GROWER' ? 'You are messaging as Grower' : 'You are messaging as Dispensary'} • Quotes set terms only; wholesale payment is handled directly.
                 </p>
               </div>
             </div>

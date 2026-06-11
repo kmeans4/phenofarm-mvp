@@ -4,6 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { toast } from '@/app/hooks/useToast';
 import { STRAIN_TYPES, STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 
 interface Strain {
@@ -110,7 +111,7 @@ export default function EditStrainPage() {
         throw new Error(data.error || 'Failed to update strain');
       }
 
-      alert('Strain updated successfully!');
+      toast.success('Strain updated');
       router.push('/grower/strains');
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred');

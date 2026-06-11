@@ -4,8 +4,10 @@ import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ExtendedUser, AuthSession } from '@/types';
+import { AuthSession } from '@/types';
 import { Button } from '@/app/components/ui/Button';
+import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
+import { toast } from '@/app/hooks/useToast';
 import { STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
 
 interface Strain {
@@ -29,6 +31,7 @@ export default function StrainsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
+  const [deleteCandidate, setDeleteCandidate] = useState<Strain | null>(null);
 
   // Load view mode from localStorage on mount
   useEffect(() => {
@@ -83,17 +86,19 @@ export default function StrainsPage() {
   };
 
   const deleteStrain = async (strainId: string) => {
-    if (!confirm('Are you sure you want to delete this strain?')) return;
     try {
       const response = await fetch('/api/strains/' + strainId, { method: 'DELETE' });
       if (response.ok) {
         setStrains(strains.filter(s => s.id !== strainId));
+        toast.success('Strain deleted');
       } else {
         const err = await response.json();
-        alert(err.error || 'Failed to delete strain');
+        toast.error(err.error || 'Failed to delete strain');
       }
     } catch {
-      console.error('Error deleting strain');
+      toast.error('Network error deleting strain');
+    } finally {
+      setDeleteCandidate(null);
     }
   };
 
@@ -231,6 +236,15 @@ export default function StrainsPage() {
                         + Product
                       </Link>
                     </Button>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="w-full sm:flex-1"
+                      onClick={() => setDeleteCandidate(strain)}
+                    >
+                      Delete
+                    </Button>
                   </div>
                 </div>
               </div>
@@ -284,6 +298,14 @@ export default function StrainsPage() {
                               + Product
                             </Link>
                           </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeleteCandidate(strain)}
+                          >
+                            Delete
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -310,6 +332,20 @@ export default function StrainsPage() {
           </Button>
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(deleteCandidate)}
+        title="Delete strain?"
+        description={`Delete ${deleteCandidate?.name || 'this strain'}. Review attached batches and products before removing it.`}
+        confirmLabel="Delete strain"
+        intent="danger"
+        onCancel={() => setDeleteCandidate(null)}
+        onConfirm={() => {
+          if (deleteCandidate) {
+            deleteStrain(deleteCandidate.id);
+          }
+        }}
+      />
     </div>
   );
 }

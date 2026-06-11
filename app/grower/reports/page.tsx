@@ -1,10 +1,12 @@
 import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from '@/lib/auth';
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
 import Link from "next/link";
 import { AuthSession } from "@/types";
+import { ReportsExportActions } from "./ReportsExportActions";
+import { getOrderStatusLabel } from "@/lib/order-workflow";
 
 export default async function GrowerReportsPage() {
   const session = await getServerSession(authOptions);
@@ -42,15 +44,15 @@ export default async function GrowerReportsPage() {
     db.dispensary.count(),
   ]);
 
-  // Calculate revenue from completed orders
+  // Calculate delivered request value from delivered orders
   const completedOrders = allOrders.filter(o => o.status === 'DELIVERED');
   const totalRevenue = completedOrders.reduce(
     (sum, o) => sum + Number(o.totalAmount), 
     0
   );
-  const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+  const avgOrderValue = completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0;
 
-  // Get orders by status for the chart
+  // Get requests by status for the chart
   const ordersByStatus = {
     PENDING: allOrders.filter(o => o.status === 'PENDING').length,
     CONFIRMED: allOrders.filter(o => o.status === 'CONFIRMED').length,
@@ -80,7 +82,7 @@ export default async function GrowerReportsPage() {
     // Filter out any null months from raw SQL results
     monthlyRevenue = (rawRevenue || []).filter(m => m && m.month);
   } catch (e) {
-    console.error('Error fetching monthly revenue:', e);
+    console.error('Error fetching monthly delivered request value:', e);
     monthlyRevenue = [];
   }
 
@@ -92,7 +94,7 @@ export default async function GrowerReportsPage() {
         p.name as "productName",
         SUM(oi.quantity)::int as quantity,
         SUM(oi."totalPrice"::numeric)::numeric as revenue
-      FROM "orderItems" oi
+      FROM "order_items" oi
       JOIN "orders" o ON oi."orderId" = o.id
       JOIN "products" p ON oi."productId" = p.id
       WHERE o."growerId" = ${user.growerId}
@@ -130,6 +132,27 @@ export default async function GrowerReportsPage() {
   }
 
   const recentOrders = allOrders.slice(0, 10);
+  const exportOrders = recentOrders.map((order) => ({
+    orderId: order.orderId,
+    customer: order.dispensary?.businessName || 'Unknown',
+    status: order.status,
+    date: order.createdAt.toISOString(),
+    totalAmount: Number(order.totalAmount),
+  }));
+  const exportMonthlyRevenue = monthlyRevenue.map((month) => ({
+    month: month.month,
+    revenue: Number(month.revenue),
+  }));
+  const exportTopProducts = topProducts.map((product) => ({
+    productName: product.productName,
+    quantity: Number(product.quantity),
+    revenue: Number(product.revenue),
+  }));
+  const exportTopCustomers = topCustomers.map((customer) => ({
+    dispensaryName: customer.dispensaryName,
+    orderCount: Number(customer.orderCount),
+    revenue: Number(customer.revenue),
+  }));
 
   // Helper function for safe date formatting
   const formatMonth = (monthStr: string | null | undefined): string => {
@@ -157,33 +180,38 @@ export default async function GrowerReportsPage() {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Analytics & Reports</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Track your sales performance and business metrics</p>
+          <p className="text-sm sm:text-base text-gray-600 mt-1">Track delivered request value and fulfillment metrics. Settlement happens directly with buyers.</p>
         </div>
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 w-full sm:w-auto">
-          <button className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-xs sm:text-sm font-medium transition-colors">
-            Export PDF
-          </button>
-          <button className="w-full sm:w-auto px-3 sm:px-4 py-2 bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 text-xs sm:text-sm font-medium transition-colors">
-            Export CSV
-          </button>
-        </div>
+        <ReportsExportActions
+          summary={{
+            totalRevenue,
+            totalOrders,
+            activeOrders,
+            activeCustomers: dispensaries,
+            avgOrderValue,
+          }}
+          monthlyRevenue={exportMonthlyRevenue}
+          topProducts={exportTopProducts}
+          topCustomers={exportTopCustomers}
+          recentOrders={exportOrders}
+        />
       </div>
 
       {/* Key Metrics - Responsive Grid */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
         <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 sm:p-6 rounded-lg shadow-lg col-span-2 md:col-span-1 lg:col-span-1">
-          <p className="text-green-100 text-xs sm:text-sm">Total Revenue</p>
+          <p className="text-green-100 text-xs sm:text-sm">Delivered Request Value</p>
           <p className="text-xl sm:text-3xl font-bold mt-1">${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
           <p className="text-green-100 text-xs sm:text-sm mt-2">
-            From {completedOrders.length} completed orders
+            From {completedOrders.length} delivered requests
           </p>
         </div>
         
         <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-xs sm:text-sm text-gray-600">Total Orders</p>
+          <p className="text-xs sm:text-sm text-gray-600">Total Requests</p>
           <p className="text-xl sm:text-3xl font-bold text-gray-900 mt-1">{totalOrders}</p>
           <p className="text-xs sm:text-sm text-green-600 mt-2">
-            {activeOrders} active orders
+            {activeOrders} active requests
           </p>
         </div>
 
@@ -194,18 +222,18 @@ export default async function GrowerReportsPage() {
         </div>
 
         <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-xs sm:text-sm text-gray-600">Avg Order Value</p>
+          <p className="text-xs sm:text-sm text-gray-600">Avg Delivered Value</p>
           <p className="text-xl sm:text-3xl font-bold text-gray-900 mt-1">${avgOrderValue.toFixed(2)}</p>
-          <p className="text-xs sm:text-sm text-gray-500 mt-2">Per order average</p>
+          <p className="text-xs sm:text-sm text-gray-500 mt-2">Delivered requests only</p>
         </div>
       </div>
 
       {/* Charts Row - Improved Mobile Responsiveness */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* Monthly Revenue Chart */}
+        {/* Monthly delivered value chart */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold">Revenue Trend (Last 6 Months)</h2>
+            <h2 className="text-base sm:text-lg font-semibold">Delivered Request Value Trend</h2>
             <span className="text-xs text-gray-400 sm:hidden">← swipe →</span>
           </div>
           {monthlyRevenue.length > 0 ? (
@@ -253,15 +281,25 @@ export default async function GrowerReportsPage() {
               </div>
             </div>
           ) : (
-            <div className="h-36 sm:h-48 flex items-center justify-center text-gray-500 text-sm">
-              No revenue data yet
+            <div className="h-36 sm:h-48 flex flex-col items-center justify-center px-4 text-center text-sm">
+              <p className="font-medium text-gray-900">
+                {totalOrders > 0 ? 'No delivered request value in this range' : 'No request value yet'}
+              </p>
+              <p className="mt-1 max-w-sm text-gray-500">
+                {totalOrders > 0
+                  ? 'The trend uses delivered requests from the last 6 months. Submitted, ready, cancelled, and older requests are excluded.'
+                  : 'Delivered requests will appear here after buyers submit requests and fulfillment is complete.'}
+              </p>
+              <Link href={totalOrders > 0 ? '/grower/orders' : '/grower/products/add'} className="mt-3 text-sm font-medium text-green-700 hover:text-green-800">
+                {totalOrders > 0 ? 'Review requests' : 'Add product'}
+              </Link>
             </div>
           )}
         </div>
 
-        {/* Orders by Status - Improved Mobile Layout */}
+        {/* Requests by Status */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6">
-          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Orders by Status</h2>
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Requests by Status</h2>
           <div className="space-y-2 sm:space-y-3">
             {Object.entries(ordersByStatus).map(([status, count]) => {
               const total = Object.values(ordersByStatus).reduce((a, b) => a + b, 0);
@@ -272,7 +310,7 @@ export default async function GrowerReportsPage() {
                   <div className="flex justify-between text-xs sm:text-sm mb-1">
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${colors?.bar || 'bg-gray-500'}`} />
-                      <span className="text-gray-600">{status.charAt(0) + status.slice(1).toLowerCase()}</span>
+                      <span className="text-gray-600">{getOrderStatusLabel(status)}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{count}</span>
@@ -317,8 +355,14 @@ export default async function GrowerReportsPage() {
               ))}
             </div>
           ) : (
-            <div className="p-6 sm:p-8 text-center text-gray-500 text-sm">
-              No product sales data yet
+            <div className="p-6 sm:p-8 text-center text-sm">
+              <p className="font-medium text-gray-900">No delivered product value yet</p>
+              <p className="mx-auto mt-1 max-w-sm text-gray-500">
+                Product rankings only include line items from delivered requests, so active listings may not show here until fulfillment is complete.
+              </p>
+              <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
+                Open catalog workspace
+              </Link>
             </div>
           )}
         </div>
@@ -346,35 +390,47 @@ export default async function GrowerReportsPage() {
               ))}
             </div>
           ) : (
-            <div className="p-6 sm:p-8 text-center text-gray-500 text-sm">
-              No customer data yet
+            <div className="p-6 sm:p-8 text-center text-sm">
+              <p className="font-medium text-gray-900">No delivered customer value yet</p>
+              <p className="mx-auto mt-1 max-w-sm text-gray-500">
+                Customer rankings are based on delivered request value. New buyers with submitted requests appear in request history first.
+              </p>
+              <Link href="/grower/orders" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
+                View request history
+              </Link>
             </div>
           )}
         </div>
       </div>
 
-      {/* Recent Orders Table - Responsive */}
+      {/* Recent Requests Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-base sm:text-lg font-semibold">Recent Orders</h2>
+          <h2 className="text-base sm:text-lg font-semibold">Recent Requests</h2>
           <Link href="/grower/orders" className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium">
-            View All
+            View All Requests
           </Link>
         </div>
         {recentOrders.length === 0 ? (
-          <div className="p-6 sm:p-12 text-center text-gray-500 text-sm">
-            No orders yet. Orders will appear here when customers place them.
+          <div className="p-6 sm:p-12 text-center text-sm">
+            <p className="font-medium text-gray-900">No requests yet</p>
+            <p className="mx-auto mt-1 max-w-sm text-gray-500">
+              Requests appear here as soon as dispensaries submit them, before they count toward delivered request value.
+            </p>
+            <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
+              Open catalog workspace
+            </Link>
           </div>
         ) : (
           <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Order ID</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Request ID</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Customer</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Date</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Total</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Est. value</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -393,7 +449,7 @@ export default async function GrowerReportsPage() {
                         order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
                         'bg-gray-100 text-gray-800'
                       }`}>
-                        {order.status.charAt(0) + order.status.slice(1).toLowerCase()}
+                        {getOrderStatusLabel(order.status)}
                       </span>
                     </td>
                     <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden md:table-cell">

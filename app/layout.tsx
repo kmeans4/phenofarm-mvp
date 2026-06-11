@@ -7,7 +7,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'PhenoFarm - B2B Cannabis Marketplace',
-  description: 'Connect growers and dispensaries for wholesale cannabis transactions',
+  description: 'Connect licensed growers and dispensaries for wholesale requests, fulfillment coordination, and direct settlement',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',

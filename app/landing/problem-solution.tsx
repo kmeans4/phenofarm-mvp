@@ -8,20 +8,20 @@ import { DollarSign, Lock, Globe, CheckCircle2 } from 'lucide-react';
 const problems = [
   {
     icon: DollarSign,
-    title: 'Exorbitant Fees',
-    description: 'Traditional platforms charge 60% markup. APEX Trading costs $600/month for basic features.',
+    title: 'Unclear Platform Costs',
+    description: 'Wholesale teams need predictable software costs without confusing marketplace settlement fees.',
     color: 'red',
   },
   {
     icon: Globe,
     title: 'Limited Access',
-    description: 'Regional restrictions lock you out of national growers. Missing out on better prices.',
+    description: 'Regional discovery is still fragmented, making it harder to find licensed partners and available products.',
     color: 'red',
   },
   {
     icon: Lock,
     title: 'Walled Gardens',
-    description: 'No transparency on pricing or quality. Hard to verify partners and build trust.',
+    description: 'Teams need clearer license, product, and fulfillment context before they trust a new wholesale relationship.',
     color: 'red',
   },
 ];
@@ -29,14 +29,14 @@ const problems = [
 const solutions = [
   {
     icon: CheckCircle2,
-    title: 'Save 60%',
-    description: 'Only $249/month for the same powerful tools. That\'s less than half of APEX.',
+    title: 'Subscription Pricing',
+    description: 'Cultivators pay PhenoFarm for software access. Buyer-seller wholesale settlement stays direct.',
     color: 'green',
   },
   {
     icon: Globe,
     title: 'Open Marketplace',
-    description: 'Access verified growers and dispensaries nationwide. Complete transparency on pricing.',
+    description: 'Browse verified growers and dispensaries with clearer product, license, and availability context.',
     color: 'green',
   },
   {
@@ -76,7 +76,7 @@ export function ProblemSolution() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">The Problem</h2>
           </div>
           <p className="text-gray-300 text-lg max-w-2xl">
-            Traditional cannabis wholesale is broken. You&apos;re paying too much for too little.
+            Cannabis wholesale teams still juggle fragmented discovery, license checks, and request follow-up across too many tools.
           </p>
         </motion.div>
 
@@ -132,7 +132,7 @@ export function ProblemSolution() {
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">The Solution: PhenoFarm</h2>
           </div>
           <p className="text-gray-300 text-lg max-w-2xl">
-            A modern marketplace built for today&apos;s cannabis industry. Affordable, transparent, connected.
+            A focused marketplace workspace for discovery, order requests, fulfillment coordination, and direct business relationships.
           </p>
         </motion.div>
 

@@ -1,27 +1,120 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { Prisma } from "@prisma/client";
 import { db } from "@/lib/db";
-import { AuthSession } from "@/types";
+import { getAuthSession } from "@/lib/auth-helpers";
 
-export async function POST(req: NextRequest) {
+async function requireDispensary() {
+  const session = await getAuthSession();
+
+  if (!session) {
+    return { error: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+
+  const user = session.user;
+  if (user.role !== "DISPENSARY" || !user.dispensaryId) {
+    return { error: NextResponse.json({ error: "Forbidden" }, { status: 403 }) };
+  }
+
+  return { user };
+}
+
+function normalizeProductIds(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  return Array.from(new Set(value.map((id) => String(id || "").trim()).filter(Boolean))).slice(0, 200);
+}
+
+function isMissingFavoritesTableError(error: unknown) {
+  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2021") {
+    return String(error.meta?.table ?? error.message).includes("dispensary_favorite_products");
+  }
+
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes("dispensary_favorite_products") && message.toLowerCase().includes("does not exist");
+}
+
+export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
-    
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = (session as AuthSession).user;
-    
-    if (user.role !== 'DISPENSARY') {
+    const auth = await requireDispensary();
+    if ("error" in auth) return auth.error;
+    const dispensaryId = auth.user.dispensaryId;
+    if (!dispensaryId) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    const body = await req.json();
-    const { productIds } = body;
+    const favorites = await db.dispensaryFavoriteProduct.findMany({
+      where: { dispensaryId },
+      orderBy: { createdAt: "desc" },
+      select: { productId: true },
+    });
 
-    if (!Array.isArray(productIds) || productIds.length === 0) {
+    return NextResponse.json({ productIds: favorites.map((favorite) => favorite.productId) });
+  } catch (error) {
+    if (isMissingFavoritesTableError(error)) {
+      console.warn("Favorite products table is not available; falling back to browser-saved favorites.");
+      return NextResponse.json({ productIds: [] });
+    }
+
+    console.error("Error loading favorite products:", error);
+    return NextResponse.json({ error: "Failed to load favorite products" }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  const body = await req.json().catch(() => ({}));
+  const productIds = normalizeProductIds(body.productIds);
+
+  try {
+    const auth = await requireDispensary();
+    if ("error" in auth) return auth.error;
+    const dispensaryId = auth.user.dispensaryId;
+    if (!dispensaryId) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const existingProducts = await db.product.findMany({
+      where: {
+        id: { in: productIds },
+        isDeleted: false,
+      },
+      select: { id: true },
+    });
+    const existingProductIds = existingProducts.map((product) => product.id);
+
+    await db.$transaction([
+      db.dispensaryFavoriteProduct.deleteMany({
+        where: { dispensaryId },
+      }),
+      ...existingProductIds.map((productId) =>
+        db.dispensaryFavoriteProduct.create({
+          data: {
+            dispensaryId,
+            productId,
+          },
+        })
+      ),
+    ]);
+
+    return NextResponse.json({ productIds: existingProductIds });
+  } catch (error) {
+    if (isMissingFavoritesTableError(error)) {
+      console.warn("Favorite products table is not available; keeping favorites browser-local.");
+      return NextResponse.json({ productIds });
+    }
+
+    console.error("Error saving favorite products:", error);
+    return NextResponse.json({ error: "Failed to save favorite products" }, { status: 500 });
+  }
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const auth = await requireDispensary();
+    if ("error" in auth) return auth.error;
+
+    const body = await req.json();
+    const productIds = normalizeProductIds(body.productIds);
+
+    if (productIds.length === 0) {
       return NextResponse.json({ products: [] });
     }
 
@@ -29,6 +122,9 @@ export async function POST(req: NextRequest) {
     const products = await db.product.findMany({
       where: {
         id: { in: productIds },
+        isAvailable: true,
+        isDeleted: false,
+        inventoryQty: { gt: 0 },
       },
       include: {
         grower: {
@@ -72,6 +168,7 @@ export async function POST(req: NextRequest) {
         id: product.id,
         name: product.name,
         price: parseFloat(String(product.price)),
+        isPriceVisible: product.isPriceVisible,
         strain: strainName || null,
         strainId: product.strainId,
         strainType,

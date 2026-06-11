@@ -13,6 +13,7 @@ export default function SignInSection() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const showDemoCredentials = process.env.NODE_ENV === 'development';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -47,9 +48,9 @@ export default function SignInSection() {
           <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-lg">PF</span>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h1 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Sign in to your account
-          </h2>
+          </h1>
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
             <Link href="/auth/sign_up" className="font-medium text-green-600 hover:text-green-500">
@@ -127,9 +128,13 @@ export default function SignInSection() {
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-green-600 hover:text-green-500">
-                Forgot your password?
-              </a>
+              <button
+                type="button"
+                onClick={() => setError('Password reset is not self-serve yet. Contact support@phenofarm.com for account help.')}
+                className="font-medium text-green-600 hover:text-green-500"
+              >
+                Need password help?
+              </button>
             </div>
           </div>
 
@@ -154,6 +159,7 @@ export default function SignInSection() {
           </div>
         </form>
         
+        {showDemoCredentials && (
         <div className="mt-6">
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -170,6 +176,7 @@ export default function SignInSection() {
             <p className="text-xs text-gray-500 mt-2">Password: password123</p>
           </div>
         </div>
+        )}
       </div>
     </div>
   );

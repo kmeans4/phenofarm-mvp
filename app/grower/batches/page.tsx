@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ExtendedUser } from '@/types';
 import { Button } from '@/app/components/ui/Button';
+import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
+import { toast } from '@/app/hooks/useToast';
 
 interface Strain {
   id: string;
@@ -34,6 +36,7 @@ export default function BatchesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterStrain, setFilterStrain] = useState<string>('');
+  const [deleteCandidate, setDeleteCandidate] = useState<Batch | null>(null);
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -75,17 +78,19 @@ export default function BatchesPage() {
   };
 
   const deleteBatch = async (batchId: string) => {
-    if (!confirm('Are you sure you want to delete this batch?')) return;
     try {
       const response = await fetch('/api/batches/' + batchId, { method: 'DELETE' });
       if (response.ok) {
         setBatches(batches.filter(b => b.id !== batchId));
+        toast.success('Batch deleted');
       } else {
         const err = await response.json();
-        alert(err.error || 'Failed to delete batch');
+        toast.error(err.error || 'Failed to delete batch');
       }
     } catch {
-      console.error('Error deleting batch');
+      toast.error('Network error deleting batch');
+    } finally {
+      setDeleteCandidate(null);
     }
   };
 
@@ -192,6 +197,15 @@ export default function BatchesPage() {
                       + Product
                     </Link>
                   </Button>
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => setDeleteCandidate(batch)}
+                  >
+                    Delete
+                  </Button>
                 </div>
               </div>
             ))}
@@ -244,6 +258,14 @@ export default function BatchesPage() {
                               + Product
                             </Link>
                           </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => setDeleteCandidate(batch)}
+                          >
+                            Delete
+                          </Button>
                         </div>
                       </td>
                     </tr>
@@ -270,6 +292,20 @@ export default function BatchesPage() {
           </Button>
         </div>
       )}
+
+      <ConfirmDialog
+        open={Boolean(deleteCandidate)}
+        title="Delete batch?"
+        description={`Delete ${deleteCandidate?.batchNumber || 'this batch'}. Products attached to this batch should be reviewed before removing it.`}
+        confirmLabel="Delete batch"
+        intent="danger"
+        onCancel={() => setDeleteCandidate(null)}
+        onConfirm={() => {
+          if (deleteCandidate) {
+            deleteBatch(deleteCandidate.id);
+          }
+        }}
+      />
     </div>
   );
 }

@@ -49,19 +49,21 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json();
     const { productId, quantityAvailable } = body;
+    const quantity = Number(quantityAvailable);
 
-    if (!productId || !quantityAvailable) {
-      return NextResponse.json({ error: 'Product and quantity are required' }, { status: 400 });
+    // Zero is a valid stock level (sold out)
+    if (!productId || !Number.isInteger(quantity) || quantity < 0) {
+      return NextResponse.json({ error: 'Product and a non-negative quantity are required' }, { status: 400 });
     }
 
-    // Update the product inventory
+    // Set the product stock level
     const product = await db.product.update({
-      where: { 
+      where: {
         id: productId,
         growerId: user.growerId,
       },
       data: {
-        inventoryQty: parseInt(quantityAvailable) || 0,
+        inventoryQty: quantity,
       },
     });
 

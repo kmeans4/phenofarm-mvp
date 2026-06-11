@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { authOptions } from '@/app/api/auth/[...nextauth]/route';
+import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
@@ -157,6 +157,7 @@ export async function GET(request: NextRequest) {
           name: true,
           productType: true,
           price: true,
+          isPriceVisible: true,
           grower: {
             select: {
               id: true,
@@ -172,8 +173,8 @@ export async function GET(request: NextRequest) {
           id: p.id,
           type: 'product',
           title: p.name,
-          subtitle: `${p.productType} • $${p.price} • ${p.grower.businessName}`,
-          href: `/dispensary/catalog`,
+          subtitle: `${p.productType || 'Product'} • ${p.isPriceVisible ? `$${Number(p.price).toFixed(2)}` : 'Request pricing'} • ${p.grower.businessName}`,
+          href: `/dispensary/catalog?search=${encodeURIComponent(p.name)}&product=${encodeURIComponent(p.id)}`,
         });
       });
 

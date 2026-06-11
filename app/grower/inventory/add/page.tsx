@@ -6,24 +6,16 @@ import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 
-export default function AddToInventoryPage() {
+export default function UpdateStockPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  
-  const [formData, setFormData] = useState({
-    productId: '',
-    quantityAvailable: '',
-    reorderLevel: '10',
-    batchNumber: '',
-    harvestDate: '',
-    expirationDate: '',
-    location: '',
-    notes: '',
-  });
+
+  const [productId, setProductId] = useState('');
+  const [quantity, setQuantity] = useState('');
 
   useEffect(() => {
     if (status === 'loading') return;
@@ -48,6 +40,8 @@ export default function AddToInventoryPage() {
     }
   };
 
+  const selectedProduct = products.find((p) => p?.id === productId);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
@@ -57,14 +51,14 @@ export default function AddToInventoryPage() {
       const response = await fetch('/api/inventory', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ productId, quantityAvailable: quantity }),
       });
 
       if (response.ok) {
         router.push('/grower/inventory');
       } else {
         const data = await response.json();
-        setError(data.error || 'Failed to add inventory');
+        setError(data.error || 'Failed to update stock');
       }
     } catch {
       setError('An error occurred');
@@ -82,10 +76,12 @@ export default function AddToInventoryPage() {
   }
 
   return (
-    <div className="space-y-5 sm:space-y-6 p-4">
+    <div className="space-y-5 sm:space-y-6">
       <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add to Inventory</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-1">Add stock to existing product inventory</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Update Stock</h1>
+        <p className="text-sm sm:text-base text-gray-600 mt-1">
+          Set the current stock level for a product. Batch, harvest, and compliance details live on the product itself.
+        </p>
       </div>
 
       {error && (
@@ -95,104 +91,45 @@ export default function AddToInventoryPage() {
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
           <div className="p-4 border-b border-gray-200">
-            <h2 className="font-semibold text-gray-900">Inventory Details</h2>
+            <h2 className="font-semibold text-gray-900">Stock Details</h2>
           </div>
           <div className="p-4 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Select Product *</label>
+              <label htmlFor="stock-product" className="block text-sm font-medium text-gray-700 mb-1">Select Product *</label>
               <select
+                id="stock-product"
                 required
-                value={formData.productId}
-                onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                value={productId}
+                onChange={(e) => setProductId(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               >
                 <option value="">Choose a product...</option>
                 {products.map((p: Product) => (
                   <option key={p?.id} value={p?.id}>
-                    {p?.name} {p?.strain && `(${p.strain})`} - {p?.category}
+                    {p?.name}
                   </option>
                 ))}
               </select>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Quantity to Add *</label>
-                <input
-                  type="number"
-                  required
-                  min="1"
-                  value={formData.quantityAvailable}
-                  onChange={(e) => setFormData({ ...formData, quantityAvailable: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                  placeholder="Enter quantity"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Reorder Level *</label>
-                <input
-                  type="number"
-                  required
-                  min="0"
-                  value={formData.reorderLevel}
-                  onChange={(e) => setFormData({ ...formData, reorderLevel: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
+              {selectedProduct && (
+                <p className="mt-1 text-sm text-gray-500">
+                  Current stock: {selectedProduct.inventoryQty ?? 0} {selectedProduct.unit || 'units'}
+                </p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Batch Number</label>
+              <label htmlFor="stock-quantity" className="block text-sm font-medium text-gray-700 mb-1">New Stock Level *</label>
               <input
-                type="text"
-                value={formData.batchNumber}
-                onChange={(e) => setFormData({ ...formData, batchNumber: e.target.value })}
+                id="stock-quantity"
+                type="number"
+                required
+                min="0"
+                value={quantity}
+                onChange={(e) => setQuantity(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                placeholder="e.g., BATCH-2024-001"
+                placeholder="Enter the total quantity on hand"
               />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Harvest Date</label>
-                <input
-                  type="date"
-                  value={formData.harvestDate}
-                  onChange={(e) => setFormData({ ...formData, harvestDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
-                <input
-                  type="date"
-                  value={formData.expirationDate}
-                  onChange={(e) => setFormData({ ...formData, expirationDate: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Storage Location</label>
-              <input
-                type="text"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                placeholder="e.g., Warehouse A, Shelf 3"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                placeholder="Additional notes..."
-              />
+              <p className="mt-1 text-xs text-gray-500">This replaces the current stock level; it is not added to it.</p>
             </div>
           </div>
         </div>
@@ -201,10 +138,10 @@ export default function AddToInventoryPage() {
           <Link href="/grower/inventory" className="w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</Link>
           <button
             type="submit"
-            disabled={isSubmitting || !formData.productId}
+            disabled={isSubmitting || !productId || quantity === ''}
             className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
           >
-            {isSubmitting ? 'Adding...' : 'Add to Inventory'}
+            {isSubmitting ? 'Saving...' : 'Update Stock'}
           </button>
         </div>
       </form>

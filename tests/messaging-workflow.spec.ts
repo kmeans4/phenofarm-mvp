@@ -81,7 +81,7 @@ test.describe('Messaging Workflow', () => {
       page
         .getByTestId('pricing-request-message')
         .last()
-        .getByText('Requesting pricing for this product. Please send an offer.')
+        .getByText('Requesting pricing for this product. Please send quote terms.')
     ).toBeVisible();
   });
 
@@ -99,9 +99,9 @@ test.describe('Messaging Workflow', () => {
 
     const { context: growerContext, page: growerPage } = await openLatestConversationAs(browser, 'grower');
     await growerPage.getByTestId('toggle-offer-composer').click();
-    await growerPage.locator('input[placeholder="Offer unit price"]').fill('125');
+    await growerPage.locator('input[placeholder="Quote unit price"]').fill('125');
     await growerPage.locator('input[placeholder="Qty (optional)"]').first().fill('10');
-    await growerPage.locator('input[placeholder="Offer note (optional)"]').fill(offerNote);
+    await growerPage.locator('input[placeholder="Quote terms note (optional)"]').fill(offerNote);
     await growerPage.getByTestId('send-offer').click();
     await expect(growerPage.getByText(offerNote)).toBeVisible();
 
@@ -111,9 +111,9 @@ test.describe('Messaging Workflow', () => {
     const incomingOffer = dispensaryPage.getByTestId('offer-message').filter({ hasText: offerNote }).first();
     await expect(incomingOffer).toBeVisible();
     await incomingOffer.getByRole('button', { name: 'Counter' }).click();
-    await dispensaryPage.locator('input[placeholder="Unit price"]').fill('115');
-    await dispensaryPage.locator('input[placeholder="Qty (optional)"]').last().fill('8');
-    await dispensaryPage.locator('input[placeholder="Counter note (optional)"]').fill(counterNote);
+    await incomingOffer.locator('input[placeholder="Quote unit price"]').fill('115');
+    await incomingOffer.locator('input[placeholder="Qty (optional)"]').fill('8');
+    await incomingOffer.locator('input[placeholder="Counter terms note (optional)"]').fill(counterNote);
     await dispensaryPage.getByTestId('send-counter').click();
     await expect(dispensaryPage.getByText(counterNote)).toBeVisible();
 
@@ -124,7 +124,7 @@ test.describe('Messaging Workflow', () => {
     const counterOffer = growerPage.getByTestId('offer-message').filter({ hasText: counterNote }).first();
     await expect(counterOffer).toBeVisible();
     await counterOffer.getByRole('button', { name: 'Accept' }).click();
-    await expect(counterOffer.getByText('Accepted')).toBeVisible();
+    await expect(counterOffer.getByText('Accepted', { exact: true })).toBeVisible();
 
     await growerContext.close();
     await dispensaryContext.close();
@@ -149,7 +149,8 @@ test.describe('Messaging Workflow', () => {
     await openChat(growerPage);
     await selectLatestConversation(growerPage);
     await expect(growerPage.getByTestId('message-bubble').filter({ hasText: readCheckMessage }).last()).toBeVisible({ timeout: 15000 });
-    await expect(growerPage.getByTestId('conversation-unread-badge').first()).not.toBeVisible({ timeout: 10000 });
+    const readConversation = growerPage.getByTestId('conversation-item').filter({ hasText: readCheckMessage }).first();
+    await expect(readConversation.getByTestId('conversation-unread-badge')).not.toBeVisible({ timeout: 10000 });
     await closeChat(growerPage);
     await expect(growerPage.getByTestId('unread-badge')).not.toBeVisible({ timeout: 10000 });
 
