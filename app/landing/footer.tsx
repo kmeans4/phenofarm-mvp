@@ -5,11 +5,11 @@ import Link from 'next/link';
 const footerLinks = {
   Growers: [
     { label: 'Sell your products', href: '/auth/sign_up' },
-    { label: 'Grower dashboard', href: '/grower/dashboard' },
+    { label: 'Grower dashboard', href: '/auth/sign_up' },
     { label: 'Pricing', href: '#pricing' },
   ],
   Dispensaries: [
-    { label: 'Browse products', href: '/dispensary/catalog' },
+    { label: 'Browse products', href: '/auth/sign_in' },
     { label: 'Dispensary dashboard', href: '/dispensary/dashboard' },
     { label: 'Pricing', href: '#pricing' },
   ],

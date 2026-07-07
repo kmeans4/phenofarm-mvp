@@ -1,12 +1,15 @@
 import {
   AmbientBackground,
-  HeroSection,
-  ProblemSolution,
-  Features,
-  HowItWorks,
-  Testimonials,
+  Nav,
+  Hero,
+  Marquee,
+  MoneyFlow,
+  FeatureTour,
+  Personas,
+  SocialProof,
   Pricing,
-  CTASection,
+  Faq,
+  Cta,
   Footer,
 } from './landing';
 
@@ -14,13 +17,16 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen bg-[#070908]">
       <AmbientBackground />
-      <HeroSection />
-      <ProblemSolution />
-      <Features />
-      <HowItWorks />
-      <Testimonials />
+      <Nav />
+      <Hero />
+      <Marquee />
+      <MoneyFlow />
+      <FeatureTour />
+      <Personas />
+      <SocialProof />
       <Pricing />
-      <CTASection />
+      <Faq />
+      <Cta />
       <Footer />
     </main>
   );

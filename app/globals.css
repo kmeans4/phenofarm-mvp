@@ -55,6 +55,22 @@ input[type="number"] {
   to { stroke-dashoffset: 0; }
 }
 
+@keyframes pf-dialog-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pf-dialog-scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 /* Utility Classes */
 .animate-float {
   animation: float 4s ease-in-out infinite;
@@ -73,6 +89,16 @@ input[type="number"] {
   stroke-dasharray: 1000;
   stroke-dashoffset: 1000;
   animation: draw-line 2s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .pf-dialog-backdrop-in {
+    animation: pf-dialog-fade-in 150ms ease-out;
+  }
+
+  .pf-dialog-panel-in {
+    animation: pf-dialog-scale-in 150ms ease-out;
+  }
 }
 
 /* Glass Effect */
@@ -178,4 +204,49 @@ input, select, textarea {
 
 input::placeholder, textarea::placeholder {
   color: #6b7280 !important;
+}
+
+:where(a, button, input, select, textarea, summary, [role="button"], [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid #16a34a;
+  outline-offset: 2px;
+}
+
+.order-print-summary {
+  display: none;
+}
+
+@media print {
+  @page {
+    margin: 0.5in;
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  body * {
+    visibility: hidden !important;
+  }
+
+  .order-print-summary,
+  .order-print-summary * {
+    visibility: visible !important;
+  }
+
+  .order-print-summary {
+    display: block !important;
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    padding: 0;
+    color: #111827;
+    background: #fff;
+  }
+}
+
+/* Landing: infinite marquee track (duplicated content, shift by half) */
+@keyframes pf-marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }

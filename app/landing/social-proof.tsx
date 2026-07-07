@@ -1,6 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { SectionHeading } from './motion';
 
 const testimonials = [
   {
@@ -26,31 +27,13 @@ const testimonials = [
   },
 ];
 
-const principles = [
-  'Built for licensed operators',
-  'Verification before ordering',
-  'Recorded quote terms',
-  'Direct settlement, always',
-];
-
-export function Testimonials() {
+export function SocialProof() {
   return (
     <section className="relative border-t border-white/[0.06] py-28 md:py-36">
       <div className="mx-auto max-w-6xl px-6">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.4 }}
-          transition={{ duration: 0.6 }}
-          className="mx-auto mb-16 max-w-2xl text-center"
-        >
-          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">Operators</p>
-          <h2 className="text-balance text-3xl font-semibold tracking-tight text-white md:text-[2.6rem] md:leading-[1.15]">
-            Trusted where trust is the product
-          </h2>
-        </motion.div>
+        <SectionHeading eyebrow="Operators" title="Trusted where trust is the product" />
 
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="mt-16 grid gap-4 md:grid-cols-3">
           {testimonials.map((testimonial, index) => (
             <motion.figure
               key={testimonial.author}
@@ -58,7 +41,8 @@ export function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.3 }}
               transition={{ duration: 0.55, delay: index * 0.08 }}
-              className="flex flex-col justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-7"
+              whileHover={{ y: -4 }}
+              className="flex flex-col justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-emerald-500/20"
             >
               <blockquote className="text-pretty text-[15px] leading-relaxed text-gray-300">
                 &ldquo;{testimonial.quote}&rdquo;
@@ -76,21 +60,7 @@ export function Testimonials() {
           ))}
         </div>
 
-        {/* Principles strip */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-14 flex flex-wrap items-center justify-center gap-x-10 gap-y-3"
-        >
-          {principles.map((principle) => (
-            <span key={principle} className="flex items-center gap-2 text-xs uppercase tracking-[0.16em] text-gray-600">
-              <span className="h-1 w-1 rounded-full bg-emerald-500/70" aria-hidden />
-              {principle}
-            </span>
-          ))}
-        </motion.div>
+        <p className="mt-8 text-center text-[11px] text-gray-600">Illustrative customer scenarios.</p>
       </div>
     </section>
   );
