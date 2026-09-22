@@ -16,7 +16,6 @@ interface OrderItemUpdateInput {
   id?: string;
   productId?: string;
   quantity: number;
-  unitPrice: number | null;
 }
 
 interface InventoryIssue {
@@ -101,7 +100,6 @@ function normalizeItems(value: unknown): OrderItemUpdateInput[] | null {
       id,
       productId,
       quantity: parsePositiveQuantity(record.quantity),
-      unitPrice: record.unitPrice === undefined ? null : parseMoney(record.unitPrice, 'unitPrice'),
     };
   });
 }
@@ -250,8 +248,7 @@ export async function PUT(
           if (!item.id || !existingIds.has(item.id)) return true;
           const existingItem = existingItemsById.get(item.id);
           return !existingItem ||
-            existingItem.quantity !== item.quantity ||
-            (item.unitPrice !== null && Number(existingItem.unitPrice) !== item.unitPrice);
+            existingItem.quantity !== item.quantity;
         }) ||
         removedItems.length > 0
       : false;
@@ -296,7 +293,8 @@ export async function PUT(
         for (const item of requestedItems) {
           if (item.id) {
             const existingItem = existingItemsById.get(item.id)!;
-            const unitPrice = item.unitPrice ?? Number(existingItem.unitPrice);
+            // Existing agreed prices are immutable snapshots; quantity edits cannot reprice a line.
+            const unitPrice = Number(existingItem.unitPrice);
             const quantityDelta = item.quantity - existingItem.quantity;
 
             if (quantityDelta > 0) {
@@ -351,7 +349,7 @@ export async function PUT(
               }]);
             }
 
-            const unitPrice = item.unitPrice ?? Number(product.price);
+            const unitPrice = Number(product.price);
             const updateResult = await tx.product.updateMany({
               where: {
                 id: productId,

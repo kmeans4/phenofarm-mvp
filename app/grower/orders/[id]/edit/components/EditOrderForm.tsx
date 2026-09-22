@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
@@ -118,15 +118,6 @@ export default function EditOrderForm({ order }: { order: Order }) {
   const [removeCandidate, setRemoveCandidate] = useState<OrderItem | null>(null);
   const [showCancellationConfirm, setShowCancellationConfirm] = useState(false);
 
-  const initialData = useMemo(() => ({
-    status: order.status,
-    notes: order.notes || '',
-    shippingFee: order.shippingFee,
-    tax: order.tax,
-    items: order.items,
-  }), [order]);
-
-  const currentData = useMemo(() => ({ status, notes, shippingFee, tax, items }), [status, notes, shippingFee, tax, items]);
   const submitRef = useRef(false);
 
   const { isDirty, setIsDirty, resetDirtyState, confirmNavigation } = useUnsavedChanges({
@@ -135,9 +126,14 @@ export default function EditOrderForm({ order }: { order: Order }) {
   });
 
   useEffect(() => {
-    const hasChanges = JSON.stringify(currentData) !== JSON.stringify(initialData);
+    const hasChanges = status !== order.status || notes !== (order.notes || '')
+      || shippingFee !== order.shippingFee || tax !== order.tax
+      || items.length !== order.items.length || items.some((item, index) => {
+        const original = order.items[index];
+        return item.id !== original?.id || item.quantity !== original?.quantity;
+      });
     setIsDirty(hasChanges);
-  }, [currentData, initialData, setIsDirty]);
+  }, [status, notes, shippingFee, tax, items, order, setIsDirty]);
 
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
@@ -293,7 +289,6 @@ export default function EditOrderForm({ order }: { order: Order }) {
           items: items.map(item => ({
             id: item.id,
             quantity: item.quantity,
-            unitPrice: item.unitPrice,
           })),
         }),
       });

@@ -470,7 +470,7 @@ test('order edits reconcile inventory for quantity changes, added lines, removal
 
       const reduceResponse = await api.put(`/api/orders/${createdOrder.id}`, {
         data: {
-          items: [{ id: productAItem.id, quantity: 2, unitPrice: 10 }],
+          items: [{ id: productAItem.id, quantity: 2, unitPrice: 0 }],
           shippingFee: 1,
           tax: 0,
           notes: 'reduced quantity',
@@ -497,7 +497,7 @@ test('order edits reconcile inventory for quantity changes, added lines, removal
         data: {
           items: [
             { id: reducedProductAItem.id, quantity: 2, unitPrice: 10 },
-            { productId: productB.id, quantity: 3, unitPrice: 7 },
+            { productId: productB.id, quantity: 3, unitPrice: 0 },
           ],
           shippingFee: 1,
           tax: 0,
@@ -507,6 +507,7 @@ test('order edits reconcile inventory for quantity changes, added lines, removal
       const addedLineOrder = await addLineResponse.json();
       const productBItem = addedLineOrder.items.find((item: { productId: string }) => item.productId === productB.id);
       expect(productBItem).toBeTruthy();
+      expect(Number(productBItem.unitPrice)).toBe(7);
       await expect.poll(() => productInventory(productB.id)).toBe(2);
 
       const removeLineResponse = await api.put(`/api/orders/${createdOrder.id}`, {
