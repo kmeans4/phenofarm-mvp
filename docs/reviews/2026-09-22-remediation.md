@@ -14,7 +14,7 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 | PF-071 | Fixed: missing and foreign customer/order edit records use the shared not-found page while retaining authorization checks. Four missing/foreign browser paths passed without list redirects or customer details. |
 | PF-072 | Fixed: settings and first filtered catalog page load on the server through shared queries. Hydration skips duplicate GETs; filter URL updates use native history to avoid a duplicate server render. Five buyer API/browser checks passed: no duplicate reads, delayed search race, draft restoration, combined filters, and mobile filter state. TypeScript passed. |
 | PF-074 | Fixed: storefront first page and subsequent searches use the shared buyer query, scoped to one verified grower; 24 products per page with explicit more-results. Search, type filters, and sorting run across the entire shop. Two desktop/mobile browser checks passed, including 52 products, later-page search, other-shop exclusion, and legacy images. TypeScript passed. |
-| PF-088 | Pending |
+| PF-088 | Already fixed in the reviewed checkpoint: touch handlers are attached only to the drag handle, not the sheet body. Added and passed a mobile regression proving a downward body gesture leaves the dialog open and the same handle gesture closes it. No unnecessary UI change. |
 | PF-094 | Pending |
 | PF-112 | Pending |
 | PF-116 | Pending |

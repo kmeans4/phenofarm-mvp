@@ -359,6 +359,24 @@ test('mobile catalog filters stage changes and dialog Escape restores scrolling'
 });
 
 
+test('scroll gestures inside mobile filters do not dismiss the sheet; the handle still closes it', async ({ page, context }) => {
+  await authenticate(context);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/dispensary/catalog');
+  await page.getByRole('button', { name: /filters/i }).first().click();
+  const dialog = page.getByRole('dialog', { name: 'Catalog filters' });
+  const swipe = (selector: string) => dialog.locator(selector).evaluate(element => {
+    for (const [type, y] of [['touchstart', 100], ['touchmove', 180]] as const) {
+      const touch = new Touch({ identifier: 1, target: element, clientY: y, clientX: 100 });
+      element.dispatchEvent(new TouchEvent(type, { bubbles: true, touches: [touch] }));
+    }
+  });
+  await swipe('.overflow-y-auto');
+  await expect(dialog).toBeVisible();
+  await swipe(':scope > div:first-child');
+  await expect(dialog).toHaveCount(0);
+});
+
 test('trending sums eligible order quantities and suggestions exclude strains without listings', async ({ request }) => {
   const listed = await db.strain.create({ data: { growerId, name: `${prefix} Listed Strain` } });
   await db.strain.create({ data: { growerId, name: `${prefix} Unlisted Strain` } });
