@@ -19,7 +19,7 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 | PF-112 | Fixed: batch lists omit both testResults and terpenes. One SQL projection counts document objects without transferring their content. API regression passed with null/array/malformed document containers and multi-megabyte legacy values while detail data remains available. |
 | PF-116 | Fixed: quantity edits retain persisted agreed-price snapshots; newly added lines use the current database catalog price. Client unitPrice is ignored and no longer submitted by the editor. Dirty detection compares editable fields and line identity/quantity. Three checks passed, including zero-price tampering, inventory reconciliation/cancellation, accepted-quote consumption, and rendered server pages. |
 | PF-121 | Already fixed in the reviewed checkpoint: messages use after/afterId cursors and merge lightweight offer updates; both fetch functions stop when document.hidden. Five checks passed for incremental API reads, hidden-tab silence, closed drawer, late responses, draft isolation, and retrying failed/aborted read acknowledgements. Added explicit hidden-tab/cursor regression. |
-| N-001 | Pending |
+| N-001 | Fixed: verification enforcement is an explicit rollout flag with production mail/origin configuration checks. Pilot accounts and legacy version-zero sessions keep working until activation; public signup stays closed. Revocation remains immediate, and no accounts are silently verified. Sixteen recovery/security tests plus two rollout configuration/legacy-session tests passed against the isolated database. TypeScript passed. Production activation remains held pending real email delivery. |
 | N-002 | Pending |
 | N-003 | Pending |
 | N-004 | Pending |

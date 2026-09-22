@@ -6,6 +6,7 @@ import { UserRole } from '@prisma/client';
 import type { NextAuthOptions } from 'next-auth';
 import { consumeAuthLimit, requestIp } from '@/lib/auth-rate-limit';
 import { logApiError } from '@/lib/api-response';
+import { emailVerificationRequired } from '@/lib/auth-rollout.cjs';
 
 if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not configured');
@@ -45,7 +46,7 @@ export const authOptions: NextAuthOptions = {
           if (!user?.passwordHash || !isValidPassword) {
             return null;
           }
-          if (!user.emailVerifiedAt) throw new Error('EmailNotVerified');
+          if (emailVerificationRequired() && !user.emailVerifiedAt) throw new Error('EmailNotVerified');
 
           return {
             id: user.id,
@@ -81,17 +82,21 @@ export const authOptions: NextAuthOptions = {
         token.dispensaryId = user.dispensaryId;
         token.sessionVersion = user.sessionVersion;
       }
-      // Every session read checks revocation and mailbox proof. A signed JWT alone is not authorization.
+      // Always check revocation. Mailbox proof activates only with the explicit rollout flag.
       {
         const current = token.id ? await db.user.findUnique({
           where: { id: token.id },
           select: { id: true, email: true, role: true, emailVerifiedAt: true, sessionVersion: true, grower: { select: { id: true } }, dispensary: { select: { id: true } } },
         }) : null;
         // Throwing makes NextAuth clear the cookie and return an unauthenticated session.
-        // Tokens issued before this rollout have no version and are deliberately rejected.
-        if (!current?.emailVerifiedAt || !Number.isInteger(token.sessionVersion) || token.sessionVersion !== current.sessionVersion) {
+        // During the invitation-only rollout, pre-version tokens represent version
+        // zero. A password reset still revokes them immediately by incrementing it.
+        const requireVerification = emailVerificationRequired();
+        const version = token.sessionVersion === undefined && !requireVerification ? 0 : token.sessionVersion;
+        if (!current || (requireVerification && !current.emailVerifiedAt) || !Number.isInteger(version) || version !== current.sessionVersion) {
           throw new Error('Session is no longer valid');
         }
+        token.sessionVersion = current.sessionVersion;
         token.id = current?.id || '';
         if (current) {
           token.email = current.email;

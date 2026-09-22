@@ -4,6 +4,7 @@ import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db';
 import { consumeAuthLimit, requestIp } from '@/lib/auth-rate-limit';
 import { accountMailConfigured } from '@/lib/account-mail';
+import { emailVerificationRequired } from '@/lib/auth-rollout.cjs';
 import { accountBody, accountJson } from '@/lib/account-security-api';
 import { ACCOUNT_REQUEST_MESSAGE, passwordRequirement, normalizeAccountEmail, requestAccountLink, validAccountEmail, validNewPassword } from '@/lib/account-security';
 
@@ -11,6 +12,8 @@ export const runtime = 'nodejs';
 
 export async function POST(request: NextRequest) {
   try {
+    // Keep public account creation closed while existing pilot accounts migrate.
+    if (!emailVerificationRequired()) return accountJson({ error: 'Sign-up is temporarily unavailable. Please try again later.' }, 503);
     const body = await accountBody(request);
     if (!body) return accountJson({ error: 'Invalid sign-up request.' }, 400);
     const email = normalizeAccountEmail(body.email);
