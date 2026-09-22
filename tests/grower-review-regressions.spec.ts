@@ -115,6 +115,27 @@ test('product lists default to bounded pages and inventory and pickers reach lat
   await noOverflow(page);
 });
 
+test('product pickers retry the failed page without dropping earlier options or skipping results', async ({ page }) => {
+  await authenticate(page);
+  const requestedPages: string[] = [];
+  let fail = true;
+  await page.route('**/api/products?*', async route => {
+    const current = new URL(route.request().url()).searchParams.get('page') || '1';
+    requestedPages.push(current);
+    if (current === '2' && fail) { fail = false; await route.fulfill({ status: 503, json: { error: 'Temporary test failure' } }); }
+    else await route.continue();
+  });
+  await page.goto('/grower/inventory/add');
+  await page.getByPlaceholder('Search products').focus();
+  await expect(page.getByRole('button', { name: /Review Product 00/ })).toBeVisible();
+  await page.getByRole('button', { name: 'More products', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Retry products', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: /Review Product 00/ })).toBeVisible();
+  await page.getByRole('button', { name: 'Retry products', exact: true }).click();
+  await expect(page.getByRole('button', { name: /Review Product 40/ })).toBeVisible();
+  expect(requestedPages.filter(value => value !== '1')).toEqual(['2', '2']);
+});
+
 test('marketplace preview pages published in-stock listings and keeps global totals', async ({ page }) => {
   await authenticate(page);
   await db.product.updateMany({ where: { growerId }, data: { isAvailable: true } });

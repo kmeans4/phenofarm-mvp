@@ -37,3 +37,9 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 ## Verification environment
 
 Local app: `http://localhost:3150`; isolated local database: `phenofarm_auth_20260918`; authenticated local mail sink. Real mail delivery, production activation, and Stripe eligibility remain separate launch gates. The branch must remain unmerged until the release gates are satisfied.
+
+## Final regression pass
+
+All 81 tests across the seven self-contained auth, buyer, grower, order, administration, marketing, and notification suites passed against the isolated local clone. The two pilot/legacy-session rollout tests also passed separately. Final aggregate lint found two cleanup issues: product-picker pending state is now derived from the request identity, and Next configuration uses its supported ESM format. Four affected picker/order checks then passed, including a new failed-page retry check that also caught and fixed an initial debounce timer resetting page selection. No archived screenshot evidence was replaced.
+
+The independent follow-up review verified catalog price privacy/potency sorting, authorization rollout, and customer/daily-total aggregation. It found two order-edit concurrency/zero-stock gaps; both were fixed and exercised with a real held database lock.

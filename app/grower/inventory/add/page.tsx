@@ -127,7 +127,7 @@ export default function UpdateStockPage() {
                 ) : (
                   <div className="px-3 py-4 text-sm text-gray-500">{loading ? 'Loading products…' : loadError || 'No products match that search.'}</div>
                 )}
-              {hasMore && <button type="button" disabled={loading} onClick={loadMore} className="w-full px-3 py-2 text-sm text-green-700">More products</button>}
+              {hasMore && <button type="button" disabled={loading} onClick={loadMore} className="w-full px-3 py-2 text-sm text-green-700">{loadError ? 'Retry products' : 'More products'}</button>}
               </div>}
 
               {selectedProduct && (

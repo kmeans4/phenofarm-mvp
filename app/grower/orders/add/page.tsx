@@ -443,7 +443,7 @@ export default function AddOrderPage() {
             <label className="sr-only" htmlFor="order-product-search">Search products</label>
             <input id="order-product-search" type="search" value={productSearch} onChange={event => setProductSearch(event.target.value)} placeholder="Search products" className="mb-3 w-full rounded-lg border px-3 py-2 text-base" />
             {productError && <p role="alert" className="text-sm text-red-600">{productError}</p>}
-            {hasMore && <button type="button" disabled={loadingProducts} onClick={loadMore} className="mb-3 min-h-10 text-sm text-green-700">More products</button>}
+            {hasMore && <button type="button" disabled={loadingProducts} onClick={loadMore} className="mb-3 min-h-10 text-sm text-green-700">{productError ? 'Retry products' : 'More products'}</button>}
             {loadingProducts && <p className="text-sm text-gray-500">Loading products…</p>}
             {products.length === 0 ? (
               <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
