@@ -23,4 +23,7 @@ jobs:
         run: npm ci
 
       - name: Verify
+        env:
+          # Build-only placeholder; verification must not connect to live data.
+          DATABASE_URL: postgresql://ci:ci@127.0.0.1:1/phenofarm_ci_build
         run: npm run verify
