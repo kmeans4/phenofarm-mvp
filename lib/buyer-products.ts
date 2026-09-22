@@ -34,7 +34,7 @@ export function serializeBuyerProduct(product: Prisma.ProductGetPayload<{ select
     cbd: number(product.batch?.cbd ?? product.cbdMax ?? product.cbdMin),
     images, inventoryQty: product.inventoryQty,
     isAvailable: product.isAvailable && product.inventoryQty > 0,
-    createdAt: product.createdAt,
+    createdAt: product.createdAt.toISOString(),
     grower: { id: product.grower.id, businessName: product.grower.businessName,
       location: [product.grower.city, product.grower.state].filter(Boolean).join(', ') || null,
       isVerified: product.grower.isVerified },

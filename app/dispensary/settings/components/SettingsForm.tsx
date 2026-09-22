@@ -33,7 +33,7 @@ interface SettingsData {
 }
 
 interface SettingsFormProps {
-  defaultValues: SettingsData;
+  initialSettings: SettingsData;
 }
 
 interface FieldErrors {
@@ -164,19 +164,18 @@ function editableDraft(value: unknown): SettingsDraft {
   return Object.fromEntries(editableDraftFields.filter(key => typeof record[key] === 'string').map(key => [key, String(record[key]).slice(0, key === 'description' ? 500 : 254)]));
 }
 
-export function SettingsForm({ defaultValues }: SettingsFormProps) {
+export function SettingsForm({ initialSettings }: SettingsFormProps) {
   const savingRef = useRef(false);
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => { if (savedTimer.current) clearTimeout(savedTimer.current); }, []);
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  const [formData, setFormData] = useState<SettingsData>(defaultValues);
-  const [initialData, setInitialData] = useState<SettingsData>(defaultValues);
+  const [formData, setFormData] = useState<SettingsData>(initialSettings);
+  const [initialData, setInitialData] = useState<SettingsData>(initialSettings);
   const { update, showToast } = useToast();
 
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
@@ -187,17 +186,16 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
   const settingsDraft = useLocalDraft<SettingsDraft>({
     key: 'phenofarm:draft:dispensary-settings',
     value: editableDraft(formData),
-    enabled: !loading,
+    enabled: true,
     onRestore: (value) => setFormData((prev) => ({ ...prev, ...editableDraft(value) })),
     shouldSave: (value) => JSON.stringify(value) !== JSON.stringify(editableDraft(initialData)),
   });
   const clearSettingsDraft = settingsDraft.clearDraft;
 
   useEffect(() => {
-    if (loading) return;
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
-  }, [formData, initialData, loading, setIsDirty]);
+  }, [formData, initialData, setIsDirty]);
 
   const validateForm = useCallback((): boolean => {
     const errors: FieldErrors = {
@@ -244,58 +242,6 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     setFieldErrors(prev => ({ ...prev, [field]: fieldError }));
     return !fieldError;
   }, []);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let isActive = true;
-
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/dispensary/settings', { signal: controller.signal });
-        if (!isActive) return;
-
-        if (res.ok) {
-          const data = await res.json();
-          const loadedData: SettingsData = {
-            businessName: data.businessName || '',
-            licenseNumber: data.licenseNumber || '',
-            licenseExpiry: data.licenseExpiry ? new Date(data.licenseExpiry).toISOString().split('T')[0] : '',
-            licenseState: data.licenseState || 'VT',
-            contactName: data.contactName || '',
-            email: data.email || '',
-            phone: data.phone || '',
-            address: data.address || '',
-            city: data.city || '',
-            state: data.state || 'VT',
-            zip: data.zip || '',
-            website: data.website || '',
-            description: data.description || '',
-            logo: data.logo || '',
-            licenseStatus: data.licenseStatus || 'pending_review',
-            licenseReviewNotes: data.licenseReviewNotes || '',
-          };
-          setFormData(loadedData);
-          setInitialData(loadedData);
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') return;
-        if (isActive) {
-          showToast('error', 'Failed to load settings');
-        }
-      } finally {
-        if (isActive) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchSettings();
-
-    return () => {
-      isActive = false;
-      controller.abort();
-    };
-  }, [showToast]);
 
   const handleAddressSelect = (address: {
     fullAddress: string;
@@ -419,20 +365,12 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-      event.preventDefault(); if (!saving && !loading) void handleSave();
+      event.preventDefault(); if (!saving) void handleSave();
     }
     if (event.key === 'Escape' && event.target === event.currentTarget && isDirty && !saving && window.confirm('Discard your unsaved settings changes?')) {
       setFormData(initialData); setTouched({}); setFieldErrors({}); setError(''); setIsDirty(false); clearSettingsDraft();
     }
   };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-      </div>
-    );
-  }
 
   const licenseStatusLabel = getLicenseStatusLabel(formData.licenseStatus);
   const licenseStatusTone = getLicenseStatusTone(formData.licenseStatus);

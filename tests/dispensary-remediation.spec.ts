@@ -183,11 +183,12 @@ test('catalog latest search wins; mounting does not write collections', async ({
   let initialStarted = false;
   await page.route('**/api/dispensary/catalog?*', async route => {
     const search = new URL(route.request().url()).searchParams.get('search') || '';
-    if (!search) initialStarted = true;
-    await new Promise(resolve => setTimeout(resolve, search ? 30 : 700));
-    await route.fulfill({ json: { products: [{ id: search ? 'latest' : 'stale', name: search || 'Old result', price: 10, isPriceVisible: true, inventoryQty: 10, isAvailable: true, images: [], unit: 'unit', grower: { id: growerId, businessName: prefix } }], total: 1, hasMore: false, productTypeCounts: {} } }).catch(() => {});
+    if (search === 'old') initialStarted = true;
+    await new Promise(resolve => setTimeout(resolve, search === 'old' ? 700 : 30));
+    await route.fulfill({ json: { products: [{ id: search === 'old' ? 'stale' : 'latest', name: search === 'old' ? 'Old result' : search, price: 10, isPriceVisible: true, inventoryQty: 10, isAvailable: true, images: [], unit: 'unit', grower: { id: growerId, businessName: prefix } }], total: 1, hasMore: false, productTypeCounts: {} } }).catch(() => {});
   });
   await page.goto('/dispensary/catalog');
+  await page.getByPlaceholder('Search products or growers').fill('old');
   await expect.poll(() => initialStarted).toBe(true);
   await page.getByPlaceholder('Search products or growers').fill('og kush');
   await expect(page.getByRole('heading', { name: 'og kush', exact: true })).toBeVisible();
@@ -195,6 +196,20 @@ test('catalog latest search wins; mounting does not write collections', async ({
   await expect(page.getByRole('heading', { name: 'Old result', exact: true })).toHaveCount(0);
   expect(writes).toEqual([]);
   await expect(page).toHaveURL(/search=og/);
+});
+
+test('settings and first catalog page arrive from the server without duplicate browser fetches', async ({ page, context }) => {
+  await authenticate(context);
+  const duplicateReads: string[] = [];
+  page.on('request', request => {
+    if (request.method() === 'GET' && ['/api/dispensary/settings', '/api/dispensary/catalog'].includes(new URL(request.url()).pathname)) duplicateReads.push(request.url());
+  });
+  await page.goto('/dispensary/settings');
+  await expect(page.getByLabel('Business Name', { exact: false })).toHaveValue(`${prefix} Buyer`);
+  await page.goto(`/dispensary/catalog?search=${prefix}`);
+  await expect(page.getByRole('heading', { name: `${prefix} available`, exact: true })).toBeVisible();
+  await page.getByPlaceholder('Search products or growers').focus();
+  expect(duplicateReads).toEqual([]);
 });
 
 test('slow inventory response cannot erase saved draft on navigation', async ({ page, context }) => {

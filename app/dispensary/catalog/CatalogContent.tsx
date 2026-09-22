@@ -1,10 +1,11 @@
 'use client';
 
+import type { BuyerCatalogPage } from '@/lib/buyer-catalog';
 import { getThcBadgeColor, getCbdBadgeColor, getStrainTypeColor } from '@/lib/product-badges';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from "next/link";
 import { createPortal } from 'react-dom';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, BarChart3, Leaf, Dna, MessageSquare, ZoomIn, BadgeCheck } from "lucide-react";
 import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
@@ -240,9 +241,8 @@ function normalizeCatalogProduct(raw: unknown): Product | null {
   };
 }
 
-export default function CatalogContent() {
+export default function CatalogContent({ initialData }: { initialData?: BuyerCatalogPage }) {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const pathname = usePathname();
   const initialSearchQuery = searchParams.get('search') || '';
   const initialSortBy = SORT_OPTIONS.some((option) => option.value === searchParams.get('sortBy'))
@@ -251,7 +251,7 @@ export default function CatalogContent() {
   const highlightedProductId = searchParams.get('product') || '';
 
   // State
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<Product[]>(() => initialData?.products.map(normalizeCatalogProduct).filter((product): product is Product => product !== null) || []);
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
@@ -319,12 +319,12 @@ export default function CatalogContent() {
 
   // Infinite scroll state
   const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [hasMore, setHasMore] = useState(initialData?.hasMore ?? true);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [isInitialLoading, setIsInitialLoading] = useState(!initialData);
   const [fetchError, setFetchError] = useState<string | null>(null);
-  const [totalProducts, setTotalProducts] = useState(0);
-  const [productTypeCounts, setProductTypeCounts] = useState<ProductTypeCounts>({});
+  const [totalProducts, setTotalProducts] = useState(initialData?.total ?? 0);
+  const [productTypeCounts, setProductTypeCounts] = useState<ProductTypeCounts>(initialData?.productTypeCounts || {});
 
   // Refs
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -394,8 +394,8 @@ export default function CatalogContent() {
       recentlyAdded: filters.recentlyAdded ? 'true' : '', trending: filters.trending ? 'true' : '', favorites: showFavoritesOnly ? 'true' : '' };
     for (const [key, value] of Object.entries(values)) { if (value) params.set(key, value); else params.delete(key); }
     const query = params.toString();
-    if (query !== searchParams.toString()) { writtenUrl.current = query; router.replace(`${pathname}${query ? `?${query}` : ''}`, { scroll: false }); }
-  }, [debouncedSearch, searchQuery, sortBy, filters, showFavoritesOnly, pathname, router, searchParams]);
+    if (query !== searchParams.toString()) { writtenUrl.current = query; window.history.replaceState(null, '', `${pathname}${query ? `?${query}` : ''}`); }
+  }, [debouncedSearch, searchQuery, sortBy, filters, showFavoritesOnly, pathname, searchParams]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -654,6 +654,8 @@ export default function CatalogContent() {
   };
 
   const favoriteIdsKey = showFavoritesOnly ? favorites.join(',') : '';
+  const requestKey = JSON.stringify([debouncedSearch, filters, sortBy, showFavoritesOnly, favoriteIdsKey]);
+  const hydratedRequestKey = useRef<string | null>(initialData ? requestKey : null);
 
   // Fetch products from API
   const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
@@ -721,9 +723,11 @@ export default function CatalogContent() {
   }, []);
 
   useEffect(() => {
+    if (hydratedRequestKey.current === requestKey) return;
+    hydratedRequestKey.current = null;
     void fetchProducts(1, false);
     return () => fetchControllerRef.current?.abort();
-  }, [fetchProducts]);
+  }, [fetchProducts, requestKey]);
 
   // Intersection Observer for infinite scroll
   useEffect(() => {
