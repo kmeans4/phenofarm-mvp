@@ -815,6 +815,23 @@ test('grower attention summary includes new requests, unread buyer messages, can
       data: { lastMessageAt: message.createdAt },
     });
 
+    await db.conversationMessage.createMany({ data: [
+      { conversationId: conversation.id, senderUserId: account.dispensaryUser.id, messageType: 'TEXT', body: 'Already read', createdAt: new Date(beforeUnread.getTime() - 1000) },
+      { conversationId: conversation.id, senderUserId: account.growerUser.id, messageType: 'TEXT', body: 'Own reply' },
+    ] });
+    const other = await createGrowerAndDispensary(`${prefix}-other`);
+    const secondConversation = await db.conversation.create({ data: {
+      growerId: account.grower.id, dispensaryId: other.dispensary.id, createdByUserId: other.dispensaryUser.id,
+      messages: { create: [
+        { senderUserId: other.dispensaryUser.id, body: 'First unread', messageType: 'TEXT' },
+        { senderUserId: other.dispensaryUser.id, body: 'Second unread', messageType: 'TEXT' },
+      ] },
+    } });
+    await db.conversation.create({ data: {
+      growerId: other.grower.id, dispensaryId: account.dispensary.id, createdByUserId: account.dispensaryUser.id,
+      messages: { create: { senderUserId: account.dispensaryUser.id, body: 'Another tenant', messageType: 'TEXT' } },
+    } });
+
     const api = await playwrightRequest.newContext({
       baseURL,
       extraHTTPHeaders: { cookie: await sessionCookie(account.growerUser) },
@@ -826,7 +843,7 @@ test('grower attention summary includes new requests, unread buyer messages, can
       const summary = await response.json();
 
       expect(summary.counts.pendingRequests).toBeGreaterThanOrEqual(1);
-      expect(summary.counts.unreadBuyerMessages).toBeGreaterThanOrEqual(1);
+      expect(summary.counts.unreadBuyerMessages).toBe(3);
       expect(summary.counts.recentCancellations).toBeGreaterThanOrEqual(1);
       expect(summary.counts.recentStatusChanges).toBeGreaterThanOrEqual(1);
       expect(summary.items).toEqual(expect.arrayContaining([
@@ -835,6 +852,9 @@ test('grower attention summary includes new requests, unread buyer messages, can
         expect.objectContaining({ type: 'cancellation' }),
         expect.objectContaining({ type: 'status' }),
       ]));
+      await db.conversation.updateMany({ where: { id: { in: [conversation.id, secondConversation.id] } }, data: { growerLastReadAt: new Date(Date.now() + 1000) } });
+      const readSummary = await (await api.get('/api/grower/attention')).json();
+      expect(readSummary.counts.unreadBuyerMessages).toBe(0);
     } finally {
       await api.dispose();
     }

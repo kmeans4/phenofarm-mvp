@@ -1,4 +1,6 @@
 import { db } from '@/lib/db';
+import { cache } from 'react';
+import { unreadMessageCounts } from '@/lib/message-counts';
 import { getOrderStatusLabel } from '@/lib/order-workflow';
 
 export type GrowerAttentionType = 'request' | 'message' | 'cancellation' | 'status';
@@ -41,12 +43,16 @@ function toIso(value: Date) {
   return value.toISOString();
 }
 
-export async function getGrowerAttentionSummary({
-  growerId,
-  userId,
-  now = new Date(),
-}: GrowerAttentionInput): Promise<GrowerAttentionSummary> {
-  const recentSince = new Date(now);
+export function getGrowerAttentionSummary({ growerId, userId, now }: GrowerAttentionInput) {
+  // Primitive keys let layout and page reuse one read within the RSC request.
+  // React cache is request-scoped; no user's authorization is cached across requests.
+  return readGrowerAttentionSummary(growerId, userId, now?.getTime());
+}
+
+const readGrowerAttentionSummary = cache(async (
+  growerId: string, userId: string, now?: number,
+): Promise<GrowerAttentionSummary> => {
+  const recentSince = new Date(now ?? Date.now());
   recentSince.setDate(recentSince.getDate() - RECENT_CHANGE_DAYS);
 
   const [
@@ -125,21 +131,10 @@ export async function getGrowerAttentionSummary({
     }),
   ]);
 
-  const unreadEntries = await Promise.all(
-    conversations.map(async (conversation) => {
-      const unreadCount = await db.conversationMessage.count({
-        where: {
-          conversationId: conversation.id,
-          senderUserId: { not: userId },
-          ...(conversation.growerLastReadAt ? { createdAt: { gt: conversation.growerLastReadAt } } : {}),
-        },
-      });
-
-      return [conversation.id, unreadCount] as const;
-    }),
-  );
-  const unreadMap = new Map(unreadEntries);
-  const unreadBuyerMessages = unreadEntries.reduce((sum, [, count]) => sum + count, 0);
+  const unreadMap = await unreadMessageCounts(userId, conversations.map(conversation => ({
+    id: conversation.id, lastReadAt: conversation.growerLastReadAt,
+  })));
+  const unreadBuyerMessages = [...unreadMap.values()].reduce((sum, count) => sum + count, 0);
 
   const messageItems = conversations
     .reduce<GrowerAttentionItem[]>((items, conversation) => {
@@ -217,4 +212,4 @@ export async function getGrowerAttentionSummary({
     },
     items,
   };
-}
+});
