@@ -812,6 +812,37 @@ test('direct orders use catalog prices, audit explicit overrides, and atomically
   } finally { await cleanupByPrefix(prefix); }
 });
 
+test('buyer order unread markers respect each conversation read time and sender', async ({ page, context }) => {
+  const prefix = `pf-buyer-unread-${Date.now()}`;
+  try {
+    const account = await createGrowerAndDispensary(prefix);
+    const other = await createGrowerAndDispensary(`${prefix}-other`);
+    const now = new Date(); const before = new Date(now.getTime() - 60000);
+    await db.order.createMany({ data: [account, other].map((source, index) => ({ growerId: source.grower.id, dispensaryId: account.dispensary.id, orderId: `${prefix}-${index}`, totalAmount: 10, subtotal: 10 })) });
+    const unread = await db.conversation.create({ data: {
+      growerId: account.grower.id, dispensaryId: account.dispensary.id, createdByUserId: account.growerUser.id, dispensaryLastReadAt: before,
+      messages: { create: [{ senderUserId: account.growerUser.id, body: 'Unread', messageType: 'TEXT', createdAt: now }, { senderUserId: account.dispensaryUser.id, body: 'Own message', messageType: 'TEXT', createdAt: now }] },
+    } });
+    await db.conversation.create({ data: {
+      growerId: other.grower.id, dispensaryId: account.dispensary.id, createdByUserId: other.growerUser.id, dispensaryLastReadAt: now,
+      messages: { create: [{ senderUserId: other.growerUser.id, body: 'Already read', messageType: 'TEXT', createdAt: before }, { senderUserId: account.dispensaryUser.id, body: 'Own newer message', messageType: 'TEXT', createdAt: new Date(now.getTime() + 1000) }] },
+    } });
+    await db.conversation.create({ data: {
+      growerId: account.grower.id, dispensaryId: other.dispensary.id, createdByUserId: account.growerUser.id,
+      messages: { create: { senderUserId: account.growerUser.id, body: 'Another buyer', messageType: 'TEXT' } },
+    } });
+    await context.addCookies([{ name: 'next-auth.session-token', value: await sessionToken(account.dispensaryUser), url: baseURL }]);
+    for (const width of [1440, 390]) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto('/dispensary/orders');
+      await expect(page.getByLabel('Unread grower message').locator('visible=true')).toHaveCount(1);
+    }
+    await db.conversation.update({ where: { id: unread.id }, data: { dispensaryLastReadAt: new Date(Date.now() + 1000) } });
+    await page.reload();
+    await expect(page.getByLabel('Unread grower message')).toHaveCount(0);
+  } finally { await cleanupByPrefix(prefix); }
+});
+
 test('grower attention summary includes new requests, unread buyer messages, cancellations, and status changes', async () => {
   const prefix = `pf-attn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 

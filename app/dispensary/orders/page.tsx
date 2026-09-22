@@ -4,6 +4,7 @@ import { getOrderStatusLabel } from '@/lib/order-workflow';
 import { parsePage } from '@/lib/buyer-products';
 import { Prisma, OrderStatus } from '@prisma/client';
 import { db } from '@/lib/db';
+import { unreadMessageCounts } from '@/lib/message-counts';
 import Link from 'next/link';
 import { Card, CardContent } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
@@ -52,26 +53,12 @@ export default async function DispensaryOrdersPage({ searchParams }: { searchPar
         },
       })
     : [];
-  const unreadByConversation = await Promise.all(
-    conversations.map(async (conversation) => {
-      const unreadCount = await db.conversationMessage.count({
-        where: {
-          conversationId: conversation.id,
-          senderUserId: { not: user.id },
-          ...(conversation.dispensaryLastReadAt
-            ? { createdAt: { gt: conversation.dispensaryLastReadAt } }
-            : {}),
-        },
-      });
-
-      return { growerId: conversation.growerId, unreadCount };
-    })
-  );
-  const unreadGrowerIds = new Set(
-    unreadByConversation
-      .filter((entry) => entry.unreadCount > 0)
-      .map((entry) => entry.growerId)
-  );
+  const unreadByConversation = await unreadMessageCounts(user.id, conversations.map(conversation => ({
+    id: conversation.id, lastReadAt: conversation.dispensaryLastReadAt,
+  })));
+  const unreadGrowerIds = new Set(conversations
+    .filter(conversation => (unreadByConversation.get(conversation.id) || 0) > 0)
+    .map(conversation => conversation.growerId));
 
   const serializedOrders = orders.map(order => ({ id: order.id, orderId: order.orderId, status: order.status,
     createdAt: order.createdAt.toISOString(), totalAmount: Number(order.totalAmount), grower: order.grower,
