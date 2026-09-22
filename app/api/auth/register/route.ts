@@ -32,31 +32,31 @@ export async function POST(request: NextRequest) {
       consumeAuthLimit('register-ip', requestIp(Object.fromEntries(request.headers)), 10, 3600),
       consumeAuthLimit('register-email', email, 4, 3600),
     ]);
-    if (!ipAllowed) return accountJson({ error: 'Too many sign-up attempts. Try again in an hour.' }, 429);
+    if (!ipAllowed || !emailAllowed) return accountJson({ error: 'Too many sign-up attempts. Try again in an hour.' }, 429);
     if (!accountMailConfigured()) return accountJson({ error: 'Email delivery is temporarily unavailable. Please try again later.' }, 503);
-    // Account lookup/creation happens after the identical response, so neither timing nor body discloses an existing address.
-    if (emailAllowed) after(async () => {
-      try {
-        const passwordHash = await bcrypt.hash(password, 10);
-        try {
-          await db.$transaction(async tx => {
-            const user = await tx.user.create({ data: { email, name, passwordHash, role: businessType === 'grower' ? 'GROWER' : 'DISPENSARY' } });
-            if (businessType === 'grower') {
-              const profile = await tx.grower.create({ data: { userId: user.id, businessName: resolvedBusinessName, contactName: name } });
-              await tx.user.update({ where: { id: user.id }, data: { growerId: profile.id } });
-            } else {
-              const profile = await tx.dispensary.create({ data: { userId: user.id, businessName: resolvedBusinessName, contactName: name } });
-              await tx.user.update({ where: { id: user.id }, data: { dispensaryId: profile.id } });
-            }
-          });
-        } catch (error) {
-          if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== 'P2002') throw error;
-          // An existing account is never overwritten. Unverified owners can resend or recover their password.
+    // Complete durable account/profile creation before acknowledging success.
+    // Hash on both paths and keep the same response for existing addresses.
+    const passwordHash = await bcrypt.hash(password, 10);
+    try {
+      await db.$transaction(async tx => {
+        const user = await tx.user.create({ data: { email, name, passwordHash, role: businessType === 'grower' ? 'GROWER' : 'DISPENSARY' } });
+        if (businessType === 'grower') {
+          const profile = await tx.grower.create({ data: { userId: user.id, businessName: resolvedBusinessName, contactName: name } });
+          await tx.user.update({ where: { id: user.id }, data: { growerId: profile.id } });
+        } else {
+          const profile = await tx.dispensary.create({ data: { userId: user.id, businessName: resolvedBusinessName, contactName: name } });
+          await tx.user.update({ where: { id: user.id }, data: { dispensaryId: profile.id } });
         }
-        await requestAccountLink(email, 'VERIFY_EMAIL');
-      } catch {
-        console.error('[account-registration]', { code: 'REGISTRATION_FAILED' });
-      }
+      });
+    } catch (error) {
+      if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== 'P2002'
+        || !await db.user.findUnique({ where: { email }, select: { id: true } })) throw error;
+      // A concurrent or existing account is never overwritten.
+    }
+    // Only delivery is deferred. A failed delivery can be retried through resend.
+    after(async () => {
+      try { await requestAccountLink(email, 'VERIFY_EMAIL'); }
+      catch { console.error('[account-registration]', { code: 'VERIFICATION_DELIVERY_FAILED' }); }
     });
     return accountJson({ success: true, message: ACCOUNT_REQUEST_MESSAGE }, 201);
   } catch {

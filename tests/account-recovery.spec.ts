@@ -84,14 +84,38 @@ test('registration is generic and creates one unverified account without a sessi
   const bodies = await Promise.all(responses.map(value => value.json()));
   expect(bodies[0]).toEqual(bodies[1]); expect(bodies[0]).not.toHaveProperty('userId'); expect(bodies[0]).not.toHaveProperty('role');
   expect(responses.every(value => !value.headers()['set-cookie'])).toBe(true);
-  const proof = await delivered(email, 'Verify your email');
   const users = await db.user.findMany({ where: { email }, include: { grower: true } });
   expect(users).toHaveLength(1); expect(users[0].emailVerifiedAt).toBeNull(); expect(users[0].sessionVersion).toBe(0); expect(users[0].grower).not.toBeNull();
+  const proof = await delivered(email, 'Verify your email');
   const token = await db.accountActionToken.findUniqueOrThrow({ where: { tokenHash: hash(proof.token) } });
   expect(token.purpose).toBe('VERIFY_EMAIL'); expect(token.expiresAt.getTime() - token.createdAt.getTime()).toBeGreaterThan(55 * 60_000);
   expect(JSON.stringify(token)).not.toContain(proof.token);
   expect((await signIn(context, email, password)).url).toContain('EmailNotVerified');
   expect((await (await context.get('/api/auth/session')).json()).user).toBeUndefined();
+});
+
+test('registration reports profile storage failures and rolls back both account types', async () => {
+  // The suite guard restricts this failure injection to a named local auth clone.
+  await db.$executeRawUnsafe(`CREATE OR REPLACE FUNCTION test_registration_failure() RETURNS trigger AS $$
+    BEGIN
+      IF NEW."businessName" = 'Review registration failure' THEN RAISE EXCEPTION 'Test profile failure'; END IF;
+      RETURN NEW;
+    END; $$ LANGUAGE plpgsql`);
+  try {
+    await db.$executeRawUnsafe('CREATE TRIGGER test_registration_failure BEFORE INSERT ON growers FOR EACH ROW EXECUTE FUNCTION test_registration_failure()');
+    await db.$executeRawUnsafe('CREATE TRIGGER test_registration_failure BEFORE INSERT ON dispensaries FOR EACH ROW EXECUTE FUNCTION test_registration_failure()');
+    for (const businessType of ['grower', 'dispensary']) {
+      const context = await api(); const email = `${prefix}-storage-${businessType}@example.test`;
+      const response = await context.post('/api/auth/register', { data: { email, password, businessName: 'Review registration failure', businessType } });
+      expect(response.status()).toBe(503);
+      expect(await db.user.count({ where: { email } })).toBe(0);
+      expect(await messages(email)).toEqual([]);
+    }
+  } finally {
+    await db.$executeRawUnsafe('DROP TRIGGER IF EXISTS test_registration_failure ON growers');
+    await db.$executeRawUnsafe('DROP TRIGGER IF EXISTS test_registration_failure ON dispensaries');
+    await db.$executeRawUnsafe('DROP FUNCTION IF EXISTS test_registration_failure()');
+  }
 });
 
 test('verification needs mailbox token plus password, rejects replay, and enables real sign-in', async () => {
@@ -302,7 +326,7 @@ for(const width of [360,1440]) test(`signup, verification and recovery work in t
   await page.goto(proof.url);await expect(page.getByRole('heading',{name:'Verify your email',exact:true})).toBeVisible();
   await expect(page.locator('#account-password')).toHaveAttribute('autocomplete','current-password');
   await page.locator('#account-password').fill(password);
-  const evidence='docs/reviews/account-recovery-2026-09-18';mkdirSync(evidence,{recursive:true});
+  const evidence=process.env.AUTH_EVIDENCE_DIR || '/tmp/phenofarm-auth/recovery-evidence';mkdirSync(evidence,{recursive:true});
   await page.screenshot({path:`${evidence}/verify-${width}.png`,fullPage:true});
   await page.getByRole('button',{name:'Verify email',exact:true}).click();await expect(page.getByRole('status')).toContainText('Your email is verified');
   await page.getByRole('link',{name:'Back to sign in',exact:true}).click();await page.locator('#email').fill(email);await page.locator('#password').fill(password);
