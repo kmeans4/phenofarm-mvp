@@ -32,7 +32,7 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 | Full N-002 | Covered by PF-116 and N-007 below. |
 | Full N-003 | Checkout already clears availability at zero; direct orders covered by N-007. |
 | Full N-004 | Already fixed: order detail uses narrow product and dispensary projections. |
-| Full N-005 | Confirmed: product detail still includes full batch JSON. Pending. |
+| Full N-005 | Fixed: product GET and PUT project only batch identity/date/metrics, excluding lab JSON, terpenes, and unused long fields. Product/strain/batch regression passed with multi-megabyte legacy batch data while both product responses remained under 5 KB and batch detail retained its documents. |
 
 ## Verification environment
 

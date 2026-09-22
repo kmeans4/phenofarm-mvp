@@ -191,6 +191,15 @@ test('product, strain, and batch APIs validate boundaries, races, and list paylo
     expect(row.labDocumentCount).toBe(expected);
     expect(JSON.stringify(row).length).toBeLessThan(3000);
   }
+  const product = await db.product.create({ data: { growerId: grower.grower!.id, name: `${prefix}-batch-product`, price: 12, inventoryQty: 5, batchId: createdBatch.id, strainId: strain.id } });
+  for (const response of [await grower.api.get(`/api/products/${product.id}`), await grower.api.put(`/api/products/${product.id}`, { data: { name: `${prefix}-batch-product-edited` } })]) {
+    expect(response.status()).toBe(200);
+    const detail = await response.json();
+    expect(detail.batch.id).toBe(createdBatch.id); expect(detail.batch.batchNumber).toBe(batchNumber);
+    expect(Number(detail.batch.thc)).toBe(18.5); expect(detail.batch.lotNumber).toBe('LOT-1');
+    expect(detail.batch).not.toHaveProperty('testResults'); expect(detail.batch).not.toHaveProperty('terpenes');
+    expect(JSON.stringify(detail).length).toBeLessThan(5000);
+  }
 });
 
 test('admin access, pagination, mobile navigation, seed method guard, and verification redirects work', async ({ page }) => {

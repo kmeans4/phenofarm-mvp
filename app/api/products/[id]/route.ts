@@ -16,6 +16,12 @@ import {
   toSafeUnit,
 } from '@/lib/product-serializers';
 
+// Product consumers need batch identity/metrics; full lab JSON belongs to batch detail.
+const productBatchSelect = {
+  id: true, batchNumber: true, lotNumber: true, strainId: true, harvestDate: true,
+  thc: true, cbd: true, totalCannabinoids: true,
+} satisfies Prisma.BatchSelect;
+
 type ProductLike = {
   name?: string | null;
   productType?: string | null;
@@ -63,7 +69,7 @@ export async function GET(
       where: { id: productId, growerId: user.growerId, isDeleted: false },
       include: {
         strain: { select: { id: true, name: true, genetics: true } },
-        batch: true,
+        batch: { select: productBatchSelect },
       },
     });
 
@@ -164,7 +170,7 @@ export async function PUT(
       data: updateData,
       include: {
         strain: { select: { id: true, name: true, genetics: true } },
-        batch: true,
+        batch: { select: productBatchSelect },
       },
     });
 
