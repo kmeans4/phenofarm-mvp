@@ -2,6 +2,8 @@ import { isLicenseExpired } from '@/lib/license';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
+import { Prisma } from '@prisma/client';
+import { deliveredValueByDay } from '@/lib/dashboard-metrics';
 import Link from 'next/link';
 import { format, parseISO } from 'date-fns';
 import { EmptyState } from '@/app/components/ui/EmptyState';
@@ -82,7 +84,9 @@ export default async function GrowerDashboardPage() {
   thirtyDaysAgo.setHours(0, 0, 0, 0);
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
 
-  const [rawRecentOrders, customerGroups, activeProducts, lowStockProducts, growerProfile, deliveredRecently, attentionSummary, orderStats] = await Promise.all([
+  const tomorrow = new Date(); tomorrow.setHours(24, 0, 0, 0);
+  const serverTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const [rawRecentOrders, customerTotals, activeProducts, lowStockProducts, growerProfile, revenueData, attentionSummary, orderStats] = await Promise.all([
     // Only the activity feed is limited; dashboard statistics use aggregate queries.
     db.order.findMany({
       where: { growerId: user.growerId },
@@ -99,10 +103,7 @@ export default async function GrowerDashboardPage() {
     }),
 
     // Distinct dispensaries this grower has orders with
-    db.order.groupBy({
-      by: ['dispensaryId'],
-      where: { growerId: user.growerId },
-    }),
+    db.$queryRaw<{ count: number }[]>(Prisma.sql`SELECT COUNT(DISTINCT "dispensaryId")::int AS count FROM orders WHERE "growerId" = ${user.growerId}`),
 
     db.product.count({
       where: { growerId: user.growerId, isDeleted: false },
@@ -139,15 +140,7 @@ export default async function GrowerDashboardPage() {
       },
     }),
 
-    // Delivered request value for the trailing 30 days
-    db.order.findMany({
-      where: {
-        growerId: user.growerId,
-        status: 'DELIVERED',
-        OR: [{ deliveredAt: { gte: thirtyDaysAgo } }, { deliveredAt: null, updatedAt: { gte: thirtyDaysAgo } }],
-      },
-      select: { deliveredAt: true, updatedAt: true, totalAmount: true },
-    }),
+    deliveredValueByDay(user.growerId, thirtyDaysAgo, tomorrow, serverTimeZone),
 
     getGrowerAttentionSummary({
       growerId: user.growerId!,
@@ -165,20 +158,11 @@ export default async function GrowerDashboardPage() {
     createdAt: order.createdAt,
   }));
 
-  const revenueByDate = new Map<string, number>();
-  for (const order of deliveredRecently) {
-    const date = format(order.deliveredAt || order.updatedAt, 'yyyy-MM-dd');
-    revenueByDate.set(date, (revenueByDate.get(date) || 0) + Number(order.totalAmount));
-  }
-  const revenueData = Array.from(revenueByDate.entries())
-    .map(([date, revenue]) => ({ date, revenue }))
-    .sort((a, b) => a.date.localeCompare(b.date));
-
   // Calculate stats
   const stats = {
     totalOrders: orderStats.reduce((sum, group) => sum + group._count._all, 0),
     deliveredWholesaleValue: Number(orderStats.find((group) => group.status === 'DELIVERED')?._sum.totalAmount || 0),
-    activeCustomers: customerGroups.length,
+    activeCustomers: customerTotals[0].count,
     pendingOrders: orderStats.find((group) => group.status === 'PENDING')?._count._all || 0,
     activeProducts,
     lowStockProducts,

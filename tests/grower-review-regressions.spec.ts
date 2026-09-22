@@ -2,6 +2,8 @@ import { test, expect, type Page } from '@playwright/test';
 import { PrismaClient } from '@prisma/client';
 import { encode } from 'next-auth/jwt';
 import { readFile } from 'node:fs/promises';
+import { getGrowerCustomerPage } from '../lib/grower-customers';
+import { deliveredValueByDay } from '../lib/dashboard-metrics';
 import { safeInternalPath } from '../app/components/ui/safeNavigation';
 import { isDateInRange } from '../app/components/ui/DateRangeFilter';
 
@@ -185,6 +187,52 @@ test('mobile search Escape returns focus to the visible trigger', async ({ page 
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await expect(trigger).toBeFocused();
+});
+
+test('customers paginate and search across the full authorized list with global summaries', async ({ page }) => {
+  await db.dispensary.createMany({ data: Array.from({ length: 54 }, (_, index) => ({ businessName: `Review Customer ${String(index).padStart(2, '0')}`, createdByGrowerId: growerId, isOffPlatform: true })) });
+  const otherGrower = await db.grower.findUniqueOrThrow({ where: { userId: otherUserId } });
+  const foreign = await db.dispensary.create({ data: { businessName: 'Review Customer 99 foreign', createdByGrowerId: otherGrower.id } });
+  try {
+    const data = await getGrowerCustomerPage(growerId, { page: '999' });
+    expect(data.page).toBe(3); expect(data.total).toBe(55); expect(data.customers).toHaveLength(5);
+    expect(data.customerCount).toBe(55); expect(data.totalCustomerOrders).toBe(106); expect(data.orderedInLast90Days).toBe(1);
+    expect(data.stats.every(row => data.customers.some(customer => customer.id === row.dispensaryId))).toBe(true);
+    expect((await getGrowerCustomerPage(growerId, { search: 'foreign' })).customers).toEqual([]);
+    await authenticate(page);
+    await page.goto('/grower/customers');
+    await expect(page.getByRole('link', { name: /^View Review/ }).locator('visible=true')).toHaveCount(25);
+    await page.getByRole('link', { name: 'Next', exact: true }).click();
+    await expect(page.getByRole('navigation', { name: 'Pagination' })).toContainText('Page 2 of 3');
+    await page.getByRole('link', { name: 'Next', exact: true }).click();
+    await expect(page.getByRole('link', { name: /^View Review/ }).locator('visible=true')).toHaveCount(5);
+    await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page);
+    await page.getByLabel('Search customers', { exact: true }).fill('Review Customer 53');
+    await page.locator('form[action="/grower/customers"]').getByRole('button', { name: 'Search', exact: true }).click();
+    await expect(page.getByRole('link', { name: 'View Review Customer 53', exact: true }).locator('visible=true')).toBeVisible();
+    await expect(page.getByRole('link', { name: /^View Review/ }).locator('visible=true')).toHaveCount(1);
+    await expect(page.getByRole('navigation', { name: 'Pagination' })).toHaveCount(0); await noOverflow(page);
+  } finally {
+    await db.dispensary.deleteMany({ where: { OR: [{ id: foreign.id }, { createdByGrowerId: growerId, businessName: { startsWith: 'Review Customer ' } }] } });
+  }
+});
+
+test('delivered daily totals aggregate in SQL with calendar boundaries and legacy dates', async () => {
+  const key = `${prefix}-daily-`;
+  const common = { growerId, dispensaryId: buyerId, status: 'DELIVERED' as const, subtotal: 10, totalAmount: 10 };
+  await db.order.createMany({ data: [
+    { ...common, orderId: key + 'late', deliveredAt: new Date('2026-09-02T03:59:59Z') },
+    { ...common, orderId: key + 'midnight', deliveredAt: new Date('2026-09-02T04:00:00Z') },
+    { ...common, orderId: key + 'legacy', deliveredAt: null, updatedAt: new Date('2026-09-02T12:00:00Z') },
+    { ...common, orderId: key + 'outside', deliveredAt: new Date('2026-09-03T04:00:00Z') },
+    { ...common, orderId: key + 'cancelled', status: 'CANCELLED', deliveredAt: new Date('2026-09-02T12:00:00Z') },
+  ] });
+  try {
+    expect(await deliveredValueByDay(growerId, new Date('2026-09-01T04:00:00Z'), new Date('2026-09-03T04:00:00Z'), 'America/New_York'))
+      .toEqual([{ date: '2026-09-01', revenue: 10 }, { date: '2026-09-02', revenue: 20 }]);
+    const otherGrower = await db.grower.findUniqueOrThrow({ where: { userId: otherUserId } });
+    expect(await deliveredValueByDay(otherGrower.id, new Date('2026-09-01T04:00:00Z'), new Date('2026-09-03T04:00:00Z'), 'America/New_York')).toEqual([]);
+  } finally { await db.order.deleteMany({ where: { orderId: { startsWith: key } } }); }
 });
 
 test('server pages serialize safely, use whole-history aggregates and preload settings', async ({ page }) => {
