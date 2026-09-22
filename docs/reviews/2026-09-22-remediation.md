@@ -24,7 +24,7 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 | N-003 | Fixed: one grouped unread-message query replaces per-conversation counts. A React request cache keyed by primitive grower/user IDs deduplicates layout/dashboard reads without retaining authorization across requests. API regression passed with multiple conversations, different read timestamps, own replies, foreign-tenant messages, and a fresh zero count immediately after marking read. |
 | N-004 | Fixed: closed bells fetch only an unread count; details load only while the panel is open. Hidden tabs and hidden responsive bells stop polling, overlapping requests are suppressed/aborted, and failed read acknowledgements preserve unread state. Two scoped API/desktop/mobile browser checks passed, including virtual-clock hidden-tab silence, one active bell, grouped details, retry, focus restoration, and mobile bounds. TypeScript and focused lint passed. |
 | N-005 | Fixed: registration commits the user and role profile atomically before returning success; only verification delivery is deferred. Duplicate addresses retain the same generic response and cannot overwrite accounts; rate limiting no longer returns a false creation success. Four auth checks passed, including concurrent duplicate signup, immediate persisted-account lookup, mailbox verification, role preservation, and injected grower/buyer profile-storage failures returning 503 with no orphan account. |
-| N-006 | Pending |
+| N-006 | Fixed: removed demo emails/password and their public access block from the sign-in page in every build. Both 360px and 1440px real signup/verification/sign-in/recovery browser workflows passed after removal. |
 | N-007 | Pending |
 | N-008 | Pending |
 | N-009 | Pending |

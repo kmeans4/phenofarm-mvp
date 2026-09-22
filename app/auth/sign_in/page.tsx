@@ -4,15 +4,9 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { getSession, signIn } from 'next-auth/react';
-import { ChevronDown, Eye, EyeOff, Loader2, Mail, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 
 const SUPPORT_EMAIL = 'support@phenofarm.com';
-
-const demoUsers = [
-  { role: 'Admin', email: 'admin@phenofarm.com' },
-  { role: 'Grower', email: 'grower@vtnurseries.com' },
-  { role: 'Dispensary', email: 'dispensary@greenvermont.com' },
-];
 
 type SignInResult = Awaited<ReturnType<typeof signIn>>;
 
@@ -222,24 +216,7 @@ export default function SignInSection() {
               </button>
             </form>
 
-            <details className="group mt-6 rounded-2xl border border-green-200 bg-green-50/70 p-4">
-              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-green-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 [&::-webkit-details-marker]:hidden">
-                Demo access
-                <ChevronDown className="h-4 w-4 text-green-700 transition-transform group-open:rotate-180" />
-              </summary>
-              <div className="mt-4 space-y-3 border-t border-green-200 pt-4">
-                {demoUsers.map((user) => (
-                  <div key={user.email} className="grid gap-1 rounded-xl bg-white/70 p-3 text-sm sm:grid-cols-[6rem_1fr] sm:items-center">
-                    <span className="font-semibold text-green-950">{user.role}</span>
-                    <span className="font-mono text-xs text-gray-700 sm:text-sm">{user.email}</span>
-                  </div>
-                ))}
-                <div className="flex items-center gap-2 rounded-xl bg-white/70 p-3 text-sm text-gray-700">
-                  <Mail className="h-4 w-4 text-green-700" />
-                  <span>Password: <span className="font-mono">password123</span></span>
-                </div>
-              </div>
-            </details>
+
           </div>
         </div>
       </section>
