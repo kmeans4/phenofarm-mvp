@@ -113,6 +113,20 @@ test('product lists default to bounded pages and inventory and pickers reach lat
   await noOverflow(page);
 });
 
+test('marketplace preview pages published in-stock listings and keeps global totals', async ({ page }) => {
+  await authenticate(page);
+  await db.product.updateMany({ where: { growerId }, data: { isAvailable: true } });
+  await db.product.update({ where: { id: productId }, data: { status: 'DRAFT' } });
+  try {
+    await page.goto('/grower/marketplace');
+    await expect(page.getByRole('navigation', { name: 'Pagination' })).toContainText('54 listings');
+    await expect(page.getByRole('link', { name: 'Edit listing', exact: true })).toHaveCount(24);
+    await page.getByRole('link', { name: 'Next', exact: true }).click();
+    await expect(page.getByRole('navigation', { name: 'Pagination' })).toContainText('Page 2 of 3');
+    await page.setViewportSize({ width: 390, height: 844 }); await noOverflow(page);
+  } finally { await db.product.update({ where: { id: productId }, data: { status: 'PUBLISHED' } }); }
+});
+
 test('product drafts restore explicitly, exclude images, stay account scoped and survive unavailable storage', async ({ page }) => {
   await authenticate(page);
   await page.goto('/grower/products/add');

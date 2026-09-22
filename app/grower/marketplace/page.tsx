@@ -1,3 +1,5 @@
+import { Pagination } from '@/app/components/ui/Pagination';
+import { parsePage } from '@/lib/buyer-products';
 import { productImagesById } from '@/lib/product-images';
 import { getThcBadgeColor, getCbdBadgeColor, getStrainTypeColor } from '@/lib/product-badges';
 import Link from "next/link";
@@ -171,7 +173,7 @@ function BuyerPreviewCard({ product }: { product: MarketplaceProduct }) {
   );
 }
 
-export default async function GrowerMarketplacePage() {
+export default async function GrowerMarketplacePage({ searchParams }: { searchParams: Promise<{ page?: string }> }) {
   const session = await getAuthSession();
   
   if (!session) {
@@ -193,11 +195,18 @@ export default async function GrowerMarketplacePage() {
     },
   });
 
-  // Buyers only see available, non-deleted listings — preview the same set
+  const query = await searchParams;
+  const where = { growerId: user.growerId, isDeleted: false, isAvailable: true, status: 'PUBLISHED' as const, inventoryQty: { gt: 0 } };
+  const [activeListings, hiddenPriceListings] = await Promise.all([
+    db.product.count({ where }), db.product.count({ where: { ...where, isPriceVisible: false } }),
+  ]);
+  const pageSize = 24;
+  const page = Math.min(parsePage(query.page || null), Math.max(1, Math.ceil(activeListings / pageSize)));
   const rawProducts = await db.product.findMany({
-    where: { growerId: user.growerId, isDeleted: false, isAvailable: true },
+    where,
+    take: pageSize, skip: (page - 1) * pageSize,
     select: { id: true, name: true, price: true, isPriceVisible: true, productType: true, subType: true, unit: true, thcMin: true, thcMax: true, cbdMin: true, cbdMax: true, inventoryQty: true, strain: { select: { name: true, strainType: true } }, batch: { select: { thc: true, cbd: true } } },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
   });
 
   const productImages = await productImagesById(rawProducts.map(product => product.id));
@@ -221,8 +230,6 @@ export default async function GrowerMarketplacePage() {
     grower: growerProfile,
   }));
 
-  const activeListings = products.length;
-  const hiddenPriceListings = products.filter((product) => !product.isPriceVisible).length;
   const savedMinimumOrder = grower?.commercialMinimumOrder?.trim();
 
   return (
@@ -271,6 +278,7 @@ export default async function GrowerMarketplacePage() {
                 <BuyerPreviewCard key={product.id} product={product} />
               ))}
               </div>
+              <Pagination page={page} pageSize={pageSize} total={activeListings} basePath="/grower/marketplace" label="listings" />
             </div>
           )}
         </div>

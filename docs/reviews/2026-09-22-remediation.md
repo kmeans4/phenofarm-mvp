@@ -10,7 +10,7 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 | PF-005 | Skipped: METRC, per user instruction. |
 | PF-009 | Fixed: testimonials and CTA copy now render on the server through small motion boundaries; FAQ uses native, keyboard-accessible details and works with JavaScript disabled. Motion was already lazy-loaded and standalone output removed. Interactive pricing/tours retained. Desktop/mobile + no-JavaScript browser check passed. |
 | PF-038 | Fixed: product GET always returns a capped page; inventory shares the server query with global SQL totals and filters. Stock/order pickers use debounced, abortable server searches and explicit more-results controls. Four focused browser/API runs passed (55 products, three inventory pages, search beyond the first page, mobile overflow, preserved quantity editing); TypeScript passed. |
-| PF-069 | Pending |
+| PF-069 | Fixed: marketplace preview fetches 24 listings per page, projects bounded media references, counts globally in SQL, and matches buyer published/in-stock eligibility. Browser check passed with 55 seeded products, a hidden draft, pagination, and mobile width. |
 | PF-071 | Pending |
 | PF-072 | Pending |
 | PF-074 | Pending |
