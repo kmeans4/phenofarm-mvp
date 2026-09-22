@@ -1,0 +1,103 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e2070]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2071]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e2072]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2076]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e2077]
+      - StaticText "Overview"
+    - link "Products" [ref=e2078]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2079]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2080]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2081]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2082]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2083]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2084]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2085]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2073]
+- main
+  - link "← Customer relationship" [ref=e2074]
+  - sectionheader
+    - heading "Maple Street Market statement" [level=1, ref=e2086]
+    - paragraph
+      - StaticText "Delivered request records for direct buyer-seller settlement."
+    - button "Export CSV" [ref=e2087]
+  - form
+    - LabelText
+      - StaticText "From"
+      - Date "From"
+        - generic
+          - spinbutton "Month Month" [ref=e2097]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e2098]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e2099]: 0
+            - StaticText "yyyy"
+        - button "Show date picker" [ref=e2090]
+    - LabelText
+      - StaticText "To"
+      - Date "To"
+        - generic
+          - spinbutton "Month Month" [ref=e2100]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e2101]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e2102]: 0
+            - StaticText "yyyy"
+        - button "Show date picker" [ref=e2091]
+    - button "Apply" [ref=e2088]
+  - generic
+    - StaticText "1"
+    - StaticText " delivered requests"
+    - StaticText "$"
+    - StaticText "450.00"
+    - table
+      - rowgroup
+        - row
+          - columnheader "REQUEST" [ref=e2103]
+          - columnheader "DELIVERED" [ref=e2104]
+          - columnheader "ITEMS" [ref=e2105]
+          - columnheader "VALUE" [ref=e2106]
+      - row
+        - cell "#ORD-20260917-REVIEW" [ref=e2092]
+          - link "#ORD-20260917-REVIEW" [ref=e2107]
+            - StaticText "#ORD-20260917-REVIEW"
+        - cell "Sep 15, 2026" [ref=e2093]
+        - cell "Purple Haze Flowers × 30" [ref=e2094]
+        - cell "$450.00" [ref=e2095]
+          - StaticText "$450.00"
+  - paragraph
+    - StaticText "Wholesale payment is settled directly between your businesses; PhenoFarm processes no funds."
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2089]
+  - button "Open messages" [ref=e2075]
+- region "Notifications alt+T" [ref=e2069]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e2096]
+  - image
+- alert

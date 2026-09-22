@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
+import { marketplaceGrowerWhere } from '@/lib/license';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
     
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -29,10 +29,11 @@ export async function GET(request: NextRequest) {
 
     // Search based on user role
     if (user.role === 'GROWER' && user.growerId) {
-      // Search Products
-      const products = await db.product.findMany({
+      const [products, orders, customers, strains] = await Promise.all([
+        db.product.findMany({
         where: {
           growerId: user.growerId,
+          isDeleted: false,
           OR: [
             { name: { contains: query, mode: 'insensitive' } },
             { productType: { contains: query, mode: 'insensitive' } },
@@ -46,20 +47,8 @@ export async function GET(request: NextRequest) {
           inventoryQty: true,
         },
         take: 5,
-      });
-
-      products.forEach(p => {
-        results.push({
-          id: p.id,
-          type: 'product',
-          title: p.name,
-          subtitle: `${p.productType} • ${p.inventoryQty} in stock`,
-          href: `/grower/products/${p.id}/edit`,
-        });
-      });
-
-      // Search Orders
-      const orders = await db.order.findMany({
+      }),
+        db.order.findMany({
         where: {
           growerId: user.growerId,
           OR: [
@@ -75,20 +64,8 @@ export async function GET(request: NextRequest) {
           dispensary: { select: { businessName: true } },
         },
         take: 5,
-      });
-
-      orders.forEach(o => {
-        results.push({
-          id: o.id,
-          type: 'order',
-          title: `Order #${o.orderId}`,
-          subtitle: `${o.dispensary.businessName} • $${o.totalAmount} • ${o.status}`,
-          href: `/grower/orders/${o.id}`,
-        });
-      });
-
-      // Search Customers (Dispensaries that have ordered)
-      const customers = await db.dispensary.findMany({
+      }),
+        db.dispensary.findMany({
         where: {
           orders: { some: { growerId: user.growerId } },
           OR: [
@@ -103,7 +80,48 @@ export async function GET(request: NextRequest) {
           state: true,
         },
         take: 5,
+      }),
+        db.strain.findMany({
+        where: {
+          growerId: user.growerId,
+          name: { contains: query, mode: 'insensitive' },
+        },
+        select: {
+          id: true,
+          name: true,
+          genetics: true,
+        },
+        take: 5,
+      }),
+      ]);
+      // Search Products
+
+
+      products.forEach(p => {
+        results.push({
+          id: p.id,
+          type: 'product',
+          title: p.name,
+          subtitle: `${p.productType} • ${p.inventoryQty} in stock`,
+          href: `/grower/products/${p.id}/edit`,
+        });
       });
+
+      // Search Orders
+
+
+      orders.forEach(o => {
+        results.push({
+          id: o.id,
+          type: 'order',
+          title: `Order #${o.orderId}`,
+          subtitle: `${o.dispensary.businessName} • ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(o.totalAmount))} • ${o.status}`,
+          href: `/grower/orders/${o.id}`,
+        });
+      });
+
+      // Search Customers (Dispensaries that have ordered)
+
 
       customers.forEach(c => {
         results.push({
@@ -116,18 +134,7 @@ export async function GET(request: NextRequest) {
       });
 
       // Search Strains
-      const strains = await db.strain.findMany({
-        where: {
-          growerId: user.growerId,
-          name: { contains: query, mode: 'insensitive' },
-        },
-        select: {
-          id: true,
-          name: true,
-          genetics: true,
-        },
-        take: 5,
-      });
+
 
       strains.forEach(s => {
         results.push({
@@ -140,11 +147,14 @@ export async function GET(request: NextRequest) {
       });
 
     } else if (user.role === 'DISPENSARY' && user.dispensaryId) {
-      // Search Products for Dispensary view
-      const products = await db.product.findMany({
+      const [products, orders] = await Promise.all([
+        db.product.findMany({
         where: {
           isAvailable: true,
+          isDeleted: false,
+          status: 'PUBLISHED',
           inventoryQty: { gt: 0 },
+          grower: marketplaceGrowerWhere(),
           OR: [
             { name: { contains: query, mode: 'insensitive' } },
             { productType: { contains: query, mode: 'insensitive' } },
@@ -166,20 +176,8 @@ export async function GET(request: NextRequest) {
           },
         },
         take: 5,
-      });
-
-      products.forEach(p => {
-        results.push({
-          id: p.id,
-          type: 'product',
-          title: p.name,
-          subtitle: `${p.productType || 'Product'} • ${p.isPriceVisible ? `$${Number(p.price).toFixed(2)}` : 'Request pricing'} • ${p.grower.businessName}`,
-          href: `/dispensary/catalog?search=${encodeURIComponent(p.name)}&product=${encodeURIComponent(p.id)}`,
-        });
-      });
-
-      // Search Orders
-      const orders = await db.order.findMany({
+      }),
+        db.order.findMany({
         where: {
           dispensaryId: user.dispensaryId,
           OR: [
@@ -195,14 +193,30 @@ export async function GET(request: NextRequest) {
           grower: { select: { businessName: true } },
         },
         take: 5,
+      }),
+      ]);
+      // Search Products for Dispensary view
+
+
+      products.forEach(p => {
+        results.push({
+          id: p.id,
+          type: 'product',
+          title: p.name,
+          subtitle: `${p.productType || 'Product'} • ${p.isPriceVisible ? `$${Number(p.price).toFixed(2)}` : 'Request pricing'} • ${p.grower.businessName}`,
+          href: `/dispensary/catalog?search=${encodeURIComponent(p.name)}&product=${encodeURIComponent(p.id)}`,
+        });
       });
+
+      // Search Orders
+
 
       orders.forEach(o => {
         results.push({
           id: o.id,
           type: 'order',
           title: `Order #${o.orderId}`,
-          subtitle: `${o.grower.businessName} • $${o.totalAmount} • ${o.status}`,
+          subtitle: `${o.grower.businessName} • ${new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(Number(o.totalAmount))} • ${o.status}`,
           href: `/dispensary/orders/${o.id}`,
         });
       });

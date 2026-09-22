@@ -1,0 +1,53 @@
+{
+  "slug": "13-batch-edit",
+  "route": "/grower/batches/ui-review-batch/edit",
+  "routePattern": "/grower/batches/[id]/edit",
+  "pass1": {
+    "inspected": [
+      "pass-1/13-batch-edit-desktop.png",
+      "pass-1/13-batch-edit-mobile.png"
+    ],
+    "strengths": [
+      "Batch, lot, harvest date, strain and notes are prefilled; lab upload status is explicit."
+    ],
+    "issues": [
+      {
+        "key": "batch-terpenes-json",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "The edit form asks growers to enter ‘Terpenes (JSON)’ in a code-style textarea. On mobile the example wraps as raw braces, quoted keys and numeric values.",
+        "recommendation": "Replace raw JSON with repeatable ‘Terpene’ and ‘%’ fields plus ‘Add terpene’. Put an advanced import option behind disclosure only if technical users need it."
+      },
+      {
+        "key": "batch-edit-density",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "As on Add Batch, three lab-document cards repeat headings in their descriptions, and three numeric lab fields stack full-width on mobile. The Edit Batch/Update batch details/Batch Details trio repeats context.",
+        "recommendation": "Use one ‘Edit batch’ heading, a compact lab-results grid and document rows labeled ‘Potency’, ‘Pesticides’, ‘Microbials’. State ‘PDF ·2MB max’ once and use a concise Upload/Replace action per row."
+      },
+      {
+        "key": "batch-id-instruction",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "‘Expected format: BATCH-YYYYMMDD-XX…’ remains beside an existing VN-2026-0912 ID, implying the existing record is invalid without showing a validation error.",
+        "recommendation": "If it is only guidance, label it ‘Example: BATCH-20260917-01’ or omit it in edit mode. If mandatory, show a specific validation message rather than generic expected-format copy."
+      }
+    ],
+    "limits": [
+      "No edits or uploads submitted. Parent nulled only synthetic fixture THC/CBD in disposable clone before this capture to allow list coverage; total cannabinoids remains27.2. Original failure evidence retained."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/13-batch-edit-desktop.png",
+      "pass-2/13-batch-edit-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile captures confirm the raw Terpenes (JSON) editor and repeated upload-card copy. Harvest Date displays 09/12/2026 while the same batch list displays Sep 11, 2026, reproducing the date inconsistency in both passes. The suggested batch format also differs from this synthetic existing record. No values or files were changed. Priority refined to medium for the JSON input: editing difficulty is visible, but no failed save or data loss was tested.",
+    "confirmedIssueKeys": [
+      "batch-terpenes-json",
+      "batch-edit-density",
+      "batch-id-instruction"
+    ],
+    "newIssues": []
+  }
+}

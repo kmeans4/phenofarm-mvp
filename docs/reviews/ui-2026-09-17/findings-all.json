@@ -1,0 +1,3989 @@
+[
+  {
+    "id": "PUB-003",
+    "section": "public",
+    "routes": [
+      "/"
+    ],
+    "priority": "Low",
+    "title": "Mobile hero repeats the settlement promise",
+    "observation": "The hero supporting paragraph takes five mobile lines and repeats the direct-settlement/no-take-rate idea that appears again in the hero footnote and later sections.",
+    "recommendation": "Shorten \u201cVerified partners, recorded quotes, and live request tracking from submission to delivery \u2014 while settlement moves directly between businesses. PhenoFarm never takes a cut.\u201d to \u201cVerified partners, recorded quotes, and live request tracking \u2014 while settlement stays direct. PhenoFarm takes no cut.\u201d",
+    "view": "390x844",
+    "evidence": [
+      "public/screenshots/pass1/home-mobile.png",
+      "public/screenshots/pass2/home-mobile.png"
+    ],
+    "verification": "Pass 2 rechecked the hero at mobile width; the paragraph remains the same five-line block and no clipping occurs."
+  },
+  {
+    "id": "PUB-016",
+    "section": "public",
+    "routes": [
+      "/"
+    ],
+    "priority": "Low",
+    "title": "Testimonial-to-pricing transition has excess vertical space",
+    "observation": "After the final testimonial cards and the \u201cIllustrative customer scenarios.\u201d disclaimer, the Pricing eyebrow sits after a low-content transition of roughly 300px on desktop and 240px on mobile. The content is fully rendered; the issue is the repeated section padding at this boundary.",
+    "recommendation": "Reduce the shared bottom padding after testimonials or top padding before pricing by roughly 25\u201335%, keeping a deliberate but shorter transition before the pricing heading.",
+    "view": "1440x1000 and 390x844",
+    "evidence": [
+      "public/screenshots/settled/pass1/desktop/y04200.png",
+      "public/screenshots/settled/pass2/desktop/y04200.png",
+      "public/screenshots/settled/pass1/mobile/y05664.png",
+      "public/screenshots/settled/pass2/mobile/y05664.png"
+    ],
+    "verification": "Pass 1 and Pass 2 show the same settled transition at both widths; all testimonials and the pricing heading are visible, so this replaces the withdrawn missing-content gap claim with a narrower spacing observation."
+  },
+  {
+    "id": "PUB-017",
+    "section": "public",
+    "routes": [
+      "/"
+    ],
+    "priority": "Low",
+    "title": "Mobile footer repeats Privacy and Terms links",
+    "observation": "The mobile footer stacks the Growers, Dispensaries, and Company groups into a long single column. Company includes \u201cPrivacy policy\u201d and \u201cTerms of service\u201d, then the bottom legal row repeats those destinations as \u201cPrivacy\u201d and \u201cTerms\u201d alongside \u201cCookies\u201d.",
+    "recommendation": "Keep Contact and Help center in the Company group, remove the duplicate Privacy policy and Terms of service entries there, and retain one compact bottom row for Privacy, Terms, and Cookies.",
+    "view": "390x844",
+    "evidence": [
+      "public/screenshots/settled/pass1/mobile/y09912.png",
+      "public/screenshots/settled/pass1/mobile/y10319.png",
+      "public/screenshots/settled/pass2/mobile/y09912.png",
+      "public/screenshots/settled/pass2/mobile/y10319.png"
+    ],
+    "verification": "Pass 1 and Pass 2 show the same one-column footer density and repeated policy destinations at 390x844."
+  },
+  {
+    "id": "PUB-014",
+    "section": "public",
+    "routes": [
+      "/auth/error?error=Configuration"
+    ],
+    "priority": "Low",
+    "title": "Configuration error repeats marketing copy",
+    "observation": "Both desktop error states reuse the same long marketing panel (\u201cGet back into your marketplace workspace.\u201d), the same two-sentence support explanation, and the same three bullets. The right cards correctly distinguish configuration from credential failure, so the repeated left panel is the remaining copy weight.",
+    "recommendation": "Use a shorter shared panel such as \u201cNeed access? We can help.\u201d with one concise support line, leaving the specific error title and red message on the right.",
+    "view": "1440x1000",
+    "evidence": [
+      "public/screenshots/pass1/error-configuration-desktop.png",
+      "public/screenshots/pass2/error-configuration-desktop.png"
+    ],
+    "verification": "Pass 2 rechecked both error states and their back-to-sign-in/contact-support actions; mobile cards remain concise and clear."
+  },
+  {
+    "id": "PUB-015",
+    "section": "public",
+    "routes": [
+      "/auth/error?error=CredentialsSignin"
+    ],
+    "priority": "Low",
+    "title": "Credentials error repeats marketing copy",
+    "observation": "Both desktop error states reuse the same long marketing panel (\u201cGet back into your marketplace workspace.\u201d), the same two-sentence support explanation, and the same three bullets. The right cards correctly distinguish configuration from credential failure, so the repeated left panel is the remaining copy weight.",
+    "recommendation": "Use a shorter shared panel such as \u201cNeed access? We can help.\u201d with one concise support line, leaving the specific error title and red message on the right.",
+    "view": "1440x1000",
+    "evidence": [
+      "public/screenshots/pass1/error-credentials-desktop.png",
+      "public/screenshots/pass2/error-credentials-desktop.png"
+    ],
+    "verification": "Pass 2 rechecked both error states and their back-to-sign-in/contact-support actions; mobile cards remain concise and clear."
+  },
+  {
+    "id": "PUB-011",
+    "section": "public",
+    "routes": [
+      "/auth/sign_in"
+    ],
+    "priority": "Low",
+    "title": "Sign-in marketing panel is overlong",
+    "observation": "The desktop marketing panel uses a long three-line headline, \u201cWholesale cannabis workflows without payment confusion.\u201d, while the adjacent form already establishes sign-in context and the supporting paragraph repeats workflow/payment language.",
+    "recommendation": "Shorten the marketing headline to \u201cWholesale workflows, without payment confusion.\u201d and trim the paragraph to one sentence. Keep the marketing panel hidden on mobile as it is today.",
+    "view": "1440x1000",
+    "evidence": [
+      "public/screenshots/pass1/sign-in-desktop.png",
+      "public/screenshots/pass2/sign-in-desktop.png"
+    ],
+    "verification": "Pass 2 rechecked the desktop form and password-visibility state; controls remain aligned and the mobile form remains focused without the marketing panel."
+  },
+  {
+    "id": "PUB-012",
+    "section": "public",
+    "routes": [
+      "/auth/sign_up"
+    ],
+    "priority": "Low",
+    "title": "Sign-up marketing panel repeats the form promise",
+    "observation": "The desktop marketing panel headline \u201cBuild a verified marketplace profile in one pass.\u201d and the paragraph beginning \u201cCreate one account...\u201d repeat the same account-creation promise already shown by the form heading.",
+    "recommendation": "Use \u201cBuild your verified profile.\u201d for the marketing headline and keep the paragraph focused on the two workflows: \u201cOne account covers grower catalog or dispensary buying workflows.\u201d",
+    "view": "1440x1000",
+    "evidence": [
+      "public/screenshots/pass1/sign-up-desktop.png",
+      "public/screenshots/pass2/sign-up-desktop.png",
+      "public/screenshots/pass2/sign-up-desktop-dispensary-password-visible.png"
+    ],
+    "verification": "Pass 2 rechecked the desktop role selection and password visibility state; the form remains readable and the additional dispensary guidance fits."
+  },
+  {
+    "id": "PUB-013",
+    "section": "public",
+    "routes": [
+      "/auth/sign_up"
+    ],
+    "priority": "Low",
+    "title": "Mobile sign-up disclosure wraps awkwardly",
+    "observation": "The mobile legal disclosure wraps into two centered lines with a large gap created by the line break: \u201cBy signing up, you agree to our Terms of Service\u201d followed by \u201cand Privacy Policy.\u201d",
+    "recommendation": "Shorten the copy to \u201cBy signing up, you agree to the Terms and Privacy Policy.\u201d while retaining both links inline.",
+    "view": "390x844",
+    "evidence": [
+      "public/screenshots/pass1/sign-up-mobile.png",
+      "public/screenshots/pass2/sign-up-mobile.png",
+      "public/screenshots/pass2/sign-up-mobile-dispensary-password-visible.png"
+    ],
+    "verification": "Pass 2 rechecked the default grower and selected dispensary states; the disclosure remains readable and does not overflow."
+  },
+  {
+    "id": "PUB-005",
+    "section": "public",
+    "routes": [
+      "/contact"
+    ],
+    "priority": "Medium",
+    "title": "Mobile contact form starts below a long preamble",
+    "observation": "The mobile title wraps to three lines, followed by a four-line intro and three information cards before the form begins at roughly y=843px. The form is usable, but the primary contact action is pushed below a long preamble.",
+    "recommendation": "Shorten the title to \u201cTalk about wholesale workflows\u201d and move the email contact card beside or immediately below the intro, before the location and policy cards. Keep the full form lower on the page.",
+    "view": "390x844",
+    "evidence": [
+      "public/screenshots/pass1/contact-mobile.png",
+      "public/screenshots/pass2/contact-mobile.png"
+    ],
+    "verification": "Pass 2 confirmed the same 1,670px page height and form start position; no horizontal overflow or control clipping was found."
+  },
+  {
+    "id": "PUB-006",
+    "section": "public",
+    "routes": [
+      "/contact"
+    ],
+    "priority": "Low",
+    "title": "Contact helper copy is longer than needed",
+    "observation": "The form helper text \u201cYour draft will include these details so support can route the conversation quickly.\u201d is longer than needed and repeats the surrounding support-routing context.",
+    "recommendation": "Use \u201cThese details help support route your request.\u201d",
+    "view": "1440x1000 and 390x844",
+    "evidence": [
+      "public/screenshots/pass1/contact-desktop.png",
+      "public/screenshots/pass1/contact-mobile.png",
+      "public/screenshots/pass2/contact-desktop.png",
+      "public/screenshots/pass2/contact-mobile.png"
+    ],
+    "verification": "Pass 1 and Pass 2 show the same helper copy in both layouts; field labels and the email-draft action remain clear."
+  },
+  {
+    "id": "PUB-004",
+    "section": "public",
+    "routes": [
+      "/help"
+    ],
+    "priority": "Low",
+    "title": "Help intro repeats the page purpose",
+    "observation": "The \u201cHELP CENTER\u201d eyebrow, \u201cPractical answers for licensed marketplace teams.\u201d heading, and explanatory paragraph all communicate the same page purpose before the question groups begin.",
+    "recommendation": "Use \u201cMarketplace help\u201d as the heading and \u201cVerification, requests, quotes, settlement, and subscriptions.\u201d as the intro, or keep the current heading and remove the eyebrow. This trims the opening copy without removing context.",
+    "view": "1440x1000 and 390x844",
+    "evidence": [
+      "public/screenshots/pass1/help-desktop.png",
+      "public/screenshots/pass1/help-mobile.png",
+      "public/screenshots/pass2/help-desktop.png",
+      "public/screenshots/pass2/help-mobile.png"
+    ],
+    "verification": "Pass 1 and Pass 2 show the same three-layer intro at both widths; opened disclosures still retain clear context."
+  },
+  {
+    "id": "PUB-009",
+    "section": "public",
+    "routes": [
+      "/legal/cookies"
+    ],
+    "priority": "Medium",
+    "title": "Cookie draft status is duplicated",
+    "observation": "The hero warning and first Draft status card repeat the same pre-launch/counsel-review state before the cookie content starts. The mobile version is 3,188px tall, so the duplicate has a noticeable scroll cost.",
+    "recommendation": "Keep one concise hero warning, remove the duplicate Draft status card, and let Contents lead into \u201cCookies and storage.\u201d",
+    "view": "1440x1000 and 390x844",
+    "evidence": [
+      "public/screenshots/pass1/cookies-desktop.png",
+      "public/screenshots/pass1/cookies-mobile.png",
+      "public/screenshots/pass2/cookies-desktop-bottom.png",
+      "public/screenshots/pass2/cookies-mobile-bottom.png"
+    ],
+    "verification": "Pass 2 rechecked the top and bottom sections at both widths; the duplicate remains, while all legal content stays readable."
+  },
+  {
+    "id": "PUB-010",
+    "section": "public",
+    "routes": [
+      "/legal/cookies"
+    ],
+    "priority": "Low",
+    "title": "Cookie section heading is wordy",
+    "observation": "The section heading \u201cWhat cookies and storage are\u201d reads like a question fragment and is longer than the neighboring noun-based section headings.",
+    "recommendation": "Rename it to \u201cCookies and storage.\u201d",
+    "view": "1440x1000 and 390x844",
+    "evidence": [
+      "public/screenshots/pass1/cookies-desktop.png",
+      "public/screenshots/pass1/cookies-mobile.png",
+      "public/screenshots/pass2/cookies-desktop.png",
+      "public/screenshots/pass2/cookies-mobile.png"
+    ],
+    "verification": "Pass 1 and Pass 2 show the same heading at both widths; the section body remains legible."
+  },
+  {
+    "id": "PUB-007",
+    "section": "public",
+    "routes": [
+      "/legal/privacy"
+    ],
+    "priority": "Medium",
+    "title": "Privacy draft status is duplicated",
+    "observation": "The hero warning identifies a pre-launch draft pending counsel review, then the first body card repeats the same draft-status message before substantive policy content. On mobile this adds a full card before \u201cInformation we collect.\u201d",
+    "recommendation": "Keep one concise hero warning, such as \u201cPre-launch draft for counsel review.\u201d, and remove the duplicate Draft status body card so Contents leads directly to \u201cInformation we collect.\u201d",
+    "view": "1440x1000 and 390x844",
+    "evidence": [
+      "public/screenshots/pass1/privacy-desktop.png",
+      "public/screenshots/pass1/privacy-mobile.png",
+      "public/screenshots/pass2/privacy-desktop-bottom.png",
+      "public/screenshots/pass2/privacy-mobile-bottom.png"
+    ],
+    "verification": "Pass 2 rechecked the top and lower sections at both widths; legal sections remain readable and the duplicate is still present."
+  },
+  {
+    "id": "PUB-008",
+    "section": "public",
+    "routes": [
+      "/legal/terms"
+    ],
+    "priority": "Medium",
+    "title": "Terms draft status is duplicated",
+    "observation": "The hero warning and the first Draft status card repeat the pre-launch/counsel-review message before \u201cEligible users.\u201d The repetition adds vertical weight to an already long mobile legal page.",
+    "recommendation": "Keep the warning once in the hero, shorten it to \u201cPre-launch draft for counsel review.\u201d, and remove the duplicate Draft status card.",
+    "view": "1440x1000 and 390x844",
+    "evidence": [
+      "public/screenshots/pass1/terms-desktop.png",
+      "public/screenshots/pass1/terms-mobile.png",
+      "public/screenshots/pass2/terms-desktop-bottom.png",
+      "public/screenshots/pass2/terms-mobile-bottom.png"
+    ],
+    "verification": "Pass 2 rechecked the complete document and bottom sections at both widths; no readability or overflow issue was found beyond the redundant status block."
+  },
+  {
+    "id": "G28",
+    "section": "grower",
+    "routes": [
+      "/grower/batches"
+    ],
+    "priority": "High",
+    "title": "Repair the batch list render failure",
+    "observation": "The Batches page fails before rendering its list: runtime TypeError \u2018batch.thc.toFixed is not a function\u2019. Both fresh navigations show the application error overlay.",
+    "recommendation": "Normalize batch lab values before numeric formatting and show a recoverable error state when data is invalid. The normal list layout has separate two-pass findings under 11b-batches-ready.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/11-batches-desktop.png",
+      "grower/pass-1/11-batches-mobile.png",
+      "grower/pass-2/11-batches-desktop.png",
+      "grower/pass-2/11-batches-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G29",
+    "section": "grower",
+    "routes": [
+      "/grower/batches",
+      "/grower/batches/[id]/edit"
+    ],
+    "priority": "High",
+    "title": "Keep harvest dates consistent",
+    "observation": "The same batch lists \u2018Sep11,2026\u2019 here but edit form shows harvest date09/12/2026. A date-only field appears to shift by one day between views.",
+    "recommendation": "Use the same date-only formatting in list and edit views so harvest dates agree; verify across time zones without altering the stored harvest day.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/11b-batches-ready-desktop.png",
+      "grower/pass-1/11b-batches-ready-mobile.png",
+      "grower/pass-1/13-batch-edit-desktop.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/11b-batches-ready-desktop.png",
+      "grower/pass-2/11b-batches-ready-mobile.png",
+      "grower/pass-2/13-batch-edit-desktop.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G30",
+    "section": "grower",
+    "routes": [
+      "/grower/batches"
+    ],
+    "priority": "Medium",
+    "title": "Compact mobile batch actions",
+    "observation": "Three stacked metrics push the first batch to y558; the batch's three actions each consume a full row, and Delete is the largest bright-red emphasis.",
+    "recommendation": "Use \u2018Batches\u2019, compact metrics, and a single action row with \u2018Edit\u2019, \u2018Add product\u2019 and an overflow menu for Delete. Shorten \u2018+ Product from batch\u2019 to \u2018Add product\u2019; the batch context already supplies the relationship.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/11b-batches-ready-mobile.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/11b-batches-ready-mobile.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G33",
+    "section": "grower",
+    "routes": [
+      "/grower/batches/[id]/edit"
+    ],
+    "priority": "Medium",
+    "title": "Replace the raw JSON terpene editor",
+    "observation": "The edit form asks growers to enter \u2018Terpenes (JSON)\u2019 in a code-style textarea. On mobile the example wraps as raw braces, quoted keys and numeric values.",
+    "recommendation": "Replace raw JSON with repeatable \u2018Terpene\u2019 and \u2018%\u2019 fields plus \u2018Add terpene\u2019. Put an advanced import option behind disclosure only if technical users need it.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/13-batch-edit-desktop.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/13-batch-edit-desktop.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G34",
+    "section": "grower",
+    "routes": [
+      "/grower/batches/[id]/edit"
+    ],
+    "priority": "Medium",
+    "title": "Reduce repeated batch-edit content",
+    "observation": "As on Add Batch, three lab-document cards repeat headings in their descriptions, and three numeric lab fields stack full-width on mobile. The Edit Batch/Update batch details/Batch Details trio repeats context.",
+    "recommendation": "Use one \u2018Edit batch\u2019 heading, a compact lab-results grid and document rows labeled \u2018Potency\u2019, \u2018Pesticides\u2019, \u2018Microbials\u2019. State \u2018PDF \u00b72MB max\u2019 once and use a concise Upload/Replace action per row.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/13-batch-edit-desktop.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/13-batch-edit-desktop.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G35",
+    "section": "grower",
+    "routes": [
+      "/grower/batches/[id]/edit"
+    ],
+    "priority": "Low",
+    "title": "Clarify the batch-number example",
+    "observation": "\u2018Expected format: BATCH-YYYYMMDD-XX\u2026\u2019 remains beside an existing VN-2026-0912 ID, implying the existing record is invalid without showing a validation error.",
+    "recommendation": "If it is only guidance, label it \u2018Example: BATCH-20260917-01\u2019 or omit it in edit mode. If mandatory, show a specific validation message rather than generic expected-format copy.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/13-batch-edit-desktop.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/13-batch-edit-desktop.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G31",
+    "section": "grower",
+    "routes": [
+      "/grower/batches/add"
+    ],
+    "priority": "Medium",
+    "title": "Use compact lab-document rows",
+    "observation": "Three upload cards each repeat the test name in a sentence, display a Missing badge and a separate Upload PDF button. On mobile these occupy roughly560px; the introductory upload paragraph adds another80px.",
+    "recommendation": "Use \u2018Lab PDFs \u00b7 up to2MB each\u2019 once, then compact rows \u2018Potency\u2019, \u2018Pesticides\u2019, \u2018Microbials\u2019 with status and Upload. Reserve explanation for help or an error. Avoid \u2018Missing\u2019 warning styling on a brand-new untouched form unless required.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/12-batch-add-desktop.png",
+      "grower/pass-1/12-batch-add-mobile.png",
+      "grower/pass-2/12-batch-add-desktop.png",
+      "grower/pass-2/12-batch-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G32",
+    "section": "grower",
+    "routes": [
+      "/grower/batches/add"
+    ],
+    "priority": "Low",
+    "title": "Pair short lab fields",
+    "observation": "THC, CBD and total cannabinoids each occupy a full-width row despite short numeric values; Add New Batch/subtitle/Batch Details repeat the task, and the batch-number example is shown twice.",
+    "recommendation": "Use \u2018Add batch\u2019, one \u2018Batch ID\u2019 example and a \u2018Generate\u2019 control. Pair THC/CBD in a grid with total below or use a compact three-column lab row if labels remain readable; use \u2018Total (%)\u2019 inside Lab results.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/12-batch-add-mobile.png",
+      "grower/pass-2/12-batch-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G05",
+    "section": "grower",
+    "routes": [
+      "/grower/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Make the catalog overview concise",
+    "observation": "Overview navigation opens \u2018Catalog Workspace\u2019; the page describes managing listings in the subtitle, next-action banner, Listings card, and Catalog health area. Four navigation cards repeat sidebar destinations with explanatory paragraphs.",
+    "recommendation": "Use \u2018Catalog overview\u2019. Replace the generic banner with one actionable issue count. Compress destinations into \u2018Listings \u00b7 3\u2019, \u2018Inventory\u2019, \u2018Buyer preview\u2019, and \u2018Price visibility\u2019, with one-line helper text only where needed.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/02-catalog-desktop.png",
+      "grower/pass-1/02-catalog-mobile.png",
+      "grower/pass-2/02-catalog-desktop.png",
+      "grower/pass-2/02-catalog-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G06",
+    "section": "grower",
+    "routes": [
+      "/grower/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Shorten multi-line status badges",
+    "observation": "The status pills on four destination cards are narrow enough to wrap \u20183 buyer-visible listings\u2019 or \u20181 quote-only listing\u2019 over three or four lines; mobile cards consume about450px before health details.",
+    "recommendation": "Use short badges \u20183 live\u2019, \u20181 quote-only\u2019, \u20180 low stock\u2019; keep counts beside titles or use a secondary line rather than circular multi-line pills.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/02-catalog-desktop.png",
+      "grower/pass-1/02-catalog-mobile.png",
+      "grower/pass-2/02-catalog-desktop.png",
+      "grower/pass-2/02-catalog-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G07",
+    "section": "grower",
+    "routes": [
+      "/grower/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Compact catalog health checks",
+    "observation": "Catalog health begins at y1211 and shows four tall cards with instructional copy even when three counts are zero; page reaches1977px for a summary screen.",
+    "recommendation": "Show only issues by default with compact rows, \u2018Images missing \u00b7 0\u2019, \u2018Type missing \u00b7 0\u2019, \u2018Quote only \u00b7 1\u2019, \u2018Low stock \u00b7 0\u2019; hide zero-count details behind \u2018All checks\u2019.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/02-catalog-mobile.png",
+      "grower/pass-2/02-catalog-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G51",
+    "section": "grower",
+    "routes": [
+      "/grower/customers"
+    ],
+    "priority": "Medium",
+    "title": "Expose supported customer-management actions",
+    "observation": "The customer directory exposes only View requests and Message. Add customer, edit saved contact and statement routes exist but have no visible entry point on this directory in the audited account.",
+    "recommendation": "If the existing Add/Edit/Statement screens are intended for everyday contact management, add an \u201cAdd customer\u201d action and \u201cEdit contact\u201d/\u201cStatement\u201d menu entries for eligible owned contacts. Respect platform-managed restrictions.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/19-customers-desktop.png",
+      "grower/pass-1/19-customers-mobile.png",
+      "grower/pass-2/19-customers-desktop.png",
+      "grower/pass-2/19-customers-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G52",
+    "section": "grower",
+    "routes": [
+      "/grower/customers"
+    ],
+    "priority": "Medium",
+    "title": "Compact customer summaries and metadata",
+    "observation": "Three summary cards push the first customer to y583. Each card prints labeled contact/email/phone/location lines plus totals; \u2018Customers\u2019 and \u2018Customer List\u2019 repeat, and Orders terminology differs from Requests elsewhere.",
+    "recommendation": "Use a compact summary \u20182 customers \u00b72 active \u00b720 requests\u2019. Remove Customer List heading and simplify subtitle to \u2018Saved contacts and buyers\u2019. Group contact details compactly, skip duplicate contact name when it equals business name, and use Requests consistently.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/19-customers-mobile.png",
+      "grower/pass-2/19-customers-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G54",
+    "section": "grower",
+    "routes": [
+      "/grower/customers/[id]/edit"
+    ],
+    "priority": "Medium",
+    "title": "Combine the customer-edit header rows",
+    "observation": "View statement sits alone at the top right, followed by a separate back link, then title and repeated subtitle. Mobile title starts at y214 rather than the usual96; the header spends over200px before the form.",
+    "recommendation": "Place \u2018Customers\u2019 back link and \u2018Statement\u2019 in one compact row, followed by \u2018Edit customer\u2019. Remove \u2018Update customer information\u2019.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/21-customer-edit-desktop.png",
+      "grower/pass-1/21-customer-edit-mobile.png",
+      "grower/pass-2/21-customer-edit-desktop.png",
+      "grower/pass-2/21-customer-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G55",
+    "section": "grower",
+    "routes": [
+      "/grower/customers/[id]/edit"
+    ],
+    "priority": "Low",
+    "title": "Tighten customer-edit form spacing",
+    "observation": "Large gaps/padding in three form cards plus full rows for City, State, ZIP and three footer actions make this contact form1862px tall. The delete action is prominently positioned above save even for a contact with request history.",
+    "recommendation": "Use \u2018Business\u2019, \u2018Contact\u2019, \u2018Address\u2019 headings with tighter spacing; pair State/ZIP. Put Delete in a secondary menu or explain why it is unavailable when history must be retained. Keep Cancel/Save together.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/21-customer-edit-mobile.png",
+      "grower/pass-2/21-customer-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G56",
+    "section": "grower",
+    "routes": [
+      "/grower/customers/[id]/statement"
+    ],
+    "priority": "Medium",
+    "title": "Keep statement values visible on mobile",
+    "observation": "Mobile statement shows request and delivered date but clips Items and Value to the right. The overall total is visible, but per-request details needed to reconcile the statement are hidden without a scroll hint.",
+    "recommendation": "Use mobile statement rows with reference/date on one line and item summary/value below; alternatively pin value and provide a clear horizontal-scroll affordance.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/22-customer-statement-mobile.png",
+      "grower/pass-2/22-customer-statement-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G57",
+    "section": "grower",
+    "routes": [
+      "/grower/customers/[id]/statement"
+    ],
+    "priority": "Low",
+    "title": "Shorten statement copy and fix singular counts",
+    "observation": "The long customer-name-plus-statement32px title takes two mobile lines; \u2018Customer relationship\u2019 is an abstract back label; direct-settlement explanation appears in subtitle and footer, and singular count reads \u20181 delivered requests\u2019.",
+    "recommendation": "Use \u2018Statement\u2019 with \u2018Maple Street Market\u2019 as a smaller subtitle, back label \u2018Customer\u2019, count \u20181 delivered request\u2019, and one concise \u2018Payments are arranged directly; PhenoFarm does not collect funds\u2019 note.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/22-customer-statement-desktop.png",
+      "grower/pass-1/22-customer-statement-mobile.png",
+      "grower/pass-2/22-customer-statement-desktop.png",
+      "grower/pass-2/22-customer-statement-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G53",
+    "section": "grower",
+    "routes": [
+      "/grower/customers/add"
+    ],
+    "priority": "Low",
+    "title": "Trim repeated customer-form context",
+    "observation": "\u2018Add New Customer\u2019, \u2018Add a new dispensary customer\u2019, and \u2018Customer Information\u2019 repeat the task. State and ZIP each consume a full row despite short values, and both footer actions are full-width.",
+    "recommendation": "Use \u2018Add customer\u2019 and omit the duplicate subtitle/inner title. Keep State and ZIP side by side with City above; pair Cancel/Add at the bottom while retaining adequate tap sizes.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/20-customer-add-mobile.png",
+      "grower/pass-2/20-customer-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G01",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Put pending work before the setup checklist",
+    "observation": "A six-row readiness checklist and setup pitch appear before daily attention items. On mobile, attention begins at y1700 after an approximately 1100px setup block; completed items each keep explanation and Complete badge.",
+    "recommendation": "Put pending requests first; collapse completed setup items into \u2018Setup \u00b7 3 left\u2019. Use \u2018Review 17 requests\u2019 and remove \u2018Pending requests are the fastest path to keeping buyers moving.\u2019",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/01-dashboard-desktop.png",
+      "grower/pass-1/01-dashboard-mobile.png",
+      "grower/pass-2/01-dashboard-desktop.png",
+      "grower/pass-2/01-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G02",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Remove repeated dashboard headings",
+    "observation": "\u2018ATTENTION CENTER\u2019 repeats \u2018What needs your attention\u2019; \u2018Activity Feed\u2019 and \u2018Recent Activity\u2019 create two headings for one list plus instructional subtitles. KPI helper text repeats linked destinations.",
+    "recommendation": "Use one \u2018Needs attention\u2019 heading and one \u2018Recent activity\u2019 heading; remove generic subtitles. Shorten KPIs to \u2018Requests\u2019, \u2018Delivered value\u2019, \u2018Customers\u2019, \u2018Products\u2019. Keep one concise settlement qualifier near value.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/01-dashboard-desktop.png",
+      "grower/pass-1/01-dashboard-mobile.png",
+      "grower/pass-2/01-dashboard-desktop.png",
+      "grower/pass-2/01-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G03",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Show recent chart data first",
+    "observation": "Delivered-value chart shows mostly empty space and oldest days first; the only visible $450 bar is outside the initial horizontal window. Desktop card is approximately340px tall; mobile swipe view initially looks empty.",
+    "recommendation": "Default to the most recent days or a seven-day mobile view; use \u2018Delivered value \u00b7 30 days\u2019, reduce chart height, and make date range visible.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/01-dashboard-desktop.png",
+      "grower/pass-1/01-dashboard-mobile.png",
+      "grower/pass-2/01-dashboard-desktop.png",
+      "grower/pass-2/01-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G04",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Low",
+    "title": "Use plain subscription and terms copy",
+    "observation": "Subscription readiness text exposes \u2018when Stripe Billing is ready\u2019, while commercial terms lists five implementation concepts.",
+    "recommendation": "Use \u2018Choose a plan to activate your account\u2019 only when available, otherwise \u2018Billing is not available yet\u2019; use \u2018Set order and delivery defaults\u2019.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/01-dashboard-desktop.png",
+      "grower/pass-1/01-dashboard-mobile.png",
+      "grower/pass-2/01-dashboard-desktop.png",
+      "grower/pass-2/01-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G58",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Low",
+    "title": "Name the catalog destination clearly",
+    "observation": "\u2018Dashboard\u2019 and \u2018Overview\u2019 are adjacent destinations, but Overview opens Catalog Workspace. The shell calls the role Cultivator while the mobile drawer says Grower Portal and Grower.",
+    "recommendation": "Rename Overview to \u2018Catalog\u2019 or \u2018Catalog overview\u2019. Pick one user-facing role term across the shell; remove \u2018Portal\u2019 where it adds no information.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/24-navigation-desktop.png",
+      "grower/pass-1/24-navigation-mobile.png",
+      "grower/pass-2/24-navigation-desktop.png",
+      "grower/pass-2/24-navigation-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G59",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Low",
+    "title": "Shorten mobile search guidance",
+    "observation": "The long input placeholder truncates at390px and uses Orders while navigation says Requests. Keyboard-only navigation hints remain in the mobile footer.",
+    "recommendation": "Use placeholder \u2018Search PhenoFarm\u2019 and one category hint \u2018Products, requests, customers, strains\u2019. Hide arrow/Enter/Esc instructions on touch layouts; keep them on desktop.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/25-search-mobile.png",
+      "grower/pass-2/25-search-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G60",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Low",
+    "title": "Use one conversation-selection prompt",
+    "observation": "Before a thread is selected, \u2018Select a conversation\u2019 appears in the header, an empty-state card and composer placeholder. Quote/pricing controls and settlement note still occupy the bottom.",
+    "recommendation": "Use one centered \u2018Choose a conversation\u2019 prompt and hide composer/quote actions until selection. The explanatory sentence about context, pricing actions and templates is unnecessary.",
+    "view": "Desktop",
+    "evidence": [
+      "grower/pass-1/26-messages-desktop.png",
+      "grower/pass-2/26-messages-desktop.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G61",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Reduce message-composer clutter",
+    "observation": "Composer has a horizontal row of six templates, two quote/pricing buttons and a two-line role/settlement note. Settlement is already a chip beneath the conversation header; on mobile the template row clips a label at the right edge.",
+    "recommendation": "Keep the message box and Send primary. Put templates under \u2018Templates\u2019 and pricing actions under \u2018Quote\u2019. Show one payment note only in quote context, with concise \u2018Payment arranged directly\u2019. Use shorter template names such as \u2018Follow up\u2019, \u2018Availability\u2019, \u2018Delivery\u2019, \u2018Terms\u2019.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/26a-message-thread-desktop.png",
+      "grower/pass-1/26a-message-thread-mobile.png",
+      "grower/pass-2/26a-message-thread-desktop.png",
+      "grower/pass-2/26a-message-thread-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G62",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Give quotes persistent labels and context",
+    "observation": "The quote form uses only placeholders\u2014\u2018Quote unit price\u2019, \u2018Qty (optional)\u2019, \u2018Quote terms note (optional)\u2019\u2014with no visible currency/unit or product context. It sits above the still-visible message composer and two other pricing controls.",
+    "recommendation": "Give the form a \u2018Quote\u2019 heading and persistent labels \u2018Unit price ($/unit)\u2019, \u2018Qty\u2019, \u2018Terms\u2019; show the product/unit being quoted or require a product choice if necessary. While quoting, replace the normal composer/actions with this form to avoid competing send controls.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/26b-quote-form-desktop.png",
+      "grower/pass-1/26b-quote-form-mobile.png",
+      "grower/pass-2/26b-quote-form-desktop.png",
+      "grower/pass-2/26b-quote-form-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G63",
+    "section": "grower",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Make notifications specific and concise",
+    "observation": "Repeated \u2018New order request\u2019 and \u2018New counter quote\u2019 titles are followed by full generic sentences (\u2018The other party sent revised quote terms for your review\u2019). Adjacent rows look almost identical and lack a visible request/product reference.",
+    "recommendation": "Use shorter, specific rows such as \u2018Green Vermont \u00b7 Request #XPJO3I\u2019 or \u2018Revised quote \u00b7 Purple Haze\u2019; show a concise value/status preview rather than \u2018the other party\u2019. Keep relative time and unread styling.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/27-notifications-desktop.png",
+      "grower/pass-1/27-notifications-mobile.png",
+      "grower/pass-2/27-notifications-desktop.png",
+      "grower/pass-2/27-notifications-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G19",
+    "section": "grower",
+    "routes": [
+      "/grower/inventory"
+    ],
+    "priority": "Medium",
+    "title": "Compact inventory summaries",
+    "observation": "Two full-width actions and three stacked metric cards push the first product below the844px initial viewport. \u2018Inventory\u2019 is followed by \u2018Product Inventory\u2019 plus two similar explanations.",
+    "recommendation": "Use a compact metrics row and one Add action; move \u2018Update stock\u2019 next to filters or label it \u2018Stock update\u2019. Remove the second heading and use one short helper \u2018Enter current stock\u2019.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/06-inventory-mobile.png",
+      "grower/pass-2/06-inventory-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G20",
+    "section": "grower",
+    "routes": [
+      "/grower/inventory"
+    ],
+    "priority": "Low",
+    "title": "Format values and units consistently",
+    "observation": "The value is \u2018$10000.00\u2019 here versus \u2018$10,000.00\u2019 in Products; rows repeat the quantity beneath the stock input and spell out \u2018gram\u2019 in prices.",
+    "recommendation": "Format value as \u2018$10,000\u2019 when cents are zero. Put units beside stock inputs and use \u2018$25/g\u2019, \u2018240 g\u2019 consistently, keeping less familiar package units written out.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/06-inventory-desktop.png",
+      "grower/pass-1/06-inventory-mobile.png",
+      "grower/pass-2/06-inventory-desktop.png",
+      "grower/pass-2/06-inventory-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G21",
+    "section": "grower",
+    "routes": [
+      "/grower/inventory"
+    ],
+    "priority": "Low",
+    "title": "Explain stock edits in plain language",
+    "observation": "\u2018Changes save as absolute quantities\u2019 describes implementation rather than the user's action.",
+    "recommendation": "Use \u2018Set the amount currently in stock\u2019 or \u2018Enter current stock; changes save automatically\u2019.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/06-inventory-desktop.png",
+      "grower/pass-1/06-inventory-mobile.png",
+      "grower/pass-2/06-inventory-desktop.png",
+      "grower/pass-2/06-inventory-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G22",
+    "section": "grower",
+    "routes": [
+      "/grower/inventory/add"
+    ],
+    "priority": "Low",
+    "title": "Keep stock updates focused",
+    "observation": "The top Add Product action competes with the stock task. The subtitle's second sentence and search helper repeat obvious context, while \u2018Stock Details\u2019 adds another heading for two fields. Desktop input spans nearly1100px.",
+    "recommendation": "Use subtitle \u2018Set a product\u2019s current stock\u2019. Move \u2018New product\u2019 beside search or into the empty state. Label fields \u2018Product\u2019 and \u2018New stock\u2019; retain \u2018Replaces current stock\u2019. Constrain desktop form width and place Cancel/Save side by side on mobile.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/07-inventory-add-desktop.png",
+      "grower/pass-1/07-inventory-add-mobile.png",
+      "grower/pass-2/07-inventory-add-desktop.png",
+      "grower/pass-2/07-inventory-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G36",
+    "section": "grower",
+    "routes": [
+      "/grower/orders"
+    ],
+    "priority": "Medium",
+    "title": "Keep request status, value, and View visible",
+    "observation": "At 390px the initial table view shows selection, a long request ID, and dispensary. Date, value, status, and View are offscreen and require horizontal scrolling. The identifier wraps over multiple lines while decision-making fields remain outside the initial view, with no clear scroll cue.",
+    "recommendation": "Use compact mobile request cards/rows with buyer, short request reference, value, status and a visible View action. Keep full ID available in details or copy action. If retaining table scrolling, pin identifier/action and add a clear scroll hint.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/14-orders-mobile.png",
+      "grower/pass-2/14-orders-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G37",
+    "section": "grower",
+    "routes": [
+      "/grower/orders"
+    ],
+    "priority": "Medium",
+    "title": "Move requests above summary clutter",
+    "observation": "Four full-width metric cards and the saved-view explanation push Active Requests below y1000; the first actual request is beyond the first screen. Active and Needs Review counts are repeated in cards, filters and section heading.",
+    "recommendation": "Combine metrics into a compact two-by-two or single summary strip, use a short status filter row, and put Record request/History in one compact header row. Show \u201818 active \u00b717 need review\u2019 once near the list.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/14-orders-mobile.png",
+      "grower/pass-2/14-orders-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G38",
+    "section": "grower",
+    "routes": [
+      "/grower/orders"
+    ],
+    "priority": "Medium",
+    "title": "Replace request workflow jargon",
+    "observation": "\u2018Saved workflow views\u2019, \u2018Start with the next request state before selecting batch actions\u2019, and the heading subtitle's \u2018without in-app payment settlement\u2019 add administrative wording before the core list.",
+    "recommendation": "Use title \u2018Requests\u2019, filters labeled by status, and no instructional sentence. Keep the payment model as a concise contextual note \u2018Payment is arranged directly\u2019 where order value/payment decisions are shown.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/14-orders-desktop.png",
+      "grower/pass-1/14-orders-mobile.png",
+      "grower/pass-2/14-orders-desktop.png",
+      "grower/pass-2/14-orders-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G45",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Prioritize the next request action",
+    "observation": "Long32px request heading plus four stacked navigation/edit/print/export actions precede the item. The primary fulfillment decision Accept/Cancel is far lower on the page, while sticky footer repeats All orders and Edit request rather than the next action.",
+    "recommendation": "Use \u2018Request\u2019 with a smaller reference line; put back navigation once, keep the next status action near the summary, and move Edit/Print/Export into an overflow menu. Use \u2018Requests\u2019 consistently instead of \u2018All orders\u2019.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/17-order-detail-mobile.png",
+      "grower/pass-2/17-order-detail-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G46",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Consolidate repeated request status",
+    "observation": "Submitted appears in the title area, Update Status badge, timeline, \u2018Currently: Submitted\u2019 callout and History. Timeline lists four future stages with Pending; mobile stretches it into a tall block, followed by a near-duplicate History card.",
+    "recommendation": "Use one current-status chip and one compact progress/history area. Collapse future stages; remove \u20185 stages\u2019, \u2018Quick actions to move fulfillment forward\u2019 and the duplicate current-status callout.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/17-order-detail-desktop.png",
+      "grower/pass-1/17-order-detail-mobile.png",
+      "grower/pass-2/17-order-detail-desktop.png",
+      "grower/pass-2/17-order-detail-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G47",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/[id]"
+    ],
+    "priority": "Low",
+    "title": "Shorten request totals copy",
+    "observation": "\u2018Requested Items\u2019, \u2018Estimated item value\u2019, \u2018Estimated request value\u2019 and repeated direct-payment wording lengthen a one-item request.",
+    "recommendation": "Use \u2018Items\u2019, \u2018Subtotal\u2019, \u2018Est. total\u2019 and one payment note \u2018Payment arranged directly\u2019.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/17-order-detail-desktop.png",
+      "grower/pass-1/17-order-detail-mobile.png",
+      "grower/pass-2/17-order-detail-desktop.png",
+      "grower/pass-2/17-order-detail-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G48",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Separate street and city in addresses",
+    "observation": "The customer address joins street and city as \u201c456 Market StreetBurlington, VT 05401\u201d with no separator. It was visible in both passes and independently confirmed in the second.",
+    "recommendation": "Preserve a line break or insert a comma between street and city in compact address layouts.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/17-order-detail-mobile.png",
+      "grower/pass-2/17-order-detail-mobile.png"
+    ],
+    "verification": "Independent second-pass refinement; both screen captures retained"
+  },
+  {
+    "id": "G49",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/[id]/edit"
+    ],
+    "priority": "Medium",
+    "title": "Use one request status panel",
+    "observation": "Submitted is shown beside the page heading and again in a full tinted Current Status box. \u2018Order Status\u2019 disagrees with request terminology and \u2018Choose a valid next status\u2019 adds procedural wording. Mobile status area is nearly310px before the item.",
+    "recommendation": "Use one \u2018Status \u00b7 Submitted\u2019 header with compact next-state choices beneath it; remove the second badge, large Current status panel and \u2018valid\u2019 wording. Use \u2018Request\u2019 consistently.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/18-order-edit-desktop.png",
+      "grower/pass-1/18-order-edit-mobile.png",
+      "grower/pass-2/18-order-edit-desktop.png",
+      "grower/pass-2/18-order-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G50",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/[id]/edit"
+    ],
+    "priority": "Low",
+    "title": "Compact short request fields",
+    "observation": "Shipping and recorded tax fields each use a full row with help text, followed by a large Notes field and separate Summary card. One item produces a1920px page.",
+    "recommendation": "Pair Shipping/Tax where readable, use \u2018Shipping ($)\u2019 and \u2018Tax ($, optional)\u2019, preserve the essential \u2018Only if included on your invoice\u2019 note, and shorten \u2018Request Notes/Request Summary\u2019 to \u2018Notes/Summary\u2019. Keep current readable item controls.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/18-order-edit-mobile.png",
+      "grower/pass-2/18-order-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G41",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/add"
+    ],
+    "priority": "Medium",
+    "title": "Use plain record-request copy",
+    "observation": "\u2018Record Direct Request\u2019 repeats in title and button; subtitle uses \u2018outside PhenoFarm payment rails\u2019. Search placeholder and helper both describe filtering by business/city.",
+    "recommendation": "Use \u2018Record request\u2019, with one clear note \u2018For orders arranged directly with a buyer. Payment is handled outside PhenoFarm.\u2019 Keep a single search placeholder \u2018Search buyers by name or city\u2019 and remove the duplicate helper.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/16-order-add-desktop.png",
+      "grower/pass-1/16-order-add-mobile.png",
+      "grower/pass-2/16-order-add-desktop.png",
+      "grower/pass-2/16-order-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G42",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/add"
+    ],
+    "priority": "Medium",
+    "title": "Put items before optional request details",
+    "observation": "Two stacked action buttons and an instruction precede the form, while Notes and a full-width shipping field come before Items. The empty Items panel starts at y769, and its Add button is near the floating message launcher.",
+    "recommendation": "Order the form Buyer \u2192 Items \u2192 shipping/notes. Use \u2018Add item\u2019 inside a compact empty state instead of a separate header button plus two explanatory lines; keep a single save action at the end or in a compact sticky footer.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/16-order-add-mobile.png",
+      "grower/pass-2/16-order-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G43",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/add"
+    ],
+    "priority": "Medium",
+    "title": "Keep the message launcher clear of Add item",
+    "observation": "The floating message button partly overlaps Add item at the initial mobile viewport: launcher x334\u2013378/y788\u2013832; Add x289\u2013357/y769\u2013809. This competes with the next required form action.",
+    "recommendation": "Reserve space around the floating launcher or move it away from form action rows. Keep Add item fully visible and tappable.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/16-order-add-mobile.png",
+      "grower/pass-2/16-order-add-mobile.png"
+    ],
+    "verification": "Independent second-pass refinement; both screen captures retained"
+  },
+  {
+    "id": "G44",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/add"
+    ],
+    "priority": "Medium",
+    "title": "Remove repeated item prices and stock",
+    "observation": "One item repeats its price in the product option, next to \u2018Agreed price\u2019, and in the input. Stock appears both in the option and an \u2018Available now\u2019 badge. Mobile row is about350px; its long select text truncates. Desktop price column is narrow enough to wrap its help over three lines while product select is very wide.",
+    "recommendation": "Select by product name, show \u201825 available \u00b7 List $40/eighth\u2019 once below, pair Qty and Unit price, and place Remove in the row corner. Use \u2018Subtotal\u2019, \u2018Shipping\u2019, \u2018Est. total\u2019 and one concise \u2018Payment arranged directly\u2019 note.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/16a-product-picker-desktop.png",
+      "grower/pass-1/16a-product-picker-mobile.png",
+      "grower/pass-2/16a-product-picker-desktop.png",
+      "grower/pass-2/16a-product-picker-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G39",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/history"
+    ],
+    "priority": "Medium",
+    "title": "Keep history values and actions visible",
+    "observation": "The history table requires horizontal scrolling to reveal estimated value, status, and View actions on mobile. Long request IDs wrap to three or four lines and dominate the initial view while buyer, value, status, and action information is harder to scan.",
+    "recommendation": "Use mobile history rows with customer, shortened reference, closed date, value and status plus a visible open action. Preserve complete references in the detail page or copy control.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/15-order-history-mobile.png",
+      "grower/pass-2/15-order-history-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G40",
+    "section": "grower",
+    "routes": [
+      "/grower/orders/history"
+    ],
+    "priority": "Medium",
+    "title": "Compact history summaries",
+    "observation": "Four full-width metrics occupy about490px; the two-row history list begins near y930. \u2018Historical Requests\u2019, \u2018Delivered & Cancelled Requests\u2019 and filter counts repeat the same summary.",
+    "recommendation": "Use \u2018History\u2019 with a compact \u20182 requests \u00b71 delivered \u00b71 cancelled\u2019 summary and delivered value beside it. Shorten navigation to \u2018Active requests\u2019; remove the second long list heading.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/15-order-history-mobile.png",
+      "grower/pass-2/15-order-history-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G08",
+    "section": "grower",
+    "routes": [
+      "/grower/products"
+    ],
+    "priority": "Medium",
+    "title": "Bring products into the first mobile screen",
+    "observation": "Three full-width actions, three stacked KPI cards, a views panel, grouping/display panel, and bulk instructions push the first product to y1295. Most of the first screen contains repeated catalog context rather than products.",
+    "recommendation": "Keep one Add action with Quick add/Import in its menu. Put three metrics in one compact row; combine filters, grouping, and display in a compact toolbar. Show bulk controls after selection. Aim for the first product within the initial screen.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/03-products-mobile.png",
+      "grower/pass-2/03-products-mobile.png",
+      "grower/pass-2/03-products-narrow.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G09",
+    "section": "grower",
+    "routes": [
+      "/grower/products"
+    ],
+    "priority": "Medium",
+    "title": "Simplify product toolbar labels",
+    "observation": "\u2018Saved workflow views\u2019 plus \u2018Use these before grouping\u2026\u2019 explains basic controls; \u2018Select products for bulk cleanup\u2019 is followed by another cleanup sentence. \u2018All\u2019 appears in saved views, grouping, and an All Products section header.",
+    "recommendation": "Use \u2018Filters\u2019, \u2018Low stock\u2019, \u2018Missing photos\u2019, \u2018Hidden\u2019; label grouping as \u2018Group by\u2019. Remove both bulk instruction sentences and the All Products divider when ungrouped. Shorten quote badge to \u2018Quote only\u2019 with a tooltip explaining price visibility.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/03-products-desktop.png",
+      "grower/pass-1/03-products-mobile.png",
+      "grower/pass-2/03-products-desktop.png",
+      "grower/pass-2/03-products-mobile.png",
+      "grower/pass-2/03-products-narrow.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G10",
+    "section": "grower",
+    "routes": [
+      "/grower/products"
+    ],
+    "priority": "Medium",
+    "title": "Keep product price, stock, and actions visible",
+    "observation": "The table retains desktop columns. At 390px, price is partly offscreen and stock plus Edit/actions are outside the initial view; horizontal scrolling is required to reach them. At 360px even more of the price is hidden. There is no explicit horizontal-scroll cue, and the long quote-only pill forms a tall narrow stack.",
+    "recommendation": "Use compact mobile product rows showing name, status, price, stock and an always-visible action menu. If the table remains, pin product/actions and add an explicit horizontal-scroll cue; use \u2018g\u2019 and \u2018ea\u2019 only where unit meaning is clear.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/03-products-mobile.png",
+      "grower/pass-2/03-products-mobile.png",
+      "grower/pass-2/03-products-narrow.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G11",
+    "section": "grower",
+    "routes": [
+      "/grower/products"
+    ],
+    "priority": "Medium",
+    "title": "Make Quick add quick to scan",
+    "observation": "Quick add expands a panel with \u2018QUICK PRODUCT CREATION\u2019, \u2018Create the basic listing now\u2019, and a 20-word explanation; on mobile its header/defaults/draft controls consume about250px before the first field.",
+    "recommendation": "Use one \u2018Quick add\u2019 heading and \u2018Add details later\u2019 helper. Put Close in the heading row and make defaults a compact \u2018Flower \u00b7 g\u2019 control; pair price and stock fields when space permits.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/03a-quick-add-desktop.png",
+      "grower/pass-1/03a-quick-add-mobile.png",
+      "grower/pass-2/03a-quick-add-desktop.png",
+      "grower/pass-2/03a-quick-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G16",
+    "section": "grower",
+    "routes": [
+      "/grower/products/[id]/edit"
+    ],
+    "priority": "High",
+    "title": "Show the saved unit in the edit form",
+    "observation": "Unit is a required select showing \u2018Select a unit\u2019 while the same form summary says \u2018$25/gram\u2019 and \u2018240 gram\u2019. The screen does not clearly indicate the current unit.",
+    "recommendation": "Normalize existing units to the available options and show the selected value. Use \u2018g\u2019 consistently in summary after a labeled \u2018Unit\u2019 control; verify unchanged edits preserve the unit.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/05-product-edit-desktop.png",
+      "grower/pass-1/05-product-edit-mobile.png",
+      "grower/pass-2/05-product-edit-desktop.png",
+      "grower/pass-2/05-product-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G17",
+    "section": "grower",
+    "routes": [
+      "/grower/products/[id]/edit"
+    ],
+    "priority": "Medium",
+    "title": "Use a focused product-edit layout",
+    "observation": "The five-step new-listing guide and creation-oriented sentences remain on Edit Product. Mobile reaches3982px; the summary repeats five values in separate cards. Desktop main form occupies a narrow column with a large empty right side below the sticky summary.",
+    "recommendation": "For edit mode use \u2018Edit product\u2019 plus compact section links, remove the creation guide, and use \u2018Stock\u2019 rather than \u2018Initial Inventory Quantity\u2019. Keep one \u2018Save changes\u2019 label across sticky and standard actions. Compact the summary into rows; give editable fields more desktop width.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/05-product-edit-desktop.png",
+      "grower/pass-1/05-product-edit-mobile.png",
+      "grower/pass-2/05-product-edit-desktop.png",
+      "grower/pass-2/05-product-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G18",
+    "section": "grower",
+    "routes": [
+      "/grower/products/[id]/edit"
+    ],
+    "priority": "Low",
+    "title": "Hide irrelevant batch-detail guidance",
+    "observation": "Batch area has \u2018No batches available yet\u2026\u2019, a \u2018View batch details\u2019 link, and \u2018Link to a harvest batch for lab results\u2019 together even though no batch is selected.",
+    "recommendation": "Use \u2018No batches for this strain\u2019 beside a \u2018New batch\u2019 action; hide \u2018View batch details\u2019 until a batch is selected. Remove the extra linkage explanation.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/05-product-edit-desktop.png",
+      "grower/pass-1/05-product-edit-mobile.png",
+      "grower/pass-2/05-product-edit-desktop.png",
+      "grower/pass-2/05-product-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G12",
+    "section": "grower",
+    "routes": [
+      "/grower/products/add"
+    ],
+    "priority": "Medium",
+    "title": "Reduce product setup guidance",
+    "observation": "Title/subtitle, five-step setup block and its paragraph, defaults panel, then Step 1 description consume nearly the first mobile screen before editing. Each later section also explains its heading; default form totals3223px.",
+    "recommendation": "Use \u2018Add product\u2019; replace setup block with compact section links \u2018Basics \u00b7 Pricing \u00b7 Stock \u00b7 Details\u2019. Put reusable defaults beside the Type field. Remove instructions such as \u2018so mobile setup stays easier to scan\u2019, \u2018Name the product\u2026\u2019 and \u2018Add the starting quantity\u2026\u2019.",
+    "view": "Mobile",
+    "evidence": [
+      "grower/pass-1/04-product-add-mobile.png",
+      "grower/pass-2/04-product-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G13",
+    "section": "grower",
+    "routes": [
+      "/grower/products/add"
+    ],
+    "priority": "Medium",
+    "title": "Use one consistent publish action",
+    "observation": "Mobile has sticky \u2018Publish product\u2019 plus bottom \u2018Create Product\u2019, separate Cancel buttons, a five-card save summary, and repeated browser-autosave text; primary labels disagree for the same action. Desktop draft helper is a narrow five-line paragraph.",
+    "recommendation": "Use one action label \u2018Publish product\u2019 across widths. Keep draft as a secondary action, show a compact one- or two-line review summary and one \u2018Draft saved on this device\u2019 note; avoid repeating the full footer behind the sticky action bar.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/04-product-add-desktop.png",
+      "grower/pass-1/04-product-add-mobile.png",
+      "grower/pass-2/04-product-add-desktop.png",
+      "grower/pass-2/04-product-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G14",
+    "section": "grower",
+    "routes": [
+      "/grower/products/add"
+    ],
+    "priority": "Low",
+    "title": "Shorten product field labels",
+    "observation": "\u2018Initial Inventory Quantity\u2019, \u2018Availability Status\u2019, and nested \u2018Pricing Display\u2019 repeat context already supplied by their sections; price visibility options each include near-synonymous helper copy.",
+    "recommendation": "Use \u2018Starting stock\u2019, \u2018Available\u2019, and \u2018Show price / Quote only\u2019, with a single explanation \u2018Quote-only listings hide the price\u2019. Shorten \u2018Optional profile, compliance, and images\u2019 to \u2018More details & photos\u2019.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/04-product-add-desktop.png",
+      "grower/pass-1/04-product-add-mobile.png",
+      "grower/pass-2/04-product-add-desktop.png",
+      "grower/pass-2/04-product-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G15",
+    "section": "grower",
+    "routes": [
+      "/grower/products/add"
+    ],
+    "priority": "Low",
+    "title": "Remove repeated optional and upload wording",
+    "observation": "Optional appears in the section title, badge and \u2018Cannabinoid Profile (Optional)\u2019. Image helper includes the implementation detail \u2018Images upload separately before you save the product.\u2019",
+    "recommendation": "Use \u2018Cannabinoids\u2019 inside the already optional section. Keep the upload helper to \u2018Up to 2 photos \u00b7 JPG, PNG, WebP \u00b7 1MB each\u2019 and show actual upload status only when needed.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/04a-product-details-desktop.png",
+      "grower/pass-1/04a-product-details-mobile.png",
+      "grower/pass-2/04a-product-details-desktop.png",
+      "grower/pass-2/04a-product-details-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G23",
+    "section": "grower",
+    "routes": [
+      "/grower/strains"
+    ],
+    "priority": "Medium",
+    "title": "Use denser strain cards and counts",
+    "observation": "Four sparse strain cards have a large gap between counts and buttons. On mobile the three metric cards alone consume300px and the first strain starts at y626; four strains extend the page to1537px.",
+    "recommendation": "Use \u2018Strains\u2019 as the title and remove the generic subtitle. Put counts in a compact summary row. Use shorter strain rows/cards with counts beside the name and Edit/Add product in a small action row; reserve card height for actual genetics details.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/08-strains-desktop.png",
+      "grower/pass-1/08-strains-mobile.png",
+      "grower/pass-2/08-strains-desktop.png",
+      "grower/pass-2/08-strains-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G24",
+    "section": "grower",
+    "routes": [
+      "/grower/strains"
+    ],
+    "priority": "Low",
+    "title": "Clarify strain actions",
+    "observation": "The green \u2018+ Product\u2019 action is shorter than other create labels but does not clearly say it creates a product from this strain; delete icons receive strong red emphasis on every card.",
+    "recommendation": "Use \u2018Add product\u2019 consistently and move destructive actions into an overflow menu, keeping Edit most prominent for library maintenance.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/08-strains-desktop.png",
+      "grower/pass-1/08-strains-mobile.png",
+      "grower/pass-2/08-strains-desktop.png",
+      "grower/pass-2/08-strains-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G27",
+    "section": "grower",
+    "routes": [
+      "/grower/strains/[id]/edit"
+    ],
+    "priority": "Medium",
+    "title": "Remove repeated help from strain editing",
+    "observation": "Editing an existing Hybrid still displays all five definitions and three levels of repeated \u2018strain details\u2019 wording. The help block consumes216px on mobile and pushes optional fields below the fold.",
+    "recommendation": "Apply the add-form simplification here: \u2018Edit strain\u2019, then fields without another details heading; show only selected-type help on demand. Use \u2018Name\u2019, \u2018Type\u2019, \u2018Lineage\u2019 and define the different purposes of description and notes.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/10-strain-edit-desktop.png",
+      "grower/pass-1/10-strain-edit-mobile.png",
+      "grower/pass-2/10-strain-edit-desktop.png",
+      "grower/pass-2/10-strain-edit-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G25",
+    "section": "grower",
+    "routes": [
+      "/grower/strains/add"
+    ],
+    "priority": "Medium",
+    "title": "Show strain-type help on demand",
+    "observation": "All five strain-type definitions are displayed below the select. They mostly restate the option name and take216px on mobile before Lineage.",
+    "recommendation": "Show help only for the selected option or behind \u2018About strain types\u2019. Use compact options \u2018Indica\u2019, \u2018Sativa\u2019, \u2018Hybrid\u2019, \u2018Sativa dominant\u2019, \u2018Indica dominant\u2019 and remove generic buyer-positioning wording.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/09-strain-add-desktop.png",
+      "grower/pass-1/09-strain-add-mobile.png",
+      "grower/pass-2/09-strain-add-desktop.png",
+      "grower/pass-2/09-strain-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "G26",
+    "section": "grower",
+    "routes": [
+      "/grower/strains/add"
+    ],
+    "priority": "Low",
+    "title": "Shorten strain-form copy",
+    "observation": "\u2018Add New Strain\u2019, \u2018Create a new cannabis genetics entry\u2019, and \u2018Strain Details\u2019 repeat the same task; placeholders list several long examples and truncate on mobile. Description and Grower Notes do not explain their distinct purposes.",
+    "recommendation": "Use \u2018Add strain\u2019, omit the subtitle or inner title, and shorten labels to \u2018Name\u2019, \u2018Type\u2019, \u2018Lineage\u2019. Use one brief example per placeholder. Clarify the audience/purpose of Description versus Grower notes instead of overlapping generic examples.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "grower/pass-1/09-strain-add-desktop.png",
+      "grower/pass-1/09-strain-add-mobile.png",
+      "grower/pass-2/09-strain-add-desktop.png",
+      "grower/pass-2/09-strain-add-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E19",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/marketplace"
+    ],
+    "priority": "Medium",
+    "title": "State the preview purpose once",
+    "observation": "Page title/intro, Buyer preview heading/subtitle and a green banner repeat the same purpose.",
+    "recommendation": "Use Marketplace preview and one sentence: \u201cHow buyers see your listings.\u201d Use Add product for the primary action.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-marketplace-desktop.png",
+      "admin-extra/p1-marketplace-mobile.png",
+      "admin-extra/p2-marketplace-desktop.png",
+      "admin-extra/p2-marketplace-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E20",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/marketplace"
+    ],
+    "priority": "Medium",
+    "title": "Replace four stacked preamble cards",
+    "observation": "Two counts and two standing instructions get equally large cards; the mobile preview heading starts at y 739.",
+    "recommendation": "Use compact Active and Quote required counts, then one Terms link and a short relevant policy note.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-marketplace-desktop.png",
+      "admin-extra/p1-marketplace-mobile.png",
+      "admin-extra/p2-marketplace-desktop.png",
+      "admin-extra/p2-marketplace-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E21",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/marketplace"
+    ],
+    "priority": "Medium",
+    "title": "Remove nested mobile card padding",
+    "observation": "The preview panel and product cards both add borders/padding, leaving about 278 px for content inside a 390 px screen.",
+    "recommendation": "Use a single product-card shell on mobile and remove the outer preview padding.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-marketplace-desktop.png",
+      "admin-extra/p1-marketplace-mobile.png",
+      "admin-extra/p2-marketplace-desktop.png",
+      "admin-extra/p2-marketplace-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E22",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/marketplace"
+    ],
+    "priority": "Medium",
+    "title": "Simplify shared product-card repetition",
+    "observation": "Large placeholder art repeats category; cards repeat stock status/quantity, unit and long lab-availability text. Three products make the mobile page 3011 px tall.",
+    "recommendation": "Shrink placeholder-only art, use category once, condense stock/unit and use \u201cLab results: request\u201d. Coordinate with the buyer catalog so preview stays accurate. Preserve supplied photos and safety-relevant lab facts.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-marketplace-desktop.png",
+      "admin-extra/p1-marketplace-mobile.png",
+      "admin-extra/p2-marketplace-desktop.png",
+      "admin-extra/p2-marketplace-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E08",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/pricing"
+    ],
+    "priority": "Medium",
+    "title": "Reduce the plan-page preamble",
+    "observation": "The first plan begins around y 825 on mobile. A two-line title, long disclosure and large current-plan panel repeat information before comparisons.",
+    "recommendation": "Use Plans; one short subscription/settlement disclosure; a compact \u201cCurrent plan: Free\u201d line. Preserve price and billing terms.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-pricing-desktop.png",
+      "admin-extra/p1-pricing-mobile.png",
+      "admin-extra/p2-pricing-desktop.png",
+      "admin-extra/p2-pricing-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E09",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/pricing"
+    ],
+    "priority": "Medium",
+    "title": "Show useful unavailable-upgrade copy",
+    "observation": "The local unavailable state tells growers to add STRIPE_PRO_PRICE_ID or STRIPE_BUSINESS_PRICE_ID.",
+    "recommendation": "Show \u201cPaid upgrades are unavailable. Contact support.\u201d Put configuration steps in the admin view. This is not a claim about production billing.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-pricing-desktop.png",
+      "admin-extra/p1-pricing-mobile.png",
+      "admin-extra/p2-pricing-desktop.png",
+      "admin-extra/p2-pricing-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E10",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/pricing"
+    ],
+    "priority": "Low",
+    "title": "Remove repeated plan labels and features",
+    "observation": "Free/current plan is repeated across the summary, badge and button; Pro lists priority support twice; some Free entitlements overlap vaguely.",
+    "recommendation": "Keep one current-plan badge, one support benefit and distinct concise entitlements. Make the Free status badge fit-content on mobile.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-pricing-desktop.png",
+      "admin-extra/p1-pricing-mobile.png",
+      "admin-extra/p2-pricing-desktop.png",
+      "admin-extra/p2-pricing-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E11",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/pricing"
+    ],
+    "priority": "Medium",
+    "title": "Make mobile plan comparison less scroll-heavy",
+    "observation": "The three plans require over 2200 px of page height; Pro starts around y 1287.",
+    "recommendation": "Use compact plan summaries with optional feature expansion or a concise comparison. Keep actual prices, annual terms and primary actions visible.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-pricing-desktop.png",
+      "admin-extra/p1-pricing-mobile.png",
+      "admin-extra/p2-pricing-desktop.png",
+      "admin-extra/p2-pricing-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E01",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/reports"
+    ],
+    "priority": "Low",
+    "title": "Shorten report headings and repeated range wording",
+    "observation": "Analytics & Reports repeats the navigation label; four KPI helpers repeat the selected date range, plus settlement and export explanations.",
+    "recommendation": "Use Reports, Delivered value and Avg. delivered value; state the date range once and omit routine export/settlement reminders. Preserve the distinction between delivered value and paid revenue.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E02",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/reports"
+    ],
+    "priority": "Medium",
+    "title": "Compact mobile exports and date presets",
+    "observation": "Two full-width export buttons, a helper line and a two-row date-range card precede the metrics.",
+    "recommendation": "Use one Export menu or inline PDF/CSV; use 30 d,90 d,12 mo,All with full accessible names.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E03",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/reports"
+    ],
+    "priority": "Medium",
+    "title": "Remove the orphan KPI half-row",
+    "observation": "The first metric spans the full row; the next three create an empty lower-right half-row. The trend starts around y 887.",
+    "recommendation": "Use a consistent 2\u00d72 mobile grid, with subtle highlighting instead of forcing the first metric full-width.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E04",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/reports"
+    ],
+    "priority": "Medium",
+    "title": "Right-size a one-period chart and empty statuses",
+    "observation": "The one-period chart has a 490 px-wide bar and roughly 200 px unused space below it. Four of six status rows contain zero in the sampled 90 day view.",
+    "recommendation": "Constrain bar width and chart height for sparse data; present zero statuses compactly or under a reveal control. Preserve access to every status.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E05",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/reports"
+    ],
+    "priority": "High",
+    "title": "Correct the month displayed on the trend",
+    "observation": "September sample request value is labeled Aug 26 in both passes and the 30 day view. The month formatter parses a UTC month-start date then displays it in local time.",
+    "recommendation": "Format year/month as a calendar month without timezone shifting; verify September remains September across timezones.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E06",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/reports"
+    ],
+    "priority": "Low",
+    "title": "Use singular count wording",
+    "observation": "The sample renders \u201c1 delivered requests\u201d and \u201c1 orders\u201d.",
+    "recommendation": "Use \u201c1 delivered request\u201d and \u201c1 order\u201d.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E07",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/reports"
+    ],
+    "priority": "Medium",
+    "title": "Preserve customer context in the compact mobile list",
+    "observation": "Recent Requests hides customer and date, leaving cryptic IDs, status and value.",
+    "recommendation": "Make customer the primary row label, with a short date/ID metadata line; keep status and value alongside.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E12",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/settings"
+    ],
+    "priority": "Medium",
+    "title": "Explain settlement once",
+    "observation": "The subscription panel, separate Wholesale Settlement panel and Commercial terms note repeat the payment boundary.",
+    "recommendation": "Keep one concise disclosure near the relevant subscription/terms action and remove the separate repeated explanation.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E13",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/settings"
+    ],
+    "priority": "Medium",
+    "title": "Rebalance profile and logo space",
+    "observation": "The business form occupies a single narrow column while the short logo card leaves a large unused column below it. The app sidebar plus section sidebar further compress the form.",
+    "recommendation": "Put logo in a compact profile header, arrange short fields in two columns on desktop and consider horizontal section navigation.",
+    "view": "Desktop",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E14",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/settings"
+    ],
+    "priority": "Medium",
+    "title": "Restore mobile section navigation",
+    "observation": "The page is 3606 px tall, Business profile starts at y 1902, and the desktop section navigation disappears on mobile.",
+    "recommendation": "Add a compact section chooser or anchored tabs so users can reach Profile, Terms and Branding directly.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E15",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/settings"
+    ],
+    "priority": "Medium",
+    "title": "Reduce the persistent save strip and clarify its scope",
+    "observation": "An untouched page reserves 92 px at the bottom for Save settings and a draft note. Commercial terms simultaneously has its own Save terms control.",
+    "recommendation": "Show a compact save strip when relevant/dirty; label its scope \u201cSave profile\u201d if it only saves profile fields. Keep Save terms distinct.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E16",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/settings"
+    ],
+    "priority": "Low",
+    "title": "Replace repeated form instructions with targeted guidance",
+    "observation": "Required-first prose lists fields already marked required; Business prefixes repeat within the profile; title/nav names vary between Business Information and Business profile.",
+    "recommendation": "Use Settings, Business profile, Name/Email/Phone/Address, Logo and Upload. Show one short required-field key or only the missing required items.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E17",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/settings"
+    ],
+    "priority": "Medium",
+    "title": "Keep the contact note readable",
+    "observation": "The single-line Contact note input clips the end of its default sentence on mobile.",
+    "recommendation": "Use a concise default such as \u201cMessage before confirming fulfillment\u201d or a compact two-line field when longer content is needed.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E18",
+    "section": "admin-extra",
+    "routes": [
+      "/grower/settings"
+    ],
+    "priority": "Low",
+    "title": "Remove the redundant desktop sign-out card",
+    "observation": "An Account card repeats the sign-out action already in the sidebar.",
+    "recommendation": "Use one consistent account action; retain a clear mobile route to sign out.",
+    "view": "Desktop",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "E23",
+    "section": "admin-extra",
+    "routes": [
+      "Unmatched URL (404)"
+    ],
+    "priority": "Medium",
+    "title": "Give missing pages a recovery action",
+    "observation": "The default 404 page shows only the error code and \u201cThis page could not be found\u201d, without branding or a route back into the app.",
+    "recommendation": "Use a concise \u201cPage not found\u201d message and Home/Back to dashboard action with the normal brand treatment. Do not add filler to the empty area.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-not-found-desktop.png",
+      "admin-extra/p1-not-found-mobile.png",
+      "admin-extra/p2-not-found-desktop.png",
+      "admin-extra/p2-not-found-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "BUY-059",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Low",
+    "title": "Mobile navigation has unnecessary categories",
+    "observation": "Six navigation destinations are split under five tiny letter-spaced section labels, while the menu header also repeats Dispensary Portal. This adds hierarchy with little information.",
+    "recommendation": "Use one straightforward list, optionally a single Shop grouping; remove the role subtitle. Keep the current 14px link text and generous rows.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-shared-menu-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Inspected the open menu and confirmed Escape closes it."
+  },
+  {
+    "id": "BUY-060",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Low",
+    "title": "Search empty state repeats instructions",
+    "observation": "Long mobile search placeholder crowds the close control; the empty state repeats Start typing to search and three category chips, and the footer says 0 results before a query exists.",
+    "recommendation": "Use Search PhenoFarm or Search products and orders; hide result counts until a query is entered.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-shared-search-mobile.png",
+      "dispensary/p2-shared-search-results-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Empty and populated search states inspected at both widths; query was typed without a form submission."
+  },
+  {
+    "id": "BUY-061",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Low",
+    "title": "Touch search shows keyboard hints and plural error",
+    "observation": "Mobile fullscreen search displays tiny keyboard navigation/Enter/Escape instructions even though the interface is being used as a touch layout; 1 results is also ungrammatical.",
+    "recommendation": "Hide keyboard hints on touch widths and use 1 result / N results.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-shared-search-results-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Empty and populated search states inspected at both widths; query was typed without a form submission."
+  },
+  {
+    "id": "BUY-062",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Low",
+    "title": "Search result secondary actions are small",
+    "observation": "Saved and message icons in search results are only 32x32px on mobile.",
+    "recommendation": "Use at least 40x40px touch areas, or move secondary actions to the destination screen.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-shared-search-results-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Empty and populated search states inspected at both widths; query was typed without a form submission."
+  },
+  {
+    "id": "BUY-063",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Medium",
+    "title": "Notifications omit distinguishing product context",
+    "observation": "Rows repeat Quote accepted or New quote terms plus generic multi-line explanations, but omit the product/grower that would distinguish entries. Eighteen older rows are visually near-identical.",
+    "recommendation": "Use a specific one-line event such as Vermont Nurseries accepted Purple Haze quote, then a short date. Group related older events where appropriate.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-shared-notifications-desktop.png",
+      "dispensary/p2-shared-notifications-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Panel opened independently at each width and inspected; no notification or mark-read action used."
+  },
+  {
+    "id": "BUY-064",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Low",
+    "title": "Notification panel opens far from its trigger",
+    "observation": "Desktop notifications opens at the far upper-right even though its trigger is in the left sidebar, increasing the visual distance between action and result.",
+    "recommendation": "Anchor the desktop panel beside the sidebar trigger or use a consistently placed notification drawer.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p2-shared-notifications-desktop.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Panel opened independently at each width and inspected; no notification or mark-read action used."
+  },
+  {
+    "id": "BUY-089",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Low",
+    "title": "Empty message pane repeats its instruction",
+    "observation": "Desktop repeats Select a conversation in the pane heading, empty-state card, and composer placeholder while exposing pricing controls before a conversation is selected.",
+    "recommendation": "Use one centered Choose a conversation prompt; reveal the composer and relevant pricing actions after selection.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p2-shared-messages-list-desktop.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Drawer list inspected at both widths; existing conversations were not opened because that marks messages read."
+  },
+  {
+    "id": "BUY-090",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Low",
+    "title": "Message footer repeats role and payment guidance",
+    "observation": "The permanent desktop footer explains You are messaging as Dispensary and Quotes set terms only; wholesale payment is handled directly in small text, adding role and settlement copy to every conversation.",
+    "recommendation": "Keep necessary settlement guidance beside a quote action or its confirmation, and remove the redundant role sentence.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p2-shared-messages-list-desktop.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Drawer list inspected at both widths; existing conversations were not opened because that marks messages read."
+  },
+  {
+    "id": "BUY-091",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/*"
+    ],
+    "priority": "Low",
+    "title": "Recent activity uses route-like page names",
+    "observation": "The recently used list names the visited shop Grower 001 instead of Vermont Nurseries, and prefixes familiar account pages with Dispensary.",
+    "recommendation": "Use the business name for shop visits and the same short Dashboard, Settings, and Saved labels as navigation.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p2-shared-activity-desktop.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Desktop drawer inspected; this control is not present at the mobile breakpoint."
+  },
+  {
+    "id": "BUY-014",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Medium",
+    "title": "Empty draft repeats payment guidance",
+    "observation": "No wholesale payment is collected is explained both under Request draft and again inside the empty state.",
+    "recommendation": "Keep one short sentence: Send requests here; arrange payment with the grower.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-empty-desktop.png",
+      "dispensary/p1-03-cart-empty-mobile.png",
+      "dispensary/p2-03-cart-empty-desktop.png",
+      "dispensary/p2-03-cart-empty-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All four pass-one findings confirmed with a freshly emptied browser-local draft. No product added."
+  },
+  {
+    "id": "BUY-015",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Medium",
+    "title": "Quote-only suggestions use an ambiguous Add action",
+    "observation": "Quote only suggestion presents the same Add action as a priced product.",
+    "recommendation": "Use Request pricing for quote-only suggestions or clearly indicate that a quote is needed before submission.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-empty-desktop.png",
+      "dispensary/p1-03-cart-empty-mobile.png",
+      "dispensary/p2-03-cart-empty-desktop.png",
+      "dispensary/p2-03-cart-empty-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All four pass-one findings confirmed with a freshly emptied browser-local draft. No product added."
+  },
+  {
+    "id": "BUY-016",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Low",
+    "title": "Empty-state copy and illustration delay suggestions",
+    "observation": "Start a request from the catalog plus a multi-line process explanation and large plus icon delay suggestions.",
+    "recommendation": "Use Your draft is empty with Add products to get started; reduce illustration padding.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-empty-desktop.png",
+      "dispensary/p1-03-cart-empty-mobile.png",
+      "dispensary/p2-03-cart-empty-desktop.png",
+      "dispensary/p2-03-cart-empty-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All four pass-one findings confirmed with a freshly emptied browser-local draft. No product added."
+  },
+  {
+    "id": "BUY-017",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Low",
+    "title": "Saved destination label is unnecessarily abstract",
+    "observation": "Open saved workspace is longer and more abstract than the destination content.",
+    "recommendation": "Use Saved items.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-empty-desktop.png",
+      "dispensary/p1-03-cart-empty-mobile.png",
+      "dispensary/p2-03-cart-empty-desktop.png",
+      "dispensary/p2-03-cart-empty-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All four pass-one findings confirmed with a freshly emptied browser-local draft. No product added."
+  },
+  {
+    "id": "BUY-018",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Medium",
+    "title": "Draft repeats direct-payment guidance",
+    "observation": "Payment outside PhenoFarm is repeated in the page introduction, Terms helper, summary notice, and selected Handled directly summary.",
+    "recommendation": "Keep one concise note below payment terms: Arrange payment directly with the grower.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-filled-desktop.png",
+      "dispensary/p1-03-cart-filled-mobile.png",
+      "dispensary/p2-03-cart-filled-desktop.png",
+      "dispensary/p2-03-cart-filled-mobile.png",
+      "dispensary/p2-cart-sticky-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one observations confirmed at both widths. Actual viewport inspection resolved the seemingly blank Add link: its text is covered by the development-only Next.js badge, not a production product defect."
+  },
+  {
+    "id": "BUY-019",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Medium",
+    "title": "Default and refresh notices dominate mobile draft",
+    "observation": "Smart request defaults and an always-visible inventory-refreshed banner consume about 190px on mobile before the one item. Banner discusses unavailable items even when none are unavailable.",
+    "recommendation": "Use a small Reuse last request control; show a change banner only when something actually changed.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-filled-desktop.png",
+      "dispensary/p1-03-cart-filled-mobile.png",
+      "dispensary/p2-03-cart-filled-desktop.png",
+      "dispensary/p2-03-cart-filled-mobile.png",
+      "dispensary/p2-cart-sticky-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one observations confirmed at both widths. Actual viewport inspection resolved the seemingly blank Add link: its text is covered by the development-only Next.js badge, not a production product defect."
+  },
+  {
+    "id": "BUY-020",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Medium",
+    "title": "Optional fields appear as warnings",
+    "observation": "Yellow Optional fixes before review presents missing optional timing/notes as warning cards and repeats both field prompts.",
+    "recommendation": "Keep (optional) next to fields; remove warnings unless a required action blocks submission.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-filled-desktop.png",
+      "dispensary/p1-03-cart-filled-mobile.png",
+      "dispensary/p2-03-cart-filled-desktop.png",
+      "dispensary/p2-03-cart-filled-mobile.png",
+      "dispensary/p2-cart-sticky-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one observations confirmed at both widths. Actual viewport inspection resolved the seemingly blank Add link: its text is covered by the development-only Next.js badge, not a production product defect."
+  },
+  {
+    "id": "BUY-021",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Medium",
+    "title": "Mobile draft stepper duplicates visible sections",
+    "observation": "Mobile four-step tracker takes two rows even though all form sections are already displayed together.",
+    "recommendation": "Use a compact Draft / Review indicator or section anchors in one row.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-filled-mobile.png",
+      "dispensary/p2-03-cart-filled-mobile.png",
+      "dispensary/p2-cart-sticky-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one observations confirmed at both widths. Actual viewport inspection resolved the seemingly blank Add link: its text is covered by the development-only Next.js badge, not a production product defect."
+  },
+  {
+    "id": "BUY-022",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Low",
+    "title": "Draft summary repeats form details",
+    "observation": "Summary repeats single-grower request count, fulfillment and payment terms already shown in the form.",
+    "recommendation": "Show total and grower count compactly; reserve the full recap for Review.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-filled-desktop.png",
+      "dispensary/p1-03-cart-filled-mobile.png",
+      "dispensary/p2-03-cart-filled-desktop.png",
+      "dispensary/p2-03-cart-filled-mobile.png",
+      "dispensary/p2-cart-sticky-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one observations confirmed at both widths. Actual viewport inspection resolved the seemingly blank Add link: its text is covered by the development-only Next.js badge, not a production product defect."
+  },
+  {
+    "id": "BUY-023",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Medium",
+    "title": "Remove-item touch target is too narrow",
+    "observation": "Remove-item target is only 16px wide at mobile size (40px high).",
+    "recommendation": "Provide at least a 40px square icon-button target without increasing the icon.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-03-cart-filled-mobile.png",
+      "dispensary/p2-03-cart-filled-mobile.png",
+      "dispensary/p2-cart-sticky-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one observations confirmed at both widths. Actual viewport inspection resolved the seemingly blank Add link: its text is covered by the development-only Next.js badge, not a production product defect."
+  },
+  {
+    "id": "BUY-078",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Low",
+    "title": "Mobile draft Add link is ambiguous",
+    "observation": "The sticky mobile secondary action is labeled only Add, which does not identify that it returns to the catalog.",
+    "recommendation": "Use Add items or Browse catalog.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-cart-sticky-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. All six pass-one observations confirmed at both widths. Actual viewport inspection resolved the seemingly blank Add link: its text is covered by the development-only Next.js badge, not a production product defect."
+  },
+  {
+    "id": "BUY-079",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "High",
+    "title": "Mobile review dialog clips submission and back actions",
+    "observation": "At 390x844 the review panel ends at y802 with overflow hidden, while Submit Order Request runs y777\u2013817 and Back to Draft runs y829\u2013871. Submit is partly cut off and Back is entirely invisible. The fixed mobile header also overlaps the dialog title.",
+    "recommendation": "Use a modal above navigation with a flex column layout: fixed header/footer and a flexing scrollable body. Ensure both footer actions fit inside the panel at mobile heights.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-cart-review-viewport-mobile.png",
+      "dispensary/p2-cart-review-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Review-only dialog opened and inspected at both widths; actual viewport capture and element geometry confirmed clipping. No submission."
+  },
+  {
+    "id": "BUY-080",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Medium",
+    "title": "Review dialog repeats its purpose and summary",
+    "observation": "Review Order Request, its long confirmation subtitle, REVIEW MODE and Confirm before submitting repeat the same instruction. Four separate summary tiles stack before the actual product.",
+    "recommendation": "Use Review request as the sole heading; one compact line for item/grower count and a 2x2 detail grid or labeled rows.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-cart-review-desktop.png",
+      "dispensary/p2-cart-review-mobile.png",
+      "dispensary/p2-cart-review-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Review-only dialog opened and inspected at both widths; actual viewport capture and element geometry confirmed clipping. No submission."
+  },
+  {
+    "id": "BUY-081",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "priority": "Low",
+    "title": "Review edit links are small and recap repeats copy",
+    "observation": "Each Edit link is only 21px wide, and payment/estimated-value explanations repeat the draft screen.",
+    "recommendation": "Make each detail row itself an edit target, retain one final Total and a short Payment arranged with grower note.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-cart-review-mobile.png",
+      "dispensary/p2-cart-review-viewport-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Review-only dialog opened and inspected at both widths; actual viewport capture and element geometry confirmed clipping. No submission."
+  },
+  {
+    "id": "BUY-007",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Catalog hero delays product browsing",
+    "observation": "Marketing title and explanatory copy dominate a task screen and push product content below the first mobile viewport.",
+    "recommendation": "Use Catalog and a single short line: Browse verified growers. Use a 24\u201328px mobile title.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-02-catalog-desktop.png",
+      "dispensary/p1-02-catalog-mobile.png",
+      "dispensary/p2-02-catalog-desktop.png",
+      "dispensary/p2-02-catalog-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843."
+  },
+  {
+    "id": "BUY-008",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Mobile catalog toolbar spans three rows",
+    "observation": "Mobile sort/filter/view controls occupy three rows; the sort arrow sits detached at the far right.",
+    "recommendation": "Put Sort and Filters in one row with view icons beside them; use Search products or growers as placeholder.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-02-catalog-mobile.png",
+      "dispensary/p2-02-catalog-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843."
+  },
+  {
+    "id": "BUY-009",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Product cards repeat seller and stock details",
+    "observation": "Each listing repeats the grower name under an existing grower group, In stock plus Stock N units plus N Available, and a long identical lab-result note.",
+    "recommendation": "Keep stock once; omit redundant grouped grower byline; shorten shared note to Lab results on request.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-02-catalog-desktop.png",
+      "dispensary/p1-02-catalog-mobile.png",
+      "dispensary/p2-02-catalog-desktop.png",
+      "dispensary/p2-02-catalog-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843."
+  },
+  {
+    "id": "BUY-010",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Desktop price and quantity controls compete for space",
+    "observation": "Price and unit break across lines on desktop while quantity controls and Add to Request crowd the same area.",
+    "recommendation": "Give price its own compact row; place quantity and Add to draft together beneath it.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p1-02-catalog-desktop.png",
+      "dispensary/p2-02-catalog-desktop.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843."
+  },
+  {
+    "id": "BUY-011",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Missing-photo placeholders dominate listings",
+    "observation": "Missing-photo fallback is a large repeated leaf occupying 192px per card and contributes to 2845px for only three products.",
+    "recommendation": "Use a compact thumbnail row for missing images or a shorter fallback aspect ratio.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-02-catalog-desktop.png",
+      "dispensary/p1-02-catalog-mobile.png",
+      "dispensary/p2-02-catalog-desktop.png",
+      "dispensary/p2-02-catalog-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843."
+  },
+  {
+    "id": "BUY-012",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Low",
+    "title": "Catalog repeats counts and view state",
+    "observation": "Counts repeat in 3 of 3 products, grower 3 products, and a large bottom end-of-results notice; View: Grid repeats the selected toggle.",
+    "recommendation": "Show the count once and remove View: Grid; reduce end marker to End of results.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-02-catalog-desktop.png",
+      "dispensary/p1-02-catalog-mobile.png",
+      "dispensary/p2-02-catalog-desktop.png",
+      "dispensary/p2-02-catalog-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843."
+  },
+  {
+    "id": "BUY-013",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Low",
+    "title": "Sparse grower groups retain a four-column grid",
+    "observation": "Desktop grid leaves an entire unused fourth-column slot for a three-item grower group.",
+    "recommendation": "Let low-count groups fit three useful-width cards instead of fixed four narrow columns.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p1-02-catalog-desktop.png",
+      "dispensary/p2-02-catalog-desktop.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843."
+  },
+  {
+    "id": "BUY-065",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Catalog shows an orphan draft-count badge",
+    "observation": "With a populated draft, the catalog header displays a standalone red 2 badge without a cart icon, label or action. It floats at the far right on desktop and creates a new row beneath the intro on mobile.",
+    "recommendation": "Attach the count to a clear View draft button or remove it here because the main navigation already shows the draft count.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-02-catalog-desktop.png",
+      "dispensary/p2-02-catalog-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843."
+  },
+  {
+    "id": "BUY-066",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "High",
+    "title": "Open desktop filters clip product action controls",
+    "observation": "Opening the desktop filter sidebar retains a four-column product grid in the reduced content width. Product cards narrow to about 190px and clip quantity increment controls and the Add to Request buttons at their right edges.",
+    "recommendation": "Reduce the column count while filters are open, enforce a minimum usable card width, and stack price above quantity/action when needed. Verify controls inside the card bounds, not just page overflow.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p2-catalog-filters-desktop.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Desktop sidebar and mobile sheet independently opened and inspected."
+  },
+  {
+    "id": "BUY-067",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Filter shortcuts are oversized",
+    "observation": "Favorites and Recently Added each take a large decorative card before the actual filter groups, pushing Unit Price below the initial mobile sheet viewport.",
+    "recommendation": "Use two compact checkbox or switch rows: Favorites (1) and Added in 7 days. Keep product type, THC and unit price visible with less padding.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-catalog-filters-desktop.png",
+      "dispensary/p2-catalog-filters-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Desktop sidebar and mobile sheet independently opened and inspected."
+  },
+  {
+    "id": "BUY-068",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Low",
+    "title": "Filter action and toggle labels are unclear",
+    "observation": "Mobile primary action reads Apply Filters All; All does not explain whether it is a result count or state. Favorites toggle is named only Off in the accessibility snapshot.",
+    "recommendation": "Use Show 3 products or Apply filters; label the toggle Favorites only with a separate on/off state.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-catalog-filters-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Desktop sidebar and mobile sheet independently opened and inspected."
+  },
+  {
+    "id": "BUY-069",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Low",
+    "title": "Price filters repeat unit wording",
+    "observation": "Each price option repeats per unit below Unit Price and Wholesale price per unit.",
+    "recommendation": "Keep Price per unit as the heading and use < $10, $10\u201325, $25\u201350, $50+ as options.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-catalog-filters-desktop.png",
+      "dispensary/p2-catalog-filters-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Desktop sidebar and mobile sheet independently opened and inspected."
+  },
+  {
+    "id": "BUY-070",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Mobile message context truncates both names",
+    "observation": "Mobile product and grower names are both truncated inside one compact pill, obscuring the recipient/context before sending.",
+    "recommendation": "Use two short wrapping lines: product name and To: grower, with no pill width constraint.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-catalog-pricing-dialog-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Opened the unsent composer at both widths; did not submit."
+  },
+  {
+    "id": "BUY-071",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Mobile message input text is small",
+    "observation": "The message textarea uses 14px text on mobile, smaller than the 16px form fields elsewhere.",
+    "recommendation": "Use 16px input text on small screens while keeping labels and supporting text compact.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-catalog-pricing-dialog-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Opened the unsent composer at both widths; did not submit."
+  },
+  {
+    "id": "BUY-072",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Low",
+    "title": "Pricing composer repeats explanations",
+    "observation": "Title is followed by Send a note to the grower about this listing; three long template chips stack vertically; a separate green box explains drawer behavior in two sentences.",
+    "recommendation": "Remove the subtitle, shorten templates to Pricing & MOQ / Availability / Introduction, and use Replies in Messages as a single quiet line.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-catalog-pricing-dialog-desktop.png",
+      "dispensary/p2-catalog-pricing-dialog-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Opened the unsent composer at both widths; did not submit."
+  },
+  {
+    "id": "BUY-073",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Price alert dialog omits manual-check limitation",
+    "observation": "The dialog says Alert me when the product drops below this target price, but omits the manual-check limitation disclosed on Saved alerts. It can imply monitoring outside the app.",
+    "recommendation": "Use Track a target price, with Checks when you visit or refresh Saved. Keep the limitation short and visible before saving.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-catalog-alert-dialog-desktop.png",
+      "dispensary/p2-catalog-alert-dialog-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Opened unsaved alert dialog at both widths; inspected without submitting."
+  },
+  {
+    "id": "BUY-074",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Low",
+    "title": "Price alert dialog omits sale unit",
+    "observation": "Target price and Current $60 omit the sale unit, and the dialog uses an inner floating card inside another modal card.",
+    "recommendation": "Label Target price ($/g), show Current $60/g, and remove the nested shadow/card padding.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-catalog-alert-dialog-desktop.png",
+      "dispensary/p2-catalog-alert-dialog-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Opened unsaved alert dialog at both widths; inspected without submitting."
+  },
+  {
+    "id": "BUY-075",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "High",
+    "title": "Comparison dialog sits behind navigation",
+    "observation": "Comparison dialog sits behind the fixed navigation. Desktop sidebar obscures the dialog left edge, including title, first product name and row labels; mobile header overlaps the comparison heading.",
+    "recommendation": "Render the comparison overlay at the shared modal layer above all navigation, and keep the panel within the visible viewport.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-catalog-compare-desktop.png",
+      "dispensary/p2-catalog-compare-mobile.png",
+      "dispensary/p2-catalog-compare-lower-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Two browser-local comparison selections opened; initial and scrolled mobile content inspected."
+  },
+  {
+    "id": "BUY-076",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Medium",
+    "title": "Mobile comparison columns are too narrow",
+    "observation": "Mobile comparison uses two 115px-wide content columns, each repeating every attribute label beside its value. Prices, product types and headings wrap heavily; key controls are far below the first view.",
+    "recommendation": "Use one shared label per attribute with two values beneath it, compact product headers, and short unit notation. Keep comparison actions outside narrow value columns.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-catalog-compare-mobile.png",
+      "dispensary/p2-catalog-compare-lower-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Two browser-local comparison selections opened; initial and scrolled mobile content inspected."
+  },
+  {
+    "id": "BUY-077",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "Low",
+    "title": "Comparison repeats decorative and explanatory content",
+    "observation": "Two giant repeated leaf placeholders and Comparing 2 products side-by-side consume space that does not help compare products. Grower appears under the title and again in an attribute row.",
+    "recommendation": "Use small thumbnails, a concise Compare (2) title, omit the explanatory subtitle and show grower once.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-catalog-compare-desktop.png",
+      "dispensary/p2-catalog-compare-mobile.png",
+      "dispensary/p2-catalog-compare-lower-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Two browser-local comparison selections opened; initial and scrolled mobile content inspected."
+  },
+  {
+    "id": "BUY-092",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "priority": "High",
+    "title": "Catalog mobile list hides prices and Add buttons",
+    "observation": "At 390px catalog List view keeps a desktop horizontal row: product-name columns shrink to 57\u201391px, pricing/message controls overlap text, prices disappear off the right edge, and Add buttons sit at x400\u2013440 outside the 390px viewport. The document still reports 390px width because overflow is clipped internally.",
+    "recommendation": "Switch list rows to a mobile stack with a compact thumbnail beside full-width identity, then price/availability and full-width actions below. Assert that each price and action fits within the visible card.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-catalog-list-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Fresh alternate layout inspected in both sizes; desktop readable, mobile severely clipped."
+  },
+  {
+    "id": "BUY-001",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Completed setup card remains oversized",
+    "observation": "Completed setup consumes a full card and lists internal feature readiness on every dashboard visit.",
+    "recommendation": "Replace with a compact Verified buyer chip or dismissible setup confirmation.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-01-dashboard-desktop.png",
+      "dispensary/p1-01-dashboard-mobile.png",
+      "dispensary/p2-01-dashboard-desktop.png",
+      "dispensary/p2-01-dashboard-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on a fresh visit at both widths. Recent Requests remains y949 mobile; no overflow."
+  },
+  {
+    "id": "BUY-002",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Saved summary repeats labels and counts",
+    "observation": "Favorites block repeats Saved for later / Favorites and price alerts / explanatory sentence / FAVORITES 1 / 1 product.",
+    "recommendation": "Use one Saved row: Favorites 1 \u00b7 Price alerts 1.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-01-dashboard-desktop.png",
+      "dispensary/p1-01-dashboard-mobile.png",
+      "dispensary/p2-01-dashboard-desktop.png",
+      "dispensary/p2-01-dashboard-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on a fresh visit at both widths. Recent Requests remains y949 mobile; no overflow."
+  },
+  {
+    "id": "BUY-003",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Recent requests subtitle describes implementation",
+    "observation": "Recent Requests subtitle explains shared tracker formatting instead of helping the buyer.",
+    "recommendation": "Remove it; keep Recent requests and View all.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-01-dashboard-desktop.png",
+      "dispensary/p1-01-dashboard-mobile.png",
+      "dispensary/p2-01-dashboard-desktop.png",
+      "dispensary/p2-01-dashboard-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on a fresh visit at both widths. Recent Requests remains y949 mobile; no overflow."
+  },
+  {
+    "id": "BUY-004",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Dashboard cards leave large empty areas",
+    "observation": "Desktop recently requested card has about 270px of unused lower space; empty chart card is over 400px tall.",
+    "recommendation": "Size recent list to content and replace empty chart with a compact No requests this week row.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p1-01-dashboard-desktop.png",
+      "dispensary/p2-01-dashboard-desktop.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on a fresh visit at both widths. Recent Requests remains y949 mobile; no overflow."
+  },
+  {
+    "id": "BUY-005",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Mobile recent requests need compact rows",
+    "observation": "On mobile recent requests begin below y949 and occupy five tall repeated cards.",
+    "recommendation": "Show three compact rows with ID suffix, grower, amount/status; move date into one secondary line.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-01-dashboard-mobile.png",
+      "dispensary/p2-01-dashboard-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on a fresh visit at both widths. Recent Requests remains y949 mobile; no overflow."
+  },
+  {
+    "id": "BUY-006",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/dashboard"
+    ],
+    "priority": "Low",
+    "title": "Dashboard status labels are unclear",
+    "observation": "Requests Waiting and Active Requests are adjacent but their distinction is unclear; Estimated Request Value is verbose in a small KPI label.",
+    "recommendation": "Use Awaiting response, In progress, and Request value; add definition on demand.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-01-dashboard-desktop.png",
+      "dispensary/p1-01-dashboard-mobile.png",
+      "dispensary/p2-01-dashboard-desktop.png",
+      "dispensary/p2-01-dashboard-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on a fresh visit at both widths. Recent Requests remains y949 mobile; no overflow."
+  },
+  {
+    "id": "BUY-037",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Shop repeats verification and category details",
+    "observation": "Verified badge/license in the hero are repeated in a separate License card; product types appear in both a large stat and product filters.",
+    "recommendation": "Keep verification/license in the header; combine product count and types into one short line.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-06-grower-shop-desktop.png",
+      "dispensary/p1-06-grower-shop-mobile.png",
+      "dispensary/p2-06-grower-shop-desktop.png",
+      "dispensary/p2-06-grower-shop-mobile.png",
+      "dispensary/p2-shop-message-anchor-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-038",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Commercial terms delay the mobile product list",
+    "observation": "Four separate commercial-term cards stack before any products on mobile.",
+    "recommendation": "Show a compact Pickup/delivery \u00b7 No minimum summary and expandable Shop details beneath the product list.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-06-grower-shop-mobile.png",
+      "dispensary/p2-06-grower-shop-mobile.png",
+      "dispensary/p2-shop-message-anchor-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-039",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Shop message label opens an anchor",
+    "observation": "Message from a listing is the prominent header CTA but it scrolls toward products instead of opening a message composer.",
+    "recommendation": "Label it View products or Browse listings, or offer a direct Message grower action with clear context.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-06-grower-shop-desktop.png",
+      "dispensary/p1-06-grower-shop-mobile.png",
+      "dispensary/p2-06-grower-shop-desktop.png",
+      "dispensary/p2-06-grower-shop-mobile.png",
+      "dispensary/p2-shop-message-anchor-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-040",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Shop placeholders dominate mobile product cards",
+    "observation": "Mobile product images are large square repeated placeholders; only three listings yield 3670px of page height.",
+    "recommendation": "Use shorter image ratios or compact missing-photo rows and bring a product name/price into the first screen.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-06-grower-shop-mobile.png",
+      "dispensary/p2-06-grower-shop-mobile.png",
+      "dispensary/p2-shop-message-anchor-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-041",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Low",
+    "title": "Shop card wording differs from catalog",
+    "observation": "Product card language/styles differ from catalog: purple THC badge, Featured sort vs Grouped by grower, Request Pricing vs Request pricing, gram casing, and a second In Stock below quantity availability.",
+    "recommendation": "Reuse consistent card tokens/labels and one availability statement across catalog and shop.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-06-grower-shop-desktop.png",
+      "dispensary/p1-06-grower-shop-mobile.png",
+      "dispensary/p2-06-grower-shop-desktop.png",
+      "dispensary/p2-06-grower-shop-mobile.png",
+      "dispensary/p2-shop-message-anchor-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-042",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Low",
+    "title": "Commercial terms mix topics and repeat payment copy",
+    "observation": "Order minimums card also contains response time; settlement card repeats direct payment twice.",
+    "recommendation": "Separate factual short labels: Minimum: none set \u00b7 Replies: 1 business day \u00b7 Payment: direct.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-06-grower-shop-desktop.png",
+      "dispensary/p1-06-grower-shop-mobile.png",
+      "dispensary/p2-06-grower-shop-desktop.png",
+      "dispensary/p2-06-grower-shop-mobile.png",
+      "dispensary/p2-shop-message-anchor-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-043",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Low",
+    "title": "Shop repeats product-list context",
+    "observation": "All Products / Browse the full catalog / Showing 3 of 3 products repeats context.",
+    "recommendation": "Use Products (3) beside the search controls.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-06-grower-shop-desktop.png",
+      "dispensary/p1-06-grower-shop-mobile.png",
+      "dispensary/p2-06-grower-shop-desktop.png",
+      "dispensary/p2-06-grower-shop-mobile.png",
+      "dispensary/p2-shop-message-anchor-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-082",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Low",
+    "title": "Shop anchor hides its destination heading",
+    "observation": "The Message from a listing anchor lands with the All Products heading hidden behind the fixed mobile header.",
+    "recommendation": "Rename the action Browse products and offset the anchor so the section heading remains visible.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-shop-message-anchor-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-083",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "priority": "Low",
+    "title": "Shop action button reaches beyond card padding",
+    "observation": "Desktop product price and request controls exceed the padded card width. The Add button reaches x830 while the first priced card ends at x828, clipping its outer edge; the price/unit and button are cramped together.",
+    "recommendation": "Put price on its own row above quantity and Add to draft; preserve consistent padding instead of letting controls touch the card edge.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p2-06-grower-shop-desktop.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile."
+  },
+  {
+    "id": "BUY-024",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders"
+    ],
+    "priority": "Medium",
+    "title": "Mobile order stats consume four rows",
+    "observation": "Mobile stacks all four summary cards vertically unlike the dashboard two-column layout.",
+    "recommendation": "Use a two-by-two compact grid or a single summary line; put search/list first.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-04-orders-mobile.png",
+      "dispensary/p2-04-orders-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Nineteen mobile request cards produce a 5071px document; tracker still begins at y699."
+  },
+  {
+    "id": "BUY-025",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders"
+    ],
+    "priority": "Medium",
+    "title": "Mobile order cards repeat labels and actions",
+    "observation": "Each mobile request occupies a large card with separate Date/Est. value labels, repeated View request button, and long full request ID.",
+    "recommendation": "Use a compact two-line tappable row: short ID + status, grower/date + amount. Keep full ID on the detail screen.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-04-orders-mobile.png",
+      "dispensary/p2-04-orders-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Nineteen mobile request cards produce a 5071px document; tracker still begins at y699."
+  },
+  {
+    "id": "BUY-026",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders"
+    ],
+    "priority": "Low",
+    "title": "Order page repeats its heading",
+    "observation": "Order Requests then Request Tracker repeats the section purpose.",
+    "recommendation": "Use Orders as the page title and omit the inner tracker heading.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-04-orders-desktop.png",
+      "dispensary/p1-04-orders-mobile.png",
+      "dispensary/p2-04-orders-desktop.png",
+      "dispensary/p2-04-orders-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Nineteen mobile request cards produce a 5071px document; tracker still begins at y699."
+  },
+  {
+    "id": "BUY-027",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders"
+    ],
+    "priority": "Low",
+    "title": "Order search placeholder is clipped",
+    "observation": "Search request or grower is clipped in a fixed-width field even on desktop.",
+    "recommendation": "Use Search orders and allow the input to grow within the filter row.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-04-orders-desktop.png",
+      "dispensary/p1-04-orders-mobile.png",
+      "dispensary/p2-04-orders-desktop.png",
+      "dispensary/p2-04-orders-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Nineteen mobile request cards produce a 5071px document; tracker still begins at y699."
+  },
+  {
+    "id": "BUY-028",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders"
+    ],
+    "priority": "Low",
+    "title": "Order result count appears twice",
+    "observation": "Showing 19 of 19 requests and Page 1 \u00b7 19 matching requests repeat the same total.",
+    "recommendation": "Keep a single 19 requests summary next to pagination.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-04-orders-desktop.png",
+      "dispensary/p1-04-orders-mobile.png",
+      "dispensary/p2-04-orders-desktop.png",
+      "dispensary/p2-04-orders-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Nineteen mobile request cards produce a 5071px document; tracker still begins at y699."
+  },
+  {
+    "id": "BUY-029",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders"
+    ],
+    "priority": "Low",
+    "title": "Order status wording differs across pages",
+    "observation": "Waiting on Growers here differs from Requests Waiting on the dashboard; Estimated Request Value is verbose.",
+    "recommendation": "Use Awaiting response and Request value consistently.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-04-orders-desktop.png",
+      "dispensary/p1-04-orders-mobile.png",
+      "dispensary/p2-04-orders-desktop.png",
+      "dispensary/p2-04-orders-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Nineteen mobile request cards produce a 5071px document; tracker still begins at y699."
+  },
+  {
+    "id": "BUY-030",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Order status is repeated four times",
+    "observation": "Submitted is shown as the header badge, timeline step, Currently: Submitted banner, and a one-entry History card.",
+    "recommendation": "Keep status once near the heading and a compact progress line; collapse History behind View history.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-05-order-detail-desktop.png",
+      "dispensary/p1-05-order-detail-mobile.png",
+      "dispensary/p2-05-order-detail-desktop.png",
+      "dispensary/p2-05-order-detail-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed with a fresh submitted request detail. Requested Items remains y1522 mobile."
+  },
+  {
+    "id": "BUY-031",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Mobile timeline delays requested items",
+    "observation": "Five vertical fulfillment stages and Pending on every future stage create a large mobile block before the requested product.",
+    "recommendation": "Show Submitted \u00b7 Awaiting grower with a compact expandable timeline; remove 5 stages and repeated Pending.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-05-order-detail-mobile.png",
+      "dispensary/p2-05-order-detail-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed with a fresh submitted request detail. Requested Items remains y1522 mobile."
+  },
+  {
+    "id": "BUY-032",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders/[id]"
+    ],
+    "priority": "Medium",
+    "title": "Buyer action copy is noisy and state-inaccurate",
+    "observation": "Buyer Actions explains three actions, then a red withdrawal explanation appears before any withdrawal intent. The paragraph also promises rebuilding although this pending-order state has no rebuild action.",
+    "recommendation": "Show the available actions directly; place withdrawal consequences in its confirmation and tailor copy to the current state.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-05-order-detail-desktop.png",
+      "dispensary/p1-05-order-detail-mobile.png",
+      "dispensary/p2-05-order-detail-desktop.png",
+      "dispensary/p2-05-order-detail-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed with a fresh submitted request detail. Requested Items remains y1522 mobile."
+  },
+  {
+    "id": "BUY-033",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders/[id]"
+    ],
+    "priority": "Low",
+    "title": "Two message actions compete",
+    "observation": "Message Grower and Request Update are adjacent variants of contacting the same person.",
+    "recommendation": "Use one Message grower action with an optional Request an update suggestion in the composer.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-05-order-detail-desktop.png",
+      "dispensary/p1-05-order-detail-mobile.png",
+      "dispensary/p2-05-order-detail-desktop.png",
+      "dispensary/p2-05-order-detail-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed with a fresh submitted request detail. Requested Items remains y1522 mobile."
+  },
+  {
+    "id": "BUY-034",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders/[id]"
+    ],
+    "priority": "Low",
+    "title": "Request value is repeated",
+    "observation": "Item value and request value both show the same $25.00, followed by another payment-outside-app explanation.",
+    "recommendation": "Show one Total unless fees change it; keep direct-payment terms in Request details.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-05-order-detail-desktop.png",
+      "dispensary/p1-05-order-detail-mobile.png",
+      "dispensary/p2-05-order-detail-desktop.png",
+      "dispensary/p2-05-order-detail-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed with a fresh submitted request detail. Requested Items remains y1522 mobile."
+  },
+  {
+    "id": "BUY-035",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders/[id]"
+    ],
+    "priority": "Low",
+    "title": "Export occupies a separate row",
+    "observation": "Export record (CSV) occupies its own separate row/card gap.",
+    "recommendation": "Place Export CSV in the heading overflow/actions menu.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-05-order-detail-desktop.png",
+      "dispensary/p1-05-order-detail-mobile.png",
+      "dispensary/p2-05-order-detail-desktop.png",
+      "dispensary/p2-05-order-detail-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed with a fresh submitted request detail. Requested Items remains y1522 mobile."
+  },
+  {
+    "id": "BUY-036",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/orders/[id]"
+    ],
+    "priority": "Low",
+    "title": "Neutral details use warning styling",
+    "observation": "Neutral request details use warning-like amber type and verbose DIRECT PAYMENT TERMS label.",
+    "recommendation": "Use neutral text and Payment terms.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-05-order-detail-desktop.png",
+      "dispensary/p1-05-order-detail-mobile.png",
+      "dispensary/p2-05-order-detail-desktop.png",
+      "dispensary/p2-05-order-detail-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All seven pass-one findings confirmed with a fresh submitted request detail. Requested Items remains y1522 mobile."
+  },
+  {
+    "id": "BUY-050",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved",
+      "/dispensary/saved?tab=favorites",
+      "/dispensary/favorites"
+    ],
+    "priority": "Medium",
+    "title": "Saved header and tabs delay the first product",
+    "observation": "Saved Workspace introduction, three descriptive tabs, My Favorites/count card and separate sorting card push the first product name to y1063 on mobile. Tabs alone occupy roughly 225px.",
+    "recommendation": "Use Saved as the heading; a compact horizontal Favorites 1 / Alerts 1 / Recent 1 tab row; combine count, sort and view controls in one toolbar.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-08-favorites-alias-desktop.png",
+      "dispensary/p1-08-favorites-alias-mobile.png",
+      "dispensary/p2-08-favorites-alias-desktop.png",
+      "dispensary/p2-08-favorites-alias-mobile.png",
+      "dispensary/p1-10-saved-desktop.png",
+      "dispensary/p1-10-saved-mobile.png",
+      "dispensary/p2-10-saved-desktop.png",
+      "dispensary/p2-10-saved-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Redirect worked at both widths on the second fresh visit. All four saved-favorites findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-051",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved",
+      "/dispensary/saved?tab=favorites",
+      "/dispensary/favorites"
+    ],
+    "priority": "Medium",
+    "title": "Clear favorites is too prominent",
+    "observation": "Clear All is a prominent red standalone action in a large count card even with only one favorite, competing with the product task.",
+    "recommendation": "Move Clear favorites into an overflow menu; show a small count beside the active tab.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-08-favorites-alias-desktop.png",
+      "dispensary/p1-08-favorites-alias-mobile.png",
+      "dispensary/p2-08-favorites-alias-desktop.png",
+      "dispensary/p2-08-favorites-alias-mobile.png",
+      "dispensary/p1-10-saved-desktop.png",
+      "dispensary/p1-10-saved-mobile.png",
+      "dispensary/p2-10-saved-desktop.png",
+      "dispensary/p2-10-saved-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Redirect worked at both widths on the second fresh visit. All four saved-favorites findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-052",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved",
+      "/dispensary/saved?tab=favorites",
+      "/dispensary/favorites"
+    ],
+    "priority": "Low",
+    "title": "Saved quote-only card repeats pricing guidance",
+    "observation": "Hidden-price product says Request pricing in the section label and the button, with a full explanation between them.",
+    "recommendation": "Keep one Request pricing button plus a short Prices on request label, or remove the label entirely.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-08-favorites-alias-desktop.png",
+      "dispensary/p1-08-favorites-alias-mobile.png",
+      "dispensary/p2-08-favorites-alias-desktop.png",
+      "dispensary/p2-08-favorites-alias-mobile.png",
+      "dispensary/p1-10-saved-desktop.png",
+      "dispensary/p1-10-saved-mobile.png",
+      "dispensary/p2-10-saved-desktop.png",
+      "dispensary/p2-10-saved-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Redirect worked at both widths on the second fresh visit. All four saved-favorites findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-053",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved",
+      "/dispensary/saved?tab=favorites",
+      "/dispensary/favorites"
+    ],
+    "priority": "Low",
+    "title": "Sparse favorites grid wastes space",
+    "observation": "An isolated narrow card leaves most of the desktop content area empty, while its large decorative fallback image is dominant on mobile.",
+    "recommendation": "Use a compact list row when there are few saved products, or give the grid a sensible wider minimum card size and a shorter image fallback.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-08-favorites-alias-desktop.png",
+      "dispensary/p1-08-favorites-alias-mobile.png",
+      "dispensary/p2-08-favorites-alias-desktop.png",
+      "dispensary/p2-08-favorites-alias-mobile.png",
+      "dispensary/p1-10-saved-desktop.png",
+      "dispensary/p1-10-saved-mobile.png",
+      "dispensary/p2-10-saved-desktop.png",
+      "dispensary/p2-10-saved-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Redirect worked at both widths on the second fresh visit. All four saved-favorites findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-084",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved",
+      "/dispensary/saved?tab=favorites",
+      "/dispensary/favorites"
+    ],
+    "priority": "Medium",
+    "title": "Saved mobile view controls have no accessible names",
+    "observation": "Mobile Grid and List controls are icon-only buttons with no accessible names in the rendered accessibility snapshot.",
+    "recommendation": "Add Grid view and List view accessible labels, matching the catalog controls.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-08-favorites-alias-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Redirect worked at both widths on the second fresh visit. All four saved-favorites findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-088",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved",
+      "/dispensary/saved?tab=favorites",
+      "/dispensary/favorites"
+    ],
+    "priority": "High",
+    "title": "Saved mobile list view overlaps product text",
+    "observation": "At 390px the list row compresses the product-name column to 60px, while price copy and request/message controls overlay the product title and grower text. Multiple text layers collide inside the card.",
+    "recommendation": "Give the product identity a full-width row on mobile, with a small thumbnail beside it; place price and actions in separate rows below. Do not preserve the desktop multi-column row at this width.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-saved-list-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. List mode inspected at both widths. Desktop compact row works; mobile visibly overlaps."
+  },
+  {
+    "id": "BUY-054",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved?tab=alerts",
+      "/dispensary/price-alerts"
+    ],
+    "priority": "Medium",
+    "title": "Alert summary delays the first mobile product",
+    "observation": "Saved navigation plus the alert summary occupies most of the first mobile screen; the first product title is y962. The mobile summary becomes a large vertical stack of two counts and two isolated icons.",
+    "recommendation": "Use the compact Saved tabs and one alert toolbar: Active 1 \u00b7 Triggered 0, Refresh icon with an accessible name; keep secondary counts off the main hierarchy.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p1-09-price-alerts-alias-mobile.png",
+      "dispensary/p2-09-price-alerts-alias-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Redirect worked again at both widths. All four alerts findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-055",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved?tab=alerts",
+      "/dispensary/price-alerts"
+    ],
+    "priority": "Low",
+    "title": "Alert counts appear three times",
+    "observation": "Desktop repeats 1 active/0 triggered, 1 Active Alerts/0 Price Drops, and Active 1.",
+    "recommendation": "Show counts once in Active (1), Triggered (0), History tabs.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-09-price-alerts-alias-desktop.png",
+      "dispensary/p1-09-price-alerts-alias-mobile.png",
+      "dispensary/p2-09-price-alerts-alias-desktop.png",
+      "dispensary/p2-09-price-alerts-alias-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Redirect worked again at both widths. All four alerts findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-056",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved?tab=alerts",
+      "/dispensary/price-alerts"
+    ],
+    "priority": "Low",
+    "title": "Alert cards repeat target price and units",
+    "observation": "Target price $20.00 repeats in both a price box and Alert at $20.00 badge; gram appears as a separate product badge and twice below prices.",
+    "recommendation": "Keep Current $25/g and Target $20/g together; remove the duplicate target badge and standalone unit badge.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-09-price-alerts-alias-desktop.png",
+      "dispensary/p1-09-price-alerts-alias-mobile.png",
+      "dispensary/p2-09-price-alerts-alias-desktop.png",
+      "dispensary/p2-09-price-alerts-alias-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Redirect worked again at both widths. All four alerts findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-057",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved?tab=alerts",
+      "/dispensary/price-alerts"
+    ],
+    "priority": "Low",
+    "title": "Manual price-check explanation needs shorter copy",
+    "observation": "Important manual-check limitation is a long sentence; Clear All and Refresh Prices lose all visible text on mobile.",
+    "recommendation": "Shorten to Checks when you visit or refresh. Put Clear all in an overflow menu and retain a compact Refresh label.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-09-price-alerts-alias-desktop.png",
+      "dispensary/p1-09-price-alerts-alias-mobile.png",
+      "dispensary/p2-09-price-alerts-alias-desktop.png",
+      "dispensary/p2-09-price-alerts-alias-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Redirect worked again at both widths. All four alerts findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-085",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved?tab=alerts",
+      "/dispensary/price-alerts"
+    ],
+    "priority": "Medium",
+    "title": "Mobile alert icons have no accessible names",
+    "observation": "Mobile Clear all and Refresh prices are unlabeled icon buttons in the accessibility snapshot, including the destructive clear-all action.",
+    "recommendation": "Give them explicit accessible names; retain Refresh as compact visible text and move Clear all into a labeled overflow action.",
+    "view": "mobile",
+    "evidence": [
+      "dispensary/p2-09-price-alerts-alias-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Redirect worked again at both widths. All four alerts findings confirmed; no separate redirect defect."
+  },
+  {
+    "id": "BUY-086",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved?tab=alerts",
+      "/dispensary/price-alerts"
+    ],
+    "priority": "Low",
+    "title": "Triggered-alert empty state repeats instructions",
+    "observation": "The empty state repeats No Triggered Alerts with No products have dropped below your target prices yet, adds an enthusiastic instruction and a View Active Alerts button even though the Active tab is immediately above.",
+    "recommendation": "Use No price drops yet with one compact View active alerts link and less vertical padding.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-alerts-triggered-desktop.png",
+      "dispensary/p2-alerts-triggered-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. Empty triggered tab inspected at both widths."
+  },
+  {
+    "id": "BUY-087",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved?tab=alerts",
+      "/dispensary/price-alerts"
+    ],
+    "priority": "Low",
+    "title": "Alert History lacks dates or events",
+    "observation": "History presents the active target/current-price card without dates or events, so its label suggests information the screen does not show.",
+    "recommendation": "If this tab is the union of active and triggered alerts, label it All. Reserve History for dated price/alert events.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p2-alerts-history-desktop.png",
+      "dispensary/p2-alerts-history-mobile.png"
+    ],
+    "verification": "Pass 1: control-state-not-inspected; pass 2: discovered. History tab inspected at both widths; it displays the same active alert card in this fixture."
+  },
+  {
+    "id": "BUY-058",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/saved?tab=recent"
+    ],
+    "priority": "Low",
+    "title": "Recent tab repeats its purpose and metadata",
+    "observation": "Recently Requested tab description, section title and Use these products as a starting point for repeat order requests all explain the same task. Product metadata repeats ordered twice.",
+    "recommendation": "Use Recent in the tab and omit the explanation. Metadata: Vermont Nurseries \u00b7 19 requests \u00b7 Jul 9. Shorten price to $25/g where unit meaning is established.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-10-saved-recent-desktop.png",
+      "dispensary/p1-10-saved-recent-mobile.png",
+      "dispensary/p2-10-saved-recent-desktop.png",
+      "dispensary/p2-10-saved-recent-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. Second freshly reopened Recent tab confirms the one pass-one copy finding. Product row itself remains compact and sound."
+  },
+  {
+    "id": "BUY-044",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/settings"
+    ],
+    "priority": "Medium",
+    "title": "Desktop branding card stretches into empty space",
+    "observation": "Branding panel is as tall as the full business form although it contains only a small logo uploader, wasting most of the desktop right column.",
+    "recommendation": "Make branding a compact top card and use available width for two-column form groups; align cards to content height.",
+    "view": "desktop",
+    "evidence": [
+      "dispensary/p1-07-settings-desktop.png",
+      "dispensary/p2-07-settings-desktop.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Input font remains 16px; branding panel still stretches to the whole desktop profile height."
+  },
+  {
+    "id": "BUY-045",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/settings"
+    ],
+    "priority": "Medium",
+    "title": "Complete account still receives setup instructions",
+    "observation": "Verified/complete account still shows REQUIRED FIRST and tells the buyer to finish already completed fields.",
+    "recommendation": "Show this guidance only when required information is missing; otherwise keep one Verified through date line.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-07-settings-desktop.png",
+      "dispensary/p1-07-settings-mobile.png",
+      "dispensary/p2-07-settings-desktop.png",
+      "dispensary/p2-07-settings-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Input font remains 16px; branding panel still stretches to the whole desktop profile height."
+  },
+  {
+    "id": "BUY-046",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/settings"
+    ],
+    "priority": "Medium",
+    "title": "License fields are grouped under the wrong section",
+    "observation": "License & verification contains only notices; license number/state/expiry fields are under Business profile.",
+    "recommendation": "Move those three fields into License & verification so section links match the work.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-07-settings-desktop.png",
+      "dispensary/p1-07-settings-mobile.png",
+      "dispensary/p2-07-settings-desktop.png",
+      "dispensary/p2-07-settings-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Input font remains 16px; branding panel still stretches to the whole desktop profile height."
+  },
+  {
+    "id": "BUY-047",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/settings"
+    ],
+    "priority": "Low",
+    "title": "Settings labels repeat account context",
+    "observation": "Long labels repeat account context: Dispensary Settings, Dispensary License Number, Business Email/Phone/Description.",
+    "recommendation": "Use Settings, License number, Email, Phone, Description where the section already supplies context.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-07-settings-desktop.png",
+      "dispensary/p1-07-settings-mobile.png",
+      "dispensary/p2-07-settings-desktop.png",
+      "dispensary/p2-07-settings-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Input font remains 16px; branding panel still stretches to the whole desktop profile height."
+  },
+  {
+    "id": "BUY-048",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/settings"
+    ],
+    "priority": "Low",
+    "title": "Persistent footer repeats draft and shortcut guidance",
+    "observation": "Persistent save footer always says Settings drafts save in this browser and shows keyboard instructions, including Ctrl+S on this Mac review.",
+    "recommendation": "Show Unsaved changes / Saved status only when relevant; use platform-appropriate shortcut hints or omit them.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-07-settings-desktop.png",
+      "dispensary/p1-07-settings-mobile.png",
+      "dispensary/p2-07-settings-desktop.png",
+      "dispensary/p2-07-settings-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Input font remains 16px; branding panel still stretches to the whole desktop profile height."
+  },
+  {
+    "id": "BUY-049",
+    "section": "dispensary",
+    "routes": [
+      "/dispensary/settings"
+    ],
+    "priority": "Low",
+    "title": "Sign-out action lacks a visible label",
+    "observation": "Bottom Account section explains signing out but uses only an unlabeled-in-appearance exit icon for the action.",
+    "recommendation": "Use a plainly labelled Sign out button and remove the explanatory sentence.",
+    "view": "desktop and mobile",
+    "evidence": [
+      "dispensary/p1-07-settings-desktop.png",
+      "dispensary/p1-07-settings-mobile.png",
+      "dispensary/p2-07-settings-desktop.png",
+      "dispensary/p2-07-settings-mobile.png"
+    ],
+    "verification": "Pass 1: observed; pass 2: confirmed. All six pass-one findings confirmed on fresh navigation. Input font remains 16px; branding panel still stretches to the whole desktop profile height."
+  },
+  {
+    "id": "A02",
+    "section": "admin",
+    "routes": [
+      "/admin/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Standardize business-role names",
+    "observation": "Growers/Cultivators and Buyers/Dispensaries vary between navigation, headings and buttons on the same screen.",
+    "recommendation": "Choose one visible term per role; retain alternative legal wording only where needed.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A08",
+    "section": "admin",
+    "routes": [
+      "/admin/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Compact the mobile metric cards",
+    "observation": "Three one-column cards consume roughly 395 px before any checklist action. Helpers repeat already-understood verification context.",
+    "recommendation": "Use compact count cards/row and \u201c1 verified\u201d / \u201c0 pending\u201d helpers.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A09",
+    "section": "admin",
+    "routes": [
+      "/admin/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Collapse completed checklist items",
+    "observation": "Three completed checks remain expanded with individual buttons. The operations panel is about 728 px tall on mobile, and Open settings appears twice.",
+    "recommendation": "Lead with outstanding work, summarize completed checks behind \u201c3 checks complete\u201d, and retain only one primary settings action.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A10",
+    "section": "admin",
+    "routes": [
+      "/admin/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Shrink the clear verification queue",
+    "observation": "A large card uses both Pending verification and Newest accounts awaiting review, then says the queue is clear.",
+    "recommendation": "Show \u201cNo accounts awaiting review\u201d as a short status row; expand the queue only when it contains work.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A11",
+    "section": "admin",
+    "routes": [
+      "/admin/dashboard"
+    ],
+    "priority": "Low",
+    "title": "Move the standing business-model explanation",
+    "observation": "A blue banner repeats the subscription/settlement policy on the routine dashboard, adding about 164 px on mobile.",
+    "recommendation": "Put the full explanation in billing/help and keep a short link here only if needed.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A12",
+    "section": "admin",
+    "routes": [
+      "/admin/dashboard"
+    ],
+    "priority": "Low",
+    "title": "Simplify the development-only seeding panel",
+    "observation": "The local-only panel repeats Demo data seeding, Seed demo accounts and Seed demo data inside nested cards. Source confirms this panel is hidden in production.",
+    "recommendation": "Use one collapsed developer-tools row and one action. This is development-only polish, not a production finding.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A13",
+    "section": "admin",
+    "routes": [
+      "/admin/dashboard"
+    ],
+    "priority": "Medium",
+    "title": "Make dashboard counts match their destinations",
+    "observation": "The clone shows 2 Dispensaries on the dashboard but 1 of 1 in the linked directory. The dashboard includes an off-platform contact that the directory excludes.",
+    "recommendation": "Count the same scope as the destination or label platform accounts and saved contacts separately. This was demonstrated with isolated sample data.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A07",
+    "section": "admin",
+    "routes": [
+      "/admin/dispensaries"
+    ],
+    "priority": "Medium",
+    "title": "Make confirmation wording specific",
+    "observation": "The verification dialog uses generic \u201cConfirm admin action\u201d and \u201cConfirm\u201d; its alert background stretches into a tall pill beside wrapped text.",
+    "recommendation": "Use \u201cRemove verification?\u201d and \u201cRemove verification\u201d; keep the alert icon square and aligned at the top.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p2-unverify-dialog-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A16",
+    "section": "admin",
+    "routes": [
+      "/admin/dispensaries"
+    ],
+    "priority": "Medium",
+    "title": "Remove repeated ordering-policy copy from rows",
+    "observation": "Every desktop row repeats \u201cWholesale settlement stays direct\u201d under ordering readiness. On mobile Ordering/Can submit requests gets a separate section.",
+    "recommendation": "Use a compact \u201cCan order\u201d status and keep the static settlement explanation in one relevant location.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dispensaries-desktop.png",
+      "admin/p1-dispensaries-mobile.png",
+      "admin/p2-dispensaries-desktop.png",
+      "admin/p2-dispensaries-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A17",
+    "section": "admin",
+    "routes": [
+      "/admin/dispensaries"
+    ],
+    "priority": "Medium",
+    "title": "Give business and license identifiers enough room",
+    "observation": "Eight columns make business names, licenses and normal expiry dates wrap even at 1440 px. Normal expiry dates are padded badges.",
+    "recommendation": "Use plain compact dates, combine closely related status fields, and reserve width for identifiers. Show badges for exceptions, not every normal date.",
+    "view": "Desktop",
+    "evidence": [
+      "admin/p1-dispensaries-desktop.png",
+      "admin/p1-dispensaries-mobile.png",
+      "admin/p2-dispensaries-desktop.png",
+      "admin/p2-dispensaries-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A18",
+    "section": "admin",
+    "routes": [
+      "/admin/dispensaries"
+    ],
+    "priority": "Medium",
+    "title": "Delay the wide table/header layout at tablet widths",
+    "observation": "At 1024 px the title is squeezed to about 230 px beside 487 px filters. The table has 980 px content in 718 px space; actions are offscreen with little scrolling indication.",
+    "recommendation": "Stack header controls earlier and use cards or fewer columns until the content area is wide enough; retain a clear scroll affordance if a table must scroll.",
+    "view": "Tablet 1024 px",
+    "evidence": [
+      "admin/p2-dispensaries-tablet.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A04",
+    "section": "admin",
+    "routes": [
+      "/admin/growers"
+    ],
+    "priority": "Medium",
+    "title": "Mobile directory controls consume too many rows",
+    "observation": "Growers and Dispensaries use a 160 px three-row form; Users uses a 113 px two-row form. The first records start around y 413\u2013425.",
+    "recommendation": "Keep search field and Search button together; put status and result count on a compact second row. Preserve usable tap targets.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-growers-desktop.png",
+      "admin/p1-growers-mobile.png",
+      "admin/p2-growers-desktop.png",
+      "admin/p2-growers-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A15",
+    "section": "admin",
+    "routes": [
+      "/admin/growers"
+    ],
+    "priority": "Medium",
+    "title": "Use compact verification metadata",
+    "observation": "A single grower card is about 270 px tall; subscription uses another section despite a short Free value.",
+    "recommendation": "Place plan alongside verification, tighten the email-to-license gap, and preserve separate missing/expired-license warnings. Existing 12 px metadata should not be made smaller.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-growers-desktop.png",
+      "admin/p1-growers-mobile.png",
+      "admin/p2-growers-desktop.png",
+      "admin/p2-growers-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A06",
+    "section": "admin",
+    "routes": [
+      "/admin/settings"
+    ],
+    "priority": "Low",
+    "title": "Reduce navigation grouping and empty notification controls",
+    "observation": "Five admin destinations are divided under three group headings. Empty notifications still show 0 unread and Mark all read.",
+    "recommendation": "Use a simpler five-item navigation list; hide irrelevant unread/action controls when notifications are empty.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-menu-mobile-viewport.png",
+      "admin/p1-notifications-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A19",
+    "section": "admin",
+    "routes": [
+      "/admin/settings"
+    ],
+    "priority": "Low",
+    "title": "Remove implementation commentary and obvious labels",
+    "observation": "The intro explains avoiding controls that silently fail; section subtitles restate titles, Platform:PhenoFarm repeats the shell, and notification copy mentions a future settings store.",
+    "recommendation": "Use \u201cView billing, support and policies\u201d; remove implementation history, repeated subtitles and obvious platform identity.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A20",
+    "section": "admin",
+    "routes": [
+      "/admin/settings"
+    ],
+    "priority": "Medium",
+    "title": "Stop stretching the short support card",
+    "observation": "The Support Profile card stretches to match billing, leaving roughly 335 px of empty white panel.",
+    "recommendation": "Align cards to their content height or use that area for the shorter policy information.",
+    "view": "Desktop",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A21",
+    "section": "admin",
+    "routes": [
+      "/admin/settings"
+    ],
+    "priority": "Medium",
+    "title": "Use one compact status per billing item",
+    "observation": "Configured plus Ready, or Needs provider setup plus Review, repeats status. On mobile the short badges become full-width colored bars.",
+    "recommendation": "Use one status next to the label and make badges fit their text.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A22",
+    "section": "admin",
+    "routes": [
+      "/admin/settings"
+    ],
+    "priority": "Medium",
+    "title": "Consolidate repeated setup and settlement guidance",
+    "observation": "The same provider-setup sentence appears three times; settlement is explained in the banner, support profile and billing. The bottom price-update panel repeats it again.",
+    "recommendation": "Keep one provider-setup link/instruction and one settlement explanation. Give any footer action a relevant destination instead of an internal dashboard link with an external-link icon.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A23",
+    "section": "admin",
+    "routes": [
+      "/admin/settings"
+    ],
+    "priority": "Medium",
+    "title": "Prioritize setup issues and flatten policy cards",
+    "observation": "Billing begins around y 865 on mobile after static information. Operational policies are cards within a card, with redundant Policy badges.",
+    "recommendation": "Put missing configuration first; collapse reference facts and show policies as compact rows without repeated Policy labels.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A01",
+    "section": "admin",
+    "routes": [
+      "/admin/users"
+    ],
+    "priority": "Low",
+    "title": "Shorten page headings and introductions",
+    "observation": "User Management, Cultivator Management and Dispensary Management repeat what the navigation already establishes; their subtitles add one to three lines.",
+    "recommendation": "Use Users, Growers and Dispensaries. Keep only necessary context, such as \u201cView accounts and verification.\u201d Use a consistent mobile heading size around 26\u201328 px instead of 32 px.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-users-desktop.png",
+      "admin/p1-users-mobile.png",
+      "admin/p2-users-desktop.png",
+      "admin/p2-users-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A03",
+    "section": "admin",
+    "routes": [
+      "/admin/users"
+    ],
+    "priority": "Low",
+    "title": "Search placeholders clip on desktop",
+    "observation": "The small desktop input visibly cuts \u201cSearch email or business\u201d; the business directories similarly cut their longer placeholder.",
+    "recommendation": "Use \u201cEmail or business\u201d and a concise visible label; size business/license search fields to their content.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-users-desktop.png",
+      "admin/p1-users-mobile.png",
+      "admin/p2-users-desktop.png",
+      "admin/p2-users-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A05",
+    "section": "admin",
+    "routes": [
+      "/admin/users"
+    ],
+    "priority": "Low",
+    "title": "Simplify directory result counts",
+    "observation": "\u201cShowing 3 of 3 users\u201d and \u201cShowing 1 of 1 cultivators\u201d use a full mobile row even when unfiltered.",
+    "recommendation": "Use \u201c3 users\u201d or \u201c1 grower\u201d in the unfiltered state, and place counts beside the heading/filter. Keep filtered totals when useful.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-users-desktop.png",
+      "admin/p1-users-mobile.png",
+      "admin/p2-users-desktop.png",
+      "admin/p2-users-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  },
+  {
+    "id": "A14",
+    "section": "admin",
+    "routes": [
+      "/admin/users"
+    ],
+    "priority": "Medium",
+    "title": "Tighten sparse mobile account rows",
+    "observation": "Each record occupies about 153 px with large gaps between email, business and joined date. The admin record repeats Admin twice plus an empty business dash.",
+    "recommendation": "Use a compact identity/status row and metadata line. Omit inapplicable business/verification rows for administrators.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-users-desktop.png",
+      "admin/p1-users-mobile.png",
+      "admin/p2-users-desktop.png",
+      "admin/p2-users-mobile.png"
+    ],
+    "verification": "Both fresh passes"
+  }
+]

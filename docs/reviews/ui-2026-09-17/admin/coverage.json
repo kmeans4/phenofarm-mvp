@@ -1,0 +1,157 @@
+[
+  {
+    "route": "/admin/dashboard",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin/p1-dashboard-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p1-dashboard-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin/p2-dashboard-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p2-dashboard-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  },
+  {
+    "route": "/admin/users",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin/p1-users-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p1-users-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin/p2-users-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p2-users-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  },
+  {
+    "route": "/admin/growers",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin/p1-growers-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p1-growers-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin/p2-growers-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p2-growers-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  },
+  {
+    "route": "/admin/dispensaries",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin/p1-dispensaries-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p1-dispensaries-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin/p2-dispensaries-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p2-dispensaries-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  },
+  {
+    "route": "/admin/settings",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin/p1-settings-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p1-settings-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin/p2-settings-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin/p2-settings-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  }
+]

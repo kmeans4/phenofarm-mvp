@@ -1,0 +1,165 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e1066]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1067]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e1068]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e1080]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e1081]
+      - StaticText "Overview"
+    - link "Products" [ref=e1082]
+      - StaticText "Products"
+    - link "Inventory" [ref=e1083]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e1084]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e1085]
+      - StaticText "Strains"
+    - link "Batches" [ref=e1086]
+      - StaticText "Batches"
+    - link "Customers" [ref=e1087]
+      - StaticText "Customers"
+    - link "Reports" [ref=e1088]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e1089]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e1069]
+- main
+  - navigation
+    - link "Dashboard" [ref=e1090]
+    - image
+    - link "Requests" [ref=e1091]
+    - image
+    - StaticText "ORD-20260710-XPJO3I"
+  - sectionheader
+    - heading "Order Request #ORD-20260710-XPJO3I" [level=1, ref=e1092]
+    - paragraph
+      - StaticText "Submitted on July 9, 2026 at 8:39 PM"
+    - StaticText "Submitted"
+    - link "All Requests" [ref=e1093]
+      - image
+      - StaticText "All Requests"
+    - link "Edit Request" [ref=e1094]
+      - image
+      - StaticText "Edit Request"
+    - button "Print" [ref=e1095]
+      - image
+      - StaticText "Print"
+    - button "Export record (CSV)" [ref=e1096]
+  - heading "Requested Items (1item)" [level=3, ref=e1070]
+    - image
+    - StaticText "Requested Items"
+    - StaticText "("
+    - StaticText "1"
+    - StaticText "item"
+    - StaticText ")"
+  - table
+    - rowgroup
+      - row
+        - columnheader "PRODUCT" [ref=e1103]
+        - columnheader "PRICE" [ref=e1104]
+        - columnheader "QTY" [ref=e1105]
+        - columnheader "LINE VALUE" [ref=e1106]
+    - row
+      - cell "Purple Haze Flowers Purple Haze Flower - Indoor" [ref=e1099]
+        - paragraph
+          - StaticText "Purple Haze Flowers"
+        - paragraph
+          - StaticText "Purple Haze"
+        - paragraph
+          - StaticText "Flower - Indoor"
+      - cell "$25.00/gram" [ref=e1100]
+        - StaticText "$25.00/gram"
+      - cell "1" [ref=e1101]
+      - cell "$25.00" [ref=e1102]
+  - StaticText "Estimated item value"
+  - StaticText "$25.00"
+  - StaticText "Estimated request value"
+  - StaticText "$25.00"
+  - paragraph
+    - StaticText "Settlement is handled directly with the dispensary outside PhenoFarm."
+  - heading "Request Details" [level=3, ref=e1071]
+    - image
+    - StaticText "Request Details"
+  - paragraph
+    - StaticText "FULFILLMENT"
+  - paragraph
+    - StaticText "Flexible"
+  - paragraph
+    - StaticText "REQUESTED WINDOW"
+  - paragraph
+    - StaticText "Coordinate with grower"
+  - paragraph
+    - StaticText "DIRECT PAYMENT TERMS"
+  - paragraph
+    - StaticText "Handled directly"
+  - heading "Update Status" [level=3, ref=e1072]
+  - paragraph
+    - StaticText "Quick actions to move fulfillment forward"
+  - StaticText "Submitted"
+  - button "Accept Request" [ref=e1073]
+  - button "Cancel Request" [ref=e1074]
+  - heading "Fulfillment Timeline" [level=3, ref=e1075]
+  - paragraph
+    - StaticText "5 stages"
+  - list
+    - listitem [level=1]
+      - StaticText "Submitted"
+      - StaticText "Jul 9, 2026 8:39 PM"
+    - listitem [level=1]
+      - StaticText "Accepted"
+      - StaticText "Pending"
+    - listitem [level=1]
+      - StaticText "Preparing"
+      - StaticText "Pending"
+    - listitem [level=1]
+      - StaticText "Ready"
+      - StaticText "Pending"
+    - listitem [level=1]
+      - StaticText "Delivered"
+      - StaticText "Pending"
+  - paragraph
+    - StaticText "Currently: Submitted"
+  - paragraph
+    - StaticText "Buyer request received"
+  - generic
+    - heading "History" [level=2, ref=e1097]
+    - list
+      - listitem [level=1]
+        - paragraph
+          - StaticText "Submitted"
+        - paragraph
+          - StaticText "Dispensary · Jul 9, 2026 8:39 PM"
+  - heading "Customer" [level=3, ref=e1076]
+    - image
+    - StaticText "Customer"
+  - link "Green Vermont Dispensary" [ref=e1077]
+  - image
+  - StaticText "(802) 555-0145"
+  - image
+  - StaticText "456 Market Street"
+  - LineBreak "\n"
+  - StaticText "Burlington"
+  - StaticText ", VT"
+  - StaticText " 05401"
+  - button "Message buyer" [ref=e1078]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1098]
+  - button "Open messages" [ref=e1079]
+- region "Notifications alt+T" [ref=e1065]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1107]
+  - image
+- alert

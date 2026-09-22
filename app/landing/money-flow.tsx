@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m as motion } from 'framer-motion';
 import { Building2, Landmark, Sprout } from 'lucide-react';
 import { SectionHeading } from './motion';
 
@@ -49,14 +49,12 @@ function FlowDot({
   path: 'top' | 'bottom';
   reverse?: boolean;
 }) {
-  const reduced = useReducedMotion();
-  if (reduced) return null;
   const from = reverse ? '92%' : '2%';
   const to = reverse ? '2%' : '92%';
   return (
     <motion.span
       aria-hidden
-      className={`absolute rounded-full ${color}`}
+      className={`absolute rounded-full motion-reduce:hidden ${color}`}
       style={{
         width: size,
         height: size,

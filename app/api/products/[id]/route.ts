@@ -1,3 +1,4 @@
+import { persistMediaReference } from '@/lib/blob-storage';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -8,7 +9,6 @@ import {
   toSafeBoolean,
   toSafeNonNegativeInteger,
   toSafeNonNegativeNumber,
-  toSafeOptionalNumber,
   toSafeOptionalString,
   toSafeProductName,
   toSafeProductType,
@@ -20,17 +20,12 @@ type ProductLike = {
   name?: string | null;
   productType?: string | null;
   subType?: string | null;
-  categoryLegacy?: string | null;
-  subcategoryLegacy?: string | null;
-  strainLegacy?: string | null;
   price: Prisma.Decimal | number | null;
   inventoryQty?: number | null;
   unit?: string | null;
   isAvailable?: boolean | null;
   isPriceVisible?: boolean | null;
   images?: string[] | null;
-  thcLegacy?: Prisma.Decimal | number | null;
-  cbdLegacy?: Prisma.Decimal | number | null;
 };
 
 function serializeProduct<T extends ProductLike>(product: T | null) {
@@ -41,19 +36,14 @@ function serializeProduct<T extends ProductLike>(product: T | null) {
   return {
     ...product,
     name: toSafeProductName(product.name),
-    productType: toSafeProductType(product.productType, product.categoryLegacy),
+    productType: toSafeProductType(product.productType),
     subType: toSafeOptionalString(product.subType),
-    categoryLegacy: toSafeOptionalString(product.categoryLegacy),
-    subcategoryLegacy: toSafeOptionalString(product.subcategoryLegacy),
-    strainLegacy: toSafeOptionalString(product.strainLegacy),
     price: toSafeNonNegativeNumber(product.price, 0),
     inventoryQty,
     unit: toSafeUnit(product.unit),
     isAvailable: toSafeAvailability(product.isAvailable, inventoryQty),
     isPriceVisible: toSafeBoolean(product.isPriceVisible, true),
     images: toSafeStringArray(product.images),
-    thcLegacy: toSafeOptionalNumber(product.thcLegacy),
-    cbdLegacy: toSafeOptionalNumber(product.cbdLegacy),
   };
 }
 
@@ -66,11 +56,11 @@ export async function GET(
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const user = session.user;
-    if (user.role !== 'GROWER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const productId = (await context.params).id;
     const product = await db.product.findFirst({
-      where: { id: productId, growerId: user.growerId },
+      where: { id: productId, growerId: user.growerId, isDeleted: false },
       include: {
         strain: { select: { id: true, name: true, genetics: true } },
         batch: true,
@@ -94,13 +84,14 @@ export async function PUT(
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const user = session.user;
-    if (user.role !== 'GROWER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const productId = (await context.params).id;
     const existingProduct = await db.product.findFirst({ where: { id: productId, growerId: user.growerId } });
     if (!existingProduct) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Invalid product' }, { status: 400 });
     const parsed = parseProductPayload(body, {
       partial: true,
       defaultStatus: PRODUCT_STATUS.PUBLISHED,
@@ -111,6 +102,8 @@ export async function PUT(
     }
 
     const data = parsed.data;
+    if (data.images) data.images = await Promise.all(data.images.map(async (value) => (await persistMediaReference(value, `products/${user.growerId}/images`))!));
+    if (data.ingredientsDocumentUrl) data.ingredientsDocumentUrl = await persistMediaReference(data.ingredientsDocumentUrl, `products/${user.growerId}/documents`) || null;
 
     if (data.strainId) {
       const strain = await db.strain.findFirst({
@@ -144,20 +137,23 @@ export async function PUT(
     if (body.ingredientsDocumentUrl !== undefined) updateData.ingredientsDocumentUrl = data.ingredientsDocumentUrl;
     if (body.isFeatured !== undefined) updateData.isFeatured = data.isFeatured;
     if (body.isPriceVisible !== undefined) updateData.isPriceVisible = data.isPriceVisible;
-
-    if (body.strainLegacy !== undefined) updateData.strainLegacy = data.strainLegacy;
-    if (body.categoryLegacy !== undefined) updateData.categoryLegacy = data.categoryLegacy;
-    if (body.subcategoryLegacy !== undefined) updateData.subcategoryLegacy = data.subcategoryLegacy;
-    if (body.thcLegacy !== undefined) updateData.thcLegacy = data.thcLegacy;
-    if (body.cbdLegacy !== undefined) updateData.cbdLegacy = data.cbdLegacy;
+    if (body.status !== undefined) updateData.status = data.status;
+    if (body.thcMin !== undefined) updateData.thcMin = data.thcMin;
+    if (body.thcMax !== undefined) updateData.thcMax = data.thcMax;
+    if (body.cbdMin !== undefined) updateData.cbdMin = data.cbdMin;
+    if (body.cbdMax !== undefined) updateData.cbdMax = data.cbdMax;
+    if (body.harvestDate !== undefined) updateData.harvestDate = data.harvestDate ? new Date(data.harvestDate) : null;
 
     const effectiveInventory = requestedInventory ?? existingProduct.inventoryQty;
+    const effectiveStatus = body.status !== undefined ? data.status : existingProduct.status;
 
     if (body.isAvailable !== undefined) {
       updateData.isAvailable = effectiveInventory > 0 ? Boolean(body.isAvailable) : false;
     } else if (requestedInventory !== null) {
-      updateData.isAvailable = effectiveInventory > 0 ? existingProduct.isAvailable : false;
+      updateData.isAvailable = effectiveInventory > 0 && effectiveStatus === 'PUBLISHED' ? (existingProduct.inventoryQty === 0 || existingProduct.isAvailable) : false;
     }
+
+    if (effectiveStatus === 'DRAFT') updateData.isAvailable = false;
 
     if (Object.keys(updateData).length === 0) {
       return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
@@ -188,7 +184,7 @@ export async function DELETE(
     if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
     const user = session.user;
-    if (user.role !== 'GROWER') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const productId = (await context.params).id;
     const existingProduct = await db.product.findFirst({ where: { id: productId, growerId: user.growerId } });

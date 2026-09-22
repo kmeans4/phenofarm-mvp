@@ -1,0 +1,55 @@
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- generic [ref=e1839] clickable [onclick]
+  - button "Open messages" [ref=e1845]
+- button "Search" [ref=e1840]
+- button "Notifications" [expanded=false, ref=e1841]
+  - StaticText "26"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1842]
+- main
+  - sectionheader
+    - heading "Orders" [level=1, ref=e1846]
+    - link "Catalog" [ref=e1847]
+  - paragraph
+    - StaticText "Requests"
+  - paragraph
+    - StaticText "19"
+  - paragraph
+    - StaticText "In progress"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Awaiting response"
+  - paragraph
+    - StaticText "17"
+  - paragraph
+    - StaticText "Request value"
+  - paragraph
+    - StaticText "$460.50"
+  - form
+    - textbox "Search all order requests" [ref=e1848]
+    - combobox "Request status" [expanded=false, ref=e1849]: Cancelled
+      - MenuListPopup
+        - option "All statuses" [ref=e1851]
+        - option "Submitted" [ref=e1852]
+        - option "Accepted" [ref=e1853]
+        - option "Preparing" [ref=e1854]
+        - option "Ready / In transit" [ref=e1855]
+        - option "Delivered" [ref=e1856]
+        - option "Cancelled" [selected, ref=e1857]
+    - button "Filter" [ref=e1850]
+  - link "View request ORD-1781123929454-1" [ref=e1843]
+    - generic
+      - StaticText "#929454-1"
+      - time
+        - StaticText "Jun 10, 26"
+    - StaticText "Cancelled"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - StaticText "$"
+    - StaticText "25.00"
+  - navigation "Request pages" [ref=e1844]
+    - StaticText "1"
+    - StaticText "request"
+- region "Notifications alt+T" [ref=e1838]
+- alert

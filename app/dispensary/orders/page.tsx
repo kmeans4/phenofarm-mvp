@@ -1,111 +1,122 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
+import { getOrderStatusLabel } from '@/lib/order-workflow';
+import { parsePage } from '@/lib/buyer-products';
+import { Prisma, OrderStatus } from '@prisma/client';
 import { db } from '@/lib/db';
 import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { Card, CardContent } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { StatCard } from '@/app/components/ui/StatCard';
 import { OrdersTable } from '../components/OrdersTable';
 
-export default async function DispensaryOrdersPage() {
-  const session = await getServerSession(authOptions);
+export default async function DispensaryOrdersPage({ searchParams }: { searchParams: Promise<{ page?: string; search?: string; status?: string }> }) {
+  const session = await getAuthSession();
   
   if (!session) {
     redirect('/auth/sign_in');
   }
 
-  const user = session.user as { role: string; growerId?: string; dispensaryId?: string };
+  const user = session.user as { id: string; role: string; growerId?: string; dispensaryId?: string };
   
-  if (user.role !== 'DISPENSARY') {
+  if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
     redirect('/dashboard');
   }
 
-  // Fetch all orders for this dispensary
-  const orders = await db.order.findMany({
-    where: {
-      dispensaryId: user.dispensaryId,
-    },
-    include: {
-      grower: {
-        select: {
-          businessName: true,
+  const params = await searchParams;
+  const page = parsePage(params.page ?? null);
+  const pageSize = 25;
+  const status = params.status && Object.values(OrderStatus).includes(params.status as OrderStatus) ? params.status as OrderStatus : undefined;
+  const search = params.search?.trim().slice(0, 160) || '';
+  const where: Prisma.OrderWhereInput = { dispensaryId: user.dispensaryId, ...(status ? { status } : {}),
+    ...(search ? { OR: [{ orderId: { contains: search, mode: 'insensitive' } }, { grower: { businessName: { contains: search, mode: 'insensitive' } } }] } : {}) };
+  const [orders, filteredCount, summaries] = await Promise.all([
+    db.order.findMany({ where, select: { id: true, orderId: true, growerId: true, createdAt: true, status: true, totalAmount: true, createdBy: true, buyerAcknowledgedAt: true, grower: { select: { businessName: true } } }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: (page - 1) * pageSize, take: pageSize }),
+    db.order.count({ where }),
+    db.order.groupBy({ by: ['status'], where: { dispensaryId: user.dispensaryId }, _count: { _all: true }, _sum: { totalAmount: true } }),
+  ]);
+  const pageHref = (next: number) => `/dispensary/orders?${new URLSearchParams({ page: String(next), ...(search ? { search } : {}), ...(status ? { status } : {}) })}`;
+
+  const growerIds = Array.from(new Set(orders.map((order) => order.growerId).filter(Boolean)));
+  const conversations = growerIds.length > 0
+    ? await db.conversation.findMany({
+        where: {
+          dispensaryId: user.dispensaryId,
+          growerId: { in: growerIds },
         },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  });
+        select: {
+          id: true,
+          growerId: true,
+          dispensaryLastReadAt: true,
+        },
+      })
+    : [];
+  const unreadByConversation = await Promise.all(
+    conversations.map(async (conversation) => {
+      const unreadCount = await db.conversationMessage.count({
+        where: {
+          conversationId: conversation.id,
+          senderUserId: { not: user.id },
+          ...(conversation.dispensaryLastReadAt
+            ? { createdAt: { gt: conversation.dispensaryLastReadAt } }
+            : {}),
+        },
+      });
 
-  const serializedOrders = orders.map((order) => ({
-    ...order,
-    createdAt: order.createdAt.toISOString(),
-    updatedAt: order.updatedAt.toISOString(),
-    shippedAt: order.shippedAt ? order.shippedAt.toISOString() : null,
-    deliveredAt: order.deliveredAt ? order.deliveredAt.toISOString() : null,
-    totalAmount: Number(order.totalAmount),
-    subtotal: Number(order.subtotal),
-    tax: Number(order.tax),
-    shippingFee: Number(order.shippingFee),
-  }));
-
-  // Calculate stats
-  const totalOrders = serializedOrders.length;
-  const activeOrders = serializedOrders.filter(o =>
-    ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(o.status)
+      return { growerId: conversation.growerId, unreadCount };
+    })
   );
-  const activeCount = activeOrders.length;
-  const pendingCount = serializedOrders.filter(o => o.status === 'PENDING').length;
-  // Cancelled requests carry no trackable value
-  const trackedOrderValue = serializedOrders
-    .filter(o => o.status !== 'CANCELLED')
-    .reduce((sum: number, o: { totalAmount: number }) => sum + o.totalAmount, 0);
+  const unreadGrowerIds = new Set(
+    unreadByConversation
+      .filter((entry) => entry.unreadCount > 0)
+      .map((entry) => entry.growerId)
+  );
+
+  const serializedOrders = orders.map(order => ({ id: order.id, orderId: order.orderId, status: order.status,
+    createdAt: order.createdAt.toISOString(), totalAmount: Number(order.totalAmount), grower: order.grower,
+    createdBy: order.createdBy, buyerAcknowledgedAt: order.buyerAcknowledgedAt?.toISOString() ?? null,
+    hasUnreadMessages: unreadGrowerIds.has(order.growerId),
+  }));
+  const totalOrders = summaries.reduce((sum, row) => sum + row._count._all, 0);
+  const activeCount = summaries.filter(row => ['CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(row.status)).reduce((sum, row) => sum + row._count._all, 0);
+  const pendingCount = summaries.find(row => row.status === 'PENDING')?._count._all ?? 0;
+  const trackedOrderValue = summaries.filter(row => row.status !== 'CANCELLED').reduce((sum, row) => sum + Number(row._sum.totalAmount ?? 0), 0);
 
   return (
-    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order Requests</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">View submitted requests, fulfillment status, and direct grower follow-up</p>
-        </div>
-        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
-          <Button variant="primary" asChild className="w-full sm:w-auto">
+    <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-24">
+      <PageHeader
+        title="Orders"
+        mobileInlineActions
+        actions={
+          <Button variant="primary" asChild className="w-auto">
             <Link href="/dispensary/catalog">
-              Browse Catalog
+              Catalog
             </Link>
           </Button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Total Requests</p>
-          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
-        </div>
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Active Requests</p>
-          <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">{activeCount}</p>
-        </div>
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Waiting on Growers</p>
-          <p className="text-xl sm:text-2xl font-bold text-yellow-600 mt-1">{pendingCount}</p>
-        </div>
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Estimated Request Value</p>
-          <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">
-            ${trackedOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-          </p>
-        </div>
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard title="Requests" value={totalOrders} />
+        <StatCard title="In progress" value={activeCount} valueClassName="text-blue-600" />
+        <StatCard title="Awaiting response" value={pendingCount} valueClassName="text-yellow-600" />
+        <StatCard
+          title="Request value"
+          value={`$${trackedOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+          valueClassName="text-green-600"
+        />
       </div>
 
       {/* Orders List */}
       <Card className="bg-white shadow-sm border border-gray-200">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-gray-900">Request Tracker</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="p-3 sm:p-6">
+          <form className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:flex-wrap" action="/dispensary/orders">
+            <input name="search" defaultValue={search} aria-label="Search all order requests" placeholder="Search orders" className="col-span-2 min-w-0 flex-1 rounded-lg border p-2 text-base sm:text-sm" />
+            <select name="status" defaultValue={status || ''} aria-label="Request status" className="min-w-0 rounded-lg border p-2 text-base sm:text-sm"><option value="">All statuses</option>{Object.values(OrderStatus).map(value => <option key={value} value={value}>{getOrderStatusLabel(value)}</option>)}</select>
+            <button type="submit" className="rounded-lg bg-green-700 px-4 py-2 text-white">Filter</button>
+          </form>
           {orders.length === 0 ? (
             <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
               <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
@@ -127,8 +138,13 @@ export default async function DispensaryOrdersPage() {
               </Button>
             </div>
           ) : (
-            <OrdersTable orders={serializedOrders} />
+            <OrdersTable orders={serializedOrders} showFilters={false} showWorkflowViews={false} showResultCount={false} />
           )}
+          <nav aria-label="Request pages" className="mt-4 flex items-center justify-between gap-3 text-sm">
+            {page > 1 ? <Link href={pageHref(page - 1)} className="rounded-lg border px-3 py-2">Previous</Link> : <span />}
+            <span>{filteredCount} {filteredCount === 1 ? 'request' : 'requests'}{filteredCount > pageSize ? ` · Page ${page}` : ''}</span>
+            {page * pageSize < filteredCount ? <Link href={pageHref(page + 1)} className="rounded-lg border px-3 py-2">Next</Link> : <span />}
+          </nav>
         </CardContent>
       </Card>
     </div>

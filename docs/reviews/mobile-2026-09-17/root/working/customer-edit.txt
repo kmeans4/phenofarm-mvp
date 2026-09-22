@@ -1,0 +1,77 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e558] clickable [onclick]
+  - button "Open messages" [ref=e564]
+- button "Search" [ref=e559]
+- button "Notifications" [expanded=false, ref=e560]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e561]
+- main
+  - link "← Customers" [ref=e562]
+  - link "Statement" [ref=e563]
+  - sectionheader
+    - heading "Edit customer" [level=1, ref=e565]
+  - form
+    - heading "Business" [level=2, ref=e566]
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox "Enter business name" [ref=e567]: Maple Street Market
+      - StaticText "Maple Street Market"
+    - LabelText
+      - StaticText "License Number"
+    - textbox "License #" [ref=e568]: VT-UI-2026-104
+      - StaticText "VT-UI-2026-104"
+    - group
+      - DisclosureTriangle "Website & description" [expanded=false]
+        - StaticText "Website & description"
+    - heading "Contact" [level=2, ref=e569]
+    - LabelText
+      - StaticText "Contact Person"
+    - textbox "Full name" [ref=e570]: Alex Morgan
+      - StaticText "Alex Morgan"
+    - LabelText
+      - StaticText "Email"
+    - textbox "email@example.com" [ref=e571]: orders@example.test
+      - StaticText "orders@example.test"
+    - LabelText
+      - StaticText "Phone"
+    - textbox "(555) 123-4567" [ref=e572]: 802-555-0142
+      - StaticText "802-555-0142"
+    - heading "Address" [level=2, ref=e573]
+    - LabelText
+      - StaticText "Street Address"
+    - textbox "123 Main St" [ref=e574]: 25 Maple Street
+      - StaticText "25 Maple Street"
+    - LabelText
+      - StaticText "City"
+    - textbox "City" [ref=e575]: Burlington
+      - StaticText "Burlington"
+    - LabelText
+      - StaticText "State"
+    - combobox [expanded=false, ref=e576]: Vermont
+      - MenuListPopup
+        - option "Vermont" [selected, ref=e581]
+        - option "Maine" [ref=e582]
+        - option "Massachusetts" [ref=e583]
+        - option "Connecticut" [ref=e584]
+        - option "Rhode Island" [ref=e585]
+        - option "New Hampshire" [ref=e586]
+        - option "New York" [ref=e587]
+        - option "New Jersey" [ref=e588]
+        - option "Pennsylvania" [ref=e589]
+        - option "Delaware" [ref=e590]
+        - option "Maryland" [ref=e591]
+        - option "District of Columbia" [ref=e592]
+        - option "Virginia" [ref=e593]
+    - LabelText
+      - StaticText "ZIP"
+    - textbox "12345" [ref=e577]: 05401
+      - StaticText "05401"
+    - button "More actions for Maple Street Market" [ref=e580]
+      - StaticText "More"
+    - link "Cancel" [ref=e578]
+    - button "Save changes" [ref=e579]
+- region "Notifications alt+T" [ref=e557]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e594]
+  - image
+- alert

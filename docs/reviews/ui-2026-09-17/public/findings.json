@@ -1,0 +1,357 @@
+{
+  "audit": "public marketing and auth UI",
+  "date": "2026-09-17",
+  "passes": 2,
+  "findings": [
+    {
+      "id": "PUB-003",
+      "route": "/",
+      "viewport": "390x844",
+      "priority": "P3",
+      "observation": "The hero supporting paragraph takes five mobile lines and repeats the direct-settlement/no-take-rate idea that appears again in the hero footnote and later sections.",
+      "recommendation": "Shorten \u201cVerified partners, recorded quotes, and live request tracking from submission to delivery \u2014 while settlement moves directly between businesses. PhenoFarm never takes a cut.\u201d to \u201cVerified partners, recorded quotes, and live request tracking \u2014 while settlement stays direct. PhenoFarm takes no cut.\u201d",
+      "evidence": [
+        "screenshots/pass1/home-mobile.png",
+        "screenshots/pass2/home-mobile.png"
+      ],
+      "passVerification": "Pass 2 rechecked the hero at mobile width; the paragraph remains the same five-line block and no clipping occurs.",
+      "title": "Mobile hero repeats the settlement promise"
+    },
+    {
+      "id": "PUB-004",
+      "route": "/help",
+      "viewport": "1440x1000 and 390x844",
+      "priority": "P3",
+      "observation": "The \u201cHELP CENTER\u201d eyebrow, \u201cPractical answers for licensed marketplace teams.\u201d heading, and explanatory paragraph all communicate the same page purpose before the question groups begin.",
+      "recommendation": "Use \u201cMarketplace help\u201d as the heading and \u201cVerification, requests, quotes, settlement, and subscriptions.\u201d as the intro, or keep the current heading and remove the eyebrow. This trims the opening copy without removing context.",
+      "evidence": [
+        "screenshots/pass1/help-desktop.png",
+        "screenshots/pass1/help-mobile.png",
+        "screenshots/pass2/help-desktop.png",
+        "screenshots/pass2/help-mobile.png"
+      ],
+      "passVerification": "Pass 1 and Pass 2 show the same three-layer intro at both widths; opened disclosures still retain clear context.",
+      "title": "Help intro repeats the page purpose"
+    },
+    {
+      "id": "PUB-005",
+      "route": "/contact",
+      "viewport": "390x844",
+      "priority": "P2",
+      "observation": "The mobile title wraps to three lines, followed by a four-line intro and three information cards before the form begins at roughly y=843px. The form is usable, but the primary contact action is pushed below a long preamble.",
+      "recommendation": "Shorten the title to \u201cTalk about wholesale workflows\u201d and move the email contact card beside or immediately below the intro, before the location and policy cards. Keep the full form lower on the page.",
+      "evidence": [
+        "screenshots/pass1/contact-mobile.png",
+        "screenshots/pass2/contact-mobile.png"
+      ],
+      "passVerification": "Pass 2 confirmed the same 1,670px page height and form start position; no horizontal overflow or control clipping was found.",
+      "title": "Mobile contact form starts below a long preamble"
+    },
+    {
+      "id": "PUB-006",
+      "route": "/contact",
+      "viewport": "1440x1000 and 390x844",
+      "priority": "P3",
+      "observation": "The form helper text \u201cYour draft will include these details so support can route the conversation quickly.\u201d is longer than needed and repeats the surrounding support-routing context.",
+      "recommendation": "Use \u201cThese details help support route your request.\u201d",
+      "evidence": [
+        "screenshots/pass1/contact-desktop.png",
+        "screenshots/pass1/contact-mobile.png",
+        "screenshots/pass2/contact-desktop.png",
+        "screenshots/pass2/contact-mobile.png"
+      ],
+      "passVerification": "Pass 1 and Pass 2 show the same helper copy in both layouts; field labels and the email-draft action remain clear.",
+      "title": "Contact helper copy is longer than needed"
+    },
+    {
+      "id": "PUB-007",
+      "route": "/legal/privacy",
+      "viewport": "1440x1000 and 390x844",
+      "priority": "P2",
+      "observation": "The hero warning identifies a pre-launch draft pending counsel review, then the first body card repeats the same draft-status message before substantive policy content. On mobile this adds a full card before \u201cInformation we collect.\u201d",
+      "recommendation": "Keep one concise hero warning, such as \u201cPre-launch draft for counsel review.\u201d, and remove the duplicate Draft status body card so Contents leads directly to \u201cInformation we collect.\u201d",
+      "evidence": [
+        "screenshots/pass1/privacy-desktop.png",
+        "screenshots/pass1/privacy-mobile.png",
+        "screenshots/pass2/privacy-desktop-bottom.png",
+        "screenshots/pass2/privacy-mobile-bottom.png"
+      ],
+      "passVerification": "Pass 2 rechecked the top and lower sections at both widths; legal sections remain readable and the duplicate is still present.",
+      "title": "Privacy draft status is duplicated"
+    },
+    {
+      "id": "PUB-008",
+      "route": "/legal/terms",
+      "viewport": "1440x1000 and 390x844",
+      "priority": "P2",
+      "observation": "The hero warning and the first Draft status card repeat the pre-launch/counsel-review message before \u201cEligible users.\u201d The repetition adds vertical weight to an already long mobile legal page.",
+      "recommendation": "Keep the warning once in the hero, shorten it to \u201cPre-launch draft for counsel review.\u201d, and remove the duplicate Draft status card.",
+      "evidence": [
+        "screenshots/pass1/terms-desktop.png",
+        "screenshots/pass1/terms-mobile.png",
+        "screenshots/pass2/terms-desktop-bottom.png",
+        "screenshots/pass2/terms-mobile-bottom.png"
+      ],
+      "passVerification": "Pass 2 rechecked the complete document and bottom sections at both widths; no readability or overflow issue was found beyond the redundant status block.",
+      "title": "Terms draft status is duplicated"
+    },
+    {
+      "id": "PUB-009",
+      "route": "/legal/cookies",
+      "viewport": "1440x1000 and 390x844",
+      "priority": "P2",
+      "observation": "The hero warning and first Draft status card repeat the same pre-launch/counsel-review state before the cookie content starts. The mobile version is 3,188px tall, so the duplicate has a noticeable scroll cost.",
+      "recommendation": "Keep one concise hero warning, remove the duplicate Draft status card, and let Contents lead into \u201cCookies and storage.\u201d",
+      "evidence": [
+        "screenshots/pass1/cookies-desktop.png",
+        "screenshots/pass1/cookies-mobile.png",
+        "screenshots/pass2/cookies-desktop-bottom.png",
+        "screenshots/pass2/cookies-mobile-bottom.png"
+      ],
+      "passVerification": "Pass 2 rechecked the top and bottom sections at both widths; the duplicate remains, while all legal content stays readable.",
+      "title": "Cookie draft status is duplicated"
+    },
+    {
+      "id": "PUB-010",
+      "route": "/legal/cookies",
+      "viewport": "1440x1000 and 390x844",
+      "priority": "P3",
+      "observation": "The section heading \u201cWhat cookies and storage are\u201d reads like a question fragment and is longer than the neighboring noun-based section headings.",
+      "recommendation": "Rename it to \u201cCookies and storage.\u201d",
+      "evidence": [
+        "screenshots/pass1/cookies-desktop.png",
+        "screenshots/pass1/cookies-mobile.png",
+        "screenshots/pass2/cookies-desktop.png",
+        "screenshots/pass2/cookies-mobile.png"
+      ],
+      "passVerification": "Pass 1 and Pass 2 show the same heading at both widths; the section body remains legible.",
+      "title": "Cookie section heading is wordy"
+    },
+    {
+      "id": "PUB-011",
+      "route": "/auth/sign_in",
+      "viewport": "1440x1000",
+      "priority": "P3",
+      "observation": "The desktop marketing panel uses a long three-line headline, \u201cWholesale cannabis workflows without payment confusion.\u201d, while the adjacent form already establishes sign-in context and the supporting paragraph repeats workflow/payment language.",
+      "recommendation": "Shorten the marketing headline to \u201cWholesale workflows, without payment confusion.\u201d and trim the paragraph to one sentence. Keep the marketing panel hidden on mobile as it is today.",
+      "evidence": [
+        "screenshots/pass1/sign-in-desktop.png",
+        "screenshots/pass2/sign-in-desktop.png"
+      ],
+      "passVerification": "Pass 2 rechecked the desktop form and password-visibility state; controls remain aligned and the mobile form remains focused without the marketing panel.",
+      "title": "Sign-in marketing panel is overlong"
+    },
+    {
+      "id": "PUB-012",
+      "route": "/auth/sign_up",
+      "viewport": "1440x1000",
+      "priority": "P3",
+      "observation": "The desktop marketing panel headline \u201cBuild a verified marketplace profile in one pass.\u201d and the paragraph beginning \u201cCreate one account...\u201d repeat the same account-creation promise already shown by the form heading.",
+      "recommendation": "Use \u201cBuild your verified profile.\u201d for the marketing headline and keep the paragraph focused on the two workflows: \u201cOne account covers grower catalog or dispensary buying workflows.\u201d",
+      "evidence": [
+        "screenshots/pass1/sign-up-desktop.png",
+        "screenshots/pass2/sign-up-desktop.png",
+        "screenshots/pass2/sign-up-desktop-dispensary-password-visible.png"
+      ],
+      "passVerification": "Pass 2 rechecked the desktop role selection and password visibility state; the form remains readable and the additional dispensary guidance fits.",
+      "title": "Sign-up marketing panel repeats the form promise"
+    },
+    {
+      "id": "PUB-013",
+      "route": "/auth/sign_up",
+      "viewport": "390x844",
+      "priority": "P3",
+      "observation": "The mobile legal disclosure wraps into two centered lines with a large gap created by the line break: \u201cBy signing up, you agree to our Terms of Service\u201d followed by \u201cand Privacy Policy.\u201d",
+      "recommendation": "Shorten the copy to \u201cBy signing up, you agree to the Terms and Privacy Policy.\u201d while retaining both links inline.",
+      "evidence": [
+        "screenshots/pass1/sign-up-mobile.png",
+        "screenshots/pass2/sign-up-mobile.png",
+        "screenshots/pass2/sign-up-mobile-dispensary-password-visible.png"
+      ],
+      "passVerification": "Pass 2 rechecked the default grower and selected dispensary states; the disclosure remains readable and does not overflow.",
+      "title": "Mobile sign-up disclosure wraps awkwardly"
+    },
+    {
+      "id": "PUB-014",
+      "route": "/auth/error?error=Configuration",
+      "viewport": "1440x1000",
+      "priority": "P3",
+      "observation": "Both desktop error states reuse the same long marketing panel (\u201cGet back into your marketplace workspace.\u201d), the same two-sentence support explanation, and the same three bullets. The right cards correctly distinguish configuration from credential failure, so the repeated left panel is the remaining copy weight.",
+      "recommendation": "Use a shorter shared panel such as \u201cNeed access? We can help.\u201d with one concise support line, leaving the specific error title and red message on the right.",
+      "evidence": [
+        "screenshots/pass1/error-configuration-desktop.png",
+        "screenshots/pass2/error-configuration-desktop.png"
+      ],
+      "passVerification": "Pass 2 rechecked both error states and their back-to-sign-in/contact-support actions; mobile cards remain concise and clear.",
+      "title": "Configuration error repeats marketing copy"
+    },
+    {
+      "id": "PUB-015",
+      "route": "/auth/error?error=CredentialsSignin",
+      "viewport": "1440x1000",
+      "priority": "P3",
+      "observation": "Both desktop error states reuse the same long marketing panel (\u201cGet back into your marketplace workspace.\u201d), the same two-sentence support explanation, and the same three bullets. The right cards correctly distinguish configuration from credential failure, so the repeated left panel is the remaining copy weight.",
+      "recommendation": "Use a shorter shared panel such as \u201cNeed access? We can help.\u201d with one concise support line, leaving the specific error title and red message on the right.",
+      "evidence": [
+        "screenshots/pass1/error-credentials-desktop.png",
+        "screenshots/pass2/error-credentials-desktop.png"
+      ],
+      "passVerification": "Pass 2 rechecked both error states and their back-to-sign-in/contact-support actions; mobile cards remain concise and clear.",
+      "title": "Credentials error repeats marketing copy"
+    },
+    {
+      "id": "PUB-016",
+      "title": "Testimonial-to-pricing transition has excess vertical space",
+      "route": "/",
+      "viewport": "1440x1000 and 390x844",
+      "priority": "P3",
+      "observation": "After the final testimonial cards and the \u201cIllustrative customer scenarios.\u201d disclaimer, the Pricing eyebrow sits after a low-content transition of roughly 300px on desktop and 240px on mobile. The content is fully rendered; the issue is the repeated section padding at this boundary.",
+      "recommendation": "Reduce the shared bottom padding after testimonials or top padding before pricing by roughly 25\u201335%, keeping a deliberate but shorter transition before the pricing heading.",
+      "evidence": [
+        "screenshots/settled/pass1/desktop/y04200.png",
+        "screenshots/settled/pass2/desktop/y04200.png",
+        "screenshots/settled/pass1/mobile/y05664.png",
+        "screenshots/settled/pass2/mobile/y05664.png"
+      ],
+      "passVerification": "Pass 1 and Pass 2 show the same settled transition at both widths; all testimonials and the pricing heading are visible, so this replaces the withdrawn missing-content gap claim with a narrower spacing observation."
+    },
+    {
+      "id": "PUB-017",
+      "title": "Mobile footer repeats Privacy and Terms links",
+      "route": "/",
+      "viewport": "390x844",
+      "priority": "P3",
+      "observation": "The mobile footer stacks the Growers, Dispensaries, and Company groups into a long single column. Company includes \u201cPrivacy policy\u201d and \u201cTerms of service\u201d, then the bottom legal row repeats those destinations as \u201cPrivacy\u201d and \u201cTerms\u201d alongside \u201cCookies\u201d.",
+      "recommendation": "Keep Contact and Help center in the Company group, remove the duplicate Privacy policy and Terms of service entries there, and retain one compact bottom row for Privacy, Terms, and Cookies.",
+      "evidence": [
+        "screenshots/settled/pass1/mobile/y09912.png",
+        "screenshots/settled/pass1/mobile/y10319.png",
+        "screenshots/settled/pass2/mobile/y09912.png",
+        "screenshots/settled/pass2/mobile/y10319.png"
+      ],
+      "passVerification": "Pass 1 and Pass 2 show the same one-column footer density and repeated policy destinations at 390x844."
+    }
+  ],
+  "withdrawnFindings": [
+    {
+      "id": "PUB-001",
+      "route": "/",
+      "viewport": "390x844",
+      "priority": "P1",
+      "reason": "Withdrawn after settled viewport scrolling: the original full-page screenshot skipped Framer Motion whileInView reveal triggers, making sections appear absent. Two fresh settled passes show the hero, metrics, money flow, feature tour, personas, testimonials, pricing, FAQ, CTA, and footer.",
+      "evidence": [
+        "screenshots/pass1/home-mobile.png",
+        "screenshots/settled/pass1/mobile/y00000.png",
+        "screenshots/settled/pass1/mobile/y07080.png",
+        "screenshots/settled/pass2/mobile/y00000.png",
+        "screenshots/settled/pass2/mobile/y09204.png"
+      ]
+    },
+    {
+      "id": "PUB-002",
+      "route": "/",
+      "viewport": "1440x1000",
+      "priority": "P2",
+      "reason": "Withdrawn after settled viewport scrolling: the original full-page screenshot skipped Framer Motion whileInView reveal triggers, making sections appear low-density or absent. Two fresh settled passes show every homepage section through the footer at its natural rendered position.",
+      "evidence": [
+        "screenshots/pass1/home-desktop.png",
+        "screenshots/settled/pass1/desktop/y00000.png",
+        "screenshots/settled/pass1/desktop/y05040.png",
+        "screenshots/settled/pass1/desktop/y06720.png",
+        "screenshots/settled/pass2/desktop/y00000.png",
+        "screenshots/settled/pass2/desktop/y06720.png"
+      ]
+    }
+  ],
+  "settledScroll": {
+    "route": "/",
+    "method": "Viewport scroll with behavior: instant and 1100ms settle after each position; full-page captures were not used to judge reveal visibility.",
+    "revealVerified": true,
+    "passes": {
+      "pass1": {
+        "desktop": {
+          "viewport": "1440x1000",
+          "pageHeight": 8041,
+          "positions": [
+            0,
+            840,
+            1680,
+            2520,
+            3360,
+            4200,
+            5040,
+            5880,
+            6720,
+            7041
+          ],
+          "screenshots": "screenshots/settled/pass1/desktop"
+        },
+        "mobile": {
+          "viewport": "390x844",
+          "pageHeight": 11163,
+          "positions": [
+            0,
+            708,
+            1416,
+            2124,
+            2832,
+            3540,
+            4248,
+            4956,
+            5664,
+            6372,
+            7080,
+            7788,
+            8496,
+            9204,
+            9912,
+            10319
+          ],
+          "screenshots": "screenshots/settled/pass1/mobile"
+        }
+      },
+      "pass2": {
+        "desktop": {
+          "viewport": "1440x1000",
+          "pageHeight": 8041,
+          "positions": [
+            0,
+            840,
+            1680,
+            2520,
+            3360,
+            4200,
+            5040,
+            5880,
+            6720,
+            7041
+          ],
+          "screenshots": "screenshots/settled/pass2/desktop"
+        },
+        "mobile": {
+          "viewport": "390x844",
+          "pageHeight": 11163,
+          "positions": [
+            0,
+            708,
+            1416,
+            2124,
+            2832,
+            3540,
+            4248,
+            4956,
+            5664,
+            6372,
+            7080,
+            7788,
+            8496,
+            9204,
+            9912,
+            10319
+          ],
+          "screenshots": "screenshots/settled/pass2/mobile"
+        }
+      }
+    }
+  }
+}

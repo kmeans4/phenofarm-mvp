@@ -1,7 +1,25 @@
 import { test, expect, type Browser, type Page } from '@playwright/test';
+import { loadEnvConfig } from '@next/env';
 
 test.describe('Messaging Workflow', () => {
   test.describe.configure({ mode: 'serial' });
+
+  test.afterAll(async () => {
+    loadEnvConfig(process.cwd());
+    const { PrismaClient } = await import('@prisma/client');
+    const prisma = new PrismaClient();
+    try {
+      await prisma.conversation.deleteMany({
+        where: {
+          messages: {
+            some: { body: { startsWith: 'Automated ' } },
+          },
+        },
+      });
+    } finally {
+      await prisma.$disconnect();
+    }
+  });
 
   async function login(page: Page, role: 'grower' | 'dispensary') {
     await page.context().clearCookies();
@@ -23,12 +41,12 @@ test.describe('Messaging Workflow', () => {
 
   async function openChat(page: Page) {
     await page.getByTestId('chat-button').click();
-    await expect(page.getByRole('heading', { name: 'Messages' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Messages', exact: true })).toBeVisible();
   }
 
   async function closeChat(page: Page) {
     await page.getByTestId('close-chat').click();
-    await expect(page.getByRole('heading', { name: 'Messages' })).not.toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Messages', exact: true })).not.toBeVisible();
   }
 
   async function selectLatestConversation(page: Page) {
@@ -40,19 +58,19 @@ test.describe('Messaging Workflow', () => {
   async function createConversationFromCatalog(page: Page, note: string) {
     await page.goto('/dispensary/catalog');
     await page.waitForURL('**/dispensary/catalog');
-    await expect(page.getByRole('heading', { name: 'Product Catalog' })).toBeVisible({ timeout: 15000 });
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible({ timeout: 15000 });
 
-    const messageGrowerButton = page.getByRole('button', { name: 'Message Grower' }).first();
+    const messageGrowerButton = page.getByRole('button', { name: 'Message grower' }).first();
     await expect(messageGrowerButton).toBeVisible({ timeout: 15000 });
     await messageGrowerButton.click();
 
-    await expect(page.getByRole('heading', { name: 'Message Grower' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Message grower' })).toBeVisible();
 
     const modalTextarea = page.locator('textarea').first();
     await modalTextarea.fill(note);
     await page.getByRole('button', { name: 'Send Message' }).click();
 
-    await expect(page.getByRole('heading', { name: 'Messages' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Messages', exact: true })).toBeVisible();
     const conversation = page.getByTestId('conversation-item').filter({ hasText: note }).first();
     await expect(conversation).toBeVisible({ timeout: 15000 });
     await conversation.click();
@@ -75,6 +93,7 @@ test.describe('Messaging Workflow', () => {
     await login(page, 'dispensary');
     await createConversationFromCatalog(page, initialMessage);
 
+    await page.locator('summary').filter({ hasText: /^Quote$/ }).click();
     await page.getByTestId('request-pricing').click();
 
     await expect(
@@ -98,10 +117,11 @@ test.describe('Messaging Workflow', () => {
     await closeChat(dispensaryPage);
 
     const { context: growerContext, page: growerPage } = await openLatestConversationAs(browser, 'grower');
+    await growerPage.locator('summary').filter({ hasText: /^Quote$/ }).click();
     await growerPage.getByTestId('toggle-offer-composer').click();
     await growerPage.locator('input[placeholder="Quote unit price"]').fill('125');
     await growerPage.locator('input[placeholder="Qty (optional)"]').first().fill('10');
-    await growerPage.locator('input[placeholder="Quote terms note (optional)"]').fill(offerNote);
+    await growerPage.getByPlaceholder('Quote terms note (optional)').fill(offerNote);
     await growerPage.getByTestId('send-offer').click();
     await expect(growerPage.getByText(offerNote)).toBeVisible();
 
@@ -144,9 +164,9 @@ test.describe('Messaging Workflow', () => {
     const growerPage = await growerContext.newPage();
     await login(growerPage, 'grower');
 
-    await expect(growerPage.getByTestId('unread-badge')).toBeVisible({ timeout: 15000 });
-
+    // Conversation counts load when the drawer opens; verify unread before selecting it.
     await openChat(growerPage);
+    await expect(growerPage.getByTestId('conversation-item').filter({ hasText: readCheckMessage }).getByTestId('conversation-unread-badge')).toBeVisible({ timeout: 15000 });
     await selectLatestConversation(growerPage);
     await expect(growerPage.getByTestId('message-bubble').filter({ hasText: readCheckMessage }).last()).toBeVisible({ timeout: 15000 });
     const readConversation = growerPage.getByTestId('conversation-item').filter({ hasText: readCheckMessage }).first();

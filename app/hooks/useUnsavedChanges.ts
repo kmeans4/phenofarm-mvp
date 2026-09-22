@@ -1,193 +1,62 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useState } from 'react';
-import { useRouter } from 'next/navigation';
 
 interface UseUnsavedChangesOptions {
   enabled?: boolean;
   message?: string;
 }
 
-/**
- * Custom hook to warn users about unsaved changes when navigating away
- * 
- * Features:
- * - Detects browser navigation (back button, close tab, refresh) via beforeunload
- * - Detects in-app navigation (Next.js router) via route interception
- * - Tracks form dirty state by comparing current values to initial values
- * 
- * Usage:
- * const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
- *   enabled: true,
- *   message: 'You have unsaved changes. Are you sure you want to leave?'
- * });
- * 
- * // To mark form as dirty when values change:
- * useEffect(() => {
- *   const isChanged = JSON.stringify(formData) !== JSON.stringify(initialData);
- *   setIsDirty(isChanged);
- * }, [formData, initialData]);
- * 
- * // To reset after successful save:
- * resetDirtyState();
+/** Guards browser unload and links without mutating Next's shared router.
+ * Programmatic Cancel/back actions must call confirmNavigation before navigating.
  */
-export function useUnsavedChanges(options: UseUnsavedChangesOptions = {}) {
-  const { 
-    enabled = true, 
-    message = 'You have unsaved changes. Are you sure you want to leave?' 
-  } = options;
-  
+export function useUnsavedChanges({
+  enabled = true,
+  message = 'You have unsaved changes. Are you sure you want to leave?',
+}: UseUnsavedChangesOptions = {}) {
   const [isDirty, setIsDirty] = useState(false);
-  const router = useRouter();
-  const originalPushRef = useRef<typeof router.push>(undefined);
-  const originalReplaceRef = useRef<typeof router.replace>(undefined);
-  const originalBackRef = useRef<typeof router.back>(undefined);
-  const originalForwardRef = useRef<typeof router.forward>(undefined);
-  const isConfirmingRef = useRef(false);
+  const dirtyRef = useRef(false);
+  const updateDirty = useCallback((value: boolean) => {
+    dirtyRef.current = value;
+    setIsDirty(value);
+  }, []);
+  const confirmNavigation = useCallback(() => (
+    !enabled || !dirtyRef.current || window.confirm(message)
+  ), [enabled, message]);
 
-  // Store original router methods
-  useEffect(() => {
-    if (!enabled) return;
-    
-    originalPushRef.current = router.push.bind(router);
-    originalReplaceRef.current = router.replace.bind(router);
-    originalBackRef.current = router.back.bind(router);
-    originalForwardRef.current = router.forward.bind(router);
-  }, [enabled, router]);
-
-  // Handle browser beforeunload event (close tab, refresh, back button)
   useEffect(() => {
     if (!enabled || !isDirty) return;
-
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = message;
-      return message;
+    const beforeUnload = (event: BeforeUnloadEvent) => {
+      if (!dirtyRef.current) return;
+      event.preventDefault();
+      event.returnValue = message;
     };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    
+    const onLink = (event: MouseEvent) => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
+      if (!anchor || anchor.hasAttribute('download') || anchor.target === '_blank') return;
+      const destination = new URL(anchor.href, window.location.href);
+      if (destination.pathname === window.location.pathname && destination.search === window.location.search) return;
+      if (!confirmNavigation()) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+    window.addEventListener('beforeunload', beforeUnload);
+    document.addEventListener('click', onLink, true);
     return () => {
-      window.removeEventListener('beforeunload', handleBeforeUnload);
+      window.removeEventListener('beforeunload', beforeUnload);
+      document.removeEventListener('click', onLink, true);
     };
-  }, [enabled, isDirty, message]);
-
-  // Handle in-app navigation via Next.js router
-  useEffect(() => {
-    if (!enabled || !originalPushRef.current) return;
-
-    const confirmNavigation = (): boolean => {
-      if (!isDirty || isConfirmingRef.current) return true;
-      
-      isConfirmingRef.current = true;
-      const confirmed = window.confirm(message);
-      isConfirmingRef.current = false;
-      
-      return confirmed;
-    };
-
-    // Override router.push
-    const originalPush = originalPushRef.current;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any,react-hooks/immutability
-    (router as any).push = async (...args: Parameters<typeof router.push>) => {
-      if (confirmNavigation()) {
-        return originalPush(...args);
-      }
-      // Return a resolved promise to maintain the return type contract
-      return Promise.resolve(false);
-    };
-
-    // Override router.replace
-    const originalReplace = originalReplaceRef.current!;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (router as any).replace = async (...args: Parameters<typeof router.replace>) => {
-      if (confirmNavigation()) {
-        return originalReplace(...args);
-      }
-      return Promise.resolve(false);
-    };
-
-    // Override router.back
-    const originalBack = originalBackRef.current!;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (router as any).back = () => {
-      if (confirmNavigation()) {
-        originalBack();
-      }
-    };
-
-    // Override router.forward
-    const originalForward = originalForwardRef.current!;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (router as any).forward = () => {
-      if (confirmNavigation()) {
-        originalForward();
-      }
-    };
-
-    // Cleanup: restore original methods
-    return () => {
-      if (originalPushRef.current) router.push = originalPushRef.current;
-      if (originalReplaceRef.current) router.replace = originalReplaceRef.current;
-      if (originalBackRef.current) router.back = originalBackRef.current;
-      if (originalForwardRef.current) router.forward = originalForwardRef.current;
-    };
-  }, [enabled, isDirty, router, message]);
-
-  // Helper to manually trigger dirty state
-  const triggerDirty = useCallback(() => {
-    setIsDirty(true);
-  }, []);
-
-  // Helper to manually reset dirty state (call after successful save)
-  const resetDirtyState = useCallback(() => {
-    setIsDirty(false);
-  }, []);
+  }, [confirmNavigation, enabled, isDirty, message]);
 
   return {
     isDirty,
-    setIsDirty,
-    triggerDirty,
-    resetDirtyState,
+    setIsDirty: updateDirty,
+    triggerDirty: useCallback(() => updateDirty(true), [updateDirty]),
+    resetDirtyState: useCallback(() => updateDirty(false), [updateDirty]),
+    confirmNavigation,
     message,
-  };
-}
-
-/**
- * Helper hook to track form dirty state by comparing current and initial values
- * 
- * Usage:
- * const { isDirty, resetDirtyState } = useFormDirty(formData, initialData);
- */
-export function useFormDirty<T extends Record<string, unknown>>(
-  currentData: T,
-  initialData: T,
-  options?: UseUnsavedChangesOptions
-) {
-  const [lastSavedData, setLastSavedData] = useState<T>(initialData);
-  
-  // Compare current data with last saved data
-  const isDirty = JSON.stringify(currentData) !== JSON.stringify(lastSavedData);
-  
-  const unsavedChanges = useUnsavedChanges({
-    ...options,
-    enabled: options?.enabled !== false && isDirty,
-  });
-
-  // Sync with the hook's isDirty state
-  useEffect(() => {
-    unsavedChanges.setIsDirty(isDirty);
-  }, [isDirty, unsavedChanges]);
-
-  const resetDirtyState = useCallback(() => {
-    setLastSavedData(currentData);
-    unsavedChanges.resetDirtyState();
-  }, [currentData, unsavedChanges]);
-
-  return {
-    isDirty,
-    resetDirtyState,
-    message: unsavedChanges.message,
   };
 }
 

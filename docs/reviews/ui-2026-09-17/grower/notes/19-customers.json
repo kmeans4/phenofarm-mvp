@@ -1,0 +1,47 @@
+{
+  "slug": "19-customers",
+  "route": "/grower/customers",
+  "pass1": {
+    "inspected": [
+      "pass-1/19-customers-desktop.png",
+      "pass-1/19-customers-mobile.png"
+    ],
+    "strengths": [
+      "Mobile uses readable customer cards, visible contact details and two clear relationship actions."
+    ],
+    "issues": [
+      {
+        "key": "customers-entry-points",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "The customer directory exposes only View requests and Message. Add customer, edit saved contact and statement routes exist but have no visible entry point on this directory in the audited account.",
+        "recommendation": "If the existing Add/Edit/Statement screens are intended for everyday contact management, add an “Add customer” action and “Edit contact”/“Statement” menu entries for eligible owned contacts. Respect platform-managed restrictions."
+      },
+      {
+        "key": "customers-mobile-density",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "Three summary cards push the first customer to y583. Each card prints labeled contact/email/phone/location lines plus totals; ‘Customers’ and ‘Customer List’ repeat, and Orders terminology differs from Requests elsewhere.",
+        "recommendation": "Use a compact summary ‘2 customers ·2 active ·20 requests’. Remove Customer List heading and simplify subtitle to ‘Saved contacts and buyers’. Group contact details compactly, skip duplicate contact name when it equals business name, and use Requests consistently."
+      }
+    ],
+    "limits": [
+      "No Message or record actions used. Availability of add/edit/statement routes verified separately; this is a discoverability finding for the visible directory."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/19-customers-desktop.png",
+      "pass-2/19-customers-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed stacked mobile metrics, repeated contact/business names, and missing visible Add/Edit/Statement entry points for supported contact-management screens. Existing desktop contact text is already small and should not be reduced.",
+    "confirmedIssueKeys": [
+      "customers-entry-points",
+      "customers-mobile-density"
+    ],
+    "newIssues": [],
+    "source": "root-pass2-notes.md"
+  }
+}

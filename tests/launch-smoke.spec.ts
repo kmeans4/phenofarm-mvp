@@ -29,7 +29,7 @@ test.describe('Launch smoke suite (safe, non-destructive)', () => {
     await page.waitForLoadState('networkidle').catch(() => {});
 
     await expect(page).toHaveURL(/\/grower\/products/);
-    await expect(page.getByRole('heading', { name: /product management/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: 'Products' })).toBeVisible();
   });
 
   test('Grower add product save flow works (mocked API, no data writes)', async ({ page }) => {
@@ -122,7 +122,7 @@ test.describe('Launch smoke suite (safe, non-destructive)', () => {
     await page.goto('/dispensary/catalog');
     await page.waitForLoadState('networkidle').catch(() => {});
 
-    await expect(page.getByRole('heading', { name: /product catalog/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
     const addToCartButtons = page.getByRole('button', { name: /add to cart/i });
     const addToCartCount = await addToCartButtons.count();

@@ -1,0 +1,385 @@
+[
+  {
+    "id": "A01",
+    "page": "Admin \u2014 shared",
+    "route": "/admin/users",
+    "priority": "Low",
+    "title": "Shorten page headings and introductions",
+    "observation": "User Management, Cultivator Management and Dispensary Management repeat what the navigation already establishes; their subtitles add one to three lines.",
+    "recommendation": "Use Users, Growers and Dispensaries. Keep only necessary context, such as \u201cView accounts and verification.\u201d Use a consistent mobile heading size around 26\u201328 px instead of 32 px.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-users-desktop.png",
+      "admin/p1-users-mobile.png",
+      "admin/p2-users-desktop.png",
+      "admin/p2-users-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A02",
+    "page": "Admin \u2014 shared",
+    "route": "/admin/dashboard",
+    "priority": "Medium",
+    "title": "Standardize business-role names",
+    "observation": "Growers/Cultivators and Buyers/Dispensaries vary between navigation, headings and buttons on the same screen.",
+    "recommendation": "Choose one visible term per role; retain alternative legal wording only where needed.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A03",
+    "page": "Admin \u2014 shared",
+    "route": "/admin/users",
+    "priority": "Low",
+    "title": "Search placeholders clip on desktop",
+    "observation": "The small desktop input visibly cuts \u201cSearch email or business\u201d; the business directories similarly cut their longer placeholder.",
+    "recommendation": "Use \u201cEmail or business\u201d and a concise visible label; size business/license search fields to their content.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-users-desktop.png",
+      "admin/p1-users-mobile.png",
+      "admin/p2-users-desktop.png",
+      "admin/p2-users-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A04",
+    "page": "Admin \u2014 shared",
+    "route": "/admin/growers",
+    "priority": "Medium",
+    "title": "Mobile directory controls consume too many rows",
+    "observation": "Growers and Dispensaries use a 160 px three-row form; Users uses a 113 px two-row form. The first records start around y 413\u2013425.",
+    "recommendation": "Keep search field and Search button together; put status and result count on a compact second row. Preserve usable tap targets.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-growers-desktop.png",
+      "admin/p1-growers-mobile.png",
+      "admin/p2-growers-desktop.png",
+      "admin/p2-growers-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A05",
+    "page": "Admin \u2014 shared",
+    "route": "/admin/users",
+    "priority": "Low",
+    "title": "Simplify directory result counts",
+    "observation": "\u201cShowing 3 of 3 users\u201d and \u201cShowing 1 of 1 cultivators\u201d use a full mobile row even when unfiltered.",
+    "recommendation": "Use \u201c3 users\u201d or \u201c1 grower\u201d in the unfiltered state, and place counts beside the heading/filter. Keep filtered totals when useful.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-users-desktop.png",
+      "admin/p1-users-mobile.png",
+      "admin/p2-users-desktop.png",
+      "admin/p2-users-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A06",
+    "page": "Admin \u2014 shared",
+    "route": "/admin/settings",
+    "priority": "Low",
+    "title": "Reduce navigation grouping and empty notification controls",
+    "observation": "Five admin destinations are divided under three group headings. Empty notifications still show 0 unread and Mark all read.",
+    "recommendation": "Use a simpler five-item navigation list; hide irrelevant unread/action controls when notifications are empty.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-menu-mobile-viewport.png",
+      "admin/p1-notifications-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A07",
+    "page": "Admin \u2014 shared",
+    "route": "/admin/dispensaries",
+    "priority": "Medium",
+    "title": "Make confirmation wording specific",
+    "observation": "The verification dialog uses generic \u201cConfirm admin action\u201d and \u201cConfirm\u201d; its alert background stretches into a tall pill beside wrapped text.",
+    "recommendation": "Use \u201cRemove verification?\u201d and \u201cRemove verification\u201d; keep the alert icon square and aligned at the top.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p2-unverify-dialog-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A08",
+    "page": "Admin dashboard",
+    "route": "/admin/dashboard",
+    "priority": "Medium",
+    "title": "Compact the mobile metric cards",
+    "observation": "Three one-column cards consume roughly 395 px before any checklist action. Helpers repeat already-understood verification context.",
+    "recommendation": "Use compact count cards/row and \u201c1 verified\u201d / \u201c0 pending\u201d helpers.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A09",
+    "page": "Admin dashboard",
+    "route": "/admin/dashboard",
+    "priority": "Medium",
+    "title": "Collapse completed checklist items",
+    "observation": "Three completed checks remain expanded with individual buttons. The operations panel is about 728 px tall on mobile, and Open settings appears twice.",
+    "recommendation": "Lead with outstanding work, summarize completed checks behind \u201c3 checks complete\u201d, and retain only one primary settings action.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A10",
+    "page": "Admin dashboard",
+    "route": "/admin/dashboard",
+    "priority": "Medium",
+    "title": "Shrink the clear verification queue",
+    "observation": "A large card uses both Pending verification and Newest accounts awaiting review, then says the queue is clear.",
+    "recommendation": "Show \u201cNo accounts awaiting review\u201d as a short status row; expand the queue only when it contains work.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A11",
+    "page": "Admin dashboard",
+    "route": "/admin/dashboard",
+    "priority": "Low",
+    "title": "Move the standing business-model explanation",
+    "observation": "A blue banner repeats the subscription/settlement policy on the routine dashboard, adding about 164 px on mobile.",
+    "recommendation": "Put the full explanation in billing/help and keep a short link here only if needed.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A12",
+    "page": "Admin dashboard",
+    "route": "/admin/dashboard",
+    "priority": "Low",
+    "title": "Simplify the development-only seeding panel",
+    "observation": "The local-only panel repeats Demo data seeding, Seed demo accounts and Seed demo data inside nested cards. Source confirms this panel is hidden in production.",
+    "recommendation": "Use one collapsed developer-tools row and one action. This is development-only polish, not a production finding.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A13",
+    "page": "Admin dashboard",
+    "route": "/admin/dashboard",
+    "priority": "Medium",
+    "title": "Make dashboard counts match their destinations",
+    "observation": "The clone shows 2 Dispensaries on the dashboard but 1 of 1 in the linked directory. The dashboard includes an off-platform contact that the directory excludes.",
+    "recommendation": "Count the same scope as the destination or label platform accounts and saved contacts separately. This was demonstrated with isolated sample data.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dashboard-desktop.png",
+      "admin/p1-dashboard-mobile.png",
+      "admin/p2-dashboard-desktop.png",
+      "admin/p2-dashboard-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A14",
+    "page": "Admin users",
+    "route": "/admin/users",
+    "priority": "Medium",
+    "title": "Tighten sparse mobile account rows",
+    "observation": "Each record occupies about 153 px with large gaps between email, business and joined date. The admin record repeats Admin twice plus an empty business dash.",
+    "recommendation": "Use a compact identity/status row and metadata line. Omit inapplicable business/verification rows for administrators.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-users-desktop.png",
+      "admin/p1-users-mobile.png",
+      "admin/p2-users-desktop.png",
+      "admin/p2-users-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A15",
+    "page": "Admin growers",
+    "route": "/admin/growers",
+    "priority": "Medium",
+    "title": "Use compact verification metadata",
+    "observation": "A single grower card is about 270 px tall; subscription uses another section despite a short Free value.",
+    "recommendation": "Place plan alongside verification, tighten the email-to-license gap, and preserve separate missing/expired-license warnings. Existing 12 px metadata should not be made smaller.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-growers-desktop.png",
+      "admin/p1-growers-mobile.png",
+      "admin/p2-growers-desktop.png",
+      "admin/p2-growers-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A16",
+    "page": "Admin dispensaries",
+    "route": "/admin/dispensaries",
+    "priority": "Medium",
+    "title": "Remove repeated ordering-policy copy from rows",
+    "observation": "Every desktop row repeats \u201cWholesale settlement stays direct\u201d under ordering readiness. On mobile Ordering/Can submit requests gets a separate section.",
+    "recommendation": "Use a compact \u201cCan order\u201d status and keep the static settlement explanation in one relevant location.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-dispensaries-desktop.png",
+      "admin/p1-dispensaries-mobile.png",
+      "admin/p2-dispensaries-desktop.png",
+      "admin/p2-dispensaries-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A17",
+    "page": "Admin dispensaries",
+    "route": "/admin/dispensaries",
+    "priority": "Medium",
+    "title": "Give business and license identifiers enough room",
+    "observation": "Eight columns make business names, licenses and normal expiry dates wrap even at 1440 px. Normal expiry dates are padded badges.",
+    "recommendation": "Use plain compact dates, combine closely related status fields, and reserve width for identifiers. Show badges for exceptions, not every normal date.",
+    "view": "Desktop",
+    "evidence": [
+      "admin/p1-dispensaries-desktop.png",
+      "admin/p1-dispensaries-mobile.png",
+      "admin/p2-dispensaries-desktop.png",
+      "admin/p2-dispensaries-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A18",
+    "page": "Admin directories \u2014 tablet",
+    "route": "/admin/dispensaries",
+    "priority": "Medium",
+    "title": "Delay the wide table/header layout at tablet widths",
+    "observation": "At 1024 px the title is squeezed to about 230 px beside 487 px filters. The table has 980 px content in 718 px space; actions are offscreen with little scrolling indication.",
+    "recommendation": "Stack header controls earlier and use cards or fewer columns until the content area is wide enough; retain a clear scroll affordance if a table must scroll.",
+    "view": "Tablet 1024 px",
+    "evidence": [
+      "admin/p2-dispensaries-tablet.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A19",
+    "page": "Admin settings",
+    "route": "/admin/settings",
+    "priority": "Low",
+    "title": "Remove implementation commentary and obvious labels",
+    "observation": "The intro explains avoiding controls that silently fail; section subtitles restate titles, Platform:PhenoFarm repeats the shell, and notification copy mentions a future settings store.",
+    "recommendation": "Use \u201cView billing, support and policies\u201d; remove implementation history, repeated subtitles and obvious platform identity.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A20",
+    "page": "Admin settings",
+    "route": "/admin/settings",
+    "priority": "Medium",
+    "title": "Stop stretching the short support card",
+    "observation": "The Support Profile card stretches to match billing, leaving roughly 335 px of empty white panel.",
+    "recommendation": "Align cards to their content height or use that area for the shorter policy information.",
+    "view": "Desktop",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A21",
+    "page": "Admin settings",
+    "route": "/admin/settings",
+    "priority": "Medium",
+    "title": "Use one compact status per billing item",
+    "observation": "Configured plus Ready, or Needs provider setup plus Review, repeats status. On mobile the short badges become full-width colored bars.",
+    "recommendation": "Use one status next to the label and make badges fit their text.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A22",
+    "page": "Admin settings",
+    "route": "/admin/settings",
+    "priority": "Medium",
+    "title": "Consolidate repeated setup and settlement guidance",
+    "observation": "The same provider-setup sentence appears three times; settlement is explained in the banner, support profile and billing. The bottom price-update panel repeats it again.",
+    "recommendation": "Keep one provider-setup link/instruction and one settlement explanation. Give any footer action a relevant destination instead of an internal dashboard link with an external-link icon.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "A23",
+    "page": "Admin settings",
+    "route": "/admin/settings",
+    "priority": "Medium",
+    "title": "Prioritize setup issues and flatten policy cards",
+    "observation": "Billing begins around y 865 on mobile after static information. Operational policies are cards within a card, with redundant Policy badges.",
+    "recommendation": "Put missing configuration first; collapse reference facts and show policies as compact rows without repeated Policy labels.",
+    "view": "Mobile",
+    "evidence": [
+      "admin/p1-settings-desktop.png",
+      "admin/p1-settings-mobile.png",
+      "admin/p2-settings-desktop.png",
+      "admin/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  }
+]

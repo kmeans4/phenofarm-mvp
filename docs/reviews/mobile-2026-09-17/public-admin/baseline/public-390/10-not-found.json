@@ -1,0 +1,76 @@
+{
+  "blocks": [
+    {
+      "font": "16px",
+      "height": 21,
+      "line": "24px",
+      "margin": "0px",
+      "padding": "0px",
+      "role": null,
+      "tag": "A",
+      "text": "PhenoFarm",
+      "width": 82,
+      "x": 154,
+      "y": 191
+    },
+    {
+      "font": "30px",
+      "height": 36,
+      "line": "36px",
+      "margin": "20px 0px 0px",
+      "padding": "0px",
+      "role": null,
+      "tag": "H1",
+      "text": "Page not found",
+      "width": 350,
+      "x": 20,
+      "y": 234
+    },
+    {
+      "font": "16px",
+      "height": 48,
+      "line": "24px",
+      "margin": "12px 0px 0px",
+      "padding": "0px",
+      "role": null,
+      "tag": "P",
+      "text": "This page may have moved or is no longer available.",
+      "width": 350,
+      "x": 20,
+      "y": 282
+    },
+    {
+      "font": "14px",
+      "height": 46,
+      "line": "20px",
+      "margin": "0px",
+      "padding": "12px 16px",
+      "role": null,
+      "tag": "A",
+      "text": "Dashboard",
+      "width": 101,
+      "x": 103,
+      "y": 354
+    },
+    {
+      "font": "14px",
+      "height": 46,
+      "line": "20px",
+      "margin": "0px",
+      "padding": "12px 16px",
+      "role": null,
+      "tag": "A",
+      "text": "Home",
+      "width": 71,
+      "x": 216,
+      "y": 354
+    }
+  ],
+  "height": 844,
+  "pageHeight": 844,
+  "pageWidth": 390,
+  "text": "PhenoFarm\nPage not found\n\nThis page may have moved or is no longer available.\n\nDashboard\nHome",
+  "title": "PhenoFarm - B2B Cannabis Marketplace",
+  "url": "http://localhost:3144/not-found",
+  "width": 390
+}

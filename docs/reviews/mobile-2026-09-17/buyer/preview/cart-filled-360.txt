@@ -1,0 +1,82 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e643]
+- button "Notifications" [expanded=false, ref=e644]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e645]
+- main
+  - sectionheader
+    - heading "Request draft" [level=1, ref=e648]
+  - navigation "Draft sections" [ref=e646]
+    - button "Items" [ref=e649]
+    - button "Logistics" [ref=e650]
+    - button "Terms" [ref=e651]
+  - group
+    - DisclosureTriangle "Templates" [expanded=false]
+  - generic
+    - paragraph
+      - StaticText "Purple Haze Flowers"
+    - paragraph
+      - StaticText "Vermont Nurseries · $25/g"
+    - button "Decrease quantity for Purple Haze Flowers" [ref=e652]
+      - StaticText "-"
+    - spinbutton "Quantity for Purple Haze Flowers" [ref=e653]: 3
+      - StaticText "3"
+    - button "Increase quantity for Purple Haze Flowers" [ref=e654]
+      - StaticText "+"
+    - paragraph
+      - StaticText "$75.00"
+    - button "Remove Purple Haze Flowers from draft" [ref=e655]
+    - heading "Logistics" [level=3, ref=e659]
+    - LabelText
+      - StaticText "Fulfillment"
+    - combobox "Fulfillment" [expanded=false, ref=e660]: Flexible
+      - MenuListPopup
+        - option "Flexible" [selected, ref=e667]
+        - option "Pickup" [ref=e668]
+        - option "Delivery requested" [ref=e669]
+        - option "Coordinate with grower" [ref=e670]
+    - LabelText
+      - StaticText "Requested window (optional)"
+    - textbox "Requested window (optional)" [ref=e661]
+    - paragraph
+      - StaticText "0/120"
+    - heading "Terms" [level=3, ref=e662]
+    - LabelText
+      - StaticText "Payment terms"
+    - combobox "Payment terms" [expanded=false, ref=e663]: Handled directly
+      - MenuListPopup
+        - option "Handled directly" [selected, ref=e671]
+        - option "Net 15" [ref=e672]
+        - option "Net 30" [ref=e673]
+        - option "ACH" [ref=e674]
+        - option "Check" [ref=e675]
+        - option "COD" [ref=e676]
+    - paragraph
+      - StaticText "Arrange payment directly with the grower."
+    - LabelText
+      - StaticText "Notes (optional)"
+    - combobox "Add a note template" [expanded=false, ref=e664]: Add note template…
+      - MenuListPopup
+        - option "Add note template…" [selected, ref=e677]
+        - option "Pickup" [ref=e678]
+        - option "Delivery" [ref=e679]
+        - option "Substitutions" [ref=e680]
+        - option "Payment terms" [ref=e681]
+    - textbox "Notes (optional)" [ref=e665]
+    - paragraph
+      - StaticText "0/500"
+    - heading "Summary" [level=3, ref=e656]
+    - StaticText "Total"
+    - StaticText "$"
+    - StaticText "75.00"
+    - paragraph
+      - StaticText "1 item · 1 grower"
+  - link "Add items" [ref=e657]
+  - button "Review request" [ref=e658]
+- button "Open messages" [ref=e647]
+- region "Notifications alt+T" [ref=e642]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e666]
+  - image
+- alert

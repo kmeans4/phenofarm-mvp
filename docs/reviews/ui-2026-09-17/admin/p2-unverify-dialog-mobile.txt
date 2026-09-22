@@ -1,0 +1,52 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e262]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e263]
+- main
+  - sectionheader
+    - heading "Dispensary Management" [level=1, ref=e264]
+    - paragraph
+      - StaticText "Review dispensary licenses, ordering access, and verification notes."
+    - form
+      - LabelText
+        - StaticText "Search dispensaries"
+      - searchbox "Search dispensaries" [ref=e268]
+      - LabelText
+        - StaticText "Verification status"
+      - combobox "Verification status" [expanded=false, ref=e269]: All statuses
+        - MenuListPopup
+          - option "All statuses" [selected, ref=e272]
+          - option "Pending only" [ref=e273]
+          - option "Verified only" [ref=e274]
+          - option "Expiring within 30 days" [ref=e275]
+          - option "Expired" [ref=e276]
+      - button "Search" [ref=e270]
+  - paragraph
+    - StaticText "Showing 1 of 1 dispensaries"
+  - article
+    - heading "Green Vermont Dispensary" [level=2, ref=e265]
+    - link "dispensary@greenvermont.com" [ref=e266]
+    - StaticText "Verified"
+    - DescriptionList
+      - term "LICENSE"
+      - definition
+        - StaticText "VT-RTL-2024-001"
+      - term "EXPIRY"
+      - definition
+        - StaticText "Dec 30, 2027"
+      - term "ORDERING"
+      - definition
+        - StaticText "Can submit requests"
+    - button "Unverify" [ref=e267]
+    - alertdialog "Confirm admin action"
+      - heading "Confirm admin action" [level=2, ref=e277]
+      - paragraph
+        - StaticText "Remove marketplace verification from Green Vermont Dispensary?"
+      - button "Close confirmation dialog" [ref=e278]
+      - button "Cancel" [ref=e279]
+      - button "Confirm" [ref=e280]
+- region "Notifications alt+T" [ref=e261]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e271]
+  - image
+- alert

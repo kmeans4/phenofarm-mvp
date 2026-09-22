@@ -1,0 +1,77 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e1657]
+- button "Notifications" [expanded=false, ref=e1658]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e1659]
+- main
+  - sectionheader
+    - heading "Request History" [level=1, ref=e1662]
+    - paragraph
+      - StaticText "View delivered and cancelled requests only"
+    - link "Back to Active Requests" [ref=e1663]
+      - button "Back to Active Requests" [ref=e1667]
+  - paragraph
+    - StaticText "Historical Requests"
+  - paragraph
+    - StaticText "2"
+  - paragraph
+    - StaticText "Delivered"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Cancelled"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Delivered Request Value"
+  - paragraph
+    - StaticText "$450.00"
+  - heading "Delivered & Cancelled Requests" [level=3, ref=e1660]
+  - generic "Request history status filter"
+    - link "All 2" [ref=e1664]
+      - StaticText "All"
+      - StaticText "2"
+    - link "Delivered 1" [ref=e1665]
+      - StaticText "Delivered"
+      - StaticText "1"
+    - link "Cancelled 1" [ref=e1666]
+      - StaticText "Cancelled"
+      - StaticText "1"
+  - table
+    - rowgroup
+      - row
+        - columnheader "REQUEST #" [ref=e1681]
+        - columnheader "CUSTOMER" [ref=e1682]
+        - columnheader "CLOSED" [ref=e1683]
+        - columnheader "EST. VALUE" [ref=e1684]
+        - columnheader "STATUS" [ref=e1685]
+        - columnheader "ACTIONS" [ref=e1686]
+    - row
+      - cell "#ORD-20260917-REVIEW" [ref=e1668]
+        - generic
+          - StaticText "#ORD-20260917-REVIEW"
+      - cell "Maple Street Market" [ref=e1669]
+      - cell "Sep 17, 2026" [ref=e1670]
+      - cell "$450.00" [ref=e1671]
+        - StaticText "$450.00"
+      - cell "Delivered" [ref=e1672]
+      - cell "View" [ref=e1673]
+        - link "View" [ref=e1687]
+    - row
+      - cell "#ORD-1781123929454-1" [ref=e1674]
+        - generic
+          - StaticText "#ORD-1781123929454-1"
+      - cell "Green Vermont Dispensary" [ref=e1675]
+      - cell "Jun 10, 2026" [ref=e1676]
+      - cell "$25.00" [ref=e1677]
+        - StaticText "$25.00"
+      - cell "Cancelled" [ref=e1678]
+      - cell "View" [ref=e1679]
+        - link "View" [ref=e1688]
+- button "Open messages" [ref=e1661]
+- region "Notifications alt+T" [ref=e1656]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1680]
+  - image
+- alert

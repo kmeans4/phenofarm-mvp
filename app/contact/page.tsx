@@ -1,376 +1,281 @@
 'use client';
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useInView } from 'framer-motion';
-import { useRef } from 'react';
-import { Mail, Phone, MapPin, Send, CheckCircle, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { motion, useInView } from 'framer-motion';
+import { ArrowLeft, Mail, MapPin, Send, ShieldCheck } from 'lucide-react';
+import { useRef, useState } from 'react';
 
-interface FormData {
+const SUPPORT_EMAIL = 'support@phenofarm.com';
+
+const businessTypes = [
+  { value: 'grower', label: 'Grower' },
+  { value: 'dispensary', label: 'Dispensary' },
+  { value: 'other', label: 'Other' },
+];
+
+interface ContactFormData {
   name: string;
   email: string;
-  phone: string;
+  businessType: string;
   message: string;
-  inquiryType: string[];
 }
 
-interface FormErrors {
+interface ContactFormErrors {
   name?: string;
   email?: string;
-  phone?: string;
+  businessType?: string;
   message?: string;
-  inquiryType?: string;
 }
 
 export default function ContactPage() {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, amount: 0.2 });
-  
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<ContactFormData>({
     name: '',
     email: '',
-    phone: '',
+    businessType: '',
     message: '',
-    inquiryType: [],
   });
-  
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [isSubmitted, setIsSubmitted] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<ContactFormErrors>({});
 
-  const inquiryTypes = [
-    { id: 'grower', label: 'Grower' },
-    { id: 'dispensary', label: 'Dispensary' },
-    { id: 'other', label: 'Other' },
-  ];
+  const selectedBusinessType = businessTypes.find((type) => type.value === formData.businessType);
 
-  const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
+  const validateForm = () => {
+    const nextErrors: ContactFormErrors = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Name is required';
+      nextErrors.name = 'Name is required';
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      nextErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Please enter a valid email';
+      nextErrors.email = 'Please enter a valid email';
     }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = 'Phone is required';
-    } else if (!/^[\d\s\-\+\(\)]{10,}$/.test(formData.phone)) {
-      newErrors.phone = 'Please enter a valid phone number';
+    if (!formData.businessType) {
+      nextErrors.businessType = 'Choose a business type';
     }
 
     if (!formData.message.trim()) {
-      newErrors.message = 'Message is required';
+      nextErrors.message = 'Message is required';
     }
 
-    if (formData.inquiryType.length === 0) {
-      newErrors.inquiryType = 'Please select at least one inquiry type';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const buildMailtoUrl = () => {
+    const businessTypeLabel = selectedBusinessType?.label || 'Not specified';
+    const subject = `PhenoFarm inquiry from ${formData.name.trim()} (${businessTypeLabel})`;
+    const body = [
+      `Name: ${formData.name.trim()}`,
+      `Email: ${formData.email.trim()}`,
+      `Business type: ${businessTypeLabel}`,
+      '',
+      'Message:',
+      formData.message.trim(),
+    ].join('\n');
+
+    return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  };
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     if (!validateForm()) return;
 
-    setIsSubmitting(true);
-
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-
-    // Store in state (mock)
-    console.log('Form submitted:', formData);
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    window.location.href = buildMailtoUrl();
   };
-
-  const handleInquiryTypeChange = (id: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      inquiryType: prev.inquiryType.includes(id)
-        ? prev.inquiryType.filter((type) => type !== id)
-        : [...prev.inquiryType, id],
-    }));
-    // Clear error when selection changes
-    if (errors.inquiryType) {
-      setErrors((prev) => ({ ...prev, inquiryType: undefined }));
-    }
-  };
-
-  if (isSubmitted) {
-    return (
-      <main className="min-h-screen bg-gray-950 pt-24 pb-12">
-        <div className="max-w-xl mx-auto px-6">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center"
-          >
-            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-400" />
-            </div>
-            <h1 className="text-3xl font-bold text-white mb-4">
-              Thank You!
-            </h1>
-            <p className="text-gray-400 mb-8">
-              Your message has been sent successfully. Our team will get back to you within 24 hours.
-            </p>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-green-400 hover:text-green-300 transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to Home
-            </Link>
-          </motion.div>
-        </div>
-      </main>
-    );
-  }
 
   return (
-    <main className="min-h-screen bg-gray-950 pt-24 pb-12">
-      <div className="max-w-7xl mx-auto px-6">
-        {/* Header */}
+    <main className="min-h-screen overflow-x-clip bg-[#070908] text-white">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute left-1/2 top-[-18rem] h-[36rem] w-[52rem] -translate-x-1/2 rounded-full bg-emerald-500/[0.07] blur-[130px]" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/30 to-transparent" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl px-6 py-8 sm:py-10 lg:px-8">
+        <Link
+          href="/"
+          className="inline-flex min-h-10 items-center gap-2 rounded-lg px-2 text-sm font-medium text-gray-400 transition-colors hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]"
+        >
+          <ArrowLeft className="h-4 w-4" />
+          Back to home
+        </Link>
+
         <motion.div
           ref={ref}
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          transition={{ duration: 0.55 }}
+          className="grid gap-10 py-16 sm:py-20 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start"
         >
-          <Link
-            href="/"
-            className="inline-flex items-center gap-2 text-gray-400 hover:text-green-400 transition-colors mb-6"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Get in Touch
-          </h1>
-          <p className="text-gray-400 text-lg max-w-2xl mx-auto">
-            Have questions about PhenoFarm? We&apos;d love to hear from you. Send us a message and we&apos;ll respond as soon as possible.
-          </p>
-        </motion.div>
+          <div>
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400">
+              Contact PhenoFarm
+            </p>
+            <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
+              Wholesale workflow help.
+            </h1>
+            <p className="mt-6 max-w-2xl text-base leading-7 text-gray-400 sm:text-lg">
+              Tell us whether you are a grower, dispensary, or partner and include the details the
+              PhenoFarm support team should know.
+            </p>
 
-        <div className="grid md:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          {/* Contact Info */}
-          <motion.div
-            initial={{ opacity: 0, x: -30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <div className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-              <h2 className="text-2xl font-semibold text-white mb-8">
-                Contact Information
-              </h2>
-              
-              <div className="space-y-6">
+            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="group rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5 transition-colors hover:border-emerald-400/30 hover:bg-white/[0.05] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]"
+              >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-green-400" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/20">
+                    <Mail className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">Email</p>
-                    <p className="text-white">hello@phenofarm.io</p>
+                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="mt-1 font-medium text-white transition-colors group-hover:text-emerald-200">
+                      {SUPPORT_EMAIL}
+                    </p>
                   </div>
                 </div>
+              </a>
 
+              <div className="rounded-2xl border border-white/[0.06] bg-white/[0.03] p-5">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-green-400" />
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/20">
+                    <MapPin className="h-5 w-5" />
                   </div>
                   <div>
-                    <p className="text-gray-400 text-sm">Phone</p>
-                    <p className="text-white">(555) 123-4567</p>
+                    <p className="text-sm text-gray-500">Location</p>
+                    <p className="mt-1 font-medium text-white">Vermont, USA</p>
                   </div>
                 </div>
-
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-green-400" />
-                  </div>
-                  <div>
-                    <p className="text-gray-400 text-sm">Location</p>
-                    <p className="text-white">San Francisco, CA</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="mt-8 pt-8 border-t border-gray-800">
-                <p className="text-gray-400 text-sm mb-4">Business Hours</p>
-                <p className="text-white">Monday - Friday: 9am - 6pm PST</p>
-                <p className="text-gray-500">Saturday - Sunday: Closed</p>
               </div>
             </div>
-          </motion.div>
 
-          {/* Contact Form */}
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            animate={isInView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            <div className="mt-8 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-5">
+              <div className="flex items-start gap-3">
+                <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
+                <p className="text-sm leading-6 text-gray-400">
+                  PhenoFarm coordinates marketplace workflows and cultivator subscriptions. Wholesale payment
+                  settlement stays directly between licensed businesses.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <motion.form
+            onSubmit={handleSubmit}
+            initial={{ opacity: 0, y: 24 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.55, delay: 0.12 }}
+            className="rounded-3xl border border-white/[0.06] bg-white/[0.035] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.32)] backdrop-blur sm:p-8"
           >
-            <form onSubmit={handleSubmit} className="bg-gray-900/50 rounded-2xl p-8 border border-gray-800">
-              <h2 className="text-2xl font-semibold text-white mb-6">
-                Send us a Message
-              </h2>
+            <div className="mb-8">
+              <h2 className="text-2xl font-semibold text-white">Email us</h2>
+              <p className="mt-2 text-sm leading-6 text-gray-400">
+                These details help support route your request.
+              </p>
+            </div>
 
-              <div className="space-y-6">
-                {/* Name */}
+            <div className="space-y-5">
+              <div>
+                <label htmlFor="name" className="mb-2 block text-sm font-medium text-gray-300">
+                  Full name
+                </label>
+                <input
+                  id="name"
+                  type="text"
+                  value={formData.name}
+                  onChange={(event) => {
+                    setFormData((current) => ({ ...current, name: event.target.value }));
+                    if (errors.name) setErrors((current) => ({ ...current, name: undefined }));
+                  }}
+                  placeholder="Jane Smith"
+                  className={`w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-white placeholder:text-gray-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908] ${
+                    errors.name ? 'border-red-400/70' : 'border-white/[0.08] hover:border-white/15'
+                  }`}
+                />
+                {errors.name && <p className="mt-1 text-sm text-red-300">{errors.name}</p>}
+              </div>
+
+              <div className="grid gap-5 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-300 mb-2">
-                    Full Name *
+                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-300">
+                    Email
                   </label>
                   <input
-                    type="text"
-                    id="name"
-                    value={formData.name}
-                    onChange={(e) => {
-                      setFormData((prev) => ({ ...prev, name: e.target.value }));
-                      if (errors.name) setErrors((prev) => ({ ...prev, name: undefined }));
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(event) => {
+                      setFormData((current) => ({ ...current, email: event.target.value }));
+                      if (errors.email) setErrors((current) => ({ ...current, email: undefined }));
                     }}
-                    className={`w-full px-4 py-3 bg-gray-800 border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all ${
-                      errors.name ? 'border-red-500' : 'border-gray-700'
+                    placeholder="jane@company.com"
+                    className={`w-full rounded-xl border bg-white/[0.04] px-4 py-3 text-white placeholder:text-gray-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908] ${
+                      errors.email ? 'border-red-400/70' : 'border-white/[0.08] hover:border-white/15'
                     }`}
-                    placeholder="John Doe"
                   />
-                  {errors.name && (
-                    <p className="text-red-400 text-sm mt-1">{errors.name}</p>
-                  )}
+                  {errors.email && <p className="mt-1 text-sm text-red-300">{errors.email}</p>}
                 </div>
 
-                {/* Email & Phone */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                      Email *
-                    </label>
-                    <input
-                      type="email"
-                      id="email"
-                      value={formData.email}
-                      onChange={(e) => {
-                        setFormData((prev) => ({ ...prev, email: e.target.value }));
-                        if (errors.email) setErrors((prev) => ({ ...prev, email: undefined }));
-                      }}
-                      className={`w-full px-4 py-3 bg-gray-800 border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all ${
-                        errors.email ? 'border-red-500' : 'border-gray-700'
-                      }`}
-                      placeholder="john@company.com"
-                    />
-                    {errors.email && (
-                      <p className="text-red-400 text-sm mt-1">{errors.email}</p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label htmlFor="phone" className="block text-sm font-medium text-gray-300 mb-2">
-                      Phone *
-                    </label>
-                    <input
-                      type="tel"
-                      id="phone"
-                      value={formData.phone}
-                      onChange={(e) => {
-                        setFormData((prev) => ({ ...prev, phone: e.target.value }));
-                        if (errors.phone) setErrors((prev) => ({ ...prev, phone: undefined }));
-                      }}
-                      className={`w-full px-4 py-3 bg-gray-800 border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all ${
-                        errors.phone ? 'border-red-500' : 'border-gray-700'
-                      }`}
-                      placeholder="(555) 123-4567"
-                    />
-                    {errors.phone && (
-                      <p className="text-red-400 text-sm mt-1">{errors.phone}</p>
-                    )}
-                  </div>
-                </div>
-
-                {/* Business Inquiry Type */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-3">
-                    Business Type *
+                  <label htmlFor="businessType" className="mb-2 block text-sm font-medium text-gray-300">
+                    Business type
                   </label>
-                  <div className="flex flex-wrap gap-3">
-                    {inquiryTypes.map((type) => (
-                      <button
-                        key={type.id}
-                        type="button"
-                        onClick={() => handleInquiryTypeChange(type.id)}
-                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
-                          formData.inquiryType.includes(type.id)
-                            ? 'bg-green-600 text-white'
-                            : 'bg-gray-800 text-gray-300 border border-gray-700 hover:border-green-500/50'
-                        }`}
-                      >
+                  <select
+                    id="businessType"
+                    value={formData.businessType}
+                    onChange={(event) => {
+                      setFormData((current) => ({ ...current, businessType: event.target.value }));
+                      if (errors.businessType) setErrors((current) => ({ ...current, businessType: undefined }));
+                    }}
+                    className={`w-full rounded-xl border bg-[#111611] px-4 py-3 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908] ${formData.businessType ? 'text-white' : 'text-gray-500'} ${
+                      errors.businessType ? 'border-red-400/70' : 'border-white/[0.08] hover:border-white/15'
+                    }`}
+                  >
+                    <option value="" className="bg-[#111611] text-gray-400">Select one</option>
+                    {businessTypes.map((type) => (
+                      <option key={type.value} value={type.value} className="bg-[#111611] text-white">
                         {type.label}
-                      </button>
+                      </option>
                     ))}
-                  </div>
-                  {errors.inquiryType && (
-                    <p className="text-red-400 text-sm mt-1">{errors.inquiryType}</p>
-                  )}
+                  </select>
+                  {errors.businessType && <p className="mt-1 text-sm text-red-300">{errors.businessType}</p>}
                 </div>
-
-                {/* Message */}
-                <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-300 mb-2">
-                    Message *
-                  </label>
-                  <textarea
-                    id="message"
-                    rows={5}
-                    value={formData.message}
-                    onChange={(e) => {
-                      setFormData((prev) => ({ ...prev, message: e.target.value }));
-                      if (errors.message) setErrors((prev) => ({ ...prev, message: undefined }));
-                    }}
-                    className={`w-full px-4 py-3 bg-gray-800 border rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-green-500/50 transition-all resize-none ${
-                      errors.message ? 'border-red-500' : 'border-gray-700'
-                    }`}
-                    placeholder="Tell us about your business and how we can help..."
-                  />
-                  {errors.message && (
-                    <p className="text-red-400 text-sm mt-1">{errors.message}</p>
-                  )}
-                </div>
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-4 bg-green-600 hover:bg-green-500 disabled:bg-green-600/50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                      </svg>
-                      Sending...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5" />
-                      Send Message
-                    </>
-                  )}
-                </button>
               </div>
-            </form>
-          </motion.div>
-        </div>
+
+              <div>
+                <label htmlFor="message" className="mb-2 block text-sm font-medium text-gray-300">
+                  Message
+                </label>
+                <textarea
+                  id="message"
+                  rows={6}
+                  value={formData.message}
+                  onChange={(event) => {
+                    setFormData((current) => ({ ...current, message: event.target.value }));
+                    if (errors.message) setErrors((current) => ({ ...current, message: undefined }));
+                  }}
+                  placeholder="Tell us what you are trying to solve..."
+                  className={`min-h-36 w-full resize-y rounded-xl border bg-white/[0.04] px-4 py-3 text-white placeholder:text-gray-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908] ${
+                    errors.message ? 'border-red-400/70' : 'border-white/[0.08] hover:border-white/15'
+                  }`}
+                />
+                {errors.message && <p className="mt-1 text-sm text-red-300">{errors.message}</p>}
+              </div>
+
+              <button
+                type="submit"
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_40px_rgba(16,185,129,0.25)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_56px_rgba(16,185,129,0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]"
+              >
+                <Send className="h-5 w-5" />
+                Open email draft
+              </button>
+            </div>
+          </motion.form>
+        </motion.div>
       </div>
     </main>
   );

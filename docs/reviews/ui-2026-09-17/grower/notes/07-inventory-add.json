@@ -1,0 +1,36 @@
+{
+  "slug": "07-inventory-add",
+  "route": "/grower/inventory/add",
+  "pass1": {
+    "inspected": [
+      "pass-1/07-inventory-add-desktop.png",
+      "pass-1/07-inventory-add-mobile.png"
+    ],
+    "strengths": [
+      "Single-purpose form is short; the replacement-stock warning is useful and should remain; current stock is visible beside each product."
+    ],
+    "issues": [
+      {
+        "key": "stock-form-focus",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "The top Add Product action competes with the stock task. The subtitle's second sentence and search helper repeat obvious context, while \u2018Stock Details\u2019 adds another heading for two fields. Desktop input spans nearly1100px.",
+        "recommendation": "Use subtitle \u2018Set a product\u2019s current stock\u2019. Move \u2018New product\u2019 beside search or into the empty state. Label fields \u2018Product\u2019 and \u2018New stock\u2019; retain \u2018Replaces current stock\u2019. Constrain desktop form width and place Cancel/Save side by side on mobile."
+      }
+    ],
+    "limits": [
+      "No product selected and no stock submitted."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/07-inventory-add-desktop.png",
+      "pass-2/07-inventory-add-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile revisits confirm the form is short and readable; only the secondary Add Product action, repeated search instruction, and wide desktop fields add avoidable space. Keep the stock-replacement warning because it prevents a meaningful mistake. No product was selected and no stock update was submitted.",
+    "confirmedIssueKeys": [
+      "stock-form-focus"
+    ],
+    "newIssues": []
+  }
+}

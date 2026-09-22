@@ -1,0 +1,33 @@
+
+> phenofarm-mvp@0.1.0 test
+> playwright test tests/buyer-ui-layout-regressions.spec.ts tests/ui-shared-density-regressions.spec.ts --workers=1 --reporter=line
+
+(node:68832) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 13 tests using 1 worker
+
+(node:68833) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:68833) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+(node:68833) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/13] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:37:5 › desktop filter sidebar preserves quantity and add controls inside product cards
+[2/13] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:49:5 › mobile catalog list keeps price, identity and Add in separate visible areas
+[3/13] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:67:5 › comparison dialog stays above navigation and remains keyboard dismissible at three widths
+[4/13] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:83:5 › mobile saved list keeps quote action below readable product identity
+[5/13] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:99:5 › request review keeps both footer actions visible above navigation
+[6/13] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:121:5 › mobile draft filters can be saved and existing presets remain reachable on a short phone
+[7/13] [chromium] › tests/ui-shared-density-regressions.spec.ts:10:5 › report month buckets stay stable across timezones and reject malformed input
+[8/13] [chromium] › tests/ui-shared-density-regressions.spec.ts:27:7 › shared controls on a populated portal › mobile settings save appears for profile edits and clears after saving
+[9/13] [chromium] › tests/ui-shared-density-regressions.spec.ts:48:7 › shared controls on a populated portal › search has touch-sized actions, correct singular result and keyboard-only desktop hints
+[10/13] [chromium] › tests/ui-shared-density-regressions.spec.ts:65:7 › shared controls on a populated portal › messaging replaces the composer with a labeled quote and restores the unsent text
+[11/13] [chromium] › tests/ui-shared-density-regressions.spec.ts:97:7 › shared controls on a populated portal › notifications anchor beside the trigger and group repeated history
+[12/13] [chromium] › tests/ui-shared-density-regressions.spec.ts:112:5 › recent shops use the business name and missing pages offer recovery
+[13/13] [chromium] › tests/ui-shared-density-regressions.spec.ts:127:5 › mobile Messages restores focus after Escape and notifications hide floating controls
+  13 passed (20.5s)

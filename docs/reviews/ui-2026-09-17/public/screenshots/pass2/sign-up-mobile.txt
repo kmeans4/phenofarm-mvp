@@ -1,0 +1,62 @@
+- main
+  - link "PF PhenoFarm" [ref=e1562]
+    - StaticText "PF"
+    - StaticText "PhenoFarm"
+  - heading "Create your account" [level=2, ref=e1561]
+  - paragraph
+    - StaticText "Already have an account?"
+    - link "Sign in" [ref=e1563]
+  - form
+    - group "Personal contact"
+      - Legend
+        - StaticText "Personal contact"
+      - LabelText
+        - StaticText "First Name *"
+      - textbox "First Name *" [required, ref=e1567]
+      - LabelText
+        - StaticText "Last Name *"
+      - textbox "Last Name *" [required, ref=e1568]
+    - group "Business profile"
+      - Legend
+        - StaticText "Business profile"
+      - LabelText
+        - StaticText "Business Name"
+      - textbox "Business Name" [ref=e1569]
+      - paragraph
+        - StaticText "Shown to marketplace partners — defaults to your name if left blank."
+      - LabelText
+        - StaticText "Business Type *"
+      - combobox "Business Type *" [expanded=false, ref=e1570]: Cannabis Grower
+        - MenuListPopup
+          - option "Cannabis Grower" [selected, ref=e1577]
+          - option "Dispensary/Retailer" [ref=e1578]
+    - group "Account security"
+      - Legend
+        - StaticText "Account security"
+      - LabelText
+        - StaticText "Email address *"
+      - textbox "Email address *" [required, ref=e1571]
+      - LabelText
+        - StaticText "Password *"
+      - generic
+        - textbox "Password *" [required, ref=e1573]
+        - button "Show password" [ref=e1574]
+      - paragraph
+        - StaticText "Use at least 12 characters."
+      - LabelText
+        - StaticText "Confirm Password *"
+      - generic
+        - textbox "Confirm Password *" [required, ref=e1575]
+        - button "Show password" [ref=e1576]
+      - paragraph
+        - StaticText "Confirm your password."
+    - button "Create account" [ref=e1564]
+  - generic
+    - StaticText "By signing up, you agree to our"
+    - link "Terms of Service" [ref=e1565]
+    - StaticText "and"
+    - link "Privacy Policy" [ref=e1566]
+    - StaticText "."
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1572]
+  - image
+- alert

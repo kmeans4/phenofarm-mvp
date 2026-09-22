@@ -1,0 +1,160 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e455]
+  - button "Notifications" [expanded=false, ref=e456]
+    - StaticText "16"
+  - button "Open Grower navigation menu" [expanded=false, ref=e457]
+  - main
+    - sectionheader
+      - paragraph
+        - StaticText "GOOD MORNING"
+      - heading "Vermont Nurseries" [level=1, ref=e410]
+    - generic "Summary"
+      - link "Requests 20" [ref=e463]
+        - paragraph
+          - StaticText "Requests"
+        - paragraph
+          - StaticText "20"
+      - link "Delivered value $450" [ref=e464]
+        - paragraph
+          - StaticText "Delivered value"
+        - paragraph
+          - StaticText "$450"
+      - link "Customers 2" [ref=e465]
+        - paragraph
+          - StaticText "Customers"
+        - paragraph
+          - StaticText "2"
+      - link "Products 3" [ref=e466]
+        - paragraph
+          - StaticText "Products"
+        - paragraph
+          - StaticText "3"
+    - generic
+      - heading "Needs attention" [level=2, ref=e467]
+      - StaticText "18"
+      - paragraph
+        - StaticText "New requests"
+      - paragraph
+        - StaticText "17"
+      - paragraph
+        - StaticText "Unread messages"
+      - paragraph
+        - StaticText "0"
+      - paragraph
+        - StaticText "Cancellations"
+      - paragraph
+        - StaticText "0"
+      - paragraph
+        - StaticText "Status changes"
+      - paragraph
+        - StaticText "1"
+      - article
+        - heading "6 new buyer requests" [level=3, ref=e472]
+        - StaticText "Review all"
+        - paragraph
+          - StaticText "Green Vermont Dispensary has 6 requests waiting for review."
+        - link "Review" [ref=e473]
+      - article
+        - heading "Recently delivered" [level=3, ref=e474]
+        - StaticText "Delivered"
+        - paragraph
+          - StaticText "ORD-20260917-REVIEW for Maple Street Market moved to Delivered."
+        - link "Review" [ref=e475]
+      - link "Review 17 requests →" [ref=e468]
+        - StaticText "Review 17 requests →"
+    - group
+      - DisclosureTriangle "Setup · 3 left" [expanded=false]
+        - StaticText "Setup · 3 left"
+    - heading "Delivered value · 30 days" [level=2, ref=e394]
+    - paragraph
+      - StaticText "Aug 18–Sep 16 · Payment is arranged directly with buyers."
+    - image "Delivered request value bar chart for the last 30 days. Maximum daily value is $450."
+      - generic
+        - generic
+          - StaticText "Scroll chart horizontally"
+          - StaticText "← Earlier"
+        - StaticText "8/18"
+        - StaticText "8/19"
+        - StaticText "8/20"
+        - StaticText "8/21"
+        - StaticText "8/22"
+        - StaticText "8/23"
+        - StaticText "8/24"
+        - StaticText "8/25"
+        - StaticText "8/26"
+        - StaticText "8/27"
+        - StaticText "8/28"
+        - StaticText "8/29"
+        - StaticText "8/30"
+        - StaticText "8/31"
+        - StaticText "9/1"
+        - StaticText "9/2"
+        - StaticText "9/3"
+        - StaticText "9/4"
+        - StaticText "9/5"
+        - StaticText "9/6"
+        - StaticText "9/7"
+        - StaticText "9/8"
+        - StaticText "9/9"
+        - StaticText "9/10"
+        - StaticText "9/11"
+        - StaticText "9/12"
+        - StaticText "9/13"
+        - StaticText "9/14"
+        - StaticText "$450"
+        - StaticText "9/15"
+        - StaticText "9/16"
+    - heading "Recent activity" [level=2, ref=e458]
+    - combobox "Date range" [expanded=false, ref=e459]: Last 30 Days
+      - MenuListPopup
+        - option "Today" [ref=e476]
+        - option "Last 7 Days" [ref=e477]
+        - option "Last 30 Days" [selected, ref=e478]
+        - option "This Month" [ref=e479]
+        - option "Last Month" [ref=e480]
+        - option "All Time" [ref=e481]
+    - link "All requests" [ref=e460]
+    - link "Request #ORD-20260917-REVIEW From Maple Street Market Sep 13, 8:00 PM" [ref=e461]
+      - paragraph
+        - StaticText "Request #ORD-20260917-REVIEW"
+      - paragraph
+        - StaticText "From Maple Street Market"
+      - paragraph
+        - StaticText "Sep 13, 8:00 PM"
+  - button "Open messages" [ref=e399]
+  - region "Notifications alt+T" [ref=e385]
+  - button "Open Next.js Dev Tools" [expanded=false, ref=e432]
+    - image
+  - alert
+  - generic
+    - button "Close messages overlay" [ref=e462]
+    - dialog "Messages"
+      - button "Back to conversations" [ref=e482]
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - paragraph
+        - StaticText "Cancellation follow-up"
+      - button "Close messages" [ref=e483]
+      - StaticText "SETTLEMENT"
+      - StaticText "Direct outside PhenoFarm"
+      - StaticText "JUN 10"
+      - paragraph
+        - StaticText "Green Vermont Dispensary • 4:39 PM"
+      - paragraph
+        - StaticText "Hi Vermont Nurseries, please review whether order #ORD-1781123929454-1 can be cancelled before fulfillment."
+      - textbox "Message" [ref=e484]
+      - button "Send message" [disabled, ref=e485]
+      - combobox "Message templates" [expanded=false, ref=e486]: Templates
+        - MenuListPopup
+          - option "Templates" [disabled, ref=e487]
+          - option "Follow up" [ref=e488]
+          - option "Availability" [ref=e489]
+          - option "Delivery" [ref=e490]
+          - option "Request update" [ref=e491]
+          - option "Terms" [ref=e492]
+      - group
+        - DisclosureTriangle "Quote" [expanded=false]
+          - StaticText "Quote"

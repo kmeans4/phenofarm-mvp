@@ -1,0 +1,76 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "ADMIN"
+  - button "Notifications" [expanded=false, ref=e335]
+    - StaticText "Notifications"
+  - navigation "Portal navigation" [ref=e336]
+    - StaticText "OPERATIONS"
+    - link "Dashboard" [ref=e338]
+      - StaticText "Dashboard"
+    - StaticText "ACCOUNTS"
+    - link "Users" [ref=e339]
+      - StaticText "Users"
+    - link "Growers" [ref=e340]
+      - StaticText "Growers"
+    - link "Dispensaries" [ref=e341]
+      - StaticText "Dispensaries"
+    - StaticText "SYSTEM"
+    - link "Settings" [ref=e342]
+      - StaticText "Settings"
+  - StaticText "A"
+  - StaticText "admin@phenofarm.com"
+  - StaticText "Full system access"
+  - button "Sign out" [ref=e337]
+- main
+  - sectionheader
+    - heading "User Management" [level=1, ref=e343]
+    - paragraph
+      - StaticText "Read-only account directory for role, business profile, and verification standing."
+    - form
+      - LabelText
+        - StaticText "Search users"
+      - searchbox "Search users" [ref=e348]
+      - button "Search" [ref=e349]
+  - generic "Filter users by role"
+    - link "All" [ref=e344]
+    - link "Admin" [ref=e345]
+    - link "Grower" [ref=e346]
+    - link "Dispensary" [ref=e347]
+  - paragraph
+    - StaticText "Showing 3 of 3 users"
+  - table
+    - rowgroup
+      - row
+        - columnheader "EMAIL" [ref=e365]
+        - columnheader "ROLE" [ref=e366]
+        - columnheader "BUSINESS" [ref=e367]
+        - columnheader "VERIFIED" [ref=e368]
+        - columnheader "JOINED" [ref=e369]
+    - row
+      - cell "dispensary@greenvermont.com" [ref=e350]
+        - link "dispensary@greenvermont.com" [ref=e370]
+      - cell "Dispensary" [ref=e351]
+      - cell "Green Vermont Dispensary" [ref=e352]
+        - link "Green Vermont Dispensary" [ref=e371]
+      - cell "Verified" [ref=e353]
+      - cell "4/9/2026" [ref=e354]
+    - row
+      - cell "grower@vtnurseries.com" [ref=e355]
+        - link "grower@vtnurseries.com" [ref=e372]
+      - cell "Grower" [ref=e356]
+      - cell "Vermont Nurseries" [ref=e357]
+        - link "Vermont Nurseries" [ref=e373]
+      - cell "Verified" [ref=e358]
+      - cell "4/9/2026" [ref=e359]
+    - row
+      - cell "admin@phenofarm.com" [ref=e360]
+        - link "admin@phenofarm.com" [ref=e374]
+      - cell "Admin" [ref=e361]
+      - cell "-" [ref=e362]
+      - cell "Admin" [ref=e363]
+      - cell "4/9/2026" [ref=e364]
+- region "Notifications alt+T" [ref=e334]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e375]
+  - image
+- alert

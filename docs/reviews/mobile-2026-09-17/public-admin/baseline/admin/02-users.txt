@@ -1,0 +1,43 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e28]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e29]
+- main
+  - sectionheader
+    - heading "Users" [level=1, ref=e30]
+    - paragraph
+      - StaticText "View accounts and verification."
+    - form
+      - LabelText
+        - StaticText "Search users"
+      - searchbox "Search users" [ref=e38]
+      - button "Search" [ref=e39]
+  - generic "Filter users by role"
+    - link "All" [ref=e31]
+    - link "Admin" [ref=e32]
+    - link "Grower" [ref=e33]
+    - link "Dispensary" [ref=e34]
+  - paragraph
+    - StaticText "3 users"
+  - article
+    - link "dispensary@greenvermont.com" [ref=e35]
+    - StaticText "Dispensary"
+    - link "Green Vermont Dispensary" [ref=e40]
+    - StaticText "Verified"
+    - paragraph
+      - StaticText "Joined 4/9/2026"
+  - article
+    - link "grower@vtnurseries.com" [ref=e36]
+    - StaticText "Grower"
+    - link "Vermont Nurseries" [ref=e41]
+    - StaticText "Verified"
+    - paragraph
+      - StaticText "Joined 4/9/2026"
+  - article
+    - link "admin@phenofarm.com" [ref=e37]
+    - StaticText "Admin"
+    - paragraph
+      - StaticText "Joined 4/9/2026"
+- region "Notifications alt+T" [ref=e27]
+- alert

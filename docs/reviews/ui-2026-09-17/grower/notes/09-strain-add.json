@@ -1,0 +1,44 @@
+{
+  "slug": "09-strain-add",
+  "route": "/grower/strains/add",
+  "pass1": {
+    "inspected": [
+      "pass-1/09-strain-add-desktop.png",
+      "pass-1/09-strain-add-mobile.png"
+    ],
+    "strengths": [
+      "Centered desktop form stays readable; required name/type and optional text fields are clearly separated."
+    ],
+    "issues": [
+      {
+        "key": "strain-type-explainer",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "All five strain-type definitions are displayed below the select. They mostly restate the option name and take216px on mobile before Lineage.",
+        "recommendation": "Show help only for the selected option or behind \u2018About strain types\u2019. Use compact options \u2018Indica\u2019, \u2018Sativa\u2019, \u2018Hybrid\u2019, \u2018Sativa dominant\u2019, \u2018Indica dominant\u2019 and remove generic buyer-positioning wording."
+      },
+      {
+        "key": "strain-form-copy",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "\u2018Add New Strain\u2019, \u2018Create a new cannabis genetics entry\u2019, and \u2018Strain Details\u2019 repeat the same task; placeholders list several long examples and truncate on mobile. Description and Grower Notes do not explain their distinct purposes.",
+        "recommendation": "Use \u2018Add strain\u2019, omit the subtitle or inner title, and shorten labels to \u2018Name\u2019, \u2018Type\u2019, \u2018Lineage\u2019. Use one brief example per placeholder. Clarify the audience/purpose of Description versus Grower notes instead of overlapping generic examples."
+      }
+    ],
+    "limits": [
+      "No form inputs modified or submitted."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/09-strain-add-desktop.png",
+      "pass-2/09-strain-add-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile captures confirm all five strain definitions remain visible below the selector and occupy about 216px on mobile. The header repeats Add New Strain, Create a new cannabis genetics entry, and Strain Details. Long example placeholders clip while the form labels remain readable. No form values were entered.",
+    "confirmedIssueKeys": [
+      "strain-type-explainer",
+      "strain-form-copy"
+    ],
+    "newIssues": []
+  }
+}

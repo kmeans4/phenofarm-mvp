@@ -1,0 +1,101 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e1991]
+- button "Notifications" [expanded=false, ref=e1992]
+  - StaticText "18"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1993]
+- main
+  - sectionheader
+    - heading "Dispensary Settings" [level=1, ref=e1995]
+    - paragraph
+      - StaticText "Manage your account and preferences"
+  - generic
+    - generic
+      - heading "License & verification" [level=2, ref=e1997]
+      - paragraph
+        - StaticText "License Verified"
+      - paragraph
+        - StaticText "Your license is verified through 12/31/2027."
+      - paragraph
+        - StaticText "REQUIRED FIRST"
+      - paragraph
+        - StaticText "Finish business name, license state, license number, and email first. Expiry, logo, address, website, and description can be completed later."
+    - generic
+      - heading "Business profile" [level=2, ref=e1998]
+      - LabelText
+        - StaticText "Business Name *"
+      - textbox "Business Name *" [ref=e1999]: Green Vermont Dispensary
+        - StaticText "Green Vermont Dispensary"
+      - LabelText
+        - StaticText "Contact Name (optional)"
+      - textbox "Contact Name (optional)" [ref=e2000]: Sarah Cannabis
+        - StaticText "Sarah Cannabis"
+      - LabelText
+        - StaticText "Dispensary License Number *"
+      - textbox "Dispensary License Number *" [ref=e2001]: VT-RTL-2024-001
+        - StaticText "VT-RTL-2024-001"
+      - LabelText
+        - StaticText "License State *"
+      - combobox "License State *" [expanded=false, ref=e2002]: Vermont (VT)
+        - MenuListPopup
+          - option "Vermont (VT)" [selected, ref=e2013]
+      - LabelText
+        - StaticText "License Expiry Date (recommended)"
+      - Date "License Expiry Date (recommended)": 2027-12-31
+        - generic
+          - spinbutton "Month Month" [ref=e2014]: 12
+            - StaticText "12"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e2015]: 31
+            - StaticText "31"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e2016]: 2027
+            - StaticText "2027"
+        - button "Show date picker" [ref=e2011]
+      - LabelText
+        - StaticText "Business Email *"
+      - textbox "Business Email *" [ref=e2003]: dispensary@greenvermont.com
+        - StaticText "dispensary@greenvermont.com"
+      - LabelText
+        - StaticText "Business Phone (optional)"
+      - textbox "Business Phone (optional)" [ref=e2004]: (802) 555-0145
+        - StaticText "(802) 555-0145"
+      - LabelText
+        - StaticText "Business Address"
+      - generic
+        - textbox "Business Address" [ref=e2017]: 456 Market Street
+          - StaticText "456 Market Street"
+        - image
+      - paragraph
+        - StaticText "Type 3+ characters to see suggestions (includes city, state, ZIP)"
+      - LabelText
+        - StaticText "Website (optional)"
+      - textbox "Website (optional)" [ref=e2005]: https://greenvermontdispensary.com
+        - StaticText "https://greenvermontdispensary.com"
+      - LabelText
+        - StaticText "Business Description (optional)"
+      - textbox "Business Description (optional)" [ref=e2006]: Vermont's premier cannabis retail destination
+        - StaticText "Vermont's premier cannabis retail destination"
+      - paragraph
+        - StaticText "45/500"
+    - generic
+      - heading "Branding" [level=2, ref=e2007]
+      - image
+      - StaticText "No logo"
+      - button "Upload Logo" [ref=e2008]
+      - paragraph
+        - StaticText "JPG, PNG, or WebP. Max 500KB."
+    - heading "Account" [level=2, ref=e1996]
+    - paragraph
+      - StaticText "Sign out of your dispensary account from this device."
+    - button "Sign Out" [ref=e2009]
+    - generic
+      - paragraph
+        - StaticText "Settings drafts save in this browser."
+      - button "Save settings" [ref=e2010]
+- button "Open messages" [ref=e1994]
+- region "Notifications alt+T" [ref=e1990]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e2012]
+  - image
+- alert

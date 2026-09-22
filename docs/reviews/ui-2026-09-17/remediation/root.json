@@ -1,0 +1,806 @@
+[
+  {
+    "id": "G58",
+    "title": "Name the catalog destination clearly",
+    "status": "fixed",
+    "files": [
+      "app/grower/layout.tsx",
+      "app/grower/components/ClientNav.tsx",
+      "app/components/ui/MobileNav.tsx"
+    ],
+    "evidence": [
+      "remediation/root/settings-desktop.png",
+      "remediation/root/settings-mobile.png"
+    ],
+    "change": "Catalog destination uses its task name; Grower role label is consistent; short menus omit category headings and repeated mobile role subtitle.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "G59",
+    "title": "Shorten mobile search guidance",
+    "status": "fixed",
+    "files": [
+      "app/components/SearchDialog.tsx"
+    ],
+    "evidence": [
+      "remediation/root/search-desktop.png",
+      "remediation/root/search-mobile.png",
+      "remediation/root/search-one-mobile.png"
+    ],
+    "change": "Short search guidance, no empty result count, correct singular result, desktop-only keyboard hints and 40px secondary actions.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "G60",
+    "title": "Use one conversation-selection prompt",
+    "status": "fixed",
+    "files": [
+      "app/components/messaging/ChatDrawer.tsx"
+    ],
+    "evidence": [
+      "remediation/root/chat-mobile.png",
+      "remediation/root/quote-1440.png",
+      "remediation/root/quote-390.png",
+      "remediation/root/quote-360.png"
+    ],
+    "change": "One empty selection prompt, deferred composer, compact Templates and Quote controls; labeled product-specific quote form replaces message controls, preserves drafts and keeps payment guidance in quote context.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "G61",
+    "title": "Reduce message-composer clutter",
+    "status": "fixed",
+    "files": [
+      "app/components/messaging/ChatDrawer.tsx",
+      "app/components/ux/DraftAutosaveStatus.tsx"
+    ],
+    "evidence": [
+      "remediation/root/chat-mobile.png",
+      "remediation/root/quote-1440.png",
+      "remediation/root/quote-390.png",
+      "remediation/root/quote-360.png"
+    ],
+    "change": "One empty selection prompt, deferred composer, compact Templates and Quote controls; labeled product-specific quote form replaces message controls, preserves drafts and keeps payment guidance in quote context.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "G62",
+    "title": "Give quotes persistent labels and context",
+    "status": "fixed",
+    "files": [
+      "app/components/messaging/ChatDrawer.tsx"
+    ],
+    "evidence": [
+      "remediation/root/chat-mobile.png",
+      "remediation/root/quote-1440.png",
+      "remediation/root/quote-390.png",
+      "remediation/root/quote-360.png"
+    ],
+    "change": "One empty selection prompt, deferred composer, compact Templates and Quote controls; labeled product-specific quote form replaces message controls, preserves drafts and keeps payment guidance in quote context.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "G63",
+    "title": "Make notifications specific and concise",
+    "status": "fixed",
+    "files": [
+      "app/components/notifications/NotificationBell.tsx",
+      "app/api/notifications/route.ts",
+      "lib/notifications.ts",
+      "app/api/messages/conversations/[id]/messages/route.ts",
+      "app/api/messages/messages/[id]/offer-action/route.ts"
+    ],
+    "evidence": [
+      "remediation/root/notifications-desktop.png",
+      "remediation/root/notifications-mobile.png"
+    ],
+    "change": "Notifications identify the buyer/seller and request or product, group duplicate history, omit empty counts, and anchor the desktop panel beside its trigger.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E19",
+    "title": "State the preview purpose once",
+    "status": "fixed",
+    "files": [
+      "app/grower/marketplace/page.tsx",
+      "app/components/ui/ProductImage.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_marketplace-1440.png",
+      "remediation/final-pages/_grower_marketplace-390.png"
+    ],
+    "change": "One preview introduction with compact listing counts and Terms link, one card shell, smaller empty art, grouped seller identity, stock once and concise buyer controls/lab note.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E20",
+    "title": "Replace four stacked preamble cards",
+    "status": "fixed",
+    "files": [
+      "app/grower/marketplace/page.tsx",
+      "app/components/ui/ProductImage.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_marketplace-1440.png",
+      "remediation/final-pages/_grower_marketplace-390.png"
+    ],
+    "change": "One preview introduction with compact listing counts and Terms link, one card shell, smaller empty art, grouped seller identity, stock once and concise buyer controls/lab note.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E21",
+    "title": "Remove nested mobile card padding",
+    "status": "fixed",
+    "files": [
+      "app/grower/marketplace/page.tsx",
+      "app/components/ui/ProductImage.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_marketplace-1440.png",
+      "remediation/final-pages/_grower_marketplace-390.png"
+    ],
+    "change": "One preview introduction with compact listing counts and Terms link, one card shell, smaller empty art, grouped seller identity, stock once and concise buyer controls/lab note.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E22",
+    "title": "Simplify shared product-card repetition",
+    "status": "fixed",
+    "files": [
+      "app/grower/marketplace/page.tsx",
+      "app/components/ui/ProductImage.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_marketplace-1440.png",
+      "remediation/final-pages/_grower_marketplace-390.png"
+    ],
+    "change": "One preview introduction with compact listing counts and Terms link, one card shell, smaller empty art, grouped seller identity, stock once and concise buyer controls/lab note. Batch lab values now take priority over product ranges, matching buyer cards and preserving legitimate zero values.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed.",
+      "Preview THC 24.8% and CBD 0% verified at 1440, 390 and 360px in two timezones."
+    ]
+  },
+  {
+    "id": "E08",
+    "title": "Reduce the plan-page preamble",
+    "status": "fixed",
+    "files": [
+      "app/grower/pricing/page.tsx",
+      "app/grower/pricing/PricingPlans.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_pricing-1440.png",
+      "remediation/final-pages/_grower_pricing-390.png"
+    ],
+    "change": "Concise plan intro and unavailable-upgrade guidance, one current-plan marker, deduplicated benefits and expandable features while prices and annual billing terms remain visible.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E09",
+    "title": "Show useful unavailable-upgrade copy",
+    "status": "fixed",
+    "files": [
+      "app/grower/pricing/page.tsx",
+      "app/grower/pricing/PricingPlans.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_pricing-1440.png",
+      "remediation/final-pages/_grower_pricing-390.png"
+    ],
+    "change": "Concise plan intro and unavailable-upgrade guidance, one current-plan marker, deduplicated benefits and expandable features while prices and annual billing terms remain visible.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E10",
+    "title": "Remove repeated plan labels and features",
+    "status": "fixed",
+    "files": [
+      "app/grower/pricing/page.tsx",
+      "app/grower/pricing/PricingPlans.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_pricing-1440.png",
+      "remediation/final-pages/_grower_pricing-390.png"
+    ],
+    "change": "Concise plan intro and unavailable-upgrade guidance, one current-plan marker, deduplicated benefits and expandable features while prices and annual billing terms remain visible.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E11",
+    "title": "Make mobile plan comparison less scroll-heavy",
+    "status": "fixed",
+    "files": [
+      "app/grower/pricing/page.tsx",
+      "app/grower/pricing/PricingPlans.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_pricing-1440.png",
+      "remediation/final-pages/_grower_pricing-390.png"
+    ],
+    "change": "Concise plan intro and unavailable-upgrade guidance, one current-plan marker, deduplicated benefits and expandable features while prices and annual billing terms remain visible.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E01",
+    "title": "Shorten report headings and repeated range wording",
+    "status": "fixed",
+    "files": [
+      "app/grower/reports/page.tsx",
+      "app/grower/reports/ReportsExportActions.tsx",
+      "lib/calendar-month.ts"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_reports-1440.png",
+      "remediation/final-pages/_grower_reports-390.png"
+    ],
+    "change": "Compact report header, inline exports and presets, 2\u00d72 KPIs, bounded sparse chart, collapsed zero statuses, UTC calendar-month labels, singular counts and customer-first rows.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E02",
+    "title": "Compact mobile exports and date presets",
+    "status": "fixed",
+    "files": [
+      "app/grower/reports/page.tsx",
+      "app/grower/reports/ReportsExportActions.tsx",
+      "lib/calendar-month.ts"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_reports-1440.png",
+      "remediation/final-pages/_grower_reports-390.png"
+    ],
+    "change": "Compact report header, inline exports and presets, 2\u00d72 KPIs, bounded sparse chart, collapsed zero statuses, UTC calendar-month labels, singular counts and customer-first rows.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E03",
+    "title": "Remove the orphan KPI half-row",
+    "status": "fixed",
+    "files": [
+      "app/grower/reports/page.tsx",
+      "app/grower/reports/ReportsExportActions.tsx",
+      "lib/calendar-month.ts"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_reports-1440.png",
+      "remediation/final-pages/_grower_reports-390.png"
+    ],
+    "change": "Compact report header, inline exports and presets, 2\u00d72 KPIs, bounded sparse chart, collapsed zero statuses, UTC calendar-month labels, singular counts and customer-first rows.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E04",
+    "title": "Right-size a one-period chart and empty statuses",
+    "status": "fixed",
+    "files": [
+      "app/grower/reports/page.tsx",
+      "app/grower/reports/ReportsExportActions.tsx",
+      "lib/calendar-month.ts"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_reports-1440.png",
+      "remediation/final-pages/_grower_reports-390.png"
+    ],
+    "change": "Compact report header, inline exports and presets, 2\u00d72 KPIs, bounded sparse chart, collapsed zero statuses, UTC calendar-month labels, singular counts and customer-first rows.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E05",
+    "title": "Correct the month displayed on the trend",
+    "status": "fixed",
+    "files": [
+      "app/grower/reports/page.tsx",
+      "app/grower/reports/ReportsExportActions.tsx",
+      "lib/calendar-month.ts"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_reports-1440.png",
+      "remediation/final-pages/_grower_reports-390.png"
+    ],
+    "change": "Compact report header, inline exports and presets, 2\u00d72 KPIs, bounded sparse chart, collapsed zero statuses, UTC calendar-month labels, singular counts and customer-first rows.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E06",
+    "title": "Use singular count wording",
+    "status": "fixed",
+    "files": [
+      "app/grower/reports/page.tsx",
+      "app/grower/reports/ReportsExportActions.tsx",
+      "lib/calendar-month.ts"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_reports-1440.png",
+      "remediation/final-pages/_grower_reports-390.png"
+    ],
+    "change": "Compact report header, inline exports and presets, 2\u00d72 KPIs, bounded sparse chart, collapsed zero statuses, UTC calendar-month labels, singular counts and customer-first rows.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E07",
+    "title": "Preserve customer context in the compact mobile list",
+    "status": "fixed",
+    "files": [
+      "app/grower/reports/page.tsx",
+      "app/grower/reports/ReportsExportActions.tsx",
+      "lib/calendar-month.ts"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_reports-1440.png",
+      "remediation/final-pages/_grower_reports-390.png"
+    ],
+    "change": "Compact report header, inline exports and presets, 2\u00d72 KPIs, bounded sparse chart, collapsed zero statuses, UTC calendar-month labels, singular counts and customer-first rows.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E12",
+    "title": "Explain settlement once",
+    "status": "fixed",
+    "files": [
+      "app/grower/settings/page.tsx",
+      "app/grower/settings/components/SettingsForm.tsx",
+      "app/grower/settings/components/SettingsSectionNav.tsx",
+      "app/components/settings/CommercialTermsPanel.tsx",
+      "app/components/settings/SubscriptionBilling.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_settings-1440.png",
+      "remediation/final-pages/_grower_settings-390.png"
+    ],
+    "change": "Profile-first full-width layout, horizontal section navigation, shorter linked labels, dirty-only Save profile actions, separate Save terms, multiline contact note, one settlement disclosure and navigation sign-out.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E13",
+    "title": "Rebalance profile and logo space",
+    "status": "fixed",
+    "files": [
+      "app/grower/settings/page.tsx",
+      "app/grower/settings/components/SettingsForm.tsx",
+      "app/grower/settings/components/SettingsSectionNav.tsx",
+      "app/components/settings/CommercialTermsPanel.tsx",
+      "app/components/settings/SubscriptionBilling.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_settings-1440.png",
+      "remediation/final-pages/_grower_settings-390.png"
+    ],
+    "change": "Profile-first full-width layout, horizontal section navigation, shorter linked labels, dirty-only Save profile actions, separate Save terms, multiline contact note, one settlement disclosure and navigation sign-out.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E14",
+    "title": "Restore mobile section navigation",
+    "status": "fixed",
+    "files": [
+      "app/grower/settings/page.tsx",
+      "app/grower/settings/components/SettingsForm.tsx",
+      "app/grower/settings/components/SettingsSectionNav.tsx",
+      "app/components/settings/CommercialTermsPanel.tsx",
+      "app/components/settings/SubscriptionBilling.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_settings-1440.png",
+      "remediation/final-pages/_grower_settings-390.png"
+    ],
+    "change": "Profile-first full-width layout, horizontal section navigation, shorter linked labels, dirty-only Save profile actions, separate Save terms, multiline contact note, one settlement disclosure and navigation sign-out.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E15",
+    "title": "Reduce the persistent save strip and clarify its scope",
+    "status": "fixed",
+    "files": [
+      "app/grower/settings/page.tsx",
+      "app/grower/settings/components/SettingsForm.tsx",
+      "app/grower/settings/components/SettingsSectionNav.tsx",
+      "app/components/settings/CommercialTermsPanel.tsx",
+      "app/components/settings/SubscriptionBilling.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_settings-1440.png",
+      "remediation/final-pages/_grower_settings-390.png"
+    ],
+    "change": "Profile-first full-width layout, horizontal section navigation, shorter linked labels, dirty-only Save profile actions, separate Save terms, multiline contact note, one settlement disclosure and navigation sign-out.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E16",
+    "title": "Replace repeated form instructions with targeted guidance",
+    "status": "fixed",
+    "files": [
+      "app/grower/settings/page.tsx",
+      "app/grower/settings/components/SettingsForm.tsx",
+      "app/grower/settings/components/SettingsSectionNav.tsx",
+      "app/components/settings/CommercialTermsPanel.tsx",
+      "app/components/settings/SubscriptionBilling.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_settings-1440.png",
+      "remediation/final-pages/_grower_settings-390.png"
+    ],
+    "change": "Profile-first full-width layout, horizontal section navigation, shorter linked labels, dirty-only Save profile actions, separate Save terms, multiline contact note, one settlement disclosure and navigation sign-out.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E17",
+    "title": "Keep the contact note readable",
+    "status": "fixed",
+    "files": [
+      "app/grower/settings/page.tsx",
+      "app/grower/settings/components/SettingsForm.tsx",
+      "app/grower/settings/components/SettingsSectionNav.tsx",
+      "app/components/settings/CommercialTermsPanel.tsx",
+      "app/components/settings/SubscriptionBilling.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_settings-1440.png",
+      "remediation/final-pages/_grower_settings-390.png"
+    ],
+    "change": "Profile-first full-width layout, horizontal section navigation, shorter linked labels, dirty-only Save profile actions, separate Save terms, multiline contact note, one settlement disclosure and navigation sign-out.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E18",
+    "title": "Remove the redundant desktop sign-out card",
+    "status": "fixed",
+    "files": [
+      "app/grower/settings/page.tsx",
+      "app/grower/settings/components/SettingsForm.tsx",
+      "app/grower/settings/components/SettingsSectionNav.tsx",
+      "app/components/settings/CommercialTermsPanel.tsx",
+      "app/components/settings/SubscriptionBilling.tsx"
+    ],
+    "evidence": [
+      "remediation/final-pages/_grower_settings-1440.png",
+      "remediation/final-pages/_grower_settings-390.png"
+    ],
+    "change": "Profile-first full-width layout, horizontal section navigation, shorter linked labels, dirty-only Save profile actions, separate Save terms, multiline contact note, one settlement disclosure and navigation sign-out.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "E23",
+    "title": "Give missing pages a recovery action",
+    "status": "fixed",
+    "files": [
+      "app/not-found.tsx"
+    ],
+    "evidence": [
+      "remediation/root/not-found-desktop.png",
+      "remediation/root/not-found-mobile.png"
+    ],
+    "change": "Branded missing-page recovery with Dashboard and Home links.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-059",
+    "title": "Mobile navigation has unnecessary categories",
+    "status": "fixed",
+    "files": [
+      "app/grower/layout.tsx",
+      "app/grower/components/ClientNav.tsx",
+      "app/components/ui/MobileNav.tsx"
+    ],
+    "evidence": [
+      "remediation/root/settings-desktop.png",
+      "remediation/root/settings-mobile.png"
+    ],
+    "change": "Catalog destination uses its task name; Grower role label is consistent; short menus omit category headings and repeated mobile role subtitle.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-060",
+    "title": "Search empty state repeats instructions",
+    "status": "fixed",
+    "files": [
+      "app/components/SearchDialog.tsx"
+    ],
+    "evidence": [
+      "remediation/root/search-desktop.png",
+      "remediation/root/search-mobile.png",
+      "remediation/root/search-one-mobile.png"
+    ],
+    "change": "Short search guidance, no empty result count, correct singular result, desktop-only keyboard hints and 40px secondary actions.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-061",
+    "title": "Touch search shows keyboard hints and plural error",
+    "status": "fixed",
+    "files": [
+      "app/components/SearchDialog.tsx"
+    ],
+    "evidence": [
+      "remediation/root/search-desktop.png",
+      "remediation/root/search-mobile.png",
+      "remediation/root/search-one-mobile.png"
+    ],
+    "change": "Short search guidance, no empty result count, correct singular result, desktop-only keyboard hints and 40px secondary actions.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-062",
+    "title": "Search result secondary actions are small",
+    "status": "fixed",
+    "files": [
+      "app/components/SearchDialog.tsx"
+    ],
+    "evidence": [
+      "remediation/root/search-desktop.png",
+      "remediation/root/search-mobile.png",
+      "remediation/root/search-one-mobile.png"
+    ],
+    "change": "Short search guidance, no empty result count, correct singular result, desktop-only keyboard hints and 40px secondary actions.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-063",
+    "title": "Notifications omit distinguishing product context",
+    "status": "fixed",
+    "files": [
+      "app/components/notifications/NotificationBell.tsx",
+      "app/api/notifications/route.ts",
+      "lib/notifications.ts",
+      "app/api/messages/conversations/[id]/messages/route.ts",
+      "app/api/messages/messages/[id]/offer-action/route.ts"
+    ],
+    "evidence": [
+      "remediation/root/notifications-desktop.png",
+      "remediation/root/notifications-mobile.png"
+    ],
+    "change": "Notifications identify the buyer/seller and request or product, group duplicate history, omit empty counts, and anchor the desktop panel beside its trigger.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-064",
+    "title": "Notification panel opens far from its trigger",
+    "status": "fixed",
+    "files": [
+      "app/components/notifications/NotificationBell.tsx",
+      "app/api/notifications/route.ts",
+      "lib/notifications.ts",
+      "app/api/messages/conversations/[id]/messages/route.ts",
+      "app/api/messages/messages/[id]/offer-action/route.ts"
+    ],
+    "evidence": [
+      "remediation/root/notifications-desktop.png",
+      "remediation/root/notifications-mobile.png"
+    ],
+    "change": "Notifications identify the buyer/seller and request or product, group duplicate history, omit empty counts, and anchor the desktop panel beside its trigger.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-089",
+    "title": "Empty message pane repeats its instruction",
+    "status": "fixed",
+    "files": [
+      "app/components/messaging/ChatDrawer.tsx"
+    ],
+    "evidence": [
+      "remediation/root/chat-mobile.png",
+      "remediation/root/quote-1440.png",
+      "remediation/root/quote-390.png",
+      "remediation/root/quote-360.png"
+    ],
+    "change": "One empty selection prompt, deferred composer, compact Templates and Quote controls; labeled product-specific quote form replaces message controls, preserves drafts and keeps payment guidance in quote context.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-090",
+    "title": "Message footer repeats role and payment guidance",
+    "status": "fixed",
+    "files": [
+      "app/components/messaging/ChatDrawer.tsx"
+    ],
+    "evidence": [
+      "remediation/root/chat-mobile.png",
+      "remediation/root/quote-1440.png",
+      "remediation/root/quote-390.png",
+      "remediation/root/quote-360.png"
+    ],
+    "change": "One empty selection prompt, deferred composer, compact Templates and Quote controls; labeled product-specific quote form replaces message controls, preserves drafts and keeps payment guidance in quote context.",
+    "checks": [
+      "Implementation reviewed against the original finding.",
+      "Desktop/mobile rendered inspection passed.",
+      "Relevant shared controls, forms, API or calendar regressions passed on the isolated local database.",
+      "Lint and production build passed."
+    ]
+  },
+  {
+    "id": "BUY-091",
+    "title": "Recent activity uses route-like page names",
+    "status": "fixed",
+    "files": [
+      "app/components/ux/RecentActivityDrawer.tsx"
+    ],
+    "evidence": [
+      "remediation/root/recent-desktop.png",
+      "remediation/root/recent-mobile.png"
+    ],
+    "change": "Recent navigation uses short page names and actual shop business names.",
+    "checks": [
+      "Shop visit appears as Vermont Nurseries in the desktop recent-activity drawer.",
+      "The desktop-only drawer remains hidden on mobile, preserving the existing mobile navigation.",
+      "Recent shop labels and missing-page recovery regression passed.",
+      "Lint/build passed."
+    ]
+  }
+]

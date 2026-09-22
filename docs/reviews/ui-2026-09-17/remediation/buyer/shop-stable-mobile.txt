@@ -1,0 +1,113 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e2001]
+- button "Notifications" [expanded=false, ref=e2002]
+  - StaticText "22"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e2003]
+- main
+  - sectionheader
+    - heading "Vermont Nurseries" [level=1, ref=e2006]
+    - paragraph
+      - StaticText "Premium cannabis products grown with care in Vermont"
+    - link "Catalog" [ref=e2007]
+    - link "Browse products" [ref=e2008]
+  - StaticText "VN"
+  - StaticText "Verified"
+  - StaticText "Bristol"
+  - StaticText ", "
+  - StaticText "VT"
+  - StaticText "(802) 555-0123"
+  - link "Website" [ref=e2004]
+  - StaticText "License: "
+  - StaticText "VT-GWL-2024-001"
+  - paragraph
+    - StaticText "Pickup or delivery · No minimum set"
+  - generic
+    - heading "Products (3)" [level=2, ref=e2009]
+      - StaticText "Products (3)"
+    - textbox "Search products" [ref=e2013]
+    - combobox "Sort products" [expanded=false, ref=e2014]: Newest first
+      - MenuListPopup
+        - option "Newest first" [selected, ref=e2030]
+        - option "Price: Low to High" [ref=e2031]
+        - option "Price: High to Low" [ref=e2032]
+        - option "THC: High to Low" [ref=e2033]
+        - option "THC: Low to High" [ref=e2034]
+        - option "Name: A-Z" [ref=e2035]
+        - option "Name: Z-A" [ref=e2036]
+    - button "Product filters" [expanded=false, ref=e2010]
+    - button "Grid view" [ref=e2011]
+    - button "List view" [ref=e2012]
+    - article
+      - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e2015]
+      - StaticText "THC "
+      - StaticText "19"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Strain: Assorted"
+      - paragraph
+        - StaticText "Greenhouse"
+      - paragraph
+        - StaticText "25 available"
+      - generic
+        - button "Request pricing" [ref=e2028]
+        - button "Message grower" [ref=e2029]
+    - article
+      - image "Silver Haze Concentrate"
+      - heading "Silver Haze Concentrate" [level=3, ref=e2016]
+      - StaticText "THC "
+      - StaticText "85"
+      - StaticText "%"
+      - StaticText "Bulk Extract"
+      - paragraph
+        - StaticText "Strain: Silver Haze"
+      - paragraph
+        - StaticText "Live Resin"
+      - paragraph
+        - StaticText "$60.00/g"
+      - LabelText
+        - StaticText "Qty:"
+      - button "Decrease quantity for Silver Haze Concentrate" [ref=e2017]
+        - StaticText "−"
+      - spinbutton "Quantity for Silver Haze Concentrate" [ref=e2018]: 1
+        - StaticText "1"
+      - button "Increase quantity for Silver Haze Concentrate" [ref=e2019]
+        - StaticText "+"
+      - button "Add to draft" [ref=e2020]
+        - StaticText "Add to draft"
+      - StaticText "50 Available"
+      - button "Message grower" [ref=e2021]
+    - article
+      - image "Purple Haze Flowers"
+      - heading "Purple Haze Flowers" [level=3, ref=e2022]
+      - StaticText "THC "
+      - StaticText "24.8"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Strain: Purple Haze"
+      - paragraph
+        - StaticText "Indoor"
+      - paragraph
+        - StaticText "$25.00/g"
+      - LabelText
+        - StaticText "Qty:"
+      - button "Decrease quantity for Purple Haze Flowers" [ref=e2023]
+        - StaticText "−"
+      - spinbutton "Quantity for Purple Haze Flowers" [ref=e2024]: 1
+        - StaticText "1"
+      - button "Increase quantity for Purple Haze Flowers" [ref=e2025]
+        - StaticText "+"
+      - button "Add to draft" [ref=e2026]
+        - StaticText "Add to draft"
+      - StaticText "240 Available"
+      - button "Message grower" [ref=e2027]
+  - group
+    - DisclosureTriangle "Shop details" [expanded=false]
+      - StaticText "Shop details"
+- button "Open messages" [ref=e2005]
+- region "Notifications alt+T" [ref=e2000]
+- alert

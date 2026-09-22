@@ -14,7 +14,14 @@ const OPTIONAL = [
   "STRIPE_PUBLISHABLE_KEY",
   "STRIPE_WEBHOOK_SECRET",
   "STRIPE_PRO_PRICE_ID",
-  "STRIPE_BUSINESS_PRICE_ID"
+  "STRIPE_BUSINESS_PRICE_ID",
+  "BLOB_READ_WRITE_TOKEN",
+  "AUTH_MAIL_PROVIDER",
+  "RESEND_API_KEY",
+  "AUTH_MAIL_FROM",
+  "AUTH_MAIL_REPLY_TO",
+  "AUTH_MAIL_TEST_URL",
+  "AUTH_MAIL_TEST_KEY"
 ];
 const ALL_KEYS = [...REQUIRED, ...OPTIONAL];
 const PLACEHOLDER_RE = /^(|change-me|change-me-too|replace-with.*|your[-_].*|\[.*\]|postgresql:\/\/\[|postgres:\/\/USER|postgresql:\/\/USER|sk_test_|pk_test_|whsec_|billing@example\.com)$/i;

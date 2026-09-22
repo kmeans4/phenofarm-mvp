@@ -1,0 +1,81 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e3109]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3110]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e3111]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3114]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e3115]
+      - StaticText "Overview"
+    - link "Products" [ref=e3116]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3117]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3118]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3119]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3120]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3121]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3122]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3123]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3112]
+- main
+  - sectionheader
+    - heading "Update Stock" [level=1, ref=e3124]
+    - paragraph
+      - StaticText "Set the current stock level for a product. Batch, harvest, and compliance details live on the product itself."
+    - link "+ Add Product" [ref=e3125]
+  - form
+    - heading "Stock Details" [level=2, ref=e3126]
+    - LabelText
+      - StaticText "Select Product *"
+    - searchbox "Select Product *" [ref=e3127]
+    - paragraph
+      - StaticText "Search and choose a product before entering the new stock level."
+    - button "Mystery Pricing Batch Flower · Greenhouse · Assorted 25 Eighth" [ref=e3128]
+      - StaticText "Mystery Pricing Batch"
+      - StaticText "Flower · Greenhouse · Assorted"
+      - StaticText "25"
+      - StaticText "Eighth"
+    - button "Silver Haze Concentrate Bulk Extract · Live Resin · Silver Haze 50 Gram" [ref=e3129]
+      - StaticText "Silver Haze Concentrate"
+      - StaticText "Bulk Extract · Live Resin · Silver Haze"
+      - StaticText "50"
+      - StaticText "Gram"
+    - button "Purple Haze Flowers Flower · Indoor · Purple Haze 240 Gram" [ref=e3130]
+      - StaticText "Purple Haze Flowers"
+      - StaticText "Flower · Indoor · Purple Haze"
+      - StaticText "240"
+      - StaticText "Gram"
+    - LabelText
+      - StaticText "New Stock Level *"
+    - spinbutton "New Stock Level *" [required, ref=e3131]
+    - paragraph
+      - StaticText "This replaces the current stock level; it is not added to it."
+    - link "Cancel" [ref=e3132]
+    - button "Update Stock" [disabled, ref=e3133]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3134]
+  - button "Open messages" [ref=e3113]
+- region "Notifications alt+T" [ref=e3108]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3135]
+  - image
+- alert

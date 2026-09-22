@@ -1,0 +1,60 @@
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- generic [ref=e902] clickable [onclick]
+  - button "Open messages" [ref=e906]
+- button "Search" [ref=e903]
+- button "Notifications" [expanded=false, ref=e904]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e905]
+- main
+  - sectionheader
+    - heading "Saved" [level=1, ref=e907]
+    - link "Catalog" [ref=e908]
+  - tablist "Saved workspace"
+    - tab "Favorites (1)" [selected, ref=e909]
+      - StaticText "Favorites"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Alerts (1)" [ref=e910]
+      - StaticText "Alerts"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Recent (1)" [ref=e911]
+      - StaticText "Recent"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+  - tabpanel "Favorites (1)"
+    - combobox "Sort favorites" [expanded=false, ref=e915]: Newest
+      - MenuListPopup
+        - option "Newest" [selected, ref=e921]
+        - option "Price: low" [ref=e922]
+        - option "Price: high" [ref=e923]
+        - option "THC: high" [ref=e924]
+        - option "Name: A-Z" [ref=e925]
+        - option "Name: Z-A" [ref=e926]
+        - option "THC: low" [ref=e927]
+    - button "Grid view" [ref=e912]
+    - button "List view" [ref=e913]
+    - group
+      - DisclosureTriangle "More" [expanded=false]
+    - generic
+      - button "Remove Mystery Pricing Batch from favorites" [ref=e916]
+      - image "Mystery Pricing Batch"
+    - heading "Mystery Pricing Batch" [level=3, ref=e914]
+    - image
+    - paragraph
+      - StaticText "by "
+      - link "Vermont Nurseries" [ref=e917]
+    - StaticText "Hybrid"
+    - generic
+      - StaticText "THC 19%"
+    - generic
+      - button "Request pricing" [ref=e918]
+      - button "Message grower" [ref=e919]
+- region "Notifications alt+T" [ref=e901]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e920]
+  - image
+- alert

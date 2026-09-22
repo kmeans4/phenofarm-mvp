@@ -24,7 +24,11 @@
     "test:report": "playwright show-report",
     "env:check": "node scripts/validate-env.mjs",
     "env:check:runtime": "node scripts/validate-env.mjs --runtime",
-    "smoke": "npx playwright test --config=.codex/playwright-smoke.config.ts"
+    "smoke": "npx playwright test --config=.codex/playwright-smoke.config.ts",
+    "db:migrate-blobs": "tsx scripts/migrate-blobs.ts",
+    "db:backfill-legacy": "tsx scripts/backfill-legacy-product-fields.ts",
+    "db:cleanup-dev": "tsx scripts/cleanup-dev-data.ts",
+    "db:verify-drop-safety": "tsx scripts/verify-drop-safety.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.10.4",
@@ -32,6 +36,7 @@
     "@radix-ui/react-slot": "^1.2.4",
     "@stripe/stripe-js": "^8.7.0",
     "@types/bcryptjs": "^2.4.6",
+    "@vercel/blob": "^2.6.1",
     "autoprefixer": "^10.4.24",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
@@ -58,6 +63,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
     "tailwindcss": "^4",
+    "tsx": "^4.23.0",
     "typescript": "^5"
   },
   "description": "PhenoFarm - B2B cannabis wholesale marketplace MVP",

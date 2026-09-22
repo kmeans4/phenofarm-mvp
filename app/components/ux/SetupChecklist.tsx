@@ -16,7 +16,8 @@ interface SetupChecklistProps {
 
 export function SetupChecklist({ eyebrow = 'Setup checklist', title, items }: SetupChecklistProps) {
   const completeCount = items.filter((item) => item.complete).length;
-  const percent = items.length ? Math.round((completeCount / items.length) * 100) : 0;
+  const pending = items.filter((item) => !item.complete);
+  const completed = items.filter((item) => item.complete);
 
   return (
     <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
@@ -24,18 +25,12 @@ export function SetupChecklist({ eyebrow = 'Setup checklist', title, items }: Se
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">{eyebrow}</p>
           <h2 className="mt-1 text-lg font-semibold text-gray-900">{title}</h2>
-          <p className="mt-1 text-sm text-gray-600">{completeCount} of {items.length} complete</p>
-        </div>
-        <div className="min-w-[140px]">
-          <div className="h-2 overflow-hidden rounded-full bg-gray-100">
-            <div className="h-full rounded-full bg-green-600" style={{ width: `${percent}%` }} />
-          </div>
-          <p className="mt-1 text-right text-xs font-medium text-gray-500">{percent}% ready</p>
+          <p className="mt-1 text-sm text-gray-600">{pending.length ? `${pending.length} remaining` : 'All set'}</p>
         </div>
       </div>
 
       <div className="mt-4 grid gap-2 lg:grid-cols-2">
-        {items.map((item) => (
+        {pending.map((item) => (
           <Link
             key={item.label}
             href={item.href}
@@ -61,6 +56,10 @@ export function SetupChecklist({ eyebrow = 'Setup checklist', title, items }: Se
           </Link>
         ))}
       </div>
+      {completeCount > 0 && <details className="mt-2 text-sm">
+        <summary className="cursor-pointer py-2 text-green-700">{completeCount} completed</summary>
+        <div className="flex flex-wrap gap-2 pt-2">{completed.map(item => <Link key={item.label} href={item.href} className="rounded-lg bg-green-50 px-3 py-2 text-green-800">{item.label} ✓</Link>)}</div>
+      </details>}
     </section>
   );
 }

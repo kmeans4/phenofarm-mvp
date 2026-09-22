@@ -1,9 +1,15 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { Hanken_Grotesk, IBM_Plex_Mono, Newsreader } from 'next/font/google'
 import './globals.css'
-import { Providers } from './providers'
 
-const inter = Inter({ subsets: ['latin'] })
+const hankenGrotesk = Hanken_Grotesk({ subsets: ['latin'], variable: '--font-hanken-grotesk', display: 'swap' })
+const newsreader = Newsreader({ subsets: ['latin'], variable: '--font-newsreader', display: 'swap' })
+const ibmPlexMono = IBM_Plex_Mono({
+  subsets: ['latin'],
+  weight: ['400', '500', '600'],
+  variable: '--font-ibm-plex-mono',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
   title: 'PhenoFarm - B2B Cannabis Marketplace',
@@ -20,8 +26,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
-    { media: '(prefers-color-scheme: light)', color: '#f9fafb' },
+    { media: '(prefers-color-scheme: dark)', color: '#16251c' },
+    { media: '(prefers-color-scheme: light)', color: '#f3efe6' },
   ],
 }
 
@@ -31,11 +37,9 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <Providers>
-          {children}
-        </Providers>
+    <html lang="en" className={`${hankenGrotesk.variable} ${newsreader.variable} ${ibmPlexMono.variable}`}>
+      <body>
+        {children}
       </body>
     </html>
   )

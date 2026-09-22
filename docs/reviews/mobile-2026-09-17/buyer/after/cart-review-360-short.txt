@@ -1,0 +1,131 @@
+- generic
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - generic [ref=e1652] clickable [onclick]
+  - button "Search" [ref=e1653]
+  - button "Notifications" [expanded=false, ref=e1654]
+    - StaticText "26"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1655]
+  - main
+    - sectionheader
+      - heading "Request draft" [level=1, ref=e1658]
+    - navigation "Draft sections" [ref=e1656]
+      - button "Items" [ref=e1659]
+      - button "Logistics" [ref=e1660]
+      - button "Terms" [ref=e1661]
+    - group
+      - DisclosureTriangle "Templates" [expanded=true]
+      - button "Use standard terms" [ref=e1691]
+    - StaticText "Request browser draft"
+    - StaticText "saved 12:35 AM"
+    - StaticText ". Nothing is submitted until you use the primary action."
+    - button "Clear draft" [ref=e1694]
+    - generic
+      - image "Purple Haze Flowers"
+      - paragraph
+        - StaticText "Purple Haze Flowers"
+      - paragraph
+        - StaticText "Vermont Nurseries · $25/g"
+      - button "Decrease quantity for Purple Haze Flowers" [ref=e1662]
+        - StaticText "-"
+      - spinbutton "Quantity for Purple Haze Flowers" [ref=e1663]: 3
+        - StaticText "3"
+      - button "Increase quantity for Purple Haze Flowers" [ref=e1664]
+        - StaticText "+"
+      - paragraph
+        - StaticText "$75.00"
+      - button "Remove Purple Haze Flowers from draft" [ref=e1665]
+      - heading "Logistics" [level=3, ref=e1669]
+      - LabelText
+        - StaticText "Fulfillment"
+      - combobox "Fulfillment" [expanded=false, ref=e1670]: Flexible
+        - MenuListPopup
+          - option "Flexible" [selected, ref=e1676]
+          - option "Pickup" [ref=e1677]
+          - option "Delivery requested" [ref=e1678]
+          - option "Coordinate with grower" [ref=e1679]
+      - LabelText
+        - StaticText "Requested window (optional)"
+      - textbox "Requested window (optional)" [ref=e1671]
+      - paragraph
+        - StaticText "0/120"
+      - heading "Terms" [level=3, ref=e1672]
+      - LabelText
+        - StaticText "Payment terms"
+      - combobox "Payment terms" [expanded=false, ref=e1673]: Handled directly
+        - MenuListPopup
+          - option "Handled directly" [selected, ref=e1680]
+          - option "Net 15" [ref=e1681]
+          - option "Net 30" [ref=e1682]
+          - option "ACH" [ref=e1683]
+          - option "Check" [ref=e1684]
+          - option "COD" [ref=e1685]
+      - paragraph
+        - StaticText "Arrange payment directly with the grower."
+      - LabelText
+        - StaticText "Notes (optional)"
+      - combobox "Add a note template" [expanded=false, ref=e1674]: Add note template…
+        - MenuListPopup
+          - option "Add note template…" [selected, ref=e1686]
+          - option "Pickup" [ref=e1687]
+          - option "Delivery" [ref=e1688]
+          - option "Substitutions" [ref=e1689]
+          - option "Payment terms" [ref=e1690]
+      - textbox "Notes (optional)" [ref=e1675]: Pickup preferred. Please confirm available pickup windows and any receiving requirements.
+        - StaticText "Pickup preferred. Please confirm available pickup windows and any receiving requirements."
+      - paragraph
+        - StaticText "89/500"
+      - heading "Summary" [level=3, ref=e1666]
+      - StaticText "Total"
+      - StaticText "$"
+      - StaticText "75.00"
+      - paragraph
+        - StaticText "1 item · 1 grower"
+    - link "Add items" [ref=e1667]
+    - button "Review request" [ref=e1668]
+  - region "Notifications alt+T" [ref=e1651]
+  - alert
+  - dialog "Review request"
+    - heading "Review request" [level=2, ref=e1695]
+    - button "Close request review" [ref=e1696]
+      - StaticText "✕"
+    - paragraph
+      - StaticText "Items"
+    - paragraph
+      - StaticText "1 item"
+    - button "Edit" [ref=e1697]
+    - paragraph
+      - StaticText "Growers"
+    - paragraph
+      - StaticText "1"
+    - button "Edit" [ref=e1698]
+    - paragraph
+      - StaticText "Fulfillment"
+    - paragraph
+      - StaticText "Flexible"
+    - button "Edit" [ref=e1699]
+    - paragraph
+      - StaticText "Terms"
+    - paragraph
+      - StaticText "Handled directly"
+    - button "Edit" [ref=e1700]
+    - heading "Vermont Nurseries" [level=3, ref=e1701]
+    - paragraph
+      - StaticText "Vermont buyers · Handled directly"
+    - StaticText "$"
+    - StaticText "75.00"
+    - list
+      - listitem [level=1]
+        - StaticText "3"
+        - StaticText " × "
+        - StaticText "Purple Haze Flowers"
+        - StaticText "$"
+        - StaticText "75.00"
+    - StaticText "Stock is checked before submission. Any changes return to your draft."
+    - StaticText "Total"
+    - StaticText "$"
+    - StaticText "75.00"
+    - paragraph
+      - StaticText "Payment arranged with the grower."
+    - button "Back" [ref=e1702]
+    - button "Submit request" [ref=e1703]

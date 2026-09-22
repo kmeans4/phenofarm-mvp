@@ -1,0 +1,70 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e2383] clickable [onclick]
+  - button "Open messages" [ref=e2391]
+- button "Search" [ref=e2384]
+- button "Notifications" [expanded=false, ref=e2385]
+  - StaticText "20"
+- button "Open Grower navigation menu" [expanded=false, ref=e2386]
+- main
+  - sectionheader
+    - heading "Catalog" [level=1, ref=e2392]
+    - link "Add product" [ref=e2393]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Products"
+    - paragraph
+      - StaticText "3"
+    - paragraph
+      - StaticText "Available"
+    - paragraph
+      - StaticText "3"
+    - paragraph
+      - StaticText "Stock value"
+    - paragraph
+      - StaticText "$10,000.00"
+    - paragraph
+      - StaticText "Quote only"
+    - paragraph
+      - StaticText "1"
+  - link "Listings 3 total" [ref=e2387]
+    - heading "Listings" [level=2, ref=e2394]
+    - StaticText "3 total"
+  - link "Inventory 0 stock alerts" [ref=e2388]
+    - heading "Inventory" [level=2, ref=e2395]
+    - StaticText "0 stock alerts"
+  - link "Buyer preview 3 live" [ref=e2389]
+    - heading "Buyer preview" [level=2, ref=e2396]
+    - StaticText "3 live"
+  - link "Pricing 1 quote only" [ref=e2390]
+    - heading "Pricing" [level=2, ref=e2397]
+    - StaticText "1 quote only"
+  - generic
+    - heading "Catalog health" [level=2, ref=e2398]
+    - link "Quote only 1 →" [ref=e2399]
+      - StaticText "Quote only"
+      - StaticText "1"
+      - StaticText " →"
+    - group
+      - DisclosureTriangle "All checks" [expanded=true]
+        - StaticText "All checks"
+      - list
+        - listitem [level=1]
+          - StaticText "Missing images: 0"
+        - listitem [level=1]
+          - StaticText "Missing type: 0"
+        - listitem [level=1]
+          - StaticText "Quote only: 1"
+        - listitem [level=1]
+          - StaticText "Low stock: 0"
+  - group
+    - DisclosureTriangle "Strains, batches & customers" [expanded=true]
+      - StaticText "Strains, batches & customers"
+    - link "Strains →" [ref=e2400]
+      - StaticText "Strains →"
+    - link "Batches →" [ref=e2401]
+      - StaticText "Batches →"
+    - link "Customers →" [ref=e2402]
+      - StaticText "Customers →"
+- region "Notifications alt+T" [ref=e2382]
+- alert

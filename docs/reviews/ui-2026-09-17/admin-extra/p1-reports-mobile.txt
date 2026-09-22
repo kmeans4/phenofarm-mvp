@@ -1,0 +1,162 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e83]
+- button "Notifications" [expanded=false, ref=e84]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e85]
+- main
+  - sectionheader
+    - heading "Analytics & Reports" [level=1, ref=e29]
+    - paragraph
+      - StaticText "Track delivered request value and fulfillment metrics. Settlement happens directly with buyers."
+    - button "Export PDF" [ref=e30]
+    - button "Export CSV" [ref=e31]
+    - paragraph
+      - StaticText "Exports reflect the selected date range."
+  - paragraph
+    - StaticText "Date range"
+  - generic "Report date range"
+    - link "Last 30 days" [ref=e32]
+    - link "Last 90 days" [ref=e33]
+    - link "Last 12 months" [ref=e34]
+    - link "All" [ref=e35]
+  - paragraph
+    - StaticText "Delivered Request Value"
+  - paragraph
+    - StaticText "$450.00"
+  - paragraph
+    - StaticText "From 1 delivered requests in last 90 days"
+  - paragraph
+    - StaticText "Total Requests"
+  - paragraph
+    - StaticText "8"
+  - paragraph
+    - StaticText "7 active in last 90 days"
+  - paragraph
+    - StaticText "Active Customers"
+  - paragraph
+    - StaticText "2"
+  - paragraph
+    - StaticText "With requests in last 90 days"
+  - paragraph
+    - StaticText "Avg Delivered Value"
+  - paragraph
+    - StaticText "$450.00"
+  - paragraph
+    - StaticText "Delivered requests in last 90 days"
+  - heading "Delivered Request Value Trend" [level=2, ref=e6]
+  - StaticText "Aug 26"
+  - StaticText "$450"
+  - heading "Requests by Status" [level=2, ref=e7]
+  - link "View Submitted requests" [ref=e8]
+    - StaticText "Submitted"
+    - StaticText "7"
+    - StaticText "("
+    - StaticText "88"
+    - StaticText "%)"
+  - link "View Accepted requests" [ref=e9]
+    - StaticText "Accepted"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - link "View Preparing requests" [ref=e10]
+    - StaticText "Preparing"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - link "View Ready / In transit requests" [ref=e11]
+    - StaticText "Ready / In transit"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - link "View Delivered requests" [ref=e12]
+    - StaticText "Delivered"
+    - StaticText "1"
+    - StaticText "("
+    - StaticText "13"
+    - StaticText "%)"
+  - link "View Cancelled requests" [ref=e13]
+    - StaticText "Cancelled"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - heading "Top Products" [level=2, ref=e14]
+  - StaticText "1"
+  - StaticText "Purple Haze Flowers"
+  - paragraph
+    - StaticText "$450"
+  - paragraph
+    - StaticText "30 units"
+  - heading "Top Customers" [level=2, ref=e15]
+  - StaticText "1"
+  - StaticText "Maple Street Market"
+  - paragraph
+    - StaticText "$450"
+  - paragraph
+    - StaticText "1 orders"
+  - heading "Recent Requests" [level=2, ref=e16]
+  - link "View All Requests" [ref=e17]
+  - table
+    - rowgroup
+      - row
+        - columnheader "REQUEST ID" [ref=e77]
+        - columnheader "STATUS" [ref=e79]
+        - columnheader "EST. VALUE" [ref=e81]
+    - row
+      - cell "#7-REVIEW" [ref=e37]
+        - StaticText "#7-REVIEW"
+      - cell "Delivered" [ref=e39]
+      - cell "$450.00" [ref=e41]
+        - StaticText "$450.00"
+    - row
+      - cell "#0-XPJO3I" [ref=e42]
+        - StaticText "#0-XPJO3I"
+      - cell "Submitted" [ref=e44]
+      - cell "$25.00" [ref=e46]
+        - StaticText "$25.00"
+    - row
+      - cell "#0-03UYXZ" [ref=e47]
+        - StaticText "#0-03UYXZ"
+      - cell "Submitted" [ref=e49]
+      - cell "$25.00" [ref=e51]
+        - StaticText "$25.00"
+    - row
+      - cell "#0-O78T5N" [ref=e52]
+        - StaticText "#0-O78T5N"
+      - cell "Submitted" [ref=e54]
+      - cell "$25.00" [ref=e56]
+        - StaticText "$25.00"
+    - row
+      - cell "#0-ZYGM3S" [ref=e57]
+        - StaticText "#0-ZYGM3S"
+      - cell "Submitted" [ref=e59]
+      - cell "$25.00" [ref=e61]
+        - StaticText "$25.00"
+    - row
+      - cell "#0-FMBIOT" [ref=e62]
+        - StaticText "#0-FMBIOT"
+      - cell "Submitted" [ref=e64]
+      - cell "$25.00" [ref=e66]
+        - StaticText "$25.00"
+    - row
+      - cell "#718088-1" [ref=e67]
+        - StaticText "#718088-1"
+      - cell "Submitted" [ref=e69]
+      - cell "$25.00" [ref=e71]
+        - StaticText "$25.00"
+    - row
+      - cell "#503047-1" [ref=e72]
+        - StaticText "#503047-1"
+      - cell "Submitted" [ref=e74]
+      - cell "$25.00" [ref=e76]
+        - StaticText "$25.00"
+- button "Open messages" [ref=e18]
+- region "Notifications alt+T" [ref=e1]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e82]
+  - image
+- alert

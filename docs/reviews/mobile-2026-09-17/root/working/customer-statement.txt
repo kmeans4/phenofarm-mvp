@@ -1,0 +1,62 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e596] clickable [onclick]
+  - button "Open messages" [ref=e601]
+- button "Search" [ref=e597]
+- button "Notifications" [expanded=false, ref=e598]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e599]
+- main
+  - link "← Customer" [ref=e600]
+  - sectionheader
+    - heading "Statement" [level=1, ref=e602]
+    - paragraph
+      - StaticText "Maple Street Market"
+    - button "Export CSV" [ref=e603]
+  - form
+    - LabelText
+      - StaticText "From"
+      - Date "From"
+        - generic
+          - spinbutton "Month Month" [ref=e609]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e610]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e611]: 0
+            - StaticText "yyyy"
+        - button "Show date picker Show date picker" [ref=e606]
+    - LabelText
+      - StaticText "To"
+      - Date "To"
+        - generic
+          - spinbutton "Month Month" [ref=e612]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e613]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e614]: 0
+            - StaticText "yyyy"
+        - button "Show date picker Show date picker" [ref=e607]
+    - button "Apply" [ref=e604]
+  - generic
+    - StaticText "1"
+    - StaticText " delivered request"
+    - StaticText "$450"
+    - article
+      - link "#ORD-20260917-REVIEW" [ref=e605]
+        - StaticText "#ORD-20260917-REVIEW"
+      - paragraph
+        - StaticText "Sep 15, 2026"
+      - paragraph
+        - StaticText "Purple Haze Flowers × 30"
+      - strong
+        - StaticText "$450"
+  - paragraph
+    - StaticText "Payments stay between businesses; PhenoFarm does not collect funds."
+- region "Notifications alt+T" [ref=e595]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e608]
+  - image
+- alert

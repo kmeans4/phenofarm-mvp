@@ -1,0 +1,45 @@
+- main
+  - generic
+  - generic
+    - link "Back to home" [ref=e884]
+    - paragraph
+      - StaticText "CONTACT PHENOFARM"
+    - heading "Talk to us about licensed wholesale cannabis workflows." [level=1, ref=e885]
+    - paragraph
+      - StaticText "Tell us whether you are a grower, dispensary, or partner and include the details the PhenoFarm support team should know."
+    - link "Email support@phenofarm.com" [ref=e886]
+      - paragraph
+        - StaticText "Email"
+      - paragraph
+        - StaticText "support@phenofarm.com"
+    - paragraph
+      - StaticText "Location"
+    - paragraph
+      - StaticText "Vermont, USA"
+    - paragraph
+      - StaticText "PhenoFarm coordinates marketplace workflows and cultivator subscriptions. Wholesale payment settlement stays directly between licensed businesses."
+    - form
+      - heading "Email us" [level=2, ref=e887]
+      - paragraph
+        - StaticText "Your draft will include these details so support can route the conversation quickly."
+      - LabelText
+        - StaticText "Full name"
+      - textbox "Full name" [ref=e888]
+      - LabelText
+        - StaticText "Email"
+      - textbox "Email" [ref=e889]
+      - LabelText
+        - StaticText "Business type"
+      - combobox "Business type" [expanded=false, ref=e890]: Select one
+        - MenuListPopup
+          - option "Select one" [selected, ref=e894]
+          - option "Grower" [ref=e895]
+          - option "Dispensary" [ref=e896]
+          - option "Other" [ref=e897]
+      - LabelText
+        - StaticText "Message"
+      - textbox "Message" [ref=e891]
+      - button "Open email draft" [ref=e892]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e893]
+  - image
+- alert

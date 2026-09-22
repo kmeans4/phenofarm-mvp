@@ -1,0 +1,108 @@
+- generic
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - generic [ref=e2159] clickable [onclick]
+    - button "Open messages" [ref=e2164]
+  - button "Search" [ref=e2160]
+  - button "Notifications" [expanded=false, ref=e2161]
+    - StaticText "19"
+  - button "Open Grower navigation menu" [expanded=false, ref=e2162]
+  - main
+    - link "Request" [ref=e2163]
+      - image
+      - StaticText "Request"
+    - sectionheader
+      - heading "Edit request #ORD-20260710-XPJO3I" [level=1, ref=e2165]
+        - StaticText "Edit request"
+        - generic
+          - StaticText "#ORD-20260710-XPJO3I"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+    - form
+      - heading "Request status" [level=2, ref=e2166]
+        - image
+        - StaticText "Request status"
+      - StaticText "Current: "
+      - StaticText "Submitted"
+      - paragraph
+        - StaticText "Change to"
+      - LabelText [ref=e2167] clickable [cursor:pointer]
+        - radio "Accepted" [checked=false, ref=e2184]
+        - StaticText "Accepted"
+      - LabelText [ref=e2168] clickable [cursor:pointer]
+        - radio "Cancelled" [checked=false, ref=e2185]
+        - StaticText "Cancelled"
+      - heading "Items (1)" [level=2, ref=e2169]
+        - image
+        - StaticText "Items"
+        - StaticText "("
+        - StaticText "1"
+        - StaticText ")"
+      - StaticText "1"
+      - paragraph
+        - StaticText "Purple Haze Flowers"
+      - paragraph
+        - StaticText "Purple Haze"
+      - paragraph
+        - StaticText "$25.00/g"
+      - button "Remove item" [ref=e2170]
+        - image
+      - button "-" [disabled, ref=e2171]
+      - StaticText "1"
+      - button "+" [ref=e2172]
+      - paragraph
+        - StaticText "Max 241"
+      - paragraph
+        - StaticText "$25.00"
+      - heading "Pricing" [level=2, ref=e2173]
+        - image
+        - StaticText "Pricing"
+      - LabelText
+        - StaticText "Shipping ($)"
+      - spinbutton [ref=e2174]: 0
+        - StaticText "0"
+      - LabelText
+        - StaticText "Tax ($)"
+      - spinbutton [ref=e2175]: 0
+        - StaticText "0"
+      - paragraph
+        - StaticText "Optional tax: enter only the amount on your invoice. PhenoFarm does not calculate tax."
+      - LabelText
+        - StaticText "Notes"
+      - textbox "Instructions or notes" [ref=e2176]: Fulfillment method: Flexible
+Requested window: Coordinate with grower
+Payment terms: Handled directly
+        - generic
+          - StaticText "Fulfillment method: Flexible"
+          - LineBreak "\n"
+          - StaticText "Requested window: Coordinate with grower"
+          - LineBreak "\n"
+          - StaticText "Payment terms: Handled directly"
+      - paragraph
+        - StaticText "101/1000 characters"
+      - heading "Summary" [level=3, ref=e2177]
+        - image
+        - StaticText "Summary"
+      - StaticText "Subtotal ("
+      - StaticText "1 item"
+      - StaticText ")"
+      - StaticText "$25.00"
+      - StaticText "Shipping"
+      - StaticText "$0.00"
+      - StaticText "Tax"
+      - StaticText "$0.00"
+      - StaticText "Total"
+      - StaticText "$25.00"
+      - link "Cancel" [ref=e2178]
+      - button "Save Changes" [ref=e2179]
+        - image
+        - StaticText "Save Changes"
+  - region "Notifications alt+T" [ref=e2158]
+  - alert
+  - alertdialog "Remove item?"
+    - heading "Remove item?" [level=2, ref=e2180]
+    - paragraph
+      - StaticText "Remove Purple Haze Flowers from the request record."
+    - button "Close confirmation dialog" [ref=e2181]
+    - button "Cancel" [ref=e2182]
+    - button "Remove item" [ref=e2183]

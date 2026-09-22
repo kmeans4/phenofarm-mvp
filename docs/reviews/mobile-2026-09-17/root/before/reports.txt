@@ -1,0 +1,163 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e2]
+- button "Notifications" [expanded=false, ref=e3]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e4]
+- main
+  - sectionheader
+    - heading "Reports" [level=1, ref=e12]
+    - paragraph
+      - StaticText "Delivered value and request activity."
+    - button "Export PDF" [ref=e13]
+      - StaticText "PDF"
+    - button "Export CSV" [ref=e14]
+      - StaticText "CSV"
+  - paragraph
+    - StaticText "Date range"
+  - generic "Report date range"
+    - link "Last 30 days" [ref=e15]
+      - StaticText "30d"
+    - link "Last 90 days" [ref=e16]
+      - StaticText "90d"
+    - link "Last 12 months" [ref=e17]
+      - StaticText "12mo"
+    - link "All" [ref=e18]
+  - paragraph
+    - StaticText "Delivered value"
+  - paragraph
+    - StaticText "$450.00"
+  - paragraph
+    - StaticText "1 delivered request"
+  - paragraph
+    - StaticText "Requests"
+  - paragraph
+    - StaticText "8"
+  - paragraph
+    - StaticText "7 active"
+  - paragraph
+    - StaticText "Customers"
+  - paragraph
+    - StaticText "2"
+  - paragraph
+    - StaticText "Avg. delivered value"
+  - paragraph
+    - StaticText "$450.00"
+  - heading "Delivered value by month" [level=2, ref=e5]
+  - StaticText "Sep 26"
+  - StaticText "$450"
+  - heading "Requests by Status" [level=2, ref=e6]
+  - link "View Submitted requests" [ref=e7]
+    - StaticText "Submitted"
+    - StaticText "7"
+    - StaticText "("
+    - StaticText "88"
+    - StaticText "%)"
+  - link "View Delivered requests" [ref=e8]
+    - StaticText "Delivered"
+    - StaticText "1"
+    - StaticText "("
+    - StaticText "13"
+    - StaticText "%)"
+  - group
+    - DisclosureTriangle "Statuses with no requests" [expanded=false]
+      - StaticText "Statuses with no requests"
+  - heading "Top Products" [level=2, ref=e9]
+  - StaticText "1"
+  - StaticText "Purple Haze Flowers"
+  - paragraph
+    - StaticText "$450"
+  - paragraph
+    - StaticText "30 units"
+  - heading "Top Customers" [level=2, ref=e10]
+  - StaticText "1"
+  - StaticText "Maple Street Market"
+  - paragraph
+    - StaticText "$450"
+  - paragraph
+    - StaticText "1 request"
+  - generic
+    - heading "Recent Requests" [level=2, ref=e19]
+    - link "View all" [ref=e20]
+    - table
+      - rowgroup
+        - row
+          - columnheader "REQUEST" [ref=e45]
+          - columnheader "STATUS" [ref=e46]
+          - columnheader "EST. VALUE" [ref=e47]
+      - row
+        - cell "Maple Street Market Sep 13 · #REVIEW" [ref=e21]
+          - link "Maple Street Market" [ref=e48]
+          - StaticText "Sep 13"
+          - StaticText " · #"
+          - StaticText "REVIEW"
+        - cell "Delivered" [ref=e22]
+        - cell "$450.00" [ref=e23]
+          - StaticText "$450.00"
+      - row
+        - cell "Green Vermont Dispensary Jul 9 · #XPJO3I" [ref=e24]
+          - link "Green Vermont Dispensary" [ref=e49]
+          - StaticText "Jul 9"
+          - StaticText " · #"
+          - StaticText "XPJO3I"
+        - cell "Submitted" [ref=e25]
+        - cell "$25.00" [ref=e26]
+          - StaticText "$25.00"
+      - row
+        - cell "Green Vermont Dispensary Jul 9 · #03UYXZ" [ref=e27]
+          - link "Green Vermont Dispensary" [ref=e50]
+          - StaticText "Jul 9"
+          - StaticText " · #"
+          - StaticText "03UYXZ"
+        - cell "Submitted" [ref=e28]
+        - cell "$25.00" [ref=e29]
+          - StaticText "$25.00"
+      - row
+        - cell "Green Vermont Dispensary Jul 9 · #O78T5N" [ref=e30]
+          - link "Green Vermont Dispensary" [ref=e51]
+          - StaticText "Jul 9"
+          - StaticText " · #"
+          - StaticText "O78T5N"
+        - cell "Submitted" [ref=e31]
+        - cell "$25.00" [ref=e32]
+          - StaticText "$25.00"
+      - row
+        - cell "Green Vermont Dispensary Jul 9 · #ZYGM3S" [ref=e33]
+          - link "Green Vermont Dispensary" [ref=e52]
+          - StaticText "Jul 9"
+          - StaticText " · #"
+          - StaticText "ZYGM3S"
+        - cell "Submitted" [ref=e34]
+        - cell "$25.00" [ref=e35]
+          - StaticText "$25.00"
+      - row
+        - cell "Green Vermont Dispensary Jul 9 · #FMBIOT" [ref=e36]
+          - link "Green Vermont Dispensary" [ref=e53]
+          - StaticText "Jul 9"
+          - StaticText " · #"
+          - StaticText "FMBIOT"
+        - cell "Submitted" [ref=e37]
+        - cell "$25.00" [ref=e38]
+          - StaticText "$25.00"
+      - row
+        - cell "Green Vermont Dispensary Jul 9 · #8088-1" [ref=e39]
+          - link "Green Vermont Dispensary" [ref=e54]
+          - StaticText "Jul 9"
+          - StaticText " · #"
+          - StaticText "8088-1"
+        - cell "Submitted" [ref=e40]
+        - cell "$25.00" [ref=e41]
+          - StaticText "$25.00"
+      - row
+        - cell "Green Vermont Dispensary Jul 9 · #3047-1" [ref=e42]
+          - link "Green Vermont Dispensary" [ref=e55]
+          - StaticText "Jul 9"
+          - StaticText " · #"
+          - StaticText "3047-1"
+        - cell "Submitted" [ref=e43]
+        - cell "$25.00" [ref=e44]
+          - StaticText "$25.00"
+- button "Open messages" [ref=e11]
+- region "Notifications alt+T" [ref=e1]
+- alert

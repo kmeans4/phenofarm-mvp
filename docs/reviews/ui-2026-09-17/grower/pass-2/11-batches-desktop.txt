@@ -1,0 +1,70 @@
+- generic
+  - generic
+    - generic
+      - generic
+        - generic
+          - navigation
+            - button "previous" [disabled, ref=e3845]
+              - image "previous"
+            - generic
+              - StaticText "1/1"
+            - button "next" [disabled, ref=e3846]
+              - image "next"
+          - image
+        - generic
+          - link "Next.js 16.1.6 (stale) Turbopack" [ref=e3844]
+            - image
+            - StaticText "Next.js 16.1.6 (stale)"
+            - StaticText "Turbopack"
+          - image
+      - dialog "Runtime TypeError"
+        - generic
+          - generic
+            - StaticText "Runtime TypeError"
+            - button "Copy Error Info" [ref=e3847]
+              - image
+            - button "No related documentation found" [disabled, ref=e3848]
+              - image
+            - button "Attach Node.js inspector" [ref=e3849]
+              - image
+            - generic
+              - StaticText "batch.thc.toFixed is not a function"
+          - generic
+            - image
+            - StaticText "app/grower/batches/page.tsx (187:89)"
+            - StaticText " @"
+            - StaticText "<unknown>"
+            - button "Open in editor" [ref=e3850]
+              - image
+            - StaticText "  185 |                   <div>"
+            - StaticText "  186 |                     <p className=\"text-xs text-gray-500\">THC</p>"
+            - StaticText "> 187 |                     <p className=\"text-green-600 font-medium\">{batch.thc ? `${batch.thc.toFixed(1)}%` : '-'}</p>"
+            - StaticText "      |                                                                                         ^"
+            - StaticText "  188 |                   </div>"
+            - StaticText "  189 |                   <div>"
+            - StaticText "  190 |                     <p className=\"text-xs text-gray-500\">CBD</p>"
+            - generic
+              - StaticText "Call Stack"
+              - StaticText "15"
+              - button "Show 12 ignore-listed frame(s)" [ref=e3851]
+                - StaticText "Show 12 ignore-listed frame(s)"
+                - image
+              - StaticText "<unknown>"
+              - button "Open <unknown> in editor" [ref=e3852]
+                - image
+              - StaticText "app/grower/batches/page.tsx (187:89)"
+              - StaticText "Array.map"
+              - StaticText "<anonymous>"
+              - StaticText "BatchesPage"
+              - button "Open BatchesPage in editor" [ref=e3853]
+                - image
+              - StaticText "app/grower/batches/page.tsx (160:22)"
+    - button "Open Next.js Dev Tools" [expanded=false, ref=e3841]
+      - image
+    - button "Open issues overlay" [ref=e3842]
+      - StaticText "1"
+      - StaticText "Issue"
+    - button "Collapse issues badge" [ref=e3843]
+      - image
+  - heading "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information)." [level=2, ref=e3840]
+    - StaticText "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information)."

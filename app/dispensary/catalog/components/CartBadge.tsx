@@ -1,20 +1,10 @@
 'use client';
 
 import { useSyncExternalStore } from 'react';
+import Link from 'next/link';
+import { readCart } from '@/lib/cart';
 
-function getCartCount(): number {
-  if (typeof window === 'undefined') return 0;
-  try {
-    const saved = localStorage.getItem('phenofarm-cart');
-    if (saved) {
-      const cart = JSON.parse(saved);
-      return cart.items?.reduce((sum: number, item: { quantity?: number }) => sum + (item.quantity || 0), 0) || 0;
-    }
-  } catch {
-    // ignore
-  }
-  return 0;
-}
+function getCartCount() { return readCart().items.reduce((sum, item) => sum + item.quantity, 0); }
 
 function subscribe(callback: () => void) {
   if (typeof window === 'undefined') return () => {};
@@ -28,14 +18,13 @@ function subscribe(callback: () => void) {
   };
 }
 
-export default function CartBadge() {
+export default function CartBadge({ showLink = false }: { showLink?: boolean } = {}) {
   const count = useSyncExternalStore(subscribe, getCartCount, () => 0);
 
   if (count === 0) return null;
 
-  return (
-    <span className="inline-flex min-w-5 h-5 items-center justify-center rounded-full bg-red-500 px-1.5 text-xs font-bold leading-none text-white">
-      {count > 99 ? '99+' : count}
-    </span>
-  );
+  const badge = <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-green-100 px-1.5 text-xs font-bold leading-none text-green-900">{count > 99 ? '99+' : count}</span>;
+  return showLink ? (
+    <Link href="/dispensary/cart" className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-green-700 px-3 text-sm font-semibold text-green-800 hover:bg-green-50">View draft {badge}</Link>
+  ) : badge;
 }

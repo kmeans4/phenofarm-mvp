@@ -1,0 +1,75 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e2888]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2889]
+    - StaticText "Notifications"
+    - StaticText "17"
+  - navigation "Portal navigation" [ref=e2890]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2893]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2894]
+      - StaticText "Catalog"
+    - link "Products" [ref=e2895]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2896]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2897]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2898]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2899]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2900]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2901]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2902]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2891]
+- main
+  - sectionheader
+    - heading "Add strain" [level=1, ref=e2903]
+  - form
+    - LabelText
+      - StaticText "Name *"
+    - combobox "Name *" [required, ref=e2904]
+    - LabelText
+      - StaticText "Type *"
+    - combobox "Type *" [expanded=false, ref=e2905]: Select strain type
+      - MenuListPopup
+        - option "Select strain type" [selected, ref=e2912]
+        - option "Indica" [ref=e2913]
+        - option "Sativa" [ref=e2914]
+        - option "Hybrid" [ref=e2915]
+        - option "Sativa Dom. Hybrid" [ref=e2916]
+        - option "Indica Dom. Hybrid" [ref=e2917]
+    - group
+      - DisclosureTriangle "About strain types" [expanded=false]
+        - StaticText "About strain types"
+    - LabelText
+      - StaticText "Genetics"
+    - textbox "Genetics" [ref=e2906]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e2907]
+    - LabelText
+      - StaticText "Growing notes"
+    - textbox "Growing notes" [ref=e2908]
+    - button "Create Strain" [disabled, ref=e2909]
+    - button "Cancel" [ref=e2910]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2911]
+  - button "Open messages" [ref=e2892]
+- region "Notifications alt+T" [ref=e2887]
+- alert

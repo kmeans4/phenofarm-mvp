@@ -1,10 +1,12 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ProductForm } from '@/app/grower/products/components/ProductForm';
 import { buildProductRequestPayload, PRODUCT_STATUS } from '@/lib/product-payload';
 import { toast } from '@/app/hooks/useToast';
+import { PageHeader } from '@/app/components/ui/PageHeader';
 
 interface ProductFormData {
   id?: string;
@@ -50,72 +52,37 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         throw new Error(data.error || 'Failed to update product');
       }
 
       toast.success('Product updated');
       router.push('/grower/products');
-      router.refresh();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleSaveDraft = async (formData: ProductFormData) => {
-    try {
-      setIsSubmitting(true);
-      const payload = buildProductRequestPayload(
-        formData as unknown as Record<string, unknown>,
-        PRODUCT_STATUS.DRAFT
-      );
-
-      const response = await fetch(`/api/products/${productId}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to save draft');
-      }
-
-      toast.success('Draft saved');
-      router.push('/grower/products');
-      router.refresh();
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : 'An error occurred');
+      throw err;
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5 sm:space-y-6">
+    <div className="w-full max-w-5xl mx-auto space-y-3 sm:space-y-6">
       <div className="space-y-3">
-        <button
-          type="button"
-          onClick={() => router.push('/grower/products')}
+        <Link
+          href="/grower/products"
           className="inline-flex items-center gap-2 rounded-md px-1 py-1 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-green-50"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Back to Products
-        </button>
+          Products
+        </Link>
 
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Edit Product</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Update your product details</p>
-        </div>
+        <PageHeader title="Edit product" />
       </div>
 
       <ProductForm
         onSubmit={handleSubmit}
-        onSaveDraft={handleSaveDraft}
         onCancel={() => router.push('/grower/products')}
         initialData={initialData}
         isSubmitting={isSubmitting}

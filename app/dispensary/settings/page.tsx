@@ -1,10 +1,10 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from "@/lib/auth-helpers";
 import { redirect } from "next/navigation";
 import { SettingsForm } from "./components/SettingsForm";
+import { PageHeader } from "@/app/components/ui/PageHeader";
 
 export default async function DispensarySettingsPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
   
   if (!session) {
     redirect('/auth/sign_in');
@@ -12,10 +12,7 @@ export default async function DispensarySettingsPage() {
 
   return (
     <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
-      <div className="space-y-1">
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Dispensary Settings</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your account and preferences</p>
-      </div>
+      <PageHeader title="Settings" description="Manage your account and preferences" />
       
       <div className="mt-5 sm:mt-6">
         <SettingsForm defaultValues={{
@@ -34,6 +31,7 @@ export default async function DispensarySettingsPage() {
           description: '',
           logo: '',
           licenseStatus: 'pending_review',
+          licenseReviewNotes: '',
         }} />
       </div>
     </div>

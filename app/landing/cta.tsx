@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
+import { m as motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
 import { ArrowRight, CheckCircle2 } from 'lucide-react';
 
 const assurances = [

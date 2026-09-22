@@ -1,0 +1,240 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e2]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3]
+    - StaticText "Notifications"
+    - StaticText "18"
+  - navigation "Portal navigation" [ref=e4]
+    - StaticText "HOME"
+    - link "Dashboard" [ref=e7]
+      - StaticText "Dashboard"
+    - StaticText "SHOP"
+    - link "Catalog" [ref=e8]
+      - StaticText "Catalog"
+    - link "Request Draft" [ref=e9]
+      - StaticText "Request Draft"
+    - StaticText "ORDERS"
+    - link "Orders 17" [ref=e10]
+      - StaticText "Orders"
+      - StaticText "17"
+    - StaticText "SAVED"
+    - link "Saved" [ref=e11]
+      - StaticText "Saved"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e12]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e5]
+- main
+  - generic
+    - sectionheader
+      - paragraph
+        - StaticText "WHOLESALE MARKETPLACE · VERMONT"
+      - heading "Source this season's finest craft cannabis." [level=1, ref=e16]
+        - StaticText "Source this season's finest craft cannabis."
+      - paragraph
+        - StaticText "Compare verified cultivator listings, request pricing, and message growers directly."
+    - generic
+      - generic
+        - LabelText
+          - StaticText "Search catalog"
+        - combobox "Search catalog" [expanded=false, ref=e43]
+      - combobox "Sort catalog results" [expanded=false, ref=e38]: Grouped by grower
+        - MenuListPopup
+          - option "Grouped by grower" [selected, ref=e49]
+          - option "Price: Low to High" [ref=e50]
+          - option "Price: High to Low" [ref=e51]
+          - option "THC: High to Low" [ref=e52]
+          - option "THC: Low to High" [ref=e53]
+          - option "Name: A-Z" [ref=e54]
+          - option "Name: Z-A" [ref=e55]
+      - button "Toggle filters" [expanded=true, ref=e17]
+        - StaticText "Filters"
+      - button "Grid view" [ref=e18]
+        - StaticText "Grid"
+      - button "List view" [ref=e19]
+        - StaticText "List"
+    - generic
+      - StaticText "3 of 3 products"
+      - StaticText "View: "
+      - StaticText "Grid"
+    - heading "Favorites" [level=3, ref=e56]
+    - button "View Favorites Only 1 item" [ref=e57]
+      - StaticText "View Favorites Only"
+      - StaticText "1 item"
+    - heading "Recently Added" [level=3, ref=e58]
+    - button "Show Recently Added 7 days" [ref=e59]
+      - StaticText "Show Recently Added"
+      - StaticText "7 days"
+    - heading "Product Type" [level=3, ref=e60]
+    - LabelText [ref=e61] clickable [cursor:pointer]
+      - checkbox "Flower 2" [checked=false, ref=e73]
+      - StaticText "Flower"
+      - StaticText "2"
+    - LabelText [ref=e62] clickable [cursor:pointer]
+      - checkbox "Concentrate 1" [checked=false, ref=e74]
+      - StaticText "Concentrate"
+      - StaticText "1"
+    - heading "THC Potency" [level=3, ref=e63]
+    - LabelText [ref=e64] clickable [cursor:pointer]
+      - checkbox "< 15%" [checked=false, ref=e75]
+      - StaticText "< 15%"
+    - LabelText [ref=e65] clickable [cursor:pointer]
+      - checkbox "15% - 20%" [checked=false, ref=e76]
+      - StaticText "15% - 20%"
+    - LabelText [ref=e66] clickable [cursor:pointer]
+      - checkbox "20% - 25%" [checked=false, ref=e77]
+      - StaticText "20% - 25%"
+    - LabelText [ref=e67] clickable [cursor:pointer]
+      - checkbox "25%+" [checked=false, ref=e78]
+      - StaticText "25%+"
+    - heading "Unit Price" [level=3, ref=e68]
+    - paragraph
+      - StaticText "Wholesale price per unit."
+    - LabelText [ref=e69] clickable [cursor:pointer]
+      - checkbox "Under $10 per unit" [checked=false, ref=e79]
+      - StaticText "Under $10 per unit"
+    - LabelText [ref=e70] clickable [cursor:pointer]
+      - checkbox "$10 - $25 per unit" [checked=false, ref=e80]
+      - StaticText "$10 - $25 per unit"
+    - LabelText [ref=e71] clickable [cursor:pointer]
+      - checkbox "$25 - $50 per unit" [checked=false, ref=e81]
+      - StaticText "$25 - $50 per unit"
+    - LabelText [ref=e72] clickable [cursor:pointer]
+      - checkbox "$50+ per unit" [checked=false, ref=e82]
+      - StaticText "$50+ per unit"
+    - heading "Vermont Nurseries" [level=2, ref=e13]
+    - paragraph
+      - StaticText "3 products"
+    - link "View Shop →" [ref=e14]
+    - generic
+      - generic
+        - button "Remove from favorites" [ref=e44]
+        - image "Mystery Pricing Batch"
+        - generic
+          - StaticText "In Stock"
+      - heading "Mystery Pricing Batch" [level=3, ref=e20]
+      - image
+      - paragraph
+        - StaticText "by "
+        - link "Vermont Nurseries" [ref=e39]
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "19"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.3"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Strain: Assorted"
+      - paragraph
+        - StaticText "Unit: Eighth • Stock: 25 units"
+      - button "Request pricing" [ref=e21]
+      - button "Message grower" [ref=e22]
+      - button "Compare Mystery Pricing Batch" [ref=e23]
+        - StaticText "Compare"
+      - StaticText "COA and lab results available from the grower on request"
+    - generic
+      - generic
+        - button "Add to favorites" [ref=e45]
+        - button "Price alert set" [ref=e46]
+        - image "Purple Haze Flowers"
+        - generic
+          - StaticText "In Stock"
+      - heading "Purple Haze Flowers" [level=3, ref=e24]
+      - image
+      - paragraph
+        - StaticText "by "
+        - link "Vermont Nurseries" [ref=e40]
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "24.8"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.6"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Strain: Purple Haze"
+      - paragraph
+        - StaticText "Unit: Gram • Stock: 240 units"
+      - generic
+        - StaticText "$25.00/ Gram"
+      - LabelText
+        - StaticText "Qty:"
+      - button "Decrease quantity for Purple Haze Flowers" [ref=e25]
+        - StaticText "−"
+      - spinbutton "Quantity for Purple Haze Flowers" [ref=e26]: 1
+        - StaticText "1"
+      - button "Increase quantity for Purple Haze Flowers" [ref=e27]
+        - StaticText "+"
+      - button "Add to Request" [ref=e28]
+        - StaticText "Add to Request"
+      - StaticText "240 Available"
+      - button "Message grower" [ref=e29]
+      - button "Compare Purple Haze Flowers" [ref=e30]
+        - StaticText "Compare"
+      - StaticText "COA and lab results available from the grower on request"
+    - generic
+      - generic
+        - button "Add to favorites" [ref=e47]
+        - button "Set price alert" [ref=e48]
+        - image "Silver Haze Concentrate"
+        - generic
+          - StaticText "In Stock"
+      - heading "Silver Haze Concentrate" [level=3, ref=e31]
+      - image
+      - paragraph
+        - StaticText "by "
+        - link "Vermont Nurseries" [ref=e41]
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "85"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.2"
+      - StaticText "%"
+      - StaticText "Bulk Extract"
+      - paragraph
+        - StaticText "Strain: Silver Haze"
+      - paragraph
+        - StaticText "Unit: Gram • Stock: 50 units"
+      - generic
+        - StaticText "$60.00/ Gram"
+      - LabelText
+        - StaticText "Qty:"
+      - button "Decrease quantity for Silver Haze Concentrate" [ref=e32]
+        - StaticText "−"
+      - spinbutton "Quantity for Silver Haze Concentrate" [ref=e33]: 1
+        - StaticText "1"
+      - button "Increase quantity for Silver Haze Concentrate" [ref=e34]
+        - StaticText "+"
+      - button "Add to Request" [ref=e35]
+        - StaticText "Add to Request"
+      - StaticText "50 Available"
+      - button "Message grower" [ref=e36]
+      - button "Compare Silver Haze Concentrate" [ref=e37]
+        - StaticText "Compare"
+      - StaticText "COA and lab results available from the grower on request"
+    - paragraph
+      - StaticText "You've reached the end • 3 products total"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e15]
+  - button "Open messages" [ref=e6]
+- region "Notifications alt+T" [ref=e1]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e42]
+  - image
+- alert

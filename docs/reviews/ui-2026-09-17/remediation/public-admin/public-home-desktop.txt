@@ -1,0 +1,326 @@
+- main
+  - navigation
+    - link "PF PhenoFarm" [ref=e381]
+      - StaticText "PF"
+      - StaticText "PhenoFarm"
+    - link "Product" [ref=e382]
+    - link "Why PhenoFarm" [ref=e383]
+    - link "Workflow" [ref=e384]
+    - link "Pricing" [ref=e385]
+    - link "FAQ" [ref=e386]
+    - link "Sign in" [ref=e387]
+    - link "Create account" [ref=e388]
+  - generic
+    - generic
+      - generic
+        - StaticText "New"
+        - StaticText "Live quote negotiation and license-gated ordering"
+      - heading "Licensed wholesale, engineered like software" [level=1, ref=e408]
+      - paragraph
+        - StaticText "Verified partners, recorded quotes, and live request tracking — while settlement stays direct. PhenoFarm takes no cut."
+      - link "Create your account" [ref=e409]
+      - link "Watch it work" [ref=e410]
+      - paragraph
+        - StaticText "Free to evaluate · No wholesale payment processing · Cultivator subscriptions only"
+      - generic
+        - generic
+          - StaticText "phenofarm.app/grower/orders"
+          - StaticText "LIVE"
+          - StaticText "PF"
+          - StaticText "Grower Portal"
+          - StaticText "Dashboard"
+          - StaticText "Catalog"
+          - StaticText "Orders"
+          - StaticText "Customers"
+          - StaticText "Reports"
+          - StaticText "Order Requests"
+          - generic
+            - StaticText "3 in flight · settlement stays direct"
+          - StaticText "Record Request"
+          - StaticText "REQUEST"
+          - StaticText "BUYER"
+          - StaticText "EST. VALUE"
+          - StaticText "STATUS"
+          - StaticText "ORD-2481"
+          - StaticText "Green Mountain Dispensary"
+          - StaticText "$4,250.00"
+          - StaticText "Submitted"
+          - StaticText "ORD-2479"
+          - StaticText "Elevate Wellness"
+          - StaticText "$1,860.00"
+          - StaticText "Preparing"
+          - StaticText "ORD-2475"
+          - StaticText "Herb House Collective"
+          - StaticText "$7,400.00"
+          - StaticText "Ready"
+          - StaticText "ORD-2468"
+          - StaticText "Pure Grow Retail"
+          - StaticText "$2,130.00"
+          - StaticText "Delivered"
+          - StaticText "Submitted"
+          - StaticText "Accepted"
+          - StaticText "Preparing"
+          - StaticText "Ready"
+          - StaticText "Delivered"
+        - paragraph
+          - StaticText "Live simulation — every request advances through the same shared lifecycle both sides see."
+    - generic
+      - StaticText "0%"
+    - StaticText "Take rate on wholesale value"
+    - generic
+      - StaticText "0%"
+    - StaticText "Buyers license-verified before ordering"
+    - StaticText "0"
+    - StaticText "Fulfillment stages tracked live"
+    - StaticText "0"
+    - StaticText "Workspace for the whole deal"
+  - region "PhenoFarm principles" [ref=e380]
+    - StaticText "License-gated ordering"
+    - StaticText "0% take rate"
+    - StaticText "Recorded quote terms"
+    - StaticText "Direct settlement"
+    - StaticText "COA & lab docs on file"
+    - StaticText "Live fulfillment status"
+    - StaticText "Metrc-ready compliance"
+    - StaticText "Verified growers & buyers"
+  - paragraph
+    - StaticText "WHY PHENOFARM"
+  - heading "Your money never routes through us" [level=2, ref=e389]
+  - paragraph
+    - StaticText "Typical marketplaces sit in the middle of the transaction and take a percentage. PhenoFarm carries the workflow — verification, quotes, fulfillment records — and leaves settlement exactly where it belongs."
+  - tablist "Compare money flow"
+    - tab "Typical marketplace" [ref=e411]
+    - tab "PhenoFarm" [selected, ref=e412]
+      - StaticText "PhenoFarm"
+  - generic
+    - StaticText "Dispensary"
+    - StaticText "Buys wholesale"
+    - generic
+      - StaticText "INVOICES SETTLE DIRECT · 100% TO THE GROWER"
+      - StaticText "PhenoFarm"
+      - StaticText "Records only — verification, quotes, status"
+      - StaticText "BOTH SIDES SYNC THE SAME REQUEST RECORD"
+    - StaticText "Grower"
+    - StaticText "Sells wholesale"
+    - StaticText "Flat software subscription. On $1M of wholesale volume, PhenoFarm costs the same as on $10k — $0 of it is ours."
+  - paragraph
+    - StaticText "PLATFORM TOUR"
+  - heading "Everything between discovery and delivery" [level=2, ref=e390]
+  - paragraph
+    - StaticText "Five systems working as one workspace. The tour plays itself — or click any step."
+  - tablist "Platform features"
+    - tab "License verification that gates ordering Admins review every license before a buyer can order. Trust is enforced, not implied." [selected, ref=e413]
+      - StaticText "License verification that gates ordering"
+      - paragraph
+        - StaticText "Admins review every license before a buyer can order. Trust is enforced, not implied."
+    - tab "Native quote negotiation" [ref=e414]
+      - StaticText "Native quote negotiation"
+    - tab "Live request lifecycle" [ref=e415]
+      - StaticText "Live request lifecycle"
+    - tab "Compliance-grade catalog" [ref=e416]
+      - StaticText "Compliance-grade catalog"
+    - tab "Operational analytics" [ref=e417]
+      - StaticText "Operational analytics"
+  - StaticText "Green Mountain Dispensary"
+  - StaticText "VT-RTL-2024-001 · expires 12/2027"
+  - StaticText "License verified"
+  - StaticText "IDENTITY"
+  - StaticText "Cleared"
+  - StaticText "LICENSE"
+  - StaticText "Cleared"
+  - StaticText "ORDERING"
+  - StaticText "Cleared"
+  - paragraph
+    - StaticText "Unverified buyers physically cannot submit a request — the gate is enforced in the order pipeline, not on a badge."
+  - paragraph
+    - StaticText "TWO SIDES, ONE WORKFLOW"
+  - heading "Built for both ends of the deal" [level=2, ref=e391]
+  - paragraph
+    - StaticText "Growers and dispensaries work from the same shared record — no forwarded PDFs, no version drift."
+  - tablist "Choose your role"
+    - tab "For growers" [selected, ref=e418]
+      - StaticText "For growers"
+    - tab "For dispensaries" [ref=e419]
+  - generic
+    - StaticText "0"
+    - StaticText "1"
+    - heading "Publish your catalog" [level=3, ref=e420]
+    - paragraph
+      - StaticText "Strains, batches, COAs, stock. Show prices openly or quote on request."
+  - generic
+    - StaticText "0"
+    - StaticText "2"
+    - heading "Field requests & quotes" [level=3, ref=e421]
+    - paragraph
+      - StaticText "Verified dispensaries submit requests; negotiate terms in a recorded thread."
+  - generic
+    - StaticText "0"
+    - StaticText "3"
+    - heading "Fulfill with shared status" [level=3, ref=e422]
+    - paragraph
+      - StaticText "Accept, prepare, deliver — the buyer watches the same timeline you update."
+  - generic
+    - StaticText "0"
+    - StaticText "4"
+    - heading "Invoice on your terms" [level=3, ref=e423]
+    - paragraph
+      - StaticText "Settle directly with the buyer. PhenoFarm keeps the record, never the money."
+  - paragraph
+    - StaticText "OPERATORS"
+  - heading "Trusted where trust is the product" [level=2, ref=e392]
+  - figure
+    - blockquote
+      - StaticText "“The verification gate changed how we onboard partners. If a buyer can submit a request, we already know their license cleared review.”"
+    - Figcaption
+      - StaticText "MJ"
+      - StaticText "Marcus Johnson"
+      - StaticText "Founder, Valley Green Farms"
+  - figure
+    - blockquote
+      - StaticText "“Quotes, counters, and the final terms live in one thread. When a delivery lands, nobody argues about what was agreed.”"
+    - Figcaption
+      - StaticText "SC"
+      - StaticText "Sarah Chen"
+      - StaticText "Owner, Green Mountain Dispensary"
+  - figure
+    - blockquote
+      - StaticText "“Settlement staying direct was the deciding factor. PhenoFarm organizes the workflow without taking a position in the transaction.”"
+    - Figcaption
+      - StaticText "DK"
+      - StaticText "David Kim"
+      - StaticText "Operations Director, Elevate Wellness"
+  - paragraph
+    - StaticText "Illustrative customer scenarios."
+  - paragraph
+    - StaticText "PRICING"
+  - heading "One flat subscription. Zero take rate." [level=2, ref=e393]
+  - paragraph
+    - StaticText "Cultivators pay for software, not per transaction. Wholesale value moves directly between businesses — PhenoFarm never touches it."
+  - generic
+    - button "Monthly" [ref=e424]
+    - button "Annual · save 20%" [ref=e425]
+      - StaticText "Annual · save 20%"
+  - generic
+    - heading "Free" [level=3, ref=e426]
+    - paragraph
+      - StaticText "Evaluate the marketplace workflow before enabling paid plans"
+    - StaticText "$"
+    - StaticText "0"
+    - StaticText "/mo"
+    - list
+      - listitem [level=1]
+        - StaticText "Demo and review access"
+      - listitem [level=1]
+        - StaticText "Catalog and request workflow preview"
+      - listitem [level=1]
+        - StaticText "Up to 50 product listings"
+      - listitem [level=1]
+        - StaticText "Basic marketplace records"
+      - listitem [level=1]
+        - StaticText "Standard support"
+    - link "Create Account" [ref=e427]
+  - generic
+    - StaticText "MOST POPULAR"
+    - heading "Pro" [level=3, ref=e428]
+    - paragraph
+      - StaticText "Cultivator subscription for active wholesale teams"
+    - StaticText "$"
+    - StaticText "199"
+    - StaticText "/mo"
+    - StaticText "billed $"
+    - StaticText "2388"
+    - StaticText "/yr"
+    - list
+      - listitem [level=1]
+        - StaticText "Everything in Free"
+      - listitem [level=1]
+        - StaticText "Unlimited product listings"
+      - listitem [level=1]
+        - StaticText "Priority support & higher limits"
+      - listitem [level=1]
+        - StaticText "CSV bulk upload"
+      - listitem [level=1]
+        - StaticText "Metrc integration ready"
+      - listitem [level=1]
+        - StaticText "Priority support"
+    - link "Create Account" [ref=e429]
+  - generic
+    - heading "Business" [level=3, ref=e430]
+    - paragraph
+      - StaticText "For multi-license operations that need deeper integrations"
+    - StaticText "Custom"
+    - list
+      - listitem [level=1]
+        - StaticText "Everything in Pro"
+      - listitem [level=1]
+        - StaticText "API access"
+      - listitem [level=1]
+        - StaticText "Custom branding"
+      - listitem [level=1]
+        - StaticText "Dedicated onboarding"
+    - link "Contact Sales" [ref=e431]
+  - paragraph
+    - StaticText "FAQ"
+  - heading "Straight answers" [level=2, ref=e394]
+  - button "Does PhenoFarm process our wholesale payments?" [expanded=true, ref=e395]
+    - StaticText "Does PhenoFarm process our wholesale payments?"
+  - paragraph
+    - StaticText "No — deliberately. Order value is tracked for your records only; invoicing and settlement happen directly between buyer and grower on whatever terms you agree. PhenoFarm charges cultivators a flat software subscription and takes 0% of wholesale value."
+  - button "How does license verification work?" [expanded=false, ref=e396]
+    - StaticText "How does license verification work?"
+  - button "What happens when a request is cancelled?" [expanded=false, ref=e397]
+    - StaticText "What happens when a request is cancelled?"
+  - button "Can we keep our prices private?" [expanded=false, ref=e398]
+    - StaticText "Can we keep our prices private?"
+  - button "Is PhenoFarm compliance-ready?" [expanded=false, ref=e399]
+    - StaticText "Is PhenoFarm compliance-ready?"
+  - button "How do we evaluate it?" [expanded=false, ref=e400]
+    - StaticText "How do we evaluate it?"
+  - generic
+    - heading "Run wholesale like the rest of your business" [level=2, ref=e435]
+    - paragraph
+      - StaticText "Catalog, verification, quotes, and fulfillment in one workspace — with settlement exactly where it belongs: between you and your partners."
+    - link "Create your account" [ref=e438]
+    - link "Talk to us" [ref=e436]
+    - StaticText "No wholesale payment processing"
+    - StaticText "Cultivator subscriptions only"
+    - StaticText "Demo access available"
+  - sectionfooter
+    - StaticText "PF"
+    - StaticText "PhenoFarm"
+    - paragraph
+      - StaticText "The B2B workspace connecting licensed cannabis growers and dispensaries for requests, fulfillment, and direct settlement."
+    - link "support@phenofarm.com" [ref=e401]
+    - navigation "Growers" [ref=e402]
+      - heading "GROWERS" [level=3, ref=e432]
+      - list
+        - listitem [level=1]
+          - link "Sell your products" [ref=e439]
+        - listitem [level=1]
+          - link "Grower dashboard" [ref=e440]
+        - listitem [level=1]
+          - link "Pricing" [ref=e441]
+    - navigation "Dispensaries" [ref=e403]
+      - heading "DISPENSARIES" [level=3, ref=e433]
+      - list
+        - listitem [level=1]
+          - link "Browse products" [ref=e442]
+        - listitem [level=1]
+          - link "Dispensary dashboard" [ref=e443]
+        - listitem [level=1]
+          - link "Pricing" [ref=e444]
+    - navigation "Company" [ref=e404]
+      - heading "COMPANY" [level=3, ref=e434]
+      - list
+        - listitem [level=1]
+          - link "Contact" [ref=e445]
+        - listitem [level=1]
+          - link "Help center" [ref=e446]
+    - paragraph
+      - StaticText "© 2026 PhenoFarm. For licensed operators only. Wholesale settlement stays direct between businesses."
+    - link "Privacy" [ref=e405]
+    - link "Terms" [ref=e406]
+    - link "Cookies" [ref=e407]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e437]
+  - image
+- alert

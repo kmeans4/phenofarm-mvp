@@ -1,0 +1,91 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e2100]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2101]
+    - StaticText "Notifications"
+    - StaticText "22"
+  - navigation "Portal navigation" [ref=e2102]
+    - link "Dashboard" [ref=e2108]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2109]
+      - StaticText "Catalog"
+    - link "Request Draft 2" [ref=e2110]
+      - StaticText "Request Draft"
+      - StaticText "2"
+    - link "Orders 17" [ref=e2111]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e2112]
+      - StaticText "Saved"
+    - link "Settings" [ref=e2113]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e2103]
+- main
+  - link "← Orders" [ref=e2104]
+  - sectionheader
+    - heading "Request #ORD-20260710-XPJO3I" [level=1, ref=e2114]
+      - StaticText "Request"
+      - generic
+        - StaticText "#ORD-20260710-XPJO3I"
+    - paragraph
+      - StaticText "Waiting for grower review"
+    - StaticText "Submitted"
+    - button "Export CSV" [ref=e2115]
+  - paragraph
+    - StaticText "REQUEST DATE"
+  - paragraph
+    - StaticText "Jul 09, 2026"
+  - paragraph
+    - StaticText "GROWER"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - group
+    - DisclosureTriangle "View timeline" [expanded=false]
+      - StaticText "View timeline"
+  - group
+    - DisclosureTriangle "View history" [expanded=false]
+      - StaticText "View history"
+  - heading "Buyer actions" [level=2, ref=e2116]
+  - button "Message grower" [ref=e2117]
+  - button "Withdraw request" [ref=e2118]
+  - heading "Requested Items" [level=3, ref=e2105]
+  - table
+    - rowgroup
+      - row
+        - columnheader "PRODUCT" [ref=e2124]
+        - columnheader "QTY" [ref=e2125]
+        - columnheader "PRICE" [ref=e2126]
+        - columnheader "LINE VALUE" [ref=e2127]
+    - row
+      - cell "Purple Haze Flowers (Purple Haze)" [ref=e2120]
+        - StaticText "Purple Haze Flowers (Purple Haze)"
+      - cell "1" [ref=e2121]
+      - cell "$25.00" [ref=e2122]
+      - cell "$25.00" [ref=e2123]
+  - StaticText "Total"
+  - StaticText "$25.00"
+  - heading "Request details" [level=3, ref=e2106]
+  - paragraph
+    - StaticText "FULFILLMENT"
+  - paragraph
+    - StaticText "Flexible"
+  - paragraph
+    - StaticText "REQUESTED WINDOW"
+  - paragraph
+    - StaticText "Coordinate with grower"
+  - paragraph
+    - StaticText "PAYMENT TERMS"
+  - paragraph
+    - StaticText "Handled directly"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2119]
+  - button "Open messages" [ref=e2107]
+- region "Notifications alt+T" [ref=e2099]
+- alert

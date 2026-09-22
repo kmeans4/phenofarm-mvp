@@ -1,0 +1,37 @@
+{
+  "slug": "27-notifications",
+  "route": "/grower/dashboard",
+  "state": "Notifications panel",
+  "pass1": {
+    "inspected": [
+      "pass-1/27-notifications-desktop.png",
+      "pass-1/27-notifications-mobile.png"
+    ],
+    "strengths": [
+      "Unread total and relative time are compact; list stays within the mobile viewport with clear close control."
+    ],
+    "issues": [
+      {
+        "key": "notification-specific-copy",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Repeated \u2018New order request\u2019 and \u2018New counter quote\u2019 titles are followed by full generic sentences (\u2018The other party sent revised quote terms for your review\u2019). Adjacent rows look almost identical and lack a visible request/product reference.",
+        "recommendation": "Use shorter, specific rows such as \u2018Green Vermont \u00b7 Request #XPJO3I\u2019 or \u2018Revised quote \u00b7 Purple Haze\u2019; show a concise value/status preview rather than \u2018the other party\u2019. Keep relative time and unread styling."
+      }
+    ],
+    "limits": [
+      "Panel opened only; no notification or Mark all read clicked. Desktop panel was reopened after viewport change and screenshot replaced because first resized capture had closed it; accepted screenshot shows correct panel."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/27-notifications-desktop.png",
+      "pass-2/27-notifications-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile notification panels were reopened and inspected independently after resizing. Repeated generic New order request and New counter quote sentences still omit useful request/product context. The panel fits both widths. No notification or Mark all read action was clicked.",
+    "confirmedIssueKeys": [
+      "notification-specific-copy"
+    ],
+    "newIssues": []
+  }
+}

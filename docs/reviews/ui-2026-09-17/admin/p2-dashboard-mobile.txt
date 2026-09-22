@@ -1,0 +1,79 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e419]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e420]
+- main
+  - sectionheader
+    - heading "Admin Dashboard" [level=1, ref=e425]
+    - paragraph
+      - StaticText "Manage subscriptions, verification, and marketplace operations"
+  - link "Total Users 3" [ref=e421]
+    - paragraph
+      - StaticText "Total Users"
+    - paragraph
+      - StaticText "3"
+  - link "Cultivators 1 1 verified for marketplace access" [ref=e422]
+    - paragraph
+      - StaticText "Cultivators"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "1 verified for marketplace access"
+  - link "Dispensaries 2 0 waiting for verification" [ref=e423]
+    - paragraph
+      - StaticText "Dispensaries"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "0 waiting for verification"
+  - generic
+    - paragraph
+      - StaticText "OPERATIONS CHECKLIST"
+    - heading "Review subscription settings" [level=2, ref=e426]
+    - paragraph
+      - StaticText "Keep PhenoFarm subscription configuration current for cultivator billing."
+    - link "Open settings" [ref=e427]
+    - paragraph
+      - StaticText "Cultivator review"
+    - paragraph
+      - StaticText "All cultivators are reviewed."
+    - link "Review cultivators" [ref=e428]
+    - paragraph
+      - StaticText "Dispensary review"
+    - paragraph
+      - StaticText "All dispensaries are reviewed."
+    - link "Review buyers" [ref=e429]
+    - paragraph
+      - StaticText "Subscription configuration"
+    - paragraph
+      - StaticText "Confirm Stripe Billing price IDs and support details before enabling paid plans."
+    - link "Open settings" [ref=e430]
+    - paragraph
+      - StaticText "Marketplace activity"
+    - paragraph
+      - StaticText "Marketplace has both seller and buyer accounts."
+    - link "Review users" [ref=e431]
+  - generic
+    - paragraph
+      - StaticText "PENDING VERIFICATION"
+    - heading "Newest accounts awaiting review" [level=2, ref=e432]
+    - link "Cultivators" [ref=e433]
+    - link "Dispensaries" [ref=e434]
+    - StaticText "Verification queue is clear."
+  - paragraph
+    - StaticText "BUSINESS MODEL"
+  - heading "PhenoFarm subscription revenue only" [level=2, ref=e424]
+  - paragraph
+    - StaticText "Cultivators pay PhenoFarm subscription fees. Wholesale order value is tracked for marketplace operations, but buyer-seller settlement happens directly outside the app."
+  - paragraph
+    - StaticText "DEVELOPER TOOLS"
+  - heading "Demo data seeding" [level=2, ref=e435]
+  - paragraph
+    - StaticText "Creates demo accounts — dev/demo environments only. Do not run this against production data."
+  - StaticText "Seed demo accounts"
+  - button "Seed demo data" [ref=e436]
+- region "Notifications alt+T" [ref=e418]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e437]
+  - image
+- alert

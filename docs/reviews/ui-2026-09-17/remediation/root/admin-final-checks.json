@@ -1,0 +1,237 @@
+[
+  {
+    "route": "/admin/dashboard",
+    "width": 1440,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/users",
+    "width": 1440,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "width": 1440,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "width": 1440,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1440,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "state": "confirmation",
+    "width": 1440,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "state": "confirmation",
+    "width": 1440,
+    "passed": true
+  },
+  {
+    "route": "/admin/dashboard",
+    "width": 1024,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/users",
+    "width": 1024,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "width": 1024,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "width": 1024,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/settings",
+    "width": 1024,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "state": "confirmation",
+    "width": 1024,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "state": "confirmation",
+    "width": 1024,
+    "passed": true
+  },
+  {
+    "route": "/admin/dashboard",
+    "width": 768,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/users",
+    "width": 768,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "width": 768,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "width": 768,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/settings",
+    "width": 768,
+    "font": 36,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "state": "confirmation",
+    "width": 768,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "state": "confirmation",
+    "width": 768,
+    "passed": true
+  },
+  {
+    "route": "/admin/dashboard",
+    "width": 390,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/users",
+    "width": 390,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "width": 390,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "width": 390,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/settings",
+    "width": 390,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "state": "confirmation",
+    "width": 390,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "state": "confirmation",
+    "width": 390,
+    "passed": true
+  },
+  {
+    "route": "/admin/dashboard",
+    "width": 360,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/users",
+    "width": 360,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "width": 360,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "width": 360,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/settings",
+    "width": 360,
+    "font": 28,
+    "overflow": false,
+    "passed": true
+  },
+  {
+    "route": "/admin/dispensaries",
+    "state": "confirmation",
+    "width": 360,
+    "passed": true
+  },
+  {
+    "route": "/admin/growers",
+    "state": "confirmation",
+    "width": 360,
+    "passed": true
+  }
+]

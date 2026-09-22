@@ -1,0 +1,43 @@
+- main
+  - generic
+  - generic
+    - link "Back to home" [ref=e254]
+    - paragraph
+      - StaticText "CONTACT PHENOFARM"
+    - heading "Talk about wholesale workflows." [level=1, ref=e255]
+    - paragraph
+      - StaticText "Tell us whether you are a grower, dispensary, or partner and include the details the PhenoFarm support team should know."
+    - link "Email support@phenofarm.com" [ref=e256]
+      - paragraph
+        - StaticText "Email"
+      - paragraph
+        - StaticText "support@phenofarm.com"
+    - paragraph
+      - StaticText "Location"
+    - paragraph
+      - StaticText "Vermont, USA"
+    - paragraph
+      - StaticText "PhenoFarm coordinates marketplace workflows and cultivator subscriptions. Wholesale payment settlement stays directly between licensed businesses."
+    - form
+      - heading "Email us" [level=2, ref=e257]
+      - paragraph
+        - StaticText "These details help support route your request."
+      - LabelText
+        - StaticText "Full name"
+      - textbox "Full name" [ref=e258]
+      - LabelText
+        - StaticText "Email"
+      - textbox "Email" [ref=e259]
+      - LabelText
+        - StaticText "Business type"
+      - combobox "Business type" [expanded=false, ref=e260]: Select one
+        - MenuListPopup
+          - option "Select one" [selected, ref=e263]
+          - option "Grower" [ref=e264]
+          - option "Dispensary" [ref=e265]
+          - option "Other" [ref=e266]
+      - LabelText
+        - StaticText "Message"
+      - textbox "Message" [ref=e261]
+      - button "Open email draft" [ref=e262]
+- alert

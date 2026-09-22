@@ -2,9 +2,27 @@
 
 import { useState, useEffect, useCallback, useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { Search, X, Package, ShoppingCart, Users, Leaf, Loader2 } from 'lucide-react';
+import {
+  ArrowUpRight,
+  Bookmark,
+  FileText,
+  Grid2X2,
+  Leaf,
+  Loader2,
+  MessageSquare,
+  Package,
+  Pencil,
+  Search,
+  ShoppingCart,
+  Users,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { useFocusTrap } from '@/app/hooks/useFocusTrap';
+import { useSession } from 'next-auth/react';
+import { safeInternalPath } from '@/app/components/ui/safeNavigation';
+import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
 
 interface SearchResult {
   id: string;
@@ -23,7 +41,7 @@ const typeIcons = {
 
 const typeLabels = {
   product: 'Product',
-  order: 'Order',
+  order: 'Request',
   customer: 'Customer',
   strain: 'Strain',
 };
@@ -33,26 +51,48 @@ interface SearchDialogProps {
   className?: string;
 }
 
+interface SearchOpenEventDetail {
+  trigger?: HTMLButtonElement | null;
+}
+
+interface SearchAction {
+  label: string;
+  href: string;
+  icon: LucideIcon;
+}
+
+const RECENT_QUERY_LIMIT = 5;
+
 export function SearchDialog({ variant = 'default', className = '' }: SearchDialogProps) {
   const router = useRouter();
+  const { data: session } = useSession();
   const pathname = usePathname() || '';
   const isDispensaryRoute = pathname.startsWith('/dispensary');
+  const isAdminRoute = pathname.startsWith('/admin');
+  const roleKey = isAdminRoute ? 'admin' : isDispensaryRoute ? 'dispensary' : 'grower';
+  const recentQueriesStorageKey = `phenofarm:search:${session?.user?.id || "anonymous"}:${roleKey}:recent-queries`;
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [searchError, setSearchError] = useState('');
   const [loading, setLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [recentQueries, setRecentQueries] = useState<string[]>([]);
   const titleId = useId();
-  const triggerRef = useRef<HTMLButtonElement>(null);
+  const resultsId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
+  const returnFocusRef = useRef<HTMLButtonElement | null>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resultRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const openDialog = useCallback(() => {
+  const openDialog = useCallback((trigger?: HTMLButtonElement | null) => {
+    returnFocusRef.current = trigger?.getClientRects().length ? trigger : null;
     setIsOpen(true);
   }, []);
 
@@ -60,118 +100,219 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
     setIsOpen(false);
   }, []);
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isOpen]);
+
   useFocusTrap({
     active: isOpen,
     containerRef: modalRef,
     initialFocusRef: inputRef,
-    returnFocusRef: triggerRef,
+    returnFocusRef,
     onEscape: closeDialog,
   });
+  useBodyOverlay(isOpen);
+
+  useEffect(() => {
+    if (!mounted) return;
+
+    try {
+      const stored = window.localStorage.getItem(recentQueriesStorageKey);
+      const parsed = stored ? JSON.parse(stored) : [];
+      setRecentQueries(Array.isArray(parsed) ? parsed.filter((item) => typeof item === 'string').slice(0, RECENT_QUERY_LIMIT) : []);
+    } catch {
+      setRecentQueries([]);
+    }
+  }, [mounted, recentQueriesStorageKey]);
+
+  const rememberQuery = useCallback((value: string) => {
+    const trimmed = value.trim();
+
+    if (trimmed.length < 2) return;
+
+    setRecentQueries((current) => {
+      const next = [
+        trimmed,
+        ...current.filter((item) => item.toLowerCase() !== trimmed.toLowerCase()),
+      ].slice(0, RECENT_QUERY_LIMIT);
+
+      try {
+        window.localStorage.setItem(recentQueriesStorageKey, JSON.stringify(next));
+      } catch {
+        // Ignore storage failures; search still works without recents.
+      }
+
+      return next;
+    });
+  }, [recentQueriesStorageKey]);
 
   // Fetch search results
-  const search = useCallback(async (q: string) => {
-    if (q.length < 2) {
-      setResults([]);
-      return;
-    }
-    
-    setLoading(true);
-    try {
-      const res = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
-      const data = await res.json();
-      setResults(data.results || []);
-    } catch (error) {
-      console.error('Search error:', error);
-      setResults([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // Debounced search
   useEffect(() => {
+    if (!isOpen) return;
+    const trimmedQuery = query.trim();
+
     if (debounceRef.current) {
       clearTimeout(debounceRef.current);
     }
-    debounceRef.current = setTimeout(() => {
-      search(query);
+
+    if (trimmedQuery.length < 2) {
+      setResults([]);
+      setLoading(false);
+      setActiveIndex(-1);
+      return;
+    }
+
+    const controller = new AbortController();
+    setLoading(true);
+    setSearchError('');
+    setResults([]);
+
+    debounceRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/search?q=${encodeURIComponent(trimmedQuery)}`, {
+          signal: controller.signal,
+        });
+
+        if (!res.ok) {
+          throw new Error(`Search failed with status ${res.status}`);
+        }
+
+        const data = await res.json();
+        if (!Array.isArray(data.results)) throw new Error('Invalid search response');
+        setResults(data.results.filter((result: SearchResult) => result && typeof result.id === 'string' && typeof result.title === 'string' && Object.hasOwn(typeIcons, result.type) && safeInternalPath(result.href, '')));
+        rememberQuery(trimmedQuery);
+      } catch (error) {
+        if (error instanceof DOMException && error.name === 'AbortError') return;
+
+        setSearchError('Search is temporarily unavailable. Please try again.');
+        setResults([]);
+      } finally {
+        if (!controller.signal.aborted) {
+          setLoading(false);
+        }
+      }
     }, 200);
     
     return () => {
       if (debounceRef.current) {
         clearTimeout(debounceRef.current);
       }
+      controller.abort();
     };
-  }, [query, search]);
+  }, [isOpen, query, rememberQuery]);
+
+  useEffect(() => {
+    setActiveIndex(results.length > 0 ? 0 : -1);
+  }, [results]);
+
+  useEffect(() => {
+    if (activeIndex < 0) return;
+
+    resultRefs.current[activeIndex]?.scrollIntoView({
+      block: 'nearest',
+    });
+  }, [activeIndex]);
 
   // Handle keyboard shortcuts
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+    if (!e.defaultPrevented && (e.metaKey || e.ctrlKey) && e.key === 'k') {
       e.preventDefault();
-      openDialog();
+      openDialog(null);
     }
   }, [openDialog]);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [handleKeyDown]);
+    const openFromTrigger = (event: Event) => {
+      const detail = (event as CustomEvent<SearchOpenEventDetail>).detail;
+      openDialog(detail?.trigger || null);
+    };
+    window.addEventListener('phenofarm:open-search', openFromTrigger);
+    return () => { document.removeEventListener('keydown', handleKeyDown); window.removeEventListener('phenofarm:open-search', openFromTrigger); };
+  }, [handleKeyDown, openDialog]);
 
-  // Close modal on escape
   const handleModalKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Escape') {
-      closeDialog();
+    if (e.key === 'ArrowDown' && results.length > 0) {
+      e.preventDefault();
+      setActiveIndex((current) => (current + 1) % results.length);
+      return;
+    }
+
+    if (e.key === 'ArrowUp' && results.length > 0) {
+      e.preventDefault();
+      setActiveIndex((current) => (current <= 0 ? results.length - 1 : current - 1));
+      return;
+    }
+
+    if (e.key === 'Enter' && activeIndex >= 0 && results[activeIndex]) {
+      const target = e.target;
+
+      if (target instanceof HTMLElement && target.closest('button, a')) {
+        return;
+      }
+
+      e.preventDefault();
+      handleResultClick(results[activeIndex].href);
     }
   };
 
   // Handle result click
-  const handleResultClick = (href: string) => {
+  const handleResultClick = useCallback((href: string) => {
+    const safeHref = safeInternalPath(href, '');
+    if (!safeHref) return;
+    rememberQuery(query);
     closeDialog();
     setQuery('');
     setResults([]);
-    router.push(href);
-  };
+    setActiveIndex(-1);
+    router.push(safeHref);
+  }, [closeDialog, query, rememberQuery, router]);
 
-  const getQuickActions = (result: SearchResult) => {
+  const getQuickActions = (result: SearchResult): SearchAction[] => {
     if (isDispensaryRoute && result.type === 'product') {
       return [
-        { label: 'View', href: result.href },
-        { label: 'Saved', href: '/dispensary/saved' },
-        { label: 'Message', href: result.href },
+        { label: 'View', href: result.href, icon: ArrowUpRight },
+        { label: 'Saved', href: '/dispensary/saved', icon: Bookmark },
+        { label: 'Message', href: result.href, icon: MessageSquare },
       ];
     }
 
     if (isDispensaryRoute && result.type === 'order') {
       return [
-        { label: 'View request', href: result.href },
-        { label: 'Follow up', href: result.href },
+        { label: 'View request', href: result.href, icon: FileText },
+        { label: 'Follow up', href: result.href, icon: MessageSquare },
       ];
     }
 
     if (!isDispensaryRoute && result.type === 'product') {
       return [
-        { label: 'Edit listing', href: result.href },
-        { label: 'Catalog', href: '/grower/catalog' },
+        { label: 'Edit listing', href: result.href, icon: Pencil },
+        { label: 'Catalog', href: '/grower/catalog', icon: Grid2X2 },
       ];
     }
 
     if (!isDispensaryRoute && result.type === 'order') {
       return [
-        { label: 'View request', href: result.href },
-        { label: 'Orders', href: '/grower/orders' },
+        { label: 'View request', href: result.href, icon: FileText },
+        { label: 'Requests', href: '/grower/orders', icon: ShoppingCart },
       ];
     }
 
-    return [{ label: 'Open', href: result.href }];
+    return [{ label: 'Open', href: result.href, icon: ArrowUpRight }];
   };
 
-  const emptySearchLabels = isDispensaryRoute
-    ? ['Products', 'Orders', 'Strains']
-    : ['Products', 'Orders', 'Customers', 'Strains'];
+
 
   const modalContent = isOpen ? (
     <div 
-      className="fixed inset-0 z-[99999] flex items-start justify-center px-4 pt-[10vh]"
+      className="fixed inset-0 z-[99999] flex items-stretch justify-center p-0 sm:items-start sm:px-4 sm:pt-[10vh]"
     >
       {/* Backdrop */}
       <button
@@ -187,20 +328,22 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-[100000] w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl"
+        className="relative z-[100000] flex h-full w-full max-w-none flex-col overflow-hidden rounded-none bg-white shadow-2xl sm:h-auto sm:max-w-2xl sm:rounded-xl"
         onKeyDown={handleModalKeyDown}
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b">
+        <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
           <h2 id={titleId} className="sr-only">Search PhenoFarm</h2>
           <div className="flex items-center gap-3 flex-1">
             <Search className="w-5 h-5 text-gray-400" />
             <input
               ref={inputRef}
               type="text"
-              placeholder={isDispensaryRoute ? 'Search products, orders, growers...' : 'Search products, orders, customers...'}
-              aria-label={isDispensaryRoute ? 'Search products, orders, growers, and strains' : 'Search products, orders, customers, and strains'}
-              className="flex-1 text-lg outline-none placeholder:text-gray-400"
+              placeholder="Search PhenoFarm"
+              aria-label={isDispensaryRoute ? 'Search products, requests, growers, and strains' : 'Search products, requests, customers, and strains'}
+              aria-controls={resultsId}
+              aria-activedescendant={activeIndex >= 0 ? `${resultsId}-result-${activeIndex}` : undefined}
+              className="flex-1 rounded-md min-w-0 px-1 py-1 text-base sm:text-lg outline-none placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
@@ -213,7 +356,7 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
             type="button"
             onClick={closeDialog}
             onMouseDown={(event) => event.preventDefault()}
-            className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors ml-2"
+            className="ml-2 rounded-lg p-1.5 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
             aria-label="Close search"
           >
             <X className="w-5 h-5 text-gray-500" />
@@ -221,42 +364,71 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
         </div>
 
         {/* Results Area */}
-        <div className="max-h-96 overflow-y-auto">
+        <div id={resultsId} className="min-h-0 flex-1 overflow-y-auto sm:max-h-96 sm:flex-none">
           {loading ? (
-            <div className="px-4 py-8 text-center text-gray-400">
-              <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
+            <div className="flex items-center justify-center gap-3 px-4 py-8 text-gray-500">
+              <Loader2 className="h-5 w-5 animate-spin" />
               <p className="text-sm">Searching...</p>
             </div>
-          ) : query.length < 2 ? (
-            <div className="px-4 py-8 text-center text-gray-400">
-              <p className="text-sm">Start typing to search...</p>
-              <div className="flex flex-wrap justify-center gap-2 mt-4">
-                {emptySearchLabels.map((label) => (
-                  <span key={label} className="px-2 py-1 text-xs bg-gray-100 rounded">{label}</span>
-                ))}
-              </div>
+          ) : searchError ? (<p role="alert" className="px-4 py-8 text-sm text-red-700">{searchError}</p>) : query.trim().length < 2 ? (
+            <div className="px-4 py-8 text-center text-gray-500">
+              <p className="text-sm">{query.trim().length === 0 ? 'Products, requests, businesses and strains' : 'Type at least 2 characters'}</p>
+              {query.trim().length === 0 && recentQueries.length > 0 ? (
+                <div className="mt-5">
+                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Recent searches</p>
+                  <div className="mt-3 flex flex-wrap justify-center gap-2">
+                    {recentQueries.map((recentQuery) => (
+                      <button
+                        key={recentQuery}
+                        type="button"
+                        onClick={() => {
+                          setQuery(recentQuery);
+                          inputRef.current?.focus();
+                        }}
+                        className="rounded-full bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 ring-1 ring-green-200 transition-colors hover:bg-green-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                      >
+                        {recentQuery}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
             </div>
           ) : results.length === 0 ? (
-            <div className="px-4 py-8 text-center text-gray-400">
-              <p className="text-sm">No results found</p>
+            <div className="px-4 py-8 text-center text-gray-500">
+              <p className="text-sm font-medium text-gray-700">No results for &apos;{query.trim()}&apos;</p>
+              <p className="mt-1 text-sm text-gray-500">Check spelling or try a product, order, customer, or strain name.</p>
             </div>
           ) : (
-            <div className="divide-y">
-              {results.map((result) => {
+            <div className="divide-y" role="listbox" aria-label="Search results">
+              {results.map((result, index) => {
                 const Icon = typeIcons[result.type];
                 const quickActions = getQuickActions(result);
+                const primaryAction = quickActions[0];
+                const secondaryActions = quickActions.slice(1);
+                const isActive = activeIndex === index;
                 return (
                   <div
                     key={`${result.type}-${result.id}`}
-                    className="px-4 py-3 hover:bg-gray-50 transition-colors"
+                    id={`${resultsId}-result-${index}`}
+                    role="option"
+                    aria-selected={isActive}
+                    className={`group relative transition-colors ${isActive ? 'bg-green-50' : 'hover:bg-gray-50'}`}
+                    onMouseEnter={() => setActiveIndex(index)}
                   >
                     <button
+                      ref={(element) => {
+                        resultRefs.current[index] = element;
+                      }}
                       type="button"
-                      onClick={() => handleResultClick(result.href)}
+                      onClick={() => handleResultClick(primaryAction.href)}
                       onMouseDown={(event) => {
                         event.preventDefault();
                       }}
-                      className="flex w-full items-start gap-3 text-left"
+                      onFocus={() => setActiveIndex(index)}
+                      className={`flex w-full items-start gap-3 px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 ${secondaryActions.length > 0 ? 'pr-24 sm:pr-28' : 'pr-4'}`}
+                      aria-label={`${primaryAction.label}: ${result.title}`}
                     >
                       <div className="flex-shrink-0">
                         <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -267,28 +439,37 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
                         <p className="text-sm font-medium text-gray-900 truncate">
                           {result.title}
                         </p>
-                        <p className="text-xs text-gray-500">
+                        <p className="truncate text-xs text-gray-500">
                           {result.subtitle}
                         </p>
                       </div>
-                      <div className="flex-shrink-0">
+                      <div className="hidden flex-shrink-0 sm:block">
                         <span className="text-xs text-gray-400 capitalize">
                           {typeLabels[result.type]}
                         </span>
                       </div>
                     </button>
-                    <div className="ml-11 mt-2 flex flex-wrap gap-2">
-                      {quickActions.map((action) => (
-                        <button
-                          key={`${result.id}-${action.label}`}
-                          type="button"
-                          onClick={() => handleResultClick(action.href)}
-                          className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-gray-700 ring-1 ring-gray-200 hover:bg-green-50 hover:text-green-700 hover:ring-green-200"
-                        >
-                          {action.label}
-                        </button>
-                      ))}
-                    </div>
+                    {secondaryActions.length > 0 ? (
+                      <div className="absolute right-3 top-1/2 z-10 flex -translate-y-1/2 items-center gap-1">
+                        {secondaryActions.map((action) => {
+                          const ActionIcon = action.icon;
+
+                          return (
+                            <button
+                              key={`${result.id}-${action.label}`}
+                              type="button"
+                              title={action.label}
+                              aria-label={`${action.label}: ${result.title}`}
+                              onClick={() => handleResultClick(action.href)}
+                              onMouseDown={(event) => event.preventDefault()}
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-gray-500 ring-1 ring-gray-200 transition-colors hover:bg-green-50 hover:text-green-700 hover:ring-green-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                            >
+                              <ActionIcon className="h-4 w-4" aria-hidden="true" />
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                   </div>
                 );
               })}
@@ -297,9 +478,9 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
         </div>
 
         {/* Footer */}
-        <div className="px-4 py-2 bg-gray-50 border-t text-xs text-gray-500 flex justify-between">
-          <span>{results.length} results</span>
-          <span>Press ESC to close</span>
+        <div className="flex justify-between gap-3 border-t bg-gray-50 px-4 py-2 text-xs text-gray-500">
+          <span>{query.trim().length >= 2 ? `${results.length} result${results.length === 1 ? '' : 's'}` : ''}</span>
+          <span className="hidden sm:inline">↑↓ navigate · ↵ open · esc close</span>
         </div>
       </div>
     </div>
@@ -310,20 +491,18 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
       {/* Search Button */}
       {variant === 'icon' ? (
         <button
-          ref={triggerRef}
-          onClick={openDialog}
-          className={`flex items-center justify-center w-10 h-10 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-800 transition-colors ${className}`}
-          aria-label="Open search"
+          onClick={(event) => openDialog(event.currentTarget)}
+          className={`flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${className}`}
+          aria-label="Search"
           title="Search"
         >
           <Search className="w-5 h-5" />
         </button>
       ) : (
         <button
-          ref={triggerRef}
-          onClick={openDialog}
-          className={`w-full flex items-center justify-between px-3 py-2.5 bg-gray-50 hover:bg-gray-100 rounded-lg border border-gray-200 text-gray-500 hover:text-gray-700 transition-colors group ${className}`}
-          aria-label="Open search"
+          onClick={(event) => openDialog(event.currentTarget)}
+          className={`group flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${className}`}
+          aria-label="Search"
         >
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4" />
@@ -339,4 +518,10 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
       {mounted && modalContent && createPortal(modalContent, document.body)}
     </>
   );
+}
+
+export function SearchTrigger({ variant = 'default', className = '' }: SearchDialogProps) {
+  return <button type="button" aria-label="Search" title="Search" onClick={(event) => window.dispatchEvent(new CustomEvent('phenofarm:open-search', { detail: { trigger: event.currentTarget } }))} className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 ${variant === 'icon' ? 'w-10 shrink-0' : 'px-3'} ${className}`}>
+    <Search className="h-5 w-5" />{variant === 'default' && <span>Search...</span>}
+  </button>;
 }

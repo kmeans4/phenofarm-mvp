@@ -1,0 +1,103 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e108]
+- button "Notifications" [expanded=false, ref=e109]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=true, ref=e110]
+- button "Close navigation menu" [ref=e122]
+- dialog "Menu"
+  - heading "Menu" [level=2, ref=e123]
+  - button "Close navigation menu" [ref=e124]
+  - navigation "Grower navigation" [ref=e125]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e127]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e128]
+      - StaticText "Catalog"
+    - link "Products" [ref=e129]
+      - StaticText "Products"
+    - link "Inventory" [ref=e130]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e131]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e132]
+      - StaticText "Strains"
+    - link "Batches" [ref=e133]
+      - StaticText "Batches"
+    - link "Customers" [ref=e134]
+      - StaticText "Customers"
+    - link "Reports" [ref=e135]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e136]
+      - StaticText "Settings"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - paragraph
+    - StaticText "Grower"
+  - button "Sign out" [ref=e126]
+- main
+  - sectionheader
+    - heading "Marketplace preview" [level=1, ref=e117]
+    - paragraph
+      - StaticText "How buyers see your listings."
+    - link "Add product" [ref=e118]
+  - strong
+    - StaticText "3"
+  - StaticText " active"
+  - strong
+    - StaticText "1"
+  - StaticText " quote required"
+  - link "Terms" [ref=e111]
+  - heading "Vermont Nurseries" [level=2, ref=e112]
+  - heading "Mystery Pricing Batch" [level=3, ref=e113]
+  - StaticText "Hybrid"
+  - StaticText "THC "
+  - StaticText "19"
+  - StaticText "%"
+  - StaticText "CBD "
+  - StaticText "0.3"
+  - StaticText "%"
+  - StaticText "Flower"
+  - paragraph
+    - StaticText "Strain:Assorted"
+  - paragraph
+    - StaticText "25eighth available"
+  - StaticText "Lab results on request"
+  - link "Edit listing" [ref=e119]
+  - heading "Silver Haze Concentrate" [level=3, ref=e114]
+  - StaticText "Hybrid"
+  - StaticText "THC "
+  - StaticText "85"
+  - StaticText "%"
+  - StaticText "CBD "
+  - StaticText "0.2"
+  - StaticText "%"
+  - StaticText "Concentrate"
+  - paragraph
+    - StaticText "Strain:Silver Haze"
+  - paragraph
+    - StaticText "50g available"
+  - StaticText "Lab results on request"
+  - link "Edit listing" [ref=e120]
+  - heading "Purple Haze Flowers" [level=3, ref=e115]
+  - StaticText "Hybrid"
+  - StaticText "THC "
+  - StaticText "24.8"
+  - StaticText "%"
+  - StaticText "CBD "
+  - StaticText "0.6"
+  - StaticText "%"
+  - StaticText "Flower"
+  - paragraph
+    - StaticText "Strain:Purple Haze"
+  - paragraph
+    - StaticText "240g available"
+  - StaticText "Lab results on request"
+  - link "Edit listing" [ref=e121]
+- button "Open messages" [ref=e116]
+- region "Notifications alt+T" [ref=e107]
+- alert

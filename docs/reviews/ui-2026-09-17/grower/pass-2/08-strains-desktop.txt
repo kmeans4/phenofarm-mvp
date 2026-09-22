@@ -1,0 +1,96 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e3153]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3154]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e3155]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3184]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e3185]
+      - StaticText "Overview"
+    - link "Products" [ref=e3186]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3187]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3188]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3189]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3190]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3191]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3192]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3193]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3156]
+- main
+  - sectionheader
+    - heading "Strain Management" [level=1, ref=e3194]
+    - paragraph
+      - StaticText "Manage your cannabis genetics library"
+    - link "+ Add Strain" [ref=e3195]
+  - paragraph
+    - StaticText "Total Strains"
+  - paragraph
+    - StaticText "4"
+  - paragraph
+    - StaticText "Total Batches"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Products"
+  - paragraph
+    - StaticText "3"
+  - button "Cards" [ref=e3157]
+    - image
+    - StaticText "Cards"
+  - button "List" [ref=e3158]
+    - image
+    - StaticText "List"
+  - heading "Assorted" [level=3, ref=e3159]
+  - link "0 batches" [ref=e3160]
+  - link "1 product" [ref=e3161]
+  - link "Edit" [ref=e3162]
+  - link "+ Product" [ref=e3163]
+  - button "Delete Assorted" [ref=e3164]
+  - heading "Audit Test Kush" [level=3, ref=e3165]
+  - paragraph
+    - StaticText "Hybrid"
+  - link "1 batch" [ref=e3166]
+  - link "0 products" [ref=e3167]
+  - link "Edit" [ref=e3168]
+  - link "+ Product" [ref=e3169]
+  - button "Delete Audit Test Kush" [ref=e3170]
+  - heading "Purple Haze" [level=3, ref=e3171]
+  - link "0 batches" [ref=e3172]
+  - link "1 product" [ref=e3173]
+  - link "Edit" [ref=e3174]
+  - link "+ Product" [ref=e3175]
+  - button "Delete Purple Haze" [ref=e3176]
+  - heading "Silver Haze" [level=3, ref=e3177]
+  - link "0 batches" [ref=e3178]
+  - link "1 product" [ref=e3179]
+  - link "Edit" [ref=e3180]
+  - link "+ Product" [ref=e3181]
+  - button "Delete Silver Haze" [ref=e3182]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3196]
+  - button "Open messages" [ref=e3183]
+- region "Notifications alt+T" [ref=e3152]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3197]
+  - image
+- alert

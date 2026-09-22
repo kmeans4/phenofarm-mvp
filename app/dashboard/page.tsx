@@ -1,13 +1,12 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
 import { redirect } from 'next/navigation';
+import { getAuthSession } from '@/lib/auth-helpers';
 
 interface SessionUser {
   role: string;
 }
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
   
   if (!session) {
     redirect('/auth/sign_in');

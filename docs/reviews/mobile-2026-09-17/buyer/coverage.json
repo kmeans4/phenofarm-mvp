@@ -1,0 +1,338 @@
+{
+  "scope": "8 actual buyer pages; favorites and price-alerts are redirects to Saved tab states. METRC excluded.",
+  "environment": "Local isolated phenofarm_ui_fixes_20260917 clone; no external message/payment/order/profile submissions.",
+  "before": {
+    "viewport": {
+      "width": 360,
+      "height": 800
+    },
+    "all_pages_captured_before_edits": true
+  },
+  "pages": [
+    {
+      "route": "/dispensary/dashboard",
+      "before": "before/dashboard-360.png",
+      "before_inspected": true,
+      "after": [
+        {
+          "viewport": 360,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_dashboard-360.png",
+          "inspected": true
+        },
+        {
+          "viewport": 390,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_dashboard-390.png",
+          "inspected": true
+        },
+        {
+          "viewport": 430,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_dashboard-430.png",
+          "inspected": true
+        },
+        {
+          "viewport": 1440,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_dashboard-1440.png",
+          "inspected": true
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        "Full-page image inspected including below fold at all four widths",
+        "HTTP 200, no horizontal overflow or browser page errors",
+        "No mobile input smaller than 16px"
+      ]
+    },
+    {
+      "route": "/dispensary/catalog",
+      "before": "before/catalog-360.png",
+      "before_inspected": true,
+      "after": [
+        {
+          "viewport": 360,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_catalog-360.png",
+          "inspected": true
+        },
+        {
+          "viewport": 390,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_catalog-390.png",
+          "inspected": true
+        },
+        {
+          "viewport": 430,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_catalog-430.png",
+          "inspected": true
+        },
+        {
+          "viewport": 1440,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_catalog-1440.png",
+          "inspected": true
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        "Full-page image inspected including below fold at all four widths",
+        "HTTP 200, no horizontal overflow or browser page errors",
+        "No mobile input smaller than 16px"
+      ]
+    },
+    {
+      "route": "/dispensary/cart",
+      "before": "before/cart-empty-360.png",
+      "before_inspected": true,
+      "after": [
+        {
+          "viewport": 360,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_cart-360.png",
+          "inspected": true
+        },
+        {
+          "viewport": 390,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_cart-390.png",
+          "inspected": true
+        },
+        {
+          "viewport": 430,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_cart-430.png",
+          "inspected": true
+        },
+        {
+          "viewport": 1440,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_cart-1440.png",
+          "inspected": true
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        "Full-page image inspected including below fold at all four widths",
+        "HTTP 200, no horizontal overflow or browser page errors",
+        "No mobile input smaller than 16px"
+      ]
+    },
+    {
+      "route": "/dispensary/orders",
+      "before": "before/orders-360.png",
+      "before_inspected": true,
+      "after": [
+        {
+          "viewport": 360,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders-360.png",
+          "inspected": true
+        },
+        {
+          "viewport": 390,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders-390.png",
+          "inspected": true
+        },
+        {
+          "viewport": 430,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders-430.png",
+          "inspected": true
+        },
+        {
+          "viewport": 1440,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders-1440.png",
+          "inspected": true
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        "Full-page image inspected including below fold at all four widths",
+        "HTTP 200, no horizontal overflow or browser page errors",
+        "No mobile input smaller than 16px"
+      ]
+    },
+    {
+      "route": "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "before": "before/detail-360.png",
+      "before_inspected": true,
+      "after": [
+        {
+          "viewport": 360,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders__id_-360.png",
+          "inspected": true
+        },
+        {
+          "viewport": 390,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders__id_-390.png",
+          "inspected": true
+        },
+        {
+          "viewport": 430,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders__id_-430.png",
+          "inspected": true
+        },
+        {
+          "viewport": 1440,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders__id_-1440.png",
+          "inspected": true
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        "Full-page image inspected including below fold at all four widths",
+        "HTTP 200, no horizontal overflow or browser page errors",
+        "No mobile input smaller than 16px"
+      ]
+    },
+    {
+      "route": "/dispensary/grower/grower-001",
+      "before": "before/shop-360.png",
+      "before_inspected": true,
+      "after": [
+        {
+          "viewport": 360,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_grower__id_-360.png",
+          "inspected": true
+        },
+        {
+          "viewport": 390,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_grower__id_-390.png",
+          "inspected": true
+        },
+        {
+          "viewport": 430,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_grower__id_-430.png",
+          "inspected": true
+        },
+        {
+          "viewport": 1440,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_grower__id_-1440.png",
+          "inspected": true
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        "Full-page image inspected including below fold at all four widths",
+        "HTTP 200, no horizontal overflow or browser page errors",
+        "No mobile input smaller than 16px"
+      ]
+    },
+    {
+      "route": "/dispensary/saved",
+      "before": "before/saved-360.png",
+      "before_inspected": true,
+      "after": [
+        {
+          "viewport": 360,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_saved-360.png",
+          "inspected": true
+        },
+        {
+          "viewport": 390,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_saved-390.png",
+          "inspected": true
+        },
+        {
+          "viewport": 430,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_saved-430.png",
+          "inspected": true
+        },
+        {
+          "viewport": 1440,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_saved-1440.png",
+          "inspected": true
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        "Full-page image inspected including below fold at all four widths",
+        "HTTP 200, no horizontal overflow or browser page errors",
+        "No mobile input smaller than 16px"
+      ]
+    },
+    {
+      "route": "/dispensary/settings",
+      "before": "before/settings-360.png",
+      "before_inspected": true,
+      "after": [
+        {
+          "viewport": 360,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_settings-360.png",
+          "inspected": true
+        },
+        {
+          "viewport": 390,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_settings-390.png",
+          "inspected": true
+        },
+        {
+          "viewport": 430,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_settings-430.png",
+          "inspected": true
+        },
+        {
+          "viewport": 1440,
+          "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_settings-1440.png",
+          "inspected": true
+        }
+      ],
+      "status": "passed",
+      "checks": [
+        "Full-page image inspected including below fold at all four widths",
+        "HTTP 200, no horizontal overflow or browser page errors",
+        "No mobile input smaller than 16px"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "area": "catalog grid/list/filter/save preset/compare/price alert/message",
+      "status": "passed",
+      "evidence": "docs/reviews/mobile-2026-09-17/buyer/interaction-checks.json"
+    },
+    {
+      "area": "cart empty/filled/quantity/templates/notes/review",
+      "status": "passed",
+      "evidence": "docs/reviews/mobile-2026-09-17/buyer/interaction-checks.json"
+    },
+    {
+      "area": "orders status filter/detail disclosures/withdraw confirmation",
+      "status": "passed",
+      "evidence": "docs/reviews/mobile-2026-09-17/buyer/interaction-checks.json"
+    },
+    {
+      "area": "shop grid/list/type filter/message",
+      "status": "passed",
+      "evidence": "docs/reviews/mobile-2026-09-17/buyer/interaction-checks.json"
+    },
+    {
+      "area": "saved favorites grid/list/sort/clear confirmation/alerts/recent",
+      "status": "passed",
+      "evidence": "docs/reviews/mobile-2026-09-17/buyer/interaction-checks.json"
+    },
+    {
+      "area": "settings lower fields/logo/Save",
+      "status": "passed",
+      "evidence": "docs/reviews/mobile-2026-09-17/buyer/interaction-checks.json"
+    }
+  ],
+  "checks": [
+    "Scoped ESLint passed for all 13 owned changed source files (root separately owns layout/shared changes)",
+    "Task-specific source diff reviewed against pre-edit source copy",
+    "32 rendered page views inspected; mobile widths 360, 390, 430 and desktop 1440",
+    "Parent reports all56 selected workflow tests passed, including all6 buyer layout regressions",
+    "Final192-view sweep and44 affected-view repeat: no page errors or horizontal overflow; all buyer mobile inputs at least16px",
+    "Task-only cart/draft/compare browser state restored or cleared; no order, message, profile, favorite or alert submission",
+    "Final rebuild shop active-filter screenshot inspected after short sort-label correction; desktop View Shop spacing also reinspected."
+  ],
+  "remaining": [],
+  "redirects": [
+    {
+      "route": "/dispensary/favorites",
+      "destination": "/dispensary/saved?tab=favorites",
+      "status": "passed",
+      "evidence": "docs/reviews/mobile-2026-09-17/final-redirect-checks.json"
+    },
+    {
+      "route": "/dispensary/price-alerts",
+      "destination": "/dispensary/saved?tab=alerts",
+      "status": "passed",
+      "evidence": "docs/reviews/mobile-2026-09-17/final-redirect-checks.json"
+    }
+  ],
+  "limitations": [
+    "Phone viewports are Chromium emulation; no physical iOS keyboard or device test was performed.",
+    "Earlier development-preview dialog images supplement final production-build route and interaction checks."
+  ],
+  "status": "complete"
+}

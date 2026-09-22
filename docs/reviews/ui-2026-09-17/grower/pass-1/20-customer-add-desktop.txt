@@ -1,0 +1,83 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e1930]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1931]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e1932]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e1935]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e1936]
+      - StaticText "Overview"
+    - link "Products" [ref=e1937]
+      - StaticText "Products"
+    - link "Inventory" [ref=e1938]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e1939]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e1940]
+      - StaticText "Strains"
+    - link "Batches" [ref=e1941]
+      - StaticText "Batches"
+    - link "Customers" [ref=e1942]
+      - StaticText "Customers"
+    - link "Reports" [ref=e1943]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e1944]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e1933]
+- main
+  - sectionheader
+    - heading "Add New Customer" [level=1, ref=e1945]
+    - paragraph
+      - StaticText "Add a new dispensary customer"
+  - form
+    - heading "Customer Information" [level=2, ref=e1946]
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox [required, ref=e1947]
+    - LabelText
+      - StaticText "Contact Name *"
+    - textbox [required, ref=e1948]
+    - LabelText
+      - StaticText "Email *"
+    - textbox [required, ref=e1949]
+    - LabelText
+      - StaticText "Phone *"
+    - textbox [required, ref=e1950]
+    - LabelText
+      - StaticText "Address"
+    - textbox [ref=e1951]
+    - LabelText
+      - StaticText "City"
+    - textbox [ref=e1952]
+    - LabelText
+      - StaticText "State"
+    - textbox [ref=e1953]: VT
+      - StaticText "VT"
+    - LabelText
+      - StaticText "ZIP"
+    - textbox [ref=e1954]
+    - LabelText
+      - StaticText "License Number"
+    - textbox "VT-DISP-XXXXX" [ref=e1955]
+    - link "Cancel" [ref=e1956]
+    - button "Add Customer" [disabled, ref=e1957]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1958]
+  - button "Open messages" [ref=e1934]
+- region "Notifications alt+T" [ref=e1929]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1959]
+  - image
+- alert

@@ -1,0 +1,130 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e757]
+- button "Notifications" [expanded=false, ref=e758]
+  - StaticText "16"
+- button "Open Grower navigation menu" [expanded=false, ref=e759]
+- main
+  - sectionheader
+    - paragraph
+      - StaticText "GOOD MORNING"
+    - heading "Vermont Nurseries" [level=1, ref=e766]
+  - generic "Summary"
+    - link "Requests 20" [ref=e767]
+      - paragraph
+        - StaticText "Requests"
+      - paragraph
+        - StaticText "20"
+    - link "Delivered value $450" [ref=e768]
+      - paragraph
+        - StaticText "Delivered value"
+      - paragraph
+        - StaticText "$450"
+    - link "Customers 2" [ref=e769]
+      - paragraph
+        - StaticText "Customers"
+      - paragraph
+        - StaticText "2"
+    - link "Products 3" [ref=e770]
+      - paragraph
+        - StaticText "Products"
+      - paragraph
+        - StaticText "3"
+  - generic
+    - heading "Needs attention" [level=2, ref=e771]
+    - StaticText "18"
+    - paragraph
+      - StaticText "New requests"
+    - paragraph
+      - StaticText "17"
+    - paragraph
+      - StaticText "Unread messages"
+    - paragraph
+      - StaticText "0"
+    - paragraph
+      - StaticText "Cancellations"
+    - paragraph
+      - StaticText "0"
+    - paragraph
+      - StaticText "Status changes"
+    - paragraph
+      - StaticText "1"
+    - article
+      - heading "6 new buyer requests" [level=3, ref=e773]
+      - StaticText "Review all"
+      - paragraph
+        - StaticText "Green Vermont Dispensary has 6 requests waiting for review."
+      - link "Review" [ref=e774]
+    - article
+      - heading "Recently delivered" [level=3, ref=e775]
+      - StaticText "Delivered"
+      - paragraph
+        - StaticText "ORD-20260917-REVIEW for Maple Street Market moved to Delivered."
+      - link "Review" [ref=e776]
+    - link "Review 17 requests →" [ref=e772]
+      - StaticText "Review 17 requests →"
+  - group
+    - DisclosureTriangle "Setup · 3 left" [expanded=false]
+      - StaticText "Setup · 3 left"
+  - heading "Delivered value · 30 days" [level=2, ref=e760]
+  - paragraph
+    - StaticText "Aug 19–Sep 17 · Payment is arranged directly with buyers."
+  - image "Delivered request value bar chart for the last 30 days. Maximum daily value is $450."
+    - generic
+      - generic
+        - StaticText "Scroll chart horizontally"
+        - StaticText "← Earlier"
+      - StaticText "8/19"
+      - StaticText "8/20"
+      - StaticText "8/21"
+      - StaticText "8/22"
+      - StaticText "8/23"
+      - StaticText "8/24"
+      - StaticText "8/25"
+      - StaticText "8/26"
+      - StaticText "8/27"
+      - StaticText "8/28"
+      - StaticText "8/29"
+      - StaticText "8/30"
+      - StaticText "8/31"
+      - StaticText "9/1"
+      - StaticText "9/2"
+      - StaticText "9/3"
+      - StaticText "9/4"
+      - StaticText "9/5"
+      - StaticText "9/6"
+      - StaticText "9/7"
+      - StaticText "9/8"
+      - StaticText "9/9"
+      - StaticText "9/10"
+      - StaticText "9/11"
+      - StaticText "9/12"
+      - StaticText "9/13"
+      - StaticText "9/14"
+      - StaticText "9/15"
+      - StaticText "$450"
+      - StaticText "9/16"
+      - StaticText "9/17"
+  - heading "Recent activity" [level=2, ref=e761]
+  - combobox "Date range" [expanded=false, ref=e762]: Last 30 Days
+    - MenuListPopup
+      - option "Today" [ref=e777]
+      - option "Last 7 Days" [ref=e778]
+      - option "Last 30 Days" [selected, ref=e779]
+      - option "This Month" [ref=e780]
+      - option "Last Month" [ref=e781]
+      - option "All Time" [ref=e782]
+  - link "All requests" [ref=e763]
+  - link "Request #ORD-20260917-REVIEW From Maple Street Market Sep 13, 8:00 PM" [ref=e764]
+    - paragraph
+      - StaticText "Request #ORD-20260917-REVIEW"
+    - paragraph
+      - StaticText "From Maple Street Market"
+    - paragraph
+      - StaticText "Sep 13, 8:00 PM"
+- button "Open messages" [ref=e765]
+- region "Notifications alt+T" [ref=e756]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e783]
+  - image
+- alert

@@ -1,0 +1,97 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e1383]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1384]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e1385]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e1414]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e1415]
+      - StaticText "Catalog"
+    - link "Products" [ref=e1416]
+      - StaticText "Products"
+    - link "Inventory" [ref=e1417]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e1418]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e1419]
+      - StaticText "Strains"
+    - link "Batches" [ref=e1420]
+      - StaticText "Batches"
+    - link "Customers" [ref=e1421]
+      - StaticText "Customers"
+    - link "Reports" [ref=e1422]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e1423]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e1386]
+- main
+  - sectionheader
+    - heading "Strains" [level=1, ref=e1424]
+    - link "Add strain" [ref=e1425]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Strains"
+    - paragraph
+      - StaticText "4"
+    - paragraph
+      - StaticText "Batches"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "Products"
+    - paragraph
+      - StaticText "3"
+  - button "Cards" [ref=e1387]
+    - image
+    - StaticText "Cards"
+  - button "List" [ref=e1388]
+    - image
+    - StaticText "List"
+  - heading "Assorted" [level=3, ref=e1389]
+  - link "0 batches" [ref=e1390]
+  - link "1 product" [ref=e1391]
+  - link "Edit" [ref=e1392]
+  - link "Add product" [ref=e1393]
+  - button "More actions for Assorted" [ref=e1394]
+    - StaticText "More"
+  - heading "Audit Test Kush" [level=3, ref=e1395]
+  - paragraph
+    - StaticText "Hybrid"
+  - link "1 batch" [ref=e1396]
+  - link "0 products" [ref=e1397]
+  - link "Edit" [ref=e1398]
+  - link "Add product" [ref=e1399]
+  - button "More actions for Audit Test Kush" [ref=e1400]
+    - StaticText "More"
+  - heading "Purple Haze" [level=3, ref=e1401]
+  - link "0 batches" [ref=e1402]
+  - link "1 product" [ref=e1403]
+  - link "Edit" [ref=e1404]
+  - link "Add product" [ref=e1405]
+  - button "More actions for Purple Haze" [ref=e1406]
+    - StaticText "More"
+  - heading "Silver Haze" [level=3, ref=e1407]
+  - link "0 batches" [ref=e1408]
+  - link "1 product" [ref=e1409]
+  - link "Edit" [ref=e1410]
+  - link "Add product" [ref=e1411]
+  - button "More actions for Silver Haze" [ref=e1412]
+    - StaticText "More"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1426]
+  - button "Open messages" [ref=e1413]
+- region "Notifications alt+T" [ref=e1382]
+- alert

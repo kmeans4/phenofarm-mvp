@@ -17,92 +17,124 @@ model User {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   passwordHash         String?
+  emailVerifiedAt      DateTime?
+  sessionVersion       Int                   @default(0)
+  accountActionTokens  AccountActionToken[]
   conversationMessages ConversationMessage[]
+  createdConversations Conversation[]        @relation("ConversationCreator")
+  notifications        Notification[]
+  orderStatusEvents    OrderStatusEvent[]
   dispensary           Dispensary?
   grower               Grower?
-  sessions             Session[]
 
   @@map("users")
 }
 
+enum AccountActionPurpose {
+  VERIFY_EMAIL
+  RESET_PASSWORD
+  CHANGE_EMAIL
+}
+
+model AccountActionToken {
+  id             String               @id @default(cuid())
+  tokenHash      String               @unique
+  userId         String
+  purpose        AccountActionPurpose
+  email          String
+  sessionVersion Int
+  expiresAt      DateTime
+  consumedAt     DateTime?
+  createdAt      DateTime             @default(now())
+  user           User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, purpose])
+  @@index([expiresAt])
+  @@map("account_action_tokens")
+}
+
 model Grower {
-  id                  String              @id @default(cuid())
-  userId              String              @unique
-  businessName        String
-  licenseNumber       String?
-  phone               String?
-  address             String?
-  city                String?
-  state               String?             @default("VT")
-  zip                 String?
-  website             String?
-  description         String?
-  logo                String?
-  createdAt           DateTime            @default(now())
-  updatedAt           DateTime            @updatedAt
-  connectOnboardedAt  DateTime?
-  isVerified          Boolean             @default(false)
-  stripeAccountId     String?
-  stripeAccountStatus String?             @default("pending")
-  stripeCustomerId    String?
-  stripeSubscriptionId String?
-  subscriptionPlan    String?             @default("free")
-  subscriptionStatus  String?             @default("inactive")
-  subscriptionCurrentPeriodEnd DateTime?
-  subscriptionCancelAtPeriodEnd Boolean   @default(false)
-  contactName         String?
-  licenseExpiry       DateTime?
-  commercialMinimumOrder String?
-  commercialFulfillmentMethods String?
-  commercialFulfillmentRegion String?
-  commercialPaymentTerms String?
-  commercialResponseWindow String?
-  commercialContactNote String?
-  commercialTermsUpdatedAt DateTime?
-  batches             Batch[]
-  cartItems           CartItem[]
-  conversations       Conversation[]
-  user                User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  metrcSyncLogs       MetrcSyncLog[]
-  orderItems          OrderItem[]
-  orders              Order[]
-  productTypeConfigs  ProductTypeConfig[]
-  products            Product[]
-  strains             Strain[]
+  id                            String              @id @default(cuid())
+  userId                        String              @unique
+  businessName                  String
+  licenseNumber                 String?
+  phone                         String?
+  address                       String?
+  city                          String?
+  state                         String?             @default("VT")
+  zip                           String?
+  website                       String?
+  description                   String?
+  logo                          String?
+  createdAt                     DateTime            @default(now())
+  updatedAt                     DateTime            @updatedAt
+  isVerified                    Boolean             @default(false)
+  stripeCustomerId              String?
+  stripeSubscriptionId          String?
+  stripeCheckoutSessionId       String?
+  subscriptionPlan              String?             @default("free")
+  subscriptionStatus            String?             @default("inactive")
+  subscriptionCurrentPeriodEnd  DateTime?
+  subscriptionCancelAtPeriodEnd Boolean             @default(false)
+  subscriptionEventCreatedAt    Int                 @default(0)
+  contactName                   String?
+  licenseExpiry                 DateTime?
+  commercialMinimumOrder        String?
+  commercialFulfillmentMethods  String?
+  commercialFulfillmentRegion   String?
+  commercialPaymentTerms        String?
+  commercialResponseWindow      String?
+  commercialContactNote         String?
+  commercialTermsUpdatedAt      DateTime?
+  batches                       Batch[]
+  conversations                 Conversation[]
+  user                          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  orderItems                    OrderItem[]
+  orders                        Order[]
+  productTypeConfigs            ProductTypeConfig[]
+  products                      Product[]
+  strains                       Strain[]
+  acceptedQuotes                AcceptedQuote[]
+  managedCustomers              Dispensary[] @relation("ManagedCustomers")
 
   @@map("growers")
 }
 
 model Dispensary {
-  id                 String         @id @default(cuid())
-  userId             String         @unique
+  id                 String                      @id @default(cuid())
+  userId             String?                     @unique
   businessName       String
   licenseNumber      String?
   phone              String?
   address            String?
   city               String?
-  state              String?        @default("VT")
+  state              String?                     @default("VT")
   zip                String?
   website            String?
   description        String?
   logo               String?
-  createdAt          DateTime       @default(now())
-  updatedAt          DateTime       @updatedAt
-  isVerified         Boolean        @default(false)
+  createdAt          DateTime                    @default(now())
+  updatedAt          DateTime                    @updatedAt
+  isVerified         Boolean                     @default(false)
   contactName        String?
   licenseExpiry      DateTime?
   licenseReviewNotes String?
-  licenseState       String?        @default("VT")
-  licenseStatus      LicenseStatus  @default(pending_review)
+  licenseState       String?                     @default("VT")
+  licenseStatus      LicenseStatus               @default(pending_review)
   verifiedAt         DateTime?
-  cart               Cart?
+  isOffPlatform      Boolean                     @default(false)
+  createdByGrowerId   String?
+  createdByGrower     Grower? @relation("ManagedCustomers", fields: [createdByGrowerId], references: [id])
+  offPlatformEmail   String?
   conversations      Conversation[]
   favoriteProducts   DispensaryFavoriteProduct[]
   priceAlerts        DispensaryPriceAlert[]
   savedFilters       DispensarySavedFilter[]
-  user               User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user               User?                       @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders             Order[]
+  acceptedQuotes     AcceptedQuote[]
 
+  @@index([createdByGrowerId])
   @@map("dispensaries")
 }
 
@@ -130,20 +162,22 @@ model Batch {
   lotNumber         String?
   harvestDate       DateTime
   strainId          String
-  thc               Float?
-  cbd               Float?
-  totalCannabinoids Float?
+  thc               Decimal?  @db.Decimal(5, 2)
+  cbd               Decimal?  @db.Decimal(5, 2)
+  totalCannabinoids Decimal?  @db.Decimal(5, 2)
   terpenes          Json?
   coaDocumentUrl    String?
   testResults       Json?
   notes             String?
   growerId          String
   createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
   grower            Grower    @relation(fields: [growerId], references: [id], onDelete: Cascade)
   strain            Strain    @relation(fields: [strainId], references: [id])
   products          Product[]
 
   @@unique([growerId, batchNumber])
+  @@index([strainId])
   @@map("batches")
 }
 
@@ -154,6 +188,7 @@ model ProductTypeConfig {
   growerId  String?
   isCustom  Boolean  @default(false)
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
   grower    Grower?  @relation(fields: [growerId], references: [id])
 
   @@unique([growerId, type])
@@ -161,125 +196,102 @@ model ProductTypeConfig {
 }
 
 model Product {
-  id                     String      @id @default(cuid())
+  id                     String                      @id @default(cuid())
   growerId               String
   name                   String
-  price                  Decimal     @db.Decimal(10, 2)
-  inventoryQty           Int         @default(0)
-  unit                   String      @default("gram")
-  isAvailable            Boolean     @default(true)
+  price                  Decimal                     @db.Decimal(10, 2)
+  inventoryQty           Int                         @default(0)
+  unit                   String                      @default("gram")
+  isAvailable            Boolean                     @default(true)
   description            String?
   images                 String[]
-  createdAt              DateTime    @default(now())
-  updatedAt              DateTime    @updatedAt
-  lastSyncedAt           DateTime?
+  createdAt              DateTime                    @default(now())
+  updatedAt              DateTime                    @updatedAt
   sku                    String?
   brand                  String?
   ingredients            String?
   batchId                String?
-  categoryLegacy         String?
-  cbdLegacy              Float?
   ingredientsDocumentUrl String?
-  isFeatured             Boolean     @default(false)
+  isFeatured             Boolean                     @default(false)
+  status                 ProductStatus               @default(PUBLISHED)
   productType            String?
   strainId               String?
-  strainLegacy           String?
   subType                String?
-  subcategoryLegacy      String?
-  thcLegacy              Float?
   deletedAt              DateTime?
-  isDeleted              Boolean     @default(false)
-  isPriceVisible         Boolean     @default(true)
-  cbdMax                 Decimal?    @db.Decimal(5, 2)
-  cbdMin                 Decimal?    @db.Decimal(5, 2)
+  isDeleted              Boolean                     @default(false)
+  isPriceVisible         Boolean                     @default(true)
+  cbdMax                 Decimal?                    @db.Decimal(5, 2)
+  cbdMin                 Decimal?                    @db.Decimal(5, 2)
   harvestDate            DateTime?
-  thcMax                 Decimal?    @db.Decimal(5, 2)
-  thcMin                 Decimal?    @db.Decimal(5, 2)
-  cartItems              CartItem[]
+  thcMax                 Decimal?                    @db.Decimal(5, 2)
+  thcMin                 Decimal?                    @db.Decimal(5, 2)
   favoriteProducts       DispensaryFavoriteProduct[]
   orderItems             OrderItem[]
   priceAlerts            DispensaryPriceAlert[]
-  batch                  Batch?      @relation(fields: [batchId], references: [id])
-  grower                 Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
-  strain                 Strain?     @relation(fields: [strainId], references: [id])
+  acceptedQuotes         AcceptedQuote[]
+  conversationMessages   ConversationMessage[]
+  batch                  Batch?                      @relation(fields: [batchId], references: [id])
+  grower                 Grower                      @relation(fields: [growerId], references: [id], onDelete: Cascade)
+  strain                 Strain?                     @relation(fields: [strainId], references: [id])
 
+  @@index([growerId, isDeleted, isAvailable])
+  @@index([isDeleted, isAvailable])
+  @@index([strainId])
+  @@index([batchId])
   @@map("products")
 }
 
 model Order {
-  id           String      @id @default(cuid())
-  orderId      String      @unique @default(cuid())
-  growerId     String
-  dispensaryId String
-  status       OrderStatus @default(PENDING)
-  totalAmount  Decimal     @db.Decimal(10, 2)
-  subtotal     Decimal     @db.Decimal(10, 2)
-  tax          Decimal     @default(0) @db.Decimal(10, 2)
-  shippingFee  Decimal     @default(0) @db.Decimal(10, 2)
-  notes        String?
-  shippedAt    DateTime?
-  deliveredAt  DateTime?
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  items        OrderItem[]
-  dispensary   Dispensary  @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
-  grower       Grower      @relation(fields: [growerId], references: [id], onDelete: Cascade)
-  payments     Payment[]
+  id                  String             @id @default(cuid())
+  orderId             String             @unique @default(cuid())
+  growerId            String
+  dispensaryId        String
+  status              OrderStatus        @default(PENDING)
+  totalAmount         Decimal            @db.Decimal(10, 2)
+  subtotal            Decimal            @db.Decimal(10, 2)
+  tax                 Decimal            @default(0) @db.Decimal(10, 2)
+  shippingFee         Decimal            @default(0) @db.Decimal(10, 2)
+  notes               String?
+  shippedAt           DateTime?
+  deliveredAt         DateTime?
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  createdBy           OrderCreatedBy     @default(DISPENSARY)
+  buyerAcknowledgedAt DateTime?
+  items               OrderItem[]
+  dispensary          Dispensary         @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+  grower              Grower             @relation(fields: [growerId], references: [id], onDelete: Cascade)
+  acceptedQuotes      AcceptedQuote[]
+  statusEvents        OrderStatusEvent[]
 
+  @@index([growerId, status, createdAt])
+  @@index([dispensaryId, status, createdAt])
+  @@index([growerId, createdAt])
+  @@index([dispensaryId, createdAt])
+  @@index([status, createdAt])
   @@map("orders")
 }
 
 model OrderItem {
-  id         String   @id @default(cuid())
-  orderId    String
-  productId  String
-  growerId   String
-  quantity   Int      @default(1)
-  unitPrice  Decimal  @db.Decimal(10, 2)
-  totalPrice Decimal  @db.Decimal(10, 2)
-  createdAt  DateTime @default(now())
-  grower     Grower   @relation(fields: [growerId], references: [id])
-  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product    Product  @relation(fields: [productId], references: [id])
+  id              String         @id @default(cuid())
+  orderId         String
+  productId       String
+  growerId        String
+  quantity        Int            @default(1)
+  unitPrice       Decimal        @db.Decimal(10, 2)
+  totalPrice      Decimal        @db.Decimal(10, 2)
+  createdAt       DateTime       @default(now())
+  acceptedQuoteId String?
+  grower          Grower         @relation(fields: [growerId], references: [id])
+  order           Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product         Product        @relation(fields: [productId], references: [id])
+  acceptedQuote   AcceptedQuote? @relation(fields: [acceptedQuoteId], references: [id])
 
+  @@index([orderId])
+  @@index([productId])
+  @@index([growerId])
+  @@index([acceptedQuoteId])
   @@map("order_items")
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("sessions")
-}
-
-model MetrcSyncLog {
-  id            String   @id @default(cuid())
-  growerId      String
-  recordsSynced Int      @default(0)
-  success       Boolean  @default(true)
-  errorMessage  String?
-  createdAt     DateTime @default(now())
-  grower        Grower   @relation(fields: [growerId], references: [id])
-
-  @@map("metrc_sync_logs")
-}
-
-model Payment {
-  id            String        @id @default(cuid())
-  orderId       String
-  amount        Decimal       @db.Decimal(10, 2)
-  method        PaymentMethod
-  status        PaymentStatus @default(PENDING)
-  transactionId String?
-  paidAt        DateTime?
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  order         Order         @relation(fields: [orderId], references: [id])
-
-  @@map("payments")
 }
 
 model DispensaryFavoriteProduct {
@@ -331,53 +343,22 @@ model DispensaryPriceAlert {
   @@map("dispensary_price_alerts")
 }
 
-model Cart {
-  id           String     @id @default(cuid())
-  dispensaryId String     @unique
-  subtotal     Decimal    @default(0) @db.Decimal(10, 2)
-  tax          Decimal    @default(0) @db.Decimal(10, 2)
-  total        Decimal    @default(0) @db.Decimal(10, 2)
-  itemCount    Int        @default(0)
-  createdAt    DateTime   @default(now())
-  updatedAt    DateTime   @updatedAt
-  items        CartItem[]
-  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
-
-  @@map("carts")
-}
-
-model CartItem {
-  id         String   @id @default(cuid())
-  cartId     String
-  productId  String
-  growerId   String
-  quantity   Int      @default(1)
-  unitPrice  Decimal  @db.Decimal(10, 2)
-  totalPrice Decimal  @db.Decimal(10, 2)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  cart       Cart     @relation(fields: [cartId], references: [id], onDelete: Cascade)
-  grower     Grower   @relation(fields: [growerId], references: [id])
-  product    Product  @relation(fields: [productId], references: [id])
-
-  @@unique([cartId, productId])
-  @@map("cart_items")
-}
-
 model Conversation {
   id                   String                @id @default(cuid())
   growerId             String
   dispensaryId         String
   productId            String?
-  createdByUserId      String
+  createdByUserId      String?
   growerLastReadAt     DateTime?
   dispensaryLastReadAt DateTime?
   lastMessageAt        DateTime              @default(now())
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
+  acceptedQuotes       AcceptedQuote[]
   messages             ConversationMessage[]
   dispensary           Dispensary            @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
   grower               Grower                @relation(fields: [growerId], references: [id], onDelete: Cascade)
+  createdBy            User?                 @relation("ConversationCreator", fields: [createdByUserId], references: [id], onDelete: SetNull)
 
   @@index([growerId, dispensaryId])
   @@index([growerId, dispensaryId, productId])
@@ -401,10 +382,73 @@ model ConversationMessage {
   createdAt            DateTime                @default(now())
   conversation         Conversation            @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   sender               User                    @relation(fields: [senderUserId], references: [id], onDelete: Cascade)
+  acceptedQuote        AcceptedQuote?
+  product              Product?                @relation(fields: [productId], references: [id], onDelete: SetNull)
+  respondedToMessage   ConversationMessage?    @relation("QuoteResponse", fields: [respondedToMessageId], references: [id], onDelete: SetNull)
+  responses            ConversationMessage[]   @relation("QuoteResponse")
 
   @@index([conversationId, createdAt])
   @@index([senderUserId])
+  @@index([productId])
+  @@index([respondedToMessageId])
   @@map("conversation_messages")
+}
+
+model AcceptedQuote {
+  id                String              @id @default(cuid())
+  conversationId    String
+  messageId         String              @unique
+  growerId          String
+  dispensaryId      String
+  productId         String
+  quantity          Int?
+  unitPrice         Decimal             @db.Decimal(10, 2)
+  note              String?
+  acceptedAt        DateTime            @default(now())
+  expiresAt         DateTime
+  consumedByOrderId String?
+  conversation      Conversation        @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  message           ConversationMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  grower            Grower              @relation(fields: [growerId], references: [id], onDelete: Cascade)
+  dispensary        Dispensary          @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+  product           Product             @relation(fields: [productId], references: [id], onDelete: Cascade)
+  consumedByOrder   Order?              @relation(fields: [consumedByOrderId], references: [id], onDelete: SetNull)
+  orderItems        OrderItem[]
+
+  @@index([dispensaryId, growerId, productId, expiresAt])
+  @@index([consumedByOrderId])
+  @@map("accepted_quotes")
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  body      String
+  href      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt, createdAt])
+  @@map("notifications")
+}
+
+model OrderStatusEvent {
+  id          String       @id @default(cuid())
+  orderId     String
+  fromStatus  OrderStatus?
+  toStatus    OrderStatus
+  actorUserId String?
+  actorRole   UserRole
+  createdAt   DateTime     @default(now())
+  order       Order        @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  actorUser   User?        @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([orderId, createdAt])
+  @@index([actorUserId])
+  @@map("order_status_events")
 }
 
 enum UserRole {
@@ -413,6 +457,7 @@ enum UserRole {
   DISPENSARY
 }
 
+/// Intentionally preserves the legacy lowercase values stored in Postgres.
 enum LicenseStatus {
   pending_review
   verified
@@ -452,17 +497,30 @@ enum OrderStatus {
   CANCELLED
 }
 
-enum PaymentMethod {
-  CASH
-  CREDIT_CARD
-  BANK_TRANSFER
-  CRYPTO
+enum OrderCreatedBy {
+  DISPENSARY
+  GROWER
 }
 
-enum PaymentStatus {
-  PENDING
-  PROCESSING
-  COMPLETED
-  FAILED
-  REFUNDED
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+}
+
+
+model AuthRateLimit {
+  key       String   @id
+  attempts  Int      @default(1)
+  expiresAt DateTime
+
+  @@index([expiresAt])
+  @@map("auth_rate_limits")
+}
+
+model StripeWebhookEvent {
+  id          String   @id
+  type        String
+  processedAt DateTime @default(now())
+
+  @@map("stripe_webhook_events")
 }

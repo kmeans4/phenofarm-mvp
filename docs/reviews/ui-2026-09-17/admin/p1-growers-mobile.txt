@@ -1,0 +1,45 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e115]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e116]
+- main
+  - sectionheader
+    - heading "Cultivator Management" [level=1, ref=e87]
+    - paragraph
+      - StaticText "Review cultivator licenses, marketplace access, and subscription state."
+    - form
+      - LabelText
+        - StaticText "Search cultivators"
+      - searchbox "Search cultivators" [ref=e88]
+      - LabelText
+        - StaticText "Verification status"
+      - combobox "Verification status" [expanded=false, ref=e89]: All statuses
+        - MenuListPopup
+          - option "All statuses" [selected, ref=e110]
+          - option "Pending only" [ref=e111]
+          - option "Verified only" [ref=e112]
+          - option "Expiring within 30 days" [ref=e113]
+          - option "Expired" [ref=e114]
+      - button "Search" [ref=e90]
+  - paragraph
+    - StaticText "Showing 1 of 1 cultivators"
+  - article
+    - heading "Vermont Nurseries" [level=2, ref=e117]
+    - link "grower@vtnurseries.com" [ref=e118]
+    - StaticText "Verified"
+    - DescriptionList
+      - term "LICENSE"
+      - definition
+        - StaticText "VT-GWL-2024-001"
+      - term "EXPIRY"
+      - definition
+        - StaticText "Not on file"
+      - term "SUBSCRIPTION"
+      - definition
+        - StaticText "Free"
+    - button "Unverify" [ref=e119]
+- region "Notifications alt+T" [ref=e78]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e109]
+  - image
+- alert

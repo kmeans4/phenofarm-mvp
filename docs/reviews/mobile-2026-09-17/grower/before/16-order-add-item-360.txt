@@ -1,0 +1,61 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e532]
+- button "Notifications" [expanded=false, ref=e533]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e534]
+- main
+  - sectionheader
+    - heading "Record request" [level=1, ref=e536]
+    - paragraph
+      - StaticText "Record an agreement made directly with a buyer."
+  - form
+    - LabelText
+      - StaticText "Buyer *"
+    - combobox "Buyer *" [expanded=false, required, ref=e541]
+    - heading "Items" [level=2, ref=e537]
+    - button "Add item" [ref=e538]
+    - LabelText
+      - StaticText "Product"
+    - combobox [expanded=false, ref=e542]: Mystery Pricing Batch
+      - MenuListPopup
+        - option "Mystery Pricing Batch" [selected, ref=e547]
+        - option "Silver Haze Concentrate" [ref=e548]
+        - option "Purple Haze Flowers" [ref=e549]
+    - LabelText
+      - StaticText "Qty"
+    - spinbutton [ref=e543]: 1
+      - StaticText "1"
+    - button "Max" [ref=e544]
+    - LabelText
+      - StaticText "Agreed price"
+    - spinbutton [ref=e545]: 40
+      - StaticText "40"
+    - StaticText "/ "
+    - StaticText "eighth"
+    - button "Remove" [ref=e546]
+    - StaticText "25"
+    - StaticText "eighth"
+    - StaticText " available"
+    - group
+      - DisclosureTriangle "Shipping & notes" [expanded=false]
+        - StaticText "Shipping & notes"
+    - StaticText "Subtotal"
+    - StaticText "$"
+    - StaticText "40.00"
+    - StaticText "Shipping"
+    - StaticText "$"
+    - StaticText "0.00"
+    - StaticText "Est. total"
+    - StaticText "$"
+    - StaticText "40.00"
+    - paragraph
+      - StaticText "Payment is arranged directly with the buyer."
+    - button "Record request" [disabled, ref=e539]
+    - link "Cancel" [ref=e540]
+    - paragraph
+      - StaticText "Select a dispensary before recording the request."
+- button "Open messages" [ref=e535]
+- region "Notifications alt+T" [ref=e531]
+- alert

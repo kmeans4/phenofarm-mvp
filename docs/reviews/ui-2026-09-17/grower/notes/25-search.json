@@ -1,0 +1,37 @@
+{
+  "slug": "25-search",
+  "route": "/grower/dashboard",
+  "state": "Search dialog empty",
+  "pass1": {
+    "inspected": [
+      "pass-1/25-search-desktop.png",
+      "pass-1/25-search-mobile.png"
+    ],
+    "strengths": [
+      "Focused search field, clear close control and supported categories; restrained desktop dialog."
+    ],
+    "issues": [
+      {
+        "key": "search-mobile-copy",
+        "priority": "low",
+        "viewport": "mobile",
+        "observation": "The long input placeholder truncates at390px and uses Orders while navigation says Requests. Keyboard-only navigation hints remain in the mobile footer.",
+        "recommendation": "Use placeholder \u2018Search PhenoFarm\u2019 and one category hint \u2018Products, requests, customers, strains\u2019. Hide arrow/Enter/Esc instructions on touch layouts; keep them on desktop."
+      }
+    ],
+    "limits": [
+      "Dialog only; no result navigation or data changes."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/25-search-desktop.png",
+      "pass-2/25-search-mobile.png"
+    ],
+    "notes": "Freshly reopened desktop/mobile search confirms the long placeholder clips on mobile and keyboard navigation hints remain at the bottom on touch layout. Search still calls requests Orders. The harmless recent-search chip reflects the prior read-only Purple query; no result was opened.",
+    "confirmedIssueKeys": [
+      "search-mobile-copy"
+    ],
+    "newIssues": []
+  }
+}

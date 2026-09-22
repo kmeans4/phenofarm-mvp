@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useState, useMemo, useSyncExternalStore } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Badge } from '@/app/components/ui/Badge';
 import {
   readDensityPreference,
@@ -18,6 +19,9 @@ interface Order {
   status: string;
   createdAt: string | Date;
   totalAmount: number;
+  hasUnreadMessages?: boolean;
+  createdBy?: string;
+  buyerAcknowledgedAt?: string | Date | null;
   grower: { businessName: string } | null;
 }
 
@@ -29,6 +33,11 @@ type BadgeVariant = 'info' | 'error' | 'default' | 'success' | 'secondary' | 'wa
 
 interface OrdersTableProps {
   orders: Order[];
+  compact?: boolean;
+  maxRows?: number;
+  showFilters?: boolean;
+  showWorkflowViews?: boolean;
+  showResultCount?: boolean;
 }
 
 const statusLabels: StatusLabelMap = {
@@ -51,26 +60,39 @@ const getBadgeVariant = (status: string): BadgeVariant => {
 
 type SortField = 'date' | 'status' | 'total' | 'orderId';
 type SortDirection = 'asc' | 'desc';
-type OrderView = 'all' | 'waiting-grower' | 'active' | 'delivered';
+type OrderView = 'all' | 'waiting-grower' | 'active' | 'delivered' | 'cancelled';
 
-export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
+function shortOrderId(orderId: string) {
+  const suffix = orderId.split('-').at(-1) || orderId;
+  return suffix.length >= 4 ? suffix : orderId.slice(-8);
+}
+
+function subscribeDensity(callback: () => void) {
+  window.addEventListener('storage', callback); window.addEventListener('dispensary-density', callback);
+  return () => { window.removeEventListener('storage', callback); window.removeEventListener('dispensary-density', callback); };
+}
+function densitySnapshot() {
+  try { return readDensityPreference('phenofarm:density:dispensary-orders'); } catch { return 'comfortable' as const; }
+}
+
+export function OrdersTable({
+  orders: initialOrders,
+  compact = false,
+  maxRows,
+  showFilters = true,
+  showWorkflowViews = true,
+  showResultCount = true,
+}: OrdersTableProps) {
+  const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [orderView, setOrderView] = useState<OrderView>('all');
   const [sortField, setSortField] = useState<SortField>('date');
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const [tableDensity, setTableDensity] = useState<TableDensity>('comfortable');
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setTableDensity(readDensityPreference('phenofarm:density:dispensary-orders'));
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, []);
-
+  const storedDensity = useSyncExternalStore(subscribeDensity, densitySnapshot, () => 'comfortable' as const);
+  const tableDensity = compact ? 'compact' : storedDensity;
   const handleDensityChange = (mode: TableDensity) => {
-    setTableDensity(mode);
-    saveDensityPreference('phenofarm:density:dispensary-orders', mode);
+    if (compact) return;
+    try { saveDensityPreference('phenofarm:density:dispensary-orders', mode); window.dispatchEvent(new Event('dispensary-density')); } catch { /* Optional preference. */ }
   };
 
   const orderViews = useMemo(
@@ -79,6 +101,7 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
       { key: 'waiting-grower' as const, label: 'Waiting on grower', count: initialOrders.filter((order) => order.status === 'PENDING').length },
       { key: 'active' as const, label: 'Active', count: initialOrders.filter((order) => ['CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(order.status)).length },
       { key: 'delivered' as const, label: 'Delivered', count: initialOrders.filter((order) => order.status === 'DELIVERED').length },
+      { key: 'cancelled' as const, label: 'Cancelled', count: initialOrders.filter((order) => order.status === 'CANCELLED').length },
     ],
     [initialOrders],
   );
@@ -93,13 +116,8 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
       result = result.filter((order) => ['CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(order.status));
     } else if (orderView === 'delivered') {
       result = result.filter((order) => order.status === 'DELIVERED');
-    }
-
-    // Filter by status
-    if (statusFilter !== 'all') {
-      result = result.filter(order => 
-        order.status.toLowerCase() === statusFilter.toLowerCase()
-      );
+    } else if (orderView === 'cancelled') {
+      result = result.filter((order) => order.status === 'CANCELLED');
     }
 
     // Filter by search query
@@ -132,7 +150,11 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
     });
 
     return result;
-  }, [initialOrders, orderView, searchQuery, statusFilter, sortField, sortDirection]);
+  }, [initialOrders, orderView, searchQuery, sortField, sortDirection]);
+  const visibleOrders = typeof maxRows === 'number' ? filteredOrders.slice(0, maxRows) : filteredOrders;
+  const navigateToOrder = (orderId: string) => {
+    router.push(`/dispensary/orders/${orderId}`);
+  };
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -161,121 +183,95 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
       </svg>
     );
   };
-  const compactMode = tableDensity === 'compact';
+  const compactMode = compact || tableDensity === 'compact';
   const cellClass = compactMode ? 'px-4 py-1.5 text-xs' : 'px-4 py-3 text-sm';
-  const mobileCardClass = compactMode ? 'rounded-xl border border-gray-200 bg-white p-3 shadow-sm' : 'rounded-xl border border-gray-200 bg-white p-4 shadow-sm';
+  const mobileCardClass = 'rounded-xl border border-gray-200 bg-white p-3 shadow-sm';
 
   return (
     <>
-      <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-        <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm font-semibold text-gray-900">Saved workflow views</p>
-          <p className="text-xs text-gray-500">Jump to the requests most likely to need your next action.</p>
+      {showWorkflowViews && (
+        <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+          <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm font-semibold text-gray-900">Saved workflow views</p>
+            <p className="text-xs text-gray-500">Jump to the requests most likely to need your next action.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {orderViews.map((view) => (
+              <button
+                key={view.key}
+                type="button"
+                onClick={() => {
+                  setOrderView(view.key);
+                }}
+                aria-pressed={orderView === view.key}
+                aria-label={`${view.label}: ${view.count} requests`}
+                className={`rounded-lg px-3 py-2 text-sm font-medium ${
+                  orderView === view.key
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {view.label}
+                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+                  orderView === view.key ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+                }`}>
+                  {view.count}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {orderViews.map((view) => (
-            <button
-              key={view.key}
-              type="button"
-              onClick={() => {
-                setOrderView(view.key);
-                setStatusFilter('all');
-              }}
-              aria-pressed={orderView === view.key}
-              aria-label={`${view.label}: ${view.count} requests`}
-              className={`rounded-lg px-3 py-2 text-sm font-medium ${
-                orderView === view.key
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-              }`}
-            >
-              {view.label}
-              <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-                orderView === view.key ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
-              }`}>
-                {view.count}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
-        <div className="relative flex-1">
-          <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search requests..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-          />
+      {showFilters && (
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              placeholder="Search requests..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+            />
+          </div>
+          <div className="sm:self-center">
+            <TableDensityControl value={tableDensity} onChange={handleDensityChange} />
+          </div>
         </div>
-        <select 
-          value={statusFilter}
-          onChange={(e) => {
-            setOrderView('all');
-            setStatusFilter(e.target.value);
-          }}
-          className="rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white"
-        >
-          <option value="all">All Status</option>
-          <option value="pending">Submitted</option>
-          <option value="confirmed">Accepted</option>
-          <option value="processing">Preparing</option>
-          <option value="shipped">Ready / In transit</option>
-          <option value="delivered">Delivered</option>
-          <option value="cancelled">Cancelled</option>
-        </select>
-        <div className="sm:self-center">
-          <TableDensityControl value={tableDensity} onChange={handleDensityChange} />
-        </div>
-      </div>
+      )}
 
       {/* Mobile order cards */}
-      <div className="space-y-3 md:hidden">
+      <div className="space-y-2 md:hidden">
         {filteredOrders.length === 0 ? (
           <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-gray-500">
-            {searchQuery || statusFilter !== 'all'
+            {searchQuery
               ? 'No requests match your filters'
               : 'No requests yet'}
           </div>
         ) : (
-          filteredOrders.map((order) => (
-            <div key={order.id} className={mobileCardClass}>
-              <div className="flex items-start justify-between gap-3">
+          visibleOrders.slice(0, compact ? 3 : visibleOrders.length).map((order) => (
+            <Link key={order.id} href={`/dispensary/orders/${order.id}`} aria-label={`View request ${order.orderId}`}
+              className={`${mobileCardClass} block transition-colors hover:border-green-200 hover:bg-green-50/40 focus-visible:ring-2 focus-visible:ring-green-600`}>
+              <div className="flex items-center justify-between gap-2">
+                <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-gray-900" title={order.orderId}>
+                  #{shortOrderId(order.orderId)}
+                  <time dateTime={new Date(order.createdAt).toISOString()} title={format(new Date(order.createdAt), 'MMM d, yyyy')} className="text-xs font-normal text-gray-500">{format(new Date(order.createdAt), 'MMM d, yy')}</time>
+                  {order.hasUnreadMessages ? <span className="h-2 w-2 shrink-0 rounded-full bg-green-600" aria-label="Unread grower message" /> : null}
+                </span>
+                <Badge variant={getBadgeVariant(order.status)}>{statusLabels[order.status] || order.status}</Badge>
+              </div>
+              <div className="mt-1 flex items-start justify-between gap-3 text-sm">
                 <div className="min-w-0">
-                  <p className="font-semibold text-gray-900">#{order.orderId}</p>
-                  <p className="mt-1 text-sm text-gray-600 truncate">
-                    {order.grower?.businessName || 'Unknown'}
-                  </p>
+                  <p className="break-words text-gray-700">{order.grower?.businessName || 'Unknown grower'}</p>
                 </div>
-                <Badge variant={getBadgeVariant(order.status)}>
-                  {statusLabels[order.status] || order.status}
-                </Badge>
+                <span className="shrink-0 font-semibold text-gray-900">${Number(order.totalAmount).toFixed(2)}</span>
               </div>
-
-              <div className={`${compactMode ? 'mt-3' : 'mt-4'} grid grid-cols-2 gap-3 text-sm`}>
-                <div>
-                  <p className="text-gray-500">Date</p>
-                  <p className="font-medium text-gray-900">{format(new Date(order.createdAt), 'MMM d, yyyy')}</p>
-                </div>
-                <div>
-                  <p className="text-gray-500">Est. value</p>
-                  <p className="font-semibold text-gray-900">${Number(order.totalAmount).toFixed(2)}</p>
-                </div>
-              </div>
-
-              <Link
-                href={'/dispensary/orders/' + order.id}
-                className={`${compactMode ? 'mt-3' : 'mt-4'} inline-flex w-full items-center justify-center rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50`}
-              >
-                View request
-              </Link>
-            </div>
+              {order.createdBy === 'GROWER' ? <p className="mt-1 text-xs text-blue-800">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</p> : null}
+            </Link>
           ))
         )}
       </div>
@@ -287,54 +283,73 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
             <tr className="border-b border-gray-200">
               <th 
                 className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
-                onClick={() => handleSort('orderId')}
+                aria-sort={sortField === 'orderId' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
-                <div className="flex items-center gap-1">
+                <button type="button" onClick={() => handleSort('orderId')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-green-600">
                   Request # {getSortIcon('orderId')}
-                </div>
+                </button>
               </th>
               <th className={`${cellClass} font-medium text-gray-700`}>Grower</th>
               <th 
                 className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
-                onClick={() => handleSort('date')}
+                aria-sort={sortField === 'date' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
-                <div className="flex items-center gap-1">
+                <button type="button" onClick={() => handleSort('date')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-green-600">
                   Date {getSortIcon('date')}
-                </div>
+                </button>
               </th>
               <th 
                 className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
-                onClick={() => handleSort('total')}
+                aria-sort={sortField === 'total' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
-                <div className="flex items-center gap-1">
+                <button type="button" onClick={() => handleSort('total')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-green-600">
                   Est. value {getSortIcon('total')}
-                </div>
+                </button>
               </th>
               <th 
                 className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
-                onClick={() => handleSort('status')}
+                aria-sort={sortField === 'status' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
-                <div className="flex items-center gap-1">
+                <button type="button" onClick={() => handleSort('status')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-green-600">
                   Status {getSortIcon('status')}
-                </div>
+                </button>
               </th>
               <th className={`${cellClass} font-medium text-gray-700`}>Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {filteredOrders.length === 0 ? (
+            {visibleOrders.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
-                  {searchQuery || statusFilter !== 'all' 
+                  {searchQuery
                     ? 'No requests match your filters' 
                     : 'No requests yet'}
                 </td>
               </tr>
             ) : (
-              filteredOrders.map((order) => (
-                <tr key={order.id} className="hover:bg-gray-50">
+              visibleOrders.map((order) => (
+                <tr
+                  key={order.id}
+                  role="link"
+                  tabIndex={0}
+                  aria-label={`View request ${order.orderId}`}
+                  onClick={() => navigateToOrder(order.id)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      navigateToOrder(order.id);
+                    }
+                  }}
+                  className="cursor-pointer transition-colors hover:bg-green-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600"
+                >
                   <td className={cellClass}>
-                    <div className="font-medium text-gray-900">#{order.orderId}</div>
+                    <div className="flex items-center gap-2 font-medium text-gray-900">
+                      #{order.orderId}
+                      {order.hasUnreadMessages ? (
+                        <span className="h-2 w-2 rounded-full bg-green-600" title="Unread grower message" aria-label="Unread grower message" />
+                      ) : null}
+                    </div>
+                    {order.createdBy === 'GROWER' ? <span className="mt-1 inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-800">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</span> : null}
                   </td>
                   <td className={`${cellClass} text-gray-600`}>
                     {order.grower?.businessName || 'Unknown'}
@@ -353,6 +368,7 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
                   <td className={cellClass}>
                     <Link 
                       href={'/dispensary/orders/' + order.id}
+                      onClick={(event) => event.stopPropagation()}
                       className="text-blue-600 hover:text-blue-700 font-medium text-sm"
                     >
                       View
@@ -366,9 +382,9 @@ export function OrdersTable({ orders: initialOrders }: OrdersTableProps) {
       </div>
 
       {/* Results count */}
-      {filteredOrders.length > 0 && (
+      {showResultCount && filteredOrders.length > 0 && (
         <div className="mt-4 text-sm text-gray-500">
-          Showing {filteredOrders.length} of {initialOrders.length} requests
+          Showing {visibleOrders.length} of {initialOrders.length} requests
         </div>
       )}
     </>

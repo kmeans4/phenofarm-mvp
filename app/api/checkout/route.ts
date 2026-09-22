@@ -1,13 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
+import { formatLicenseExpiry, isLicenseExpired } from '@/lib/license';
+import { marketplaceGrowerWhere } from '@/lib/license';
+import { createNotification } from '@/lib/notifications';
+import { createWithOrderIdRetry } from '@/lib/order-id';
 
 /**
  * Order request API endpoint
- * 
+ *
  * Base path: /api/checkout
  * Authentication: Required (DISPENSARY role)
- * 
+ *
  * This compatibility endpoint submits wholesale order requests for dispensaries,
  * creating one request per grower. PhenoFarm does not process wholesale payment;
  * item value is tracked for operational reporting and settlement happens
@@ -27,6 +31,14 @@ interface OrderItemData {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  acceptedQuoteId?: string;
+}
+
+interface QuotedItemResult {
+  productId: string;
+  quantity: number;
+  unitPrice: number;
+  acceptedQuoteId: string;
 }
 
 interface CheckoutIssue {
@@ -34,6 +46,7 @@ interface CheckoutIssue {
   productName: string;
   requested: number;
   available: number;
+  reason?: string;
 }
 
 class CheckoutConflictError extends Error {
@@ -47,10 +60,10 @@ class CheckoutConflictError extends Error {
 
 /**
  * POST /api/checkout
- * 
+ *
  * Submits an order request from a dispensary's request draft.
  * Creates one order request per grower when the draft contains items from multiple growers.
- * 
+ *
  * Request Body:
  * - items (required): Array of cart items, each containing:
  *   - id (string): Product ID
@@ -58,7 +71,7 @@ class CheckoutConflictError extends Error {
  *   - price (number): Unit price
  *   - quantity (number): Quantity requested
  * - notes (optional): Request notes, logistics, and direct payment terms
- * 
+ *
  * Business Logic:
  * - Items are automatically grouped by growerId
  * - One order is created per unique grower in the cart
@@ -66,13 +79,13 @@ class CheckoutConflictError extends Error {
  * - Orders with insufficient inventory are skipped and reported as errors
  * - Tax is not calculated or collected by PhenoFarm
  * - Order IDs are auto-generated as 'ORD-{timestamp}-{sequence}'
- * 
+ *
  * Response: 200 OK - Request result with:
  *   - success (boolean): true if at least one order created
  *   - orders (array): Created orders with id and orderId
  *   - orderCount (number): Number of orders created
  *   - errors (array, optional): List of inventory errors by product ID
- * 
+ *
  * Response: 400 Bad Request - Empty cart or missing dispensary profile
  * Response: 401 Unauthorized - No valid session
  * Response: 403 Forbidden - User is not a DISPENSARY
@@ -81,7 +94,7 @@ class CheckoutConflictError extends Error {
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
-    
+
     if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -99,11 +112,26 @@ export async function POST(request: NextRequest) {
 
     const dispensary = await db.dispensary.findUnique({
       where: { id: dispensaryId },
-      select: { licenseStatus: true, businessName: true },
+      select: { licenseStatus: true, licenseExpiry: true, businessName: true },
     });
 
     if (!dispensary) {
       return NextResponse.json({ error: 'Dispensary not found' }, { status: 404 });
+    }
+
+    if (isLicenseExpired(dispensary.licenseExpiry)) {
+      await db.dispensary.update({
+        where: { id: dispensaryId },
+        data: { licenseStatus: 'expired', isVerified: false },
+      });
+      return NextResponse.json(
+        {
+          error: `License expired ${formatLicenseExpiry(dispensary.licenseExpiry!)} - update it in Settings; ordering resumes after re-verification`,
+          code: 'LICENSE_EXPIRED',
+          licenseStatus: 'expired',
+        },
+        { status: 403 }
+      );
     }
 
     if (dispensary.licenseStatus !== 'verified') {
@@ -117,7 +145,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { items, notes } = await request.json();
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    const { items, notes } = body;
+    if (notes !== undefined && (typeof notes !== 'string' || notes.length > 1000)) return NextResponse.json({ error: 'Notes must be text under 1000 characters' }, { status: 400 });
+    if (!Array.isArray(items) || items.length > 100 || items.some(item => !item || typeof item !== 'object')) return NextResponse.json({ error: 'Choose up to 100 valid items' }, { status: 400 });
 
     if (!items?.length) {
       return NextResponse.json({ error: 'Order request draft is empty' }, { status: 400 });
@@ -136,78 +168,94 @@ export async function POST(request: NextRequest) {
       !Number.isFinite(item.price) ||
       item.price < 0 ||
       !Number.isInteger(item.quantity) ||
-      item.quantity <= 0
+      item.quantity <= 0 || item.quantity > 9999 || item.id.length > 100 || item.growerId.length > 100
     );
 
     if (hasInvalidItem) {
       return NextResponse.json({ error: 'Invalid cart items' }, { status: 400 });
     }
 
+    // Consolidate duplicate lines before applying inventory and quote caps.
+    const consolidated = new Map<string, CartItem>();
+    for (const item of normalizedItems) {
+      const key = `${item.growerId}:${item.id}`;
+      const existing = consolidated.get(key);
+      consolidated.set(key, existing ? { ...existing, quantity: existing.quantity + item.quantity } : item);
+    }
+
     // Group items by grower
     const byGrower: Record<string, CartItem[]> = {};
-    normalizedItems.forEach((item) => {
+    consolidated.forEach((item) => {
       if (!byGrower[item.growerId]) byGrower[item.growerId] = [];
       byGrower[item.growerId].push(item);
     });
 
-    const orders: { id: string; orderId: string }[] = [];
+    const orders: { id: string; orderId: string; growerId: string; orderedProductIds: string[] }[] = [];
+    const quotedItems: QuotedItemResult[] = [];
     const issues: CheckoutIssue[] = [];
 
     for (const [growerId, growerItems] of Object.entries(byGrower)) {
-      const requestedByProduct = new Map<string, number>();
-      for (const item of growerItems) {
-        requestedByProduct.set(item.id, (requestedByProduct.get(item.id) || 0) + item.quantity);
-      }
-
-      const productIds = Array.from(requestedByProduct.keys());
-      const products = await db.product.findMany({
-        where: {
-          id: { in: productIds },
-          growerId,
-          isDeleted: false,
-        },
-        select: {
-          id: true,
-          name: true,
-          price: true,
-          inventoryQty: true,
-          isAvailable: true,
-        },
-      });
-
-      const productById = new Map(products.map((product) => [product.id, product]));
-      const growerIssues: CheckoutIssue[] = [];
-
-      for (const [productId, requested] of requestedByProduct.entries()) {
-        const product = productById.get(productId);
-        const available = Number(product?.inventoryQty || 0);
-
-        if (!product || !product.isAvailable || requested > available) {
-          growerIssues.push({
-            productId,
-            productName: product?.name || 'Unknown product',
-            requested,
-            available,
-          });
-        }
-      }
-
-      if (growerIssues.length > 0) {
-        issues.push(...growerIssues);
-        continue;
-      }
-
       try {
-        const order = await db.$transaction(async (tx) => {
+        const requestedByProduct = new Map<string, number>();
+        for (const item of growerItems) {
+          requestedByProduct.set(item.id, (requestedByProduct.get(item.id) || 0) + item.quantity);
+        }
+
+        const productIds = Array.from(requestedByProduct.keys());
+        const products = await db.product.findMany({
+          where: {
+            id: { in: productIds },
+            growerId,
+            isDeleted: false,
+            status: 'PUBLISHED',
+            grower: marketplaceGrowerWhere(),
+          },
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            inventoryQty: true,
+            isAvailable: true,
+            isPriceVisible: true,
+            grower: { select: { userId: true, businessName: true } },
+          },
+        });
+
+        const productById = new Map(products.map((product) => [product.id, product]));
+        const growerIssues: CheckoutIssue[] = [];
+
+        for (const [productId, requested] of requestedByProduct.entries()) {
+          const product = productById.get(productId);
+          const available = Number(product?.inventoryQty || 0);
+
+          if (!product || !product.isAvailable || requested > available) {
+            growerIssues.push({
+              productId,
+              productName: product?.name || 'Unknown product',
+              requested,
+              available,
+            });
+          }
+        }
+
+        if (growerIssues.length > 0) {
+          issues.push(...growerIssues);
+          continue;
+        }
+
+        const result = await createWithOrderIdRetry((orderId) => db.$transaction(async (tx) => {
           let subtotal = 0;
           const orderItems: OrderItemData[] = [];
+          const orderQuotedItems: QuotedItemResult[] = [];
 
-          for (const item of growerItems) {
+          for (const item of [...growerItems].sort((a, b) => a.id.localeCompare(b.id))) {
             const updateResult = await tx.product.updateMany({
               where: {
                 id: item.id,
                 growerId,
                 isDeleted: false,
+                status: 'PUBLISHED',
+                grower: marketplaceGrowerWhere(),
                 isAvailable: true,
                 inventoryQty: { gte: item.quantity },
               },
@@ -230,43 +278,118 @@ export async function POST(request: NextRequest) {
               ]);
             }
 
-            // Always record the grower's current catalog price; the
-            // client-side cart price is display-only and untrusted.
-            const serverPrice = Number(productById.get(item.id)?.price ?? item.price);
-            const total = item.quantity * serverPrice;
-            subtotal += total;
-            orderItems.push({
-              productId: item.id,
-              growerId,
-              quantity: item.quantity,
-              unitPrice: serverPrice,
-              totalPrice: total,
+            const currentProduct = await tx.product.findUniqueOrThrow({ where: { id: item.id }, select: { price: true, isPriceVisible: true, inventoryQty: true } });
+            if (currentProduct.inventoryQty === 0) await tx.product.update({ where: { id: item.id }, data: { isAvailable: false } });
+            const serverPrice = Number(currentProduct.price);
+            const acceptedQuote = await tx.acceptedQuote.findFirst({
+              where: {
+                dispensaryId,
+                growerId,
+                productId: item.id,
+                consumedByOrderId: null,
+                expiresAt: { gt: new Date() },
+              },
+              orderBy: { acceptedAt: 'desc' },
             });
+            const quotedQuantity = acceptedQuote
+              ? Math.min(item.quantity, acceptedQuote.quantity ?? item.quantity)
+              : 0;
+
+            if (!currentProduct.isPriceVisible && quotedQuantity < item.quantity) {
+              throw new CheckoutConflictError([{ productId: item.id, productName: productById.get(item.id)?.name || 'Product', requested: item.quantity, available: quotedQuantity, reason: 'An accepted quote for the full quantity is required' }]);
+            }
+            if (acceptedQuote && quotedQuantity > 0) {
+              const quotePrice = Number(acceptedQuote.unitPrice);
+              const quoteTotal = Math.round(quotedQuantity * quotePrice * 100) / 100;
+              subtotal += quoteTotal;
+              orderItems.push({
+                productId: item.id,
+                growerId,
+                quantity: quotedQuantity,
+                unitPrice: quotePrice,
+                totalPrice: quoteTotal,
+                acceptedQuoteId: acceptedQuote.id,
+              });
+              orderQuotedItems.push({
+                productId: item.id,
+                quantity: quotedQuantity,
+                unitPrice: quotePrice,
+                acceptedQuoteId: acceptedQuote.id,
+              });
+            }
+
+            const listQuantity = item.quantity - quotedQuantity;
+            if (listQuantity > 0) {
+              const listTotal = Math.round(listQuantity * serverPrice * 100) / 100;
+              subtotal += listTotal;
+              orderItems.push({
+                productId: item.id,
+                growerId,
+                quantity: listQuantity,
+                unitPrice: serverPrice,
+                totalPrice: listTotal,
+              });
+            }
           }
 
           const tax = 0;
-          return tx.order.create({
+          const createdOrder = await tx.order.create({
             data: {
               growerId,
               dispensaryId,
-              orderId: `ORD-${Date.now()}-${orders.length + 1}`,
+              orderId,
               status: 'PENDING',
-              totalAmount: subtotal,
-              subtotal,
+              totalAmount: Math.round(subtotal * 100) / 100,
+              subtotal: Math.round(subtotal * 100) / 100,
               tax,
               notes,
-              items: { create: orderItems },
+              createdBy: 'DISPENSARY',
             },
           });
-        });
 
-        orders.push({ id: order.id, orderId: order.orderId });
+          await tx.orderItem.createMany({
+            data: orderItems.map((item) => ({ ...item, orderId: createdOrder.id })),
+          });
+
+          for (const quote of orderQuotedItems) {
+            const consumed = await tx.acceptedQuote.updateMany({
+              where: { id: quote.acceptedQuoteId, consumedByOrderId: null },
+              data: { consumedByOrderId: createdOrder.id },
+            });
+            if (consumed.count !== 1) throw new Error('Accepted quote was already consumed');
+          }
+
+          await tx.orderStatusEvent.create({
+            data: {
+              orderId: createdOrder.id,
+              fromStatus: null,
+              toStatus: 'PENDING',
+              actorUserId: user.id,
+              actorRole: 'DISPENSARY',
+            },
+          });
+
+          const growerUserId = productById.get(growerItems[0]?.id)?.grower.userId;
+          await createNotification(tx, {
+            userId: growerUserId,
+            type: 'ORDER_CREATED',
+            title: 'New order request',
+            body: `${dispensary.businessName} submitted a new order request.`,
+            href: `/grower/orders/${createdOrder.id}`,
+          });
+
+          return { order: createdOrder, quotedItems: orderQuotedItems };
+        }));
+
+        orders.push({ id: result.order.id, orderId: result.order.orderId, growerId, orderedProductIds: productIds });
+        quotedItems.push(...result.quotedItems);
       } catch (error) {
         if (error instanceof CheckoutConflictError) {
           issues.push(...error.issues);
           continue;
         }
-        throw error;
+        console.error('Unable to submit grower request:', error);
+        issues.push(...growerItems.map(item => ({ productId: item.id, productName: 'Product', requested: item.quantity, available: 0, reason: 'This request could not be submitted. Please retry.' })));
       }
     }
 
@@ -280,10 +403,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json({ 
-      success: true, 
-      orders, 
+    return NextResponse.json({
+      success: true,
+      orders,
       orderCount: orders.length,
+      quotedItems,
       ...(issues.length > 0 && { issues })
     });
   } catch (error) {

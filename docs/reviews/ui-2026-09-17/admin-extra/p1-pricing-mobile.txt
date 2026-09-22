@@ -1,0 +1,90 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e111]
+- button "Notifications" [expanded=false, ref=e112]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e113]
+- main
+  - sectionheader
+    - heading "Cultivator Subscription Plans" [level=1, ref=e103]
+    - paragraph
+      - StaticText "Choose the PhenoFarm software plan that fits your grower workflow."
+  - paragraph
+    - StaticText "Buyer-seller wholesale payment is never processed by PhenoFarm."
+  - paragraph
+    - StaticText "The only in-app payment flow is the cultivator subscription paid to PhenoFarm. Wholesale invoices, ACH, checks, COD, and other settlement terms stay directly between licensed businesses."
+  - heading "Current subscription Free" [level=3, ref=e91]
+    - StaticText "Current subscription"
+    - StaticText "Free"
+  - paragraph
+    - StaticText "Free plan"
+  - paragraph
+    - StaticText "No paid subscription period is connected yet."
+  - paragraph
+    - StaticText "Stripe Billing is not configured for this environment."
+  - paragraph
+    - StaticText "Add STRIPE_PRO_PRICE_ID or STRIPE_BUSINESS_PRICE_ID in the environment to enable Stripe Billing checkout."
+  - heading "Free" [level=2, ref=e104]
+  - StaticText "Current plan"
+  - paragraph
+    - StaticText "Evaluate the marketplace workflow before enabling paid plans."
+  - paragraph
+    - StaticText "$0"
+  - paragraph
+    - StaticText "/mo"
+  - list
+    - listitem [level=1]
+      - StaticText "Demo and review access"
+    - listitem [level=1]
+      - StaticText "Catalog and request workflow preview"
+    - listitem [level=1]
+      - StaticText "Up to 50 product listings"
+    - listitem [level=1]
+      - StaticText "Basic marketplace records"
+    - listitem [level=1]
+      - StaticText "Standard support"
+  - button "Current plan" [disabled, ref=e108]
+  - StaticText "Most popular"
+  - heading "Pro" [level=2, ref=e105]
+  - paragraph
+    - StaticText "Cultivator subscription for active wholesale teams."
+  - paragraph
+    - StaticText "$249"
+  - paragraph
+    - StaticText "/mo ($199/mo billed annually)"
+  - list
+    - listitem [level=1]
+      - StaticText "Everything in Free"
+    - listitem [level=1]
+      - StaticText "Unlimited product listings"
+    - listitem [level=1]
+      - StaticText "Priority support & higher limits"
+    - listitem [level=1]
+      - StaticText "CSV bulk upload"
+    - listitem [level=1]
+      - StaticText "Metrc integration ready"
+    - listitem [level=1]
+      - StaticText "Priority support"
+  - paragraph
+    - StaticText "Checkout unavailable"
+  - heading "Business" [level=2, ref=e106]
+  - paragraph
+    - StaticText "For multi-license operations that need deeper integrations."
+  - paragraph
+    - StaticText "Custom"
+  - list
+    - listitem [level=1]
+      - StaticText "Everything in Pro"
+    - listitem [level=1]
+      - StaticText "API access"
+    - listitem [level=1]
+      - StaticText "Custom branding"
+    - listitem [level=1]
+      - StaticText "Dedicated onboarding"
+  - link "Contact sales" [ref=e109]
+- button "Open messages" [ref=e92]
+- region "Notifications alt+T" [ref=e86]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e110]
+  - image
+- alert

@@ -1,0 +1,173 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e2467]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2468]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e2469]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2484]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e2485]
+      - StaticText "Overview"
+    - link "Products" [ref=e2486]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2487]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2488]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2489]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2490]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2491]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2492]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2493]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2470]
+- main
+  - sectionheader
+    - paragraph
+      - StaticText "CATALOG"
+    - heading "Products" [level=1, ref=e2494]
+    - paragraph
+      - StaticText "Manage listings, pricing, and stock visibility for dispensary buyers."
+    - button "Quick add" [ref=e2495]
+    - button "Import CSV" [ref=e2496]
+    - link "+ Add Product" [ref=e2497]
+  - paragraph
+    - StaticText "Total Products"
+  - paragraph
+    - StaticText "3"
+  - paragraph
+    - StaticText "Total Value"
+  - paragraph
+    - StaticText "$10,000.00"
+  - paragraph
+    - StaticText "Available"
+  - paragraph
+    - StaticText "3"
+  - paragraph
+    - StaticText "Saved workflow views"
+  - paragraph
+    - StaticText "Use these before grouping to focus the catalog on the next cleanup task."
+  - button "All: 3 products" [ref=e2471]
+    - StaticText "All"
+    - StaticText "3"
+  - button "Active: 3 products" [ref=e2472]
+    - StaticText "Active"
+    - StaticText "3"
+  - button "Low inventory: 0 products" [ref=e2473]
+    - StaticText "Low inventory"
+    - StaticText "0"
+  - button "Quote only: 1 products" [ref=e2474]
+    - StaticText "Quote only"
+    - StaticText "1"
+  - button "Missing images: 0 products" [ref=e2475]
+    - StaticText "Missing images"
+    - StaticText "0"
+  - button "Missing type: 0 products" [ref=e2476]
+    - StaticText "Missing type"
+    - StaticText "0"
+  - button "Hidden/out: 0 products" [ref=e2477]
+    - StaticText "Hidden/out"
+    - StaticText "0"
+  - button "Show all products" [ref=e2478]
+    - image
+    - StaticText "All"
+  - button "Group products by Product type" [ref=e2479]
+    - image
+    - StaticText "Product type"
+  - button "Group products by Strain" [ref=e2480]
+    - image
+    - StaticText "Strain"
+  - button "Group products by Batch" [ref=e2481]
+    - image
+    - StaticText "Batch"
+  - button "Display List · Comfort" [expanded=false, ref=e2498]
+    - StaticText "Display"
+    - StaticText "List"
+    - StaticText " · "
+    - StaticText "Comfort"
+  - button "Select visible" [ref=e2482]
+  - StaticText "Select products for bulk cleanup."
+  - paragraph
+    - StaticText "Bulk cleanup can enable, disable, delete, or clear the current selection."
+  - StaticText "All Products"
+  - StaticText "3"
+  - table
+    - rowgroup
+      - row
+        - columnheader "Select all visible products" [ref=e2521]
+          - checkbox "Select all visible products" [checked=false, ref=e2535]
+        - columnheader "PRODUCT" [ref=e2522]
+        - columnheader "TYPE" [ref=e2523]
+        - columnheader "STATUS" [ref=e2524]
+        - columnheader "PRICE" [ref=e2525]
+        - columnheader "INVENTORY" [ref=e2526]
+        - columnheader "ACTIONS" [ref=e2527]
+    - row
+      - cell "Select Mystery Pricing Batch" [ref=e2500]
+        - checkbox "Select Mystery Pricing Batch" [checked=false, ref=e2528]
+      - cell "Mystery Pricing Batch Assorted" [ref=e2501]
+        - StaticText "Mystery Pricing Batch"
+        - StaticText "Assorted"
+      - cell "Flower" [ref=e2502]
+      - cell "Available" [ref=e2503]
+      - cell "$40.00 Quote only — price hidden from buyers" [ref=e2504]
+        - StaticText "$"
+        - StaticText "40.00"
+        - StaticText "Quote only — price hidden from buyers"
+      - cell "25 Eighths" [ref=e2505]
+      - cell "Edit More actions for Mystery Pricing Batch" [ref=e2506]
+        - link "Edit" [ref=e2529]
+        - button "More actions for Mystery Pricing Batch" [expanded=false, ref=e2536]
+    - row
+      - cell "Select Silver Haze Concentrate" [ref=e2507]
+        - checkbox "Select Silver Haze Concentrate" [checked=false, ref=e2530]
+      - cell "Silver Haze Concentrate Silver Haze" [ref=e2508]
+        - StaticText "Silver Haze Concentrate"
+        - StaticText "Silver Haze"
+      - cell "Bulk Extract" [ref=e2509]
+      - cell "Available" [ref=e2510]
+      - cell "$60.00" [ref=e2511]
+        - StaticText "$"
+        - StaticText "60.00"
+      - cell "50 Grams" [ref=e2512]
+      - cell "Edit More actions for Silver Haze Concentrate" [ref=e2513]
+        - link "Edit" [ref=e2531]
+        - button "More actions for Silver Haze Concentrate" [expanded=false, ref=e2537]
+    - row
+      - cell "Select Purple Haze Flowers" [ref=e2514]
+        - checkbox "Select Purple Haze Flowers" [checked=false, ref=e2532]
+      - cell "Purple Haze Flowers Purple Haze" [ref=e2515]
+        - StaticText "Purple Haze Flowers"
+        - StaticText "Purple Haze"
+      - cell "Flower" [ref=e2516]
+      - cell "Available" [ref=e2517]
+      - cell "$25.00" [ref=e2518]
+        - StaticText "$"
+        - StaticText "25.00"
+      - cell "240 Grams" [ref=e2519]
+      - cell "Edit More actions for Purple Haze Flowers" [ref=e2520]
+        - link "Edit" [ref=e2533]
+        - button "More actions for Purple Haze Flowers" [expanded=false, ref=e2538]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2499]
+  - button "Open messages" [ref=e2483]
+- region "Notifications alt+T" [ref=e2466]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e2534]
+  - image
+- alert

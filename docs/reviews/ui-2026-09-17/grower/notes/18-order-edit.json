@@ -1,0 +1,48 @@
+{
+  "slug": "18-order-edit",
+  "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+  "routePattern": "/grower/orders/[id]/edit",
+  "pass1": {
+    "inspected": [
+      "pass-1/18-order-edit-desktop.png",
+      "pass-1/18-order-edit-mobile.png"
+    ],
+    "strengths": [
+      "Request reference is already smaller than the heading; item quantity controls remain visible on mobile; tax guidance clearly separates recorded tax from automatic calculation."
+    ],
+    "issues": [
+      {
+        "key": "request-edit-status-density",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Submitted is shown beside the page heading and again in a full tinted Current Status box. ‘Order Status’ disagrees with request terminology and ‘Choose a valid next status’ adds procedural wording. Mobile status area is nearly310px before the item.",
+        "recommendation": "Use one ‘Status · Submitted’ header with compact next-state choices beneath it; remove the second badge, large Current status panel and ‘valid’ wording. Use ‘Request’ consistently."
+      },
+      {
+        "key": "request-edit-spacing-copy",
+        "priority": "low",
+        "viewport": "mobile",
+        "observation": "Shipping and recorded tax fields each use a full row with help text, followed by a large Notes field and separate Summary card. One item produces a1920px page.",
+        "recommendation": "Pair Shipping/Tax where readable, use ‘Shipping ($)’ and ‘Tax ($, optional)’, preserve the essential ‘Only if included on your invoice’ note, and shorten ‘Request Notes/Request Summary’ to ‘Notes/Summary’. Keep current readable item controls."
+      }
+    ],
+    "limits": [
+      "No status selected, items changed, fields edited or save submitted."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/18-order-edit-desktop.png",
+      "pass-2/18-order-edit-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed duplicated status presentation and short numeric fields using separate mobile rows. The compact heading/reference and quantity control fit well. The maximum quantity of 241 is expected: one reserved unit plus 240 available. No save occurred.",
+    "confirmedIssueKeys": [
+      "request-edit-status-density",
+      "request-edit-spacing-copy"
+    ],
+    "newIssues": [],
+    "source": "root-pass2-notes.md"
+  }
+}

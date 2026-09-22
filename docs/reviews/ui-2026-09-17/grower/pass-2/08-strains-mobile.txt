@@ -1,0 +1,60 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e3199]
+- button "Notifications" [expanded=false, ref=e3200]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e3201]
+- main
+  - sectionheader
+    - heading "Strain Management" [level=1, ref=e3229]
+    - paragraph
+      - StaticText "Manage your cannabis genetics library"
+    - link "+ Add Strain" [ref=e3230]
+  - paragraph
+    - StaticText "Total Strains"
+  - paragraph
+    - StaticText "4"
+  - paragraph
+    - StaticText "Total Batches"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Products"
+  - paragraph
+    - StaticText "3"
+  - button "Card View" [ref=e3202]
+    - image
+  - button "List View" [ref=e3203]
+    - image
+  - heading "Assorted" [level=3, ref=e3204]
+  - link "0 batches" [ref=e3205]
+  - link "1 product" [ref=e3206]
+  - link "Edit" [ref=e3207]
+  - link "+ Product" [ref=e3208]
+  - button "Delete Assorted" [ref=e3209]
+  - heading "Audit Test Kush" [level=3, ref=e3210]
+  - paragraph
+    - StaticText "Hybrid"
+  - link "1 batch" [ref=e3211]
+  - link "0 products" [ref=e3212]
+  - link "Edit" [ref=e3213]
+  - link "+ Product" [ref=e3214]
+  - button "Delete Audit Test Kush" [ref=e3215]
+  - heading "Purple Haze" [level=3, ref=e3216]
+  - link "0 batches" [ref=e3217]
+  - link "1 product" [ref=e3218]
+  - link "Edit" [ref=e3219]
+  - link "+ Product" [ref=e3220]
+  - button "Delete Purple Haze" [ref=e3221]
+  - heading "Silver Haze" [level=3, ref=e3222]
+  - link "0 batches" [ref=e3223]
+  - link "1 product" [ref=e3224]
+  - link "Edit" [ref=e3225]
+  - link "+ Product" [ref=e3226]
+  - button "Delete Silver Haze" [ref=e3227]
+- button "Open messages" [ref=e3228]
+- region "Notifications alt+T" [ref=e3198]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3231]
+  - image
+- alert

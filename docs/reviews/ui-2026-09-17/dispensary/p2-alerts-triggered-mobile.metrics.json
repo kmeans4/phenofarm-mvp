@@ -1,0 +1,308 @@
+{
+  "controls": [
+    {
+      "font": "16px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Search",
+      "width": 46,
+      "x": 232,
+      "y": 12
+    },
+    {
+      "font": "16px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "18",
+      "width": 40,
+      "x": 286,
+      "y": 12
+    },
+    {
+      "font": "16px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Open Dispensary Portal navigation menu",
+      "width": 40,
+      "x": 334,
+      "y": 12
+    },
+    {
+      "font": "14px",
+      "height": 40,
+      "href": "/dispensary/catalog",
+      "lineHeight": "20px",
+      "role": null,
+      "tag": "A",
+      "text": "Browse Catalog",
+      "width": 358,
+      "x": 16,
+      "y": 198
+    },
+    {
+      "font": "16px",
+      "height": 64,
+      "href": null,
+      "lineHeight": "24px",
+      "role": "tab",
+      "tag": "BUTTON",
+      "text": "Favorites (1)\nProducts saved from the catalog.",
+      "width": 340,
+      "x": 25,
+      "y": 267
+    },
+    {
+      "font": "16px",
+      "height": 64,
+      "href": null,
+      "lineHeight": "24px",
+      "role": "tab",
+      "tag": "BUTTON",
+      "text": "Price Alerts (1)\nProducts you want to revisit when prices change.",
+      "width": 340,
+      "x": 25,
+      "y": 339
+    },
+    {
+      "font": "16px",
+      "height": 64,
+      "href": null,
+      "lineHeight": "24px",
+      "role": "tab",
+      "tag": "BUTTON",
+      "text": "Recently Requested (1)\nProducts you have requested before.",
+      "width": 340,
+      "x": 25,
+      "y": 411
+    },
+    {
+      "font": "16px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "",
+      "width": 324,
+      "x": 33,
+      "y": 601
+    },
+    {
+      "font": "14px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "20px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "",
+      "width": 324,
+      "x": 33,
+      "y": 733
+    },
+    {
+      "font": "14px",
+      "height": 46,
+      "href": null,
+      "lineHeight": "20px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Active1",
+      "width": 102,
+      "x": 33,
+      "y": 786
+    },
+    {
+      "font": "14px",
+      "height": 46,
+      "href": null,
+      "lineHeight": "20px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Triggered",
+      "width": 91,
+      "x": 139,
+      "y": 786
+    },
+    {
+      "font": "14px",
+      "height": 46,
+      "href": null,
+      "lineHeight": "20px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "History",
+      "width": 77,
+      "x": 234,
+      "y": 786
+    },
+    {
+      "font": "16px",
+      "height": 48,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "View Active Alerts",
+      "width": 205,
+      "x": 92,
+      "y": 1125
+    },
+    {
+      "font": "16px",
+      "height": 44,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Open messages",
+      "width": 44,
+      "x": 334,
+      "y": 788
+    }
+  ],
+  "document": {
+    "height": 1445,
+    "width": 390
+  },
+  "headings": [
+    {
+      "font": "32px",
+      "height": 32,
+      "href": null,
+      "lineHeight": "32px",
+      "role": null,
+      "tag": "H1",
+      "text": "Saved Workspace",
+      "width": 358,
+      "x": 16,
+      "y": 96
+    },
+    {
+      "font": "20px",
+      "height": 28,
+      "href": null,
+      "lineHeight": "28px",
+      "role": null,
+      "tag": "H2",
+      "text": "Price Alerts",
+      "width": 272,
+      "x": 85,
+      "y": 521
+    },
+    {
+      "font": "20px",
+      "height": 28,
+      "href": null,
+      "lineHeight": "28px",
+      "role": null,
+      "tag": "H3",
+      "text": "No Triggered Alerts",
+      "width": 358,
+      "x": 16,
+      "y": 1017
+    }
+  ],
+  "overflow": [],
+  "smallText": [
+    {
+      "font": "10px",
+      "height": 15,
+      "href": null,
+      "lineHeight": "15px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "DISPENSARY",
+      "width": 94,
+      "x": 66,
+      "y": 36
+    },
+    {
+      "font": "11px",
+      "height": 17,
+      "href": null,
+      "lineHeight": "16.5px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "18",
+      "width": 20,
+      "x": 305,
+      "y": 24
+    },
+    {
+      "font": "12px",
+      "height": 16,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "Products saved from the catalog.",
+      "width": 316,
+      "x": 37,
+      "y": 303
+    },
+    {
+      "font": "12px",
+      "height": 16,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "Products you want to revisit when prices change.",
+      "width": 316,
+      "x": 37,
+      "y": 375
+    },
+    {
+      "font": "12px",
+      "height": 16,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "Products you have requested before.",
+      "width": 316,
+      "x": 37,
+      "y": 447
+    },
+    {
+      "font": "12px",
+      "height": 32,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "P",
+      "text": "Price alerts are checked when you browse or refresh prices, not in the background.",
+      "width": 272,
+      "x": 85,
+      "y": 553
+    },
+    {
+      "font": "12px",
+      "height": 20,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "1",
+      "width": 23,
+      "x": 96,
+      "y": 799
+    }
+  ],
+  "text": "P\nPhenoFarm\nDISPENSARY\n18\nSaved Workspace\n\nFavorites, price alerts, and repeat-request products in one buyer workspace.\n\nBrowse Catalog\nFavorites (1)\nProducts saved from the catalog.\nPrice Alerts (1)\nProducts you want to revisit when prices change.\nRecently Requested (1)\nProducts you have requested before.\nPrice Alerts\n\nPrice alerts are checked when you browse or refresh prices, not in the background.\n\n1 Active Alerts\n0 Price Drops\nActive1\nTriggered\nHistory\nNo Triggered Alerts\n\nNo products have dropped below your target prices yet. Check back later or set more alerts!\n\nView Active Alerts",
+  "title": "Saved | PhenoFarm",
+  "url": "http://localhost:3144/dispensary/saved?tab=alerts",
+  "viewport": {
+    "height": 844,
+    "width": 390
+  }
+}

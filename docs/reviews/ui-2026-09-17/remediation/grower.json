@@ -1,0 +1,1312 @@
+[
+  {
+    "id": "G01",
+    "title": "Put pending work before the setup checklist",
+    "status": "fixed",
+    "files": [
+      "app/grower/dashboard/page.tsx",
+      "app/grower/dashboard/GrowerAttentionPanel.tsx",
+      "app/grower/dashboard/ActivityFeed.tsx",
+      "app/grower/dashboard/DeliveredValueChartFrame.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-setup-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-setup-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/dashboard",
+    "summary": "Daily attention comes before a collapsed Setup count; completed setup items share one compact line."
+  },
+  {
+    "id": "G02",
+    "title": "Remove repeated dashboard headings",
+    "status": "fixed",
+    "files": [
+      "app/grower/dashboard/page.tsx",
+      "app/grower/dashboard/GrowerAttentionPanel.tsx",
+      "app/grower/dashboard/ActivityFeed.tsx",
+      "app/grower/dashboard/DeliveredValueChartFrame.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/dashboard",
+    "summary": "Uses one Needs attention heading, one Recent activity heading and concise linked metrics."
+  },
+  {
+    "id": "G03",
+    "title": "Show recent chart data first",
+    "status": "fixed",
+    "files": [
+      "app/grower/dashboard/page.tsx",
+      "app/grower/dashboard/GrowerAttentionPanel.tsx",
+      "app/grower/dashboard/ActivityFeed.tsx",
+      "app/grower/dashboard/DeliveredValueChartFrame.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/dashboard",
+    "summary": "Shorter chart defaults to recent days, preserves horizontal access to earlier days and shows its date range."
+  },
+  {
+    "id": "G04",
+    "title": "Use plain subscription and terms copy",
+    "status": "fixed",
+    "files": [
+      "app/grower/dashboard/page.tsx",
+      "app/grower/dashboard/GrowerAttentionPanel.tsx",
+      "app/grower/dashboard/ActivityFeed.tsx",
+      "app/grower/dashboard/DeliveredValueChartFrame.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-setup-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-setup-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/dashboard",
+    "summary": "Subscription and commercial terms use plain business copy without exposing provider setup details."
+  },
+  {
+    "id": "G05",
+    "title": "Make the catalog overview concise",
+    "status": "fixed",
+    "files": [
+      "app/grower/catalog/page.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/catalog-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/catalog-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/catalog",
+    "summary": "Catalog overview uses concise destinations and one actionable issue prompt instead of repeated explanations."
+  },
+  {
+    "id": "G06",
+    "title": "Shorten multi-line status badges",
+    "status": "fixed",
+    "files": [
+      "app/grower/catalog/page.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/catalog-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/catalog-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/catalog",
+    "summary": "Destination badges use short, unbroken counts such as 3 live and 1 quote-only."
+  },
+  {
+    "id": "G07",
+    "title": "Compact catalog health checks",
+    "status": "fixed",
+    "files": [
+      "app/grower/catalog/page.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/catalog-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/catalog-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/catalog",
+    "summary": "Health issues use compact linked rows; zero-count details sit under All checks."
+  },
+  {
+    "id": "G08",
+    "title": "Bring products into the first mobile screen",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/page.tsx",
+      "app/grower/products/ProductCsvImportDialog.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-selected-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products",
+    "summary": "Compact metrics and toolbars bring the first mobile product into the initial viewport; bulk controls appear after selection."
+  },
+  {
+    "id": "G09",
+    "title": "Simplify product toolbar labels",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/page.tsx",
+      "app/grower/products/ProductCsvImportDialog.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-selected-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products",
+    "summary": "Short filter/group labels replace workflow explanations and the ungrouped All Products heading."
+  },
+  {
+    "id": "G10",
+    "title": "Keep product price, stock, and actions visible",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/page.tsx",
+      "app/grower/products/ProductCsvImportDialog.tsx",
+      "app/grower/components/OperationsSummary.tsx",
+      "app/grower/components/RecordActions.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-narrow.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-more-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products",
+    "summary": "Mobile product cards show identity, price, stock and Edit/Hide/More without horizontal table scrolling."
+  },
+  {
+    "id": "G11",
+    "title": "Make Quick add quick to scan",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/page.tsx",
+      "app/grower/products/ProductCsvImportDialog.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-quick-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/products-quick-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products",
+    "summary": "Quick add has one heading with Close beside it, concise defaults, and paired mobile price/stock inputs."
+  },
+  {
+    "id": "G12",
+    "title": "Reduce product setup guidance",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/components/ProductForm.tsx",
+      "app/grower/products/add/page.tsx",
+      "app/grower/products/[id]/edit/components/EditProductPageClient.tsx",
+      "app/grower/components/BatchSelector.tsx",
+      "lib/product-display.ts",
+      "tests/ui-grower-data-regressions.spec.ts"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products/add",
+    "summary": "Product creation starts with compact section links and core fields instead of a five-step guide."
+  },
+  {
+    "id": "G13",
+    "title": "Use one consistent publish action",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/components/ProductForm.tsx",
+      "app/grower/products/add/page.tsx",
+      "app/grower/products/[id]/edit/components/EditProductPageClient.tsx",
+      "app/grower/components/BatchSelector.tsx",
+      "lib/product-display.ts",
+      "tests/ui-grower-data-regressions.spec.ts"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products/add",
+    "summary": "Publish product is consistent; mobile uses one sticky primary action, one draft action and a compact summary."
+  },
+  {
+    "id": "G14",
+    "title": "Shorten product field labels",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/components/ProductForm.tsx",
+      "app/grower/products/add/page.tsx",
+      "app/grower/products/[id]/edit/components/EditProductPageClient.tsx",
+      "app/grower/components/BatchSelector.tsx",
+      "lib/product-display.ts",
+      "tests/ui-grower-data-regressions.spec.ts"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products/add",
+    "summary": "Core labels read Starting stock, Available and Show price/Quote only with one visibility explanation."
+  },
+  {
+    "id": "G15",
+    "title": "Remove repeated optional and upload wording",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/components/ProductForm.tsx",
+      "app/grower/products/add/page.tsx",
+      "app/grower/products/[id]/edit/components/EditProductPageClient.tsx",
+      "app/grower/components/BatchSelector.tsx",
+      "lib/product-display.ts",
+      "tests/ui-grower-data-regressions.spec.ts"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products/add",
+    "summary": "Optional details and photo requirements appear once with concise labels and actual upload status."
+  },
+  {
+    "id": "G16",
+    "title": "Show the saved unit in the edit form",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/components/ProductForm.tsx",
+      "app/grower/products/add/page.tsx",
+      "app/grower/products/[id]/edit/components/EditProductPageClient.tsx",
+      "app/grower/components/BatchSelector.tsx",
+      "lib/product-display.ts",
+      "tests/ui-grower-data-regressions.spec.ts"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Three meaningful data regressions cover decimal/zero/missing labs, harvest dates in Los Angeles and Tokyo at 1440/390/360px, and saving a legacy lowercase unit without altering stock, price, labs or harvest day; all passed in the root stable-build run.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products/product-001/edit",
+    "summary": "Legacy product units normalize into the selected option; editing preserves price, stock, labs and harvest date."
+  },
+  {
+    "id": "G17",
+    "title": "Use a focused product-edit layout",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/components/ProductForm.tsx",
+      "app/grower/products/add/page.tsx",
+      "app/grower/products/[id]/edit/components/EditProductPageClient.tsx",
+      "app/grower/components/BatchSelector.tsx",
+      "lib/product-display.ts",
+      "tests/ui-grower-data-regressions.spec.ts"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products/product-001/edit",
+    "summary": "Editing uses compact navigation, wider fields, Stock wording and one Save changes action per viewport."
+  },
+  {
+    "id": "G18",
+    "title": "Hide irrelevant batch-detail guidance",
+    "status": "fixed",
+    "files": [
+      "app/grower/products/components/ProductForm.tsx",
+      "app/grower/products/add/page.tsx",
+      "app/grower/products/[id]/edit/components/EditProductPageClient.tsx",
+      "app/grower/components/BatchSelector.tsx",
+      "lib/product-display.ts",
+      "tests/ui-grower-data-regressions.spec.ts"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/products/product-001/edit",
+    "summary": "Batch details links appear only for a matching selected batch; empty guidance is concise."
+  },
+  {
+    "id": "G19",
+    "title": "Compact inventory summaries",
+    "status": "fixed",
+    "files": [
+      "app/grower/inventory/InventoryClient.tsx",
+      "app/grower/inventory/page.tsx",
+      "lib/product-display.ts",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/inventory-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/inventory-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/inventory",
+    "summary": "Inventory has one heading, compact metrics and inline actions; its first product is visible sooner on mobile."
+  },
+  {
+    "id": "G20",
+    "title": "Format values and units consistently",
+    "status": "fixed",
+    "files": [
+      "app/grower/inventory/InventoryClient.tsx",
+      "app/grower/inventory/page.tsx",
+      "lib/product-display.ts",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/inventory-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/inventory-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/inventory",
+    "summary": "Stock value uses grouped currency and familiar unit abbreviations such as g while package names remain explicit."
+  },
+  {
+    "id": "G21",
+    "title": "Explain stock edits in plain language",
+    "status": "fixed",
+    "files": [
+      "app/grower/inventory/InventoryClient.tsx",
+      "app/grower/inventory/page.tsx",
+      "lib/product-display.ts",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/inventory-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/inventory-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/inventory",
+    "summary": "Stock instructions explain entering the current total and automatic saving in ordinary language."
+  },
+  {
+    "id": "G22",
+    "title": "Keep stock updates focused",
+    "status": "fixed",
+    "files": [
+      "app/grower/inventory/add/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/stock-update-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/stock-update-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/inventory/add",
+    "summary": "Stock update has a bounded, full-width form, two core fields, paired actions and secondary Add a new product."
+  },
+  {
+    "id": "G23",
+    "title": "Use denser strain cards and counts",
+    "status": "fixed",
+    "files": [
+      "app/grower/strains/page.tsx",
+      "app/grower/components/RecordActions.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/strains-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strains-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/strains",
+    "summary": "Strain metrics share one row and cards have concise counts, genetics when present and a compact action row."
+  },
+  {
+    "id": "G24",
+    "title": "Clarify strain actions",
+    "status": "fixed",
+    "files": [
+      "app/grower/strains/page.tsx",
+      "app/grower/components/RecordActions.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/strains-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strains-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-more-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-more-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-delete-confirm-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Opened More and Delete confirmation, then cancelled; no deletion was submitted.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/strains",
+    "summary": "Strain cards use Add product and keep Delete inside More actions."
+  },
+  {
+    "id": "G25",
+    "title": "Show strain-type help on demand",
+    "status": "fixed",
+    "files": [
+      "app/grower/strains/add/page.tsx",
+      "app/grower/strains/[id]/edit/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-help-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-help-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Expanded the shared strain-type help content and verified it remains readable at both widths.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/strains/add",
+    "summary": "Strain-type definitions sit behind About strain types rather than filling every new form."
+  },
+  {
+    "id": "G26",
+    "title": "Shorten strain-form copy",
+    "status": "fixed",
+    "files": [
+      "app/grower/strains/add/page.tsx",
+      "app/grower/strains/[id]/edit/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/strains/add",
+    "summary": "Add strain has one heading, brief examples, and distinct description/growing-notes prompts."
+  },
+  {
+    "id": "G27",
+    "title": "Remove repeated help from strain editing",
+    "status": "fixed",
+    "files": [
+      "app/grower/strains/add/page.tsx",
+      "app/grower/strains/[id]/edit/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-edit-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-help-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/strain-help-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Expanded the shared strain-type help content and verified it remains readable at both widths.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+    "summary": "Edit strain shares the concise form and on-demand type help while retaining populated values."
+  },
+  {
+    "id": "G28",
+    "title": "Repair the batch list render failure",
+    "status": "fixed",
+    "files": [
+      "app/grower/batches/page.tsx",
+      "lib/batch-utils.ts",
+      "tests/ui-grower-data-regressions.spec.ts",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Three meaningful data regressions cover decimal/zero/missing labs, harvest dates in Los Angeles and Tokyo at 1440/390/360px, and saving a legacy lowercase unit without altering stock, price, labs or harvest day; all passed in the root stable-build run.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/batches",
+    "summary": "Batch API lab values normalize before formatting; decimal strings and zeroes render, invalid or absent values show a dash."
+  },
+  {
+    "id": "G29",
+    "title": "Keep harvest dates consistent",
+    "status": "fixed",
+    "files": [
+      "app/grower/batches/page.tsx",
+      "lib/batch-utils.ts",
+      "tests/ui-grower-data-regressions.spec.ts",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Three meaningful data regressions cover decimal/zero/missing labs, harvest dates in Los Angeles and Tokyo at 1440/390/360px, and saving a legacy lowercase unit without altering stock, price, labs or harvest day; all passed in the root stable-build run.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/batches",
+    "summary": "Harvest dates use the same UTC calendar day in list and edit views across time zones."
+  },
+  {
+    "id": "G30",
+    "title": "Compact mobile batch actions",
+    "status": "fixed",
+    "files": [
+      "app/grower/batches/page.tsx",
+      "lib/batch-utils.ts",
+      "tests/ui-grower-data-regressions.spec.ts",
+      "app/grower/components/OperationsSummary.tsx",
+      "app/grower/components/RecordActions.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batches-narrow.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-more-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-more-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Opened the batch More menu at both widths and dismissed it with Escape without submitting a delete.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/batches",
+    "summary": "Batches use compact metrics and one Edit/Add product/More action row; destructive work is secondary."
+  },
+  {
+    "id": "G31",
+    "title": "Use compact lab-document rows",
+    "status": "fixed",
+    "files": [
+      "app/grower/batches/add/page.tsx",
+      "app/grower/components/BatchLabDocumentUploaders.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/batches/add",
+    "summary": "Lab PDFs use three concise rows with one PDF/2MB limit note and no untouched Missing badges."
+  },
+  {
+    "id": "G32",
+    "title": "Pair short lab fields",
+    "status": "fixed",
+    "files": [
+      "app/grower/batches/add/page.tsx",
+      "app/grower/components/BatchLabDocumentUploaders.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/batches/add",
+    "summary": "Add batch has one title, one batch-ID example and a compact THC/CBD/Total numeric row."
+  },
+  {
+    "id": "G33",
+    "title": "Replace the raw JSON terpene editor",
+    "status": "fixed",
+    "files": [
+      "app/grower/batches/[id]/edit/page.tsx",
+      "app/grower/components/BatchLabDocumentUploaders.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-terpenes-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-terpenes-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Added an unsaved terpene row; name, percent and remove control remain visible on mobile and desktop.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/batches/ui-review-batch/edit",
+    "summary": "Batch terpenes use name/percentage rows with Add/remove controls, retaining existing data unless intentionally edited."
+  },
+  {
+    "id": "G34",
+    "title": "Reduce repeated batch-edit content",
+    "status": "fixed",
+    "files": [
+      "app/grower/batches/[id]/edit/page.tsx",
+      "app/grower/components/BatchLabDocumentUploaders.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/batches/ui-review-batch/edit",
+    "summary": "Batch editing uses one heading, paired short lab fields and compact document upload rows."
+  },
+  {
+    "id": "G35",
+    "title": "Clarify the batch-number example",
+    "status": "fixed",
+    "files": [
+      "app/grower/batches/[id]/edit/page.tsx",
+      "app/grower/components/BatchLabDocumentUploaders.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/batches/ui-review-batch/edit",
+    "summary": "Edit mode removes the misleading expected-format hint beside existing batch numbers."
+  },
+  {
+    "id": "G36",
+    "title": "Keep request status, value, and View visible",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/page.tsx",
+      "app/grower/orders/components/OrdersList.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/orders-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/orders-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/orders-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders",
+    "summary": "Mobile requests show buyer/reference, status, value and View request in cards without horizontal scrolling."
+  },
+  {
+    "id": "G37",
+    "title": "Move requests above summary clutter",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/page.tsx",
+      "app/grower/orders/components/OrdersList.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/orders-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/orders-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/orders-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders",
+    "summary": "Compact metrics and status filters bring active requests into the first mobile screen."
+  },
+  {
+    "id": "G38",
+    "title": "Replace request workflow jargon",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/page.tsx",
+      "app/grower/orders/components/OrdersList.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/orders-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/orders-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders",
+    "summary": "Request headings and filters use plain language, with one relevant direct-payment note."
+  },
+  {
+    "id": "G39",
+    "title": "Keep history values and actions visible",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/history/page.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-history-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-history-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-history-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/history",
+    "summary": "Mobile history cards expose buyer/reference, closed date, value, status and View request together."
+  },
+  {
+    "id": "G40",
+    "title": "Compact history summaries",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/history/page.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-history-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-history-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-history-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/history",
+    "summary": "Request history uses compact metrics and one concise heading with Active requests navigation."
+  },
+  {
+    "id": "G41",
+    "title": "Use plain record-request copy",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/add/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/add",
+    "summary": "Record request explains the direct agreement once and uses one buyer search prompt."
+  },
+  {
+    "id": "G42",
+    "title": "Put items before optional request details",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/add/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/add",
+    "summary": "The form runs Buyer, Items, then optional Shipping/notes, with one save action at the end."
+  },
+  {
+    "id": "G43",
+    "title": "Keep the message launcher clear of Add item",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/add/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/add",
+    "summary": "Add item is left-aligned with reserved trailing space, clear of the floating message launcher at mobile widths."
+  },
+  {
+    "id": "G44",
+    "title": "Remove repeated item prices and stock",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/add/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/add",
+    "summary": "Items select by product name, pair quantity and agreed price, show availability once, and use concise totals."
+  },
+  {
+    "id": "G45",
+    "title": "Prioritize the next request action",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/[id]/page.tsx",
+      "app/grower/orders/[id]/components/QuickStatusUpdate.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-actions-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-actions-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Fresh final production-build screenshots inspected at both widths after the detail width and Progress spacing correction. Actions, Progress and Request history open correctly; the page remains within the viewport.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "summary": "Request detail has one back link, a small reference, secondary Actions disclosure and the next status action above items."
+  },
+  {
+    "id": "G46",
+    "title": "Consolidate repeated request status",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/[id]/page.tsx",
+      "app/grower/orders/[id]/components/QuickStatusUpdate.tsx",
+      "app/components/ui/OrderTimeline.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-progress-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-progress-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Depends on root-owned shared timeline simplification; local Progress/history disclosures retain access.",
+      "Fresh final production-build screenshots inspected at both widths after the detail width and Progress spacing correction. Actions, Progress and Request history open correctly; the page remains within the viewport.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "summary": "One current-status badge remains prominent; Progress and Request history are collapsed but accessible."
+  },
+  {
+    "id": "G47",
+    "title": "Shorten request totals copy",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/[id]/page.tsx",
+      "app/grower/orders/[id]/components/QuickStatusUpdate.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Fresh final production-build screenshots inspected at both widths after the detail width and Progress spacing correction. Actions, Progress and Request history open correctly; the page remains within the viewport.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "summary": "Request items and totals use Items, Subtotal and Est. total with one direct-payment note."
+  },
+  {
+    "id": "G48",
+    "title": "Separate street and city in addresses",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/[id]/page.tsx",
+      "app/grower/orders/[id]/components/QuickStatusUpdate.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Fresh final production-build screenshots inspected at both widths after the detail width and Progress spacing correction. Actions, Progress and Request history open correctly; the page remains within the viewport.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "summary": "Customer street and city keep a visible line break on mobile and desktop."
+  },
+  {
+    "id": "G49",
+    "title": "Use one request status panel",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/[id]/edit/components/EditOrderForm.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+    "summary": "Edit request uses one compact current-status area and clear next-status choices."
+  },
+  {
+    "id": "G50",
+    "title": "Compact short request fields",
+    "status": "fixed",
+    "files": [
+      "app/grower/orders/[id]/edit/components/EditOrderForm.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+    "summary": "Shipping/tax share a row, retain the invoice-only tax explanation and use concise Notes/Summary headings."
+  },
+  {
+    "id": "G51",
+    "title": "Expose supported customer-management actions",
+    "status": "fixed",
+    "files": [
+      "app/grower/customers/page.tsx",
+      "app/grower/customers/components/CustomersList.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/customers-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customers-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/customers",
+    "summary": "Customer directory exposes Add customer, Statement and eligible Edit contact links while platform records remain read-only."
+  },
+  {
+    "id": "G52",
+    "title": "Compact customer summaries and metadata",
+    "status": "fixed",
+    "files": [
+      "app/grower/customers/page.tsx",
+      "app/grower/customers/components/CustomersList.tsx",
+      "app/grower/components/OperationsSummary.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/customers-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customers-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/customers",
+    "summary": "Customer metrics are compact, duplicate business/contact names are omitted and request terminology is consistent."
+  },
+  {
+    "id": "G53",
+    "title": "Trim repeated customer-form context",
+    "status": "fixed",
+    "files": [
+      "app/grower/customers/add/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-add-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-add-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/customers/add",
+    "summary": "Add customer has one heading, paired State/ZIP fields and paired footer actions."
+  },
+  {
+    "id": "G54",
+    "title": "Combine the customer-edit header rows",
+    "status": "fixed",
+    "files": [
+      "app/grower/customers/[id]/edit/page.tsx",
+      "app/grower/customers/[id]/edit/components/EditCustomerForm.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/customers/ui-review-customer/edit",
+    "summary": "Customer edit combines back and Statement links in one row above one title."
+  },
+  {
+    "id": "G55",
+    "title": "Tighten customer-edit form spacing",
+    "status": "fixed",
+    "files": [
+      "app/grower/customers/[id]/edit/page.tsx",
+      "app/grower/customers/[id]/edit/components/EditCustomerForm.tsx",
+      "app/grower/components/RecordActions.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-more-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-more-mobile.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Opened More and dismissed it with Escape; the form remained unchanged.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/customers/ui-review-customer/edit",
+    "summary": "Customer edit uses tighter cards, paired State/ZIP and Cancel/Save; Delete is in a compact More control."
+  },
+  {
+    "id": "G56",
+    "title": "Keep statement values visible on mobile",
+    "status": "fixed",
+    "files": [
+      "app/grower/customers/[id]/statement/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/customers/ui-review-customer/statement",
+    "summary": "Mobile statements use rows with visible reference/date, item summary and value without horizontal scrolling."
+  },
+  {
+    "id": "G57",
+    "title": "Shorten statement copy and fix singular counts",
+    "status": "fixed",
+    "files": [
+      "app/grower/customers/[id]/statement/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-desktop.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-mobile.png",
+      "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-narrow.png"
+    ],
+    "checks": [
+      "Focused ESLint passed on changed grower components.",
+      "Reviewed the data, authorization and action paths; validation and request payloads remain intact.",
+      "Desktop 1440\u00d71000 and mobile 390\u00d7844 screenshots were inspected; page geometry has no horizontal overflow.",
+      "Parent final npm run verify passed after all source corrections."
+    ],
+    "route": "/grower/customers/ui-review-customer/statement",
+    "summary": "Statements have a short title with customer subtitle, Customer back link, singular-aware counts and one settlement note."
+  }
+]

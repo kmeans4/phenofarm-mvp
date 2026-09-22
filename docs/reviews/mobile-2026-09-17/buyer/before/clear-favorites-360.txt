@@ -1,0 +1,67 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e416]
+  - button "Notifications" [expanded=false, ref=e417]
+    - StaticText "24"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e418]
+  - main
+    - sectionheader
+      - heading "Saved" [level=1, ref=e420]
+      - link "Browse Catalog" [ref=e421]
+    - tablist "Saved workspace"
+      - tab "Favorites (1)" [selected, ref=e422]
+        - StaticText "Favorites"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Alerts (1)" [ref=e423]
+        - StaticText "Alerts"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Recent (1)" [ref=e424]
+        - StaticText "Recent"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+    - tabpanel "Favorites (1)"
+      - combobox "Sort favorites" [expanded=false, ref=e427]: Recently Added
+        - MenuListPopup
+          - option "Recently Added" [selected, ref=e433]
+          - option "Price: Low to High" [ref=e434]
+          - option "Price: High to Low" [ref=e435]
+          - option "THC: High to Low" [ref=e436]
+          - option "Name: A-Z" [ref=e437]
+          - option "Name: Z-A" [ref=e438]
+          - option "THC: Low to High" [ref=e439]
+      - button "Grid view" [ref=e425]
+      - button "List view" [ref=e426]
+      - group
+        - DisclosureTriangle "More" [expanded=true]
+        - button "Clear favorites" [ref=e445]
+      - generic
+        - button "Remove Mystery Pricing Batch from favorites" [ref=e441]
+        - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e440]
+      - image
+      - paragraph
+        - StaticText "by "
+        - link "Vermont Nurseries" [ref=e442]
+      - StaticText "Hybrid"
+      - generic
+        - StaticText "THC 19%"
+      - generic
+        - button "Request pricing" [ref=e443]
+        - button "Message grower" [ref=e444]
+  - button "Open messages" [ref=e419]
+  - region "Notifications alt+T" [ref=e415]
+  - alert
+  - dialog "Clear favorites?"
+    - heading "Clear favorites?" [level=2, ref=e446]
+    - button "Close Clear favorites?" [ref=e447]
+    - paragraph
+      - StaticText "Remove your saved products? You can save them again from the catalog."
+    - button "Cancel" [ref=e448]
+    - button "Clear favorites" [ref=e449]

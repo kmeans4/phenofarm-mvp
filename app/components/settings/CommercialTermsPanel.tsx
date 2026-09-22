@@ -7,17 +7,18 @@ import {
   type CommercialTermsDefaults,
 } from '@/lib/ux-workflow';
 
-const FIELD_CLASS = 'mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500';
+const FIELD_CLASS = 'mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500';
 
-export function CommercialTermsPanel() {
-  const [terms, setTerms] = useState<CommercialTermsDefaults>(DEFAULT_COMMERCIAL_TERMS);
-  const [savedAt, setSavedAt] = useState<string | null>(null);
+export function CommercialTermsPanel({ initialData }: { initialData?: { terms: CommercialTermsDefaults; savedAt: string | null } }) {
+  const [terms, setTerms] = useState<CommercialTermsDefaults>(initialData?.terms || DEFAULT_COMMERCIAL_TERMS);
+  const [savedAt, setSavedAt] = useState<string | null>(initialData?.savedAt || null);
   const [statusMessage, setStatusMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!initialData);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
+    if (initialData) return;
     let active = true;
 
     async function loadTerms() {
@@ -47,7 +48,7 @@ export function CommercialTermsPanel() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [initialData]);
 
   const updateTerm = (field: keyof CommercialTermsDefaults, value: string) => {
     setStatusMessage('');
@@ -74,7 +75,7 @@ export function CommercialTermsPanel() {
 
       setTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || nextTerms) });
       setSavedAt(data.savedAt || new Date().toISOString());
-      setStatusMessage('Commercial terms saved for your grower account.');
+      setStatusMessage('Terms saved.');
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Unable to save commercial terms');
     } finally {
@@ -91,10 +92,9 @@ export function CommercialTermsPanel() {
     <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Reusable defaults</p>
-          <h2 className="mt-1 text-lg font-semibold text-gray-900">Commercial terms</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Commercial terms</h2>
           <p className="mt-1 text-sm text-gray-600">
-            Save the fulfillment and direct-settlement notes you repeat most often. These are stored with your grower account.
+            Shown to buyers on your shop.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -117,7 +117,7 @@ export function CommercialTermsPanel() {
         {errorMessage && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</p>}
       </div>
 
-      <div className={`mt-4 grid gap-4 md:grid-cols-2 ${isLoading ? 'opacity-60' : ''}`}>
+      <div className={`mt-3 grid gap-3 sm:mt-4 sm:gap-4 md:grid-cols-2 ${isLoading ? 'opacity-60' : ''}`}>
         <label className="block text-sm font-medium text-gray-700">
           Default MOQ
           <input
@@ -130,7 +130,7 @@ export function CommercialTermsPanel() {
         </label>
 
         <label className="block text-sm font-medium text-gray-700">
-          Fulfillment methods
+          Fulfillment
           <input
             value={terms.fulfillmentMethods}
             onChange={(event) => updateTerm('fulfillmentMethods', event.target.value)}
@@ -141,7 +141,7 @@ export function CommercialTermsPanel() {
         </label>
 
         <label className="block text-sm font-medium text-gray-700">
-          Fulfillment region
+          Region
           <input
             value={terms.fulfillmentRegion}
             onChange={(event) => updateTerm('fulfillmentRegion', event.target.value)}
@@ -152,7 +152,7 @@ export function CommercialTermsPanel() {
         </label>
 
         <label className="block text-sm font-medium text-gray-700">
-          Direct payment terms
+          Payment terms
           <input
             value={terms.paymentTerms}
             onChange={(event) => updateTerm('paymentTerms', event.target.value)}
@@ -163,7 +163,7 @@ export function CommercialTermsPanel() {
         </label>
 
         <label className="block text-sm font-medium text-gray-700">
-          Response window
+          Response time
           <input
             value={terms.responseWindow}
             onChange={(event) => updateTerm('responseWindow', event.target.value)}
@@ -175,7 +175,8 @@ export function CommercialTermsPanel() {
 
         <label className="block text-sm font-medium text-gray-700">
           Contact note
-          <input
+          <textarea
+            rows={2}
             value={terms.contactNote}
             onChange={(event) => updateTerm('contactNote', event.target.value)}
             disabled={isLoading || isSaving}
@@ -186,7 +187,7 @@ export function CommercialTermsPanel() {
       </div>
 
       <p className="mt-4 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-900">
-        These terms are informational defaults only. PhenoFarm does not collect or remit wholesale payments between businesses.
+        Defaults only; confirm final terms with each buyer.
       </p>
     </section>
   );

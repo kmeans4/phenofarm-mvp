@@ -1,0 +1,112 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e2988]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2989]
+    - StaticText "Notifications"
+    - StaticText "17"
+  - navigation "Portal navigation" [ref=e2990]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2993]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2994]
+      - StaticText "Catalog"
+    - link "Products" [ref=e2995]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2996]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2997]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2998]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2999]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3000]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3001]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3002]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2991]
+- main
+  - sectionheader
+    - heading "Add batch" [level=1, ref=e3003]
+  - form
+    - LabelText
+      - StaticText "Batch Number *"
+    - button "Generate" [ref=e3004]
+    - textbox "Batch Number *" [required, ref=e3005]
+    - paragraph
+      - StaticText "Example: BATCH-20260917-01"
+    - LabelText
+      - StaticText "Lot Number"
+    - textbox "Lot Number" [ref=e3006]
+    - LabelText
+      - StaticText "Harvest Date *"
+    - Date "Harvest Date *": 2026-09-17
+      - generic
+        - spinbutton "Month Month" [ref=e3024]: 9
+          - StaticText "09"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e3025]: 17
+          - StaticText "17"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e3026]: 2026
+          - StaticText "2026"
+      - button "Show date picker" [ref=e3023]
+    - LabelText
+      - StaticText "Strain *"
+    - combobox "Strain *" [expanded=false, ref=e3007]: Select a strain
+      - MenuListPopup
+        - option "Select a strain" [selected, ref=e3027]
+        - option "Assorted " [ref=e3028]
+        - option "Audit Test Kush " [ref=e3029]
+        - option "Purple Haze " [ref=e3030]
+        - option "Silver Haze " [ref=e3031]
+    - heading "Lab Results" [level=3, ref=e3008]
+    - LabelText
+      - StaticText "THC (%)"
+    - spinbutton "THC (%)" [ref=e3009]
+    - LabelText
+      - StaticText "CBD (%)"
+    - spinbutton "CBD (%)" [ref=e3010]
+    - LabelText
+      - StaticText "Total (%)"
+    - spinbutton "Total (%)" [ref=e3011]
+    - heading "Lab PDFs" [level=4, ref=e3012]
+    - paragraph
+      - StaticText "PDF · 2MB max each"
+    - LabelText
+      - StaticText "Potency"
+    - button "Potency" [ref=e3013]: No file chosen
+    - button "Upload Potency PDF" [ref=e3014]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Pesticides"
+    - button "Pesticides" [ref=e3015]: No file chosen
+    - button "Upload Pesticides PDF" [ref=e3016]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Microbials"
+    - button "Microbials" [ref=e3017]: No file chosen
+    - button "Upload Microbials PDF" [ref=e3018]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Notes" [ref=e3019]
+    - button "Create Batch" [disabled, ref=e3020]
+    - button "Cancel" [ref=e3021]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3022]
+  - button "Open messages" [ref=e2992]
+- region "Notifications alt+T" [ref=e2987]
+- alert

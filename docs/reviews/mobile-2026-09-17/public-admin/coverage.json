@@ -1,0 +1,378 @@
+{
+  "owner": "repo_admin_cleanup",
+  "audit": "fresh mobile UI review and bounded fixes",
+  "date": "2026-09-17",
+  "server": "http://localhost:3144",
+  "baselineNote": "Baseline captures were taken before the two scoped edits on 3144. Fresh post-fix captures were taken on isolated dev 3146; root final production sweep should supersede them after the aggregate rebuild.",
+  "viewports": [
+    "360x800",
+    "390x844",
+    "430x932"
+  ],
+  "screens": [
+    {
+      "id": "S-P01",
+      "scope": "public/auth",
+      "route": "/",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/01-home.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/01-home.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/01-home.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-P02",
+      "scope": "public/auth",
+      "route": "/help",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/02-help.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/02-help.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/02-help.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-P03",
+      "scope": "public/auth",
+      "route": "/contact",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/03-contact.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/03-contact.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/03-contact.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": [
+        "M-P01"
+      ],
+      "post360": "docs/reviews/mobile-2026-09-17/public-admin/post/public/contact-360.png",
+      "post390": "docs/reviews/mobile-2026-09-17/public-admin/post/public/contact-390.png",
+      "post430": "docs/reviews/mobile-2026-09-17/public-admin/post/public/contact-430.png",
+      "postVerified": true
+    },
+    {
+      "id": "S-P04",
+      "scope": "public/auth",
+      "route": "/legal/privacy",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/04-privacy.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/04-privacy.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/04-privacy.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-P05",
+      "scope": "public/auth",
+      "route": "/legal/terms",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/05-terms.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/05-terms.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/05-terms.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-P06",
+      "scope": "public/auth",
+      "route": "/legal/cookies",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/06-cookies.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/06-cookies.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/06-cookies.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-P07",
+      "scope": "public/auth",
+      "route": "/auth/sign_in",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/07-sign-in.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/07-sign-in.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/07-sign-in.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-P08",
+      "scope": "public/auth",
+      "route": "/auth/sign_up",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/08-sign-up.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/08-sign-up.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/08-sign-up.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-P09",
+      "scope": "public/auth",
+      "route": "/auth/error?error=Configuration",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/09-auth-error-configuration.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/09-auth-error-configuration.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/09-auth-error-configuration.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-P10",
+      "scope": "public/auth",
+      "route": "/not-found",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/10-not-found.png",
+      "spot390": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/10-not-found.png",
+      "spot430": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-430/10-not-found.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-A01",
+      "scope": "admin",
+      "route": "/admin/dashboard",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/01-dashboard.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-A02",
+      "scope": "admin",
+      "route": "/admin/users",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/02-users.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": [
+        "M-A01"
+      ],
+      "post360": "docs/reviews/mobile-2026-09-17/public-admin/post/admin/users-filter-360.png",
+      "post390": "docs/reviews/mobile-2026-09-17/public-admin/post/admin/users-filter-390.png",
+      "post430": "docs/reviews/mobile-2026-09-17/public-admin/post/admin/users-filter-430.png",
+      "postVerified": true
+    },
+    {
+      "id": "S-A03",
+      "scope": "admin",
+      "route": "/admin/growers",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/03-growers.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-A04",
+      "scope": "admin",
+      "route": "/admin/dispensaries",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/04-dispensaries.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    },
+    {
+      "id": "S-A05",
+      "scope": "admin",
+      "route": "/admin/settings",
+      "baseline360": "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/05-settings.png",
+      "horizontalOverflow": false,
+      "inspected360": true,
+      "findings": []
+    }
+  ],
+  "interactions": [
+    {
+      "route": "/admin/dashboard",
+      "state": "navigation menu open",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/01-dashboard-menu-open.png",
+      "result": "Menu links and sign-out action remain visible within the drawer; inspected."
+    },
+    {
+      "route": "/admin/users?role=dispensary",
+      "state": "role filter active",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/02-users-dispensary-filter.png",
+      "result": "One matching user card and Clear action render without overflow; inspected."
+    },
+    {
+      "route": "/admin/growers?status=pending",
+      "state": "status filter submitted with no matches",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/03-growers-pending-filter-submitted.png",
+      "result": "No matching growers state and Clear filters action fit the card; inspected."
+    },
+    {
+      "route": "/auth/sign_in",
+      "state": "blank required-field validation",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/07-sign-in-validation.png",
+      "result": "Browser validation focuses Email address and keeps the form in place; inspected."
+    },
+    {
+      "route": "/auth/sign_up",
+      "state": "blank required-field validation",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/08-sign-up-validation.png",
+      "result": "Browser validation focuses First Name and keeps the 16px fields usable; inspected."
+    },
+    {
+      "route": "/auth/error?error=CredentialsSignin",
+      "state": "credential error",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/09-auth-error-credentials.png",
+      "result": "Error message and both recovery actions fit the card; inspected."
+    }
+  ],
+  "checks": [
+    "15 scoped pages captured at 360x800 and visually inspected: 10 public/auth plus 5 admin.",
+    "Public spot captures taken at 390x844 and 430x932 for all 10 scoped routes; representative contact, help, privacy, and sign-up screenshots inspected.",
+    "Admin navigation menu, role/status filters, and both auth blank-submit validation states captured and inspected.",
+    "No horizontal overflow reported in captured baseline metrics.",
+    "No forms were sent and no API or business logic was changed."
+  ],
+  "postFixChecks": {
+    "server": "http://localhost:3146",
+    "contact": {
+      "viewports": [
+        "360x800",
+        "390x844",
+        "430x932"
+      ],
+      "h1Text": "Wholesale workflow help.",
+      "lineCount": 2,
+      "errors": []
+    },
+    "adminUsersFiltered": {
+      "viewports": [
+        "360x800",
+        "390x844",
+        "430x932"
+      ],
+      "placeholder": "Email or name",
+      "searchFieldWidths": [
+        141.875,
+        171.875,
+        211.875
+      ],
+      "documentWidths": [
+        360,
+        390,
+        430
+      ],
+      "errors": []
+    }
+  },
+  "secondPassFinal360": {
+    "server": "http://localhost:3144",
+    "viewport": "360x800",
+    "status": "inspected-final-build",
+    "screens": [
+      {
+        "route": "/",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_-360.png",
+        "result": "Inspected; no actionable mobile defect found."
+      },
+      {
+        "route": "/help",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_help-360.png",
+        "result": "Inspected; support cards and accordion targets fit the viewport."
+      },
+      {
+        "route": "/contact",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_contact-360.png",
+        "result": "Inspected; shortened heading remains readable and form controls fit."
+      },
+      {
+        "route": "/legal/privacy",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_legal_privacy-360.png",
+        "result": "Inspected; long-form sections remain readable with no horizontal overflow."
+      },
+      {
+        "route": "/legal/terms",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_legal_terms-360.png",
+        "result": "Inspected; long-form sections remain readable with no horizontal overflow."
+      },
+      {
+        "route": "/legal/cookies",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_legal_cookies-360.png",
+        "result": "Inspected; long-form sections remain readable with no horizontal overflow."
+      },
+      {
+        "route": "/auth/sign_in",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_auth_sign_in-360.png",
+        "result": "Inspected; 16px fields and recovery controls fit the card."
+      },
+      {
+        "route": "/auth/sign_up",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_auth_sign_up-360.png",
+        "result": "Inspected; 16px fields and grouped registration sections fit the card."
+      },
+      {
+        "route": "/auth/error?error=Configuration",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_auth_error-360.png",
+        "result": "Inspected; error copy and recovery actions fit the card."
+      },
+      {
+        "route": "/admin/dashboard",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_admin_dashboard-360.png",
+        "result": "Inspected; checklist, KPI cards, and actions fit the viewport."
+      },
+      {
+        "route": "/admin/users",
+        "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-users-360.png",
+        "result": "Inspected after rebuild; users filter and cards fit, with a computed 16px search input."
+      },
+      {
+        "route": "/admin/growers",
+        "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-growers-360.png",
+        "result": "Inspected after rebuild; verification filter and grower card fit, with computed 16px controls."
+      },
+      {
+        "route": "/admin/dispensaries",
+        "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-dispensaries-360.png",
+        "result": "Inspected after rebuild; verification filter and dispensary card fit, with computed 16px controls."
+      },
+      {
+        "route": "/admin/settings",
+        "screenshot": "docs/reviews/mobile-2026-09-17/final-pages/_admin_settings-360.png",
+        "result": "Inspected; billing, support, and policy sections fit the viewport."
+      }
+    ],
+    "checks": [
+      "All 14 final-pages routes were opened as individual 360px screenshots and visually inspected in this second pass.",
+      "No additional public/auth/legal or admin layout defect was found.",
+      "Admin post-rebuild computed font-size checks passed at 360x800, 390x844, and 430x932 with document width equal to viewport."
+    ]
+  },
+  "headerFinalChecks": {
+    "server": "http://localhost:3144",
+    "viewport": "360x800",
+    "notificationOverlay": {
+      "screenshot": "docs/reviews/mobile-2026-09-17/public-admin/post/header/buyer-notifications-360.png",
+      "panel": true,
+      "messagesComputed": {
+        "opacity": "0",
+        "visibility": "hidden",
+        "pointerEvents": "none"
+      },
+      "elementFromPoint": "Close notifications",
+      "escapeRestoredFocus": "Notifications",
+      "status": "verified-production"
+    },
+    "messagesOverlay": {
+      "growerOpenFocus": "Close messages",
+      "growerEscapeFocus": "Open messages",
+      "buyerOpenFocus": "Close messages",
+      "buyerEscapeFocus": "Open messages",
+      "status": "verified-production",
+      "note": "Mobile Messages focus returns to the visible trigger after Escape for both portal roles."
+    },
+    "menuOverlay": {
+      "openFocus": "Close navigation menu",
+      "escapeRestoredFocus": "Open Grower navigation menu"
+    },
+    "searchOverlay": {
+      "openFocus": "Search products, requests, customers, and strains",
+      "escapeRestoredFocus": "Search"
+    }
+  }
+}

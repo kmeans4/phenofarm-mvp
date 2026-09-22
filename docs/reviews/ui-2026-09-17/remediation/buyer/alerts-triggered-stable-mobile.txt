@@ -1,0 +1,46 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e1872]
+  - button "Notifications" [expanded=false, ref=e1873]
+    - StaticText "20"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1874]
+  - main
+    - sectionheader
+      - heading "Saved" [level=1, ref=e1876]
+      - link "Browse Catalog" [ref=e1877]
+    - tablist "Saved workspace"
+      - tab "Favorites (1)" [ref=e1878]
+        - StaticText "Favorites"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Alerts (1)" [selected, ref=e1879]
+        - StaticText "Alerts"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Recent (1)" [ref=e1880]
+        - StaticText "Recent"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+    - tabpanel "Alerts (1)"
+      - paragraph
+        - StaticText "Checks when you visit or refresh."
+      - button "Refresh prices" [ref=e1913]
+        - StaticText "Refresh"
+      - group
+        - DisclosureTriangle "More" [expanded=false]
+      - button "Active (1)" [ref=e1914]
+      - button "Triggered (0)" [ref=e1915]
+      - button "All" [ref=e1916]
+      - heading "No price drops yet" [level=3, ref=e1921]
+      - paragraph
+        - StaticText "Targets are checked when you visit or refresh."
+      - button "View Active Alerts" [ref=e1922]
+  - button "Open messages" [ref=e1875]
+  - region "Notifications alt+T" [ref=e1871]
+  - alert
+    - StaticText "Saved"

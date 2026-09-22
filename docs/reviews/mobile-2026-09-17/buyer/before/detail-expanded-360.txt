@@ -1,0 +1,85 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e451]
+- button "Notifications" [expanded=false, ref=e452]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e453]
+- main
+  - link "← Orders" [ref=e454]
+  - sectionheader
+    - heading "Request #ORD-20260710-XPJO3I" [level=1, ref=e458]
+      - StaticText "Request"
+      - generic
+        - StaticText "#ORD-20260710-XPJO3I"
+    - paragraph
+      - StaticText "Waiting for grower review"
+    - StaticText "Submitted"
+    - button "Export CSV" [ref=e459]
+  - paragraph
+    - StaticText "REQUEST DATE"
+  - paragraph
+    - StaticText "Jul 09, 2026"
+  - paragraph
+    - StaticText "GROWER"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - group
+    - DisclosureTriangle "View timeline" [expanded=true]
+      - StaticText "View timeline"
+    - heading "Timeline" [level=3, ref=e465]
+    - list
+      - listitem [level=1]
+        - StaticText "Submitted"
+        - StaticText "Jul 9, 2026 8:39 PM"
+      - listitem [level=1]
+        - StaticText "Accepted"
+      - listitem [level=1]
+        - StaticText "Preparing"
+      - listitem [level=1]
+        - StaticText "Ready"
+      - listitem [level=1]
+        - StaticText "Delivered"
+    - paragraph
+      - StaticText "Buyer request received"
+  - group
+    - DisclosureTriangle "View history" [expanded=true]
+      - StaticText "View history"
+    - generic
+      - heading "History" [level=2, ref=e466]
+      - list
+        - listitem [level=1]
+          - paragraph
+            - StaticText "Submitted"
+          - paragraph
+            - StaticText "Dispensary · Jul 9, 2026 8:39 PM"
+  - heading "Buyer actions" [level=2, ref=e460]
+  - button "Message grower" [ref=e461]
+  - button "Withdraw request" [ref=e462]
+  - heading "Requested Items" [level=3, ref=e455]
+  - paragraph
+    - StaticText "Purple Haze Flowers (Purple Haze)"
+  - StaticText "1"
+  - StaticText " x "
+  - StaticText "$25.00"
+  - StaticText "$25.00"
+  - StaticText "Total"
+  - StaticText "$25.00"
+  - heading "Request details" [level=3, ref=e456]
+  - paragraph
+    - StaticText "FULFILLMENT"
+  - paragraph
+    - StaticText "Flexible"
+  - paragraph
+    - StaticText "REQUESTED WINDOW"
+  - paragraph
+    - StaticText "Coordinate with grower"
+  - paragraph
+    - StaticText "PAYMENT TERMS"
+  - paragraph
+    - StaticText "Handled directly"
+  - link "Orders" [ref=e463]
+  - button "Buyer actions" [ref=e464]
+- button "Open messages" [ref=e457]
+- region "Notifications alt+T" [ref=e450]
+- alert

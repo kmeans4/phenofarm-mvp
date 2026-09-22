@@ -1,0 +1,121 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e818]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e819]
+    - StaticText "Notifications"
+    - StaticText "18"
+  - navigation "Portal navigation" [ref=e820]
+    - link "Dashboard" [ref=e823]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e824]
+      - StaticText "Catalog"
+    - link "Request Draft 2" [ref=e825]
+      - StaticText "Request Draft"
+      - StaticText "2"
+    - link "Orders 17" [ref=e826]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e827]
+      - StaticText "Saved"
+    - link "Settings" [ref=e828]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e821]
+- main
+  - sectionheader
+    - heading "Settings" [level=1, ref=e829]
+    - paragraph
+      - StaticText "Manage your account and preferences"
+  - generic
+    - navigation
+      - StaticText "SECTIONS"
+      - link "License & verification" [ref=e833]
+      - link "Business profile" [ref=e834]
+      - link "Branding" [ref=e835]
+    - generic
+      - heading "License & verification" [level=2, ref=e836]
+      - paragraph
+        - StaticText "Verified through 12/31/2027"
+      - LabelText
+        - StaticText "License number *"
+      - textbox "License number *" [ref=e837]: VT-RTL-2024-001
+        - StaticText "VT-RTL-2024-001"
+      - LabelText
+        - StaticText "State *"
+      - combobox "State *" [expanded=false, ref=e838]: Vermont (VT)
+        - MenuListPopup
+          - option "Vermont (VT)" [selected, ref=e851]
+      - LabelText
+        - StaticText "Expiry date (recommended)"
+      - Date "Expiry date (recommended)": 2027-12-31
+        - generic
+          - spinbutton "Month Month" [ref=e852]: 12
+            - StaticText "12"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e853]: 31
+            - StaticText "31"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e854]: 2027
+            - StaticText "2027"
+        - button "Show date picker" [ref=e849]
+    - generic
+      - heading "Business profile" [level=2, ref=e839]
+      - LabelText
+        - StaticText "Business Name *"
+      - textbox "Business Name *" [ref=e840]: Green Vermont Dispensary
+        - StaticText "Green Vermont Dispensary"
+      - LabelText
+        - StaticText "Contact Name (optional)"
+      - textbox "Contact Name (optional)" [ref=e841]: Sarah Cannabis
+        - StaticText "Sarah Cannabis"
+      - LabelText
+        - StaticText "Email *"
+      - textbox "Email *" [ref=e842]: dispensary@greenvermont.com
+        - StaticText "dispensary@greenvermont.com"
+      - LabelText
+        - StaticText "Phone (optional)"
+      - textbox "Phone (optional)" [ref=e843]: (802) 555-0145
+        - StaticText "(802) 555-0145"
+      - LabelText
+        - StaticText "Address"
+      - generic
+        - textbox "Address" [ref=e855]: 456 Market Street
+          - StaticText "456 Market Street"
+        - image
+      - paragraph
+        - StaticText "Type 3+ characters to see suggestions (includes city, state, ZIP)"
+      - LabelText
+        - StaticText "Website (optional)"
+      - textbox "Website (optional)" [ref=e844]: https://greenvermontdispensary.com
+        - StaticText "https://greenvermontdispensary.com"
+      - LabelText
+        - StaticText "Description (optional)"
+      - textbox "Description (optional)" [ref=e845]: Vermont's premier cannabis retail destination
+        - StaticText "Vermont's premier cannabis retail destination"
+      - paragraph
+        - StaticText "45/500"
+    - generic
+      - heading "Branding" [level=2, ref=e846]
+      - image
+      - StaticText "No logo"
+      - button "Upload Logo" [ref=e847]
+      - paragraph
+        - StaticText "JPG, PNG, or WebP. Max 500KB."
+    - heading "Account" [level=2, ref=e830]
+    - button "Sign out" [ref=e831]
+    - generic
+      - status
+      - button "Save settings" [ref=e848]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e832]
+  - button "Open messages" [ref=e822]
+- region "Notifications alt+T" [ref=e817]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e850]
+  - image
+- alert

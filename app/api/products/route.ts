@@ -1,3 +1,4 @@
+import { persistMediaReference } from '@/lib/blob-storage';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -16,22 +17,18 @@ import {
   toSafeStringArray,
   toSafeUnit,
 } from '@/lib/product-serializers';
+import { canCreateListings, FREE_LISTING_LIMIT_MESSAGE } from '@/lib/plans';
 
 type ProductLike = {
   name?: string | null;
   productType?: string | null;
   subType?: string | null;
-  categoryLegacy?: string | null;
-  subcategoryLegacy?: string | null;
-  strainLegacy?: string | null;
   price: Prisma.Decimal | number | null;
   inventoryQty?: number | null;
   unit?: string | null;
   isAvailable?: boolean | null;
   isPriceVisible?: boolean | null;
   images?: string[] | null;
-  thcLegacy?: Prisma.Decimal | number | null;
-  cbdLegacy?: Prisma.Decimal | number | null;
   thcMin?: Prisma.Decimal | number | null;
   thcMax?: Prisma.Decimal | number | null;
   cbdMin?: Prisma.Decimal | number | null;
@@ -45,19 +42,14 @@ function serializeProduct<T extends ProductLike>(product: T) {
   return {
     ...product,
     name: toSafeProductName(product.name),
-    productType: toSafeProductType(product.productType, product.categoryLegacy),
+    productType: toSafeProductType(product.productType),
     subType: toSafeOptionalString(product.subType),
-    categoryLegacy: toSafeOptionalString(product.categoryLegacy),
-    subcategoryLegacy: toSafeOptionalString(product.subcategoryLegacy),
-    strainLegacy: toSafeOptionalString(product.strainLegacy),
     price: toSafeNonNegativeNumber(product.price, 0),
     inventoryQty,
     unit: toSafeUnit(product.unit),
     isAvailable: toSafeAvailability(product.isAvailable, inventoryQty),
     isPriceVisible: toSafeBoolean(product.isPriceVisible, true),
     images: toSafeStringArray(product.images),
-    thcLegacy: toSafeOptionalNumber(product.thcLegacy),
-    cbdLegacy: toSafeOptionalNumber(product.cbdLegacy),
     thcMin: toSafeOptionalNumber(product.thcMin),
     thcMax: toSafeOptionalNumber(product.thcMax),
     cbdMin: toSafeOptionalNumber(product.cbdMin),
@@ -69,60 +61,76 @@ function serializeProduct<T extends ProductLike>(product: T) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getAuthSession();
-
     if (!session) return apiError(401, 'UNAUTHORIZED', 'Unauthorized');
-
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) {
-      return apiError(403, 'FORBIDDEN', 'Forbidden');
-    }
+    if (user.role !== 'GROWER' || !user.growerId) return apiError(403, 'FORBIDDEN', 'Forbidden');
 
     const { searchParams } = new URL(request.url);
     const productType = searchParams.get('productType');
     const strainId = searchParams.get('strainId');
     const batchId = searchParams.get('batchId');
     const isAvailable = searchParams.get('isAvailable');
-    const search = searchParams.get('search');
-    const sortBy = searchParams.get('sortBy') || 'createdAt';
-    const sortOrder = searchParams.get('sortOrder') || 'desc';
-
-    const where: Prisma.ProductWhereInput = {
-      growerId: user.growerId,
-      isDeleted: false,
-      ...(productType && { productType }),
-      ...(strainId && { strainId }),
-      ...(batchId && { batchId }),
+    const search = searchParams.get('search')?.trim().slice(0, 200);
+    const paged = searchParams.get('paged') === 'true';
+    const pageSize = Math.floor(Math.min(100, Math.max(1, Number(searchParams.get('pageSize')) || 50)));
+    const requestedPage = Math.max(1, Math.min(100000, Math.floor(Number(searchParams.get('page')) || 1)));
+    const sortBy = ['createdAt', 'name', 'price', 'inventoryQty'].includes(searchParams.get('sortBy') || '') ? searchParams.get('sortBy')! : 'createdAt';
+    const sortOrder = searchParams.get('sortOrder') === 'asc' ? 'asc' : 'desc';
+    const baseWhere: Prisma.ProductWhereInput = {
+      growerId: user.growerId, isDeleted: false,
+      ...(productType && { productType }), ...(strainId && { strainId }), ...(batchId && { batchId }),
       ...(isAvailable !== null && { isAvailable: isAvailable === 'true' }),
-      // NOTE: status filtering disabled for DB compatibility until ProductStatus migration is guaranteed applied.
-      ...(search && {
-        OR: [
-          { name: { contains: search, mode: 'insensitive' } },
-          { strainLegacy: { contains: search, mode: 'insensitive' } },
-          { description: { contains: search, mode: 'insensitive' } },
-        ],
-      }),
+      ...(search && { OR: [{ name: { contains: search, mode: 'insensitive' } }, { strain: { name: { contains: search, mode: 'insensitive' } } }] }),
     };
-
+    const views: Record<string, Prisma.ProductWhereInput> = {
+      all: {}, active: { isAvailable: true, inventoryQty: { gt: 0 } },
+      'low-stock': { inventoryQty: { gt: 0, lte: 10 } }, 'quote-only': { isPriceVisible: false },
+      'missing-images': { images: { isEmpty: true } }, 'missing-type': { OR: [{ productType: null }, { productType: '' }] },
+      hidden: { OR: [{ isAvailable: false }, { inventoryQty: { lte: 0 } }] },
+    };
+    const view = searchParams.get('view') || 'all';
+    const where = paged ? { AND: [baseWhere, views[view] || views.all] } : baseWhere;
+    let counts: Record<string, number> = {};
+    let inventoryValue = 0;
+    let page = requestedPage;
+    if (paged) {
+      // Counts are computed in the database; no catalog rows or media are hydrated.
+      const clauses = [Prisma.sql`p."growerId" = ${user.growerId}`, Prisma.sql`p."isDeleted" = false`];
+      if (strainId) clauses.push(Prisma.sql`p."strainId" = ${strainId}`);
+      if (batchId) clauses.push(Prisma.sql`p."batchId" = ${batchId}`);
+      if (productType) clauses.push(Prisma.sql`p."productType" = ${productType}`);
+      if (isAvailable !== null) clauses.push(Prisma.sql`p."isAvailable" = ${isAvailable === 'true'}`);
+      if (search) clauses.push(Prisma.sql`(p.name ILIKE ${`%${search}%`} OR EXISTS (SELECT 1 FROM strains s WHERE s.id = p."strainId" AND s.name ILIKE ${`%${search}%`}))`);
+      const [stats] = await db.$queryRaw<Array<Record<string, bigint | Prisma.Decimal>>>(Prisma.sql`
+        SELECT COUNT(*) AS "all", COUNT(*) FILTER (WHERE "isAvailable" AND "inventoryQty" > 0) AS active,
+          COUNT(*) FILTER (WHERE "inventoryQty" > 0 AND "inventoryQty" <= 10) AS "low-stock",
+          COUNT(*) FILTER (WHERE NOT "isPriceVisible") AS "quote-only",
+          COUNT(*) FILTER (WHERE COALESCE(cardinality(images), 0) = 0) AS "missing-images",
+          COUNT(*) FILTER (WHERE "productType" IS NULL OR "productType" = '') AS "missing-type",
+          COUNT(*) FILTER (WHERE NOT "isAvailable" OR "inventoryQty" <= 0) AS hidden,
+          COALESCE(SUM(price * "inventoryQty"), 0) AS "inventoryValue"
+        FROM products p WHERE ${Prisma.join(clauses, ' AND ')}`);
+      counts = Object.fromEntries(Object.keys(views).map(key => [key, Number(stats[key] || 0)]));
+      inventoryValue = Number(stats.inventoryValue || 0);
+      page = Math.min(requestedPage, Math.max(1, Math.ceil((counts[view] ?? counts.all) / pageSize)));
+    }
     const products = await db.product.findMany({
       where,
-      include: {
-        strain: { select: { id: true, name: true, genetics: true } },
-        batch: {
-          select: {
-            id: true,
-            batchNumber: true,
-            harvestDate: true,
-            thc: true,
-            cbd: true,
-            totalCannabinoids: true,
-            terpenes: true,
-          },
-        },
+      select: {
+        id: true, name: true, productType: true, subType: true, strainId: true, batchId: true,
+        price: true, inventoryQty: true, unit: true, isAvailable: true, isPriceVisible: true,
+        status: true, createdAt: true,
+        strain: { select: { id: true, name: true, genetics: true, strainType: true } },
+        batch: { select: { id: true, batchNumber: true } },
       },
-      orderBy: { [sortBy]: sortOrder },
+      ...(paged ? { skip: (page - 1) * pageSize, take: Math.floor(pageSize) } : {}),
+      orderBy: [{ [sortBy]: sortOrder }, { id: 'asc' }],
     });
-
-    return NextResponse.json(products.map(serializeProduct), { status: 200 });
+    const imageCounts = paged && products.length ? await db.$queryRaw<Array<{ id: string; imageCount: number }>>(Prisma.sql`
+      SELECT id, COALESCE(cardinality(images), 0)::integer AS "imageCount" FROM products WHERE id IN (${Prisma.join(products.map(p => p.id))}) AND "growerId" = ${user.growerId}`) : [];
+    const imagesById = new Map(imageCounts.map(row => [row.id, row.imageCount]));
+    const summaries = products.map(product => ({ ...serializeProduct(product), imageCount: imagesById.get(product.id) || 0 }));
+    return NextResponse.json(paged ? { products: summaries, page, pageSize, total: counts[view] ?? counts.all, counts, inventoryValue } : summaries);
   } catch (error) {
     logApiError('products.GET', error, { route: '/api/products' });
     return apiError(500, 'INTERNAL_SERVER_ERROR', 'Internal server error');
@@ -153,6 +161,21 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parsed.data;
+    if (data.images) data.images = await Promise.all(data.images.map(async (value) => (await persistMediaReference(value, `products/${user.growerId}/images`))!));
+    if (data.ingredientsDocumentUrl) data.ingredientsDocumentUrl = await persistMediaReference(data.ingredientsDocumentUrl, `products/${user.growerId}/documents`) || null;
+
+    const [growerPlan, listingCount] = await Promise.all([
+      db.grower.findUnique({
+        where: { id: user.growerId },
+        select: { subscriptionPlan: true, subscriptionStatus: true },
+      }),
+      db.product.count({ where: { growerId: user.growerId, isDeleted: false } }),
+    ]);
+    if (!canCreateListings(growerPlan, listingCount)) {
+      return apiError(402, 'PLAN_LIMIT_REACHED', FREE_LISTING_LIMIT_MESSAGE, {
+        upgradeHref: '/grower/pricing',
+      });
+    }
 
     if (data.strainId) {
       const strain = await db.strain.findFirst({
@@ -171,17 +194,12 @@ export async function POST(request: NextRequest) {
       data: {
         growerId: user.growerId,
         isDeleted: false,
-        // status intentionally omitted until ProductStatus migration is guaranteed applied
+        status: data.status,
         name: data.name || 'Untitled Draft Product',
         productType: data.productType,
         subType: data.subType,
         strainId: data.strainId,
         batchId: data.batchId,
-        strainLegacy: data.strainLegacy,
-        categoryLegacy: data.categoryLegacy,
-        subcategoryLegacy: data.subcategoryLegacy,
-        thcLegacy: data.thcLegacy,
-        cbdLegacy: data.cbdLegacy,
         thcMin: data.thcMin,
         thcMax: data.thcMax,
         cbdMin: data.cbdMin,

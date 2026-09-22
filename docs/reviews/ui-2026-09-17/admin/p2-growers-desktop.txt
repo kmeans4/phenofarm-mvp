@@ -1,0 +1,72 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "ADMIN"
+  - button "Notifications" [expanded=false, ref=e282]
+    - StaticText "Notifications"
+  - navigation "Portal navigation" [ref=e283]
+    - StaticText "OPERATIONS"
+    - link "Dashboard" [ref=e285]
+      - StaticText "Dashboard"
+    - StaticText "ACCOUNTS"
+    - link "Users" [ref=e286]
+      - StaticText "Users"
+    - link "Growers" [ref=e287]
+      - StaticText "Growers"
+    - link "Dispensaries" [ref=e288]
+      - StaticText "Dispensaries"
+    - StaticText "SYSTEM"
+    - link "Settings" [ref=e289]
+      - StaticText "Settings"
+  - StaticText "A"
+  - StaticText "admin@phenofarm.com"
+  - StaticText "Full system access"
+  - button "Sign out" [ref=e284]
+- main
+  - sectionheader
+    - heading "Cultivator Management" [level=1, ref=e290]
+    - paragraph
+      - StaticText "Review cultivator licenses, marketplace access, and subscription state."
+    - form
+      - LabelText
+        - StaticText "Search cultivators"
+      - searchbox "Search cultivators" [ref=e291]
+      - LabelText
+        - StaticText "Verification status"
+      - combobox "Verification status" [expanded=false, ref=e292]: All statuses
+        - MenuListPopup
+          - option "All statuses" [selected, ref=e313]
+          - option "Pending only" [ref=e314]
+          - option "Verified only" [ref=e315]
+          - option "Expiring within 30 days" [ref=e316]
+          - option "Expired" [ref=e317]
+      - button "Search" [ref=e293]
+  - paragraph
+    - StaticText "Showing 1 of 1 cultivators"
+  - table
+    - rowgroup
+      - row
+        - columnheader "BUSINESS" [ref=e302]
+        - columnheader "EMAIL" [ref=e303]
+        - columnheader "LICENSE" [ref=e304]
+        - columnheader "EXPIRY" [ref=e305]
+        - columnheader "STATUS" [ref=e306]
+        - columnheader "SUBSCRIPTION" [ref=e307]
+        - columnheader "JOINED" [ref=e308]
+        - columnheader "ACTIONS" [ref=e309]
+    - row
+      - cell "Vermont Nurseries" [ref=e294]
+      - cell "grower@vtnurseries.com" [ref=e295]
+        - link "grower@vtnurseries.com" [ref=e310]
+      - cell "VT-GWL-2024-001" [ref=e296]
+      - cell "Not on file" [ref=e297]
+      - cell "Verified" [ref=e298]
+      - cell "Plan: Free, Status: inactive" [ref=e299]
+        - StaticText "Free"
+      - cell "4/9/2026" [ref=e300]
+      - cell "Unverify" [ref=e301]
+        - button "Unverify" [ref=e311]
+- region "Notifications alt+T" [ref=e281]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e312]
+  - image
+- alert

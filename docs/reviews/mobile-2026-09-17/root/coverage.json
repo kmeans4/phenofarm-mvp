@@ -1,0 +1,282 @@
+[
+  {
+    "route": "/grower/reports",
+    "beforeInspected": true,
+    "afterInspected360": true,
+    "finalViews": [
+      {
+        "width": 360,
+        "overflow": false,
+        "errors": [],
+        "height": 1758
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "errors": [],
+        "height": 1659
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "errors": [],
+        "height": 1659
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "errors": [],
+        "height": 1403
+      }
+    ],
+    "afterSpotChecks": [
+      430,
+      1440
+    ]
+  },
+  {
+    "route": "/grower/settings",
+    "beforeInspected": true,
+    "afterInspected360": true,
+    "finalViews": [
+      {
+        "width": 360,
+        "overflow": false,
+        "errors": [],
+        "height": 2654
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "errors": [],
+        "height": 2654
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "errors": [],
+        "height": 2634
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "errors": [],
+        "height": 2084
+      }
+    ],
+    "afterSpotChecks": [
+      430
+    ]
+  },
+  {
+    "route": "/grower/pricing",
+    "beforeInspected": true,
+    "afterInspected360": true,
+    "finalViews": [
+      {
+        "width": 360,
+        "overflow": false,
+        "errors": [],
+        "height": 1061
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "errors": [],
+        "height": 1061
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "errors": [],
+        "height": 1061
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "errors": [],
+        "height": 1000
+      }
+    ],
+    "afterSpotChecks": [
+      430,
+      1440
+    ]
+  },
+  {
+    "route": "/grower/marketplace",
+    "beforeInspected": true,
+    "afterInspected360": true,
+    "finalViews": [
+      {
+        "width": 360,
+        "overflow": false,
+        "errors": [],
+        "height": 1381
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "errors": [],
+        "height": 1381
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "errors": [],
+        "height": 1381
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "errors": [],
+        "height": 1000
+      }
+    ],
+    "afterSpotChecks": [
+      430,
+      1440
+    ]
+  },
+  {
+    "route": "/grower/customers",
+    "beforeInspected": true,
+    "afterInspected360": true,
+    "finalViews": [
+      {
+        "width": 360,
+        "overflow": false,
+        "errors": [],
+        "height": 949
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "errors": [],
+        "height": 933
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "errors": [],
+        "height": 933
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "errors": [],
+        "height": 1000
+      }
+    ],
+    "afterSpotChecks": [
+      430
+    ],
+    "breakpointChecks": [
+      360,
+      700,
+      768
+    ]
+  },
+  {
+    "route": "/grower/customers/add",
+    "beforeInspected": true,
+    "afterInspected360": true,
+    "finalViews": [
+      {
+        "width": 360,
+        "overflow": false,
+        "errors": [],
+        "height": 800
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "errors": [],
+        "height": 800
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "errors": [],
+        "height": 800
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "errors": [],
+        "height": 1000
+      }
+    ],
+    "afterSpotChecks": [
+      430
+    ]
+  },
+  {
+    "route": "/grower/customers/[id]/edit",
+    "beforeInspected": true,
+    "afterInspected360": true,
+    "finalViews": [
+      {
+        "width": 360,
+        "overflow": false,
+        "errors": [],
+        "height": 1237
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "errors": [],
+        "height": 1237
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "errors": [],
+        "height": 1237
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "errors": [],
+        "height": 1117
+      }
+    ],
+    "afterSpotChecks": [
+      430
+    ]
+  },
+  {
+    "route": "/grower/customers/[id]/statement",
+    "beforeInspected": true,
+    "afterInspected360": true,
+    "finalViews": [
+      {
+        "width": 360,
+        "overflow": false,
+        "errors": [],
+        "height": 800
+      },
+      {
+        "width": 390,
+        "overflow": false,
+        "errors": [],
+        "height": 800
+      },
+      {
+        "width": 430,
+        "overflow": false,
+        "errors": [],
+        "height": 800
+      },
+      {
+        "width": 1440,
+        "overflow": false,
+        "errors": [],
+        "height": 1000
+      }
+    ],
+    "afterSpotChecks": [
+      430
+    ]
+  }
+]

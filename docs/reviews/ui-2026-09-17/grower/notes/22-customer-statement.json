@@ -1,0 +1,48 @@
+{
+  "slug": "22-customer-statement",
+  "route": "/grower/customers/ui-review-customer/statement",
+  "routePattern": "/grower/customers/[id]/statement",
+  "pass1": {
+    "inspected": [
+      "pass-1/22-customer-statement-desktop.png",
+      "pass-1/22-customer-statement-mobile.png"
+    ],
+    "strengths": [
+      "Short statement with clear date controls and overall delivered value; payment boundary is explicit."
+    ],
+    "issues": [
+      {
+        "key": "statement-mobile-columns",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "Mobile statement shows request and delivered date but clips Items and Value to the right. The overall total is visible, but per-request details needed to reconcile the statement are hidden without a scroll hint.",
+        "recommendation": "Use mobile statement rows with reference/date on one line and item summary/value below; alternatively pin value and provide a clear horizontal-scroll affordance."
+      },
+      {
+        "key": "statement-copy",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "The long customer-name-plus-statement32px title takes two mobile lines; ‘Customer relationship’ is an abstract back label; direct-settlement explanation appears in subtitle and footer, and singular count reads ‘1 delivered requests’.",
+        "recommendation": "Use ‘Statement’ with ‘Maple Street Market’ as a smaller subtitle, back label ‘Customer’, count ‘1 delivered request’, and one concise ‘Payments are arranged directly; PhenoFarm does not collect funds’ note."
+      }
+    ],
+    "limits": [
+      "No date filter submitted or CSV exported; read-only view of one synthetic delivered request."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/22-customer-statement-desktop.png",
+      "pass-2/22-customer-statement-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed long title/copy, singular-count grammar, and hidden per-request values on mobile. From/To already fit a two-column row. The September 15 delivered date is the expected local conversion of a September 16 midnight-UTC instant and is not reported as a bug.",
+    "confirmedIssueKeys": [
+      "statement-mobile-columns",
+      "statement-copy"
+    ],
+    "newIssues": [],
+    "source": "root-pass2-notes.md"
+  }
+}

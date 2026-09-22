@@ -1,0 +1,75 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e3996]
+- button "Notifications" [expanded=false, ref=e3997]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e3998]
+- main
+  - sectionheader
+    - heading "Record Direct Request" [level=1, ref=e3977]
+    - paragraph
+      - StaticText "Record a request coordinated directly with a dispensary outside PhenoFarm payment rails"
+    - link "Cancel" [ref=e3978]
+    - button "Record Direct Request" [disabled, ref=e3979]
+    - paragraph
+      - StaticText "Select a dispensary before recording the request."
+  - form
+    - heading "Request Details" [level=2, ref=e3980]
+    - LabelText
+      - StaticText "Dispensary *"
+    - combobox "Search dispensaries by name or city" [expanded=false, required, ref=e3986]
+    - paragraph
+      - StaticText "Filter by business name, city, or state."
+    - LabelText
+      - StaticText "Notes"
+    - textbox [ref=e3981]
+    - LabelText
+      - StaticText "Shipping estimate ($)"
+    - spinbutton [ref=e3982]: 0
+      - StaticText "0"
+    - heading "Items" [level=2, ref=e3983]
+    - button "+ Add" [ref=e3984]
+    - LabelText
+      - StaticText "Product"
+    - combobox [expanded=false, ref=e3988]: Mystery Pricing Batch - $40.00 (25 available)
+      - MenuListPopup
+        - option "Mystery Pricing Batch - $40.00 (25 available)" [selected, ref=e3993]
+        - option "Silver Haze Concentrate - $60.00 (50 available)" [ref=e3994]
+        - option "Purple Haze Flowers - $25.00 (240 available)" [ref=e3995]
+    - LabelText
+      - StaticText "Qty"
+    - spinbutton [ref=e3989]: 1
+      - StaticText "1"
+    - button "Max" [ref=e3990]
+    - LabelText
+      - StaticText "Agreed price"
+      - StaticText "$"
+      - StaticText "40.00"
+      - StaticText " / "
+      - StaticText "Eighth"
+    - spinbutton [ref=e3991]: 40
+      - StaticText "40"
+    - StaticText "/ "
+    - StaticText "Eighth"
+    - paragraph
+      - StaticText "Defaults to list price; adjust to the agreed price."
+    - button "Remove" [ref=e3992]
+    - StaticText "Available now:"
+    - StaticText "25"
+    - StaticText "Estimated item value:"
+    - StaticText "$"
+    - StaticText "40.00"
+    - StaticText "Shipping estimate:"
+    - StaticText "$"
+    - StaticText "0.00"
+    - StaticText "Estimated request value:"
+    - StaticText "$"
+    - StaticText "40.00"
+    - paragraph
+      - StaticText "PhenoFarm records value for operations only. Wholesale settlement is handled directly with the dispensary."
+- button "Open messages" [ref=e3966]
+- region "Notifications alt+T" [ref=e3961]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3987]
+  - image
+- alert

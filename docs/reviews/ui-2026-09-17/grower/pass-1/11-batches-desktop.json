@@ -1,0 +1,24 @@
+{
+  "blocks": [
+    {
+      "font": "14px",
+      "height": 28,
+      "line": "28px",
+      "margin": "0px 8px",
+      "padding": "0px",
+      "role": null,
+      "tag": "H2",
+      "text": "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information).",
+      "width": 812,
+      "x": 314,
+      "y": 486
+    }
+  ],
+  "height": 1000,
+  "pageHeight": 1000,
+  "pageWidth": 1440,
+  "text": "Application error: a client-side exception has occurred while loading localhost (see the browser console for more information).",
+  "title": "",
+  "url": "http://localhost:3144/grower/batches",
+  "width": 1440
+}

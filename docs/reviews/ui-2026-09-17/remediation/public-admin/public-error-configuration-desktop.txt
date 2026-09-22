@@ -1,0 +1,28 @@
+- main
+  - generic
+    - generic
+    - link "PF PhenoFarm" [ref=e359]
+      - StaticText "PF"
+      - StaticText "PhenoFarm"
+    - generic
+      - paragraph
+        - StaticText "ACCOUNT ACCESS"
+      - heading "Need access? We can help." [level=1, ref=e360]
+      - paragraph
+        - StaticText "PhenoFarm support can help account owners recover access."
+      - StaticText "Role-based grower and dispensary access"
+      - StaticText "License-aware buyer ordering gates"
+      - StaticText "Support-assisted password recovery"
+    - paragraph
+      - StaticText "Need help?"
+      - link "support@phenofarm.com" [ref=e361]
+  - heading "Authentication is not configured" [level=2, ref=e356]
+  - alert
+    - StaticText "The sign-in service is not configured correctly. Contact support if this continues."
+  - paragraph
+    - StaticText "If this keeps happening, email support from the account owner address and include your business name."
+  - link "Back to sign in" [ref=e357]
+  - link "Contact support" [ref=e358]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e362]
+  - image
+- alert

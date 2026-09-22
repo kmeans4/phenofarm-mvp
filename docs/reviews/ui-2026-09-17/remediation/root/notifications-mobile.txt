@@ -1,0 +1,234 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e338]
+  - button "Notifications" [expanded=true, ref=e339]
+    - StaticText "16"
+  - button "Open Grower navigation menu" [expanded=false, ref=e340]
+  - main
+    - sectionheader
+      - paragraph
+        - StaticText "GOOD MORNING"
+      - heading "Vermont Nurseries" [level=1, ref=e351]
+      - paragraph
+        - StaticText "Track buyer requests, estimated value, and catalog health from one place."
+    - link "Total Requests 20 17 pending review" [ref=e341]
+      - paragraph
+        - StaticText "Total Requests"
+      - paragraph
+        - StaticText "20"
+      - paragraph
+        - StaticText "17 pending review"
+    - link "Delivered Request Value $450.00 Value tracked only; settlement is direct" [ref=e342]
+      - paragraph
+        - StaticText "Delivered Request Value"
+      - paragraph
+        - StaticText "$450.00"
+      - paragraph
+        - StaticText "Value tracked only; settlement is direct"
+    - link "Active Customers 2 Manage dispensary relationships" [ref=e343]
+      - paragraph
+        - StaticText "Active Customers"
+      - paragraph
+        - StaticText "2"
+      - paragraph
+        - StaticText "Manage dispensary relationships"
+    - link "Active Products 3 Manage your catalog" [ref=e344]
+      - paragraph
+        - StaticText "Active Products"
+      - paragraph
+        - StaticText "3"
+      - paragraph
+        - StaticText "Manage your catalog"
+    - generic
+      - paragraph
+        - StaticText "SETUP & NEXT STEPS"
+      - heading "Review pending buyer requests" [level=2, ref=e352]
+      - paragraph
+        - StaticText "Pending requests are the fastest path to keeping buyers moving."
+      - link "Check catalog" [ref=e353]
+      - link "Review requests" [ref=e354]
+      - heading "Marketplace readiness" [level=3, ref=e355]
+      - paragraph
+        - StaticText "3 of 6 complete"
+      - paragraph
+        - StaticText "50% ready"
+      - paragraph
+        - StaticText "Profile"
+      - paragraph
+        - StaticText "Business profile has the basics buyers need."
+      - StaticText "Complete"
+      - paragraph
+        - StaticText "License"
+      - paragraph
+        - StaticText "Add a current license number and expiry date."
+      - link "Update license" [ref=e356]
+      - paragraph
+        - StaticText "Subscription"
+      - paragraph
+        - StaticText "Connect the cultivator subscription when Stripe Billing is ready."
+      - link "Review subscription" [ref=e357]
+      - paragraph
+        - StaticText "Catalog"
+      - paragraph
+        - StaticText "Products are available for buyer discovery."
+      - StaticText "Complete"
+      - paragraph
+        - StaticText "Commercial terms"
+      - paragraph
+        - StaticText "Set MOQ, fulfillment, region, response, and direct-payment defaults."
+      - link "Set terms" [ref=e358]
+      - paragraph
+        - StaticText "Request readiness"
+      - paragraph
+        - StaticText "Buyer requests are waiting for review."
+      - StaticText "Complete"
+    - generic
+      - paragraph
+        - StaticText "ATTENTION CENTER"
+      - heading "What needs your attention" [level=2, ref=e359]
+      - paragraph
+        - StaticText "New requests, unread buyer messages, cancellations, and recent fulfillment changes stay grouped here."
+      - StaticText "18"
+      - paragraph
+        - StaticText "New requests"
+      - paragraph
+        - StaticText "17"
+      - paragraph
+        - StaticText "Unread messages"
+      - paragraph
+        - StaticText "0"
+      - paragraph
+        - StaticText "Cancellations"
+      - paragraph
+        - StaticText "0"
+      - paragraph
+        - StaticText "Status changes"
+      - paragraph
+        - StaticText "1"
+      - article
+        - heading "6 new buyer requests" [level=3, ref=e362]
+        - StaticText "Review all"
+        - paragraph
+          - StaticText "Green Vermont Dispensary has 6 requests waiting for review."
+        - link "Review" [ref=e363]
+      - article
+        - heading "Recently delivered" [level=3, ref=e364]
+        - StaticText "Delivered"
+        - paragraph
+          - StaticText "ORD-20260917-REVIEW for Maple Street Market moved to Delivered."
+        - link "Review" [ref=e365]
+      - link "View all 17 in Requests →" [ref=e360]
+        - StaticText "View all 17 in Requests →"
+    - heading "Delivered Request Value (Last 30 Days)" [level=2, ref=e345]
+    - image "Delivered request value bar chart for the last 30 days. Maximum daily value is $450."
+      - generic
+        - generic
+          - StaticText "Scroll chart horizontally"
+          - StaticText "Swipe"
+        - StaticText "Tue"
+        - StaticText "Wed"
+        - StaticText "Thu"
+        - StaticText "Fri"
+        - StaticText "Sat"
+        - StaticText "Sun"
+        - StaticText "Mon"
+        - StaticText "Tue"
+        - StaticText "Wed"
+        - StaticText "Thu"
+        - StaticText "Fri"
+        - StaticText "Sat"
+        - StaticText "Sun"
+        - StaticText "Mon"
+        - StaticText "Tue"
+        - StaticText "Wed"
+        - StaticText "Thu"
+        - StaticText "Fri"
+        - StaticText "Sat"
+        - StaticText "Sun"
+        - StaticText "Mon"
+        - StaticText "Tue"
+        - StaticText "Wed"
+        - StaticText "Thu"
+        - StaticText "Fri"
+        - StaticText "Sat"
+        - StaticText "Sun"
+        - StaticText "Mon"
+        - StaticText "$450"
+        - StaticText "Tue"
+        - StaticText "Wed"
+    - heading "Activity Feed" [level=2, ref=e346]
+    - paragraph
+      - StaticText "Track new requests by timeframe without leaving the dashboard."
+    - link "View All Requests" [ref=e347]
+    - heading "Recent Activity" [level=2, ref=e348]
+    - combobox "Date range" [expanded=false, ref=e361]: Last 30 Days
+      - MenuListPopup
+        - option "Today" [ref=e366]
+        - option "Last 7 Days" [ref=e367]
+        - option "Last 30 Days" [selected, ref=e368]
+        - option "This Month" [ref=e369]
+        - option "Last Month" [ref=e370]
+        - option "All Time" [ref=e371]
+    - link "Request #ORD-20260917-REVIEW From Maple Street Market Sep 13, 8:00 PM" [ref=e349]
+      - paragraph
+        - StaticText "Request #ORD-20260917-REVIEW"
+      - paragraph
+        - StaticText "From Maple Street Market"
+      - paragraph
+        - StaticText "Sep 13, 8:00 PM"
+  - button "Open messages" [ref=e350]
+  - region "Notifications alt+T" [ref=e337]
+  - button "Open Next.js Dev Tools" [expanded=false, ref=e372]
+    - image
+  - alert
+  - button "Close notifications" [ref=e373]
+  - region "Notifications panel" [ref=e374]
+    - sectionheader
+      - heading "Notifications" [level=2, ref=e375]
+      - paragraph
+        - StaticText "16 unread"
+      - button "Mark all read" [ref=e376]
+      - button "Close notifications" [ref=e377]
+    - generic
+      - button "New order request Green Vermont Dispensary · #XPJO3I · $25.00 69d" [ref=e378]
+        - StaticText "New order request"
+        - StaticText "Green Vermont Dispensary · #XPJO3I · $25.00"
+        - time
+          - StaticText "69d"
+      - group
+        - DisclosureTriangle "New counter quote · 9 The other party sent revised quote terms for your review." [expanded=false]
+          - ListMarker "▸ "
+          - StaticText "New counter quote · 9"
+          - StaticText "The other party sent revised quote terms for your review."
+      - button "New order request Green Vermont Dispensary · #03UYXZ · $25.00 69d" [ref=e379]
+        - StaticText "New order request"
+        - StaticText "Green Vermont Dispensary · #03UYXZ · $25.00"
+        - time
+          - StaticText "69d"
+      - button "New order request Green Vermont Dispensary · #O78T5N · $25.00 69d" [ref=e380]
+        - StaticText "New order request"
+        - StaticText "Green Vermont Dispensary · #O78T5N · $25.00"
+        - time
+          - StaticText "69d"
+      - button "New order request Green Vermont Dispensary · #ZYGM3S · $25.00 69d" [ref=e381]
+        - StaticText "New order request"
+        - StaticText "Green Vermont Dispensary · #ZYGM3S · $25.00"
+        - time
+          - StaticText "69d"
+      - button "New order request Green Vermont Dispensary · #FMBIOT · $25.00 69d" [ref=e382]
+        - StaticText "New order request"
+        - StaticText "Green Vermont Dispensary · #FMBIOT · $25.00"
+        - time
+          - StaticText "69d"
+      - button "New order request Green Vermont Dispensary · #8088-1 · $25.00 69d" [ref=e383]
+        - StaticText "New order request"
+        - StaticText "Green Vermont Dispensary · #8088-1 · $25.00"
+        - time
+          - StaticText "69d"
+      - button "New order request Green Vermont Dispensary · #3047-1 · $25.00 69d" [ref=e384]
+        - StaticText "New order request"
+        - StaticText "Green Vermont Dispensary · #3047-1 · $25.00"
+        - time
+          - StaticText "69d"

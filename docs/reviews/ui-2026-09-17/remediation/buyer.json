@@ -1,0 +1,2732 @@
+{
+  "owner": "buyer",
+  "count": 83,
+  "items": [
+    {
+      "id": "BUY-001",
+      "title": "Completed setup card remains oversized",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/dashboard/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile dashboard: three compact mobile request rows, content-height cards, one Saved summary and distinct pending/in-progress values."
+      ],
+      "summary": "Completed setup becomes a compact Verified buyer link.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/dashboard"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-002",
+      "title": "Saved summary repeats labels and counts",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/dashboard/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile dashboard: three compact mobile request rows, content-height cards, one Saved summary and distinct pending/in-progress values."
+      ],
+      "summary": "Saved is one row with Favorites and Alerts counts.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/dashboard"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-003",
+      "title": "Recent requests subtitle describes implementation",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/dashboard/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile dashboard: three compact mobile request rows, content-height cards, one Saved summary and distinct pending/in-progress values."
+      ],
+      "summary": "Removed the internal tracker-format explanation.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/dashboard"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-004",
+      "title": "Dashboard cards leave large empty areas",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/dashboard/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile dashboard: three compact mobile request rows, content-height cards, one Saved summary and distinct pending/in-progress values."
+      ],
+      "summary": "Recent products fit their content; the empty weekly chart is a short message.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/dashboard"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-005",
+      "title": "Mobile recent requests need compact rows",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/dashboard/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile dashboard: three compact mobile request rows, content-height cards, one Saved summary and distinct pending/in-progress values."
+      ],
+      "summary": "Dashboard shows three compact linked mobile order rows with short IDs, grower/date, amount and status.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/dashboard"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-006",
+      "title": "Dashboard status labels are unclear",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/dashboard/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile dashboard: three compact mobile request rows, content-height cards, one Saved summary and distinct pending/in-progress values."
+      ],
+      "summary": "Awaiting response and In progress use distinct status counts; Request value is shorter and definitions are expandable.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/dashboard"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-007",
+      "title": "Catalog hero delays product browsing",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile catalog: short heading, compact toolbar, grouped seller context, reduced images and one availability statement; all request controls remain visible."
+      ],
+      "summary": "Catalog uses a short heading and description.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-008",
+      "title": "Mobile catalog toolbar spans three rows",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile catalog: short heading, compact toolbar, grouped seller context, reduced images and one availability statement; all request controls remain visible."
+      ],
+      "summary": "Mobile search and toolbar use two compact rows and preserve named sort/filter/view controls.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-009",
+      "title": "Product cards repeat seller and stock details",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile catalog: short heading, compact toolbar, grouped seller context, reduced images and one availability statement; all request controls remain visible."
+      ],
+      "summary": "Removed per-card seller text inside grower groups and repeated group counts.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-010",
+      "title": "Desktop price and quantity controls compete for space",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile catalog: short heading, compact toolbar, grouped seller context, reduced images and one availability statement; all request controls remain visible."
+      ],
+      "summary": "Availability appears once per product, next to request controls.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-011",
+      "title": "Missing-photo placeholders dominate listings",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile catalog: short heading, compact toolbar, grouped seller context, reduced images and one availability statement; all request controls remain visible."
+      ],
+      "summary": "Lab guidance is shortened to Lab results on request.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-012",
+      "title": "Catalog repeats counts and view state",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile catalog: short heading, compact toolbar, grouped seller context, reduced images and one availability statement; all request controls remain visible."
+      ],
+      "summary": "Phone product images are shorter; missing-photo space no longer dominates cards.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-013",
+      "title": "Sparse grower groups retain a four-column grid",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile catalog: short heading, compact toolbar, grouped seller context, reduced images and one availability statement; all request controls remain visible."
+      ],
+      "summary": "Removed repeated view CTA and reduced end-of-list copy and spacing.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-014",
+      "title": "Empty draft repeats payment guidance",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected empty draft at both widths; quote-only saved product offers Request pricing and priced recent product offers Add. Temporary browser draft restored afterward."
+      ],
+      "summary": "Empty draft has one short heading and helper line.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-015",
+      "title": "Quote-only suggestions use an ambiguous Add action",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected empty draft at both widths; quote-only saved product offers Request pricing and priced recent product offers Add. Temporary browser draft restored afterward."
+      ],
+      "summary": "Quote-only suggestions offer Request pricing instead of adding an unpriced item.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-016",
+      "title": "Empty-state copy and illustration delay suggestions",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected empty draft at both widths; quote-only saved product offers Request pricing and priced recent product offers Add. Temporary browser draft restored afterward."
+      ],
+      "summary": "Empty-state decorative padding and oversized icon are removed.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-017",
+      "title": "Saved destination label is unnecessarily abstract",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected empty draft at both widths; quote-only saved product offers Request pricing and priced recent product offers Add. Temporary browser draft restored afterward."
+      ],
+      "summary": "Suggestions use the concise Saved items heading.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-018",
+      "title": "Draft repeats direct-payment guidance",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected filled draft at both widths; named section anchors, larger remove targets, one total and one direct-payment note remain readable."
+      ],
+      "summary": "Payment guidance appears once with payment terms.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-019",
+      "title": "Default and refresh notices dominate mobile draft",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected filled draft at both widths; named section anchors, larger remove targets, one total and one direct-payment note remain readable."
+      ],
+      "summary": "Template actions are compact; reconciliation feedback appears only when product data changed.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-020",
+      "title": "Optional fields appear as warnings",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected filled draft at both widths; named section anchors, larger remove targets, one total and one direct-payment note remain readable."
+      ],
+      "summary": "Removed nonblocking warning-style suggestions for optional fields.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-021",
+      "title": "Mobile draft stepper duplicates visible sections",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected filled draft at both widths; named section anchors, larger remove targets, one total and one direct-payment note remain readable."
+      ],
+      "summary": "Items, Logistics and Terms are compact anchored navigation.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-022",
+      "title": "Draft summary repeats form details",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected filled draft at both widths; named section anchors, larger remove targets, one total and one direct-payment note remain readable."
+      ],
+      "summary": "Draft summary shows one Total and item/grower count.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-023",
+      "title": "Remove-item touch target is too narrow",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected filled draft at both widths; named section anchors, larger remove targets, one total and one direct-payment note remain readable."
+      ],
+      "summary": "Remove-item controls have 40px targets.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-024",
+      "title": "Mobile order stats consume four rows",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile order list: two-column mobile stats, distinct shortened IDs, grower/date/value/status and one result count."
+      ],
+      "summary": "Order statistics use a two-column mobile grid.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/orders"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-025",
+      "title": "Mobile order cards repeat labels and actions",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile order list: two-column mobile stats, distinct shortened IDs, grower/date/value/status and one result count."
+      ],
+      "summary": "Mobile orders are compact linked rows; legacy and current IDs retain distinguishable short labels.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/orders"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-026",
+      "title": "Order page repeats its heading",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile order list: two-column mobile stats, distinct shortened IDs, grower/date/value/status and one result count."
+      ],
+      "summary": "Orders is the sole page heading; removed Request Tracker heading.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/orders"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-027",
+      "title": "Order search placeholder is clipped",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile order list: two-column mobile stats, distinct shortened IDs, grower/date/value/status and one result count."
+      ],
+      "summary": "Search orders grows within the responsive filter row.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/orders"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-028",
+      "title": "Order result count appears twice",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile order list: two-column mobile stats, distinct shortened IDs, grower/date/value/status and one result count."
+      ],
+      "summary": "A single result count accompanies pagination.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/orders"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-029",
+      "title": "Order status wording differs across pages",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/page.tsx",
+        "app/dispensary/components/OrdersTable.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile order list: two-column mobile stats, distinct shortened IDs, grower/date/value/status and one result count."
+      ],
+      "summary": "Orders and dashboard use Awaiting response, In progress and Request value consistently.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/orders"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-030",
+      "title": "Order status is repeated four times",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/[id]/page.tsx",
+        "app/dispensary/orders/[id]/OrderDetailActions.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-desktop-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-message-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile request detail with compact header/actions, one Total, Export CSV and collapsed timeline/history; underlying role/status actions preserved."
+      ],
+      "summary": "Status remains in the heading; timeline and history are collapsed until requested.",
+      "sharedDependencies": [
+        "Root-owned OrderTimeline and OrderRecordExport display cleanup."
+      ],
+      "priority": "P2",
+      "routes": [
+        "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-031",
+      "title": "Mobile timeline delays requested items",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/[id]/page.tsx",
+        "app/dispensary/orders/[id]/OrderDetailActions.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-desktop-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-message-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile request detail with compact header/actions, one Total, Export CSV and collapsed timeline/history; underlying role/status actions preserved."
+      ],
+      "summary": "Expandable timeline keeps requested items near the top; shared timeline removes repeated stage/pending copy.",
+      "sharedDependencies": [
+        "Root-owned OrderTimeline and OrderRecordExport display cleanup."
+      ],
+      "priority": "P2",
+      "routes": [
+        "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-032",
+      "title": "Buyer action copy is noisy and state-inaccurate",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/[id]/page.tsx",
+        "app/dispensary/orders/[id]/OrderDetailActions.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-desktop-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-message-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile request detail with compact header/actions, one Total, Export CSV and collapsed timeline/history; underlying role/status actions preserved. Opened withdrawal confirmation at desktop/360px and canceled; no order mutation."
+      ],
+      "summary": "Only available buyer actions are shown; withdrawal consequences appear in confirmation.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-033",
+      "title": "Two message actions compete",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/[id]/page.tsx",
+        "app/dispensary/orders/[id]/OrderDetailActions.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-desktop-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-message-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile request detail with compact header/actions, one Total, Export CSV and collapsed timeline/history; underlying role/status actions preserved. Opened Message grower; confirmed the editable update draft, then cleared it and closed without sending."
+      ],
+      "summary": "One Message grower action opens an editable update draft for active requests.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-034",
+      "title": "Request value is repeated",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/[id]/page.tsx",
+        "app/dispensary/orders/[id]/OrderDetailActions.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-desktop-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-message-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile request detail with compact header/actions, one Total, Export CSV and collapsed timeline/history; underlying role/status actions preserved."
+      ],
+      "summary": "A single Total replaces duplicate item/request totals when there are no fees.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-035",
+      "title": "Export occupies a separate row",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/[id]/page.tsx",
+        "app/dispensary/orders/[id]/OrderDetailActions.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-desktop-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-message-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile request detail with compact header/actions, one Total, Export CSV and collapsed timeline/history; underlying role/status actions preserved."
+      ],
+      "summary": "Export CSV is in the page header action group.",
+      "sharedDependencies": [
+        "Root-owned OrderTimeline and OrderRecordExport display cleanup."
+      ],
+      "priority": "P3",
+      "routes": [
+        "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-036",
+      "title": "Neutral details use warning styling",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/orders/[id]/page.tsx",
+        "app/dispensary/orders/[id]/OrderDetailActions.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-desktop-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-message-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile request detail with compact header/actions, one Total, Export CSV and collapsed timeline/history; underlying role/status actions preserved."
+      ],
+      "summary": "Request details use neutral styling and Payment terms.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-037",
+      "title": "Shop repeats verification and category details",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile shop: compact terms, products near the top, contained shorter images, normalized product type, per-unit prices and full request controls."
+      ],
+      "summary": "Verification/license appear once in a compact shop header; product types remain in filters.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-038",
+      "title": "Commercial terms delay the mobile product list",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile shop: compact terms, products near the top, contained shorter images, normalized product type, per-unit prices and full request controls."
+      ],
+      "summary": "A short fulfillment/minimum line precedes products; full shop details expand beneath them.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-039",
+      "title": "Shop message label opens an anchor",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile shop: compact terms, products near the top, contained shorter images, normalized product type, per-unit prices and full request controls."
+      ],
+      "summary": "Browse products accurately describes the header anchor action.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-040",
+      "title": "Shop placeholders dominate mobile product cards",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile shop: compact terms, products near the top, contained shorter images, normalized product type, per-unit prices and full request controls."
+      ],
+      "summary": "Shop phone product images are 96px tall, bringing the first product into the first screen.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-041",
+      "title": "Shop card wording differs from catalog",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile shop: compact terms, products near the top, contained shorter images, normalized product type, per-unit prices and full request controls. Toggled List, opened quote-only Request pricing at360px, confirmed16px textarea, and dismissed without sending."
+      ],
+      "summary": "Shop cards share catalog THC colors, product-type normalization, price units, request labels and one stock statement.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-042",
+      "title": "Commercial terms mix topics and repeat payment copy",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile shop: compact terms, products near the top, contained shorter images, normalized product type, per-unit prices and full request controls."
+      ],
+      "summary": "Shop details separate minimum, reply window, fulfillment and direct payment facts.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-043",
+      "title": "Shop repeats product-list context",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile shop: compact terms, products near the top, contained shorter images, normalized product type, per-unit prices and full request controls."
+      ],
+      "summary": "Products (count) is the single product-list context label.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-044",
+      "title": "Desktop branding card stretches into empty space",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/settings/page.tsx",
+        "app/dispensary/settings/components/SettingsForm.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile settings: license fields match their section, branding fits content, two-column desktop fields and labelled Sign out; no profile changes submitted."
+      ],
+      "summary": "Branding fits its content while business fields use a two-column desktop layout.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/settings"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-045",
+      "title": "Complete account still receives setup instructions",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/settings/page.tsx",
+        "app/dispensary/settings/components/SettingsForm.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile settings: license fields match their section, branding fits content, two-column desktop fields and labelled Sign out; no profile changes submitted."
+      ],
+      "summary": "Completed accounts show Verified through; setup guidance is conditional on missing required fields.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/settings"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-046",
+      "title": "License fields are grouped under the wrong section",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/settings/page.tsx",
+        "app/dispensary/settings/components/SettingsForm.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile settings: license fields match their section, branding fits content, two-column desktop fields and labelled Sign out; no profile changes submitted."
+      ],
+      "summary": "License number, state and expiry controls moved into License & verification with existing validation intact.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/settings"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-047",
+      "title": "Settings labels repeat account context",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/settings/page.tsx",
+        "app/dispensary/settings/components/SettingsForm.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile settings: license fields match their section, branding fits content, two-column desktop fields and labelled Sign out; no profile changes submitted."
+      ],
+      "summary": "Settings and field labels omit redundant dispensary/business prefixes.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/settings"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-048",
+      "title": "Persistent footer repeats draft and shortcut guidance",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/settings/page.tsx",
+        "app/dispensary/settings/components/SettingsForm.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile settings: license fields match their section, branding fits content, two-column desktop fields and labelled Sign out; no profile changes submitted."
+      ],
+      "summary": "Save bars show relevant Saving, Unsaved changes or Saved status; removed persistent browser/keyboard instructions.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/settings"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-049",
+      "title": "Sign-out action lacks a visible label",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/settings/page.tsx",
+        "app/dispensary/settings/components/SettingsForm.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile settings: license fields match their section, branding fits content, two-column desktop fields and labelled Sign out; no profile changes submitted."
+      ],
+      "summary": "Account offers a visibly labelled Sign out button.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/settings"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-050",
+      "title": "Saved header and tabs delay the first product",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/saved/SavedContent.tsx",
+        "app/dispensary/favorites/FavoritesContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected Saved at both widths and toggled named List/Grid controls; default list and quote-only Request pricing remain readable."
+      ],
+      "summary": "Saved uses a short heading, compact horizontal tabs and one sorting/view toolbar.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/saved",
+        "/dispensary/saved?tab=favorites",
+        "/dispensary/favorites"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-051",
+      "title": "Clear favorites is too prominent",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/saved/SavedContent.tsx",
+        "app/dispensary/favorites/FavoritesContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/favorites-clear-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/favorites-clear-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Opened More then Clear favorites at both widths; shared confirmation stays above navigation, traps focus and dismisses with Cancel/Escape. No favorites cleared."
+      ],
+      "summary": "Clear favorites moved into More and retains confirmation.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/saved",
+        "/dispensary/saved?tab=favorites",
+        "/dispensary/favorites"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-052",
+      "title": "Saved quote-only card repeats pricing guidance",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/saved/SavedContent.tsx",
+        "app/dispensary/favorites/FavoritesContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected Saved at both widths and toggled named List/Grid controls; default list and quote-only Request pricing remain readable."
+      ],
+      "summary": "Quote-only favorites show one Request pricing action without duplicated guidance.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/saved",
+        "/dispensary/saved?tab=favorites",
+        "/dispensary/favorites"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-053",
+      "title": "Sparse favorites grid wastes space",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/saved/SavedContent.tsx",
+        "app/dispensary/favorites/FavoritesContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected Saved at both widths and toggled named List/Grid controls; default list and quote-only Request pricing remain readable."
+      ],
+      "summary": "Favorites default to compact List; Grid remains available with shorter images.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/saved",
+        "/dispensary/saved?tab=favorites",
+        "/dispensary/favorites"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-054",
+      "title": "Alert summary delays the first mobile product",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/price-alerts/PriceAlertsContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected Active alerts at both widths: compact tabs/toolbar, one pair of per-unit prices and manually refreshed-state wording."
+      ],
+      "summary": "Alerts use compact Saved tabs and a single toolbar above the first product.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/saved?tab=alerts",
+        "/dispensary/price-alerts"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-055",
+      "title": "Alert counts appear three times",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/price-alerts/PriceAlertsContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected Active alerts at both widths: compact tabs/toolbar, one pair of per-unit prices and manually refreshed-state wording."
+      ],
+      "summary": "Alert counts appear once in Active and Triggered tabs.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/saved?tab=alerts",
+        "/dispensary/price-alerts"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-056",
+      "title": "Alert cards repeat target price and units",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/price-alerts/PriceAlertsContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected Active alerts at both widths: compact tabs/toolbar, one pair of per-unit prices and manually refreshed-state wording."
+      ],
+      "summary": "Current and target per-unit prices are paired; removed repeated unit/target badges.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/saved?tab=alerts",
+        "/dispensary/price-alerts"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-057",
+      "title": "Manual price-check explanation needs shorter copy",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/price-alerts/PriceAlertsContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected Active alerts at both widths: compact tabs/toolbar, one pair of per-unit prices and manually refreshed-state wording."
+      ],
+      "summary": "Manual-check copy is one line; Refresh remains visible and Clear alerts is under More.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/saved?tab=alerts",
+        "/dispensary/price-alerts"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-058",
+      "title": "Recent tab repeats its purpose and metadata",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/saved/SavedContent.tsx",
+        "app/dispensary/favorites/FavoritesContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/recent-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/recent-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected Recent at both widths: grower/count/date metadata on one compact line with price per unit and retained navigation actions."
+      ],
+      "summary": "Recent products omit repeated intro copy and use compact grower/count/date metadata and unit notation.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/saved?tab=recent"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-065",
+      "title": "Catalog shows an orphan draft-count badge",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected View draft link/count in Catalog. Source review confirms navigation CartBadge stays inline, avoiding nested links."
+      ],
+      "summary": "Catalog draft count is attached to a View draft link; navigation badge remains valid inline markup.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-066",
+      "title": "Open desktop filters clip product action controls",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-desktop.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected actual open desktop filter sidebar: cards retain minimum width, price row is separate and quantity/Add controls remain within card padding.",
+        "Final regression: relevant clipping/geometry, layering or action-reachability check passed in tests/buyer-ui-layout-regressions.spec.ts (five of five passed, root run)."
+      ],
+      "summary": "Auto-fit cards enforce a usable minimum width; price sits above full-width quantity/Add controls with filters open.",
+      "priority": "P1",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-067",
+      "title": "Filter shortcuts are oversized",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected open desktop filter sidebar and mobile sheet; compact checkboxes, Favorites only label, one price-unit label and reachable Apply filters."
+      ],
+      "summary": "Filter shortcuts are compact checkboxes.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-068",
+      "title": "Filter action and toggle labels are unclear",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected open desktop filter sidebar and mobile sheet; compact checkboxes, Favorites only label, one price-unit label and reachable Apply filters."
+      ],
+      "summary": "Favorites only is a labelled checkbox and the sheet ends with Apply filters.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-069",
+      "title": "Price filters repeat unit wording",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected open desktop filter sidebar and mobile sheet; compact checkboxes, Favorites only label, one price-unit label and reachable Apply filters."
+      ],
+      "summary": "Price per unit is stated once above shortened range options.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-070",
+      "title": "Mobile message context truncates both names",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/composer-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected composer at desktop and 360px: wrapping product/grower context, concise templates, 16px mobile textarea and reachable actions. No message sent."
+      ],
+      "summary": "Message context uses wrapping product and To: grower lines.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-071",
+      "title": "Mobile message input text is small",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/composer-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected composer at desktop and 360px: wrapping product/grower context, concise templates, 16px mobile textarea and reachable actions. No message sent."
+      ],
+      "summary": "Catalog message input uses 16px text on phones.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-072",
+      "title": "Pricing composer repeats explanations",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/composer-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/composer-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected composer at desktop and 360px: wrapping product/grower context, concise templates, 16px mobile textarea and reachable actions. No message sent."
+      ],
+      "summary": "Pricing templates are concise and Replies in Messages is a single quiet line.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-073",
+      "title": "Price alert dialog omits manual-check limitation",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected target-price dialog at both widths: explicit manual check timing and matching target/current sale-unit notation. No alert submitted."
+      ],
+      "summary": "Target-price dialog states that checking occurs on visits or refresh.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-074",
+      "title": "Price alert dialog omits sale unit",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected target-price dialog at both widths: explicit manual check timing and matching target/current sale-unit notation. No alert submitted."
+      ],
+      "summary": "Target-price input and current price show their sale unit without nested card decoration.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-075",
+      "title": "Comparison dialog sits behind navigation",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected comparison at 1440/390/360px, including three products at 360px: portaled above navigation, shared attribute labels, separate request rows and reachable close control. Escape dismisses.",
+        "Final regression: relevant clipping/geometry, layering or action-reachability check passed in tests/buyer-ui-layout-regressions.spec.ts (five of five passed, root run)."
+      ],
+      "summary": "Compare is portaled above navigation with a bounded, scrolling panel and reachable close control.",
+      "priority": "P1",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-076",
+      "title": "Mobile comparison columns are too narrow",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected comparison at 1440/390/360px, including three products at 360px: portaled above navigation, shared attribute labels, separate request rows and reachable close control. Escape dismisses."
+      ],
+      "summary": "Comparison uses shared attribute labels, short units, compact headers and separate action rows; full quantity selection remains expandable.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-077",
+      "title": "Comparison repeats decorative and explanatory content",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected comparison at 1440/390/360px, including three products at 360px: portaled above navigation, shared attribute labels, separate request rows and reachable close control. Escape dismisses."
+      ],
+      "summary": "Compare title and thumbnails are compact; grower appears once per product.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-078",
+      "title": "Mobile draft Add link is ambiguous",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected mobile Add items shortcut and desktop draft navigation; existing link destination preserved."
+      ],
+      "summary": "Mobile draft shortcut reads Add items.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-079",
+      "title": "Mobile review dialog clips submission and back actions",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected review at 1440/390/360px: header and Back/Submit remain visible above navigation, body scrolls and final recap has one Total. Dismissed without submitting.",
+        "Final regression: relevant clipping/geometry, layering or action-reachability check passed in tests/buyer-ui-layout-regressions.spec.ts (five of five passed, root run)."
+      ],
+      "summary": "Review is portaled above navigation with fixed header/footer and a scrollable body; Back and Submit remain inside the viewport.",
+      "priority": "P1",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-080",
+      "title": "Review dialog repeats its purpose and summary",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected review at 1440/390/360px: header and Back/Submit remain visible above navigation, body scrolls and final recap has one Total. Dismissed without submitting."
+      ],
+      "summary": "Review request is the sole title; details use a compact grid.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-081",
+      "title": "Review edit links are small and recap repeats copy",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/cart/page.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-360-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected review at 1440/390/360px: header and Back/Submit remain visible above navigation, body scrolls and final recap has one Total. Dismissed without submitting."
+      ],
+      "summary": "Review edit controls have 40px targets; final recap has one Total and short direct-payment note.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/cart"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-082",
+      "title": "Shop anchor hides its destination heading",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-anchor-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-anchor-stable-mobile-viewport.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Clicked Browse products; product heading lands below fixed mobile header. No application data changed. Product heading top95.75px versus fixed header65px."
+      ],
+      "summary": "Browse products anchor uses a mobile-header scroll offset.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-083",
+      "title": "Shop action button reaches beyond card padding",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/grower/[id]/page.tsx",
+        "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected desktop/mobile shop cards: separate price row and quantity/Add controls fully contained within card padding."
+      ],
+      "summary": "Shop price has its own row above quantity/Add, preserving card padding.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/grower/grower-001"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-084",
+      "title": "Saved mobile view controls have no accessible names",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/saved/SavedContent.tsx",
+        "app/dispensary/favorites/FavoritesContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Toggled accessible Grid view and List view controls; pressed state and visible card layout changed correctly."
+      ],
+      "summary": "Saved view controls have Grid view/List view labels and pressed states.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/saved",
+        "/dispensary/saved?tab=favorites",
+        "/dispensary/favorites"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-085",
+      "title": "Mobile alert icons have no accessible names",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/price-alerts/PriceAlertsContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-menu-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected named Refresh, More, delete and clear actions; opened Clear alerts confirmation and canceled. Mark-seen naming reviewed in source because the fixture has no triggered alert. No alerts changed."
+      ],
+      "summary": "Alert Refresh, More, delete and mark-seen actions have accessible names.",
+      "priority": "P2",
+      "routes": [
+        "/dispensary/saved?tab=alerts",
+        "/dispensary/price-alerts"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-086",
+      "title": "Triggered-alert empty state repeats instructions",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/price-alerts/PriceAlertsContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-triggered-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-triggered-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected compact Triggered empty state at both widths; View active alerts switches to Active and restores the product list."
+      ],
+      "summary": "Triggered empty state is compact; View active alerts switches to Active.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/saved?tab=alerts",
+        "/dispensary/price-alerts"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-087",
+      "title": "Alert History lacks dates or events",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/price-alerts/PriceAlertsContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-mobile.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected accurately named All tab beside counted Active and Triggered tabs; combined-list behavior preserved."
+      ],
+      "summary": "The combined alert tab is correctly named All.",
+      "priority": "P3",
+      "routes": [
+        "/dispensary/saved?tab=alerts",
+        "/dispensary/price-alerts"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-088",
+      "title": "Saved mobile list view overlaps product text",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/saved/SavedContent.tsx",
+        "app/dispensary/favorites/FavoritesContent.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-list-stable-360.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected default Saved list at 1440/390/360px: product identity is readable and quote request/message/remove controls occupy a separate mobile row.",
+        "Final regression: relevant clipping/geometry, layering or action-reachability check passed in tests/buyer-ui-layout-regressions.spec.ts (five of five passed, root run)."
+      ],
+      "summary": "Saved list has readable thumbnail/identity and separate mobile price/actions rows.",
+      "priority": "P1",
+      "routes": [
+        "/dispensary/saved",
+        "/dispensary/saved?tab=favorites",
+        "/dispensary/favorites"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    },
+    {
+      "id": "BUY-092",
+      "title": "Catalog mobile list hides prices and Add buttons",
+      "status": "fixed and verified",
+      "files": [
+        "app/dispensary/catalog/CatalogContent.tsx",
+        "app/dispensary/catalog/components/AddToCartButton.tsx",
+        "app/dispensary/catalog/components/CartBadge.tsx",
+        "app/dispensary/catalog/components/MobileFilterSheet.tsx"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-list-stable-360.png"
+      ],
+      "checks": [
+        "Scoped ESLint passed after this implementation batch.",
+        "Initial fix visually inspected; final repeat and focused geometry regression remain pending.",
+        "Reviewed preserved data contracts, event handlers, validation and authorization; changes are UI composition, display labels and nonoverlapping status counts.",
+        "Rendered verification: Inspected catalog List at 390/360px: full identity, price and request actions in separate rows without overlap.",
+        "Final regression: relevant clipping/geometry, layering or action-reachability check passed in tests/buyer-ui-layout-regressions.spec.ts (five of five passed, root run)."
+      ],
+      "summary": "Catalog list separates mobile identity, price and request controls into full-width areas.",
+      "priority": "P1",
+      "routes": [
+        "/dispensary/catalog"
+      ],
+      "verification": {
+        "sourceReview": "Complete; reviewed after change against task baseline.",
+        "rendered": "passed",
+        "automated": "Passed: five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions; executed serially by root against isolated clone."
+      }
+    }
+  ],
+  "scope": "83 buyer-owned findings; shared BUY-059\u2013064 and BUY-089\u2013091 are recorded by root.",
+  "environment": "Local http://localhost:3144; isolated phenofarm_ui_fixes_20260917 clone; signed buyer fixture. No live app submissions, original database edits, commit, push or deployment by this work.",
+  "checks": [
+    "Scoped ESLint passed for all app/dispensary sources and four affected Playwright specifications.",
+    "All 83 findings implemented; final stable-build rendered and five high-priority layout regression checks pending."
+  ],
+  "verificationNotes": [
+    "Each linked screenshot was freshly captured after the fix and visually inspected. Companion JSON/text files record DOM geometry and accessible structure.",
+    "Evidence with stable in its filename was captured from the local production build. Earlier development-server captures are not used as final proof.",
+    "Manual checks did not submit orders/messages, change saved products, or save settings. Only ephemeral browser draft state was adjusted and restored.",
+    "Source review and scoped ESLint passed. Root reported aggregate npm run verify passed; five buyer layout regressions, 14 existing buyer regressions and five profile-settings regressions passed serially against the isolated clone.",
+    "A later whole-app sweep reported intermittent React418 on buyer dashboard and several grower pages. Fresh isolated buyer diagnostic sessions (normal/reduced motion) had zero errors, raw SSR and hydrated dates matched, and root repeated the production buyer dashboard five times cleanly. No buyer source defect was reproduced; root is running a clean serialized whole-app repeat before final completion."
+  ],
+  "statusCounts": {
+    "fixed and verified": 83
+  },
+  "coverage": [
+    {
+      "route": "/dispensary/dashboard",
+      "viewports": [
+        1440,
+        390
+      ],
+      "states": [
+        "verified-buyer summary",
+        "recent orders",
+        "saved summary",
+        "empty weekly chart"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/dashboard-stable-mobile.png"
+      ]
+    },
+    {
+      "route": "/dispensary/catalog",
+      "viewports": [
+        1440,
+        390,
+        360
+      ],
+      "states": [
+        "default Grid",
+        "mobile List",
+        "desktop filters open",
+        "mobile filter sheet",
+        "message/pricing composer",
+        "price-alert dialog",
+        "Compare two and three products"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/filters-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/catalog-list-stable-360.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/composer-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/composer-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/price-alert-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/compare-stable-360-viewport.png"
+      ]
+    },
+    {
+      "route": "/dispensary/cart",
+      "viewports": [
+        1440,
+        390,
+        360
+      ],
+      "states": [
+        "empty draft and suggestions",
+        "filled draft",
+        "review dialog",
+        "Back dismissal"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/cart-empty-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/review-stable-360-viewport.png"
+      ]
+    },
+    {
+      "route": "/dispensary/orders",
+      "viewports": [
+        1440,
+        390
+      ],
+      "states": [
+        "desktop table",
+        "mobile linked rows",
+        "stats and filters",
+        "distinct legacy/current short IDs"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/orders-stable-mobile.png"
+      ]
+    },
+    {
+      "route": "/dispensary/orders/[id]",
+      "fixtureRoute": "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "viewports": [
+        1440,
+        390,
+        360
+      ],
+      "states": [
+        "default pending request",
+        "expanded timeline and history",
+        "withdraw confirmation canceled",
+        "editable Message grower update draft cleared without sending"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-expanded-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-desktop-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-withdraw-stable-360-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/detail-message-stable-360-viewport.png"
+      ]
+    },
+    {
+      "route": "/dispensary/grower/[id]",
+      "fixtureRoute": "/dispensary/grower/grower-001",
+      "viewports": [
+        1440,
+        390,
+        360
+      ],
+      "states": [
+        "default Grid",
+        "mobile List",
+        "Browse products anchor",
+        "expanded shop facts",
+        "quote-only composer dismissed"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-details-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-list-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-anchor-stable-mobile-viewport.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/shop-composer-stable-360-viewport.png"
+      ]
+    },
+    {
+      "route": "/dispensary/settings",
+      "viewports": [
+        1440,
+        390
+      ],
+      "states": [
+        "verified complete profile",
+        "license section",
+        "business profile",
+        "branding",
+        "Account"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/settings-stable-mobile.png"
+      ]
+    },
+    {
+      "route": "/dispensary/saved",
+      "viewports": [
+        1440,
+        390,
+        360
+      ],
+      "states": [
+        "Favorites List",
+        "Favorites Grid",
+        "More/Clear confirmation with focus and Escape checks",
+        "Recent",
+        "Active alerts",
+        "Triggered empty",
+        "View Active Alerts transition",
+        "All label",
+        "More/Clear alerts confirmation canceled"
+      ],
+      "evidence": [
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-grid-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/favorites-clear-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/favorites-clear-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/recent-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/recent-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-triggered-stable-desktop.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-triggered-stable-mobile.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/saved-list-stable-360.png",
+        "docs/reviews/ui-2026-09-17/remediation/buyer/alerts-menu-stable-mobile.png"
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "route": "/dispensary/favorites",
+      "destination": "/dispensary/saved?tab=favorites",
+      "verification": "Route code unchanged; destination tab rendered at desktop/mobile."
+    },
+    {
+      "route": "/dispensary/price-alerts",
+      "destination": "/dispensary/saved?tab=alerts",
+      "verification": "Route code unchanged; destination tab rendered at desktop/mobile."
+    }
+  ],
+  "limitations": [
+    "Rendered detail checks used a pending request fixture; status-specific actions retain their existing guards and are covered by the broader existing workflow checks where applicable.",
+    "The fixture has no triggered alert, so mark-seen visual state was reviewed in source; Active/Triggered/All controls and empty-state navigation were inspected.",
+    "Manual browser verification did not send messages, submit orders, clear favorites/alerts, or save profile settings. Root executed functional regressions only against the isolated clone."
+  ]
+}

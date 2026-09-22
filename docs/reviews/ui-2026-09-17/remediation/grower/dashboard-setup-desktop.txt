@@ -1,0 +1,235 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e3806]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3807]
+    - StaticText "Notifications"
+    - StaticText "19"
+  - navigation "Portal navigation" [ref=e3808]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3810]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e3811]
+      - StaticText "Catalog"
+    - link "Products" [ref=e3812]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3813]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3814]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3815]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3816]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3817]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3818]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3819]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3809]
+- main
+  - sectionheader
+    - paragraph
+      - StaticText "GOOD MORNING"
+    - heading "Vermont Nurseries" [level=1, ref=e3789]
+  - generic "Summary"
+    - link "Requests 20" [ref=e3790]
+      - paragraph
+        - StaticText "Requests"
+      - paragraph
+        - StaticText "20"
+    - link "Delivered value $450" [ref=e3791]
+      - paragraph
+        - StaticText "Delivered value"
+      - paragraph
+        - StaticText "$450"
+    - link "Customers 2" [ref=e3792]
+      - paragraph
+        - StaticText "Customers"
+      - paragraph
+        - StaticText "2"
+    - link "Products 3" [ref=e3793]
+      - paragraph
+        - StaticText "Products"
+      - paragraph
+        - StaticText "3"
+  - generic
+    - heading "Needs attention" [level=2, ref=e3794]
+    - StaticText "18"
+    - paragraph
+      - StaticText "New requests"
+    - paragraph
+      - StaticText "17"
+    - paragraph
+      - StaticText "Unread messages"
+    - paragraph
+      - StaticText "0"
+    - paragraph
+      - StaticText "Cancellations"
+    - paragraph
+      - StaticText "0"
+    - paragraph
+      - StaticText "Status changes"
+    - paragraph
+      - StaticText "1"
+    - article
+      - heading "6 new buyer requests" [level=3, ref=e3796]
+      - StaticText "Review all"
+      - paragraph
+        - StaticText "Green Vermont Dispensary has 6 requests waiting for review."
+      - link "Review" [ref=e3797]
+    - article
+      - heading "Recently delivered" [level=3, ref=e3798]
+      - StaticText "Delivered"
+      - paragraph
+        - StaticText "ORD-20260917-REVIEW for Maple Street Market moved to Delivered."
+      - link "Review" [ref=e3799]
+    - link "Review 17 requests →" [ref=e3795]
+      - StaticText "Review 17 requests →"
+  - group
+    - DisclosureTriangle "Setup · 3 left" [expanded=true]
+      - StaticText "Setup · 3 left"
+    - paragraph
+      - StaticText "License"
+    - paragraph
+      - StaticText "Add a current license number and expiry date."
+    - link "Update license" [ref=e3820]
+    - paragraph
+      - StaticText "Subscription"
+    - paragraph
+      - StaticText "Choose a plan for your business."
+    - link "Review subscription" [ref=e3821]
+    - paragraph
+      - StaticText "Commercial terms"
+    - paragraph
+      - StaticText "Set minimum order, delivery and payment terms."
+    - link "Set terms" [ref=e3822]
+    - paragraph
+      - StaticText "Complete: Profile, Catalog, Request readiness."
+  - heading "Delivered value · 30 days" [level=2, ref=e3783]
+  - paragraph
+    - StaticText "Aug 19–Sep 17 · Payment is arranged directly with buyers."
+  - image "Delivered request value bar chart for the last 30 days. Maximum daily value is $450."
+    - generic
+      - StaticText "$0"
+    - StaticText "8/19"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/20"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/21"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/22"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/23"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/24"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/25"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/26"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/27"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/28"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/29"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/30"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/31"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/1"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/2"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/3"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/4"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/5"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/6"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/7"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/8"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/9"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/10"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/11"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/12"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/13"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/14"
+    - generic
+      - StaticText "$450"
+    - StaticText "9/15"
+    - StaticText "$450"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/16"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/17"
+  - heading "Recent activity" [level=2, ref=e3784]
+  - combobox "Date range" [expanded=false, ref=e3785]: Last 30 Days
+    - MenuListPopup
+      - option "Today" [ref=e3800]
+      - option "Last 7 Days" [ref=e3801]
+      - option "Last 30 Days" [selected, ref=e3802]
+      - option "This Month" [ref=e3803]
+      - option "Last Month" [ref=e3804]
+      - option "All Time" [ref=e3805]
+  - link "All requests" [ref=e3786]
+  - link "Request #ORD-20260917-REVIEW From Maple Street Market Sep 13, 8:00 PM" [ref=e3787]
+    - paragraph
+      - StaticText "Request #ORD-20260917-REVIEW"
+    - paragraph
+      - StaticText "From Maple Street Market"
+    - paragraph
+      - StaticText "Sep 13, 8:00 PM"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3823]
+  - button "Open messages" [ref=e3788]
+- region "Notifications alt+T" [ref=e3779]
+- alert

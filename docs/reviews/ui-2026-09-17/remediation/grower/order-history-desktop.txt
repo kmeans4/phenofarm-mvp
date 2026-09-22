@@ -1,0 +1,107 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e2051]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2052]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e2053]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2056]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2057]
+      - StaticText "Catalog"
+    - link "Products" [ref=e2058]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2059]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2060]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2061]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2062]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2063]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2064]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2065]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2054]
+- main
+  - sectionheader
+    - heading "Request history" [level=1, ref=e2066]
+    - link "Active requests" [ref=e2067]
+      - button "Active requests" [ref=e2072]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Requests"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "Delivered"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "Cancelled"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "Delivered value"
+    - paragraph
+      - StaticText "$450"
+  - generic "Request history status filter"
+    - link "All 2" [ref=e2068]
+      - StaticText "All"
+      - StaticText "2"
+    - link "Delivered 1" [ref=e2069]
+      - StaticText "Delivered"
+      - StaticText "1"
+    - link "Cancelled 1" [ref=e2070]
+      - StaticText "Cancelled"
+      - StaticText "1"
+  - table
+    - rowgroup
+      - row
+        - columnheader "REQUEST #" [ref=e2085]
+        - columnheader "CUSTOMER" [ref=e2086]
+        - columnheader "CLOSED" [ref=e2087]
+        - columnheader "EST. VALUE" [ref=e2088]
+        - columnheader "STATUS" [ref=e2089]
+        - columnheader "ACTIONS" [ref=e2090]
+    - row
+      - cell "#ORD-20260917-REVIEW" [ref=e2073]
+        - generic
+          - StaticText "#ORD-20260917-REVIEW"
+      - cell "Maple Street Market" [ref=e2074]
+      - cell "Sep 17, 2026" [ref=e2075]
+      - cell "$450.00" [ref=e2076]
+        - StaticText "$450.00"
+      - cell "Delivered" [ref=e2077]
+      - cell "View" [ref=e2078]
+        - link "View" [ref=e2091]
+    - row
+      - cell "#ORD-1781123929454-1" [ref=e2079]
+        - generic
+          - StaticText "#ORD-1781123929454-1"
+      - cell "Green Vermont Dispensary" [ref=e2080]
+      - cell "Jun 10, 2026" [ref=e2081]
+      - cell "$25.00" [ref=e2082]
+        - StaticText "$25.00"
+      - cell "Cancelled" [ref=e2083]
+      - cell "View" [ref=e2084]
+        - link "View" [ref=e2092]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2071]
+  - button "Open messages" [ref=e2055]
+- region "Notifications alt+T" [ref=e2050]
+- alert

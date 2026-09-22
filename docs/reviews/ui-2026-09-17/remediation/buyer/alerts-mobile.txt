@@ -1,0 +1,61 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e461]
+- button "Notifications" [expanded=false, ref=e462]
+  - StaticText "18"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e463]
+- main
+  - sectionheader
+    - heading "Saved" [level=1, ref=e465]
+    - link "Browse Catalog" [ref=e466]
+  - tablist "Saved workspace"
+    - tab "Favorites (1)" [ref=e467]
+      - StaticText "Favorites"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Alerts (1)" [selected, ref=e468]
+      - StaticText "Alerts"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Recent (1)" [ref=e469]
+      - StaticText "Recent"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+  - tabpanel "Alerts (1)"
+    - paragraph
+      - StaticText "Checks when you visit or refresh."
+    - button "Refresh prices" [ref=e470]
+      - StaticText "Refresh"
+    - group
+      - DisclosureTriangle "More" [expanded=false]
+    - button "Active (1)" [ref=e471]
+    - button "Triggered (0)" [ref=e472]
+    - button "All" [ref=e473]
+    - link "Purple Haze Flowers" [ref=e474]
+      - image "Purple Haze Flowers"
+    - heading "Purple Haze Flowers" [level=3, ref=e475]
+    - paragraph
+      - StaticText "by "
+      - link "Vermont Nurseries" [ref=e477]
+    - StaticText "THC "
+    - StaticText "24.8"
+    - StaticText "%"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "CURRENT"
+    - paragraph
+      - StaticText "$25.00/g"
+    - paragraph
+      - StaticText "TARGET"
+    - paragraph
+      - StaticText "$20.00/g"
+    - button "Remove alert" [ref=e476]
+- button "Open messages" [ref=e464]
+- region "Notifications alt+T" [ref=e460]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e478]
+  - image
+- alert

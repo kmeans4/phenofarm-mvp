@@ -1,0 +1,37 @@
+{
+  "slug": "24-navigation",
+  "route": "/grower/dashboard",
+  "state": "Shared desktop sidebar and mobile navigation drawer",
+  "pass1": {
+    "inspected": [
+      "pass-1/24-navigation-desktop.png",
+      "pass-1/24-navigation-mobile.png"
+    ],
+    "strengths": [
+      "Mobile navigation fits390x844, has clear touch rows and visible close/sign-out controls; desktop sections are tidy."
+    ],
+    "issues": [
+      {
+        "key": "navigation-overview-label",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "\u2018Dashboard\u2019 and \u2018Overview\u2019 are adjacent destinations, but Overview opens Catalog Workspace. The shell calls the role Cultivator while the mobile drawer says Grower Portal and Grower.",
+        "recommendation": "Rename Overview to \u2018Catalog\u2019 or \u2018Catalog overview\u2019. Pick one user-facing role term across the shell; remove \u2018Portal\u2019 where it adds no information."
+      }
+    ],
+    "limits": [
+      "Menu only opened/closed; no navigation preference or sign-out used. No desktop drawer exists; persistent sidebar is the desktop equivalent."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/24-navigation-desktop.png",
+      "pass-2/24-navigation-mobile.png"
+    ],
+    "notes": "Fresh desktop sidebar and reopened mobile menu were inspected. Mobile rows fit the viewport and remain comfortably spaced; only the Overview versus Dashboard distinction and Cultivator versus Grower naming need simplification. No navigation preference was changed.",
+    "confirmedIssueKeys": [
+      "navigation-overview-label"
+    ],
+    "newIssues": []
+  }
+}

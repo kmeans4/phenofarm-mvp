@@ -1,0 +1,139 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e3196]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3197]
+    - StaticText "Notifications"
+    - StaticText "17"
+  - navigation "Portal navigation" [ref=e3198]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3201]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e3202]
+      - StaticText "Catalog"
+    - link "Products" [ref=e3203]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3204]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3205]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3206]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3207]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3208]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3209]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3210]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3199]
+- main
+  - navigation
+    - link "Dashboard" [ref=e3211]
+    - image
+    - link "Requests" [ref=e3212]
+    - image
+    - link "ORD-20260710-XPJO3I" [ref=e3213]
+    - image
+    - StaticText "Edit"
+  - sectionheader
+    - heading "Edit request #ORD-20260710-XPJO3I" [level=1, ref=e3214]
+      - StaticText "Edit request"
+      - generic
+        - StaticText "#ORD-20260710-XPJO3I"
+    - paragraph
+      - StaticText "Customer: Green Vermont Dispensary"
+  - form
+    - heading "Request status" [level=2, ref=e3215]
+      - image
+      - StaticText "Request status"
+    - StaticText "Current: "
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Change to"
+    - LabelText [ref=e3216] clickable [cursor:pointer]
+      - radio "Accepted" [checked=false, ref=e3230]
+      - StaticText "Accepted"
+    - LabelText [ref=e3217] clickable [cursor:pointer]
+      - radio "Cancelled" [checked=false, ref=e3231]
+      - StaticText "Cancelled"
+    - heading "Items (1)" [level=2, ref=e3218]
+      - image
+      - StaticText "Items"
+      - StaticText "("
+      - StaticText "1"
+      - StaticText ")"
+    - StaticText "1"
+    - paragraph
+      - StaticText "Purple Haze Flowers"
+    - paragraph
+      - StaticText "Purple Haze"
+    - paragraph
+      - StaticText "$25.00 / gram"
+    - button "-" [disabled, ref=e3219]
+    - StaticText "1"
+    - button "+" [ref=e3220]
+    - paragraph
+      - StaticText "Max 241"
+    - paragraph
+      - StaticText "$25.00"
+    - button "Remove item" [ref=e3221]
+      - image
+    - heading "Pricing" [level=2, ref=e3222]
+      - image
+      - StaticText "Pricing"
+    - LabelText
+      - StaticText "Shipping ($)"
+    - spinbutton [ref=e3223]: 0
+      - StaticText "0"
+    - LabelText
+      - StaticText "Tax ($)"
+    - spinbutton [ref=e3224]: 0
+      - StaticText "0"
+    - paragraph
+      - StaticText "Optional tax: enter only the amount on your invoice. PhenoFarm does not calculate tax."
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Add any special instructions or notes..." [ref=e3225]: Fulfillment method: Flexible
+Requested window: Coordinate with grower
+Payment terms: Handled directly
+      - generic
+        - StaticText "Fulfillment method: Flexible"
+        - LineBreak "\n"
+        - StaticText "Requested window: Coordinate with grower"
+        - LineBreak "\n"
+        - StaticText "Payment terms: Handled directly"
+    - paragraph
+      - StaticText "101/1000 characters"
+    - heading "SUMMARY" [level=3, ref=e3226]
+      - image
+      - StaticText "SUMMARY"
+    - StaticText "Subtotal ("
+    - StaticText "1 item"
+    - StaticText ")"
+    - StaticText "$25.00"
+    - StaticText "Shipping"
+    - StaticText "$0.00"
+    - StaticText "Tax"
+    - StaticText "$0.00"
+    - StaticText "Total"
+    - StaticText "$25.00"
+    - link "Cancel" [ref=e3227]
+    - button "Save Changes" [ref=e3228]
+      - image
+      - StaticText "Save Changes"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3229]
+  - button "Open messages" [ref=e3200]
+- region "Notifications alt+T" [ref=e3195]
+- alert

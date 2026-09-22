@@ -1,0 +1,14 @@
+- main
+  - link "PF PhenoFarm" [ref=e366]
+    - StaticText "PF"
+    - StaticText "PhenoFarm"
+  - heading "Authentication is not configured" [level=2, ref=e363]
+  - alert
+    - StaticText "The sign-in service is not configured correctly. Contact support if this continues."
+  - paragraph
+    - StaticText "If this keeps happening, email support from the account owner address and include your business name."
+  - link "Back to sign in" [ref=e364]
+  - link "Contact support" [ref=e365]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e367]
+  - image
+- alert

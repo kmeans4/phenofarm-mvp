@@ -1,14 +1,21 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import Link from 'next/link';
 import { Button } from '@/app/components/ui/Button';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { OperationsSummary } from '../components/OperationsSummary';
+import { formatProductMoney } from '@/lib/product-display';
+import { Pagination } from '@/app/components/ui/Pagination';
 import OrdersList from './components/OrdersList';
 import { ExtendedUser } from '@/types';
 
-export default async function GrowerOrdersPage() {
-  const session = await getServerSession(authOptions);
+export default async function GrowerOrdersPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ dispensary?: string; page?: string }>;
+}) {
+  const session = await getAuthSession();
   
   if (!session) {
     redirect('/auth/sign_in');
@@ -16,52 +23,48 @@ export default async function GrowerOrdersPage() {
 
   const user = session.user as ExtendedUser;
   
-  if (user.role !== 'GROWER') {
+  if (user.role !== 'GROWER' || !user.growerId) {
     redirect('/dashboard');
   }
 
-  // Fetch active requests (pending, confirmed, processing, shipped)
+  const params = searchParams ? await searchParams : {};
+  const dispensaryFilterId = typeof params.dispensary === 'string' && params.dispensary.trim()
+    ? params.dispensary.trim()
+    : null;
+  const customerFilter = dispensaryFilterId
+    ? await db.dispensary.findFirst({
+        where: {
+          id: dispensaryFilterId,
+          orders: {
+            some: {
+              growerId: user.growerId,
+            },
+          },
+        },
+        select: {
+          id: true,
+          businessName: true,
+        },
+      })
+    : null;
+  const orderScope = {
+    growerId: user.growerId,
+    ...(customerFilter ? { dispensaryId: customerFilter.id } : {}),
+  };
+
+  const pageSize = 50;
+  const groups = await db.order.groupBy({ by: ['status'], where: orderScope, _count: { _all: true }, _sum: { totalAmount: true } });
+  const activeStatuses = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'];
+  const totalOrders = groups.reduce((sum, group) => sum + group._count._all, 0);
+  const activeCount = groups.filter((group) => activeStatuses.includes(group.status)).reduce((sum, group) => sum + group._count._all, 0);
+  const pendingCount = groups.find((group) => group.status === 'PENDING')?._count._all || 0;
+  const trackedWholesaleValue = groups.filter((group) => group.status !== 'CANCELLED').reduce((sum, group) => sum + Number(group._sum.totalAmount || 0), 0);
+  const page = Math.min(Math.max(1, Number.parseInt(params.page || '1', 10) || 1), Math.max(1, Math.ceil(activeCount / pageSize)));
   const activeOrders = await db.order.findMany({
-    where: {
-      growerId: user.growerId,
-      status: {
-        in: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'],
-      },
-    },
-    include: {
-      dispensary: {
-        select: {
-          businessName: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
+    where: { ...orderScope, status: { in: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'] } },
+    select: { id: true, orderId: true, status: true, createdAt: true, updatedAt: true, totalAmount: true, subtotal: true, tax: true, shippingFee: true, dispensary: { select: { businessName: true } } },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], skip: (page - 1) * pageSize, take: pageSize,
   });
-
-  // Fetch all orders for stats
-  const allOrders = await db.order.findMany({
-    where: {
-      growerId: user.growerId,
-    },
-    include: {
-      dispensary: {
-        select: {
-          businessName: true,
-        },
-      },
-    },
-  });
-
-  // Calculate stats
-  const totalOrders = allOrders.length;
-  const activeCount = activeOrders.length;
-  const pendingCount = allOrders.filter(o => o.status === 'PENDING').length;
-  // Cancelled requests carry no trackable value
-  const trackedWholesaleValue = allOrders
-    .filter(o => o.status !== 'CANCELLED')
-    .reduce((sum, o) => sum + Number(o.totalAmount), 0);
 
   // Serialize orders for client component
   const serializedOrders = activeOrders.map(order => ({
@@ -78,47 +81,38 @@ export default async function GrowerOrdersPage() {
   }));
 
   return (
-    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Order Requests</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Review, accept, and fulfill buyer requests without in-app payment settlement</p>
-        </div>
-        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
-          <Button variant="outline" asChild className="w-full sm:w-auto">
-            <Link href="/grower/orders/history">View History</Link>
+    <div className="space-y-3 sm:space-y-6 pb-20 sm:pb-24">
+      <PageHeader
+        mobileInlineActions={!customerFilter}
+        title="Requests"
+        description={
+          customerFilter
+            ? `Review active requests for ${customerFilter.businessName}`
+            : undefined
+        }
+        actions={
+          <>
+          {customerFilter && (
+            <Button variant="outline" asChild className="shrink-0">
+              <Link href="/grower/orders">Clear filter</Link>
+            </Button>
+          )}
+          <Button variant="outline" asChild className="shrink-0">
+            <Link href="/grower/orders/history">History</Link>
           </Button>
-          <Button variant="primary" asChild className="w-full sm:w-auto">
-            <Link href="/grower/orders/add">Record Request</Link>
+          <Button variant="primary" asChild className="shrink-0">
+            <Link href="/grower/orders/add" aria-label="Record request"><span className="sm:hidden">Record</span><span className="hidden sm:inline">Record request</span></Link>
           </Button>
-        </div>
-      </div>
+          </>
+        }
+      />
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Total Requests</p>
-          <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{totalOrders}</p>
-        </div>
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Active Requests</p>
-          <p className="text-xl sm:text-2xl font-bold text-blue-600 mt-1">{activeCount}</p>
-        </div>
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Needs Review</p>
-          <p className="text-xl sm:text-2xl font-bold text-yellow-600 mt-1">{pendingCount}</p>
-        </div>
-        <div className="bg-white p-3 sm:p-4 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <p className="text-xs sm:text-sm text-gray-600">Estimated Request Value</p>
-          <p className="text-xl sm:text-2xl font-bold text-green-600 mt-1">
-            ${trackedWholesaleValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-          </p>
-        </div>
-      </div>
+      <OperationsSummary items={[{label: 'Requests', value: totalOrders}, {label: 'Active', value: activeCount}, {label: 'Needs review', value: pendingCount}, {label: 'Est. value', value: formatProductMoney(trackedWholesaleValue)}]} />
+      <p className="text-xs text-gray-500">Excludes cancelled requests. Payment is arranged directly.</p>
 
       {/* Orders List with Batch Actions */}
-      <OrdersList initialOrders={serializedOrders} />
+      <OrdersList initialOrders={serializedOrders} customerFilterLabel={customerFilter?.businessName} />
+      <Pagination page={page} pageSize={pageSize} total={activeCount} basePath="/grower/orders" query={customerFilter ? { dispensary: customerFilter.id } : {}} />
     </div>
   );
 }

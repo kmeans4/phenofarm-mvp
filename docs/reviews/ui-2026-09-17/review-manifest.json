@@ -1,0 +1,16 @@
+{
+  "date": "2026-09-17",
+  "status": "complete",
+  "pendingSections": [],
+  "routeFiles": 53,
+  "pageRoutes": 48,
+  "redirects": 5,
+  "findings": 216,
+  "priorities": {
+    "Low": 87,
+    "Medium": 120,
+    "High": 9
+  },
+  "missingEvidence": [],
+  "missingCoverage": []
+}

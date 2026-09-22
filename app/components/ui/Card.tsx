@@ -1,6 +1,5 @@
-'use client';
-
 import React from 'react';
+import { twMerge } from 'tailwind-merge';
 
 interface CardProps {
   className?: string;
@@ -9,7 +8,7 @@ interface CardProps {
 
 export function Card({ className, children }: CardProps) {
   return (
-    <div className={`rounded-xl border border-gray-200 bg-white text-gray-950 shadow-sm ${className}`}>
+    <div className={`rounded-[15px] border border-gray-200 bg-white text-gray-950 shadow-sm ${className || ''}`}>
       {children}
     </div>
   );
@@ -22,7 +21,7 @@ interface CardHeaderProps {
 
 export function CardHeader({ className, children }: CardHeaderProps) {
   return (
-    <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>
+    <div className={twMerge('flex flex-col space-y-1.5 [--pf-card-padding:1rem] sm:[--pf-card-padding:1.5rem] p-[var(--pf-card-padding)]', className)}>
       {children}
     </div>
   );
@@ -35,7 +34,7 @@ interface CardTitleProps {
 
 export function CardTitle({ className, children }: CardTitleProps) {
   return (
-    <h3 className={`text-2xl font-semibold leading-none tracking-tight ${className}`}>
+    <h3 className={`text-base font-semibold leading-none ${className || ''}`}>
       {children}
     </h3>
   );
@@ -48,7 +47,7 @@ interface CardContentProps {
 
 export function CardContent({ className, children }: CardContentProps) {
   return (
-    <div className={`p-6 pt-0 ${className}`}>
+    <div className={twMerge('[--pf-card-padding:1rem] sm:[--pf-card-padding:1.5rem] p-[var(--pf-card-padding)] pt-0', className)}>
       {children}
     </div>
   );
@@ -61,7 +60,7 @@ interface CardFooterProps {
 
 export function CardFooter({ className, children }: CardFooterProps) {
   return (
-    <div className={`flex items-center p-6 pt-0 ${className}`}>
+    <div className={twMerge('flex items-center [--pf-card-padding:1rem] sm:[--pf-card-padding:1.5rem] p-[var(--pf-card-padding)] pt-0', className)}>
       {children}
     </div>
   );

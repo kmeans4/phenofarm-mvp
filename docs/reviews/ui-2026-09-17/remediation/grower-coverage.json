@@ -1,0 +1,806 @@
+{
+  "scope": "G01-G57; grower operational pages only",
+  "environment": {
+    "baseURL": "http://localhost:3144",
+    "database": "phenofarm_ui_fixes_20260917",
+    "productionDeployed": false,
+    "manualDataSubmissions": false
+  },
+  "actualPageCount": 22,
+  "baseCaptureCount": 44,
+  "additionalStateCaptureCount": 29,
+  "totalInspectedCaptureCount": 73,
+  "pages": [
+    {
+      "page": "dashboard",
+      "route": "/grower/dashboard",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "catalog",
+      "route": "/grower/catalog",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/catalog-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/catalog-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/catalog-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/catalog-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/catalog-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/catalog-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "products",
+      "route": "/grower/products",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/products-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/products-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "product-add",
+      "route": "/grower/products/add",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/product-add-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/product-add-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/product-add-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/product-add-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/product-add-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/product-add-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "product-edit",
+      "route": "/grower/products/product-001/edit",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/product-edit-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "inventory",
+      "route": "/grower/inventory",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/inventory-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/inventory-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/inventory-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/inventory-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/inventory-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/inventory-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "stock-update",
+      "route": "/grower/inventory/add",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/stock-update-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/stock-update-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/stock-update-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/stock-update-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/stock-update-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/stock-update-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "strains",
+      "route": "/grower/strains",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strains-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/strains-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/strains-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strains-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/strains-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/strains-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "strain-add",
+      "route": "/grower/strains/add",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/strain-add-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "strain-edit",
+      "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-edit-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-edit-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/strain-edit-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-edit-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-edit-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/strain-edit-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "batches",
+      "route": "/grower/batches",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batches-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/batches-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/batches-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batches-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/batches-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/batches-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "batch-add",
+      "route": "/grower/batches/add",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/batch-add-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "batch-edit",
+      "route": "/grower/batches/ui-review-batch/edit",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/batch-edit-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "orders",
+      "route": "/grower/orders",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/orders-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/orders-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/orders-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/orders-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/orders-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/orders-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "order-history",
+      "route": "/grower/orders/history",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-history-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-history-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/order-history-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-history-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-history-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/order-history-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "order-add",
+      "route": "/grower/orders/add",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "order-detail",
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/order-detail-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "order-edit",
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/order-edit-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "customers",
+      "route": "/grower/customers",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customers-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/customers-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/customers-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customers-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/customers-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/customers-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "customer-add",
+      "route": "/grower/customers/add",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-add-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-add-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/customer-add-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-add-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-add-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/customer-add-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "customer-edit",
+      "route": "/grower/customers/ui-review-customer/edit",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/customer-edit-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    },
+    {
+      "page": "customer-statement",
+      "route": "/grower/customers/ui-review-customer/statement",
+      "views": [
+        {
+          "viewport": "1440x1000",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-desktop.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-desktop.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-desktop.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        },
+        {
+          "viewport": "390x844",
+          "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-mobile.png",
+          "snapshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-mobile.txt",
+          "geometry": "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-mobile.json",
+          "inspected": true,
+          "pageHorizontalOverflow": false,
+          "status": "passed"
+        }
+      ]
+    }
+  ],
+  "additionalStates": [
+    {
+      "state": "batch-more-desktop",
+      "route": "/grower/batches",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-more-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "batch-more-mobile",
+      "route": "/grower/batches",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-more-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "batch-terpenes-desktop",
+      "route": "/grower/batches/ui-review-batch/edit",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-terpenes-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "batch-terpenes-mobile",
+      "route": "/grower/batches/ui-review-batch/edit",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batch-terpenes-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "batches-narrow",
+      "route": "/grower/batches",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/batches-narrow.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "customer-more-desktop",
+      "route": "/grower/customers/ui-review-customer/edit",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-more-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "customer-more-mobile",
+      "route": "/grower/customers/ui-review-customer/edit",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-more-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "customer-statement-narrow",
+      "route": "/grower/customers/ui-review-customer/statement",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/customer-statement-narrow.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "dashboard-setup-desktop",
+      "route": "/grower/dashboard",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-setup-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "dashboard-setup-mobile",
+      "route": "/grower/dashboard",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/dashboard-setup-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "order-actions-desktop",
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-actions-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "order-actions-mobile",
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-actions-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "order-add-item-desktop",
+      "route": "/grower/orders/add",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "order-add-item-mobile",
+      "route": "/grower/orders/add",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "order-add-item-narrow",
+      "route": "/grower/orders/add",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-add-item-narrow.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "order-history-narrow",
+      "route": "/grower/orders/history",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-history-narrow.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "order-progress-desktop",
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-progress-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "order-progress-mobile",
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/order-progress-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "orders-narrow",
+      "route": "/grower/orders",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/orders-narrow.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "products-more-mobile",
+      "route": "/grower/products",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-more-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "products-narrow",
+      "route": "/grower/products",
+      "viewport": "360x800",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-narrow.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "products-quick-desktop",
+      "route": "/grower/products",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-quick-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "products-quick-mobile",
+      "route": "/grower/products",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-quick-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "products-selected-mobile",
+      "route": "/grower/products",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/products-selected-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "strain-delete-confirm-mobile",
+      "route": "/grower/strains",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-delete-confirm-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "strain-help-desktop",
+      "route": "/grower/strains/add",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-help-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "strain-help-mobile",
+      "route": "/grower/strains/add",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-help-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "strain-more-desktop",
+      "route": "/grower/strains",
+      "viewport": "1440x1000",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-more-desktop.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    },
+    {
+      "state": "strain-more-mobile",
+      "route": "/grower/strains",
+      "viewport": "390x844",
+      "screenshot": "docs/reviews/ui-2026-09-17/remediation/grower/strain-more-mobile.png",
+      "inspected": true,
+      "pageHorizontalOverflow": false,
+      "status": "passed"
+    }
+  ]
+}

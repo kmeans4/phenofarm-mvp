@@ -1,0 +1,41 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e330]
+- button "Notifications" [expanded=false, ref=e331]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e332]
+- main
+  - sectionheader
+    - heading "Add strain" [level=1, ref=e334]
+  - form
+    - LabelText
+      - StaticText "Name *"
+    - combobox "Name *" [required, ref=e335]
+    - LabelText
+      - StaticText "Type *"
+    - combobox "Type *" [expanded=false, ref=e336]: Select strain type
+      - MenuListPopup
+        - option "Select strain type" [selected, ref=e342]
+        - option "Indica" [ref=e343]
+        - option "Sativa" [ref=e344]
+        - option "Hybrid" [ref=e345]
+        - option "Sativa Dom. Hybrid" [ref=e346]
+        - option "Indica Dom. Hybrid" [ref=e347]
+    - group
+      - DisclosureTriangle "About strain types" [expanded=false]
+        - StaticText "About strain types"
+    - LabelText
+      - StaticText "Genetics"
+    - textbox "Genetics" [ref=e337]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e338]
+    - LabelText
+      - StaticText "Growing notes"
+    - textbox "Growing notes" [ref=e339]
+    - button "Create Strain" [disabled, ref=e340]
+    - button "Cancel" [ref=e341]
+- button "Open messages" [ref=e333]
+- region "Notifications alt+T" [ref=e329]
+- alert

@@ -1,0 +1,8 @@
+- link "PF PhenoFarm" [ref=e364]
+- link "Sign in" [ref=e365]
+- heading "Practical answers for licensed marketplace teams." [level=1, ref=e362]
+- link "support@phenofarm.com" [ref=e363]
+- heading "For growers" [level=2, ref=e366]
+- heading "For dispensaries" [level=2, ref=e367]
+- heading "Account & billing" [level=2, ref=e368]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e369]

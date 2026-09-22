@@ -1,0 +1,76 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "ADMIN"
+  - button "Notifications" [expanded=false, ref=e121]
+    - StaticText "Notifications"
+  - navigation "Portal navigation" [ref=e122]
+    - StaticText "OPERATIONS"
+    - link "Dashboard" [ref=e124]
+      - StaticText "Dashboard"
+    - StaticText "ACCOUNTS"
+    - link "Users" [ref=e125]
+      - StaticText "Users"
+    - link "Growers" [ref=e126]
+      - StaticText "Growers"
+    - link "Dispensaries" [ref=e127]
+      - StaticText "Dispensaries"
+    - StaticText "SYSTEM"
+    - link "Settings" [ref=e128]
+      - StaticText "Settings"
+  - StaticText "A"
+  - StaticText "admin@phenofarm.com"
+  - StaticText "Full system access"
+  - button "Sign out" [ref=e123]
+- main
+  - sectionheader
+    - heading "Dispensary Management" [level=1, ref=e129]
+    - paragraph
+      - StaticText "Review dispensary licenses, ordering access, and verification notes."
+    - form
+      - LabelText
+        - StaticText "Search dispensaries"
+      - searchbox "Search dispensaries" [ref=e130]
+      - LabelText
+        - StaticText "Verification status"
+      - combobox "Verification status" [expanded=false, ref=e131]: All statuses
+        - MenuListPopup
+          - option "All statuses" [selected, ref=e152]
+          - option "Pending only" [ref=e153]
+          - option "Verified only" [ref=e154]
+          - option "Expiring within 30 days" [ref=e155]
+          - option "Expired" [ref=e156]
+      - button "Search" [ref=e132]
+  - paragraph
+    - StaticText "Showing 1 of 1 dispensaries"
+  - table
+    - rowgroup
+      - row
+        - columnheader "BUSINESS" [ref=e141]
+        - columnheader "EMAIL" [ref=e142]
+        - columnheader "LICENSE" [ref=e143]
+        - columnheader "EXPIRY" [ref=e144]
+        - columnheader "STATUS" [ref=e145]
+        - columnheader "ORDERING READINESS" [ref=e146]
+        - columnheader "JOINED" [ref=e147]
+        - columnheader "ACTIONS" [ref=e148]
+    - row
+      - cell "Green Vermont Dispensary" [ref=e133]
+      - cell "dispensary@greenvermont.com" [ref=e134]
+        - link "dispensary@greenvermont.com" [ref=e149]
+      - cell "VT-RTL-2024-001" [ref=e135]
+        - StaticText "VT-RTL-2024-001"
+      - cell "Dec 30, 2027" [ref=e136]
+        - StaticText "Dec 30, 2027"
+      - cell "Verified" [ref=e137]
+      - cell "Can submit requests Wholesale settlement stays direct." [ref=e138]
+        - StaticText "Can submit requests"
+        - paragraph
+          - StaticText "Wholesale settlement stays direct."
+      - cell "4/9/2026" [ref=e139]
+      - cell "Unverify" [ref=e140]
+        - button "Unverify" [ref=e150]
+- region "Notifications alt+T" [ref=e120]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e151]
+  - image
+- alert

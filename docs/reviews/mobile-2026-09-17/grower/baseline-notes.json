@@ -1,0 +1,308 @@
+[
+  {
+    "page": "01-dashboard",
+    "route": "/grower/dashboard",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1717,
+    "observations": [
+      "32px title, stacked metrics and 581px attention panel push recent activity below 1300px.",
+      "Zero-count attention tiles and repeated Review/request wording use space.",
+      "No horizontal overflow; chart recent-data position and key actions work."
+    ],
+    "plan": "Tighten local heading/metrics/attention spacing and simplify attention-row copy while keeping actions at least 40px."
+  },
+  {
+    "page": "02-catalog",
+    "route": "/grower/catalog",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1242,
+    "observations": [
+      "Four navigation cards repeat explanatory copy, consuming 363px.",
+      "A separate keep-current banner repeats the Listings destination.",
+      "Catalog health actions remain available with no overflow."
+    ],
+    "plan": "Combine the introductory link with navigation; reduce mobile card padding and descriptions to keep health closer to the first screen."
+  },
+  {
+    "page": "03-products",
+    "route": "/grower/products",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1379,
+    "observations": [
+      "First product starts at y679; the 233px chip filter and wrapped add actions consume the first screen.",
+      "Product actions already meet 40px and mobile cards retain price/stock.",
+      "The shared floating message control overlaps long stock text near the viewport edge.",
+      "Quick-add input text is 14px; pair Type and Unit and preserve 16px mobile form text. More dialog fits 360px."
+    ],
+    "plan": "Use a compact mobile filter select with all current options, prioritize Add product in the header, and abbreviate stock metadata without changing units.",
+    "states": [
+      "Quick add open (restored local draft; preserved without submission)",
+      "More actions opened, inspected and dismissed with Escape"
+    ]
+  },
+  {
+    "page": "04-product-add",
+    "route": "/grower/products/add",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1962,
+    "observations": [
+      "The defaults row leaves a large gap before Basics; essential fields extend past the first screen.",
+      "Repeated card padding and 20\u201324px field gaps make a 1962px form.",
+      "Primary sticky actions remain usable; mobile inputs are already 16px.",
+      "Strain placeholder is clipped and narrow SKU/brand fields use long placeholders.",
+      "Expanded details are 2617px tall; nested card padding and repeated upload notes can be tightened."
+    ],
+    "plan": "Use a compact defaults row, smaller mobile section/field gaps, concise placeholders and grouped short values.",
+    "states": [
+      "Details and photos expanded; all cannabinoid/date/upload fields inspected below the fold, no data entered."
+    ]
+  },
+  {
+    "page": "05-product-edit",
+    "route": "/grower/products/product-001/edit",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 2731,
+    "observations": [
+      "Edit form inherits large field/card gaps and a separate back-link row.",
+      "Details and photos are expanded for populated data; all content remains reachable.",
+      "The batch placeholder clips before optional; unit and saved lab values remain correct."
+    ],
+    "plan": "Apply the same form-density changes as Add, tighten back/header spacing, and keep populated details and sticky save accessible."
+  },
+  {
+    "page": "06-inventory",
+    "route": "/grower/inventory",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1415,
+    "observations": [
+      "Inventory cards use 256px per product and repeat quantity beneath the stock control.",
+      "Type/Price/Inventory labels and two-row filters push the first editor to y643.",
+      "All inline controls remain visible without overflow."
+    ],
+    "plan": "Use a compact filter select, combine product metadata, place unit next to the editable quantity and retain accessible stock labels."
+  },
+  {
+    "page": "07-stock-update",
+    "route": "/grower/inventory/add",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 800,
+    "observations": [
+      "The complete stock update flow fits within one screen with readable 16px inputs.",
+      "The replacement-stock helper wraps twice; footer spacing can be tightened."
+    ],
+    "plan": "Preserve the existing form structure and shorten the replacement-stock helper with smaller mobile gaps."
+  },
+  {
+    "page": "08-strains",
+    "route": "/grower/strains",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1246,
+    "observations": [
+      "Each short strain card is 178\u2013198px with unused space above the actions.",
+      "Add strain consumes a full row, and the view toggle has a separate tall row.",
+      "Actions fit 360px with 40px targets and clear labels."
+    ],
+    "plan": "Inline the short header action and condense card spacing, metadata and the view-control area."
+  },
+  {
+    "page": "09-strain-add",
+    "route": "/grower/strains/add",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 946,
+    "observations": [
+      "24px card padding and large field gaps push submit below 780px.",
+      "Growing notes is taller than the description although both start empty.",
+      "About strain types has a small text-only hit area."
+    ],
+    "plan": "Use 16px mobile card padding, 16px field gaps and shorter default note height; give help a 40px disclosure target.",
+    "states": [
+      "About strain types expanded and read at 360px; no form submitted."
+    ]
+  },
+  {
+    "page": "10-strain-edit",
+    "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 946,
+    "observations": [
+      "Edit repeats the same large note field and 24px padding as Add.",
+      "Saved name/type and the complete form render correctly."
+    ],
+    "plan": "Apply shared grower strain-form mobile spacing and keep all saved content intact."
+  },
+  {
+    "page": "11-batches",
+    "route": "/grower/batches",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 800,
+    "observations": [
+      "Batch card repeats Batch, Strain and Products labels across six rows.",
+      "One populated batch fits the screen, but card height is 270px.",
+      "Numeric lab values and harvest date are correct, and actions fit."
+    ],
+    "plan": "Combine lab values into one row and metadata into fewer lines, with a compact inline Add batch header."
+  },
+  {
+    "page": "12-batch-add",
+    "route": "/grower/batches/add",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1311,
+    "observations": [
+      "24px card padding and field/section gaps stretch this form beyond 1300px.",
+      "The three short lab values already share a row, with legible 16px inputs.",
+      "PDF upload actions are 40px inside tall rows."
+    ],
+    "plan": "Reduce mobile padding/section gaps and shorten labels; preserve the existing three-column lab grid and uploads."
+  },
+  {
+    "page": "13-batch-edit",
+    "route": "/grower/batches/ui-review-batch/edit",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1370,
+    "observations": [
+      "Edit repeats add-form padding/gaps and places Add terpene on a separate tall block.",
+      "Saved date, 24.8 THC, 0.6 CBD and 27.2 total remain correct.",
+      "The terpene remove control sits near the floating launcher; keep sufficient right-side space."
+    ],
+    "plan": "Apply consistent batch form spacing and a compact Terpenes heading/action row without changing values.",
+    "states": [
+      "Added a blank unsaved terpene row, inspected controls, then removed it without saving."
+    ]
+  },
+  {
+    "page": "14-orders",
+    "route": "/grower/orders",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 4012,
+    "observations": [
+      "Five status chips wrap to three rows; first request appears below the initial screen controls.",
+      "Eighteen request cards create a 4012px page; status/date/value/actions can share fewer rows."
+    ],
+    "plan": "Use a 16px mobile status select and compact request cards while retaining selection and View actions.",
+    "states": [
+      "Full page plus first and last viewport inspected at 360px; all 18 records remain reachable."
+    ]
+  },
+  {
+    "page": "15-order-history",
+    "route": "/grower/orders/history",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 970,
+    "observations": [
+      "A full-width Active requests action, four summary cells and wrapped filter chips push the first record to y517.",
+      "Record cards have repeated request wording on View buttons."
+    ],
+    "plan": "Use a short inline Active action, a mobile filter select and denser history records."
+  },
+  {
+    "page": "16-order-add",
+    "route": "/grower/orders/add",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 824,
+    "observations": [
+      "Empty items use a 136px box with two repeated instructions.",
+      "Card gaps and a long buyer placeholder add space to an otherwise compact form.",
+      "Item editor uses a separate Remove row and repeated nested padding; compact the row without shrinking quantity or price inputs."
+    ],
+    "plan": "Use a short empty-state row and tighter mobile sections; retain the clear Add item control and optional shipping disclosure.",
+    "states": [
+      "Added an unsaved item, inspected quantity/price/stock and totals, then removed it."
+    ]
+  },
+  {
+    "page": "17-order-detail",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1668,
+    "observations": [
+      "Back link/header/status/actions occupy 238px before the next-action panel.",
+      "Item/customer cards have large internal padding; request details use three stacked label/value groups.",
+      "Progress and history are correctly collapsed and address line breaks remain intact."
+    ],
+    "plan": "Tighten the local header and cards, abbreviate the timestamp/unit display and condense request metadata while keeping disclosures.",
+    "states": [
+      "Actions menu, Progress and Request history opened and inspected at 360px; no request action submitted."
+    ]
+  },
+  {
+    "page": "18-order-edit",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1686,
+    "observations": [
+      "Two status-choice buttons each take a row, and header/status context is repeated.",
+      "Footer Save and Cancel occupy two full-width rows.",
+      "All numeric fields are readable, values and transitions remain correct."
+    ],
+    "plan": "Use a compact current-status row, pair short status choices and footer actions, and reduce local card padding."
+  },
+  {
+    "page": "19-customers",
+    "route": "/grower/customers",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1132,
+    "observations": [
+      "Each customer row repeats Email/Phone/Location labels and stacks last request and delivered value.",
+      "Two customer cards use about 680px, with all four relevant actions visible."
+    ],
+    "plan": "Shorten contact metadata and combine summary rows while preserving the visible Details/Edit, Statement, Requests and Message actions."
+  },
+  {
+    "page": "20-customer-add",
+    "route": "/grower/customers/add",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 984,
+    "observations": [
+      "Four required contact fields precede four optional address/license rows; saving needs a full-page scroll.",
+      "State/ZIP pairing is effective; all inputs are 16px and 40px."
+    ],
+    "plan": "Group optional address/license fields in a clear disclosure and tighten mobile form gaps."
+  },
+  {
+    "page": "21-customer-edit",
+    "route": "/grower/customers/ui-review-customer/edit",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 1568,
+    "observations": [
+      "Empty optional website/description fields add about 250px ahead of Contact.",
+      "Business, Contact and Address headings have large bottom margins; More sits on a separate footer row."
+    ],
+    "plan": "Put optional website/description in a disclosure, reduce local header gaps and keep More with the footer controls where width allows.",
+    "states": [
+      "More menu inspected and dismissed with Escape; no deletion submitted."
+    ]
+  },
+  {
+    "page": "22-customer-statement",
+    "route": "/grower/customers/ui-review-customer/statement",
+    "width": 360,
+    "inspected": true,
+    "beforeHeight": 824,
+    "observations": [
+      "Export CSV takes its own row below a short title, and the payment note repeats platform context.",
+      "Date inputs and Apply are usable without clipping, and statement data is visible."
+    ],
+    "plan": "Place the short title and export action together and shorten the payment note; retain date field widths."
+  }
+]

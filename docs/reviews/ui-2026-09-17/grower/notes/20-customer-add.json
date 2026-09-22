@@ -1,0 +1,39 @@
+{
+  "slug": "20-customer-add",
+  "route": "/grower/customers/add",
+  "pass1": {
+    "inspected": [
+      "pass-1/20-customer-add-desktop.png",
+      "pass-1/20-customer-add-mobile.png"
+    ],
+    "strengths": [
+      "Plain labels, no excessive field instructions, clear required fields, readable desktop grid."
+    ],
+    "issues": [
+      {
+        "key": "customer-form-small-density",
+        "priority": "low",
+        "viewport": "mobile",
+        "observation": "‘Add New Customer’, ‘Add a new dispensary customer’, and ‘Customer Information’ repeat the task. State and ZIP each consume a full row despite short values, and both footer actions are full-width.",
+        "recommendation": "Use ‘Add customer’ and omit the duplicate subtitle/inner title. Keep State and ZIP side by side with City above; pair Cancel/Add at the bottom while retaining adequate tap sizes."
+      }
+    ],
+    "limits": [
+      "No values entered or customer created; otherwise no new major issue observed."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/20-customer-add-desktop.png",
+      "pass-2/20-customer-add-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed only minor copy and spacing improvements: three repeated task labels and separate State/ZIP rows. Input text and targets remain readable; desktop grid works well.",
+    "confirmedIssueKeys": [
+      "customer-form-small-density"
+    ],
+    "newIssues": [],
+    "source": "root-pass2-notes.md"
+  }
+}

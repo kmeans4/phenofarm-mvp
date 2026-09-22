@@ -1,42 +1,46 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Product } from '@/types';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { formatProductUnit } from '@/lib/product-display';
 
 const LOW_STOCK_THRESHOLD = 10;
 
+type DispensaryOption = {
+  id: string;
+  businessName: string;
+  city: string;
+  state: string;
+};
+
+type DirectRequestItem = {
+  productId: string;
+  quantity: number | string;
+  unitPrice: number;
+};
+
 export default function AddOrderPage() {
-  const { data: session, status } = useSession();
   const router = useRouter();
-  const [dispensaries, setDispensaries] = useState<{id: string; businessName: string; city: string; state: string}[]>([]);
+  const [dispensaries, setDispensaries] = useState<DispensaryOption[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [formData, setFormData] = useState<{dispensaryId: string; items: {productId: string; quantity: number; unitPrice: number}[]; notes: string; shippingFee: string}>({
+  const [formData, setFormData] = useState<{dispensaryId: string; items: DirectRequestItem[]; notes: string; shippingFee: string}>({
     dispensaryId: '',
-    items: [] as {productId: string; quantity: number; unitPrice: number}[],
+    items: [] as DirectRequestItem[],
     notes: '',
     shippingFee: '0',
   });
+  const [dispensaryQuery, setDispensaryQuery] = useState('');
+  const [isDispensaryListOpen, setIsDispensaryListOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (status === 'loading') return;
-    if (!session) {
-      router.push('/auth/sign_in');
-      return;
-    }
-    const user = session?.user;
-    if (user?.role !== 'GROWER') {
-      router.push('/dashboard');
-      return;
-    }
-    loadData();
-  }, [status, session, router]);
+  const submitRef = useRef(false);
+  useEffect(() => { loadData(); }, []);
 
   const loadData = async () => {
     try {
@@ -44,6 +48,7 @@ export default function AddOrderPage() {
         fetch('/api/dispensaries'),
         fetch('/api/products')
       ]);
+      if (!dispRes.ok || !prodRes.ok) throw new Error('Could not load customers and products. Please reload and try again.');
       if (dispRes.ok) {
         const dispData = await dispRes.json();
         setDispensaries(Array.isArray(dispData) ? dispData : []);
@@ -55,26 +60,51 @@ export default function AddOrderPage() {
         }
       }
     } catch (err) {
-      console.error('Error:', err);
+      setError(err instanceof Error ? err.message : 'Could not load request options.');
     } finally {
       setLoading(false);
     }
   };
 
   const getProductById = (productId: string) => products.find((p) => p?.id === productId);
+  const getDispensaryLabel = (dispensary: DispensaryOption) =>
+    `${dispensary.businessName} - ${dispensary.city}, ${dispensary.state}`;
+
+  const selectedDispensary = dispensaries.find((dispensary) => dispensary.id === formData.dispensaryId);
+  const filteredDispensaries = useMemo(() => {
+    const query = dispensaryQuery.trim().toLowerCase();
+    if (!query) return dispensaries;
+
+    return dispensaries.filter((dispensary) =>
+      [
+        dispensary.businessName,
+        dispensary.city,
+        dispensary.state,
+      ].some((value) => value?.toLowerCase().includes(query))
+    );
+  }, [dispensaries, dispensaryQuery]);
+
+  const selectDispensary = (dispensary: DispensaryOption) => {
+    setFormData((prev) => ({ ...prev, dispensaryId: dispensary.id }));
+    setDispensaryQuery(getDispensaryLabel(dispensary));
+    setIsDispensaryListOpen(false);
+    setError(null);
+  };
+
+  const getSelectedProductIds = (items = formData.items) => new Set(items.map((item) => item.productId).filter(Boolean));
 
   const getAllocatedQuantity = (
-    items: {productId: string; quantity: number; unitPrice: number}[],
+    items: DirectRequestItem[],
     productId: string,
     excludeIndex?: number
   ) => items.reduce((sum, item, index) => {
     if (excludeIndex !== undefined && index === excludeIndex) return sum;
     if (item.productId !== productId) return sum;
-    return sum + (Number.isFinite(item.quantity) ? item.quantity : 0);
+    return sum + (Number.isFinite(Number(item.quantity)) ? Number(item.quantity) : 0);
   }, 0);
 
   const getRemainingForLine = (
-    items: {productId: string; quantity: number; unitPrice: number}[],
+    items: DirectRequestItem[],
     productId: string,
     lineIndex: number
   ) => {
@@ -84,7 +114,7 @@ export default function AddOrderPage() {
     return Math.max(0, totalAvailable - allocatedElsewhere);
   };
 
-  const getInventoryIssues = (items: {productId: string; quantity: number; unitPrice: number}[]) => {
+  const getInventoryIssues = (items: DirectRequestItem[]) => {
     const issues: { productName: string; requested: number; available: number }[] = [];
 
     const byProduct = new Map<string, number>();
@@ -124,12 +154,18 @@ export default function AddOrderPage() {
 
   const handleAddItem = () => {
     if (products.length === 0) return;
-    const firstProduct = products[0];
+    const selectedProductIds = getSelectedProductIds();
+    const firstProduct = products.find((product) => !selectedProductIds.has(product.id));
+    if (!firstProduct) {
+      setError('All available products are already in this request. Adjust quantities on the existing lines.');
+      return;
+    }
     const newItem = {
       productId: firstProduct?.id || '',
       quantity: 1,
       unitPrice: typeof firstProduct?.price === 'number' ? firstProduct.price : 0,
     };
+    setError(null);
     setFormData((prev) => ({ ...prev, items: [...prev.items, newItem] }));
   };
 
@@ -146,6 +182,31 @@ export default function AddOrderPage() {
       const currentItem = newItems[index];
       if (!currentItem) return prev;
 
+      if (field === 'productId') {
+        const productId = String(value);
+        const product = products.find((p) => p?.id === productId);
+        const duplicateIndex = newItems.findIndex((item, itemIndex) => itemIndex !== index && item.productId === productId);
+
+        if (duplicateIndex >= 0) {
+          const nextItems = newItems.filter((_, itemIndex) => itemIndex !== index);
+          const targetIndex = duplicateIndex > index ? duplicateIndex - 1 : duplicateIndex;
+          const targetItem = nextItems[targetIndex];
+          const totalAvailable = Number(product?.inventoryQty || 0);
+          const requestedQuantity = Number(currentItem.quantity || 0);
+          const mergedQuantity = Math.min(
+            totalAvailable,
+            Number(targetItem.quantity || 0) + Math.max(requestedQuantity, 1)
+          );
+
+          nextItems[targetIndex] = {
+            ...targetItem,
+            quantity: mergedQuantity,
+          };
+
+          return { ...prev, items: nextItems };
+        }
+      }
+
       newItems[index] = { ...currentItem, [field]: value };
 
       if (field === 'productId') {
@@ -157,21 +218,11 @@ export default function AddOrderPage() {
         const maxForLine = getRemainingForLine(newItems, String(value), index);
         if (maxForLine <= 0) {
           newItems[index].quantity = 0;
-        } else if (newItems[index].quantity > maxForLine || newItems[index].quantity <= 0) {
-          newItems[index].quantity = Math.min(Math.max(newItems[index].quantity || 1, 1), maxForLine);
+        } else if (Number(newItems[index].quantity) > maxForLine || Number(newItems[index].quantity) <= 0) {
+          newItems[index].quantity = Math.min(Math.max(Number(newItems[index].quantity) || 1, 1), maxForLine);
         }
       }
 
-      if (field === 'quantity') {
-        const requestedQty = Number(value) || 0;
-        const maxForLine = getRemainingForLine(newItems, newItems[index].productId, index);
-
-        if (maxForLine <= 0) {
-          newItems[index].quantity = 0;
-        } else {
-          newItems[index].quantity = Math.min(Math.max(requestedQty, 1), maxForLine);
-        }
-      }
 
       return { ...prev, items: newItems };
     });
@@ -179,18 +230,28 @@ export default function AddOrderPage() {
 
   const calculateSubtotal = () =>
     formData.items.reduce((total: number, item) => {
-      const qty = typeof item?.quantity === 'number' ? item.quantity : 0;
+      const qty = Number(item.quantity) || 0;
       const price = typeof item?.unitPrice === 'number' ? item.unitPrice : 0;
-      return total + (qty * price);
-    }, 0);
+      return total + qty * Math.round(price * 100);
+    }, 0) / 100;
 
   const calculateTax = () => 0;
   const shippingFee = parseFloat(formData?.shippingFee || '0') || 0;
-  const calculateTotal = () => calculateSubtotal() + calculateTax() + shippingFee;
+  const calculateTotal = () => (Math.round(calculateSubtotal() * 100) + Math.round(calculateTax() * 100) + Math.round(shippingFee * 100)) / 100;
 
-  const hasInvalidQuantities = formData.items.some((item) => (Number(item.quantity) || 0) <= 0);
+  const hasInvalidQuantities = formData.items.some((item) => (!Number.isInteger(Number(item.quantity)) || Number(item.quantity) <= 0));
   const inventoryIssues = getInventoryIssues(formData.items);
   const firstInventoryIssue = inventoryIssues[0];
+  const hasProductsAvailableToAdd = products.some((product) => !getSelectedProductIds().has(product.id));
+  const submitHint = (() => {
+    if (!formData.dispensaryId) return 'Select a dispensary before recording the request.';
+    if (formData.items.length === 0) return 'Add at least one product line item.';
+    if (hasInvalidQuantities) return 'Each line item needs a quantity of at least 1.';
+    if (firstInventoryIssue) {
+      return `Adjust ${firstInventoryIssue.productName}; requested ${firstInventoryIssue.requested}, available ${firstInventoryIssue.available}.`;
+    }
+    return '';
+  })();
   const canSubmitOrder = (
     !loading &&
     !isSubmitting &&
@@ -202,6 +263,7 @@ export default function AddOrderPage() {
 
   const handleSubmit = async (e: React.FormEvent | React.MouseEvent) => {
     e.preventDefault();
+    if (submitRef.current) return;
     if (!canSubmitOrder) {
       if (!formData.dispensaryId) {
         setError('Please select a dispensary');
@@ -215,6 +277,7 @@ export default function AddOrderPage() {
       return;
     }
 
+    submitRef.current = true;
     setError(null);
     setIsSubmitting(true);
 
@@ -238,7 +301,7 @@ export default function AddOrderPage() {
 
       if (response.ok) {
         setSuccess(true);
-        setTimeout(() => router.push('/grower/orders'), 2000);
+        router.push('/grower/orders');
       } else {
         const errorData = await response.json().catch(() => ({}));
         if (response.status === 409 && Array.isArray(errorData.issues) && errorData.issues.length > 0) {
@@ -251,11 +314,12 @@ export default function AddOrderPage() {
     } catch {
       setError('Failed to create order');
     } finally {
+      submitRef.current = false;
       setIsSubmitting(false);
     }
   };
 
-  if (status === 'loading' || loading) {
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -283,29 +347,8 @@ export default function AddOrderPage() {
   }
 
   return (
-    <div className="space-y-5 sm:space-y-6 p-4">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Record Direct Request</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Record a request coordinated directly with a dispensary outside PhenoFarm payment rails</p>
-        </div>
-        <div className="flex flex-col sm:flex-row w-full sm:w-auto gap-2 sm:gap-3">
-          <Link
-            href="/grower/orders"
-            className={`w-full sm:w-auto text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
-          >
-            Cancel
-          </Link>
-          <button
-            type="button"
-            onClick={handleSubmit}
-            disabled={!canSubmitOrder}
-            className="w-full sm:w-auto px-4 py-2 bg-green-600 text-white rounded-lg disabled:opacity-50"
-          >
-            {isSubmitting ? 'Creating...' : 'Record Direct Request'}
-          </button>
-        </div>
-      </div>
+    <div className="space-y-3 sm:space-y-6">
+      <PageHeader title="Record request" description="Record an agreement made directly with a buyer." />
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -313,55 +356,81 @@ export default function AddOrderPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 border-b border-gray-200">
-            <h2 className="font-semibold text-gray-900">Request Details</h2>
-          </div>
-          <div className="p-4 space-y-4">
+          <div className="p-3 space-y-3 sm:p-4 sm:space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Dispensary *</label>
-              <select
-                value={formData.dispensaryId}
-                onChange={(e) => setFormData((prev) => ({ ...prev, dispensaryId: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                required
-              >
-                <option value="">Select...</option>
-                {dispensaries.map((d) => (
-                  <option key={d.id} value={d.id}>{d.businessName} - {d.city}, {d.state}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
-              <textarea
-                value={formData.notes}
-                onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Shipping estimate ($)</label>
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={formData.shippingFee}
-                onChange={(e) => setFormData((prev) => ({ ...prev, shippingFee: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-              />
+              <label htmlFor="request-buyer" className="block text-sm font-medium text-gray-700 mb-1">Buyer *</label>
+              <div className="relative">
+                <input
+                  id="request-buyer"
+                  type="text"
+                  value={isDispensaryListOpen ? dispensaryQuery : selectedDispensary ? getDispensaryLabel(selectedDispensary) : dispensaryQuery}
+                  onFocus={() => {
+                    setDispensaryQuery(selectedDispensary ? getDispensaryLabel(selectedDispensary) : '');
+                    setIsDispensaryListOpen(true);
+                  }}
+                  onBlur={() => {
+                    window.setTimeout(() => setIsDispensaryListOpen(false), 120);
+                  }}
+                  onChange={(e) => {
+                    setDispensaryQuery(e.target.value);
+                    setFormData((prev) => ({ ...prev, dispensaryId: '' }));
+                    setIsDispensaryListOpen(true);
+                  }}
+                  role="combobox"
+                  aria-expanded={isDispensaryListOpen}
+                  aria-controls="dispensary-combobox-results"
+                  aria-autocomplete="list"
+                  placeholder="Search by name or city"
+                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  required
+                />
+                {isDispensaryListOpen && (
+                  <div
+                    id="dispensary-combobox-results"
+                    role="listbox"
+                    className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
+                  >
+                    {filteredDispensaries.length > 0 ? (
+                      filteredDispensaries.map((dispensary) => (
+                        <button
+                          key={dispensary.id}
+                          type="button"
+                          role="option"
+                          aria-selected={formData.dispensaryId === dispensary.id}
+                          onMouseDown={(event) => event.preventDefault()}
+                          onClick={() => selectDispensary(dispensary)}
+                          className="flex w-full flex-col px-3 py-2 text-left hover:bg-green-50 focus-visible:bg-green-50 focus-visible:outline-none"
+                        >
+                          <span className="text-sm font-medium text-gray-900">{dispensary.businessName}</span>
+                          <span className="text-xs text-gray-500">{dispensary.city}, {dispensary.state}</span>
+                        </button>
+                      ))
+                    ) : (
+                      <p className="px-3 py-3 text-sm text-gray-500">No dispensaries match that search.</p>
+                    )}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
         <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="p-4 border-b border-gray-200 flex justify-between">
+          <div className="px-3 py-2 border-b border-gray-200 flex items-center justify-between gap-3 sm:p-4">
             <h2 className="font-semibold text-gray-900">Items</h2>
-            <button type="button" onClick={handleAddItem} disabled={isSubmitting} className="px-3 py-1 border rounded hover:bg-gray-50 disabled:opacity-50">+ Add</button>
+            <button
+              type="button"
+              onClick={handleAddItem}
+              disabled={isSubmitting || !hasProductsAvailableToAdd}
+              className="min-h-10 rounded border px-3 py-2 text-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              title={hasProductsAvailableToAdd ? 'Add product line' : 'All available products are already selected'}
+            >
+              Add item
+            </button>
           </div>
-          <div className="p-4">
+          <div className="p-3 sm:p-4">
             {products.length === 0 ? (
               <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
                 <p className="text-gray-700 font-medium mb-2">No products available to add</p>
@@ -371,10 +440,7 @@ export default function AddOrderPage() {
                 </Link>
               </div>
             ) : formData.items.length === 0 ? (
-              <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-                <p className="text-gray-700 font-medium mb-2">No items in this direct request yet</p>
-                <p className="text-sm text-gray-500">Click <span className="font-medium text-gray-700">Add</span> above to include your first line item.</p>
-              </div>
+              <p className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-5 text-center text-sm text-gray-600">Use Add item to choose products.</p>
             ) : (
               <div className="space-y-4">
                 {formData.items.map((item, index: number) => {
@@ -382,30 +448,30 @@ export default function AddOrderPage() {
                   const totalAvailable = Number(product?.inventoryQty || 0);
                   const remainingForLine = getRemainingForLine(formData.items, item.productId, index);
                   const isLowStock = totalAvailable > 0 && totalAvailable <= LOW_STOCK_THRESHOLD;
-                  const isOverLimit = item.quantity > remainingForLine;
+                  const isOverLimit = Number(item.quantity) > remainingForLine;
 
                   return (
-                    <div key={index} className="p-4 bg-gray-50 rounded-lg border space-y-3">
-                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                        <div className="flex-1">
+                    <div key={index} className="p-3 bg-gray-50 rounded-lg border space-y-2 sm:p-4 sm:space-y-3">
+                      <div className="grid grid-cols-2 sm:grid-cols-[minmax(0,1fr)_8rem_9rem_auto] gap-3">
+                        <div className="col-span-2 min-w-0 sm:col-span-1">
                           <label className="block text-xs text-gray-500 mb-1">Product</label>
                           <select
                             value={item.productId}
                             onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                            className="min-h-10 min-w-0 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                           >
                             {products.map((p) => {
                               const remainingForOption = getRemainingForLine(formData.items, p.id, index);
                               const disabled = remainingForOption <= 0 && p.id !== item.productId;
                               return (
                                 <option key={p.id} value={p.id} disabled={disabled}>
-                                  {p.name} - ${typeof p.price === 'number' ? p.price.toFixed(2) : '0.00'} ({remainingForOption} available)
+                                  {p.name}
                                 </option>
                               );
                             })}
                           </select>
                         </div>
-                        <div className="w-full sm:w-28">
+                        <div className="min-w-0">
                           <label className="block text-xs text-gray-500 mb-1">Qty</label>
                           <div className="flex gap-2">
                             <input
@@ -413,42 +479,57 @@ export default function AddOrderPage() {
                               min={remainingForLine > 0 ? 1 : 0}
                               max={remainingForLine}
                               value={item.quantity}
-                              onChange={(e) => handleItemChange(index, 'quantity', parseInt(e.target.value) || 0)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                              onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                              onBlur={(e) => handleItemChange(index, 'quantity', Math.min(remainingForLine, Math.max(1, Math.floor(Number(e.target.value) || 1))))}
+                              className="min-h-10 min-w-0 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                             />
                             <button
                               type="button"
                               onClick={() => handleSetMaxQuantity(index)}
-                              className="px-3 py-2 text-xs font-medium border border-gray-300 rounded-lg hover:bg-gray-100"
+                              className="min-h-10 rounded-lg border border-gray-300 px-2 py-2 text-sm font-medium hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                               title="Use maximum available quantity"
                             >
                               Max
                             </button>
                           </div>
                         </div>
-                        <div className="w-full sm:w-32">
-                          <label className="block text-xs text-gray-500 mb-1">Price</label>
-                          <input
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            value={item.unitPrice}
-                            onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                          />
+                        <div className="min-w-0">
+                          <label className="mb-1 flex items-center justify-between gap-2 text-xs text-gray-500">
+                            <span>Agreed price</span>
+                          </label>
+                          <div className="flex overflow-hidden rounded-lg border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-green-500">
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={item.unitPrice}
+                              onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
+                              className="min-h-10 min-w-0 flex-1 border-0 px-3 py-2 text-base focus:outline-none"
+                            />
+                            <span className="flex items-center border-l border-gray-200 bg-gray-50 px-2 text-xs text-gray-500">
+                              / {formatProductUnit(product?.unit)}
+                            </span>
+                          </div>
                         </div>
-                        <div className="flex items-end">
-                          <button type="button" onClick={() => handleRemoveItem(index)} className="w-full sm:w-auto text-left sm:text-right text-red-600">Remove</button>
+                        <div className="hidden items-end justify-end sm:flex">
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveItem(index)}
+                            className="min-h-10 rounded px-2 py-2 text-sm text-right text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 sm:w-auto sm:text-right"
+                          >
+                            Remove
+                          </button>
                         </div>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-2 text-xs">
+                        <button type="button" onClick={() => handleRemoveItem(index)} className="order-last ml-auto min-h-10 rounded px-2 py-2 text-sm text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 sm:hidden">Remove</button>
                         <span className="inline-flex items-center px-2 py-1 rounded bg-white border border-gray-200 text-gray-600">
-                          Available now: <span className="ml-1 font-semibold text-gray-900">{remainingForLine}</span>
+                          <span className="font-semibold">{remainingForLine} {formatProductUnit(product?.unit)}</span>&nbsp;available
                         </span>
                         {isLowStock && (
                           <span className="inline-flex items-center px-2 py-1 rounded bg-amber-50 border border-amber-200 text-amber-700">
-                            Low stock ({totalAvailable} total remaining)
+                            Low stock
                           </span>
                         )}
                         {isOverLimit && (
@@ -461,17 +542,48 @@ export default function AddOrderPage() {
                   );
                 })}
 
-                <div className="mt-6 p-4 bg-gray-100 rounded-lg">
-                  <div className="flex justify-between"><span>Estimated item value:</span><span>${calculateSubtotal().toFixed(2)}</span></div>
-                  {calculateTax() > 0 && <div className="flex justify-between"><span>Tax estimate:</span><span>${calculateTax().toFixed(2)}</span></div>}
-                  <div className="flex justify-between"><span>Shipping estimate:</span><span>${shippingFee.toFixed(2)}</span></div>
-                  <div className="flex justify-between pt-2 border-t font-bold"><span>Estimated request value:</span><span className="text-green-600">${calculateTotal().toFixed(2)}</span></div>
-                  <p className="pt-2 text-xs text-gray-500">PhenoFarm records value for operations only. Wholesale settlement is handled directly with the dispensary.</p>
-                </div>
               </div>
             )}
           </div>
         </div>
+        <details className="rounded-xl border border-gray-200 bg-white px-3 py-1 sm:p-4">
+          <summary className="min-h-10 cursor-pointer py-2.5 text-sm font-semibold sm:py-0">Shipping &amp; notes</summary>
+          <div className="mt-2 grid gap-3 pb-2 sm:mt-4 sm:gap-4 sm:grid-cols-2 sm:pb-0">            <div>
+              <label htmlFor="request-notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+              <textarea id="request-notes"
+                value={formData.notes}
+                onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
+                rows={3}
+                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              />
+            </div>
+            <div>
+              <label htmlFor="request-shipping" className="block text-sm font-medium text-gray-700 mb-1">Shipping ($)</label>
+              <input
+                id="request-shipping"
+                type="number"
+                min="0"
+                step="0.01"
+                value={formData.shippingFee}
+                onChange={(e) => setFormData((prev) => ({ ...prev, shippingFee: e.target.value }))}
+                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              />
+            </div>
+          </div>
+        </details>
+        {formData.items.length > 0 && <>                <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+                  <div className="flex justify-between"><span>Subtotal</span><span>${calculateSubtotal().toFixed(2)}</span></div>
+                  {calculateTax() > 0 && <div className="flex justify-between"><span>Recorded tax</span><span>${calculateTax().toFixed(2)}</span></div>}
+                  <div className="flex justify-between"><span>Shipping</span><span>${shippingFee.toFixed(2)}</span></div>
+                  <div className="flex justify-between pt-2 border-t font-bold"><span>Est. total</span><span className="text-green-600">${calculateTotal().toFixed(2)}</span></div>
+                  <p className="pt-2 text-xs text-gray-500">Payment is arranged directly with the buyer.</p>
+                </div>
+        </>}
+        <div className="flex flex-wrap items-center gap-3">
+          <button type="submit" disabled={!canSubmitOrder} className="min-h-10 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{isSubmitting ? 'Saving...' : 'Record request'}</button>
+          <Link href="/grower/orders" className={`inline-flex min-h-10 items-center rounded-lg border border-gray-300 px-4 py-2 text-sm ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}>Cancel</Link>
+        </div>
+        {submitHint && <p className="text-xs text-gray-500">{submitHint}</p>}
       </form>
     </div>
   );

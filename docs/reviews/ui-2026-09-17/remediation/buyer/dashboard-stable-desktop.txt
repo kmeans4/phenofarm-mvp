@@ -1,0 +1,146 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e1636]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1637]
+    - StaticText "Notifications"
+    - StaticText "20"
+  - navigation "Portal navigation" [ref=e1638]
+    - link "Dashboard" [ref=e1647]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e1648]
+      - StaticText "Catalog"
+    - link "Request Draft 2" [ref=e1649]
+      - StaticText "Request Draft"
+      - StaticText "2"
+    - link "Orders 17" [ref=e1650]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e1651]
+      - StaticText "Saved"
+    - link "Settings" [ref=e1652]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e1639]
+- main
+  - sectionheader
+    - paragraph
+      - StaticText "BUYER WORKSPACE"
+    - heading "Green Vermont Dispensary" [level=1, ref=e1653]
+    - paragraph
+      - StaticText "Track requests and revisit saved products."
+    - link "Browse Catalog" [ref=e1654]
+  - paragraph
+    - StaticText "Request value"
+  - paragraph
+    - StaticText "$460.50"
+  - paragraph
+    - StaticText "Awaiting response"
+  - paragraph
+    - StaticText "17"
+  - paragraph
+    - StaticText "Growers"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "In progress"
+  - paragraph
+    - StaticText "1"
+  - link "Verified buyer" [ref=e1640]
+  - group
+    - DisclosureTriangle "About these totals" [expanded=false]
+      - StaticText "About these totals"
+  - link "Saved Favorites 1 · Alerts 1" [ref=e1641]
+    - StaticText "Saved"
+    - StaticText "Favorites "
+    - StaticText "1"
+    - StaticText " · Alerts "
+    - StaticText "1"
+  - heading "Recent Requests" [level=3, ref=e1642]
+  - link "View all" [ref=e1643]
+  - table
+    - rowgroup
+      - row
+        - columnheader "Request #" [ref=e1661] clickable [cursor:pointer]
+          - button "Request #" [ref=e1672]
+            - StaticText "Request #"
+            - image
+        - columnheader "GROWER" [ref=e1662]
+        - columnheader "Date" [ref=e1663] clickable [cursor:pointer]
+          - button "Date" [ref=e1673]
+            - StaticText "Date"
+            - image
+        - columnheader "Est. value" [ref=e1664] clickable [cursor:pointer]
+          - button "Est. value" [ref=e1674]
+            - StaticText "Est. value"
+            - image
+        - columnheader "Status" [ref=e1665] clickable [cursor:pointer]
+          - button "Status" [ref=e1675]
+            - StaticText "Status"
+            - image
+        - columnheader "ACTIONS" [ref=e1666]
+    - link "View request ORD-20260710-XPJO3I" [ref=e1655]
+      - StaticText "#"
+      - StaticText "ORD-20260710-XPJO3I"
+      - StaticText "Vermont Nurseries"
+      - StaticText "Jul 9, 2026"
+      - generic
+        - StaticText "$25.00"
+      - StaticText "Submitted"
+      - link "View" [ref=e1667]
+    - link "View request ORD-20260710-03UYXZ" [ref=e1656]
+      - StaticText "#"
+      - StaticText "ORD-20260710-03UYXZ"
+      - StaticText "Vermont Nurseries"
+      - StaticText "Jul 9, 2026"
+      - generic
+        - StaticText "$25.00"
+      - StaticText "Submitted"
+      - link "View" [ref=e1668]
+    - link "View request ORD-20260710-O78T5N" [ref=e1657]
+      - StaticText "#"
+      - StaticText "ORD-20260710-O78T5N"
+      - StaticText "Vermont Nurseries"
+      - StaticText "Jul 9, 2026"
+      - generic
+        - StaticText "$25.00"
+      - StaticText "Submitted"
+      - link "View" [ref=e1669]
+    - link "View request ORD-20260710-ZYGM3S" [ref=e1658]
+      - StaticText "#"
+      - StaticText "ORD-20260710-ZYGM3S"
+      - StaticText "Vermont Nurseries"
+      - StaticText "Jul 9, 2026"
+      - generic
+        - StaticText "$25.00"
+      - StaticText "Submitted"
+      - link "View" [ref=e1670]
+    - link "View request ORD-20260710-FMBIOT" [ref=e1659]
+      - StaticText "#"
+      - StaticText "ORD-20260710-FMBIOT"
+      - StaticText "Vermont Nurseries"
+      - StaticText "Jul 9, 2026"
+      - generic
+        - StaticText "$25.00"
+      - StaticText "Submitted"
+      - link "View" [ref=e1671]
+  - heading "Recently Requested" [level=3, ref=e1644]
+  - paragraph
+    - StaticText "Purple Haze Flowers"
+  - paragraph
+    - StaticText "Flower • from Vermont Nurseries"
+  - StaticText "$"
+  - StaticText "25.00"
+  - heading "7-Day Request Value" [level=3, ref=e1645]
+  - paragraph
+    - StaticText "No requests this week."
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1660]
+  - button "Open messages" [ref=e1646]
+- region "Notifications alt+T" [ref=e1635]
+- alert

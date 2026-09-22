@@ -1,0 +1,52 @@
+{
+  "slug": "06-inventory",
+  "route": "/grower/inventory",
+  "pass1": {
+    "inspected": [
+      "pass-1/06-inventory-desktop.png",
+      "pass-1/06-inventory-mobile.png"
+    ],
+    "strengths": [
+      "Mobile switches to usable product cards with visible stock controls and Edit link; no sideways table scrolling."
+    ],
+    "issues": [
+      {
+        "key": "inventory-top-density",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "Two full-width actions and three stacked metric cards push the first product below the844px initial viewport. ‘Inventory’ is followed by ‘Product Inventory’ plus two similar explanations.",
+        "recommendation": "Use a compact metrics row and one Add action; move ‘Update stock’ next to filters or label it ‘Stock update’. Remove the second heading and use one short helper ‘Enter current stock’."
+      },
+      {
+        "key": "inventory-units-format",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "The value is ‘$10000.00’ here versus ‘$10,000.00’ in Products; rows repeat the quantity beneath the stock input and spell out ‘gram’ in prices.",
+        "recommendation": "Format value as ‘$10,000’ when cents are zero. Put units beside stock inputs and use ‘$25/g’, ‘240 g’ consistently, keeping less familiar package units written out."
+      },
+      {
+        "key": "inventory-technical-copy",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "‘Changes save as absolute quantities’ describes implementation rather than the user's action.",
+        "recommendation": "Use ‘Set the amount currently in stock’ or ‘Enter current stock; changes save automatically’."
+      }
+    ],
+    "limits": [
+      "Stock controls and Update Stock not activated; no inventory changes."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/06-inventory-desktop.png",
+      "pass-2/06-inventory-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile captures confirm the three stacked mobile metrics and repeated inventory introduction place the first product below the 844px fold. Inventory cards themselves remain readable with visible quantity controls. Total Value still renders $10000.00 without grouping. No stock controls were used.",
+    "confirmedIssueKeys": [
+      "inventory-top-density",
+      "inventory-units-format",
+      "inventory-technical-copy"
+    ],
+    "newIssues": []
+  }
+}

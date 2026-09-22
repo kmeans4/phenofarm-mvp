@@ -1,0 +1,37 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e61]
+- button "Notifications" [expanded=false, ref=e62]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e63]
+- main
+  - sectionheader
+    - heading "Request draft" [level=1, ref=e71]
+    - paragraph
+      - StaticText "Send requests here; arrange payment with the grower."
+  - heading "Your draft is empty" [level=2, ref=e64]
+  - paragraph
+    - StaticText "Add products to get started."
+  - heading "Saved and recent products" [level=3, ref=e65]
+  - paragraph
+    - StaticText "Mystery Pricing Batch"
+  - StaticText "Favorite"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - paragraph
+    - StaticText "Quote only · 25 available"
+  - button "Request pricing" [ref=e66]
+  - paragraph
+    - StaticText "Purple Haze Flowers"
+  - StaticText "Recent"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - paragraph
+    - StaticText "$25.00/gram · 240 available"
+  - button "Add" [ref=e67]
+  - link "Browse products" [ref=e68]
+  - link "Saved items" [ref=e69]
+- button "Open messages" [ref=e70]
+- region "Notifications alt+T" [ref=e60]
+- alert

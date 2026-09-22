@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
-import type { Order } from '@prisma/client';
+import type { Order, UserRole } from '@prisma/client';
 import {
   canTransitionOrderStatus,
+  getOrderStatusLabel,
   getInvalidOrderStatusTransitionMessage,
   isOrderStatus,
 } from '@/lib/order-workflow';
+import { claimOrder, restoreInventory, OrderConflictError } from '@/lib/order-mutations';
+import { createNotification } from '@/lib/notifications';
 
 // Dispensaries may only withdraw their own not-yet-accepted requests;
 // growers own the rest of the fulfillment lifecycle.
@@ -26,7 +29,7 @@ export async function PATCH(
 
     const user = session.user;
     const { id: orderId } = await params;
-    const { status: newStatus } = await request.json() as { status: string };
+    const { status: newStatus } = await request.json().catch(() => ({})) as { status: string };
 
     if (!isOrderStatus(newStatus)) {
       return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
@@ -34,7 +37,10 @@ export async function PATCH(
 
     const order = await db.order.findUnique({
       where: { id: orderId },
-      include: { grower: true }
+      include: {
+        grower: { select: { userId: true, businessName: true } },
+        dispensary: { select: { userId: true, businessName: true } },
+      },
     });
 
     if (!order) {
@@ -62,6 +68,7 @@ export async function PATCH(
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
+    if (order.status === newStatus) return NextResponse.json({ success: true, order: { id: order.id, status: order.status, shippedAt: order.shippedAt, deliveredAt: order.deliveredAt } });
     const currentStatus = order.status;
     if (!canTransitionOrderStatus(currentStatus, newStatus)) {
       return NextResponse.json({
@@ -81,6 +88,7 @@ export async function PATCH(
     const isCancellation = newStatus === 'CANCELLED' && currentStatus !== 'CANCELLED';
 
     const updatedOrder = await db.$transaction(async (tx) => {
+      await claimOrder(tx, order);
       if (isCancellation) {
         // Return the inventory that was reserved when the request was created
         const items = await tx.orderItem.findMany({
@@ -89,17 +97,37 @@ export async function PATCH(
         });
 
         for (const item of items) {
-          await tx.product.updateMany({
-            where: { id: item.productId },
-            data: { inventoryQty: { increment: item.quantity } },
-          });
+          await restoreInventory(tx, item.productId, item.quantity);
         }
       }
 
-      return tx.order.update({
+      const updated = await tx.order.update({
         where: { id: orderId },
         data: updateData,
       });
+
+      await tx.orderStatusEvent.create({
+        data: {
+          orderId,
+          fromStatus: currentStatus,
+          toStatus: newStatus,
+          actorUserId: user.id,
+          actorRole: user.role as UserRole,
+        },
+      });
+
+      const recipientUserId = user.role === 'GROWER'
+        ? order.dispensary.userId
+        : order.grower.userId;
+      await createNotification(tx, {
+        userId: recipientUserId,
+        type: 'ORDER_STATUS_CHANGED',
+        title: `Request ${getOrderStatusLabel(newStatus).toLowerCase()}`,
+        body: `Request #${order.orderId} is now ${getOrderStatusLabel(newStatus)}.`,
+        href: user.role === 'GROWER' ? `/dispensary/orders/${order.id}` : `/grower/orders/${order.id}`,
+      });
+
+      return updated;
     });
 
     return NextResponse.json({
@@ -113,6 +141,7 @@ export async function PATCH(
     });
 
   } catch (error) {
+    if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Status update error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }

@@ -72,26 +72,6 @@ function normalizeSavedFilters(value: unknown): Array<Required<Pick<SavedFilterP
     .slice(0, MAX_SAVED_FILTERS);
 }
 
-function isMissingSavedFiltersTableError(error: unknown) {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2021") {
-    return String(error.meta?.table ?? error.message).includes("dispensary_saved_filters");
-  }
-
-  const message = error instanceof Error ? error.message : String(error);
-  return message.includes("dispensary_saved_filters") && message.toLowerCase().includes("does not exist");
-}
-
-function serializeSavedFilters(filters: ReturnType<typeof normalizeSavedFilters>) {
-  return filters.map((filter, index) => ({
-    id: filter.id || `${Date.now()}-${index}`,
-    name: filter.name,
-    filters: filter.filters,
-    searchQuery: filter.searchQuery,
-    sortBy: filter.sortBy,
-    createdAt: (filter.createdAt || new Date()).toISOString(),
-  }));
-}
-
 export async function GET() {
   try {
     const auth = await requireDispensary();
@@ -117,20 +97,12 @@ export async function GET() {
       })),
     });
   } catch (error) {
-    if (isMissingSavedFiltersTableError(error)) {
-      console.warn("Saved filters table is not available; falling back to browser-saved filters.");
-      return NextResponse.json({ filters: [] });
-    }
-
     console.error("Error loading saved filters:", error);
     return NextResponse.json({ error: "Failed to load saved filters" }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest) {
-  const body = await req.json().catch(() => ({}));
-  const filters = normalizeSavedFilters(body.filters);
-
   try {
     const auth = await requireDispensary();
     if ("error" in auth) return auth.error;
@@ -139,31 +111,21 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    await db.$transaction([
-      db.dispensarySavedFilter.deleteMany({
-        where: { dispensaryId },
-      }),
-      ...filters.map((filter) =>
-        db.dispensarySavedFilter.create({
-          data: {
-            dispensaryId,
-            name: filter.name,
-            filters: filter.filters,
-            searchQuery: filter.searchQuery,
-            sortBy: filter.sortBy,
-            ...(filter.createdAt ? { createdAt: filter.createdAt } : {}),
-          },
-        })
-      ),
-    ]);
-
-    return NextResponse.json({ filters: serializeSavedFilters(filters) });
+    const body = await req.json().catch(() => null);
+    if (!body || !Array.isArray(body.filters)) return NextResponse.json({ error: 'Provide filters.' }, { status: 400 });
+    const filters = normalizeSavedFilters(body.filters);
+    const key = (filter: { name: string; filters: unknown; searchQuery: string; sortBy: string }) => JSON.stringify([filter.name, normalizeFilters(filter.filters), filter.searchQuery, filter.sortBy]);
+    const saved = await db.$transaction(async tx => {
+      const existing = await tx.dispensarySavedFilter.findMany({ where: { dispensaryId } });
+      const incoming = new Map(filters.map(filter => [key(filter), filter]));
+      const existingKeys = new Set(existing.map(key));
+      await tx.dispensarySavedFilter.deleteMany({ where: { dispensaryId, id: { in: existing.filter(filter => !incoming.has(key(filter))).map(filter => filter.id) } } });
+      const additions = [...incoming.values()].filter(filter => !existingKeys.has(key(filter)));
+      if (additions.length) await tx.dispensarySavedFilter.createMany({ data: additions.map(filter => ({ name: filter.name, filters: filter.filters, searchQuery: filter.searchQuery, sortBy: filter.sortBy, ...(filter.createdAt ? { createdAt: filter.createdAt } : {}), dispensaryId })) });
+      return tx.dispensarySavedFilter.findMany({ where: { dispensaryId }, orderBy: { createdAt: 'desc' } });
+    });
+    return NextResponse.json({ filters: saved });
   } catch (error) {
-    if (isMissingSavedFiltersTableError(error)) {
-      console.warn("Saved filters table is not available; keeping filters browser-local.");
-      return NextResponse.json({ filters: serializeSavedFilters(filters) });
-    }
-
     console.error("Error saving saved filters:", error);
     return NextResponse.json({ error: "Failed to save saved filters" }, { status: 500 });
   }

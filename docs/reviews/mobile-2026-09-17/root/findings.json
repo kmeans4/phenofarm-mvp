@@ -1,0 +1,455 @@
+[
+  {
+    "id": "M-S01",
+    "routes": [
+      "/grower/*",
+      "/dispensary/*",
+      "/admin/*"
+    ],
+    "title": "Excess space below mobile navigation",
+    "before": "Content began 31px below the 65px mobile header.",
+    "change": "Removed 16px of excess top offset; desktop offsets remain unchanged.",
+    "files": [
+      "app/grower/layout.tsx",
+      "app/dispensary/layout.tsx",
+      "app/admin/layout.tsx"
+    ],
+    "evidence": [
+      "root/before/reports.png",
+      "root/working/reports.png",
+      "final-pages/_admin_dashboard-360.png",
+      "final-pages/_admin_settings-360.png",
+      "final-pages/_dispensary_catalog-360.png",
+      "final-pages/_dispensary_dashboard-360.png",
+      "final-pages/_dispensary_settings-360.png",
+      "final-pages/_grower_catalog-360.png",
+      "final-pages/_grower_dashboard-360.png",
+      "final-pages/_grower_reports-360.png",
+      "final-pages/_grower_settings-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-S02",
+    "routes": [
+      "/grower/*",
+      "/dispensary/*",
+      "/admin/*"
+    ],
+    "title": "Oversized mobile page headers",
+    "before": "Default 32px titles and stacked full-width actions pushed content down.",
+    "change": "Default 28px headings, 12px gaps and an optional title/action row for short labels.",
+    "files": [
+      "app/components/ui/PageHeader.tsx"
+    ],
+    "evidence": [
+      "root/before/reports.png",
+      "root/working/reports.png",
+      "final-pages/_admin_dashboard-360.png",
+      "final-pages/_admin_settings-360.png",
+      "final-pages/_dispensary_catalog-360.png",
+      "final-pages/_dispensary_dashboard-360.png",
+      "final-pages/_dispensary_settings-360.png",
+      "final-pages/_grower_catalog-360.png",
+      "final-pages/_grower_dashboard-360.png",
+      "final-pages/_grower_reports-360.png",
+      "final-pages/_grower_settings-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-S03",
+    "routes": [
+      "/grower/*",
+      "/dispensary/*"
+    ],
+    "title": "Overpadded shared cards",
+    "before": "Cards used 24px padding on narrow phones; conflicting utility classes could defeat local padding.",
+    "change": "Use 16px mobile/24px desktop defaults and merge padding overrides correctly.",
+    "files": [
+      "app/components/ui/Card.tsx"
+    ],
+    "evidence": [
+      "root/before/settings.png",
+      "root/working/settings.png",
+      "final-pages/_dispensary_catalog-360.png",
+      "final-pages/_dispensary_dashboard-360.png",
+      "final-pages/_dispensary_settings-360.png",
+      "final-pages/_grower_catalog-360.png",
+      "final-pages/_grower_dashboard-360.png",
+      "final-pages/_grower_reports-360.png",
+      "final-pages/_grower_settings-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-S04",
+    "routes": [
+      "/grower/*",
+      "/dispensary/*",
+      "/admin/*"
+    ],
+    "title": "Tall mobile navigation",
+    "before": "Group gaps and row padding pushed Settings to the bottom of the grower drawer.",
+    "change": "Tighter group/header/footer spacing; 40px nav links and 40px Close retained.",
+    "files": [
+      "app/components/ui/MobileNav.tsx"
+    ],
+    "evidence": [
+      "root/before/menu.png",
+      "root/working/menu.png",
+      "final-pages/_admin_dashboard-360.png",
+      "final-pages/_admin_settings-360.png",
+      "final-pages/_dispensary_catalog-360.png",
+      "final-pages/_dispensary_dashboard-360.png",
+      "final-pages/_dispensary_settings-360.png",
+      "final-pages/_grower_catalog-360.png",
+      "final-pages/_grower_dashboard-360.png",
+      "final-pages/_grower_reports-360.png",
+      "final-pages/_grower_settings-360.png",
+      "root/after/menu-mobile-final.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-S05",
+    "routes": [
+      "/grower/*",
+      "/dispensary/*"
+    ],
+    "title": "Large search input",
+    "before": "The 18px search field occupied excess width beside Search and Close.",
+    "change": "Use 16px on mobile and allow flex shrinking; preserve 18px desktop.",
+    "files": [
+      "app/components/SearchDialog.tsx"
+    ],
+    "evidence": [
+      "root/before/search.png",
+      "root/working/search.png",
+      "final-pages/_dispensary_catalog-360.png",
+      "final-pages/_dispensary_dashboard-360.png",
+      "final-pages/_dispensary_settings-360.png",
+      "final-pages/_grower_catalog-360.png",
+      "final-pages/_grower_dashboard-360.png",
+      "final-pages/_grower_reports-360.png",
+      "final-pages/_grower_settings-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-S06",
+    "routes": [
+      "/grower/*",
+      "/dispensary/*"
+    ],
+    "title": "Small chat navigation targets",
+    "before": "Back/Close were 20px icons with no 40px touch box; template select used 14px text.",
+    "change": "40px icon buttons, tighter surrounding header padding and 16px mobile select.",
+    "files": [
+      "app/components/messaging/ChatDrawer.tsx"
+    ],
+    "evidence": [
+      "root/before/thread.png",
+      "root/working/thread.png",
+      "final-pages/_dispensary_catalog-360.png",
+      "final-pages/_dispensary_dashboard-360.png",
+      "final-pages/_dispensary_settings-360.png",
+      "final-pages/_grower_catalog-360.png",
+      "final-pages/_grower_dashboard-360.png",
+      "final-pages/_grower_reports-360.png",
+      "final-pages/_grower_settings-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-S07",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "title": "Small date filter text",
+    "before": "The shared native select used 14px at phone widths.",
+    "change": "16px mobile input text with 40px minimum control height;14px desktop.",
+    "files": [
+      "app/components/ui/DateRangeFilter.tsx"
+    ],
+    "evidence": [
+      "grower/before/01-dashboard-360.png",
+      "final-pages/_grower_dashboard-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-R01",
+    "routes": [
+      "/grower/reports"
+    ],
+    "title": "Stacked report header and padded metrics",
+    "before": "Description, title and full-width exports used three rows before the date range.",
+    "change": "Place PDF/CSV beside the title, remove the redundant description, and tighten metric padding.",
+    "files": [
+      "app/grower/reports/page.tsx",
+      "app/grower/reports/ReportsExportActions.tsx"
+    ],
+    "evidence": [
+      "root/before/reports.png",
+      "root/working/reports.png",
+      "final-pages/_grower_reports-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-R02",
+    "routes": [
+      "/grower/reports"
+    ],
+    "title": "Tall recent-request rows",
+    "before": "A 40px customer link sat above separate date/ID metadata, inflating every row.",
+    "change": "Put metadata inside the same accessible request link and shorten empty-status disclosure.",
+    "files": [
+      "app/grower/reports/page.tsx"
+    ],
+    "evidence": [
+      "root/before/reports.png",
+      "root/working/reports.png",
+      "final-pages/_grower_reports-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-R03",
+    "routes": [
+      "/grower/settings"
+    ],
+    "title": "Repeated optional markers and long profile form",
+    "before": "Optional markers repeated the required-field convention;16px row gaps and a three-row description added scroll.",
+    "change": "Keep required stars, remove repeated optional markers, use 12px mobile gaps and a two-row description.",
+    "files": [
+      "app/grower/settings/components/SettingsForm.tsx"
+    ],
+    "evidence": [
+      "root/before/settings.png",
+      "root/working/settings.png",
+      "final-pages/_grower_settings-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-R04",
+    "routes": [
+      "/grower/settings",
+      "/dispensary/settings"
+    ],
+    "title": "Logo control width and whitespace",
+    "before": "96px logo +24px gap left little room for Change and Remove together.",
+    "change": "80px mobile preview,12px gap and wrapping upload/remove controls.",
+    "files": [
+      "app/components/settings/LogoUpload.tsx"
+    ],
+    "evidence": [
+      "root/before/settings.png",
+      "root/working/settings.png",
+      "final-pages/_dispensary_settings-360.png",
+      "final-pages/_grower_settings-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-R05",
+    "routes": [
+      "/grower/settings"
+    ],
+    "title": "Verbose commercial term labels",
+    "before": "Repeated Fulfillment and long payment/response labels used unnecessary space.",
+    "change": "Shorter labels,16px section title and 12px mobile field gaps; terms and field values preserved.",
+    "files": [
+      "app/components/settings/CommercialTermsPanel.tsx"
+    ],
+    "evidence": [
+      "root/before/settings.png",
+      "root/working/settings.png",
+      "final-pages/_grower_settings-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-R06",
+    "routes": [
+      "/grower/pricing"
+    ],
+    "title": "Verbose plan cards and empty action spacing",
+    "before": "Long plan descriptions,30px prices and an empty current-plan action margin inflated cards.",
+    "change": "Shortened copy,24px mobile prices, smaller gaps and removed empty current-plan action spacing; rates/billing terms retained.",
+    "files": [
+      "app/grower/pricing/page.tsx",
+      "app/grower/pricing/PricingPlans.tsx"
+    ],
+    "evidence": [
+      "root/before/pricing.png",
+      "root/working/pricing.png",
+      "final-pages/_grower_pricing-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-R07",
+    "routes": [
+      "/grower/marketplace"
+    ],
+    "title": "Tall preview cards",
+    "before": "Large missing-image placeholders and separate price/action/footer rows added repeated dead space.",
+    "change": "Shorter mobile heading with inline Add product action, 64px thumbnails beside product identity, price/Add row, 12px card padding and combined lab/edit footer. Desktop keeps full product images.",
+    "files": [
+      "app/grower/marketplace/page.tsx"
+    ],
+    "evidence": [
+      "root/before/marketplace.png",
+      "root/working/marketplace.png",
+      "final-pages/_grower_marketplace-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-R08",
+    "routes": [
+      "/grower/reports"
+    ],
+    "title": "Sparse monthly chart leaves unused mobile space",
+    "before": "One month of data still used a 160px plotting area, with a large empty area beside the single bar.",
+    "change": "Use compact labeled value/bar rows for up to three months on phones; keep the full chart on desktop and for longer ranges.",
+    "files": [
+      "app/grower/reports/page.tsx"
+    ],
+    "evidence": [
+      "root/before/reports.png",
+      "root/working/reports.png",
+      "final-pages/_grower_reports-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-S08",
+    "routes": [
+      "/grower/*",
+      "/dispensary/*"
+    ],
+    "title": "Floating messages covers mobile content",
+    "before": "The fixed bottom-right messages button overlapped stock text, report values and card actions at the viewport edge.",
+    "change": "Moved the same messages trigger into a reserved mobile header slot. Kept 40px controls and a compact wordmark; preserved the desktop floating trigger and chat behavior. Notification panels now hide floating triggers, including keyboard focus targets, like the other overlays.",
+    "files": [
+      "app/grower/layout.tsx",
+      "app/dispensary/layout.tsx",
+      "app/components/ui/PortalBrand.tsx",
+      "app/components/SearchDialog.tsx",
+      "app/components/messaging/ChatDrawer.tsx",
+      "app/globals.css",
+      "app/components/notifications/NotificationBell.tsx",
+      "tests/ui-shared-density-regressions.spec.ts"
+    ],
+    "evidence": [
+      "root/before/reports.png",
+      "root/working/header-chat.png",
+      "root/working/header-chat-320.png",
+      "final-pages/_dispensary_catalog-360.png",
+      "final-pages/_dispensary_dashboard-360.png",
+      "final-pages/_dispensary_settings-360.png",
+      "final-pages/_grower_catalog-360.png",
+      "final-pages/_grower_dashboard-360.png",
+      "final-pages/_grower_reports-360.png",
+      "final-pages/_grower_settings-360.png",
+      "root/after/notifications-mobile-final.png"
+    ],
+    "verification": "Header controls measured 40px at 320/360/430; visual order matches keyboard order. Chat/search/notifications workflow tests passed on final production build. Mobile sticky Save remains unobstructed and desktop floating Messages stays in place. The new final regression confirms Escape restores the Messages trigger for both roles; notification-only hiding also passes."
+  },
+  {
+    "id": "M-C01",
+    "routes": [
+      "/grower/customers"
+    ],
+    "title": "Repeated customer labels and tall card metadata",
+    "before": "Each phone card repeated Email, Phone and Location labels and stacked request date/value. The page introduction repeated the title.",
+    "change": "Kept accessible labels, shortened visual metadata, combined date/value, reduced card gaps and placed Add beside the title. All four actions remain visible.",
+    "files": [
+      "app/grower/customers/page.tsx",
+      "app/grower/customers/components/CustomersList.tsx"
+    ],
+    "evidence": [
+      "grower/before/19-customers-360.png",
+      "root/working/customers.png",
+      "final-pages/_grower_customers-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-C02",
+    "routes": [
+      "/grower/customers/add"
+    ],
+    "title": "Optional contact details pushed Add below the first screen",
+    "before": "Address and license fields expanded the form even when unused.",
+    "change": "Grouped optional address/license fields in a disclosure, used full available width, and tightened mobile gaps while retaining every input and value.",
+    "files": [
+      "app/grower/customers/add/page.tsx"
+    ],
+    "evidence": [
+      "grower/before/20-customer-add-360.png",
+      "root/working/customer-add-latest.png",
+      "final-pages/_grower_customers_add-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-C03",
+    "routes": [
+      "/grower/customers/[id]/edit"
+    ],
+    "title": "Empty website and description fields lengthened customer editing",
+    "before": "Empty optional fields added roughly 250px; section spacing and a separate More row added further scrolling.",
+    "change": "Website/description disclosure starts open for saved values and exposes a correction prompt for invalid fields. Smaller section gaps, two-row description, full-width form and one wrapping action row preserve access to editing and deletion.",
+    "files": [
+      "app/grower/customers/[id]/edit/components/EditCustomerForm.tsx"
+    ],
+    "evidence": [
+      "grower/before/21-customer-edit-360.png",
+      "root/working/customer-edit.png",
+      "final-pages/_grower_customers__id__edit-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-C04",
+    "routes": [
+      "/grower/customers/[id]/statement"
+    ],
+    "title": "Statement export and bottom spacing consumed unnecessary height",
+    "before": "CSV export sat under a short title; the page added 96px bottom padding inside an already-padded portal.",
+    "change": "Placed CSV next to the title and reduced local bottom padding, retaining date fields, amounts and direct-settlement context. Date fields retain 16px phone text to avoid focus zoom.",
+    "files": [
+      "app/grower/customers/[id]/statement/page.tsx"
+    ],
+    "evidence": [
+      "grower/before/22-customer-statement-360.png",
+      "root/working/customer-statement.png",
+      "final-pages/_grower_customers__id__statement-360.png"
+    ],
+    "verification": "Verified on the isolated production build: 360/390/430px and desktop 1440px, with no page overflow or runtime errors. Fresh phone screenshots inspected; affected interactive states checked."
+  },
+  {
+    "id": "M-C05",
+    "routes": [
+      "/grower/customers/[id]/edit"
+    ],
+    "title": "Valid customer edits left Save disabled",
+    "before": "Blurring a valid field left an undefined value in the error object. Counting its keys incorrectly disabled Save changes.",
+    "change": "Count actual error messages; valid edits can save and invalid fields still block submission.",
+    "files": [
+      "app/grower/customers/[id]/edit/components/EditCustomerForm.tsx",
+      "tests/ui-grower-data-regressions.spec.ts"
+    ],
+    "evidence": [
+      "root/before/customer-save-disabled.txt",
+      "root/after/customer-edit-expanded-360.png",
+      "final-pages/_grower_customers__id__edit-360.png"
+    ],
+    "verification": "Customer interaction checks passed; valid cleared errors allow saving, hidden optional values remain in payload, and invalid fields keep a visible correction prompt. Persistent regression passed with a real local customer update, and all 56 selected workflows passed."
+  }
+]

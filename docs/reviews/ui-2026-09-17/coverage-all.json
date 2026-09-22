@@ -1,0 +1,837 @@
+{
+  "method": "Fresh browser screenshots matched to current source route patterns; each owner also confirmed visual inspection. Secondary screenshots and interactions may add more evidence for a state.",
+  "viewports": [
+    "1440x1000",
+    "390x844"
+  ],
+  "passes": 2,
+  "routes": {
+    "/": {
+      "1-desktop": [
+        "public/screenshots/settled/pass1/desktop/y00000.png",
+        "public/screenshots/settled/pass1/desktop/y00840.png",
+        "public/screenshots/settled/pass1/desktop/y01680.png",
+        "public/screenshots/settled/pass1/desktop/y02520.png",
+        "public/screenshots/settled/pass1/desktop/y03360.png",
+        "public/screenshots/settled/pass1/desktop/y04200.png",
+        "public/screenshots/settled/pass1/desktop/y05040.png",
+        "public/screenshots/settled/pass1/desktop/y05880.png",
+        "public/screenshots/settled/pass1/desktop/y06720.png",
+        "public/screenshots/settled/pass1/desktop/y07041.png",
+        "public/screenshots/pass1/home-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/settled/pass1/mobile/y00000.png",
+        "public/screenshots/settled/pass1/mobile/y00708.png",
+        "public/screenshots/settled/pass1/mobile/y01416.png",
+        "public/screenshots/settled/pass1/mobile/y02124.png",
+        "public/screenshots/settled/pass1/mobile/y02832.png",
+        "public/screenshots/settled/pass1/mobile/y03540.png",
+        "public/screenshots/settled/pass1/mobile/y04248.png",
+        "public/screenshots/settled/pass1/mobile/y04956.png",
+        "public/screenshots/settled/pass1/mobile/y05664.png",
+        "public/screenshots/settled/pass1/mobile/y06372.png",
+        "public/screenshots/settled/pass1/mobile/y07080.png",
+        "public/screenshots/settled/pass1/mobile/y07788.png",
+        "public/screenshots/settled/pass1/mobile/y08496.png",
+        "public/screenshots/settled/pass1/mobile/y09204.png",
+        "public/screenshots/settled/pass1/mobile/y09912.png",
+        "public/screenshots/settled/pass1/mobile/y10319.png",
+        "public/screenshots/pass1/home-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/settled/pass2/desktop/y00000.png",
+        "public/screenshots/settled/pass2/desktop/y00840.png",
+        "public/screenshots/settled/pass2/desktop/y01680.png",
+        "public/screenshots/settled/pass2/desktop/y02520.png",
+        "public/screenshots/settled/pass2/desktop/y03360.png",
+        "public/screenshots/settled/pass2/desktop/y04200.png",
+        "public/screenshots/settled/pass2/desktop/y05040.png",
+        "public/screenshots/settled/pass2/desktop/y05880.png",
+        "public/screenshots/settled/pass2/desktop/y06720.png",
+        "public/screenshots/settled/pass2/desktop/y07041.png",
+        "public/screenshots/pass2/home-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/settled/pass2/mobile/y00000.png",
+        "public/screenshots/settled/pass2/mobile/y00708.png",
+        "public/screenshots/settled/pass2/mobile/y01416.png",
+        "public/screenshots/settled/pass2/mobile/y02124.png",
+        "public/screenshots/settled/pass2/mobile/y02832.png",
+        "public/screenshots/settled/pass2/mobile/y03540.png",
+        "public/screenshots/settled/pass2/mobile/y04248.png",
+        "public/screenshots/settled/pass2/mobile/y04956.png",
+        "public/screenshots/settled/pass2/mobile/y05664.png",
+        "public/screenshots/settled/pass2/mobile/y06372.png",
+        "public/screenshots/settled/pass2/mobile/y07080.png",
+        "public/screenshots/settled/pass2/mobile/y07788.png",
+        "public/screenshots/settled/pass2/mobile/y08496.png",
+        "public/screenshots/settled/pass2/mobile/y09204.png",
+        "public/screenshots/settled/pass2/mobile/y09912.png",
+        "public/screenshots/settled/pass2/mobile/y10319.png",
+        "public/screenshots/pass2/home-mobile.png"
+      ]
+    },
+    "/admin/dashboard": {
+      "1-desktop": [
+        "admin/p1-dashboard-desktop.png"
+      ],
+      "1-mobile": [
+        "admin/p1-dashboard-mobile.png"
+      ],
+      "2-desktop": [
+        "admin/p2-dashboard-desktop.png"
+      ],
+      "2-mobile": [
+        "admin/p2-dashboard-mobile.png"
+      ]
+    },
+    "/admin/dispensaries": {
+      "1-desktop": [
+        "admin/p1-dispensaries-desktop.png"
+      ],
+      "1-mobile": [
+        "admin/p1-dispensaries-mobile.png"
+      ],
+      "2-desktop": [
+        "admin/p2-dispensaries-desktop.png"
+      ],
+      "2-mobile": [
+        "admin/p2-dispensaries-mobile.png",
+        "admin/p2-unverify-dialog-mobile.png"
+      ]
+    },
+    "/admin/growers": {
+      "1-desktop": [
+        "admin/p1-growers-desktop.png"
+      ],
+      "1-mobile": [
+        "admin/p1-growers-mobile.png"
+      ],
+      "2-desktop": [
+        "admin/p2-growers-desktop.png"
+      ],
+      "2-mobile": [
+        "admin/p2-growers-mobile.png"
+      ]
+    },
+    "/admin/settings": {
+      "1-desktop": [
+        "admin/p1-settings-desktop.png"
+      ],
+      "1-mobile": [
+        "admin/p1-settings-mobile.png",
+        "admin/p1-menu-mobile.png",
+        "admin/p1-notifications-mobile.png"
+      ],
+      "2-desktop": [
+        "admin/p2-settings-desktop.png"
+      ],
+      "2-mobile": [
+        "admin/p2-settings-mobile.png"
+      ]
+    },
+    "/admin/users": {
+      "1-desktop": [
+        "admin/p1-users-desktop.png"
+      ],
+      "1-mobile": [
+        "admin/p1-users-mobile.png"
+      ],
+      "2-desktop": [
+        "admin/p2-users-desktop.png"
+      ],
+      "2-mobile": [
+        "admin/p2-users-mobile.png"
+      ]
+    },
+    "/auth/error": {
+      "1-desktop": [
+        "public/screenshots/pass1/error-credentials-desktop.png",
+        "public/screenshots/pass1/error-configuration-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/pass1/error-credentials-mobile.png",
+        "public/screenshots/pass1/error-configuration-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/pass2/error-credentials-desktop.png",
+        "public/screenshots/pass2/error-configuration-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/pass2/error-credentials-mobile.png",
+        "public/screenshots/pass2/error-configuration-mobile.png"
+      ]
+    },
+    "/auth/sign_in": {
+      "1-desktop": [
+        "public/screenshots/pass1/sign-in-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/pass1/sign-in-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/pass2/sign-in-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/pass2/sign-in-mobile.png"
+      ]
+    },
+    "/auth/sign_up": {
+      "1-desktop": [
+        "public/screenshots/pass1/sign-up-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/pass1/sign-up-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/pass2/sign-up-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/pass2/sign-up-mobile.png"
+      ]
+    },
+    "/contact": {
+      "1-desktop": [
+        "public/screenshots/pass1/contact-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/pass1/contact-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/pass2/contact-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/pass2/contact-mobile.png"
+      ]
+    },
+    "/dispensary/cart": {
+      "1-desktop": [
+        "dispensary/p1-03-cart-filled-desktop.png",
+        "dispensary/p1-03-cart-empty-desktop.png"
+      ],
+      "1-mobile": [
+        "dispensary/p1-03-cart-filled-mobile.png",
+        "dispensary/p1-03-cart-empty-mobile.png"
+      ],
+      "2-desktop": [
+        "dispensary/p2-03-cart-empty-desktop.png",
+        "dispensary/p2-03-cart-filled-desktop.png",
+        "dispensary/p2-cart-review-desktop.png"
+      ],
+      "2-mobile": [
+        "dispensary/p2-cart-review-mobile.png",
+        "dispensary/p2-03-cart-empty-mobile.png",
+        "dispensary/p2-03-cart-filled-mobile.png"
+      ]
+    },
+    "/dispensary/catalog": {
+      "1-desktop": [
+        "dispensary/p1-02-catalog-desktop.png"
+      ],
+      "1-mobile": [
+        "dispensary/p1-02-catalog-mobile.png"
+      ],
+      "2-desktop": [
+        "dispensary/p2-catalog-list-desktop.png",
+        "dispensary/p2-catalog-alert-dialog-desktop.png",
+        "dispensary/p2-catalog-filters-desktop.png",
+        "dispensary/p2-catalog-pricing-dialog-desktop.png",
+        "dispensary/p2-catalog-compare-desktop.png",
+        "dispensary/p2-02-catalog-desktop.png"
+      ],
+      "2-mobile": [
+        "dispensary/p2-catalog-compare-mobile.png",
+        "dispensary/p2-catalog-alert-dialog-mobile.png",
+        "dispensary/p2-02-catalog-mobile.png",
+        "dispensary/p2-catalog-filters-mobile.png",
+        "dispensary/p2-catalog-list-mobile.png",
+        "dispensary/p2-catalog-compare-lower-mobile.png",
+        "dispensary/p2-catalog-pricing-dialog-mobile.png"
+      ]
+    },
+    "/dispensary/dashboard": {
+      "1-desktop": [
+        "dispensary/p1-01-dashboard-desktop.png"
+      ],
+      "1-mobile": [
+        "dispensary/p1-01-dashboard-mobile.png"
+      ],
+      "2-desktop": [
+        "dispensary/p2-shared-search-desktop.png",
+        "dispensary/p2-01-dashboard-desktop.png",
+        "dispensary/p2-shared-notifications-desktop.png",
+        "dispensary/p2-shared-search-results-desktop.png"
+      ],
+      "2-mobile": [
+        "dispensary/p2-01-dashboard-mobile.png",
+        "dispensary/p2-shared-search-mobile.png",
+        "dispensary/p2-shared-search-results-mobile.png",
+        "dispensary/p2-shared-menu-mobile.png",
+        "dispensary/p2-shared-notifications-mobile.png"
+      ]
+    },
+    "/dispensary/orders": {
+      "1-desktop": [
+        "dispensary/p1-04-orders-desktop.png"
+      ],
+      "1-mobile": [
+        "dispensary/p1-04-orders-mobile.png"
+      ],
+      "2-desktop": [
+        "dispensary/p2-04-orders-desktop.png"
+      ],
+      "2-mobile": [
+        "dispensary/p2-04-orders-mobile.png"
+      ]
+    },
+    "/dispensary/saved": {
+      "1-desktop": [
+        "dispensary/p1-09-price-alerts-alias-desktop.png",
+        "dispensary/p1-08-favorites-alias-desktop.png",
+        "dispensary/p1-10-saved-recent-desktop.png",
+        "dispensary/p1-10-saved-desktop.png"
+      ],
+      "1-mobile": [
+        "dispensary/p1-08-favorites-alias-mobile.png",
+        "dispensary/p1-10-saved-recent-mobile.png",
+        "dispensary/p1-10-saved-mobile.png",
+        "dispensary/p1-09-price-alerts-alias-mobile.png"
+      ],
+      "2-desktop": [
+        "dispensary/p2-shared-activity-desktop.png",
+        "dispensary/p2-alerts-triggered-desktop.png",
+        "dispensary/p2-09-price-alerts-alias-desktop.png",
+        "dispensary/p2-alerts-history-desktop.png",
+        "dispensary/p2-08-favorites-alias-desktop.png",
+        "dispensary/p2-shared-messages-list-desktop.png",
+        "dispensary/p2-10-saved-recent-desktop.png",
+        "dispensary/p2-saved-list-desktop.png",
+        "dispensary/p2-10-saved-desktop.png"
+      ],
+      "2-mobile": [
+        "dispensary/p2-saved-list-mobile.png",
+        "dispensary/p2-08-favorites-alias-mobile.png",
+        "dispensary/p2-10-saved-recent-mobile.png",
+        "dispensary/p2-alerts-history-mobile.png",
+        "dispensary/p2-alerts-triggered-mobile.png",
+        "dispensary/p2-09-price-alerts-alias-mobile.png",
+        "dispensary/p2-shared-messages-list-mobile.png",
+        "dispensary/p2-10-saved-mobile.png"
+      ]
+    },
+    "/dispensary/settings": {
+      "1-desktop": [
+        "dispensary/p1-07-settings-desktop.png"
+      ],
+      "1-mobile": [
+        "dispensary/p1-07-settings-mobile.png"
+      ],
+      "2-desktop": [
+        "dispensary/p2-07-settings-desktop.png"
+      ],
+      "2-mobile": [
+        "dispensary/p2-07-settings-mobile.png"
+      ]
+    },
+    "/grower/batches": {
+      "1-desktop": [
+        "grower/pass-1/11-batches-desktop.png",
+        "grower/pass-1/11b-batches-ready-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/11b-batches-ready-mobile.png",
+        "grower/pass-1/11-batches-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/11-batches-desktop.png",
+        "grower/pass-2/11b-batches-ready-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/11b-batches-ready-mobile.png",
+        "grower/pass-2/11-batches-mobile.png"
+      ]
+    },
+    "/grower/batches/add": {
+      "1-desktop": [
+        "grower/pass-1/12-batch-add-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/12-batch-add-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/12-batch-add-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/12-batch-add-mobile.png"
+      ]
+    },
+    "/grower/catalog": {
+      "1-desktop": [
+        "grower/pass-1/02-catalog-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/02-catalog-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/02-catalog-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/02-catalog-mobile.png"
+      ]
+    },
+    "/grower/customers": {
+      "1-desktop": [
+        "grower/pass-1/19-customers-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/19-customers-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/19-customers-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/19-customers-mobile.png"
+      ]
+    },
+    "/grower/customers/add": {
+      "1-desktop": [
+        "grower/pass-1/20-customer-add-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/20-customer-add-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/20-customer-add-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/20-customer-add-mobile.png"
+      ]
+    },
+    "/grower/dashboard": {
+      "1-desktop": [
+        "grower/pass-1/26b-quote-form-desktop.png",
+        "grower/pass-1/25a-search-results-desktop.png",
+        "grower/pass-1/24-navigation-desktop.png",
+        "grower/pass-1/26-messages-desktop.png",
+        "grower/pass-1/01-dashboard-desktop.png",
+        "grower/pass-1/27-notifications-desktop.png",
+        "grower/pass-1/25-search-desktop.png",
+        "grower/pass-1/26a-message-thread-desktop.png",
+        "grower/pass-1/23-grower-redirect-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/27-notifications-mobile.png",
+        "grower/pass-1/25a-search-results-mobile.png",
+        "grower/pass-1/01-dashboard-mobile.png",
+        "grower/pass-1/23-grower-redirect-mobile.png",
+        "grower/pass-1/26a-message-thread-mobile.png",
+        "grower/pass-1/24-navigation-mobile.png",
+        "grower/pass-1/25-search-mobile.png",
+        "grower/pass-1/26-messages-mobile.png",
+        "grower/pass-1/26b-quote-form-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/26b-quote-form-desktop.png",
+        "grower/pass-2/25a-search-results-desktop.png",
+        "grower/pass-2/24-navigation-desktop.png",
+        "grower/pass-2/26-messages-desktop.png",
+        "grower/pass-2/01-dashboard-desktop.png",
+        "grower/pass-2/27-notifications-desktop.png",
+        "grower/pass-2/25-search-desktop.png",
+        "grower/pass-2/26a-message-thread-desktop.png",
+        "grower/pass-2/23-grower-redirect-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/27-notifications-mobile.png",
+        "grower/pass-2/25a-search-results-mobile.png",
+        "grower/pass-2/01-dashboard-mobile.png",
+        "grower/pass-2/23-grower-redirect-mobile.png",
+        "grower/pass-2/26a-message-thread-mobile.png",
+        "grower/pass-2/24-navigation-mobile.png",
+        "grower/pass-2/25-search-mobile.png",
+        "grower/pass-2/26-messages-mobile.png",
+        "grower/pass-2/26b-quote-form-mobile.png"
+      ]
+    },
+    "/grower/inventory": {
+      "1-desktop": [
+        "grower/pass-1/06-inventory-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/06-inventory-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/06-inventory-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/06-inventory-mobile.png"
+      ]
+    },
+    "/grower/inventory/add": {
+      "1-desktop": [
+        "grower/pass-1/07-inventory-add-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/07-inventory-add-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/07-inventory-add-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/07-inventory-add-mobile.png"
+      ]
+    },
+    "/grower/marketplace": {
+      "1-desktop": [
+        "admin-extra/p1-marketplace-desktop.png"
+      ],
+      "1-mobile": [
+        "admin-extra/p1-marketplace-mobile.png"
+      ],
+      "2-desktop": [
+        "admin-extra/p2-marketplace-desktop.png"
+      ],
+      "2-mobile": [
+        "admin-extra/p2-marketplace-mobile.png"
+      ]
+    },
+    "/grower/orders": {
+      "1-desktop": [
+        "grower/pass-1/14-orders-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/14-orders-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/14-orders-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/14-orders-mobile.png"
+      ]
+    },
+    "/grower/orders/add": {
+      "1-desktop": [
+        "grower/pass-1/16-order-add-desktop.png",
+        "grower/pass-1/16a-product-picker-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/16-order-add-mobile.png",
+        "grower/pass-1/16a-product-picker-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/16-order-add-desktop.png",
+        "grower/pass-2/16a-product-picker-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/16-order-add-mobile.png",
+        "grower/pass-2/16a-product-picker-mobile.png"
+      ]
+    },
+    "/grower/orders/history": {
+      "1-desktop": [
+        "grower/pass-1/15-order-history-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/15-order-history-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/15-order-history-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/15-order-history-mobile.png"
+      ]
+    },
+    "/grower/pricing": {
+      "1-desktop": [
+        "admin-extra/p1-pricing-desktop.png"
+      ],
+      "1-mobile": [
+        "admin-extra/p1-pricing-mobile.png"
+      ],
+      "2-desktop": [
+        "admin-extra/p2-pricing-desktop.png"
+      ],
+      "2-mobile": [
+        "admin-extra/p2-pricing-mobile.png"
+      ]
+    },
+    "/grower/products": {
+      "1-desktop": [
+        "grower/pass-1/03-products-desktop.png",
+        "grower/pass-1/03a-quick-add-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/03-products-mobile.png",
+        "grower/pass-1/03a-quick-add-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/03-products-desktop.png",
+        "grower/pass-2/03a-quick-add-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/03-products-mobile.png",
+        "grower/pass-2/03a-quick-add-mobile.png"
+      ]
+    },
+    "/grower/products/add": {
+      "1-desktop": [
+        "grower/pass-1/04-product-add-desktop.png",
+        "grower/pass-1/04a-product-details-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/04a-product-details-mobile.png",
+        "grower/pass-1/04-product-add-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/04-product-add-desktop.png",
+        "grower/pass-2/04a-product-details-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/04a-product-details-mobile.png",
+        "grower/pass-2/04-product-add-mobile.png"
+      ]
+    },
+    "/grower/reports": {
+      "1-desktop": [
+        "admin-extra/p1-reports-desktop.png"
+      ],
+      "1-mobile": [
+        "admin-extra/p1-reports-mobile.png"
+      ],
+      "2-desktop": [
+        "admin-extra/p2-reports-desktop.png"
+      ],
+      "2-mobile": [
+        "admin-extra/p2-reports-30d-mobile.png",
+        "admin-extra/p2-reports-mobile.png"
+      ]
+    },
+    "/grower/settings": {
+      "1-desktop": [
+        "admin-extra/p1-settings-desktop.png"
+      ],
+      "1-mobile": [
+        "admin-extra/p1-settings-mobile.png"
+      ],
+      "2-desktop": [
+        "admin-extra/p2-settings-desktop.png"
+      ],
+      "2-mobile": [
+        "admin-extra/p2-settings-mobile.png"
+      ]
+    },
+    "/grower/strains": {
+      "1-desktop": [
+        "grower/pass-1/08-strains-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/08-strains-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/08-strains-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/08-strains-mobile.png"
+      ]
+    },
+    "/grower/strains/add": {
+      "1-desktop": [
+        "grower/pass-1/09-strain-add-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/09-strain-add-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/09-strain-add-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/09-strain-add-mobile.png"
+      ]
+    },
+    "/help": {
+      "1-desktop": [
+        "public/screenshots/pass1/help-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/pass1/help-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/pass2/help-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/pass2/help-mobile.png"
+      ]
+    },
+    "/legal/cookies": {
+      "1-desktop": [
+        "public/screenshots/pass1/cookies-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/pass1/cookies-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/pass2/cookies-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/pass2/cookies-mobile.png"
+      ]
+    },
+    "/legal/privacy": {
+      "1-desktop": [
+        "public/screenshots/pass1/privacy-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/pass1/privacy-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/pass2/privacy-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/pass2/privacy-mobile.png"
+      ]
+    },
+    "/legal/terms": {
+      "1-desktop": [
+        "public/screenshots/pass1/terms-desktop.png"
+      ],
+      "1-mobile": [
+        "public/screenshots/pass1/terms-mobile.png"
+      ],
+      "2-desktop": [
+        "public/screenshots/pass2/terms-desktop.png"
+      ],
+      "2-mobile": [
+        "public/screenshots/pass2/terms-mobile.png"
+      ]
+    },
+    "/dispensary/grower/[id]": {
+      "1-desktop": [
+        "dispensary/p1-06-grower-shop-desktop.png"
+      ],
+      "1-mobile": [
+        "dispensary/p1-06-grower-shop-mobile.png"
+      ],
+      "2-desktop": [
+        "dispensary/p2-06-grower-shop-desktop.png"
+      ],
+      "2-mobile": [
+        "dispensary/p2-06-grower-shop-mobile.png",
+        "dispensary/p2-shop-filters-mobile.png"
+      ]
+    },
+    "/dispensary/orders/[id]": {
+      "1-desktop": [
+        "dispensary/p1-05-order-detail-desktop.png"
+      ],
+      "1-mobile": [
+        "dispensary/p1-05-order-detail-mobile.png"
+      ],
+      "2-desktop": [
+        "dispensary/p2-05-order-detail-desktop.png"
+      ],
+      "2-mobile": [
+        "dispensary/p2-05-order-detail-mobile.png"
+      ]
+    },
+    "/grower/batches/[id]/edit": {
+      "1-desktop": [
+        "grower/pass-1/13-batch-edit-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/13-batch-edit-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/13-batch-edit-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/13-batch-edit-mobile.png"
+      ]
+    },
+    "/grower/customers/[id]/edit": {
+      "1-desktop": [
+        "grower/pass-1/21-customer-edit-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/21-customer-edit-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/21-customer-edit-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/21-customer-edit-mobile.png"
+      ]
+    },
+    "/grower/customers/[id]/statement": {
+      "1-desktop": [
+        "grower/pass-1/22-customer-statement-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/22-customer-statement-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/22-customer-statement-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/22-customer-statement-mobile.png"
+      ]
+    },
+    "/grower/orders/[id]": {
+      "1-desktop": [
+        "grower/pass-1/17-order-detail-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/17-order-detail-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/17-order-detail-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/17-order-detail-mobile.png"
+      ]
+    },
+    "/grower/orders/[id]/edit": {
+      "1-desktop": [
+        "grower/pass-1/18-order-edit-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/18-order-edit-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/18-order-edit-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/18-order-edit-mobile.png"
+      ]
+    },
+    "/grower/products/[id]/edit": {
+      "1-desktop": [
+        "grower/pass-1/05-product-edit-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/05-product-edit-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/05-product-edit-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/05-product-edit-mobile.png"
+      ]
+    },
+    "/grower/strains/[id]/edit": {
+      "1-desktop": [
+        "grower/pass-1/10-strain-edit-desktop.png"
+      ],
+      "1-mobile": [
+        "grower/pass-1/10-strain-edit-mobile.png"
+      ],
+      "2-desktop": [
+        "grower/pass-2/10-strain-edit-desktop.png"
+      ],
+      "2-mobile": [
+        "grower/pass-2/10-strain-edit-mobile.png"
+      ]
+    }
+  },
+  "missing": []
+}

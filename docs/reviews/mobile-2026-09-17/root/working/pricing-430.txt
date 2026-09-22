@@ -1,0 +1,59 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e231]
+- button "Notifications" [expanded=false, ref=e232]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e233]
+- main
+  - sectionheader
+    - heading "Plans" [level=1, ref=e235]
+    - paragraph
+      - StaticText "Software plans. Wholesale payments stay direct."
+  - generic
+    - StaticText "Current plan: "
+    - strong
+      - StaticText "Free"
+  - paragraph
+    - StaticText "Paid upgrades are unavailable. "
+    - link "Contact support" [ref=e236]
+    - StaticText "."
+  - heading "Free" [level=2, ref=e237]
+  - StaticText "Current plan"
+  - paragraph
+    - StaticText "Start listing and managing requests."
+  - paragraph
+    - StaticText "$0"
+  - paragraph
+    - StaticText "/mo"
+  - group
+    - DisclosureTriangle "Plan features" [expanded=false]
+      - StaticText "Plan features"
+  - StaticText "Selected subscription plan"
+  - StaticText "Most popular"
+  - heading "Pro" [level=2, ref=e238]
+  - paragraph
+    - StaticText "For active wholesale teams."
+  - paragraph
+    - StaticText "$249"
+  - paragraph
+    - StaticText "/mo ($199/mo billed annually)"
+  - group
+    - DisclosureTriangle "Plan features" [expanded=false]
+      - StaticText "Plan features"
+  - paragraph
+    - StaticText "Checkout unavailable"
+  - heading "Business" [level=2, ref=e239]
+  - paragraph
+    - StaticText "For multi-license operations."
+  - paragraph
+    - StaticText "Custom"
+  - group
+    - DisclosureTriangle "Plan features" [expanded=false]
+      - StaticText "Plan features"
+  - link "Contact sales" [ref=e240]
+- button "Open messages" [ref=e234]
+- region "Notifications alt+T" [ref=e230]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e241]
+  - image
+- alert

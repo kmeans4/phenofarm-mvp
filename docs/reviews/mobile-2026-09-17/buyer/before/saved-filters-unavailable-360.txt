@@ -1,0 +1,162 @@
+- generic
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - generic [ref=e1228] clickable [onclick]
+    - button "Open messages" [ref=e1233]
+  - button "Search" [ref=e1229]
+  - button "Notifications" [expanded=false, ref=e1230]
+    - StaticText "24"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1231]
+  - main
+    - generic
+      - sectionheader
+        - heading "Catalog" [level=1, ref=e1238]
+        - link "View draft 3" [ref=e1239]
+          - StaticText "View draft"
+          - StaticText "3"
+      - generic
+        - generic
+          - LabelText
+            - StaticText "Search catalog"
+          - combobox "Search catalog" [expanded=false, ref=e1283]
+        - combobox "Sort catalog results" [expanded=false, ref=e1282]: By grower
+          - MenuListPopup
+            - option "By grower" [selected, ref=e1284]
+            - option "Price: low" [ref=e1285]
+            - option "Price: high" [ref=e1286]
+            - option "THC: high" [ref=e1287]
+            - option "THC: low" [ref=e1288]
+            - option "Name: A-Z" [ref=e1289]
+            - option "Name: Z-A" [ref=e1290]
+        - button "Toggle filters" [expanded=true, ref=e1240]
+        - button "Grid view" [ref=e1241]
+        - button "List view" [ref=e1242]
+      - StaticText "3 of 3 products"
+      - heading "Vermont Nurseries" [level=2, ref=e1234]
+      - link "Shop →" [ref=e1235]
+      - generic
+        - generic
+          - image "Mystery Pricing Batch"
+        - heading "Mystery Pricing Batch" [level=3, ref=e1243]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "19"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "0.3"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Assorted"
+        - paragraph
+          - StaticText "25 available"
+        - button "Request pricing" [ref=e1244]
+        - button "Remove Mystery Pricing Batch from favorites" [ref=e1245]
+        - button "Message grower" [ref=e1246]
+          - StaticText "Message"
+        - button "Compare Mystery Pricing Batch" [ref=e1247]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Purple Haze Flowers"
+        - heading "Purple Haze Flowers" [level=3, ref=e1248]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "24.8"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "0.6"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Purple Haze"
+        - generic
+          - StaticText "$25.00/ g"
+        - button "Decrease quantity for Purple Haze Flowers" [ref=e1249]
+          - StaticText "−"
+        - spinbutton "Quantity for Purple Haze Flowers" [ref=e1250]: 1
+          - StaticText "1"
+        - button "Increase quantity for Purple Haze Flowers" [ref=e1251]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1252]
+          - StaticText "Add"
+        - StaticText "240 available"
+        - button "Favorite Purple Haze Flowers" [ref=e1253]
+        - button "Price alert for Purple Haze Flowers" [ref=e1254]
+        - button "Message grower" [ref=e1255]
+          - StaticText "Message"
+        - button "Compare Purple Haze Flowers" [ref=e1256]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Silver Haze Concentrate"
+        - heading "Silver Haze Concentrate" [level=3, ref=e1257]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "85"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "0.2"
+        - StaticText "%"
+        - StaticText "Bulk Extract"
+        - paragraph
+          - StaticText "Strain: Silver Haze"
+        - generic
+          - StaticText "$60.00/ g"
+        - button "Decrease quantity for Silver Haze Concentrate" [ref=e1258]
+          - StaticText "−"
+        - spinbutton "Quantity for Silver Haze Concentrate" [ref=e1259]: 1
+          - StaticText "1"
+        - button "Increase quantity for Silver Haze Concentrate" [ref=e1260]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1261]
+          - StaticText "Add"
+        - StaticText "50 available"
+        - button "Favorite Silver Haze Concentrate" [ref=e1262]
+        - button "Price alert for Silver Haze Concentrate" [ref=e1263]
+        - button "Message grower" [ref=e1264]
+          - StaticText "Message"
+        - button "Compare Silver Haze Concentrate" [ref=e1265]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - paragraph
+        - StaticText "End of results"
+  - region "Notifications alt+T" [ref=e1227]
+  - alert
+  - generic
+    - generic [ref=e1232] clickable [onclick]
+    - dialog "Catalog filters"
+      - heading "Filters" [level=2, ref=e1236]
+      - button "Close filters" [ref=e1237]
+      - generic
+        - checkbox "Favorites only (1)" [checked=false, ref=e1266]
+        - checkbox "Added in 7 days" [checked=false, ref=e1267]
+        - heading "PRODUCT TYPE" [level=3, ref=e1268]
+        - button "Flower 2" [ref=e1269]
+          - StaticText "Flower"
+          - StaticText "2"
+        - button "Concentrate 1" [ref=e1270]
+          - StaticText "Concentrate"
+          - StaticText "1"
+        - heading "THC POTENCY" [level=3, ref=e1271]
+        - button "< 15%" [ref=e1272]
+        - button "15% - 20%" [ref=e1273]
+        - button "20% - 25%" [ref=e1274]
+        - button "25%+" [ref=e1275]
+        - heading "PRICE PER UNIT" [level=3, ref=e1276]
+        - button "Under $10" [ref=e1277]
+        - button "$10 - $25" [ref=e1278]
+        - button "$25 - $50" [ref=e1279]
+        - button "$50+" [ref=e1280]
+      - button "Apply filters" [ref=e1281]

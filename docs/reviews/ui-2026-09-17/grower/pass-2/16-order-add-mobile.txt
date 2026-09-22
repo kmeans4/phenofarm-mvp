@@ -1,0 +1,41 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e1051]
+- button "Notifications" [expanded=false, ref=e1052]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e1053]
+- main
+  - sectionheader
+    - heading "Record Direct Request" [level=1, ref=e1055]
+    - paragraph
+      - StaticText "Record a request coordinated directly with a dispensary outside PhenoFarm payment rails"
+    - link "Cancel" [ref=e1056]
+    - button "Record Direct Request" [disabled, ref=e1057]
+    - paragraph
+      - StaticText "Select a dispensary before recording the request."
+  - form
+    - heading "Request Details" [level=2, ref=e1058]
+    - LabelText
+      - StaticText "Dispensary *"
+    - combobox "Search dispensaries by name or city" [expanded=false, required, ref=e1063]
+    - paragraph
+      - StaticText "Filter by business name, city, or state."
+    - LabelText
+      - StaticText "Notes"
+    - textbox [ref=e1059]
+    - LabelText
+      - StaticText "Shipping estimate ($)"
+    - spinbutton [ref=e1060]: 0
+      - StaticText "0"
+    - heading "Items" [level=2, ref=e1061]
+    - button "+ Add" [ref=e1062]
+    - paragraph
+      - StaticText "No items in this direct request yet"
+    - paragraph
+      - StaticText "Click Add above to include your first line item."
+- button "Open messages" [ref=e1054]
+- region "Notifications alt+T" [ref=e1050]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1064]
+  - image
+- alert

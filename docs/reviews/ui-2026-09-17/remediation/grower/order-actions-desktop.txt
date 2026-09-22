@@ -1,0 +1,134 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e3751]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3752]
+    - StaticText "Notifications"
+    - StaticText "18"
+  - navigation "Portal navigation" [ref=e3753]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3755]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e3756]
+      - StaticText "Catalog"
+    - link "Products" [ref=e3757]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3758]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3759]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3760]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3761]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3762]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3763]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3764]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3754]
+- main
+  - link "← Requests" [ref=e3740]
+  - sectionheader
+    - heading "Request #ORD-20260710-XPJO3I" [level=1, ref=e3750]
+      - StaticText "Request"
+      - StaticText "#"
+      - StaticText "ORD-20260710-XPJO3I"
+    - paragraph
+      - StaticText "Submitted on July 9, 2026 at 8:39 PM"
+    - StaticText "Submitted"
+    - group
+      - DisclosureTriangle "Actions" [expanded=true]
+        - StaticText "Actions"
+      - generic
+        - link "Edit" [ref=e3774]
+          - image
+          - StaticText "Edit"
+        - button "Print" [ref=e3775]
+          - image
+          - StaticText "Print"
+        - button "Export CSV" [ref=e3776]
+  - heading "Next action" [level=2, ref=e3741]
+  - button "Accept request" [ref=e3742]
+  - button "Cancel request" [ref=e3743]
+  - heading "Items (1item)" [level=3, ref=e3744]
+    - image
+    - StaticText "Items"
+    - StaticText "("
+    - StaticText "1"
+    - StaticText "item"
+    - StaticText ")"
+  - table
+    - rowgroup
+      - row
+        - columnheader "PRODUCT" [ref=e3770]
+        - columnheader "PRICE" [ref=e3771]
+        - columnheader "QTY" [ref=e3772]
+        - columnheader "LINE VALUE" [ref=e3773]
+    - row
+      - cell "Purple Haze Flowers Purple Haze Flower - Indoor" [ref=e3766]
+        - paragraph
+          - StaticText "Purple Haze Flowers"
+        - paragraph
+          - StaticText "Purple Haze"
+        - paragraph
+          - StaticText "Flower - Indoor"
+      - cell "$25.00/gram" [ref=e3767]
+        - StaticText "$25.00/gram"
+      - cell "1" [ref=e3768]
+      - cell "$25.00" [ref=e3769]
+  - StaticText "Subtotal"
+  - StaticText "$25.00"
+  - StaticText "Est. total"
+  - StaticText "$25.00"
+  - paragraph
+    - StaticText "Payment is arranged directly with the buyer."
+  - heading "Request Details" [level=3, ref=e3745]
+    - image
+    - StaticText "Request Details"
+  - paragraph
+    - StaticText "FULFILLMENT"
+  - paragraph
+    - StaticText "Flexible"
+  - paragraph
+    - StaticText "REQUESTED WINDOW"
+  - paragraph
+    - StaticText "Coordinate with grower"
+  - paragraph
+    - StaticText "DIRECT PAYMENT TERMS"
+  - paragraph
+    - StaticText "Handled directly"
+  - group
+    - DisclosureTriangle "Progress" [expanded=false]
+      - StaticText "Progress"
+  - group
+    - DisclosureTriangle "Request history" [expanded=false]
+      - StaticText "Request history"
+  - heading "Customer" [level=3, ref=e3746]
+    - image
+    - StaticText "Customer"
+  - link "Green Vermont Dispensary" [ref=e3747]
+  - image
+  - StaticText "(802) 555-0145"
+  - image
+  - StaticText "456 Market Street"
+  - LineBreak "\n"
+  - StaticText "Burlington"
+  - StaticText ", VT"
+  - StaticText " 05401"
+  - button "Message buyer" [ref=e3748]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3765]
+  - button "Open messages" [ref=e3749]
+- region "Notifications alt+T" [ref=e3736]
+- alert

@@ -1,0 +1,37 @@
+{
+  "slug": "26a-message-thread",
+  "route": "/grower/dashboard",
+  "state": "Existing conversation open",
+  "pass1": {
+    "inspected": [
+      "pass-1/26a-message-thread-desktop.png",
+      "pass-1/26a-message-thread-mobile.png"
+    ],
+    "strengths": [
+      "Conversation title, timestamps and message body are readable; composer stays anchored at bottom and mobile back/close actions are visible."
+    ],
+    "issues": [
+      {
+        "key": "message-composer-noise",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Composer has a horizontal row of six templates, two quote/pricing buttons and a two-line role/settlement note. Settlement is already a chip beneath the conversation header; on mobile the template row clips a label at the right edge.",
+        "recommendation": "Keep the message box and Send primary. Put templates under \u2018Templates\u2019 and pricing actions under \u2018Quote\u2019. Show one payment note only in quote context, with concise \u2018Payment arranged directly\u2019. Use shorter template names such as \u2018Follow up\u2019, \u2018Availability\u2019, \u2018Delivery\u2019, \u2018Terms\u2019."
+      }
+    ],
+    "limits": [
+      "Existing conversation viewed only; read receipt endpoint mocked to avoid database writes. No message typed/sent or template inserted; sparse message content is fixture-limited."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/26a-message-thread-desktop.png",
+      "pass-2/26a-message-thread-mobile.png"
+    ],
+    "notes": "Reopened existing conversation at both widths confirms the horizontally clipped template strip, two pricing actions, and repeated settlement/role text around the composer. Message bubbles remain readable. Read receipts were mocked; no template, message, quote, or pricing request was submitted.",
+    "confirmedIssueKeys": [
+      "message-composer-noise"
+    ],
+    "newIssues": []
+  }
+}

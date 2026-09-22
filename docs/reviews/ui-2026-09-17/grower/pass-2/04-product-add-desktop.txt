@@ -1,0 +1,213 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e2697]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2698]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e2699]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2702]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e2703]
+      - StaticText "Overview"
+    - link "Products" [ref=e2704]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2705]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2706]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2707]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2708]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2709]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2710]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2711]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2700]
+- main
+  - sectionheader
+    - paragraph
+      - StaticText "PRODUCTS / NEW PRODUCT"
+    - heading "Add a product" [level=1, ref=e2712]
+    - paragraph
+      - StaticText "Create a new cannabis product listing"
+  - form
+    - paragraph
+      - StaticText "GUIDED LISTING SETUP"
+    - generic
+      - StaticText "1"
+      - StaticText "Basics"
+    - generic
+      - StaticText "2"
+      - StaticText "Pricing"
+    - generic
+      - StaticText "3"
+      - StaticText "Inventory"
+    - generic
+      - StaticText "4"
+      - StaticText "Profile"
+    - generic
+      - StaticText "5"
+      - StaticText "Images"
+    - paragraph
+      - StaticText "Fill the core listing first. Optional profile, lab, and image details stay grouped so mobile setup stays easier to scan."
+    - paragraph
+      - StaticText "Smart defaults"
+    - paragraph
+      - StaticText "Reuse your last product type, unit, price, and pricing visibility."
+    - button "Use starter defaults" [ref=e2713]
+    - paragraph
+      - StaticText "STEP 1"
+    - heading "Basics" [level=3, ref=e2714]
+    - paragraph
+      - StaticText "Name the product and connect it to strain and batch context when available."
+    - LabelText
+      - StaticText "Product Name *"
+    - textbox "Product Name *" [ref=e2715]
+    - LabelText
+      - StaticText "Product Type *"
+    - combobox "Product Type *" [expanded=false, ref=e2716]: Select a product type
+      - MenuListPopup
+        - option "Select a product type" [selected, ref=e2735]
+        - option "Bulk Extract" [ref=e2736]
+        - option "Cartridge" [ref=e2737]
+        - option "Edibles" [ref=e2738]
+        - option "Beverages" [ref=e2739]
+        - option "Flower" [ref=e2740]
+        - option "Live Plant" [ref=e2741]
+        - option "Plant Material" [ref=e2742]
+        - option "Prepack" [ref=e2743]
+        - option "Preroll" [ref=e2744]
+        - option "Tincture" [ref=e2745]
+        - option "Topicals & Wellness" [ref=e2746]
+    - LabelText
+      - StaticText "Sub Type"
+    - textbox "Select a product type first" [disabled, ref=e2717]
+    - LabelText
+      - StaticText "Strain"
+    - combobox [expanded=false, ref=e2718]: Select a strain (optional)
+      - MenuListPopup
+        - option "Select a strain (optional)" [selected, ref=e2747]
+        - option "Assorted" [ref=e2748]
+        - option "Audit Test Kush • Hybrid" [ref=e2749]
+        - option "Purple Haze" [ref=e2750]
+        - option "Silver Haze" [ref=e2751]
+    - button "+ New" [ref=e2719]
+    - paragraph
+      - StaticText "Link to a strain for better inventory tracking"
+    - LabelText
+      - StaticText "Batch"
+    - StaticText "Pick a strain to attach a batch"
+    - paragraph
+      - StaticText "Batches become available after a strain is selected."
+    - paragraph
+      - StaticText "STEP 2"
+    - heading "Pricing" [level=3, ref=e2720]
+    - paragraph
+      - StaticText "Set the buyer-facing unit price or require a pricing request."
+    - LabelText
+      - StaticText "Price ($) *"
+    - spinbutton "Price ($) *" [ref=e2721]
+    - LabelText
+      - StaticText "Unit *"
+    - combobox "Unit *" [expanded=false, ref=e2722]: Gram
+      - MenuListPopup
+        - option "Select a unit" [ref=e2752]
+        - option "Gram" [selected, ref=e2753]
+        - option "Half Ounce" [ref=e2754]
+        - option "Ounce" [ref=e2755]
+        - option "Eighth" [ref=e2756]
+        - option "Quarter" [ref=e2757]
+        - option "Unit" [ref=e2758]
+        - option "Pack" [ref=e2759]
+        - option "Each" [ref=e2760]
+        - option "Lb" [ref=e2761]
+    - LabelText
+      - StaticText "Pricing Display"
+    - paragraph
+      - StaticText "Choose whether dispensaries see your price or must request pricing via message."
+    - button "Show Price Display public product price" [ref=e2723]
+      - StaticText "Show Price"
+      - StaticText "Display public product price"
+    - button "Request Pricing Hide price and require inquiry" [ref=e2724]
+      - StaticText "Request Pricing"
+      - StaticText "Hide price and require inquiry"
+    - paragraph
+      - StaticText "STEP 3"
+    - heading "Inventory and status" [level=3, ref=e2725]
+    - paragraph
+      - StaticText "Add the starting quantity and decide whether this listing is available now."
+    - LabelText
+      - StaticText "Initial Inventory Quantity *"
+    - spinbutton "Initial Inventory Quantity *" [ref=e2726]: 0
+      - StaticText "0"
+    - LabelText
+      - StaticText "SKU"
+    - textbox "SKU" [ref=e2727]
+    - LabelText
+      - StaticText "Brand"
+    - textbox "Brand" [ref=e2728]: Vermont Nurseries
+      - StaticText "Vermont Nurseries"
+    - LabelText
+      - StaticText "Availability Status"
+    - paragraph
+      - StaticText "Make product available for buyer requests"
+    - button "Mark product unavailable" [ref=e2729]
+    - group
+      - DisclosureTriangle "STEPS 4 AND 5 Optional profile, compliance, and images Add cannabinoids, harvest details, descriptions, and product imagery when needed. Optional" [expanded=false]
+        - paragraph
+          - StaticText "STEPS 4 AND 5"
+        - heading "Optional profile, compliance, and images" [level=3, ref=e2762]
+        - paragraph
+          - StaticText "Add cannabinoids, harvest details, descriptions, and product imagery when needed."
+        - StaticText "Optional"
+    - complementary
+      - paragraph
+        - StaticText "SAVE SUMMARY"
+      - heading "Review before saving" [level=3, ref=e2731]
+      - StaticText "Available"
+      - paragraph
+        - StaticText "Listing"
+      - paragraph
+        - StaticText "Unnamed product"
+      - paragraph
+        - StaticText "Type"
+      - paragraph
+        - StaticText "Not selected"
+      - paragraph
+        - StaticText "Price"
+      - paragraph
+        - StaticText "Not priced"
+      - paragraph
+        - StaticText "Inventory"
+      - paragraph
+        - StaticText "0 Gram"
+      - paragraph
+        - StaticText "Visibility"
+      - paragraph
+        - StaticText "Available · price visible"
+      - button "Create Product" [ref=e2732]
+      - button "Save Draft" [ref=e2733]
+      - paragraph
+        - StaticText "Creates a hidden draft listing. Browser autosave stays on this device until you create or save the product."
+      - button "Cancel" [ref=e2734]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2730]
+  - button "Open messages" [ref=e2701]
+- region "Notifications alt+T" [ref=e2696]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e2763]
+  - image
+- alert

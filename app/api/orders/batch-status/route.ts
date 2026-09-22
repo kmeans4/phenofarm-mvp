@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
-import type { OrderStatus } from '@prisma/client';
+import { claimOrder, restoreInventory, OrderConflictError } from '@/lib/order-mutations';
 import {
   canTransitionOrderStatus,
   getInvalidOrderStatusTransitionMessage,
@@ -10,10 +9,11 @@ import {
   isOrderStatus,
   ORDER_STATUS_VALUES,
 } from '@/lib/order-workflow';
+import { createNotification } from '@/lib/notifications';
 
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const session = await getAuthSession();
 
     if (!session) {
       return NextResponse.json(
@@ -24,17 +24,17 @@ export async function PATCH(req: NextRequest) {
 
     const user = session.user;
 
-    if (user.role !== 'GROWER') {
+    if (user.role !== 'GROWER' || !user.growerId) {
       return NextResponse.json(
         { error: 'Forbidden - Grower access only' },
         { status: 403 }
       );
     }
 
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const { orderIds, status } = body;
 
-    if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0) {
+    if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0 || orderIds.length > 100 || orderIds.some((id: unknown) => typeof id !== 'string') || new Set(orderIds).size !== orderIds.length) {
       return NextResponse.json(
         { error: 'orderIds array is required' },
         { status: 400 }
@@ -69,7 +69,15 @@ export async function PATCH(req: NextRequest) {
         id: { in: orderIds },
         growerId: growerId,
       },
-      select: { id: true, status: true },
+      select: {
+        id: true,
+        orderId: true,
+        status: true,
+        updatedAt: true,
+        shippedAt: true,
+        deliveredAt: true,
+        dispensary: { select: { userId: true } },
+      },
     });
 
     if (orders.length !== orderIds.length) {
@@ -77,17 +85,6 @@ export async function PATCH(req: NextRequest) {
         { error: 'Some orders not found or do not belong to you' },
         { status: 403 }
       );
-    }
-
-    const updateData: { status: OrderStatus; shippedAt?: Date | null; deliveredAt?: Date | null } = { 
-      status: status as OrderStatus 
-    };
-    
-    // Set timestamps based on status
-    if (status === 'SHIPPED') {
-      updateData.shippedAt = new Date();
-    } else if (status === 'DELIVERED') {
-      updateData.deliveredAt = new Date();
     }
 
     const targetStatus = status;
@@ -122,35 +119,22 @@ export async function PATCH(req: NextRequest) {
     const transitionableIds = transitionableOrders.map((order) => order.id);
 
     const result = await db.$transaction(async (tx) => {
-      if (status === 'CANCELLED') {
-        const items = await tx.orderItem.findMany({
-          where: { orderId: { in: transitionableIds } },
-          select: { productId: true, quantity: true },
-        });
-
-        for (const item of items) {
-          await tx.product.updateMany({
-            where: { id: item.productId },
-            data: { inventoryQty: { increment: item.quantity } },
-          });
+      // Stable locking order prevents opposing batch requests from deadlocking.
+      for (const order of [...transitionableOrders].sort((a, b) => a.id.localeCompare(b.id))) {
+        await claimOrder(tx, order);
+        if (targetStatus === 'CANCELLED') {
+          const items = await tx.orderItem.findMany({ where: { orderId: order.id }, select: { productId: true, quantity: true } });
+          for (const item of items) await restoreInventory(tx, item.productId, item.quantity);
         }
-
-        return tx.order.updateMany({
-          where: {
-            id: { in: transitionableIds },
-            growerId: growerId,
-          },
-          data: updateData,
-        });
+        await tx.order.update({ where: { id: order.id }, data: {
+          status: targetStatus,
+          ...(targetStatus === 'SHIPPED' && !order.shippedAt ? { shippedAt: new Date() } : {}),
+          ...(targetStatus === 'DELIVERED' && !order.deliveredAt ? { deliveredAt: new Date() } : {}),
+        } });
+        await tx.orderStatusEvent.create({ data: { orderId: order.id, fromStatus: order.status, toStatus: targetStatus, actorUserId: user.id, actorRole: 'GROWER' } });
+        await createNotification(tx, { userId: order.dispensary.userId, type: 'ORDER_STATUS_CHANGED', title: `Request ${getOrderStatusLabel(targetStatus).toLowerCase()}`, body: `Request #${order.orderId} is now ${getOrderStatusLabel(targetStatus)}.`, href: `/dispensary/orders/${order.id}` });
       }
-
-      return tx.order.updateMany({
-        where: {
-          id: { in: transitionableIds },
-          growerId: growerId,
-        },
-        data: updateData,
-      });
+      return { count: transitionableOrders.length };
     });
 
     return NextResponse.json({
@@ -164,6 +148,7 @@ export async function PATCH(req: NextRequest) {
     });
 
   } catch (error) {
+    if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Batch status update error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

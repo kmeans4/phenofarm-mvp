@@ -1,0 +1,53 @@
+{
+  "slug": "03-products",
+  "route": "/grower/products",
+  "pass1": {
+    "inspected": [
+      "pass-1/03-products-desktop.png",
+      "pass-1/03-products-mobile.png"
+    ],
+    "strengths": [
+      "Useful saved issue counts; columns align on desktop and no page-level horizontal overflow."
+    ],
+    "issues": [
+      {
+        "key": "products-before-content",
+        "priority": "high",
+        "viewport": "mobile",
+        "observation": "Three full-width actions, three stacked KPI cards, a views panel, grouping/display panel, and bulk instructions push the first product to y1295. Most of the first screen contains repeated catalog context rather than products.",
+        "recommendation": "Keep one Add action with Quick add/Import in its menu. Put three metrics in one compact row; combine filters, grouping, and display in a compact toolbar. Show bulk controls after selection. Aim for the first product within the initial screen."
+      },
+      {
+        "key": "products-copy",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "\u2018Saved workflow views\u2019 plus \u2018Use these before grouping\u2026\u2019 explains basic controls; \u2018Select products for bulk cleanup\u2019 is followed by another cleanup sentence. \u2018All\u2019 appears in saved views, grouping, and an All Products section header.",
+        "recommendation": "Use \u2018Filters\u2019, \u2018Low stock\u2019, \u2018Missing photos\u2019, \u2018Hidden\u2019; label grouping as \u2018Group by\u2019. Remove both bulk instruction sentences and the All Products divider when ungrouped. Shorten quote badge to \u2018Quote only\u2019 with a tooltip explaining price visibility."
+      },
+      {
+        "key": "products-mobile-table",
+        "priority": "high",
+        "viewport": "mobile",
+        "observation": "The table retains desktop columns: the visible mobile area clips the price and hides stock plus Edit/actions to the right; the long quote-only pill breaks into a tall narrow stack.",
+        "recommendation": "Use compact mobile product rows showing name, status, price, stock and an always-visible action menu. If the table remains, pin product/actions and add an explicit horizontal-scroll cue; use \u2018g\u2019 and \u2018ea\u2019 only where unit meaning is clear."
+      }
+    ],
+    "limits": [
+      "No selection, edit, or bulk mutation performed."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/03-products-desktop.png",
+      "pass-2/03-products-mobile.png",
+      "pass-2/03-products-narrow.png"
+    ],
+    "notes": "Second desktop/mobile pass confirms the first product is below the fold and stock/actions are hidden inside horizontal table scrolling. Additional360px capture worsens clipping: Price is nearly entirely offscreen and filter chips gain another row. Keep high priority for mobile list composition; no distinct new issue.",
+    "confirmedIssueKeys": [
+      "products-before-content",
+      "products-copy",
+      "products-mobile-table"
+    ],
+    "newIssues": []
+  }
+}

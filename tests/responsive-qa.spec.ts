@@ -45,7 +45,9 @@ async function openAndCheck(page: Page, path: string, headingRegex: RegExp) {
   await page.waitForLoadState('networkidle').catch(() => {});
 
   await expect(page).toHaveURL(new RegExp(path.replace('/', '\\/')));
-  await expect(page.getByRole('heading', { name: headingRegex })).toBeVisible();
+  const pageHeading = page.getByRole('heading', { level: 1 });
+  await expect(pageHeading).toBeVisible();
+  await expect(pageHeading).toHaveText(headingRegex);
   await expectNoHorizontalOverflow(page);
 }
 
@@ -57,9 +59,9 @@ test.describe('Responsive QA sweep for launch-critical grower + dispensary paths
 
       await login(page, TEST_USERS.grower.email, TEST_USERS.grower.password);
 
-      await openAndCheck(page, '/grower/dashboard', /grower dashboard/i);
-      await openAndCheck(page, '/grower/products', /product management/i);
-      await openAndCheck(page, '/grower/products/add', /add new product/i);
+      await openAndCheck(page, '/grower/dashboard', /Vermont Nurseries/i);
+      await openAndCheck(page, '/grower/products', /Products/i);
+      await openAndCheck(page, '/grower/products/add', /add a product/i);
 
       await expect(page.locator('#name')).toBeVisible();
       await expect(page.getByRole('button', { name: /create product/i })).toBeVisible();
@@ -74,8 +76,8 @@ test.describe('Responsive QA sweep for launch-critical grower + dispensary paths
 
       await login(page, TEST_USERS.dispensary.email, TEST_USERS.dispensary.password);
 
-      await openAndCheck(page, '/dispensary/dashboard', /dispensary dashboard/i);
-      await openAndCheck(page, '/dispensary/catalog', /product catalog/i);
+      await openAndCheck(page, '/dispensary/dashboard', /Green Vermont Dispensary/i);
+      await openAndCheck(page, '/dispensary/catalog', /^Catalog$/i);
 
       const topAddToCartButton = page.getByRole('button', { name: /add to cart/i }).first();
       const addToCartCount = await page.getByRole('button', { name: /add to cart/i }).count();

@@ -1,0 +1,320 @@
+[
+  {
+    "route": "/admin/dashboard",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin"
+  },
+  {
+    "route": "/admin/dispensaries",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin"
+  },
+  {
+    "route": "/admin/growers",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin"
+  },
+  {
+    "route": "/admin",
+    "kind": "Redirect",
+    "destination": "/admin/dashboard",
+    "area": "admin"
+  },
+  {
+    "route": "/admin/settings",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin"
+  },
+  {
+    "route": "/admin/users",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin"
+  },
+  {
+    "route": "/auth/error",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  },
+  {
+    "route": "/auth/sign_in",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  },
+  {
+    "route": "/auth/sign_up",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  },
+  {
+    "route": "/contact",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  },
+  {
+    "route": "/dashboard",
+    "kind": "Redirect",
+    "destination": "role dashboard",
+    "area": "public"
+  },
+  {
+    "route": "/dispensary/cart",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/catalog",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/dashboard",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/favorites",
+    "kind": "Redirect",
+    "destination": "/dispensary/saved?tab=favorites",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/grower/[id]",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/orders/[id]",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/orders",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/price-alerts",
+    "kind": "Redirect",
+    "destination": "/dispensary/saved?tab=alerts",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/saved",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary"
+  },
+  {
+    "route": "/dispensary/settings",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary"
+  },
+  {
+    "route": "/grower/batches/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/batches/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/batches",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/catalog",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/customers/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/customers/[id]/statement",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/customers/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/customers",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/dashboard",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/inventory/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/inventory",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/marketplace",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/orders/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/orders/[id]",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/orders/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/orders/history",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/orders",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower",
+    "kind": "Redirect",
+    "destination": "/grower/dashboard",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/pricing",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/products/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/products/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/products",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/reports",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/settings",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/strains/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/strains/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/grower/strains",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower"
+  },
+  {
+    "route": "/help",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  },
+  {
+    "route": "/legal/cookies",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  },
+  {
+    "route": "/legal/privacy",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  },
+  {
+    "route": "/legal/terms",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  },
+  {
+    "route": "/",
+    "kind": "Page",
+    "destination": "",
+    "area": "public"
+  }
+]

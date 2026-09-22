@@ -88,22 +88,15 @@ export async function GET() {
     const dispensaryMap = new Map(dispensaries.map((d) => [d.id, d]));
     const productMap = new Map(products.map((p) => [p.id, p]));
 
-    const unreadEntries = await Promise.all(
-      conversations.map(async (conversation) => {
+    const unreadCounts = conversations.length ? await db.conversationMessage.groupBy({
+      by: ['conversationId'],
+      where: { senderUserId: { not: user.id }, OR: conversations.map(conversation => {
         const lastReadAt = isGrower ? conversation.growerLastReadAt : conversation.dispensaryLastReadAt;
-        const unreadCount = await db.conversationMessage.count({
-          where: {
-            conversationId: conversation.id,
-            senderUserId: { not: user.id },
-            ...(lastReadAt ? { createdAt: { gt: lastReadAt } } : {}),
-          },
-        });
-
-        return [conversation.id, unreadCount] as const;
-      })
-    );
-
-    const unreadMap = new Map(unreadEntries);
+        return { conversationId: conversation.id, ...(lastReadAt ? { createdAt: { gt: lastReadAt } } : {}) };
+      }) },
+      _count: { _all: true },
+    }) : [];
+    const unreadMap = new Map(unreadCounts.map(entry => [entry.conversationId, entry._count._all]));
 
     const payload = conversations.map((conversation) => {
       const lastMessage = conversation.messages[0] || null;
@@ -147,7 +140,10 @@ export async function POST(request: NextRequest) {
     if ('error' in auth) return auth.error;
     const user = auth.user;
 
-    const body = await request.json();
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Invalid message' }, { status: 400 });
+    if (body.messageType && !['TEXT', 'PRICING_REQUEST'].includes(body.messageType)) return NextResponse.json({ error: 'Invalid message type' }, { status: 400 });
+    if (typeof body.body === 'string' && body.body.length > 5000) return NextResponse.json({ error: 'Message exceeds 5000 characters' }, { status: 400 });
     const messageBody = typeof body.body === 'string' ? body.body.trim() : '';
     const messageType = body.messageType === ConversationMessageType.PRICING_REQUEST
       ? ConversationMessageType.PRICING_REQUEST
@@ -196,8 +192,11 @@ export async function POST(request: NextRequest) {
       productId = product.id;
     }
 
+    const result = await db.$transaction(async tx => {
+      // Serialize creation by participant/context even when productId is null.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${`${growerId}:${dispensaryId}:${productId || ''}`}, 0))`;
     const now = new Date();
-    const existing = await db.conversation.findFirst({
+    const existing = await tx.conversation.findFirst({
       where: {
         growerId,
         dispensaryId,
@@ -209,14 +208,14 @@ export async function POST(request: NextRequest) {
     });
 
     const conversation = existing
-      ? await db.conversation.update({
+      ? await tx.conversation.update({
           where: { id: existing.id },
           data: {
             ...(user.role === 'GROWER' ? { growerLastReadAt: now } : { dispensaryLastReadAt: now }),
             updatedAt: now,
           },
         })
-      : await db.conversation.create({
+      : await tx.conversation.create({
           data: {
             growerId,
             dispensaryId,
@@ -231,7 +230,7 @@ export async function POST(request: NextRequest) {
     let createdMessage = null;
 
     if (messageBody) {
-      createdMessage = await db.conversationMessage.create({
+      createdMessage = await tx.conversationMessage.create({
         data: {
           conversationId: conversation.id,
           senderUserId: user.id,
@@ -241,7 +240,7 @@ export async function POST(request: NextRequest) {
         },
       });
 
-      await db.conversation.update({
+      await tx.conversation.update({
         where: { id: conversation.id },
         data: {
           lastMessageAt: createdMessage.createdAt,
@@ -252,12 +251,14 @@ export async function POST(request: NextRequest) {
       });
     }
 
+      return { conversationId: conversation.id, messageId: createdMessage?.id || null, existed: Boolean(existing) };
+    });
     return NextResponse.json(
       {
-        conversationId: conversation.id,
-        messageId: createdMessage?.id || null,
+        conversationId: result.conversationId,
+        messageId: result.messageId,
       },
-      { status: existing ? 200 : 201 }
+      { status: result.existed ? 200 : 201 }
     );
   } catch (error) {
     console.error('Error creating conversation:', error);

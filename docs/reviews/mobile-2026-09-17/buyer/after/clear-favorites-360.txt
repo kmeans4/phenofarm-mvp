@@ -1,0 +1,69 @@
+- generic
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - generic [ref=e868] clickable [onclick]
+    - button "Open messages" [ref=e872]
+  - button "Search" [ref=e869]
+  - button "Notifications" [expanded=false, ref=e870]
+    - StaticText "24"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e871]
+  - main
+    - sectionheader
+      - heading "Saved" [level=1, ref=e873]
+      - link "Catalog" [ref=e874]
+    - tablist "Saved workspace"
+      - tab "Favorites (1)" [selected, ref=e875]
+        - StaticText "Favorites"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Alerts (1)" [ref=e876]
+        - StaticText "Alerts"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Recent (1)" [ref=e877]
+        - StaticText "Recent"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+    - tabpanel "Favorites (1)"
+      - combobox "Sort favorites" [expanded=false, ref=e881]: Newest
+        - MenuListPopup
+          - option "Newest" [selected, ref=e887]
+          - option "Price: low first" [ref=e888]
+          - option "Price: high first" [ref=e889]
+          - option "THC: high first" [ref=e890]
+          - option "Name: A-Z" [ref=e891]
+          - option "Name: Z-A" [ref=e892]
+          - option "THC: low first" [ref=e893]
+      - button "Grid view" [ref=e878]
+      - button "List view" [ref=e879]
+      - group
+        - DisclosureTriangle "More" [expanded=true]
+        - button "Clear favorites" [ref=e899]
+      - generic
+        - button "Remove Mystery Pricing Batch from favorites" [ref=e882]
+        - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e880]
+      - image
+      - paragraph
+        - StaticText "by "
+        - link "Vermont Nurseries" [ref=e883]
+      - StaticText "Hybrid"
+      - generic
+        - StaticText "THC 19%"
+      - generic
+        - button "Request pricing" [ref=e884]
+        - button "Message grower" [ref=e885]
+  - region "Notifications alt+T" [ref=e867]
+  - button "Open Next.js Dev Tools" [expanded=false, ref=e886]
+    - image
+  - alert
+  - dialog "Clear favorites?"
+    - heading "Clear favorites?" [level=2, ref=e895]
+    - button "Close Clear favorites?" [ref=e896]
+    - paragraph
+      - StaticText "Remove your saved products? You can save them again from the catalog."
+    - button "Cancel" [ref=e897]
+    - button "Clear favorites" [ref=e898]

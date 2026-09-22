@@ -1,0 +1,59 @@
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- generic [ref=e902] clickable [onclick]
+  - button "Open messages" [ref=e906]
+- button "Search" [ref=e903]
+- button "Notifications" [expanded=false, ref=e904]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e905]
+- main
+  - sectionheader
+    - heading "Saved" [level=1, ref=e907]
+    - link "Catalog" [ref=e908]
+  - tablist "Saved workspace"
+    - tab "Favorites (1)" [selected, ref=e909]
+      - StaticText "Favorites"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Alerts (1)" [ref=e910]
+      - StaticText "Alerts"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Recent (1)" [ref=e911]
+      - StaticText "Recent"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+  - tabpanel "Favorites (1)"
+    - combobox "Sort favorites" [expanded=false, ref=e915]: Price: high
+      - MenuListPopup
+        - option "Newest" [ref=e921]
+        - option "Price: low" [ref=e922]
+        - option "Price: high" [selected, ref=e923]
+        - option "THC: high" [ref=e924]
+        - option "Name: A-Z" [ref=e925]
+        - option "Name: Z-A" [ref=e926]
+        - option "THC: low" [ref=e927]
+    - button "Grid view" [ref=e912]
+    - button "List view" [ref=e913]
+    - group
+      - DisclosureTriangle "More" [expanded=false]
+    - article
+      - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e929]
+      - link "Vermont Nurseries" [ref=e930]
+      - StaticText "Flower"
+      - StaticText "THC "
+      - StaticText "19"
+      - StaticText "%"
+      - StaticText "25"
+      - StaticText " available"
+      - button "Request pricing" [ref=e931]
+      - button "Message" [ref=e932]
+      - button "Remove Mystery Pricing Batch from favorites" [ref=e933]
+- region "Notifications alt+T" [ref=e901]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e920]
+  - image
+- alert

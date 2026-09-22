@@ -1,0 +1,249 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e897]
+- button "Notifications" [expanded=false, ref=e898]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e899]
+- main
+  - sectionheader
+    - heading "Requests" [level=1, ref=e901]
+    - link "History" [ref=e902]
+    - link "Record request" [ref=e903]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Requests"
+    - paragraph
+      - StaticText "20"
+    - paragraph
+      - StaticText "Active"
+    - paragraph
+      - StaticText "18"
+    - paragraph
+      - StaticText "Needs review"
+    - paragraph
+      - StaticText "17"
+    - paragraph
+      - StaticText "Est. value"
+    - paragraph
+      - StaticText "$910.50"
+  - paragraph
+    - StaticText "Value excludes cancelled requests. Payment is arranged directly with buyers."
+  - generic
+    - button "All: 18 requests" [ref=e904]
+      - StaticText "All"
+      - StaticText "18"
+    - button "Needs review: 17 requests" [ref=e905]
+      - StaticText "Needs review"
+      - StaticText "17"
+    - button "Accepted: 1 requests" [ref=e906]
+      - StaticText "Accepted"
+      - StaticText "1"
+    - button "Preparing: 0 requests" [ref=e907]
+      - StaticText "Preparing"
+      - StaticText "0"
+    - button "Ready: 0 requests" [ref=e908]
+      - StaticText "Ready"
+      - StaticText "0"
+    - checkbox "Select all" [checked=false, ref=e909]
+    - article
+      - checkbox "Select request #ORD-20260710-XPJO3I" [checked=false, ref=e910]
+      - link "#ORD-20260710-XPJO3I" [ref=e911]
+        - StaticText "#ORD-20260710-XPJO3I"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jul 9, 2026"
+      - link "View request →" [ref=e912]
+    - article
+      - checkbox "Select request #ORD-20260710-03UYXZ" [checked=false, ref=e913]
+      - link "#ORD-20260710-03UYXZ" [ref=e914]
+        - StaticText "#ORD-20260710-03UYXZ"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jul 9, 2026"
+      - link "View request →" [ref=e915]
+    - article
+      - checkbox "Select request #ORD-20260710-O78T5N" [checked=false, ref=e916]
+      - link "#ORD-20260710-O78T5N" [ref=e917]
+        - StaticText "#ORD-20260710-O78T5N"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jul 9, 2026"
+      - link "View request →" [ref=e918]
+    - article
+      - checkbox "Select request #ORD-20260710-ZYGM3S" [checked=false, ref=e919]
+      - link "#ORD-20260710-ZYGM3S" [ref=e920]
+        - StaticText "#ORD-20260710-ZYGM3S"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jul 9, 2026"
+      - link "View request →" [ref=e921]
+    - article
+      - checkbox "Select request #ORD-20260710-FMBIOT" [checked=false, ref=e922]
+      - link "#ORD-20260710-FMBIOT" [ref=e923]
+        - StaticText "#ORD-20260710-FMBIOT"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jul 9, 2026"
+      - link "View request →" [ref=e924]
+    - article
+      - checkbox "Select request #ORD-1783641718088-1" [checked=false, ref=e925]
+      - link "#ORD-1783641718088-1" [ref=e926]
+        - StaticText "#ORD-1783641718088-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jul 9, 2026"
+      - link "View request →" [ref=e927]
+    - article
+      - checkbox "Select request #ORD-1783641503047-1" [checked=false, ref=e928]
+      - link "#ORD-1783641503047-1" [ref=e929]
+        - StaticText "#ORD-1783641503047-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jul 9, 2026"
+      - link "View request →" [ref=e930]
+    - article
+      - checkbox "Select request #ORD-1781196282824-1" [checked=false, ref=e931]
+      - link "#ORD-1781196282824-1" [ref=e932]
+        - StaticText "#ORD-1781196282824-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jun 11, 2026"
+      - link "View request →" [ref=e933]
+    - article
+      - checkbox "Select request #ORD-1781145140815-1" [checked=false, ref=e934]
+      - link "#ORD-1781145140815-1" [ref=e935]
+        - StaticText "#ORD-1781145140815-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jun 10, 2026"
+      - link "View request →" [ref=e936]
+    - article
+      - checkbox "Select request #ORD-1781144783465-1" [checked=false, ref=e937]
+      - link "#ORD-1781144783465-1" [ref=e938]
+        - StaticText "#ORD-1781144783465-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jun 10, 2026"
+      - link "View request →" [ref=e939]
+    - article
+      - checkbox "Select request #ORD-1781144724494-1" [checked=false, ref=e940]
+      - link "#ORD-1781144724494-1" [ref=e941]
+        - StaticText "#ORD-1781144724494-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$25"
+      - StaticText "Jun 10, 2026"
+      - link "View request →" [ref=e942]
+    - article
+      - checkbox "Select request #ORD-1777395857103-1" [checked=false, ref=e943]
+      - link "#ORD-1777395857103-1" [ref=e944]
+        - StaticText "#ORD-1777395857103-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Accepted"
+      - strong
+        - StaticText "$26.50"
+      - StaticText "Apr 28, 2026"
+      - link "View request →" [ref=e945]
+    - article
+      - checkbox "Select request #ORD-1777395448158-1" [checked=false, ref=e946]
+      - link "#ORD-1777395448158-1" [ref=e947]
+        - StaticText "#ORD-1777395448158-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$26.50"
+      - StaticText "Apr 28, 2026"
+      - link "View request →" [ref=e948]
+    - article
+      - checkbox "Select request #ORD-1777395128040-1" [checked=false, ref=e949]
+      - link "#ORD-1777395128040-1" [ref=e950]
+        - StaticText "#ORD-1777395128040-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$26.50"
+      - StaticText "Apr 28, 2026"
+      - link "View request →" [ref=e951]
+    - article
+      - checkbox "Select request #ORD-1776721375263-1" [checked=false, ref=e952]
+      - link "#ORD-1776721375263-1" [ref=e953]
+        - StaticText "#ORD-1776721375263-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$26.50"
+      - StaticText "Apr 20, 2026"
+      - link "View request →" [ref=e954]
+    - article
+      - checkbox "Select request #ORD-1776721208544-1" [checked=false, ref=e955]
+      - link "#ORD-1776721208544-1" [ref=e956]
+        - StaticText "#ORD-1776721208544-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$26.50"
+      - StaticText "Apr 20, 2026"
+      - link "View request →" [ref=e957]
+    - article
+      - checkbox "Select request #ORD-1776352194185-1" [checked=false, ref=e958]
+      - link "#ORD-1776352194185-1" [ref=e959]
+        - StaticText "#ORD-1776352194185-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$26.50"
+      - StaticText "Apr 16, 2026"
+      - link "View request →" [ref=e960]
+    - article
+      - checkbox "Select request #ORD-1776352143510-1" [checked=false, ref=e961]
+      - link "#ORD-1776352143510-1" [ref=e962]
+        - StaticText "#ORD-1776352143510-1"
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - StaticText "Submitted"
+      - strong
+        - StaticText "$26.50"
+      - StaticText "Apr 16, 2026"
+      - link "View request →" [ref=e963]
+- button "Open messages" [ref=e900]
+- region "Notifications alt+T" [ref=e896]
+- alert

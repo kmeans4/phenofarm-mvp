@@ -1,0 +1,136 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e57]
+- button "Notifications" [expanded=false, ref=e58]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e59]
+- main
+  - sectionheader
+    - heading "Settings" [level=1, ref=e61]
+  - complementary
+    - navigation "Settings sections" [ref=e62]
+      - generic
+        - link "Profile" [ref=e81]
+        - link "Logo" [ref=e82]
+        - link "Terms" [ref=e83]
+        - link "Subscription" [ref=e84]
+        - link "Integrations" [ref=e85]
+  - generic
+    - heading "Business profile" [level=2, ref=e63]
+    - paragraph
+      - StaticText "* Required"
+    - LabelText
+      - StaticText "Name *"
+    - textbox "Name *" [ref=e64]: Vermont Nurseries
+      - StaticText "Vermont Nurseries"
+    - LabelText
+      - StaticText "Contact (optional)"
+    - textbox "Contact (optional)" [ref=e65]: John Green
+      - StaticText "John Green"
+    - LabelText
+      - StaticText "License number *"
+    - textbox "License number *" [ref=e66]: VT-GWL-2024-001
+      - StaticText "VT-GWL-2024-001"
+    - LabelText
+      - StaticText "License expiry *"
+    - Date "License expiry *"
+      - generic
+        - spinbutton "Month Month" [ref=e86]: 0
+          - StaticText "mm"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e87]: 0
+          - StaticText "dd"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e88]: 0
+          - StaticText "yyyy"
+      - button "Show date picker Show date picker" [ref=e77]
+    - LabelText
+      - StaticText "Email *"
+    - textbox "Email *" [ref=e67]: grower@vtnurseries.com
+      - StaticText "grower@vtnurseries.com"
+    - LabelText
+      - StaticText "Phone (optional)"
+    - textbox "Phone (optional)" [ref=e68]: (802) 555-0123
+      - StaticText "(802) 555-0123"
+    - LabelText
+      - StaticText "Address"
+    - generic
+      - textbox "Address" [ref=e89]: 123 Green Valley Rd
+        - StaticText "123 Green Valley Rd"
+      - image
+    - paragraph
+      - StaticText "Includes city, state and ZIP."
+    - LabelText
+      - StaticText "Website (optional)"
+    - textbox "Website (optional)" [ref=e69]: https://vermontnurseries.com
+      - StaticText "https://vermontnurseries.com"
+    - LabelText
+      - StaticText "Description (optional)"
+    - textbox "Description (optional)" [ref=e70]: Premium cannabis products grown with care in Vermont
+      - StaticText "Premium cannabis products grown with care in Vermont"
+    - paragraph
+      - StaticText "52/500"
+  - generic
+    - heading "Logo" [level=2, ref=e71]
+    - image
+    - StaticText "No logo"
+    - button "Upload Logo" [ref=e72]
+    - paragraph
+      - StaticText "JPG, PNG, or WebP. Max 500KB."
+  - generic
+    - heading "Commercial terms" [level=2, ref=e78]
+    - paragraph
+      - StaticText "Shown to buyers on your shop."
+    - button "Reset defaults" [ref=e79]
+    - button "Save terms" [ref=e80]
+    - LabelText
+      - StaticText "Default MOQ"
+      - textbox "Default MOQ" [ref=e90]: No minimum set
+        - StaticText "No minimum set"
+    - LabelText
+      - StaticText "Fulfillment methods"
+      - textbox "Fulfillment methods" [ref=e91]: Pickup or coordinated delivery
+        - StaticText "Pickup or coordinated delivery"
+    - LabelText
+      - StaticText "Fulfillment region"
+      - textbox "Fulfillment region" [ref=e92]: Vermont buyers
+        - StaticText "Vermont buyers"
+    - LabelText
+      - StaticText "Direct payment terms"
+      - textbox "Direct payment terms" [ref=e93]: Handled directly
+        - StaticText "Handled directly"
+    - LabelText
+      - StaticText "Response window"
+      - textbox "Response window" [ref=e94]: Respond within 1 business day
+        - StaticText "Respond within 1 business day"
+    - LabelText
+      - StaticText "Contact note"
+      - textbox "Contact note" [ref=e95]: Message through PhenoFarm before confirming fulfillment.
+        - StaticText "Message through PhenoFarm before confirming fulfillment."
+    - paragraph
+      - StaticText "Defaults only; confirm final terms with each buyer."
+  - heading "Subscription FREE" [level=3, ref=e73]
+    - StaticText "Subscription"
+    - StaticText "FREE"
+  - paragraph
+    - StaticText "Software subscription only. Wholesale payment stays directly between businesses."
+  - heading "Free Plan" [level=4, ref=e74]
+  - paragraph
+    - StaticText "Starter access"
+  - paragraph
+    - StaticText "$0/mo"
+  - group
+    - DisclosureTriangle "Plan features" [expanded=false]
+      - StaticText "Plan features"
+  - button "Upgrade to Pro" [disabled, ref=e75]
+  - paragraph
+    - StaticText "Online subscription checkout is currently unavailable."
+  - heading "Integrations" [level=3, ref=e76]
+  - paragraph
+    - StaticText "Metrc state-tracking sync"
+  - paragraph
+    - StaticText "In development. Your batch and COA records are structured for future synchronization; no automatic Metrc sync runs today."
+- button "Open messages" [ref=e60]
+- region "Notifications alt+T" [ref=e56]
+- alert

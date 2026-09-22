@@ -1,0 +1,57 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e3379]
+- button "Notifications" [expanded=false, ref=e3380]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e3381]
+- main
+  - sectionheader
+    - heading "Batch Management" [level=1, ref=e3387]
+    - paragraph
+      - StaticText "Manage your harvest batches and lab results"
+    - link "+ Add Batch" [ref=e3388]
+  - paragraph
+    - StaticText "Total Batches"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Total Products"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Avg. THC"
+  - paragraph
+    - StaticText "—"
+  - paragraph
+    - StaticText "Batch #"
+  - paragraph
+    - StaticText "VN-2026-0912"
+  - paragraph
+    - StaticText "Lot VT-A104"
+  - StaticText "Sep 11, 2026"
+  - paragraph
+    - StaticText "Strain"
+  - paragraph
+    - StaticText "Audit Test Kush"
+  - paragraph
+    - StaticText "Products"
+  - link "1 product" [ref=e3382]
+  - paragraph
+    - StaticText "THC"
+  - paragraph
+    - StaticText "-"
+  - paragraph
+    - StaticText "CBD"
+  - paragraph
+    - StaticText "-"
+  - paragraph
+    - StaticText "0/3 lab docs"
+  - link "Edit" [ref=e3383]
+  - link "+ Product from batch" [ref=e3384]
+  - button "Delete" [ref=e3385]
+- button "Open messages" [ref=e3386]
+- region "Notifications alt+T" [ref=e3378]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3389]
+  - image
+- alert

@@ -1,5 +1,5 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from "@/lib/auth-helpers";
+import { customerSelect, customerWhere } from "@/lib/customers";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { ExtendedUser } from "@/types";
@@ -21,14 +21,10 @@ interface CustomerData {
   isPlatformManaged: boolean;
 }
 
-async function fetchCustomer(id: string): Promise<CustomerData | null> {
-  const dispensary = await db.dispensary.findUnique({
-    where: { id },
-    include: {
-      user: {
-        select: { email: true, name: true },
-      },
-    },
+async function fetchCustomer(id: string, growerId: string): Promise<CustomerData | null> {
+  const dispensary = await db.dispensary.findFirst({
+    where: { id, ...customerWhere(growerId) },
+    select: customerSelect,
   });
   
   if (!dispensary) return null;
@@ -44,9 +40,9 @@ async function fetchCustomer(id: string): Promise<CustomerData | null> {
     zip: dispensary.zip,
     website: dispensary.website,
     description: dispensary.description,
-    email: dispensary.user?.email || undefined,
-    contactName: dispensary.user?.name || undefined,
-    isPlatformManaged: Boolean(dispensary.userId),
+    email: dispensary.user?.email || dispensary.offPlatformEmail || undefined,
+    contactName: dispensary.user?.name || dispensary.contactName || undefined,
+    isPlatformManaged: Boolean(dispensary.userId) || dispensary.createdByGrowerId !== growerId,
   };
 }
 
@@ -55,7 +51,7 @@ interface PageProps {
 }
 
 export default async function EditCustomerPage({ params }: PageProps) {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   if (!session) {
     redirect('/auth/sign_in');
@@ -63,12 +59,12 @@ export default async function EditCustomerPage({ params }: PageProps) {
 
   const user = session.user as ExtendedUser;
 
-  if (user.role !== 'GROWER') {
+  if (user.role !== 'GROWER' || !user.growerId) {
     redirect('/dashboard');
   }
 
   const { id } = await params;
-  const customer = await fetchCustomer(id);
+  const customer = await fetchCustomer(id, user.growerId);
 
   if (!customer) {
     redirect('/grower/customers');

@@ -1,0 +1,78 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e2314]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2315]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e2316]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2319]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2320]
+      - StaticText "Catalog"
+    - link "Products" [ref=e2321]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2322]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2323]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2324]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2325]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2326]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2327]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2328]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2317]
+- main
+  - sectionheader
+    - heading "Add customer" [level=1, ref=e2329]
+  - form
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox "Business Name *" [required, ref=e2330]
+    - LabelText
+      - StaticText "Contact Name *"
+    - textbox "Contact Name *" [required, ref=e2331]
+    - LabelText
+      - StaticText "Email *"
+    - textbox "Email *" [required, ref=e2332]
+    - LabelText
+      - StaticText "Phone *"
+    - textbox "Phone *" [required, ref=e2333]
+    - LabelText
+      - StaticText "Address"
+    - textbox "Address" [ref=e2334]
+    - LabelText
+      - StaticText "City"
+    - textbox "City" [ref=e2335]
+    - LabelText
+      - StaticText "State"
+    - textbox "State" [ref=e2336]: VT
+      - StaticText "VT"
+    - LabelText
+      - StaticText "ZIP"
+    - textbox "ZIP" [ref=e2337]
+    - LabelText
+      - StaticText "License Number"
+    - textbox "License Number" [ref=e2338]
+    - link "Cancel" [ref=e2339]
+    - button "Add customer" [disabled, ref=e2340]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2341]
+  - button "Open messages" [ref=e2318]
+- region "Notifications alt+T" [ref=e2313]
+- alert

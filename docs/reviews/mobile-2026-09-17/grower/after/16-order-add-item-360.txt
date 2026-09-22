@@ -1,0 +1,68 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e2110] clickable [onclick]
+  - button "Open messages" [ref=e2114]
+- button "Search" [ref=e2111]
+- button "Notifications" [expanded=false, ref=e2112]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e2113]
+- main
+  - sectionheader
+    - heading "Record request" [level=1, ref=e2115]
+    - paragraph
+      - StaticText "Record an agreement made directly with a buyer."
+  - form
+    - LabelText
+      - StaticText "Buyer *"
+    - combobox "Buyer *" [expanded=false, required, ref=e2125]
+    - heading "Items" [level=2, ref=e2116]
+    - button "Add item" [ref=e2117]
+    - LabelText
+      - StaticText "Product"
+    - combobox [expanded=false, ref=e2118]: Mystery Pricing Batch
+      - MenuListPopup
+        - option "Mystery Pricing Batch" [selected, ref=e2128]
+        - option "Silver Haze Concentrate" [ref=e2129]
+        - option "Purple Haze Flowers" [ref=e2130]
+    - LabelText
+      - StaticText "Qty"
+    - spinbutton [ref=e2119]: 1
+      - StaticText "1"
+    - button "Max" [ref=e2120]
+    - LabelText
+      - StaticText "Agreed price"
+    - spinbutton [ref=e2121]: 40
+      - StaticText "40"
+    - StaticText "/ "
+    - StaticText "eighth"
+    - button "Remove" [ref=e2122]
+    - StaticText "25"
+    - StaticText "eighth"
+    - StaticText " available"
+    - group
+      - DisclosureTriangle "Shipping & notes" [expanded=true]
+        - StaticText "Shipping & notes"
+      - LabelText
+        - StaticText "Notes"
+      - textbox "Notes" [ref=e2126]
+      - LabelText
+        - StaticText "Shipping ($)"
+      - spinbutton "Shipping ($)" [ref=e2127]: 0
+        - StaticText "0"
+    - StaticText "Subtotal"
+    - StaticText "$"
+    - StaticText "40.00"
+    - StaticText "Shipping"
+    - StaticText "$"
+    - StaticText "0.00"
+    - StaticText "Est. total"
+    - StaticText "$"
+    - StaticText "40.00"
+    - paragraph
+      - StaticText "Payment is arranged directly with the buyer."
+    - button "Record request" [disabled, ref=e2123]
+    - link "Cancel" [ref=e2124]
+    - paragraph
+      - StaticText "Select a dispensary before recording the request."
+- region "Notifications alt+T" [ref=e2109]
+- alert

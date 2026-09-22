@@ -1,0 +1,105 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e259]
+- button "Notifications" [expanded=false, ref=e260]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e261]
+- main
+  - sectionheader
+    - heading "Inventory" [level=1, ref=e275]
+    - link "Add product" [ref=e276]
+    - link "Update stock" [ref=e277]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Products"
+    - paragraph
+      - StaticText "3"
+    - paragraph
+      - StaticText "Stock value"
+    - paragraph
+      - StaticText "$10,000"
+    - paragraph
+      - StaticText "Low stock"
+    - paragraph
+      - StaticText "0"
+  - paragraph
+    - StaticText "Stock value = list price × quantity on hand."
+  - paragraph
+    - StaticText "Enter the total stock on hand. Changes save automatically."
+  - generic "Inventory filters"
+    - button "All 3" [ref=e278]
+      - StaticText "All"
+      - StaticText "3"
+    - button "Low stock 0" [ref=e279]
+      - StaticText "Low stock"
+      - StaticText "0"
+    - button "Out of stock 0" [ref=e280]
+      - StaticText "Out of stock"
+      - StaticText "0"
+    - button "Unavailable 0" [ref=e281]
+      - StaticText "Unavailable"
+      - StaticText "0"
+  - StaticText "Mystery Pricing Batch"
+  - StaticText "Assorted"
+  - StaticText "Available"
+  - paragraph
+    - StaticText "Type"
+  - paragraph
+    - StaticText "Flower - Greenhouse"
+  - paragraph
+    - StaticText "Price"
+  - paragraph
+    - StaticText "$40/eighth"
+  - paragraph
+    - StaticText "Inventory"
+  - button "Decrease stock for Mystery Pricing Batch" [ref=e262]
+  - spinbutton "Stock quantity for Mystery Pricing Batch" [ref=e263]: 25
+    - StaticText "25"
+  - button "Increase stock for Mystery Pricing Batch" [ref=e264]
+  - paragraph
+    - StaticText "25eighth"
+  - link "Edit product" [ref=e265]
+  - StaticText "Silver Haze Concentrate"
+  - StaticText "Silver Haze"
+  - StaticText "Available"
+  - paragraph
+    - StaticText "Type"
+  - paragraph
+    - StaticText "Concentrate - Live Resin"
+  - paragraph
+    - StaticText "Price"
+  - paragraph
+    - StaticText "$60/g"
+  - paragraph
+    - StaticText "Inventory"
+  - button "Decrease stock for Silver Haze Concentrate" [ref=e266]
+  - spinbutton "Stock quantity for Silver Haze Concentrate" [ref=e267]: 50
+    - StaticText "50"
+  - button "Increase stock for Silver Haze Concentrate" [ref=e268]
+  - paragraph
+    - StaticText "50g"
+  - link "Edit product" [ref=e269]
+  - StaticText "Purple Haze Flowers"
+  - StaticText "Purple Haze"
+  - StaticText "Available"
+  - paragraph
+    - StaticText "Type"
+  - paragraph
+    - StaticText "Flower - Indoor"
+  - paragraph
+    - StaticText "Price"
+  - paragraph
+    - StaticText "$25/g"
+  - paragraph
+    - StaticText "Inventory"
+  - button "Decrease stock for Purple Haze Flowers" [ref=e270]
+  - spinbutton "Stock quantity for Purple Haze Flowers" [ref=e271]: 240
+    - StaticText "240"
+  - button "Increase stock for Purple Haze Flowers" [ref=e272]
+  - paragraph
+    - StaticText "240g"
+  - link "Edit product" [ref=e273]
+- button "Open messages" [ref=e274]
+- region "Notifications alt+T" [ref=e258]
+- alert

@@ -1,0 +1,52 @@
+{
+  "slug": "02-catalog",
+  "route": "/grower/catalog",
+  "pass1": {
+    "inspected": [
+      "pass-1/02-catalog-desktop.png",
+      "pass-1/02-catalog-mobile.png"
+    ],
+    "strengths": [
+      "Four overview metrics and a clear Add Product action; all content fits width."
+    ],
+    "issues": [
+      {
+        "key": "catalog-repetition",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Overview navigation opens \u2018Catalog Workspace\u2019; the page describes managing listings in the subtitle, next-action banner, Listings card, and Catalog health area. Four navigation cards repeat sidebar destinations with explanatory paragraphs.",
+        "recommendation": "Use \u2018Catalog overview\u2019. Replace the generic banner with one actionable issue count. Compress destinations into \u2018Listings \u00b7 3\u2019, \u2018Inventory\u2019, \u2018Buyer preview\u2019, and \u2018Price visibility\u2019, with one-line helper text only where needed."
+      },
+      {
+        "key": "catalog-pill-wrap",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "The status pills on four destination cards are narrow enough to wrap \u20183 buyer-visible listings\u2019 or \u20181 quote-only listing\u2019 over three or four lines; mobile cards consume about450px before health details.",
+        "recommendation": "Use short badges \u20183 live\u2019, \u20181 quote-only\u2019, \u20180 low stock\u2019; keep counts beside titles or use a secondary line rather than circular multi-line pills."
+      },
+      {
+        "key": "catalog-health-density",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "Catalog health begins at y1211 and shows four tall cards with instructional copy even when three counts are zero; page reaches1977px for a summary screen.",
+        "recommendation": "Show only issues by default with compact rows, \u2018Images missing \u00b7 0\u2019, \u2018Type missing \u00b7 0\u2019, \u2018Quote only \u00b7 1\u2019, \u2018Low stock \u00b7 0\u2019; hide zero-count details behind \u2018All checks\u2019."
+      }
+    ],
+    "limits": [
+      "No advanced-setup panel or destination writes used."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/02-catalog-desktop.png",
+      "pass-2/02-catalog-mobile.png"
+    ],
+    "notes": "Revisited both widths. Catalog health remains below1211px mobile and status pills still wrap over several lines. Refined priority: compact navigation cards and zero-count checks first; keep the useful two-by-two metric layout. No new issue.",
+    "confirmedIssueKeys": [
+      "catalog-repetition",
+      "catalog-pill-wrap",
+      "catalog-health-density"
+    ],
+    "newIssues": []
+  }
+}

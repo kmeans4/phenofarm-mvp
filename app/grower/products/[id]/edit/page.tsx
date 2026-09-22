@@ -1,6 +1,5 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { redirect } from 'next/navigation';
+import { getAuthSession } from '@/lib/auth-helpers';
+import { redirect, notFound } from 'next/navigation';
 import { db } from '@/lib/db';
 import EditProductPageClient from './components/EditProductPageClient';
 
@@ -9,25 +8,25 @@ interface PageProps {
 }
 
 export default async function EditProductPage({ params }: PageProps) {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   if (!session) {
     redirect('/auth/sign_in');
   }
 
   const user = session.user;
-  if (user?.role !== 'GROWER') {
+  if (user?.role !== 'GROWER' || !user.growerId) {
     redirect('/dashboard');
   }
 
   const { id } = await params;
 
   const product = await db.product.findFirst({
-    where: { id, growerId: user.growerId },
+    where: { id, growerId: user.growerId, isDeleted: false },
   });
 
   if (!product) {
-    redirect('/grower/products');
+    notFound();
   }
 
   const initialData = {
@@ -48,6 +47,9 @@ export default async function EditProductPage({ params }: PageProps) {
     brand: product.brand || '',
     ingredients: product.ingredients || '',
     isFeatured: product.isFeatured || false,
+    thcMin: product.thcMin?.toString() || '', thcMax: product.thcMax?.toString() || '',
+    cbdMin: product.cbdMin?.toString() || '', cbdMax: product.cbdMax?.toString() || '',
+    harvestDate: product.harvestDate?.toISOString().slice(0, 10) || '',
   };
 
   return <EditProductPageClient productId={product.id} initialData={initialData} />;

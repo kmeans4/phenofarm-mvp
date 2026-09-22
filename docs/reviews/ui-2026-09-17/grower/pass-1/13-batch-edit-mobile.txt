@@ -1,0 +1,96 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e1102]
+- button "Notifications" [expanded=false, ref=e1103]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e1104]
+- main
+  - sectionheader
+    - heading "Edit Batch" [level=1, ref=e1107]
+    - paragraph
+      - StaticText "Update batch details and lab results"
+  - heading "Batch Details" [level=3, ref=e1105]
+  - form
+    - LabelText
+      - StaticText "Batch Number *"
+    - button "Suggest" [ref=e1108]
+    - textbox "Batch Number *" [required, ref=e1109]: VN-2026-0912
+      - StaticText "VN-2026-0912"
+    - paragraph
+      - StaticText "Expected format: BATCH-YYYYMMDD-XX, such as BATCH-20260706-01."
+    - LabelText
+      - StaticText "Lot Number"
+    - textbox "Lot Number" [ref=e1110]: VT-A104
+      - StaticText "VT-A104"
+    - LabelText
+      - StaticText "Harvest Date *"
+    - Date "Harvest Date *": 2026-09-12
+      - generic
+        - spinbutton "Month Month" [ref=e1128]: 9
+          - StaticText "09"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e1129]: 12
+          - StaticText "12"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e1130]: 2026
+          - StaticText "2026"
+      - button "Show date picker" [ref=e1127]
+    - LabelText
+      - StaticText "Strain *"
+    - combobox "Strain *" [expanded=false, ref=e1111]: Audit Test Kush
+      - MenuListPopup
+        - option "Select a strain" [ref=e1131]
+        - option "Assorted " [ref=e1132]
+        - option "Audit Test Kush " [selected, ref=e1133]
+        - option "Purple Haze " [ref=e1134]
+        - option "Silver Haze " [ref=e1135]
+    - heading "Lab Results" [level=3, ref=e1112]
+    - LabelText
+      - StaticText "THC (%)"
+    - spinbutton "THC (%)" [ref=e1113]
+    - LabelText
+      - StaticText "CBD (%)"
+    - spinbutton "CBD (%)" [ref=e1114]
+    - LabelText
+      - StaticText "Total Cannabinoids (%)"
+    - spinbutton "Total Cannabinoids (%)" [ref=e1115]: 27.200000762939453
+      - StaticText "27.2"
+    - LabelText
+      - StaticText "Terpenes (JSON)"
+    - textbox "Terpenes (JSON)" [ref=e1116]
+    - heading "Lab Result Documents" [level=4, ref=e1117]
+    - paragraph
+      - StaticText "Upload the three lab PDFs growers typically receive before selling flower. Each PDF must be 2MB or smaller."
+    - LabelText
+      - StaticText "Potency Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the PDF showing THC, CBD, and total cannabinoids."
+    - button "Potency Test" [ref=e1118]: No file chosen
+    - button "Upload PDF" [ref=e1119]
+    - LabelText
+      - StaticText "Pesticide Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the pesticide test PDF for this batch."
+    - button "Pesticide Test" [ref=e1120]: No file chosen
+    - button "Upload PDF" [ref=e1121]
+    - LabelText
+      - StaticText "Microbial Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the microbial test PDF for this batch."
+    - button "Microbial Test" [ref=e1122]: No file chosen
+    - button "Upload PDF" [ref=e1123]
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Notes" [ref=e1124]: Fall greenhouse harvest. Cured and ready for wholesale orders.
+      - StaticText "Fall greenhouse harvest. Cured and ready for wholesale orders."
+    - button "Save Changes" [ref=e1125]
+    - button "Cancel" [ref=e1126]
+- button "Open messages" [ref=e1106]
+- region "Notifications alt+T" [ref=e1101]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1136]
+  - image
+- alert

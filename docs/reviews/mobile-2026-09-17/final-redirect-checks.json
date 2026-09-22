@@ -1,0 +1,32 @@
+[
+  {
+    "route": "/dashboard",
+    "expected": "/grower/dashboard",
+    "actual": "/grower/dashboard",
+    "passed": true
+  },
+  {
+    "route": "/grower",
+    "expected": "/grower/dashboard",
+    "actual": "/grower/dashboard",
+    "passed": true
+  },
+  {
+    "route": "/admin",
+    "expected": "/admin/dashboard",
+    "actual": "/admin/dashboard",
+    "passed": true
+  },
+  {
+    "route": "/dispensary/favorites",
+    "expected": "/dispensary/saved?tab=favorites",
+    "actual": "/dispensary/saved?tab=favorites",
+    "passed": true
+  },
+  {
+    "route": "/dispensary/price-alerts",
+    "expected": "/dispensary/saved?tab=alerts",
+    "actual": "/dispensary/saved?tab=alerts",
+    "passed": true
+  }
+]

@@ -1,0 +1,53 @@
+{
+  "slug": "05-product-edit",
+  "route": "/grower/products/product-001/edit",
+  "routePattern": "/grower/products/[id]/edit",
+  "pass1": {
+    "inspected": [
+      "pass-1/05-product-edit-desktop.png",
+      "pass-1/05-product-edit-mobile.png"
+    ],
+    "strengths": [
+      "Existing values and optional profile details are visible together; desktop summary provides a cross-check."
+    ],
+    "issues": [
+      {
+        "key": "edit-unit-display",
+        "priority": "high",
+        "viewport": "desktop and mobile",
+        "observation": "Unit is a required select showing \u2018Select a unit\u2019 while the same form summary says \u2018$25/gram\u2019 and \u2018240 gram\u2019. The screen does not clearly indicate the current unit.",
+        "recommendation": "Normalize existing units to the available options and show the selected value. Use \u2018g\u2019 consistently in summary after a labeled \u2018Unit\u2019 control; verify unchanged edits preserve the unit."
+      },
+      {
+        "key": "edit-form-density",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "The five-step new-listing guide and creation-oriented sentences remain on Edit Product. Mobile reaches3982px; the summary repeats five values in separate cards. Desktop main form occupies a narrow column with a large empty right side below the sticky summary.",
+        "recommendation": "For edit mode use \u2018Edit product\u2019 plus compact section links, remove the creation guide, and use \u2018Stock\u2019 rather than \u2018Initial Inventory Quantity\u2019. Keep one \u2018Save changes\u2019 label across sticky and standard actions. Compact the summary into rows; give editable fields more desktop width."
+      },
+      {
+        "key": "edit-batch-helper",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "Batch area has \u2018No batches available yet\u2026\u2019, a \u2018View batch details\u2019 link, and \u2018Link to a harvest batch for lab results\u2019 together even though no batch is selected.",
+        "recommendation": "Use \u2018No batches for this strain\u2019 beside a \u2018New batch\u2019 action; hide \u2018View batch details\u2019 until a batch is selected. Remove the extra linkage explanation."
+      }
+    ],
+    "limits": [
+      "Viewed existing record only; no field or data changed. Gray thumbnail may be synthetic fixture imagery and is not treated as a production defect."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/05-product-edit-desktop.png",
+      "pass-2/05-product-edit-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile revisits confirm the required Unit select displays Select a unit while the summary shows $25/gram and 240 gram. The unlinked batch still presents View batch details. New-listing guidance and repeated save labels remain in edit mode; no fields were changed and no save attempted. Sample-data limitations apply to the unit/batch mismatch.",
+    "confirmedIssueKeys": [
+      "edit-unit-display",
+      "edit-form-density",
+      "edit-batch-helper"
+    ],
+    "newIssues": []
+  }
+}

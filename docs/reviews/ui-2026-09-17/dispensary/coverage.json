@@ -1,0 +1,1633 @@
+{
+  "review": "PhenoFarm buyer UI review",
+  "date": "2026-09-17",
+  "mode": "read-only",
+  "baseURL": "http://localhost:3144",
+  "browser": "Chrome via dedicated agent-browser session phenofarm-ui-buyer",
+  "viewports": {
+    "desktop": {
+      "width": 1440,
+      "height": 1000
+    },
+    "mobile": {
+      "width": 390,
+      "height": 844
+    },
+    "additionalMobile": {
+      "width": 360,
+      "height": 844
+    }
+  },
+  "routeFileCount": 10,
+  "actualPageCount": 8,
+  "redirectCount": 2,
+  "fullPassesCompleted": 2,
+  "baseRouteViewportVisits": 40,
+  "additionalTwoPassStates": [
+    "Populated request draft",
+    "Saved recent tab"
+  ],
+  "screenshotCount": 82,
+  "allScreenshotsVisuallyInspected": true,
+  "findingCount": 92,
+  "priorityCounts": {
+    "P1": 5,
+    "P2": 42,
+    "P3": 45
+  },
+  "routes": [
+    {
+      "routePattern": "/dispensary/dashboard",
+      "source": "app/dispensary/dashboard/page.tsx",
+      "kind": "page",
+      "screen": "Dashboard",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-01-dashboard-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-01-dashboard-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-01-dashboard-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-01-dashboard-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-01-dashboard-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-01-dashboard-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-01-dashboard-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-01-dashboard-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-01-dashboard-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-01-dashboard-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-01-dashboard-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-01-dashboard-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "All six pass-one findings confirmed on a fresh visit at both widths. Recent Requests remains y949 mobile; no overflow.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/dashboard",
+      "strengths": [
+        "Desktop request table is compact and readable.",
+        "Mobile stat tiles use a sensible 2x2 grid that can also be applied to Orders."
+      ],
+      "limits": [],
+      "findings": [
+        "BUY-001",
+        "BUY-002",
+        "BUY-003",
+        "BUY-004",
+        "BUY-005",
+        "BUY-006"
+      ]
+    },
+    {
+      "routePattern": "/dispensary/catalog",
+      "source": "app/dispensary/catalog/page.tsx",
+      "kind": "page",
+      "screen": "Catalog",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-02-catalog-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-02-catalog-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-02-catalog-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-02-catalog-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-02-catalog-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-02-catalog-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-02-catalog-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-02-catalog-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-02-catalog-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-02-catalog-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-02-catalog-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-02-catalog-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "All seven first-pass observations confirmed. Populated draft adds 20px to the mobile header and pushes the first product heading to y843.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/catalog",
+      "strengths": [
+        "Grid/List and filter icon buttons have accessible names.",
+        "No viewport overflow on the fresh second visit."
+      ],
+      "limits": [],
+      "findings": [
+        "BUY-007",
+        "BUY-008",
+        "BUY-009",
+        "BUY-010",
+        "BUY-011",
+        "BUY-012",
+        "BUY-013",
+        "BUY-065",
+        "BUY-066",
+        "BUY-067",
+        "BUY-068",
+        "BUY-069",
+        "BUY-070",
+        "BUY-071",
+        "BUY-072",
+        "BUY-073",
+        "BUY-074",
+        "BUY-075",
+        "BUY-076",
+        "BUY-077",
+        "BUY-092"
+      ]
+    },
+    {
+      "routePattern": "/dispensary/cart",
+      "source": "app/dispensary/cart/page.tsx",
+      "kind": "page",
+      "screen": "Empty request draft",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-empty-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-empty-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-empty-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-empty-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-empty-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-empty-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-empty-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-empty-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-empty-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-empty-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-empty-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-empty-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "All four pass-one findings confirmed with a freshly emptied browser-local draft. No product added.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/cart",
+      "strengths": [
+        "Both catalog and saved entry points remain available.",
+        "No viewport overflow."
+      ],
+      "limits": [],
+      "findings": [
+        "BUY-014",
+        "BUY-015",
+        "BUY-016",
+        "BUY-017",
+        "BUY-018",
+        "BUY-019",
+        "BUY-020",
+        "BUY-021",
+        "BUY-022",
+        "BUY-023",
+        "BUY-078",
+        "BUY-079",
+        "BUY-080",
+        "BUY-081"
+      ]
+    },
+    {
+      "routePattern": "/dispensary/orders",
+      "source": "app/dispensary/orders/page.tsx",
+      "kind": "page",
+      "screen": "Order list",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-04-orders-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-04-orders-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-04-orders-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-04-orders-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-04-orders-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-04-orders-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-04-orders-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-04-orders-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-04-orders-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-04-orders-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-04-orders-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-04-orders-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "All six pass-one findings confirmed on fresh navigation. Nineteen mobile request cards produce a 5071px document; tracker still begins at y699.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/orders",
+      "strengths": [
+        "Desktop table uses width effectively and includes status text rather than color alone.",
+        "Mobile search/filter controls remain available.",
+        "No viewport overflow."
+      ],
+      "limits": [
+        "Search/filter form not submitted; existing orders unchanged."
+      ],
+      "findings": [
+        "BUY-024",
+        "BUY-025",
+        "BUY-026",
+        "BUY-027",
+        "BUY-028",
+        "BUY-029"
+      ]
+    },
+    {
+      "routePattern": "/dispensary/orders/[id]",
+      "source": "app/dispensary/orders/[id]/page.tsx",
+      "kind": "page",
+      "screen": "Order detail",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-05-order-detail-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-05-order-detail-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-05-order-detail-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-05-order-detail-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-05-order-detail-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-05-order-detail-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-05-order-detail-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-05-order-detail-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-05-order-detail-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-05-order-detail-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-05-order-detail-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-05-order-detail-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "All seven pass-one findings confirmed with a fresh submitted request detail. Requested Items remains y1522 mobile.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "strengths": [
+        "Status is text-labeled and the seller contact information is available.",
+        "No viewport overflow."
+      ],
+      "limits": [
+        "Withdraw, reorder, request-update/message sending and CSV export were not activated; this read-only audit used an existing submitted request."
+      ],
+      "findings": [
+        "BUY-030",
+        "BUY-031",
+        "BUY-032",
+        "BUY-033",
+        "BUY-034",
+        "BUY-035",
+        "BUY-036"
+      ]
+    },
+    {
+      "routePattern": "/dispensary/grower/[id]",
+      "source": "app/dispensary/grower/[id]/page.tsx",
+      "kind": "page",
+      "screen": "Grower shop",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-06-grower-shop-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-06-grower-shop-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-06-grower-shop-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-06-grower-shop-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-06-grower-shop-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-06-grower-shop-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-06-grower-shop-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-06-grower-shop-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-06-grower-shop-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-06-grower-shop-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-06-grower-shop-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-06-grower-shop-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "All seven pass-one findings confirmed. Clicking Message from a listing only navigated to #shop-products and opened no composer. First product name remains y1838 mobile.",
+          "additionalEvidence": [
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shop-message-anchor-mobile.png",
+              "visuallyInspected": true
+            }
+          ]
+        }
+      },
+      "visitedRoute": "/dispensary/grower/grower-001",
+      "strengths": [
+        "Grower contact and verified identity remain clear.",
+        "No document-width overflow."
+      ],
+      "limits": [
+        "No messages, requests or external website navigation."
+      ],
+      "findings": [
+        "BUY-037",
+        "BUY-038",
+        "BUY-039",
+        "BUY-040",
+        "BUY-041",
+        "BUY-042",
+        "BUY-043",
+        "BUY-082",
+        "BUY-083"
+      ]
+    },
+    {
+      "routePattern": "/dispensary/settings",
+      "source": "app/dispensary/settings/page.tsx",
+      "kind": "page",
+      "screen": "Settings",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-07-settings-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-07-settings-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-07-settings-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-07-settings-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-07-settings-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-07-settings-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-07-settings-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-07-settings-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-07-settings-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-07-settings-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-07-settings-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-07-settings-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "All six pass-one findings confirmed on fresh navigation. Input font remains 16px; branding panel still stretches to the whole desktop profile height.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/settings",
+      "strengths": [
+        "Field text and labels remain legible at 390px.",
+        "Required fields are marked.",
+        "No viewport overflow."
+      ],
+      "limits": [
+        "No field changes, uploads, saves, sign out or destructive keyboard shortcuts."
+      ],
+      "findings": [
+        "BUY-044",
+        "BUY-045",
+        "BUY-046",
+        "BUY-047",
+        "BUY-048",
+        "BUY-049"
+      ]
+    },
+    {
+      "routePattern": "/dispensary/saved",
+      "source": "app/dispensary/saved/page.tsx",
+      "kind": "page",
+      "screen": "Saved favorites",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "All four default favorites findings confirmed on a fresh route visit. Same unnamed mobile view buttons as the favorites redirect.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/saved",
+      "resolvedRoute": "/dispensary/saved",
+      "strengths": [
+        "Default favorites state is consistent across both entry routes.",
+        "No viewport overflow."
+      ],
+      "limits": [
+        "No favorites saved, removed or cleared."
+      ],
+      "findings": [
+        "BUY-050",
+        "BUY-051",
+        "BUY-052",
+        "BUY-053",
+        "BUY-054",
+        "BUY-055",
+        "BUY-056",
+        "BUY-057",
+        "BUY-058",
+        "BUY-084",
+        "BUY-085",
+        "BUY-086",
+        "BUY-087",
+        "BUY-088"
+      ]
+    },
+    {
+      "routePattern": "/dispensary/favorites",
+      "source": "app/dispensary/favorites/page.tsx",
+      "kind": "redirect",
+      "screen": "Saved favorites",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-08-favorites-alias-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-08-favorites-alias-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-08-favorites-alias-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-08-favorites-alias-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-08-favorites-alias-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-08-favorites-alias-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-08-favorites-alias-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-08-favorites-alias-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-08-favorites-alias-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-08-favorites-alias-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-08-favorites-alias-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-08-favorites-alias-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Redirect worked at both widths on the second fresh visit. All four saved-favorites findings confirmed; no separate redirect defect.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/favorites",
+      "resolvedRoute": "/dispensary/saved?tab=favorites",
+      "strengths": [
+        "Legacy favorites entry preserves the intended active tab."
+      ],
+      "limits": [
+        "No favorite changes."
+      ],
+      "findings": [
+        "BUY-050",
+        "BUY-051",
+        "BUY-052",
+        "BUY-053",
+        "BUY-084",
+        "BUY-088"
+      ],
+      "redirectVerdict": "No redirect-specific finding; destination tab correct in both passes at both widths."
+    },
+    {
+      "routePattern": "/dispensary/price-alerts",
+      "source": "app/dispensary/price-alerts/page.tsx",
+      "kind": "redirect",
+      "screen": "Saved price alerts",
+      "passes": {
+        "pass1": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 1,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-09-price-alerts-alias-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-09-price-alerts-alias-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-09-price-alerts-alias-desktop.snapshot.txt"
+            },
+            {
+              "pass": 1,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-09-price-alerts-alias-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-09-price-alerts-alias-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-09-price-alerts-alias-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Initial full-page visual inspection completed at both widths; observations recorded in notes.jsonl.",
+          "additionalEvidence": []
+        },
+        "pass2": {
+          "status": "complete",
+          "navigation": "fresh route visit at each width",
+          "evidence": [
+            {
+              "pass": 2,
+              "viewport": "desktop",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-09-price-alerts-alias-desktop.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-09-price-alerts-alias-desktop.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-09-price-alerts-alias-desktop.snapshot.txt"
+            },
+            {
+              "pass": 2,
+              "viewport": "mobile",
+              "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-09-price-alerts-alias-mobile.png",
+              "visuallyInspected": true,
+              "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-09-price-alerts-alias-mobile.metrics.json",
+              "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-09-price-alerts-alias-mobile.snapshot.txt"
+            }
+          ],
+          "verdict": "Redirect worked again at both widths. All four alerts findings confirmed; no separate redirect defect.",
+          "additionalEvidence": []
+        }
+      },
+      "visitedRoute": "/dispensary/price-alerts",
+      "resolvedRoute": "/dispensary/saved?tab=alerts",
+      "strengths": [
+        "Active alert renders consistently on repeat visit.",
+        "No viewport overflow."
+      ],
+      "limits": [
+        "No alerts refreshed, deleted or cleared."
+      ],
+      "findings": [
+        "BUY-054",
+        "BUY-055",
+        "BUY-056",
+        "BUY-057",
+        "BUY-085",
+        "BUY-086",
+        "BUY-087"
+      ],
+      "redirectVerdict": "No redirect-specific finding; destination tab correct in both passes at both widths."
+    }
+  ],
+  "additionalStates": [
+    {
+      "screen": "Populated request draft",
+      "route": "/dispensary/cart",
+      "pass": 1,
+      "evidence": [
+        {
+          "pass": 1,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-filled-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-filled-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-filled-desktop.snapshot.txt"
+        },
+        {
+          "pass": 1,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-filled-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-filled-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-filled-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Fresh visual inspection complete.",
+      "strengths": [
+        "Clear quantity and value for the requested item",
+        "Sticky review affordance reduces need to scroll to the bottom",
+        "No horizontal overflow at 390px"
+      ],
+      "limits": [
+        "Only temporary localStorage cart was populated; no request submission, form save, or mutation of original application data"
+      ],
+      "findings": [
+        "BUY-018",
+        "BUY-019",
+        "BUY-020",
+        "BUY-021",
+        "BUY-022",
+        "BUY-023",
+        "BUY-078"
+      ]
+    },
+    {
+      "screen": "Saved recent",
+      "route": "/dispensary/saved?tab=recent",
+      "pass": 1,
+      "evidence": [
+        {
+          "pass": 1,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-recent-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-recent-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-recent-desktop.snapshot.txt"
+        },
+        {
+          "pass": 1,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-recent-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-recent-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-recent-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Fresh visual inspection complete.",
+      "strengths": [
+        "The actual recent-product row is compact, legible, and does not waste card height.",
+        "Find again and View grower are distinct actions.",
+        "No viewport overflow."
+      ],
+      "limits": [
+        "Actions were not used to add products or change a draft."
+      ],
+      "findings": [
+        "BUY-058"
+      ]
+    },
+    {
+      "screen": "Shared mobile navigation",
+      "route": "All dispensary pages; captured on /dispensary/dashboard",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-menu-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-menu-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-menu-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Inspected the open menu and confirmed Escape closes it.",
+      "strengths": [
+        "Clear selected page, distinct close control and bottom account block.",
+        "Menu fits the 390x844 viewport without horizontal overflow."
+      ],
+      "limits": [
+        "Sign out was not activated."
+      ],
+      "findings": [
+        "BUY-059"
+      ]
+    },
+    {
+      "screen": "Shared search dialog",
+      "route": "All dispensary pages; captured on /dispensary/dashboard",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-mobile.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-results-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-results-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-results-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-results-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-results-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-results-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Empty and populated search states inspected at both widths; query was typed without a form submission.",
+      "strengths": [
+        "Search input is 18px and focus is obvious.",
+        "Result title and product context fit in one compact row.",
+        "Both icon actions have accessible names."
+      ],
+      "limits": [
+        "Result action buttons and message sends were not activated."
+      ],
+      "findings": [
+        "BUY-060",
+        "BUY-061",
+        "BUY-062"
+      ]
+    },
+    {
+      "screen": "Shared notifications",
+      "route": "All dispensary pages; captured on /dispensary/dashboard",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-notifications-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-notifications-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-notifications-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-notifications-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-notifications-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-notifications-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Panel opened independently at each width and inspected; no notification or mark-read action used.",
+      "strengths": [
+        "Unread count and Mark all read are understandable.",
+        "Panel reflows inside the mobile viewport and has an explicit close control."
+      ],
+      "limits": [
+        "Unread state was preserved; no row clicked or mark-read action used."
+      ],
+      "findings": [
+        "BUY-063",
+        "BUY-064"
+      ]
+    },
+    {
+      "screen": "Catalog filters",
+      "route": "/dispensary/catalog \u2014 filters open",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-filters-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-filters-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-filters-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-filters-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-filters-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-filters-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Desktop sidebar and mobile sheet independently opened and inspected.",
+      "strengths": [
+        "Mobile sheet is readable with 14px group labels.",
+        "Close control is explicit."
+      ],
+      "limits": [
+        "No filters were applied or saved."
+      ],
+      "findings": [
+        "BUY-066",
+        "BUY-067",
+        "BUY-068",
+        "BUY-069"
+      ]
+    },
+    {
+      "screen": "Catalog pricing message dialog",
+      "route": "/dispensary/catalog \u2014 Request pricing",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-pricing-dialog-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-pricing-dialog-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-pricing-dialog-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-pricing-dialog-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-pricing-dialog-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-pricing-dialog-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Opened the unsent composer at both widths; did not submit.",
+      "strengths": [
+        "Sender can review an editable prefilled message.",
+        "Send and Cancel remain visible at 390x844."
+      ],
+      "limits": [
+        "No messages sent; virtual mobile keyboard was not emulated."
+      ],
+      "findings": [
+        "BUY-070",
+        "BUY-071",
+        "BUY-072"
+      ]
+    },
+    {
+      "screen": "Catalog price alert dialog",
+      "route": "/dispensary/catalog \u2014 Set price alert",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-alert-dialog-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-alert-dialog-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-alert-dialog-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-alert-dialog-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-alert-dialog-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-alert-dialog-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Opened unsaved alert dialog at both widths; inspected without submitting.",
+      "strengths": [
+        "One target-price field with clear Save/Cancel hierarchy.",
+        "Product name and current price remain visible at mobile width."
+      ],
+      "limits": [
+        "Alert was not saved."
+      ],
+      "findings": [
+        "BUY-073",
+        "BUY-074"
+      ]
+    },
+    {
+      "screen": "Catalog comparison",
+      "route": "/dispensary/catalog \u2014 compare two products",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-mobile.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-lower-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-lower-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-lower-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Two browser-local comparison selections opened; initial and scrolled mobile content inspected.",
+      "strengths": [
+        "The inner comparison body can scroll to reach lower attributes and actions.",
+        "Price-hidden product continues to show Request pricing rather than a numeric price."
+      ],
+      "limits": [
+        "No product added to a request; only local comparison selection was changed and then cleared.",
+        "Out-of-viewport DOM metrics include the horizontally scrollable compare bar behind the dialog; document width remains 390px."
+      ],
+      "findings": [
+        "BUY-075",
+        "BUY-076",
+        "BUY-077"
+      ]
+    },
+    {
+      "screen": "Populated request draft",
+      "route": "/dispensary/cart",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-filled-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-filled-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-filled-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-filled-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-filled-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-filled-mobile.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-cart-sticky-viewport-mobile.png",
+          "visuallyInspected": true
+        }
+      ],
+      "verdict": "All six pass-one observations confirmed at both widths. Actual viewport inspection resolved the seemingly blank Add link: its text is covered by the development-only Next.js badge, not a production product defect.",
+      "strengths": [
+        "Main Review request action remains reachable at the bottom of the mobile viewport.",
+        "No viewport overflow."
+      ],
+      "limits": [
+        "No checkout submitted.",
+        "Development-only Next.js badge intentionally excluded from product findings."
+      ],
+      "findings": [
+        "BUY-018",
+        "BUY-019",
+        "BUY-020",
+        "BUY-021",
+        "BUY-022",
+        "BUY-023",
+        "BUY-078"
+      ]
+    },
+    {
+      "screen": "Cart request review dialog",
+      "route": "/dispensary/cart \u2014 Review request",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-mobile.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-viewport-mobile.png",
+          "visuallyInspected": true
+        }
+      ],
+      "verdict": "Review-only dialog opened and inspected at both widths; actual viewport capture and element geometry confirmed clipping. No submission.",
+      "strengths": [
+        "Desktop keeps a clear final total and primary action.",
+        "Product quantity and grower grouping are visible before submission."
+      ],
+      "limits": [
+        "No order submitted."
+      ],
+      "findings": [
+        "BUY-079",
+        "BUY-080",
+        "BUY-081"
+      ]
+    },
+    {
+      "screen": "Grower shop mobile filters",
+      "route": "/dispensary/grower/grower-001 \u2014 Filters open",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shop-filters-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shop-filters-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shop-filters-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Expanded type filters inspected without selecting a filter.",
+      "strengths": [
+        "Three compact, understandable product-type choices fit in one row.",
+        "No additional finding in this control beyond the surrounding page density."
+      ],
+      "limits": [
+        "No filter selection or form submission."
+      ],
+      "findings": []
+    },
+    {
+      "screen": "Alerts triggered empty state",
+      "route": "/dispensary/saved?tab=alerts \u2014 Triggered",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-triggered-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-triggered-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-triggered-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-triggered-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-triggered-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-triggered-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Empty triggered tab inspected at both widths.",
+      "strengths": [
+        "The empty state is understandable and does not look like a loading error."
+      ],
+      "limits": [
+        "No price refresh or alert mutation."
+      ],
+      "findings": [
+        "BUY-086"
+      ]
+    },
+    {
+      "screen": "Alerts history tab",
+      "route": "/dispensary/saved?tab=alerts \u2014 History",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-history-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-history-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-history-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-history-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-history-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-history-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "History tab inspected at both widths; it displays the same active alert card in this fixture.",
+      "strengths": [
+        "Current/target comparison stays consistent with Active."
+      ],
+      "limits": [
+        "Only one active alert exists in the review fixture; historical triggered events were not fabricated."
+      ],
+      "findings": [
+        "BUY-087"
+      ]
+    },
+    {
+      "screen": "Saved favorites list view",
+      "route": "/dispensary/saved \u2014 Favorites List view",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-saved-list-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-saved-list-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-saved-list-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-saved-list-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-saved-list-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-saved-list-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "List mode inspected at both widths. Desktop compact row works; mobile visibly overlaps.",
+      "strengths": [
+        "Desktop list view makes much better use of width and shorter thumbnails."
+      ],
+      "limits": [
+        "No favorite removed or message sent."
+      ],
+      "findings": [
+        "BUY-088"
+      ]
+    },
+    {
+      "screen": "Saved recent",
+      "route": "/dispensary/saved?tab=recent",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-recent-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-recent-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-recent-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-recent-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-recent-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-recent-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Second freshly reopened Recent tab confirms the one pass-one copy finding. Product row itself remains compact and sound.",
+      "strengths": [
+        "Price and both actions fit on mobile.",
+        "No additional layout defect in this tab."
+      ],
+      "limits": [
+        "No repeat request initiated."
+      ],
+      "findings": [
+        "BUY-058"
+      ]
+    },
+    {
+      "screen": "Messages drawer list",
+      "route": "Shared buyer Messages drawer",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-messages-list-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-messages-list-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-messages-list-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-messages-list-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-messages-list-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-messages-list-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Drawer list inspected at both widths; existing conversations were not opened because that marks messages read.",
+      "strengths": [
+        "Mobile conversation list is compact, readable, and fills the viewport cleanly.",
+        "Close action stays visible."
+      ],
+      "limits": [
+        "Opening an existing conversation sends a read acknowledgement, so conversation contents and quote actions are excluded under the read-only constraint."
+      ],
+      "findings": [
+        "BUY-089",
+        "BUY-090"
+      ]
+    },
+    {
+      "screen": "Recent activity drawer",
+      "route": "Shared buyer Recent activity drawer",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-activity-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-activity-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-shared-activity-desktop.snapshot.txt"
+        }
+      ],
+      "verdict": "Desktop drawer inspected; this control is not present at the mobile breakpoint.",
+      "strengths": [
+        "Compact list fits its content without overlapping page controls."
+      ],
+      "limits": [
+        "No mobile trigger exists in the current layout."
+      ],
+      "findings": [
+        "BUY-091"
+      ]
+    },
+    {
+      "screen": "Catalog list view",
+      "route": "/dispensary/catalog \u2014 List view",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "desktop",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-list-desktop.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-list-desktop.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-list-desktop.snapshot.txt"
+        },
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-list-mobile.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-list-mobile.metrics.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-list-mobile.snapshot.txt"
+        }
+      ],
+      "verdict": "Fresh alternate layout inspected in both sizes; desktop readable, mobile severely clipped.",
+      "strengths": [
+        "Desktop list mode is readable and uses smaller thumbnails."
+      ],
+      "limits": [
+        "No Add, favorite, alert, or messaging action submitted."
+      ],
+      "findings": [
+        "BUY-092"
+      ]
+    },
+    {
+      "screen": "Settings narrow mobile",
+      "route": "/dispensary/settings",
+      "pass": 2,
+      "evidence": [
+        {
+          "pass": 2,
+          "viewport": "mobile",
+          "screenshot": "docs/reviews/ui-2026-09-17/dispensary/p2-settings-360.png",
+          "visuallyInspected": true,
+          "metrics": "docs/reviews/ui-2026-09-17/dispensary/p2-settings-360.json",
+          "snapshot": "docs/reviews/ui-2026-09-17/dispensary/p2-settings-360.txt"
+        }
+      ],
+      "verdict": "Additional 360x844 inspection confirms the existing copy/density findings without a new reflow defect.",
+      "strengths": [
+        "Form fields use 16px text and remain within the 360px viewport.",
+        "No document-width overflow."
+      ],
+      "limits": [
+        "Desktop and standard mobile baseline passes are separately captured; no inputs changed."
+      ],
+      "findings": []
+    }
+  ],
+  "noAdditionalFindingScreens": [
+    {
+      "screen": "Favorites redirect",
+      "verdict": "Correct destination and tab in both fresh passes at both widths. Destination design findings are tracked under Saved favorites."
+    },
+    {
+      "screen": "Price alerts redirect",
+      "verdict": "Correct destination and tab in both fresh passes at both widths. Destination design findings are tracked under Saved price alerts."
+    },
+    {
+      "screen": "Grower shop mobile filters",
+      "verdict": "Compact options fit; no additional finding beyond surrounding page density."
+    },
+    {
+      "screen": "Settings at 360px",
+      "verdict": "No new reflow issue; 16px fields fit the viewport."
+    },
+    {
+      "screen": "Saved recent product row",
+      "verdict": "Compact desktop and mobile row fits price/actions; surrounding copy finding remains."
+    },
+    {
+      "screen": "Messages mobile conversation list",
+      "verdict": "No new mobile layout issue; desktop idle-pane copy findings remain."
+    }
+  ],
+  "limitations": [
+    "Local review only at http://localhost:3144 using a temporary cloned database (phenofarm_ui_review_20260917); original database and production were not reviewed or changed.",
+    "No app source edits, order submissions, message sends, account changes, uploads, favorite mutations, alert saves/deletes/refreshes, sign-out, or notification read actions were performed.",
+    "Opening an existing message thread sends a read acknowledgement. Conversation detail and quote-action states were therefore not opened under the read-only constraint; the conversation list and unsent listing-pricing composer were reviewed.",
+    "Order detail used an existing submitted request. Withdraw/reorder/request-update confirmations and post-submit outcomes were not activated. Active, accepted and cancelled states were visible in the order list; other detailed order states were not fabricated.",
+    "Price alerts contained one active alert and no triggered event. The empty Triggered and populated History tabs were inspected, but historical triggered events were not fabricated.",
+    "Browser-local cart and comparison state was temporarily staged for filled draft/review/comparison inspection, then cleared. Navigation history and view selection changed only in the dedicated browser session.",
+    "Desktop viewport was 1440\u00d71000; standard mobile viewport 390\u00d7844, with an additional 360\u00d7844 Settings check. These are responsive Chrome checks, not physical-device or virtual-keyboard tests.",
+    "Two full fresh route passes are complete. Shared dialogs and alternate control states were additional pass-two checks; their findings explicitly say when the state was not inspected in pass one.",
+    "Development-only Next.js tools/badge are excluded from product findings. A partly covered Add label was traced to the development badge and not reported as a production visibility defect.",
+    "METRC is outside this audit scope."
+  ],
+  "inspectedScreenshots": [
+    "docs/reviews/ui-2026-09-17/dispensary/p1-01-dashboard-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-01-dashboard-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-02-catalog-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-02-catalog-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-empty-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-empty-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-filled-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-03-cart-filled-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-04-orders-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-04-orders-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-05-order-detail-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-05-order-detail-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-06-grower-shop-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-06-grower-shop-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-07-settings-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-07-settings-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-08-favorites-alias-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-08-favorites-alias-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-09-price-alerts-alias-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-09-price-alerts-alias-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-recent-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p1-10-saved-recent-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-01-dashboard-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-01-dashboard-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-02-catalog-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-02-catalog-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-empty-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-empty-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-filled-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-03-cart-filled-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-04-orders-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-04-orders-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-05-order-detail-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-05-order-detail-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-06-grower-shop-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-06-grower-shop-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-07-settings-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-07-settings-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-08-favorites-alias-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-08-favorites-alias-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-09-price-alerts-alias-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-09-price-alerts-alias-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-recent-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-10-saved-recent-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-history-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-history-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-triggered-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-alerts-triggered-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-cart-review-viewport-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-cart-sticky-viewport-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-alert-dialog-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-alert-dialog-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-lower-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-compare-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-filters-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-filters-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-list-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-list-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-pricing-dialog-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-catalog-pricing-dialog-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-saved-list-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-saved-list-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-settings-360.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-activity-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-menu-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-messages-list-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-messages-list-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-notifications-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-notifications-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-results-desktop.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shared-search-results-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shop-filters-mobile.png",
+    "docs/reviews/ui-2026-09-17/dispensary/p2-shop-message-anchor-mobile.png"
+  ]
+}

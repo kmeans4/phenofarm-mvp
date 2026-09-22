@@ -1,0 +1,121 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e236]
+- button "Notifications" [expanded=false, ref=e237]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e238]
+- main
+  - sectionheader
+    - heading "Grower Marketplace" [level=1, ref=e245]
+    - paragraph
+      - StaticText "Preview how verified dispensaries discover your active listings."
+    - link "+ List New Product" [ref=e246]
+  - paragraph
+    - StaticText "Active listings"
+  - paragraph
+    - StaticText "3"
+  - paragraph
+    - StaticText "Visible to verified buyers."
+  - paragraph
+    - StaticText "Quote-needed listings"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Buyers request quote terms before submitting."
+  - link "COMMERCIAL TERMS Settings → Commercial terms Add MOQ, fulfillment, and direct-settlement notes." [ref=e239]
+    - paragraph
+      - StaticText "COMMERCIAL TERMS"
+    - paragraph
+      - StaticText "Settings → Commercial terms"
+    - paragraph
+      - StaticText "Add MOQ, fulfillment, and direct-settlement notes."
+  - paragraph
+    - StaticText "SETTLEMENT"
+  - paragraph
+    - StaticText "Direct with buyers"
+  - paragraph
+    - StaticText "PhenoFarm does not process wholesale payments."
+  - heading "Buyer preview" [level=2, ref=e240]
+  - paragraph
+    - StaticText "Buyer-facing cards use the same catalog presentation and pricing states."
+  - StaticText "3"
+  - StaticText " products"
+  - StaticText "This is how your listings appear to verified dispensaries."
+  - generic
+    - generic
+      - StaticText "FLOWER"
+    - generic
+      - StaticText "In Stock"
+    - generic
+      - StaticText "MOQ: 1"
+  - heading "Mystery Pricing Batch" [level=3, ref=e241]
+  - paragraph
+    - StaticText "by Vermont Nurseries"
+  - StaticText "Hybrid"
+  - StaticText "THC "
+  - StaticText "19"
+  - StaticText "%"
+  - StaticText "CBD "
+  - StaticText "0.3"
+  - StaticText "%"
+  - StaticText "Flower"
+  - paragraph
+    - StaticText "Strain:Assorted"
+  - paragraph
+    - StaticText "Unit:eighth Stock:25 units"
+  - StaticText "COA and lab results available from the grower on request"
+  - link "Edit listing" [ref=e247]
+  - generic
+    - generic
+      - StaticText "CONCENTRATE"
+    - generic
+      - StaticText "In Stock"
+    - generic
+      - StaticText "MOQ: 2"
+  - heading "Silver Haze Concentrate" [level=3, ref=e242]
+  - paragraph
+    - StaticText "by Vermont Nurseries"
+  - StaticText "Hybrid"
+  - StaticText "THC "
+  - StaticText "85"
+  - StaticText "%"
+  - StaticText "CBD "
+  - StaticText "0.2"
+  - StaticText "%"
+  - StaticText "Concentrate"
+  - paragraph
+    - StaticText "Strain:Silver Haze"
+  - paragraph
+    - StaticText "Unit:gram Stock:50 units"
+  - StaticText "COA and lab results available from the grower on request"
+  - link "Edit listing" [ref=e248]
+  - generic
+    - generic
+      - StaticText "FLOWER"
+    - generic
+      - StaticText "In Stock"
+    - generic
+      - StaticText "MOQ: 1"
+  - heading "Purple Haze Flowers" [level=3, ref=e243]
+  - paragraph
+    - StaticText "by Vermont Nurseries"
+  - StaticText "Hybrid"
+  - StaticText "THC "
+  - StaticText "22"
+  - StaticText "%"
+  - StaticText "CBD "
+  - StaticText "0.5"
+  - StaticText "%"
+  - StaticText "Flower"
+  - paragraph
+    - StaticText "Strain:Purple Haze"
+  - paragraph
+    - StaticText "Unit:gram Stock:240 units"
+  - StaticText "COA and lab results available from the grower on request"
+  - link "Edit listing" [ref=e249]
+- button "Open messages" [ref=e244]
+- region "Notifications alt+T" [ref=e235]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e250]
+  - image
+- alert

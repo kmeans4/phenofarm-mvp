@@ -39,7 +39,7 @@ test.describe('Profile hardening + license verification', () => {
     await page.fill('#inventoryQty', '10');
     
     // Expand the optional profile/compliance section, then fill cannabinoids
-    const advancedSummary = page.locator('summary', { hasText: 'Optional profile, compliance, and images' });
+    const advancedSummary = page.locator('summary', { hasText: 'Details & photos' });
     if (!(await page.locator('#thcMin').isVisible().catch(() => false))) {
       await advancedSummary.click();
     }
@@ -73,7 +73,7 @@ test.describe('Profile hardening + license verification', () => {
       return route.continue();
     });
 
-    await page.getByRole('button', { name: 'Create Product' }).click();
+    await page.getByRole('button', { name: 'Publish product' }).click();
 
     // Verify POST was made with cannabinoid data
     await expect
@@ -109,7 +109,7 @@ test.describe('Profile hardening + license verification', () => {
 
     // Expand the optional profile/compliance section before testing ranges
     if (!(await page.locator('#thcMin').isVisible().catch(() => false))) {
-      await page.locator('summary', { hasText: 'Optional profile, compliance, and images' }).click();
+      await page.locator('summary', { hasText: 'Details & photos' }).click();
     }
 
     // Test invalid THC range (min > max)
@@ -168,7 +168,7 @@ test.describe('Profile hardening + license verification', () => {
 
     // Mock order creation to verify it's blocked
     let orderAttempted = false;
-    await page.route('**/api/orders', async (route) => {
+    await page.route('**/api/checkout', async (route) => {
       if (route.request().method() === 'POST') {
         orderAttempted = true;
         return route.fulfill({
@@ -183,16 +183,18 @@ test.describe('Profile hardening + license verification', () => {
       return route.continue();
     });
 
+    await page.addInitScript(() => {
+      localStorage.setItem('phenofarm-cart', JSON.stringify({
+        items: [{ id: 'product-001', name: 'Purple Haze Flowers', grower: 'Vermont Nurseries', growerId: 'grower-001', price: 25, quantity: 1, maxQty: 240, unit: 'Gram', isPriceVisible: true }],
+        subtotal: 25, tax: 0, total: 25,
+      }));
+    });
     await page.goto('/dispensary/cart');
     await page.waitForLoadState('networkidle').catch(() => {});
 
-    // Try to checkout
-    const checkoutButton = page.getByRole('button', { name: /checkout|place order/i });
-    const checkoutVisible = await checkoutButton.count() > 0;
-    
-    test.skip(!checkoutVisible, 'No checkout button available');
-
-    await checkoutButton.click();
+    // Exercise submission from a populated draft, then surface the API denial.
+    await page.getByRole('button', { name: /^Review request$/i }).first().click();
+    await page.getByRole('dialog', { name: 'Review request' }).getByRole('button', { name: 'Submit request', exact: true }).click();
 
     // Verify order was blocked
     await expect
@@ -203,8 +205,7 @@ test.describe('Profile hardening + license verification', () => {
       .toBeTruthy();
 
     // Should show license verification warning
-    const licenseWarning = page.locator('text=/license.*verif|pending.*review/i');
-    await expect(licenseWarning).toBeVisible();
+    await expect(page.getByText('License verification required. Please complete license verification before placing orders.', { exact: true }).first()).toBeVisible();
   });
 
   test('Dispensary settings form shows license status badge', async ({ page }) => {
@@ -238,12 +239,12 @@ test.describe('Profile hardening + license verification', () => {
     await page.goto('/dispensary/settings', { waitUntil: 'domcontentloaded' });
 
     // Should show pending review badge
-    await expect.poll(async () => page.locator('main').innerText(), { timeout: 15000 }).toContain('License Pending Review');
+    await expect.poll(async () => page.locator('main').innerText(), { timeout: 15000 }).toContain('Current status: Pending review');
 
     // Verify required fields are marked
     const settingsText = await page.locator('main').innerText();
-    expect(settingsText).toContain('Business Name *');
-    expect(settingsText).toContain('Dispensary License Number *');
+    expect(settingsText).toContain('Business name *');
+    expect(settingsText).toContain('License number *');
   });
 
   test('Grower settings form validates license expiry', async ({ page }) => {
@@ -286,11 +287,11 @@ test.describe('Profile hardening + license verification', () => {
     await page.locator('input[type="date"]').blur();
 
     // Should show error
-    const expiryError = page.locator('text=/license expiry.*future|invalid.*date|expiry date/i').first();
+    const expiryError = page.getByText('License expiry must be today or later', { exact: true });
     await expect(expiryError).toBeVisible({ timeout: 15000 });
 
     // Submit should be blocked
-    const saveButton = page.getByRole('button', { name: /save/i });
+    const saveButton = page.getByRole('button', { name: 'Save profile', exact: true }).first();
     await saveButton.click();
 
     // Should still be on settings page (not redirected)

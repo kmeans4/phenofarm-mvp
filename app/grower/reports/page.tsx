@@ -1,15 +1,60 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
+import { formatCalendarMonth } from "@/lib/calendar-month";
 import Link from "next/link";
+import { Prisma } from "@prisma/client";
 import { AuthSession } from "@/types";
 import { ReportsExportActions } from "./ReportsExportActions";
 import { getOrderStatusLabel } from "@/lib/order-workflow";
+import { PageHeader } from "@/app/components/ui/PageHeader";
+import { StatCard } from "@/app/components/ui/StatCard";
 
-export default async function GrowerReportsPage() {
-  const session = await getServerSession(authOptions);
+const REPORT_RANGE_OPTIONS = [
+  { key: '30d', label: 'Last 30 days' },
+  { key: '90d', label: 'Last 90 days' },
+  { key: '12m', label: 'Last 12 months' },
+  { key: 'all', label: 'All' },
+] as const;
+
+type ReportRangeKey = (typeof REPORT_RANGE_OPTIONS)[number]['key'];
+
+const REPORT_STATUSES = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED', 'CANCELLED'] as const;
+
+function normalizeRange(value?: string): ReportRangeKey {
+  return REPORT_RANGE_OPTIONS.some((option) => option.key === value) ? (value as ReportRangeKey) : '90d';
+}
+
+function getRangeStart(range: ReportRangeKey) {
+  if (range === 'all') return null;
+
+  const start = new Date();
+  start.setHours(0, 0, 0, 0);
+
+  if (range === '30d') start.setDate(start.getDate() - 30);
+  else if (range === '90d') start.setDate(start.getDate() - 90);
+  else start.setMonth(start.getMonth() - 12);
+
+  return start;
+}
+
+function getStatusHref(status: string) {
+  if (status === 'DELIVERED') return '/grower/orders/history?status=delivered';
+  if (status === 'CANCELLED') return '/grower/orders/history?status=cancelled';
+  return '/grower/orders';
+}
+
+function formatRangeForSentence(label: string) {
+  return label === 'All' ? 'all time' : label.toLowerCase();
+}
+
+export default async function GrowerReportsPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ range?: string }>;
+}) {
+  const session = await getAuthSession();
   
   if (!session) {
     redirect('/auth/sign_in');
@@ -21,121 +66,50 @@ export default async function GrowerReportsPage() {
     redirect('/dashboard');
   }
 
-  // Fetch real stats from database
-  const [
-    totalOrders,
-    activeOrders,
-    allOrders,
-    dispensaries,
-  ] = await Promise.all([
-    db.order.count({ where: { growerId: user.growerId } }),
-    db.order.count({ 
-      where: { 
-        growerId: user.growerId,
-        status: { in: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'] },
-      } 
-    }),
-    db.order.findMany({
-      where: { growerId: user.growerId },
-      include: { dispensary: { select: { businessName: true } } },
-      orderBy: { createdAt: 'desc' },
-      take: 50,
-    }),
-    db.dispensary.count(),
-  ]);
-
-  // Calculate delivered request value from delivered orders
-  const completedOrders = allOrders.filter(o => o.status === 'DELIVERED');
-  const totalRevenue = completedOrders.reduce(
-    (sum, o) => sum + Number(o.totalAmount), 
-    0
-  );
-  const avgOrderValue = completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0;
-
-  // Get requests by status for the chart
-  const ordersByStatus = {
-    PENDING: allOrders.filter(o => o.status === 'PENDING').length,
-    CONFIRMED: allOrders.filter(o => o.status === 'CONFIRMED').length,
-    PROCESSING: allOrders.filter(o => o.status === 'PROCESSING').length,
-    SHIPPED: allOrders.filter(o => o.status === 'SHIPPED').length,
-    DELIVERED: allOrders.filter(o => o.status === 'DELIVERED').length,
-    CANCELLED: allOrders.filter(o => o.status === 'CANCELLED').length,
+  const params = searchParams ? await searchParams : {};
+  const selectedRange = normalizeRange(params.range);
+  const selectedRangeOption = REPORT_RANGE_OPTIONS.find((option) => option.key === selectedRange) || REPORT_RANGE_OPTIONS[1];
+  const rangeStart = getRangeStart(selectedRange);
+  const rangeSentence = formatRangeForSentence(selectedRangeOption.label);
+  const rangeWhere: Prisma.OrderWhereInput = {
+    growerId: user.growerId,
+    ...(rangeStart ? { createdAt: { gte: rangeStart } } : {}),
   };
 
-  // Get monthly revenue data (last 6 months)
-  const sixMonthsAgo = new Date();
-  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-  
-  let monthlyRevenue: { month: string; revenue: number }[] = [];
-  try {
-    const rawRevenue = await db.$queryRaw<{ month: string; revenue: number }[]>`
-      SELECT 
-        TO_CHAR("createdAt", 'YYYY-MM') as month,
-        SUM("totalAmount"::numeric) as revenue
-      FROM "orders"
-      WHERE "growerId" = ${user.growerId}
-        AND status = 'DELIVERED'
-        AND "createdAt" >= ${sixMonthsAgo}
-      GROUP BY TO_CHAR("createdAt", 'YYYY-MM')
-      ORDER BY month
-    `;
-    // Filter out any null months from raw SQL results
-    monthlyRevenue = (rawRevenue || []).filter(m => m && m.month);
-  } catch (e) {
-    console.error('Error fetching monthly delivered request value:', e);
-    monthlyRevenue = [];
-  }
-
-  // Get top products by orders
-  let topProducts: { productName: string; quantity: number; revenue: number }[] = [];
-  try {
-    const rawProducts = await db.$queryRaw<{ productName: string; quantity: number; revenue: number }[]>`
-      SELECT 
-        p.name as "productName",
-        SUM(oi.quantity)::int as quantity,
-        SUM(oi."totalPrice"::numeric)::numeric as revenue
-      FROM "order_items" oi
-      JOIN "orders" o ON oi."orderId" = o.id
-      JOIN "products" p ON oi."productId" = p.id
-      WHERE o."growerId" = ${user.growerId}
-        AND o.status = 'DELIVERED'
-      GROUP BY p.name
-      ORDER BY revenue DESC
-      LIMIT 5
-    `;
-    topProducts = (rawProducts || []).filter(p => p && p.productName);
-  } catch (e) {
-    console.error('Error fetching top products:', e);
-    topProducts = [];
-  }
-
-  // Get top customers
-  let topCustomers: { dispensaryName: string; orderCount: number; revenue: number }[] = [];
-  try {
-    const rawCustomers = await db.$queryRaw<{ dispensaryName: string; orderCount: number; revenue: number }[]>`
-      SELECT 
-        d."businessName" as "dispensaryName",
-        COUNT(o.id)::int as "orderCount",
-        SUM(o."totalAmount"::numeric)::numeric as revenue
-      FROM "orders" o
-      JOIN "dispensaries" d ON o."dispensaryId" = d.id
-      WHERE o."growerId" = ${user.growerId}
-        AND o.status = 'DELIVERED'
-      GROUP BY d."businessName"
-      ORDER BY revenue DESC
-      LIMIT 5
-    `;
-    topCustomers = (rawCustomers || []).filter(c => c && c.dispensaryName);
-  } catch (e) {
-    console.error('Error fetching top customers:', e);
-    topCustomers = [];
-  }
-
-  const recentOrders = allOrders.slice(0, 10);
+  const sqlRange = rangeStart ? Prisma.sql`AND o."createdAt" >= ${rangeStart}` : Prisma.empty;
+  const [statusGroups, customerGroups, recentOrders, monthlyRows, productRows, customerRows] = await Promise.all([
+    db.order.groupBy({ by: ['status'], where: rangeWhere, _count: { _all: true }, _sum: { totalAmount: true } }),
+    db.order.groupBy({ by: ['dispensaryId'], where: rangeWhere }),
+    db.order.findMany({ where: rangeWhere, select: { id: true, orderId: true, status: true, createdAt: true, totalAmount: true, dispensary: { select: { businessName: true } } }, orderBy: [{ createdAt: 'desc' }, { id: 'desc' }], take: 10 }),
+    db.$queryRaw<Array<{ month: string; revenue: number }>>(Prisma.sql`
+      SELECT to_char(o."createdAt", 'YYYY-MM') AS month, SUM(o."totalAmount")::float AS revenue
+      FROM orders o WHERE o."growerId" = ${user.growerId} AND o.status = 'DELIVERED' ${sqlRange}
+      GROUP BY 1 ORDER BY 1`),
+    db.$queryRaw<Array<{ productName: string; quantity: number; revenue: number }>>(Prisma.sql`
+      SELECT p.name AS "productName", SUM(i.quantity)::float AS quantity, SUM(i."totalPrice")::float AS revenue
+      FROM order_items i JOIN orders o ON o.id = i."orderId" JOIN products p ON p.id = i."productId"
+      WHERE o."growerId" = ${user.growerId} AND o.status = 'DELIVERED' ${sqlRange}
+      GROUP BY p.id, p.name ORDER BY revenue DESC LIMIT 5`),
+    db.$queryRaw<Array<{ dispensaryName: string; orderCount: number; revenue: number }>>(Prisma.sql`
+      SELECT d."businessName" AS "dispensaryName", COUNT(*)::int AS "orderCount", SUM(o."totalAmount")::float AS revenue
+      FROM orders o JOIN dispensaries d ON d.id = o."dispensaryId"
+      WHERE o."growerId" = ${user.growerId} AND o.status = 'DELIVERED' ${sqlRange}
+      GROUP BY d.id, d."businessName" ORDER BY revenue DESC LIMIT 5`),
+  ]);
+  const totalOrders = statusGroups.reduce((sum, group) => sum + group._count._all, 0);
+  const activeOrders = statusGroups.filter((group) => ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(group.status)).reduce((sum, group) => sum + group._count._all, 0);
+  const activeCustomers = customerGroups.length;
+  const delivered = statusGroups.find((group) => group.status === 'DELIVERED');
+  const totalRevenue = Number(delivered?._sum.totalAmount || 0);
+  const avgOrderValue = delivered?._count._all ? totalRevenue / delivered._count._all : 0;
+  const ordersByStatus = Object.fromEntries(REPORT_STATUSES.map((status) => [status, statusGroups.find((group) => group.status === status)?._count._all || 0]));
+  const monthlyRevenue = monthlyRows;
+  const topProducts = productRows;
+  const topCustomers = customerRows;
   const exportOrders = recentOrders.map((order) => ({
     orderId: order.orderId,
     customer: order.dispensary?.businessName || 'Unknown',
-    status: order.status,
+    status: getOrderStatusLabel(order.status),
     date: order.createdAt.toISOString(),
     totalAmount: Number(order.totalAmount),
   }));
@@ -154,16 +128,6 @@ export default async function GrowerReportsPage() {
     revenue: Number(customer.revenue),
   }));
 
-  // Helper function for safe date formatting
-  const formatMonth = (monthStr: string | null | undefined): string => {
-    if (!monthStr) return '';
-    try {
-      return format(new Date(monthStr + '-01'), 'MMM');
-    } catch {
-      return '';
-    }
-  };
-
   // Status color mapping for improved visual
   const statusColors: Record<string, { bg: string; text: string; bar: string }> = {
     PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-800', bar: 'bg-yellow-500' },
@@ -176,103 +140,134 @@ export default async function GrowerReportsPage() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Analytics & Reports</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Track delivered request value and fulfillment metrics. Settlement happens directly with buyers.</p>
+      <PageHeader
+        title="Reports"
+        mobileInlineActions
+        actions={
+          <ReportsExportActions
+            summary={{
+              totalRevenue,
+              totalOrders,
+              activeOrders,
+              activeCustomers,
+              avgOrderValue,
+            }}
+            rangeLabel={selectedRangeOption.label}
+            monthlyRevenue={exportMonthlyRevenue}
+            topProducts={exportTopProducts}
+            topCustomers={exportTopCustomers}
+            recentOrders={exportOrders}
+          />
+        }
+      />
+
+      <div className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
+        <p className="sr-only sm:not-sr-only text-sm font-medium text-gray-700">Date range</p>
+        <div className="flex flex-wrap gap-2" aria-label="Report date range">
+          {REPORT_RANGE_OPTIONS.map((option) => {
+            const active = selectedRange === option.key;
+            const href = option.key === '90d' ? '/grower/reports' : `/grower/reports?range=${option.key}`;
+            return (
+              <Link
+                key={option.key}
+                href={href}
+                aria-label={option.label}
+                aria-current={active ? 'page' : undefined}
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
+                  active
+                    ? 'bg-green-600 text-white'
+                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                {option.key === '12m' ? '12mo' : option.key === 'all' ? 'All' : option.key}
+              </Link>
+            );
+          })}
         </div>
-        <ReportsExportActions
-          summary={{
-            totalRevenue,
-            totalOrders,
-            activeOrders,
-            activeCustomers: dispensaries,
-            avgOrderValue,
-          }}
-          monthlyRevenue={exportMonthlyRevenue}
-          topProducts={exportTopProducts}
-          topCustomers={exportTopCustomers}
-          recentOrders={exportOrders}
-        />
       </div>
 
       {/* Key Metrics - Responsive Grid */}
       <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
-        <div className="bg-gradient-to-br from-green-500 to-green-600 text-white p-4 sm:p-6 rounded-lg shadow-lg col-span-2 md:col-span-1 lg:col-span-1">
-          <p className="text-green-100 text-xs sm:text-sm">Delivered Request Value</p>
-          <p className="text-xl sm:text-3xl font-bold mt-1">${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
-          <p className="text-green-100 text-xs sm:text-sm mt-2">
-            From {completedOrders.length} delivered requests
-          </p>
-        </div>
-        
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-xs sm:text-sm text-gray-600">Total Requests</p>
-          <p className="text-xl sm:text-3xl font-bold text-gray-900 mt-1">{totalOrders}</p>
-          <p className="text-xs sm:text-sm text-green-600 mt-2">
-            {activeOrders} active requests
-          </p>
-        </div>
-
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-xs sm:text-sm text-gray-600">Active Customers</p>
-          <p className="text-xl sm:text-3xl font-bold text-gray-900 mt-1">{dispensaries}</p>
-          <p className="text-xs sm:text-sm text-gray-500 mt-2">Registered dispensaries</p>
-        </div>
-
-        <div className="bg-white p-4 sm:p-6 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-xs sm:text-sm text-gray-600">Avg Delivered Value</p>
-          <p className="text-xl sm:text-3xl font-bold text-gray-900 mt-1">${avgOrderValue.toFixed(2)}</p>
-          <p className="text-xs sm:text-sm text-gray-500 mt-2">Delivered requests only</p>
-        </div>
+        <StatCard
+          compact
+          title="Delivered value"
+          value={`$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
+          helperText={`${delivered?._count._all || 0} delivered request${delivered?._count._all === 1 ? '' : 's'}`}
+          className="border-green-200 bg-green-50"
+          valueClassName="text-green-700 sm:text-3xl"
+        />
+        <StatCard compact title="Requests" value={totalOrders} helperText={`${activeOrders} active`} valueClassName="sm:text-3xl" />
+        <StatCard compact title="Customers" value={activeCustomers} valueClassName="sm:text-3xl" />
+        <StatCard compact title="Avg. delivered value" value={`$${avgOrderValue.toFixed(2)}`} valueClassName="sm:text-3xl" />
       </div>
 
       {/* Charts Row - Improved Mobile Responsiveness */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 items-start lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Monthly delivered value chart */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold">Delivered Request Value Trend</h2>
-            <span className="text-xs text-gray-400 sm:hidden">← swipe →</span>
+            <h2 className="text-base sm:text-lg font-semibold">Delivered value by month</h2>
+            {monthlyRevenue.length > 6 && <span className="text-xs text-gray-400 sm:hidden">← swipe →</span>}
           </div>
           {monthlyRevenue.length > 0 ? (
             <div className="relative">
+              {monthlyRevenue.length <= 3 && (
+                <div className="space-y-3 sm:hidden">
+                  {monthlyRevenue.map((month) => {
+                    const revenue = Number(month.revenue);
+                    const maxRevenue = Math.max(...monthlyRevenue.map((row) => Number(row.revenue)));
+                    return (
+                      <div key={month.month}>
+                        <div className="mb-1 flex items-center justify-between gap-2 text-sm">
+                          <span className="text-gray-600">{formatCalendarMonth(month.month)}</span>
+                          <span className="font-semibold text-green-700">${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                        </div>
+                        <div className="h-2 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
+                          <div className="h-full rounded-full bg-green-500" style={{ width: `${maxRevenue > 0 ? revenue / maxRevenue * 100 : 0}%` }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               {/* Mobile scroll hint - enhanced */}
-              <div className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none bg-gradient-to-l from-white via-white/80 to-transparent pl-4 pr-1">
+              {monthlyRevenue.length > 6 && <div className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none bg-gradient-to-l from-white via-white/80 to-transparent pl-4 pr-1">
                 <div className="bg-gray-100 rounded-full p-1.5 shadow-sm">
                   <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
-              </div>
+              </div>}
               <div 
-                className="h-36 sm:h-40 md:h-48 flex items-end justify-between gap-1 sm:gap-2 px-2 overflow-x-auto pb-2 -mx-3 sm:-mx-0 px-3 sm:px-2 scrollbar-hide snap-x snap-mandatory"
+                className={`h-40 ${monthlyRevenue.length <= 3 ? 'hidden sm:flex' : 'flex'} items-end justify-start gap-1 sm:gap-2 overflow-x-auto pb-2 -mx-3 sm:-mx-0 px-3 sm:px-2 scrollbar-hide snap-x snap-mandatory`}
                 style={{ WebkitOverflowScrolling: 'touch' }}
               >
                 {monthlyRevenue.map((month, idx) => {
                   const maxRevenue = Math.max(...monthlyRevenue.map(m => Number(m.revenue)));
-                  const height = maxRevenue > 0 ? (Number(month.revenue) / maxRevenue) * 100 : 0;
-                  const monthLabel = formatMonth(month.month);
+                  const revenue = Number(month.revenue);
+                  const height = maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0;
+                  const monthLabel = formatCalendarMonth(month.month);
+                  const monthTitle = formatCalendarMonth(month.month, true);
                   if (!monthLabel) return null;
                   return (
-                    <div key={idx} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[44px] sm:min-w-[52px] snap-center">
-                      <div className="w-full flex flex-col items-center justify-end h-24 sm:h-28 md:h-36 group cursor-pointer">
+                    <div key={idx} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[44px] max-w-[88px] sm:min-w-[52px] snap-center">
+                      <div className="w-full flex flex-col items-center justify-end h-24 group cursor-pointer">
                         {/* Tooltip */}
                         <div className="opacity-0 group-hover:opacity-100 transition-opacity mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-20 hidden sm:block">
-                          ${Number(month.revenue).toLocaleString()}
+                          ${revenue.toLocaleString()}
                         </div>
                         <div 
                           className="w-full bg-green-500 rounded-t hover:bg-green-600 transition-colors"
+                          title={`${monthTitle}: $${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                           style={{ height: `${Math.max(height, 4)}%`, minHeight: '4px' }}
                         />
                       </div>
-                      <span className="text-[10px] sm:text-xs text-gray-500 whitespace-nowrap font-medium">
+                      <span className="text-xs text-gray-500 whitespace-nowrap font-medium">
                         {monthLabel}
                       </span>
-                      {Number(month.revenue) > 0 && (
-                        <span className="text-[9px] sm:text-xs font-medium text-gray-600 whitespace-nowrap">
-                          {Number(month.revenue) >= 1000 ? `$${(Number(month.revenue) / 1000).toFixed(0)}k` : `$${Number(month.revenue)}`}
+                      {revenue > 0 && (
+                        <span className="text-xs font-medium text-gray-600 whitespace-nowrap">
+                          {revenue >= 1000 ? `$${(revenue / 1000).toFixed(0)}k` : `$${revenue}`}
                         </span>
                       )}
                     </div>
@@ -287,7 +282,7 @@ export default async function GrowerReportsPage() {
               </p>
               <p className="mt-1 max-w-sm text-gray-500">
                 {totalOrders > 0
-                  ? 'The trend uses delivered requests from the last 6 months. Submitted, ready, cancelled, and older requests are excluded.'
+                  ? `The trend uses delivered requests in ${rangeSentence}; submitted, ready, and cancelled requests are excluded.`
                   : 'Delivered requests will appear here after buyers submit requests and fulfillment is complete.'}
               </p>
               <Link href={totalOrders > 0 ? '/grower/orders' : '/grower/products/add'} className="mt-3 text-sm font-medium text-green-700 hover:text-green-800">
@@ -301,16 +296,22 @@ export default async function GrowerReportsPage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6">
           <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Requests by Status</h2>
           <div className="space-y-2 sm:space-y-3">
-            {Object.entries(ordersByStatus).map(([status, count]) => {
+            {Object.entries(ordersByStatus).filter(([, count]) => count > 0).map(([status, count]) => {
               const total = Object.values(ordersByStatus).reduce((a, b) => a + b, 0);
               const percentage = total > 0 ? (count / total) * 100 : 0;
               const colors = statusColors[status];
+              const statusLabel = getOrderStatusLabel(status);
               return (
-                <div key={status} className="group">
+                <Link
+                  key={status}
+                  href={getStatusHref(status)}
+                  className="group block rounded-lg p-2 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  aria-label={`View ${statusLabel} requests`}
+                >
                   <div className="flex justify-between text-xs sm:text-sm mb-1">
                     <div className="flex items-center gap-2">
                       <span className={`w-2 h-2 rounded-full ${colors?.bar || 'bg-gray-500'}`} />
-                      <span className="text-gray-600">{getOrderStatusLabel(status)}</span>
+                      <span className="text-gray-600 group-hover:text-gray-900">{statusLabel}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{count}</span>
@@ -323,15 +324,25 @@ export default async function GrowerReportsPage() {
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
-                </div>
+                </Link>
               );
             })}
           </div>
+          {Object.values(ordersByStatus).some((count) => count === 0) && (
+            <details className="mt-3 text-sm">
+              <summary className="min-h-10 cursor-pointer py-2 text-gray-500">Empty statuses</summary>
+              <div className="flex flex-wrap gap-2 py-2">
+                {Object.entries(ordersByStatus).filter(([, count]) => count === 0).map(([status]) => (
+                  <Link key={status} href={getStatusHref(status)} className="rounded-lg border px-3 py-2 text-gray-600">{getOrderStatusLabel(status)} · 0</Link>
+                ))}
+              </div>
+            </details>
+          )}
         </div>
       </div>
 
       {/* Top Products & Customers - Responsive Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 items-start lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Top Products */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
@@ -358,7 +369,7 @@ export default async function GrowerReportsPage() {
             <div className="p-6 sm:p-8 text-center text-sm">
               <p className="font-medium text-gray-900">No delivered product value yet</p>
               <p className="mx-auto mt-1 max-w-sm text-gray-500">
-                Product rankings only include line items from delivered requests, so active listings may not show here until fulfillment is complete.
+                Product rankings include only line items from delivered requests in {rangeSentence}.
               </p>
               <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
                 Open catalog workspace
@@ -384,7 +395,7 @@ export default async function GrowerReportsPage() {
                   </div>
                   <div className="text-right flex-shrink-0">
                     <p className="font-semibold text-green-600 text-sm sm:text-base">${Number(customer.revenue).toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">{customer.orderCount} orders</p>
+                    <p className="text-xs text-gray-500">{customer.orderCount} request{Number(customer.orderCount) === 1 ? '' : 's'}</p>
                   </div>
                 </div>
               ))}
@@ -393,7 +404,7 @@ export default async function GrowerReportsPage() {
             <div className="p-6 sm:p-8 text-center text-sm">
               <p className="font-medium text-gray-900">No delivered customer value yet</p>
               <p className="mx-auto mt-1 max-w-sm text-gray-500">
-                Customer rankings are based on delivered request value. New buyers with submitted requests appear in request history first.
+                Customer rankings are based on delivered request value in {rangeSentence}.
               </p>
               <Link href="/grower/orders" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
                 View request history
@@ -408,14 +419,14 @@ export default async function GrowerReportsPage() {
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center">
           <h2 className="text-base sm:text-lg font-semibold">Recent Requests</h2>
           <Link href="/grower/orders" className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium">
-            View All Requests
+            View all
           </Link>
         </div>
         {recentOrders.length === 0 ? (
           <div className="p-6 sm:p-12 text-center text-sm">
             <p className="font-medium text-gray-900">No requests yet</p>
             <p className="mx-auto mt-1 max-w-sm text-gray-500">
-              Requests appear here as soon as dispensaries submit them, before they count toward delivered request value.
+              Requests created in {rangeSentence} will appear here before they count toward delivered request value.
             </p>
             <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
               Open catalog workspace
@@ -426,7 +437,7 @@ export default async function GrowerReportsPage() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Request ID</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Request</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Customer</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Status</th>
                   <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Date</th>
@@ -437,7 +448,11 @@ export default async function GrowerReportsPage() {
                 {recentOrders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50">
                     <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap font-medium text-gray-900 text-xs sm:text-sm">
-                      #{order.orderId.slice(-8)}
+                      <Link href={`/grower/orders/${order.id}`} className="block max-w-[150px] whitespace-normal text-green-700 hover:underline sm:hidden">
+                        {order.dispensary?.businessName || 'Unknown'}
+                        <span className="mt-1 block text-xs font-normal text-gray-500">{format(order.createdAt, 'MMM d')} · #{order.orderId.slice(-6)}</span>
+                      </Link>
+                      <span className="hidden sm:inline">#{order.orderId.slice(-8)}</span>
                     </td>
                     <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
                       {order.dispensary?.businessName || 'Unknown'}

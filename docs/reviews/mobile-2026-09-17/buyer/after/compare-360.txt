@@ -1,0 +1,255 @@
+- generic
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - generic [ref=e1578] clickable [onclick]
+  - button "Search" [ref=e1579]
+  - button "Notifications" [expanded=false, ref=e1580]
+    - StaticText "26"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1581]
+  - main
+    - generic
+      - sectionheader
+        - heading "Catalog" [level=1, ref=e1585]
+        - link "View draft 7" [ref=e1586]
+          - StaticText "View draft"
+          - StaticText "7"
+      - generic
+        - generic
+          - LabelText
+            - StaticText "Search catalog"
+          - combobox "Search catalog" [expanded=false, ref=e1614]
+        - combobox "Sort catalog results" [expanded=false, ref=e1613]: By grower
+          - MenuListPopup
+            - option "By grower" [selected, ref=e1615]
+            - option "Price: low" [ref=e1616]
+            - option "Price: high" [ref=e1617]
+            - option "THC: high" [ref=e1618]
+            - option "THC: low" [ref=e1619]
+            - option "Name: A-Z" [ref=e1620]
+            - option "Name: Z-A" [ref=e1621]
+        - button "Toggle filters" [expanded=false, ref=e1587]
+        - button "Grid view" [ref=e1588]
+        - button "List view" [ref=e1589]
+      - StaticText "3 of 3 products"
+      - heading "Vermont Nurseries" [level=2, ref=e1583]
+      - link "Shop →" [ref=e1584]
+      - generic
+        - generic
+          - image "Mystery Pricing Batch"
+        - heading "Mystery Pricing Batch" [level=3, ref=e1590]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "19"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "0.3"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Assorted"
+        - paragraph
+          - StaticText "25 available"
+        - button "Request pricing" [ref=e1591]
+        - button "Remove Mystery Pricing Batch from favorites" [ref=e1592]
+        - button "Message grower" [ref=e1593]
+          - StaticText "Message"
+        - button "Remove Mystery Pricing Batch from comparison" [ref=e1594]
+          - StaticText "Remove compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Purple Haze Flowers"
+        - heading "Purple Haze Flowers" [level=3, ref=e1595]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "24.8"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "0.6"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Purple Haze"
+        - generic
+          - StaticText "$25.00/ g"
+        - button "Decrease quantity for Purple Haze Flowers" [ref=e1596]
+          - StaticText "−"
+        - spinbutton "Quantity for Purple Haze Flowers" [ref=e1597]: 1
+          - StaticText "1"
+        - button "Increase quantity for Purple Haze Flowers" [ref=e1598]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1599]
+          - StaticText "Add"
+        - StaticText "240 available"
+        - button "Favorite Purple Haze Flowers" [ref=e1600]
+        - button "Price alert for Purple Haze Flowers" [ref=e1601]
+        - button "Message grower" [ref=e1602]
+          - StaticText "Message"
+        - button "Remove Purple Haze Flowers from comparison" [ref=e1603]
+          - StaticText "Remove compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Silver Haze Concentrate"
+        - heading "Silver Haze Concentrate" [level=3, ref=e1604]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "85"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "0.2"
+        - StaticText "%"
+        - StaticText "Bulk Extract"
+        - paragraph
+          - StaticText "Strain: Silver Haze"
+        - generic
+          - StaticText "$60.00/ g"
+        - button "Decrease quantity for Silver Haze Concentrate" [ref=e1605]
+          - StaticText "−"
+        - spinbutton "Quantity for Silver Haze Concentrate" [ref=e1606]: 1
+          - StaticText "1"
+        - button "Increase quantity for Silver Haze Concentrate" [ref=e1607]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1608]
+          - StaticText "Add"
+        - StaticText "50 available"
+        - button "Favorite Silver Haze Concentrate" [ref=e1609]
+        - button "Price alert for Silver Haze Concentrate" [ref=e1610]
+        - button "Message grower" [ref=e1611]
+          - StaticText "Message"
+        - button "Remove Silver Haze Concentrate from comparison" [ref=e1612]
+          - StaticText "Remove compare"
+        - StaticText "Labs on request"
+      - paragraph
+        - StaticText "End of results"
+      - StaticText "Compare ("
+      - StaticText "3"
+      - StaticText "/"
+      - StaticText "3"
+      - StaticText ")"
+      - generic
+        - image "Mystery Pricing Batch thumbnail"
+        - StaticText "Mystery Pricing Batch"
+        - button "Remove Mystery Pricing Batch from compare" [ref=e1647]
+        - image "Purple Haze Flowers thumbnail"
+        - StaticText "Purple Haze Flowers"
+        - button "Remove Purple Haze Flowers from compare" [ref=e1648]
+        - image "Silver Haze Concentrate thumbnail"
+        - StaticText "Silver Haze Concentrate"
+        - button "Remove Silver Haze Concentrate from compare" [ref=e1649]
+      - button "Compare Now" [ref=e1629]
+      - button "Clear compare list" [ref=e1630]
+        - StaticText "Clear"
+      - button "Hide compare bar" [ref=e1631]
+  - region "Notifications alt+T" [ref=e1577]
+  - alert
+  - dialog "Compare (3)"
+    - heading "Compare (3)" [level=2, ref=e1626]
+      - StaticText "Compare (3)"
+    - button "Clear" [ref=e1627]
+    - button "Close product comparison" [ref=e1628]
+    - generic
+      - paragraph
+        - StaticText "Units differ; confirm with the grower."
+      - image "Mystery Pricing Batch"
+      - button "Remove Mystery Pricing Batch from comparison" [ref=e1632]
+      - heading "Mystery Pricing Batch" [level=3, ref=e1633]
+      - link "Vermont Nurseries" [ref=e1634]
+      - image "Purple Haze Flowers"
+      - button "Remove Purple Haze Flowers from comparison" [ref=e1635]
+      - heading "Purple Haze Flowers" [level=3, ref=e1636]
+      - link "Vermont Nurseries" [ref=e1637]
+      - image "Silver Haze Concentrate"
+      - button "Remove Silver Haze Concentrate from comparison" [ref=e1638]
+      - heading "Silver Haze Concentrate" [level=3, ref=e1639]
+      - link "Vermont Nurseries" [ref=e1640]
+      - paragraph
+        - StaticText "Price"
+      - paragraph
+        - StaticText "Request pricing"
+      - paragraph
+        - StaticText "$25.00 / g"
+      - paragraph
+        - StaticText "$60.00 / g"
+      - paragraph
+        - StaticText "THC"
+      - paragraph
+        - StaticText "19%"
+      - paragraph
+        - StaticText "24.8%"
+      - paragraph
+        - StaticText "85%"
+      - paragraph
+        - StaticText "CBD"
+      - paragraph
+        - StaticText "0.3%"
+      - paragraph
+        - StaticText "0.6%"
+      - paragraph
+        - StaticText "0.2%"
+      - paragraph
+        - StaticText "Strain Type"
+      - paragraph
+        - StaticText "Hybrid"
+      - paragraph
+        - StaticText "Hybrid"
+      - paragraph
+        - StaticText "Hybrid"
+      - paragraph
+        - StaticText "Strain"
+      - paragraph
+        - StaticText "Assorted"
+      - paragraph
+        - StaticText "Purple Haze"
+      - paragraph
+        - StaticText "Silver Haze"
+      - paragraph
+        - StaticText "Product Type"
+      - paragraph
+        - StaticText "Flower"
+      - paragraph
+        - StaticText "Flower"
+      - paragraph
+        - StaticText "Bulk Extract"
+      - paragraph
+        - StaticText "Unit"
+      - paragraph
+        - StaticText "Eighth"
+      - paragraph
+        - StaticText "g"
+      - paragraph
+        - StaticText "g"
+      - paragraph
+        - StaticText "Stock"
+      - paragraph
+        - StaticText "25 Eighth"
+      - paragraph
+        - StaticText "240 g"
+      - paragraph
+        - StaticText "50 g"
+      - paragraph
+        - StaticText "Mystery Pricing Batch"
+      - button "Request pricing" [ref=e1641]
+      - button "Message" [ref=e1642]
+      - paragraph
+        - StaticText "Purple Haze Flowers"
+      - button "Add Purple Haze Flowers to request draft" [ref=e1643]
+        - StaticText "Add"
+      - button "Message" [ref=e1644]
+      - paragraph
+        - StaticText "Silver Haze Concentrate"
+      - button "Add Silver Haze Concentrate to request draft" [ref=e1645]
+        - StaticText "Add"
+      - button "Message" [ref=e1646]
+      - group
+        - DisclosureTriangle "Choose quantities" [expanded=false]
+          - StaticText "Choose quantities"

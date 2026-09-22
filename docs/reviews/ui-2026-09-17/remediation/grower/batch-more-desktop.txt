@@ -1,0 +1,92 @@
+- generic
+  - complementary
+    - StaticText "P"
+    - StaticText "PhenoFarm"
+    - StaticText "GROWER"
+    - button "Search" [ref=e3665]
+      - StaticText "Search..."
+      - StaticText "⌘K"
+    - button "Notifications" [expanded=false, ref=e3666]
+      - StaticText "Notifications"
+      - StaticText "18"
+    - navigation "Portal navigation" [ref=e3667]
+      - StaticText "SELL"
+      - link "Dashboard" [ref=e3669]
+        - StaticText "Dashboard"
+      - link "Catalog" [ref=e3670]
+        - StaticText "Catalog"
+      - link "Products" [ref=e3671]
+        - StaticText "Products"
+      - link "Inventory" [ref=e3672]
+        - StaticText "Inventory"
+      - link "Requests 17" [ref=e3673]
+        - StaticText "Requests"
+        - StaticText "17"
+      - StaticText "GROW"
+      - link "Strains" [ref=e3674]
+        - StaticText "Strains"
+      - link "Batches" [ref=e3675]
+        - StaticText "Batches"
+      - link "Customers" [ref=e3676]
+        - StaticText "Customers"
+      - link "Reports" [ref=e3677]
+        - StaticText "Reports"
+      - StaticText "ACCOUNT"
+      - link "Settings" [ref=e3678]
+        - StaticText "Settings"
+    - StaticText "VN"
+    - StaticText "Vermont Nurseries"
+    - StaticText "Grower account"
+    - button "Sign out" [ref=e3668]
+  - main
+    - sectionheader
+      - heading "Batches" [level=1, ref=e3663]
+      - link "Add batch" [ref=e3664]
+    - generic "Summary"
+      - paragraph
+        - StaticText "Batches"
+      - paragraph
+        - StaticText "1"
+      - paragraph
+        - StaticText "Products"
+      - paragraph
+        - StaticText "1"
+      - paragraph
+        - StaticText "Avg. THC"
+      - paragraph
+        - StaticText "24.8%"
+    - table
+      - rowgroup
+        - row
+          - columnheader "BATCH #" [ref=e3690]
+          - columnheader "STRAIN" [ref=e3691]
+          - columnheader "HARVEST DATE" [ref=e3692]
+          - columnheader "THC" [ref=e3693]
+          - columnheader "CBD" [ref=e3694]
+          - columnheader "PRODUCTS" [ref=e3695]
+          - columnheader "ACTIONS" [ref=e3696]
+      - row
+        - cell "VN-2026-0912" [ref=e3683]
+        - cell "Audit Test Kush" [ref=e3684]
+        - cell "Sep 12, 2026" [ref=e3685]
+        - cell "24.8%" [ref=e3686]
+        - cell "0.6%" [ref=e3687]
+        - cell "1 product 0/3 lab docs" [ref=e3688]
+          - link "1 product" [ref=e3697]
+          - StaticText "0/3 lab docs"
+        - cell "Edit Add product More actions for VN-2026-0912" [ref=e3689]
+          - link "Edit" [ref=e3698]
+          - link "Add product" [ref=e3699]
+          - button "More actions for VN-2026-0912" [ref=e3700]
+            - StaticText "More"
+  - generic
+    - button "Open recent activity" [expanded=false, ref=e3679]
+    - button "Open messages" [ref=e3662]
+  - region "Notifications alt+T" [ref=e3654]
+  - alert
+  - dialog "More actions"
+    - heading "More actions" [level=2, ref=e3680]
+    - button "Close More actions" [ref=e3681]
+    - paragraph
+      - StaticText "VN-2026-0912"
+    - button "Delete batch" [ref=e3682]

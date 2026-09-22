@@ -1,9 +1,17 @@
 'use client';
 
+import { Modal } from '@/app/components/ui/Modal';
+import { getThcBadgeColor, getStrainTypeColor } from '@/lib/product-badges';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useBuyerCollection } from '../hooks/useBuyerCollection';
 import Link from "next/link";
-import { LayoutGrid, List as ListIcon, Heart, ArrowLeft, Trash2, ShoppingCart, Loader2 } from "lucide-react";
+import { LayoutGrid, List as ListIcon, Heart, HeartOff, ShoppingCart, Loader2, MessageCircle } from "lucide-react";
 import AddToCartButton from "../catalog/components/AddToCartButton";
+import { PageHeader } from "@/app/components/ui/PageHeader";
+import { toast } from '@/app/hooks/useToast';
+import { ProductImage } from '@/app/components/ui/ProductImage';
+
+function displayUnit(unit: string | null | undefined) { return unit?.toLowerCase() === 'gram' ? 'g' : unit || 'unit'; }
 
 interface Product {
   id: string;
@@ -29,30 +37,22 @@ interface Product {
 }
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'thc-desc' | 'thc-asc' | 'name-asc' | 'name-desc';
+type MessageMode = 'REQUEST_PRICING' | 'QUESTION';
 
-const FAVORITES_KEY = 'phenofarm_favorites';
+
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'default', label: 'Recently Added' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'thc-desc', label: 'THC: High to Low' },
+  { value: 'default', label: 'Newest' },
+  { value: 'price-asc', label: 'Price: low' },
+  { value: 'price-desc', label: 'Price: high' },
+  { value: 'thc-desc', label: 'THC: high' },
   { value: 'name-asc', label: 'Name: A-Z' },
+  { value: 'name-desc', label: 'Name: Z-A' },
+  { value: 'thc-asc', label: 'THC: low' },
 ];
 
-function getSortablePrice(product: Product) {
-  return product.isPriceVisible ? product.price : Number.POSITIVE_INFINITY;
-}
-
-function readFavoriteIds() {
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(FAVORITES_KEY) || '[]');
-    return Array.isArray(parsed)
-      ? Array.from(new Set(parsed.map((id) => String(id || '').trim()).filter(Boolean)))
-      : [];
-  } catch {
-    return [];
-  }
+function normalizeFavoriteIds(value: unknown): string[] {
+  return Array.isArray(value) ? [...new Set(value.filter((id): id is string => typeof id === 'string' && !!id))] : [];
 }
 
 interface FavoritesContentProps {
@@ -60,106 +60,36 @@ interface FavoritesContentProps {
 }
 
 export default function FavoritesContent({ embedded = false }: FavoritesContentProps) {
-  const [favorites, setFavorites] = useState<string[]>([]);
+  const { items: favorites, setItems: setFavorites, ready, error: syncError } = useBuyerCollection('favorites', normalizeFavoriteIds);
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const favoritesReadyRef = useRef(false);
-
-  // Load favorites from localStorage, then merge account-backed favorites.
+  const [openingConversationKey, setOpeningConversationKey] = useState<string | null>(null);
+  const productCache = useRef(new Map<string, Product>());
   useEffect(() => {
-    let cancelled = false;
-
-    const syncFavorites = async () => {
-      const localFavorites = readFavoriteIds();
-      if (!cancelled) setFavorites(localFavorites);
-
+    if (!ready) return;
+    const controller = new AbortController();
+    const missing = favorites.filter(id => !productCache.current.has(id));
+    const populate = () => setFavoriteProducts(favorites.map(id => productCache.current.get(id)).filter((product): product is Product => !!product));
+    if (!missing.length) { populate(); setIsLoading(false); return; }
+    setIsLoading(true);
+    void (async () => {
       try {
-        const response = await fetch('/api/dispensary/favorites');
-        if (!response.ok) throw new Error('Failed to load account favorites');
-
+        const response = await fetch('/api/dispensary/favorites', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productIds: missing }), signal: controller.signal });
         const data = await response.json();
-        const serverFavorites = Array.isArray(data.productIds)
-          ? data.productIds.map((id: unknown) => String(id || '').trim()).filter(Boolean)
-          : [];
-        const merged = Array.from(new Set([...serverFavorites, ...localFavorites]));
-
-        if (!cancelled) {
-          setFavorites(merged);
-          localStorage.setItem(FAVORITES_KEY, JSON.stringify(merged));
-          favoritesReadyRef.current = true;
+        if (!response.ok || !Array.isArray(data.products)) throw new Error('Unable to load favorite products.');
+        if (controller.signal.aborted) return;
+        for (const product of data.products) {
+          if (typeof product?.id === 'string' && product.grower?.id && Array.isArray(product.images)) productCache.current.set(product.id, { ...product, price: product.price == null ? 0 : Number(product.price) });
         }
-
-        if (localFavorites.length > 0) {
-          await fetch('/api/dispensary/favorites', {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ productIds: merged }),
-          });
-        }
-      } catch (e) {
-        console.error('Failed to sync favorites:', e);
-        favoritesReadyRef.current = true;
-      }
-    };
-
-    syncFavorites();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!favoritesReadyRef.current) return;
-
-    localStorage.setItem(FAVORITES_KEY, JSON.stringify(favorites));
-    fetch('/api/dispensary/favorites', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productIds: favorites }),
-    }).catch((error) => {
-      console.error('Failed to save favorites:', error);
-    });
-  }, [favorites]);
-
-  // Fetch full product details for favorites
-  useEffect(() => {
-    const fetchFavoriteProducts = async () => {
-      if (favorites.length === 0) {
-        setFavoriteProducts([]);
-        setIsLoading(false);
-        return;
-      }
-
-      setIsLoading(true);
-      try {
-        const response = await fetch('/api/dispensary/favorites', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ productIds: favorites }),
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch favorite products');
-        }
-
-        const data = await response.json();
-        // Sort by the order in favorites array (most recent first)
-        const ordered = favorites
-          .map(id => data.products.find((p: Product) => p.id === id))
-          .filter(Boolean);
-        setFavoriteProducts(ordered);
-      } catch (error) {
-        console.error('Error fetching favorites:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchFavoriteProducts();
-  }, [favorites]);
+        populate();
+      } catch { if (!controller.signal.aborted) toast.error('Unable to load favorite products. Your saved favorites are unchanged.'); }
+      finally { if (!controller.signal.aborted) setIsLoading(false); }
+    })();
+    return () => controller.abort();
+  }, [favorites, ready]);
 
   // Remove from favorites
   const removeFromFavorites = useCallback((productId: string) => {
@@ -168,94 +98,91 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
       return updated;
     });
     setFavoriteProducts(prev => prev.filter(p => p.id !== productId));
-  }, []);
+  }, [setFavorites]);
 
   // Clear all favorites
   const clearAllFavorites = useCallback(() => {
     setFavorites([]);
     setFavoriteProducts([]);
     setShowClearConfirm(false);
+  }, [setFavorites]);
+
+  const openConversationDraft = useCallback(async (product: Product, mode: MessageMode) => {
+    const key = `${product.id}:${mode}`;
+    const draft = mode === 'REQUEST_PRICING'
+      ? `Hi ${product.grower.businessName}, can you send pricing for ${product.name}${product.unit ? ` (${product.unit})` : ''}?`
+      : `Hi ${product.grower.businessName}, I have a question about ${product.name}.`;
+
+    setOpeningConversationKey(key);
+
+    try {
+      const response = await fetch('/api/messages/conversations', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          growerId: product.grower.id,
+          productId: product.id,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok || !data.conversationId) {
+        throw new Error(data.error || 'Failed to open conversation');
+      }
+
+      window.dispatchEvent(
+        new CustomEvent('phenofarm-open-chat', {
+          detail: {
+            conversationId: data.conversationId,
+            draft,
+            context: [
+              { label: 'Product', value: product.name },
+              { label: 'Grower', value: product.grower.businessName },
+            ],
+            flash: true,
+          },
+        })
+      );
+    } catch (error) {
+      console.error('Failed to open grower conversation:', error);
+      toast.error('Could not open the conversation. Please try again.');
+    } finally {
+      setOpeningConversationKey(null);
+    }
   }, []);
 
   // Sort products
   const sortedProducts = [...favoriteProducts].sort((a, b) => {
     switch (sortBy) {
-      case 'price-asc': return getSortablePrice(a) - getSortablePrice(b);
-      case 'price-desc': return getSortablePrice(a) === Number.POSITIVE_INFINITY
-        ? 1
-        : getSortablePrice(b) === Number.POSITIVE_INFINITY
-          ? -1
-          : b.price - a.price;
+      case 'price-asc': return Number(!a.isPriceVisible) - Number(!b.isPriceVisible) || (a.isPriceVisible && b.isPriceVisible ? a.price - b.price : 0);
+      case 'price-desc': return Number(!a.isPriceVisible) - Number(!b.isPriceVisible) || (a.isPriceVisible && b.isPriceVisible ? b.price - a.price : 0);
       case 'thc-desc': return (b.thc || 0) - (a.thc || 0);
       case 'thc-asc': return (a.thc || 0) - (b.thc || 0);
       case 'name-asc': return a.name.localeCompare(b.name);
+      case 'name-desc': return b.name.localeCompare(a.name);
       default: return 0; // Keep original order (recently added)
     }
   });
 
-  const getThcBadgeColor = (thc: number) => {
-    if (thc < 15) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-    if (thc < 20) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    if (thc < 25) return 'bg-orange-100 text-orange-800 border-orange-200';
-    return 'bg-red-100 text-red-800 border-red-200';
-  };
-
-  const getStrainTypeColor = (strainType: string | null) => {
-    if (!strainType) return 'bg-gray-100 text-gray-700';
-    const lower = strainType.toLowerCase();
-    if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
-    if (lower.includes('sativa')) return 'bg-amber-100 text-amber-700';
-    return 'bg-blue-100 text-blue-700';
-  };
-  const HeadingTag = embedded ? 'h2' : 'h1';
 
   return (
-    <div className={embedded ? "" : "bg-gray-50"}>
-      <div className={embedded ? "pb-4" : "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 pb-20 sm:pb-24"}>
-        {/* Header */}
-        <div className={embedded ? "mb-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm" : "mb-6 sm:mb-8"}>
-          {!embedded && (
-            <Link 
-              href="/dispensary/catalog" 
-              className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 mb-4 transition-colors"
-            >
-              <ArrowLeft size={18} />
-              Back to Catalog
-            </Link>
-          )}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <HeadingTag className={`${embedded ? 'text-lg' : 'text-2xl sm:text-3xl'} font-bold text-gray-900 flex items-center gap-3`}>
-                <Heart className={`${embedded ? 'w-5 h-5' : 'w-8 h-8'} text-red-500`} fill="currentColor" />
-                My Favorites
-              </HeadingTag>
-              <p className="text-gray-600 mt-1">
-                {favoriteProducts.length} saved product{favoriteProducts.length !== 1 ? 's' : ''}
-              </p>
-            </div>
-            {favoriteProducts.length > 0 && (
-              <button
-                onClick={() => setShowClearConfirm(true)}
-                className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              >
-                <Trash2 size={18} />
-                Clear All
-              </button>
-            )}
-          </div>
-        </div>
+    <div className={embedded ? "" : "pb-20 sm:pb-24"}>
+      {syncError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-red-700">{syncError}</p>}
+      <div className={embedded ? "pb-4" : "space-y-6"}>
+        {!embedded && <PageHeader title="Favorites" actions={<Link href="/dispensary/catalog" className="min-h-10 text-green-700">Browse catalog</Link>} />}
 
         {/* Controls */}
         {favoriteProducts.length > 0 && (
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white p-3">
+            <div className="min-w-0 flex-1">
               {/* Sort Dropdown */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <span className="text-sm text-gray-500">Sort by:</span>
+              <div className="min-w-0">
                 <select
+                  aria-label="Sort favorites"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full text-base sm:text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                 >
                   {SORT_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -265,10 +192,11 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg self-start lg:self-auto">
+            <div className="flex items-center rounded-lg bg-gray-100 p-1">
               <button
+                aria-label="Grid view" aria-pressed={viewMode === 'grid'}
                 onClick={() => setViewMode('grid')}
-                className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors ${
+                className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
                   viewMode === 'grid' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -276,8 +204,9 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
                 <span className="hidden sm:inline text-sm">Grid</span>
               </button>
               <button
+                aria-label="List view" aria-pressed={viewMode === 'list'}
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors ${
+                className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
                   viewMode === 'list' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
                 }`}
               >
@@ -285,11 +214,15 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
                 <span className="hidden sm:inline text-sm">List</span>
               </button>
             </div>
+            <details className="relative ml-auto">
+              <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-gray-600">More</summary>
+              <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border bg-white p-1 shadow-lg"><button type="button" onClick={() => setShowClearConfirm(true)} className="min-h-10 w-full rounded px-3 text-left text-sm text-red-700 hover:bg-red-50">Clear favorites</button></div>
+            </details>
           </div>
         )}
 
         {/* Content */}
-        {isLoading ? (
+        {(isLoading && !syncError) ? (
           <div className="flex flex-col items-center justify-center py-20">
             <Loader2 className="w-10 h-10 text-green-600 animate-spin mb-4" />
             <p className="text-gray-600">Loading your favorites...</p>
@@ -324,12 +257,20 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
                   key={product.id} 
                   product={product}
                   onRemove={() => removeFromFavorites(product.id)}
+                  onRequestPricing={() => openConversationDraft(product, 'REQUEST_PRICING')}
+                  onMessageGrower={() => openConversationDraft(product, 'QUESTION')}
+                  isOpeningPricing={openingConversationKey === `${product.id}:REQUEST_PRICING`}
+                  isOpeningMessage={openingConversationKey === `${product.id}:QUESTION`}
                 />
               ) : (
                 <FavoriteListItem 
                   key={product.id} 
                   product={product}
                   onRemove={() => removeFromFavorites(product.id)}
+                  onRequestPricing={() => openConversationDraft(product, 'REQUEST_PRICING')}
+                  onMessageGrower={() => openConversationDraft(product, 'QUESTION')}
+                  isOpeningPricing={openingConversationKey === `${product.id}:REQUEST_PRICING`}
+                  isOpeningMessage={openingConversationKey === `${product.id}:QUESTION`}
                 />
               )
             ))}
@@ -337,56 +278,35 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
         )}
 
         {/* Clear All Confirmation Modal */}
-        {showClearConfirm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <div className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-red-100 rounded-lg">
-                  <Trash2 className="w-6 h-6 text-red-600" />
-                </div>
-                <h2 className="text-xl font-bold text-gray-900">Clear All Favorites?</h2>
-              </div>
-              <p className="text-gray-600 mb-6">
-                This will remove all {favoriteProducts.length} products from your favorites. This action cannot be undone.
-              </p>
-              <div className="flex justify-end gap-3">
-                <button
-                  onClick={() => setShowClearConfirm(false)}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={clearAllFavorites}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  Clear All
-                </button>
-              </div>
-            </div>
+        <Modal open={showClearConfirm} onClose={() => setShowClearConfirm(false)} title="Clear favorites?" className="max-w-md">
+          <p className="mb-5 text-sm text-gray-600">Remove your saved products? You can save them again from the catalog.</p>
+          <div className="flex justify-end gap-3">
+            <button type="button" onClick={() => setShowClearConfirm(false)} className="min-h-10 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100">Cancel</button>
+            <button type="button" onClick={clearAllFavorites} className="min-h-10 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">Clear favorites</button>
           </div>
-        )}
+        </Modal>
       </div>
     </div>
   );
 }
 
 // Favorite Card Component (Grid View)
-function FavoriteCard({ product, onRemove }: { product: Product; onRemove: () => void }) {
-  const getThcBadgeColor = (thc: number) => {
-    if (thc < 15) return 'bg-emerald-100 text-emerald-800 border-emerald-200';
-    if (thc < 20) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    if (thc < 25) return 'bg-orange-100 text-orange-800 border-orange-200';
-    return 'bg-red-100 text-red-800 border-red-200';
-  };
+function FavoriteCard({
+  product,
+  onRemove,
+  onRequestPricing,
+  onMessageGrower,
+  isOpeningPricing,
+  isOpeningMessage,
+}: {
+  product: Product;
+  onRemove: () => void;
+  onRequestPricing: () => void;
+  onMessageGrower: () => void;
+  isOpeningPricing: boolean;
+  isOpeningMessage: boolean;
+}) {
 
-  const getStrainTypeColor = (strainType: string | null) => {
-    if (!strainType) return 'bg-gray-100 text-gray-700';
-    const lower = strainType.toLowerCase();
-    if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
-    if (lower.includes('sativa')) return 'bg-amber-100 text-amber-700';
-    return 'bg-blue-100 text-blue-700';
-  };
 
   const strainType = product.strainType || (product.strain ? 
     (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
@@ -395,29 +315,27 @@ function FavoriteCard({ product, onRemove }: { product: Product; onRemove: () =>
   return (
     <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group">
       {/* Image */}
-      <div className="relative h-48 bg-gradient-to-br from-green-50 to-emerald-100 overflow-hidden">
+      <div className={`relative overflow-hidden bg-green-50 ${product.images?.[0] ? 'h-20 sm:h-40' : 'h-20 sm:h-24'}`}>
         <button
+          type="button"
           onClick={onRemove}
-          className="absolute top-2 right-2 z-10 p-2 bg-white/90 backdrop-blur-sm rounded-lg text-red-500 hover:bg-red-50 shadow-sm transition-colors"
+          aria-label={`Remove ${product.name} from favorites`}
+          className="absolute top-2 right-2 z-10 min-h-10 min-w-10 p-2 bg-white/90 backdrop-blur-sm rounded-lg text-red-500 shadow-sm transition-all hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
           title="Remove from favorites"
         >
-          <Trash2 size={16} />
+          <HeartOff size={16} />
         </button>
 
-        {product.images && product.images.length > 0 ? (
-          <img 
-            src={product.images[0]} 
-            alt={product.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center">
-            <span className="text-6xl opacity-30">🌿</span>
-          </div>
-        )}
+        <ProductImage
+          src={product.images?.[0]}
+          alt={product.name}
+          productType={product.productType}
+          className="h-full w-full"
+          imageClassName="max-sm:object-contain transition-transform duration-300 group-hover:scale-105"
+        />
       </div>
 
-      <div className="p-4">
+      <div className="p-3 sm:p-4">
         {/* Name & Verified */}
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="font-semibold text-gray-900 line-clamp-2">{product.name}</h3>
@@ -432,7 +350,7 @@ function FavoriteCard({ product, onRemove }: { product: Product; onRemove: () =>
 
         {/* Grower */}
         <p className="text-sm text-gray-500 mb-2">
-          by <Link href={`/dispensary/grower/${product.grower.id}`} className="text-green-600 hover:underline">
+          by <Link href={`/dispensary/grower/${product.grower.id}`} className="inline-flex min-h-10 items-center text-green-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
             {product.grower.businessName}
           </Link>
         </p>
@@ -445,7 +363,7 @@ function FavoriteCard({ product, onRemove }: { product: Product; onRemove: () =>
         )}
 
         {/* THC Badge */}
-        {product.thc && (
+        {product.thc != null && (
           <div className="mb-3">
             <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)}`}>
               THC {product.thc}%
@@ -456,10 +374,10 @@ function FavoriteCard({ product, onRemove }: { product: Product; onRemove: () =>
         {/* Price & Actions */}
         <div className="pt-3 border-t border-gray-100">
           {product.isPriceVisible ? (
-            <div className="flex items-center justify-between">
+            <div className="space-y-3">
               <div>
                 <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
-                <span className="text-sm text-gray-500 ml-1">/ {product.unit || 'unit'}</span>
+                <span className="text-sm text-gray-500 ml-1">/ {displayUnit(product.unit)}</span>
               </div>
               <AddToCartButton
                 product={product}
@@ -469,16 +387,24 @@ function FavoriteCard({ product, onRemove }: { product: Product; onRemove: () =>
             </div>
           ) : (
             <div className="space-y-2">
-              <div>
-                <span className="text-sm font-semibold text-gray-900">Request pricing</span>
-                <p className="text-xs text-gray-500">This grower shares pricing by request.</p>
-              </div>
-              <Link
-                href={`/dispensary/grower/${product.grower.id}?search=${encodeURIComponent(product.name)}`}
-                className="inline-flex w-full items-center justify-center rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
+              <button
+                type="button"
+                onClick={onRequestPricing}
+                disabled={isOpeningPricing}
+                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
               >
-                Request Pricing
-              </Link>
+                {isOpeningPricing && <Loader2 className="h-4 w-4 animate-spin" />}
+                Request pricing
+              </button>
+              <button
+                type="button"
+                onClick={onMessageGrower}
+                disabled={isOpeningMessage}
+                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-50 hover:text-green-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              >
+                {isOpeningMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+                Message grower
+              </button>
             </div>
           )}
         </div>
@@ -488,103 +414,41 @@ function FavoriteCard({ product, onRemove }: { product: Product; onRemove: () =>
 }
 
 // Favorite List Item Component (List View)
-function FavoriteListItem({ product, onRemove }: { product: Product; onRemove: () => void }) {
-  const strainType = product.strainType || (product.strain ? 
-    (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
-     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
-
-  const getStrainTypeColor = (strainType: string | null) => {
-    if (!strainType) return 'bg-gray-100 text-gray-700';
-    const lower = strainType.toLowerCase();
-    if (lower.includes('indica')) return 'bg-purple-100 text-purple-700';
-    if (lower.includes('sativa')) return 'bg-amber-100 text-amber-700';
-    return 'bg-blue-100 text-blue-700';
-  };
-
-  const stockStatus = product.inventoryQty === 0 
-    ? { text: 'Out of Stock', color: 'text-red-600' }
-    : product.inventoryQty <= 10 
-      ? { text: 'Low Stock', color: 'text-orange-600' }
-      : { text: 'In Stock', color: 'text-green-600' };
-
+function FavoriteListItem({
+  product,
+  onRemove,
+  onRequestPricing,
+  onMessageGrower,
+  isOpeningPricing,
+  isOpeningMessage,
+}: {
+  product: Product;
+  onRemove: () => void;
+  onRequestPricing: () => void;
+  onMessageGrower: () => void;
+  isOpeningPricing: boolean;
+  isOpeningMessage: boolean;
+}) {
   return (
-    <div className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:shadow-sm transition-shadow">
-      {/* Image */}
-      <div className="w-16 h-16 rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center flex-shrink-0 overflow-hidden">
-        {product.images && product.images.length > 0 ? (
-          <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-2xl opacity-30">🌿</span>
-        )}
-      </div>
-
-      {/* Info */}
-      <div className="flex-1 min-w-0">
-        <div className="flex items-start justify-between">
-          <div>
-            <h3 className="font-semibold text-gray-900">{product.name}</h3>
-            <p className="text-sm text-gray-500">
-              by <Link href={`/dispensary/grower/${product.grower.id}`} className="text-green-600 hover:underline">
-                {product.grower.businessName}
-              </Link>
-              {product.grower.isVerified && (
-                <span className="ml-1 text-green-600" title="Verified">✓</span>
-              )}
-            </p>
-          </div>
-          <div className="text-right">
-            {product.isPriceVisible ? (
-              <span className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</span>
-            ) : (
-              <span className="text-sm font-semibold text-gray-700">Request pricing</span>
-            )}
-            <p className={`text-xs ${stockStatus.color}`}>{stockStatus.text}</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 mt-2">
-          {strainType && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStrainTypeColor(strainType)}`}>
-              {strainType}
-            </span>
-          )}
-          {product.thc && (
-            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-              THC {product.thc}%
-            </span>
-          )}
-          {product.productType && (
-            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
-              {product.productType}
-            </span>
-          )}
+    <article data-product-row className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-xl border border-gray-200 bg-white p-3 sm:p-4 sm:flex sm:items-center">
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-green-50"><ProductImage src={product.images?.[0]} alt={product.name} productType={product.productType} className="h-full w-full" /></div>
+      <div className="min-w-0 flex-1">
+        <h3 className="font-semibold text-gray-900">{product.name}</h3>
+        <Link href={`/dispensary/grower/${product.grower.id}`} className="mt-1 inline-block text-sm text-green-700 hover:underline">{product.grower.businessName}</Link>
+        <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-600">
+          {product.productType && <span>{product.productType}</span>}
+          {product.thc != null && <span>THC {product.thc}%</span>}
+          <span>{product.inventoryQty} available</span>
         </div>
       </div>
-
-      {/* Actions */}
-      <div className="flex items-center gap-2">
-        {product.isPriceVisible ? (
-          <AddToCartButton
-            product={product}
-            growerName={product.grower.businessName}
-            growerId={product.grower.id}
-            compact
-          />
-        ) : (
-          <Link
-            href={`/dispensary/grower/${product.grower.id}?search=${encodeURIComponent(product.name)}`}
-            className="rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
-          >
-            Request Pricing
-          </Link>
-        )}
-        <button
-          onClick={onRemove}
-          className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-          title="Remove from favorites"
-        >
-          <Trash2 size={18} />
-        </button>
+      <div className="col-span-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-3 sm:max-w-xs sm:border-0 sm:pt-0">
+        {product.isPriceVisible ? <>
+          <span data-product-price className="text-lg font-bold text-green-700">${product.price.toFixed(2)}<span className="text-sm font-normal text-gray-500">/{displayUnit(product.unit)}</span></span>
+          <AddToCartButton product={product} growerName={product.grower.businessName} growerId={product.grower.id} compact compactLabel="Add" />
+        </> : <button type="button" onClick={onRequestPricing} disabled={isOpeningPricing} className="min-h-10 flex-1 rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 disabled:opacity-60">{isOpeningPricing ? 'Opening…' : 'Request pricing'}</button>}
+        <button type="button" onClick={onMessageGrower} disabled={isOpeningMessage} className="min-h-10 px-2 text-sm font-medium text-green-700 hover:underline disabled:opacity-60">{isOpeningMessage ? 'Opening…' : 'Message'}</button>
+        <button type="button" onClick={onRemove} aria-label={`Remove ${product.name} from favorites`} className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600"><HeartOff size={18} /></button>
       </div>
-    </div>
+    </article>
   );
 }

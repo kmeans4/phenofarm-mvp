@@ -1,0 +1,755 @@
+- generic
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - generic [ref=e1313] clickable [onclick]
+  - button "Search" [ref=e1314]
+  - button "Notifications" [expanded=false, ref=e1315]
+    - StaticText "24"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1316]
+  - main
+    - generic
+      - sectionheader
+        - heading "Catalog" [level=1, ref=e1324]
+        - link "View draft 3" [ref=e1325]
+          - StaticText "View draft"
+          - StaticText "3"
+      - generic
+        - generic
+          - LabelText
+            - StaticText "Search catalog"
+          - combobox "Search catalog" [expanded=false, ref=e1368]
+        - combobox "Sort catalog results" [expanded=false, ref=e1367]: By grower
+          - MenuListPopup
+            - option "By grower" [selected, ref=e1369]
+            - option "Price: low" [ref=e1370]
+            - option "Price: high" [ref=e1371]
+            - option "THC: high" [ref=e1372]
+            - option "THC: low" [ref=e1373]
+            - option "Name: A-Z" [ref=e1374]
+            - option "Name: Z-A" [ref=e1375]
+        - button "Toggle filters" [expanded=false, ref=e1326]
+          - StaticText "1"
+        - button "Grid view" [ref=e1327]
+        - button "List view" [ref=e1328]
+      - StaticText "Active:"
+      - StaticText "Flower"
+      - button "Remove Flower filter" [ref=e1380]
+      - button "Clear all filters" [ref=e1381]
+      - StaticText "20 of 56 products"
+      - heading "Review Farm" [level=2, ref=e1382]
+      - link "Shop →" [ref=e1383]
+      - generic
+        - generic
+          - image "Review Product 01"
+        - heading "Review Product 01" [level=3, ref=e1389]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 01" [ref=e1390]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 01" [ref=e1391]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 01" [ref=e1392]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1393]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 01" [ref=e1394]
+        - button "Price alert for Review Product 01" [ref=e1395]
+        - button "Message grower" [ref=e1396]
+          - StaticText "Message"
+        - button "Compare Review Product 01" [ref=e1397]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 02"
+        - heading "Review Product 02" [level=3, ref=e1398]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 02" [ref=e1399]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 02" [ref=e1400]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 02" [ref=e1401]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1402]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 02" [ref=e1403]
+        - button "Price alert for Review Product 02" [ref=e1404]
+        - button "Message grower" [ref=e1405]
+          - StaticText "Message"
+        - button "Compare Review Product 02" [ref=e1406]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 03"
+        - heading "Review Product 03" [level=3, ref=e1407]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 03" [ref=e1408]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 03" [ref=e1409]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 03" [ref=e1410]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1411]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 03" [ref=e1412]
+        - button "Price alert for Review Product 03" [ref=e1413]
+        - button "Message grower" [ref=e1414]
+          - StaticText "Message"
+        - button "Compare Review Product 03" [ref=e1415]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 04"
+        - heading "Review Product 04" [level=3, ref=e1416]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 04" [ref=e1417]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 04" [ref=e1418]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 04" [ref=e1419]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1420]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 04" [ref=e1421]
+        - button "Price alert for Review Product 04" [ref=e1422]
+        - button "Message grower" [ref=e1423]
+          - StaticText "Message"
+        - button "Compare Review Product 04" [ref=e1424]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 05"
+        - heading "Review Product 05" [level=3, ref=e1425]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 05" [ref=e1426]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 05" [ref=e1427]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 05" [ref=e1428]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1429]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 05" [ref=e1430]
+        - button "Price alert for Review Product 05" [ref=e1431]
+        - button "Message grower" [ref=e1432]
+          - StaticText "Message"
+        - button "Compare Review Product 05" [ref=e1433]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 06"
+        - heading "Review Product 06" [level=3, ref=e1434]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 06" [ref=e1435]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 06" [ref=e1436]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 06" [ref=e1437]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1438]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 06" [ref=e1439]
+        - button "Price alert for Review Product 06" [ref=e1440]
+        - button "Message grower" [ref=e1441]
+          - StaticText "Message"
+        - button "Compare Review Product 06" [ref=e1442]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 07"
+        - heading "Review Product 07" [level=3, ref=e1443]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 07" [ref=e1444]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 07" [ref=e1445]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 07" [ref=e1446]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1447]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 07" [ref=e1448]
+        - button "Price alert for Review Product 07" [ref=e1449]
+        - button "Message grower" [ref=e1450]
+          - StaticText "Message"
+        - button "Compare Review Product 07" [ref=e1451]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 08"
+        - heading "Review Product 08" [level=3, ref=e1452]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 08" [ref=e1453]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 08" [ref=e1454]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 08" [ref=e1455]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1456]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 08" [ref=e1457]
+        - button "Price alert for Review Product 08" [ref=e1458]
+        - button "Message grower" [ref=e1459]
+          - StaticText "Message"
+        - button "Compare Review Product 08" [ref=e1460]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 09"
+        - heading "Review Product 09" [level=3, ref=e1461]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 09" [ref=e1462]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 09" [ref=e1463]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 09" [ref=e1464]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1465]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 09" [ref=e1466]
+        - button "Price alert for Review Product 09" [ref=e1467]
+        - button "Message grower" [ref=e1468]
+          - StaticText "Message"
+        - button "Compare Review Product 09" [ref=e1469]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 10"
+        - heading "Review Product 10" [level=3, ref=e1470]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 10" [ref=e1471]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 10" [ref=e1472]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 10" [ref=e1473]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1474]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 10" [ref=e1475]
+        - button "Price alert for Review Product 10" [ref=e1476]
+        - button "Message grower" [ref=e1477]
+          - StaticText "Message"
+        - button "Compare Review Product 10" [ref=e1478]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 11"
+        - heading "Review Product 11" [level=3, ref=e1479]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 11" [ref=e1480]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 11" [ref=e1481]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 11" [ref=e1482]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1483]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 11" [ref=e1484]
+        - button "Price alert for Review Product 11" [ref=e1485]
+        - button "Message grower" [ref=e1486]
+          - StaticText "Message"
+        - button "Compare Review Product 11" [ref=e1487]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 12"
+        - heading "Review Product 12" [level=3, ref=e1488]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 12" [ref=e1489]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 12" [ref=e1490]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 12" [ref=e1491]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1492]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 12" [ref=e1493]
+        - button "Price alert for Review Product 12" [ref=e1494]
+        - button "Message grower" [ref=e1495]
+          - StaticText "Message"
+        - button "Compare Review Product 12" [ref=e1496]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 13"
+        - heading "Review Product 13" [level=3, ref=e1497]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 13" [ref=e1498]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 13" [ref=e1499]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 13" [ref=e1500]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1501]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 13" [ref=e1502]
+        - button "Price alert for Review Product 13" [ref=e1503]
+        - button "Message grower" [ref=e1504]
+          - StaticText "Message"
+        - button "Compare Review Product 13" [ref=e1505]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 14"
+        - heading "Review Product 14" [level=3, ref=e1506]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 14" [ref=e1507]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 14" [ref=e1508]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 14" [ref=e1509]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1510]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 14" [ref=e1511]
+        - button "Price alert for Review Product 14" [ref=e1512]
+        - button "Message grower" [ref=e1513]
+          - StaticText "Message"
+        - button "Compare Review Product 14" [ref=e1514]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 15"
+        - heading "Review Product 15" [level=3, ref=e1515]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 15" [ref=e1516]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 15" [ref=e1517]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 15" [ref=e1518]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1519]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 15" [ref=e1520]
+        - button "Price alert for Review Product 15" [ref=e1521]
+        - button "Message grower" [ref=e1522]
+          - StaticText "Message"
+        - button "Compare Review Product 15" [ref=e1523]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 16"
+        - heading "Review Product 16" [level=3, ref=e1524]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 16" [ref=e1525]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 16" [ref=e1526]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 16" [ref=e1527]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1528]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 16" [ref=e1529]
+        - button "Price alert for Review Product 16" [ref=e1530]
+        - button "Message grower" [ref=e1531]
+          - StaticText "Message"
+        - button "Compare Review Product 16" [ref=e1532]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 17"
+        - heading "Review Product 17" [level=3, ref=e1533]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 17" [ref=e1534]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 17" [ref=e1535]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 17" [ref=e1536]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1537]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 17" [ref=e1538]
+        - button "Price alert for Review Product 17" [ref=e1539]
+        - button "Message grower" [ref=e1540]
+          - StaticText "Message"
+        - button "Compare Review Product 17" [ref=e1541]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 18"
+        - heading "Review Product 18" [level=3, ref=e1542]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 18" [ref=e1543]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 18" [ref=e1544]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 18" [ref=e1545]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1546]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 18" [ref=e1547]
+        - button "Price alert for Review Product 18" [ref=e1548]
+        - button "Message grower" [ref=e1549]
+          - StaticText "Message"
+        - button "Compare Review Product 18" [ref=e1550]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 19"
+        - heading "Review Product 19" [level=3, ref=e1551]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 19" [ref=e1552]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 19" [ref=e1553]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 19" [ref=e1554]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1555]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 19" [ref=e1556]
+        - button "Price alert for Review Product 19" [ref=e1557]
+        - button "Message grower" [ref=e1558]
+          - StaticText "Message"
+        - button "Compare Review Product 19" [ref=e1559]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Review Product 20"
+        - heading "Review Product 20" [level=3, ref=e1560]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "20"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "2"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Review Strain"
+        - generic
+          - StaticText "$10.00/ g"
+        - button "Decrease quantity for Review Product 20" [ref=e1561]
+          - StaticText "−"
+        - spinbutton "Quantity for Review Product 20" [ref=e1562]: 1
+          - StaticText "1"
+        - button "Increase quantity for Review Product 20" [ref=e1563]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1564]
+          - StaticText "Add"
+        - StaticText "20 available"
+        - button "Favorite Review Product 20" [ref=e1565]
+        - button "Price alert for Review Product 20" [ref=e1566]
+        - button "Message grower" [ref=e1567]
+          - StaticText "Message"
+        - button "Compare Review Product 20" [ref=e1568]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+  - region "Notifications alt+T" [ref=e1312]
+  - alert
+  - dialog "Save Filter"
+    - heading "Save Filter" [level=2, ref=e1384]
+    - button "Close Save Filter" [ref=e1385]
+    - LabelText
+      - StaticText "Filter Name"
+    - textbox "e.g., High THC Flower Under $20" [ref=e1386]
+    - paragraph
+      - StaticText "This filter includes:"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "You can save up to 5 filters (4 remaining)."
+    - button "Cancel" [ref=e1387]
+    - button "Save Filter" [disabled, ref=e1388]

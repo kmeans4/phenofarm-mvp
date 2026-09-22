@@ -1,0 +1,69 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e3600]
+  - button "Notifications" [expanded=false, ref=e3601]
+    - StaticText "18"
+  - button "Open Grower navigation menu" [expanded=false, ref=e3602]
+  - main
+    - sectionheader
+      - heading "Strains" [level=1, ref=e3630]
+      - link "Add strain" [ref=e3631]
+    - generic "Summary"
+      - paragraph
+        - StaticText "Strains"
+      - paragraph
+        - StaticText "4"
+      - paragraph
+        - StaticText "Batches"
+      - paragraph
+        - StaticText "1"
+      - paragraph
+        - StaticText "Products"
+      - paragraph
+        - StaticText "3"
+    - button "Card View" [ref=e3603]
+      - image
+    - button "List View" [ref=e3604]
+      - image
+    - heading "Assorted" [level=3, ref=e3605]
+    - link "0 batches" [ref=e3606]
+    - link "1 product" [ref=e3607]
+    - link "Edit" [ref=e3608]
+    - link "Add product" [ref=e3609]
+    - button "More actions for Assorted" [ref=e3610]
+      - StaticText "More"
+    - heading "Audit Test Kush" [level=3, ref=e3611]
+    - paragraph
+      - StaticText "Hybrid"
+    - link "1 batch" [ref=e3612]
+    - link "0 products" [ref=e3613]
+    - link "Edit" [ref=e3614]
+    - link "Add product" [ref=e3615]
+    - button "More actions for Audit Test Kush" [ref=e3616]
+      - StaticText "More"
+    - heading "Purple Haze" [level=3, ref=e3617]
+    - link "0 batches" [ref=e3618]
+    - link "1 product" [ref=e3619]
+    - link "Edit" [ref=e3620]
+    - link "Add product" [ref=e3621]
+    - button "More actions for Purple Haze" [ref=e3622]
+      - StaticText "More"
+    - heading "Silver Haze" [level=3, ref=e3623]
+    - link "0 batches" [ref=e3624]
+    - link "1 product" [ref=e3625]
+    - link "Edit" [ref=e3626]
+    - link "Add product" [ref=e3627]
+    - button "More actions for Silver Haze" [ref=e3628]
+      - StaticText "More"
+  - button "Open messages" [ref=e3629]
+  - region "Notifications alt+T" [ref=e3599]
+  - alert
+  - alertdialog "Delete strain?"
+    - heading "Delete strain?" [level=2, ref=e3650]
+    - paragraph
+      - StaticText "Delete Audit Test Kush. Review attached batches and products before removing it."
+    - button "Close confirmation dialog" [ref=e3651]
+    - button "Cancel" [ref=e3652]
+    - button "Delete strain" [ref=e3653]

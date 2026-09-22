@@ -1,0 +1,92 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e2261] clickable [onclick]
+  - button "Open messages" [ref=e2291]
+- button "Search" [ref=e2262]
+- button "Notifications" [expanded=false, ref=e2263]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e2264]
+- main
+  - sectionheader
+    - heading "Strains" [level=1, ref=e2292]
+    - link "Add strain" [ref=e2293]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Strains"
+    - paragraph
+      - StaticText "4"
+    - paragraph
+      - StaticText "Batches"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "Products"
+    - paragraph
+      - StaticText "3"
+  - button "Card View" [ref=e2265]
+    - image
+  - button "List View" [ref=e2266]
+    - image
+  - table
+    - rowgroup
+      - row
+        - columnheader "STRAIN" [ref=e2314]
+        - columnheader "GENETICS" [ref=e2315]
+        - columnheader "BATCHES" [ref=e2316]
+        - columnheader "PRODUCTS" [ref=e2317]
+        - columnheader "ACTIONS" [ref=e2318]
+    - row
+      - cell "Assorted" [ref=e2294]
+        - StaticText "Assorted"
+      - cell "-" [ref=e2295]
+      - cell "0" [ref=e2296]
+        - link "0" [ref=e2319]
+      - cell "1" [ref=e2297]
+        - link "1" [ref=e2320]
+      - cell "Edit Add product More actions for Assorted" [ref=e2298]
+        - link "Edit" [ref=e2321]
+        - link "Add product" [ref=e2322]
+        - button "More actions for Assorted" [ref=e2323]
+          - StaticText "More"
+    - row
+      - cell "Audit Test Kush Hybrid" [ref=e2299]
+        - StaticText "Audit Test Kush"
+        - StaticText "Hybrid"
+      - cell "-" [ref=e2300]
+      - cell "1" [ref=e2301]
+        - link "1" [ref=e2324]
+      - cell "0" [ref=e2302]
+        - link "0" [ref=e2325]
+      - cell "Edit Add product More actions for Audit Test Kush" [ref=e2303]
+        - link "Edit" [ref=e2326]
+        - link "Add product" [ref=e2327]
+        - button "More actions for Audit Test Kush" [ref=e2328]
+          - StaticText "More"
+    - row
+      - cell "Purple Haze" [ref=e2304]
+        - StaticText "Purple Haze"
+      - cell "-" [ref=e2305]
+      - cell "0" [ref=e2306]
+        - link "0" [ref=e2329]
+      - cell "1" [ref=e2307]
+        - link "1" [ref=e2330]
+      - cell "Edit Add product More actions for Purple Haze" [ref=e2308]
+        - link "Edit" [ref=e2331]
+        - link "Add product" [ref=e2332]
+        - button "More actions for Purple Haze" [ref=e2333]
+          - StaticText "More"
+    - row
+      - cell "Silver Haze" [ref=e2309]
+        - StaticText "Silver Haze"
+      - cell "-" [ref=e2310]
+      - cell "0" [ref=e2311]
+        - link "0" [ref=e2334]
+      - cell "1" [ref=e2312]
+        - link "1" [ref=e2335]
+      - cell "Edit Add product More actions for Silver Haze" [ref=e2313]
+        - link "Edit" [ref=e2336]
+        - link "Add product" [ref=e2337]
+        - button "More actions for Silver Haze" [ref=e2338]
+          - StaticText "More"
+- region "Notifications alt+T" [ref=e2260]
+- alert

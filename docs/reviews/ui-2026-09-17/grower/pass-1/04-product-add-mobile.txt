@@ -1,0 +1,184 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e383]
+- button "Notifications" [expanded=false, ref=e384]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e385]
+- main
+  - sectionheader
+    - paragraph
+      - StaticText "PRODUCTS / NEW PRODUCT"
+    - heading "Add a product" [level=1, ref=e387]
+    - paragraph
+      - StaticText "Create a new cannabis product listing"
+  - form
+    - paragraph
+      - StaticText "GUIDED LISTING SETUP"
+    - generic
+      - StaticText "1"
+      - StaticText "Basics"
+    - generic
+      - StaticText "2"
+      - StaticText "Pricing"
+    - generic
+      - StaticText "3"
+      - StaticText "Inventory"
+    - generic
+      - StaticText "4"
+      - StaticText "Profile"
+    - generic
+      - StaticText "5"
+      - StaticText "Images"
+    - paragraph
+      - StaticText "Fill the core listing first. Optional profile, lab, and image details stay grouped so mobile setup stays easier to scan."
+    - paragraph
+      - StaticText "Smart defaults"
+    - paragraph
+      - StaticText "Reuse your last product type, unit, price, and pricing visibility."
+    - button "Use starter defaults" [ref=e388]
+    - paragraph
+      - StaticText "STEP 1"
+    - heading "Basics" [level=3, ref=e389]
+    - paragraph
+      - StaticText "Name the product and connect it to strain and batch context when available."
+    - LabelText
+      - StaticText "Product Name *"
+    - textbox "Product Name *" [ref=e390]
+    - LabelText
+      - StaticText "Product Type *"
+    - combobox "Product Type *" [expanded=false, ref=e391]: Select a product type
+      - MenuListPopup
+        - option "Select a product type" [selected, ref=e411]
+        - option "Bulk Extract" [ref=e412]
+        - option "Cartridge" [ref=e413]
+        - option "Edibles" [ref=e414]
+        - option "Beverages" [ref=e415]
+        - option "Flower" [ref=e416]
+        - option "Live Plant" [ref=e417]
+        - option "Plant Material" [ref=e418]
+        - option "Prepack" [ref=e419]
+        - option "Preroll" [ref=e420]
+        - option "Tincture" [ref=e421]
+        - option "Topicals & Wellness" [ref=e422]
+    - LabelText
+      - StaticText "Sub Type"
+    - textbox "Select a product type first" [disabled, ref=e392]
+    - LabelText
+      - StaticText "Strain"
+    - combobox [expanded=false, ref=e393]: Select a strain (optional)
+      - MenuListPopup
+        - option "Select a strain (optional)" [selected, ref=e423]
+        - option "Assorted" [ref=e424]
+        - option "Audit Test Kush • Hybrid" [ref=e425]
+        - option "Purple Haze" [ref=e426]
+        - option "Silver Haze" [ref=e427]
+    - button "+ New" [ref=e394]
+    - paragraph
+      - StaticText "Link to a strain for better inventory tracking"
+    - LabelText
+      - StaticText "Batch"
+    - StaticText "Pick a strain to attach a batch"
+    - paragraph
+      - StaticText "Batches become available after a strain is selected."
+    - paragraph
+      - StaticText "STEP 2"
+    - heading "Pricing" [level=3, ref=e395]
+    - paragraph
+      - StaticText "Set the buyer-facing unit price or require a pricing request."
+    - LabelText
+      - StaticText "Price ($) *"
+    - spinbutton "Price ($) *" [ref=e396]
+    - LabelText
+      - StaticText "Unit *"
+    - combobox "Unit *" [expanded=false, ref=e397]: Gram
+      - MenuListPopup
+        - option "Select a unit" [ref=e428]
+        - option "Gram" [selected, ref=e429]
+        - option "Half Ounce" [ref=e430]
+        - option "Ounce" [ref=e431]
+        - option "Eighth" [ref=e432]
+        - option "Quarter" [ref=e433]
+        - option "Unit" [ref=e434]
+        - option "Pack" [ref=e435]
+        - option "Each" [ref=e436]
+        - option "Lb" [ref=e437]
+    - LabelText
+      - StaticText "Pricing Display"
+    - paragraph
+      - StaticText "Choose whether dispensaries see your price or must request pricing via message."
+    - button "Show Price Display public product price" [ref=e398]
+      - StaticText "Show Price"
+      - StaticText "Display public product price"
+    - button "Request Pricing Hide price and require inquiry" [ref=e399]
+      - StaticText "Request Pricing"
+      - StaticText "Hide price and require inquiry"
+    - paragraph
+      - StaticText "STEP 3"
+    - heading "Inventory and status" [level=3, ref=e400]
+    - paragraph
+      - StaticText "Add the starting quantity and decide whether this listing is available now."
+    - LabelText
+      - StaticText "Initial Inventory Quantity *"
+    - spinbutton "Initial Inventory Quantity *" [ref=e401]: 0
+      - StaticText "0"
+    - LabelText
+      - StaticText "SKU"
+    - textbox "SKU" [ref=e402]
+    - LabelText
+      - StaticText "Brand"
+    - textbox "Brand" [ref=e403]: Vermont Nurseries
+      - StaticText "Vermont Nurseries"
+    - LabelText
+      - StaticText "Availability Status"
+    - paragraph
+      - StaticText "Make product available for buyer requests"
+    - button "Mark product unavailable" [ref=e404]
+    - group
+      - DisclosureTriangle "STEPS 4 AND 5 Optional profile, compliance, and images Add cannabinoids, harvest details, descriptions, and product imagery when needed. Optional" [expanded=false]
+        - paragraph
+          - StaticText "STEPS 4 AND 5"
+        - heading "Optional profile, compliance, and images" [level=3, ref=e438]
+        - paragraph
+          - StaticText "Add cannabinoids, harvest details, descriptions, and product imagery when needed."
+        - StaticText "Optional"
+    - complementary
+      - paragraph
+        - StaticText "SAVE SUMMARY"
+      - heading "Review before saving" [level=3, ref=e407]
+      - StaticText "Available"
+      - paragraph
+        - StaticText "Listing"
+      - paragraph
+        - StaticText "Unnamed product"
+      - paragraph
+        - StaticText "Type"
+      - paragraph
+        - StaticText "Not selected"
+      - paragraph
+        - StaticText "Price"
+      - paragraph
+        - StaticText "Not priced"
+      - paragraph
+        - StaticText "Inventory"
+      - paragraph
+        - StaticText "0 Gram"
+      - paragraph
+        - StaticText "Visibility"
+      - paragraph
+        - StaticText "Available · price visible"
+      - button "Create Product" [ref=e408]
+      - button "Save Draft" [ref=e409]
+      - paragraph
+        - StaticText "Creates a hidden draft listing. Browser autosave stays on this device until you create or save the product."
+      - button "Cancel" [ref=e410]
+  - generic
+    - paragraph
+      - StaticText "Browser autosave stays on this device."
+    - button "Cancel" [ref=e405]
+    - button "Publish product" [ref=e406]
+- button "Open messages" [ref=e386]
+- region "Notifications alt+T" [ref=e382]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e439]
+  - image
+- alert

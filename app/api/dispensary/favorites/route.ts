@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma } from "@prisma/client";
+import { buyerProductSelect, serializeBuyerProduct, normalizeProductIds, buyerProductWhere } from "@/lib/buyer-products";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth-helpers";
 
@@ -16,20 +16,6 @@ async function requireDispensary() {
   }
 
   return { user };
-}
-
-function normalizeProductIds(value: unknown) {
-  if (!Array.isArray(value)) return [];
-  return Array.from(new Set(value.map((id) => String(id || "").trim()).filter(Boolean))).slice(0, 200);
-}
-
-function isMissingFavoritesTableError(error: unknown) {
-  if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2021") {
-    return String(error.meta?.table ?? error.message).includes("dispensary_favorite_products");
-  }
-
-  const message = error instanceof Error ? error.message : String(error);
-  return message.includes("dispensary_favorite_products") && message.toLowerCase().includes("does not exist");
 }
 
 export async function GET() {
@@ -49,20 +35,12 @@ export async function GET() {
 
     return NextResponse.json({ productIds: favorites.map((favorite) => favorite.productId) });
   } catch (error) {
-    if (isMissingFavoritesTableError(error)) {
-      console.warn("Favorite products table is not available; falling back to browser-saved favorites.");
-      return NextResponse.json({ productIds: [] });
-    }
-
     console.error("Error loading favorite products:", error);
     return NextResponse.json({ error: "Failed to load favorite products" }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest) {
-  const body = await req.json().catch(() => ({}));
-  const productIds = normalizeProductIds(body.productIds);
-
   try {
     const auth = await requireDispensary();
     if ("error" in auth) return auth.error;
@@ -71,10 +49,14 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    const body = await req.json().catch(() => null);
+    if (!body || !Array.isArray(body.productIds)) return NextResponse.json({ error: 'Provide productIds.' }, { status: 400 });
+    const productIds = normalizeProductIds(body.productIds);
+
     const existingProducts = await db.product.findMany({
       where: {
         id: { in: productIds },
-        isDeleted: false,
+        ...buyerProductWhere(),
       },
       select: { id: true },
     });
@@ -82,25 +64,13 @@ export async function PUT(req: NextRequest) {
 
     await db.$transaction([
       db.dispensaryFavoriteProduct.deleteMany({
-        where: { dispensaryId },
+        where: { dispensaryId, productId: { notIn: existingProductIds } },
       }),
-      ...existingProductIds.map((productId) =>
-        db.dispensaryFavoriteProduct.create({
-          data: {
-            dispensaryId,
-            productId,
-          },
-        })
-      ),
+      db.dispensaryFavoriteProduct.createMany({ data: existingProductIds.map(productId => ({ dispensaryId, productId })), skipDuplicates: true }),
     ]);
 
     return NextResponse.json({ productIds: existingProductIds });
   } catch (error) {
-    if (isMissingFavoritesTableError(error)) {
-      console.warn("Favorite products table is not available; keeping favorites browser-local.");
-      return NextResponse.json({ productIds });
-    }
-
     console.error("Error saving favorite products:", error);
     return NextResponse.json({ error: "Failed to save favorite products" }, { status: 500 });
   }
@@ -122,73 +92,11 @@ export async function POST(req: NextRequest) {
     const products = await db.product.findMany({
       where: {
         id: { in: productIds },
-        isAvailable: true,
-        isDeleted: false,
-        inventoryQty: { gt: 0 },
+        ...buyerProductWhere(),
       },
-      include: {
-        grower: {
-          select: {
-            id: true,
-            businessName: true,
-            city: true,
-            state: true,
-            isVerified: true,
-          },
-        },
-        strain: {
-          select: {
-            id: true,
-            name: true,
-            genetics: true,
-          },
-        },
-        batch: {
-          select: {
-            thc: true,
-            cbd: true,
-          },
-        },
-      },
+      select: buyerProductSelect,
     });
-
-    // Transform to match the Product interface
-    const formattedProducts = products.map(product => {
-      const strainName = product.strain?.name || product.strainLegacy || '';
-      const genetics = product.strain?.genetics || '';
-      // Infer strain type from strain name or genetics
-      const strainType = genetics.toLowerCase().includes('indica') ? 'Indica' :
-                        genetics.toLowerCase().includes('sativa') ? 'Sativa' :
-                        genetics.toLowerCase().includes('hybrid') ? 'Hybrid' :
-                        strainName.toLowerCase().includes('indica') ? 'Indica' :
-                        strainName.toLowerCase().includes('sativa') ? 'Sativa' :
-                        strainName.toLowerCase().includes('hybrid') ? 'Hybrid' : null;
-      
-      return {
-        id: product.id,
-        name: product.name,
-        price: parseFloat(String(product.price)),
-        isPriceVisible: product.isPriceVisible,
-        strain: strainName || null,
-        strainId: product.strainId,
-        strainType,
-        productType: product.productType,
-        subType: product.subType,
-        unit: product.unit,
-        thc: product.batch?.thc ?? product.thcLegacy ?? null,
-        cbd: product.batch?.cbd ?? product.cbdLegacy ?? null,
-        images: product.images || [],
-        inventoryQty: product.inventoryQty,
-        grower: {
-          id: product.grower.id,
-          businessName: product.grower.businessName,
-          location: product.grower.city && product.grower.state 
-            ? `${product.grower.city}, ${product.grower.state}`
-            : product.grower.city || product.grower.state || null,
-          isVerified: product.grower.isVerified,
-        },
-      };
-    });
+    const formattedProducts = products.map(serializeBuyerProduct);
 
     return NextResponse.json({ products: formattedProducts });
   } catch (error) {
@@ -198,4 +106,20 @@ export async function POST(req: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function PATCH(req: NextRequest) {
+  const auth = await requireDispensary();
+  if ('error' in auth) return auth.error;
+  const dispensaryId = auth.user.dispensaryId!;
+  const body = await req.json().catch(() => null);
+  if (!body || !Array.isArray(body.added) || !Array.isArray(body.removed)) return NextResponse.json({ error: 'Provide added and removed IDs.' }, { status: 400 });
+  const added = normalizeProductIds(body.added);
+  const removed = normalizeProductIds(body.removed);
+  const products = await db.product.findMany({ where: { id: { in: added }, ...buyerProductWhere() }, select: { id: true } });
+  await db.$transaction([
+    db.dispensaryFavoriteProduct.deleteMany({ where: { dispensaryId, productId: { in: removed } } }),
+    db.dispensaryFavoriteProduct.createMany({ data: products.map(product => ({ dispensaryId, productId: product.id })), skipDuplicates: true }),
+  ]);
+  return NextResponse.json({ ok: true });
 }

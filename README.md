@@ -88,17 +88,10 @@ npm run prisma:migrate
 
 ### 4. Seed Test Data
 
-Visit the seed endpoint after starting the dev server:
+Run the development seed script directly:
 
 ```bash
-npm run dev
-# Then open: http://localhost:3000/seed
-```
-
-Or run the seed script directly:
-
-```bash
-npx ts-node seed-demo-users.ts
+npx tsx scripts/seed-demo-users.ts
 ```
 
 ### 5. Start Development Server
@@ -181,7 +174,7 @@ phenofarm-mvp/
 | Model | Description |
 |-------|-------------|
 | `User` | Base user with role (ADMIN, GROWER, DISPENSARY) |
-| `Grower` | Cultivators/sellers. Stripe Connect for payouts |
+| `Grower` | Cultivators/sellers with PhenoFarm subscription state |
 | `Dispensary` | Retail buyers |
 | `Strain` | Cannabis genetics/lineage |
 | `Batch` | Harvest batch with lab results (THC, CBD, terpenes) |
@@ -192,21 +185,13 @@ phenofarm-mvp/
 |-------|-------------|
 | `Product` | Sellable items linked to batch/strain |
 | `ProductTypeConfig` | Flexible product categorization |
-| `Cart` / `CartItem` | Dispensary shopping cart |
+| Browser request draft | Dispensary request draft, stored locally until submission |
 
-### Orders & Payments
-
-| Model | Description |
-|-------|-------------|
-| `Order` / `OrderItem` | Purchase orders between grower ↔ dispensary |
-| `Payment` | Payment records (Cash, Credit, Transfer) |
-
-### Supporting
+### Orders
 
 | Model | Description |
 |-------|-------------|
-| `Session` | NextAuth sessions |
-| `MetrcSyncLog` | Compliance tracking |
+| `Order` / `OrderItem` | Wholesale request records between grower and dispensary; settlement stays direct |
 
 ---
 
@@ -306,8 +291,6 @@ npm run prisma:generate
 
 ## Documentation
 
-- `BUILD_SUMMARY_DASHBOARD.md` - Dashboard feature overview
-- `MVP_PAGE_2_COMPLETE.md` - Page 2 implementation details
 - See `/docs/` for additional documentation
 
 ---

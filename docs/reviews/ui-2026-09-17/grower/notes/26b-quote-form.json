@@ -1,0 +1,37 @@
+{
+  "slug": "26b-quote-form",
+  "route": "/grower/dashboard",
+  "state": "Quote form expanded in existing conversation",
+  "pass1": {
+    "inspected": [
+      "pass-1/26b-quote-form-desktop.png",
+      "pass-1/26b-quote-form-mobile.png"
+    ],
+    "strengths": [
+      "Quote inputs are compact and stay next to the conversation; cancellation is explicit."
+    ],
+    "issues": [
+      {
+        "key": "quote-form-context",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "The quote form uses only placeholders\u2014\u2018Quote unit price\u2019, \u2018Qty (optional)\u2019, \u2018Quote terms note (optional)\u2019\u2014with no visible currency/unit or product context. It sits above the still-visible message composer and two other pricing controls.",
+        "recommendation": "Give the form a \u2018Quote\u2019 heading and persistent labels \u2018Unit price ($/unit)\u2019, \u2018Qty\u2019, \u2018Terms\u2019; show the product/unit being quoted or require a product choice if necessary. While quoting, replace the normal composer/actions with this form to avoid competing send controls."
+      }
+    ],
+    "limits": [
+      "Expanded form only; no quote fields entered, pricing request made, or quote sent. This fixture conversation has no visible product context; recommendation is based on that state."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/26b-quote-form-desktop.png",
+      "pass-2/26b-quote-form-mobile.png"
+    ],
+    "notes": "Reopened quote form at both widths again shows placeholder-only unit-price and quantity fields, no visible currency/unit or product context for this general conversation, and two competing send surfaces. Persistent field labels and an explicit product/unit context would be clearer. No quote values or message were entered or submitted.",
+    "confirmedIssueKeys": [
+      "quote-form-context"
+    ],
+    "newIssues": []
+  }
+}

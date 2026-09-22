@@ -1,0 +1,52 @@
+{
+  "slug": "04-product-add",
+  "route": "/grower/products/add",
+  "pass1": {
+    "inspected": [
+      "pass-1/04-product-add-desktop.png",
+      "pass-1/04-product-add-mobile.png"
+    ],
+    "strengths": [
+      "Required basics are separated from optional profile details; desktop review panel keeps summary near save controls."
+    ],
+    "issues": [
+      {
+        "key": "product-form-guidance",
+        "priority": "high",
+        "viewport": "mobile",
+        "observation": "Title/subtitle, five-step setup block and its paragraph, defaults panel, then Step 1 description consume nearly the first mobile screen before editing. Each later section also explains its heading; default form totals3223px.",
+        "recommendation": "Use \u2018Add product\u2019; replace setup block with compact section links \u2018Basics \u00b7 Pricing \u00b7 Stock \u00b7 Details\u2019. Put reusable defaults beside the Type field. Remove instructions such as \u2018so mobile setup stays easier to scan\u2019, \u2018Name the product\u2026\u2019 and \u2018Add the starting quantity\u2026\u2019."
+      },
+      {
+        "key": "product-form-save-duplication",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Mobile has sticky \u2018Publish product\u2019 plus bottom \u2018Create Product\u2019, separate Cancel buttons, a five-card save summary, and repeated browser-autosave text; primary labels disagree for the same action. Desktop draft helper is a narrow five-line paragraph.",
+        "recommendation": "Use one action label \u2018Publish product\u2019 across widths. Keep draft as a secondary action, show a compact one- or two-line review summary and one \u2018Draft saved on this device\u2019 note; avoid repeating the full footer behind the sticky action bar."
+      },
+      {
+        "key": "product-form-label-length",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "\u2018Initial Inventory Quantity\u2019, \u2018Availability Status\u2019, and nested \u2018Pricing Display\u2019 repeat context already supplied by their sections; price visibility options each include near-synonymous helper copy.",
+        "recommendation": "Use \u2018Starting stock\u2019, \u2018Available\u2019, and \u2018Show price / Quote only\u2019, with a single explanation \u2018Quote-only listings hide the price\u2019. Shorten \u2018Optional profile, compliance, and images\u2019 to \u2018More details & photos\u2019."
+      }
+    ],
+    "limits": [
+      "No values changed and no save/publish/draft action used."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/04-product-add-desktop.png",
+      "pass-2/04-product-add-mobile.png"
+    ],
+    "notes": "Fresh second pass confirms the same3223px mobile form, duplicated summaries/actions and Publish/Create naming mismatch. Keep optional details collapsed by default but remove the guide paragraphs; no extra issue found.",
+    "confirmedIssueKeys": [
+      "product-form-guidance",
+      "product-form-save-duplication",
+      "product-form-label-length"
+    ],
+    "newIssues": []
+  }
+}

@@ -1,0 +1,39 @@
+- main
+  - generic
+    - generic
+    - link "PF PhenoFarm" [ref=e569]
+      - StaticText "PF"
+      - StaticText "PhenoFarm"
+    - generic
+      - paragraph
+        - StaticText "LICENSED MARKETPLACE OPERATIONS"
+      - heading "Wholesale workflows, without payment confusion." [level=1, ref=e570]
+      - paragraph
+        - StaticText "Manage catalog listings, buyer requests, order status, and subscription access. Settlement stays direct."
+      - StaticText "Direct grower to dispensary requests"
+      - StaticText "Friendly order status tracking"
+      - StaticText "Cultivator subscription billing only"
+    - paragraph
+      - StaticText "Need access help?"
+      - link "support@phenofarm.com" [ref=e571]
+  - heading "Sign in to your account" [level=2, ref=e568]
+  - paragraph
+    - StaticText "Or"
+    - link "create a new account" [ref=e572]
+  - form
+    - LabelText
+      - StaticText "Email address"
+    - textbox "Email address" [required, ref=e573]
+    - LabelText
+      - StaticText "Password"
+    - generic
+      - textbox "Password" [required, ref=e575]
+      - button "Show password" [ref=e576]
+    - group
+      - DisclosureTriangle "Need password help?" [expanded=false]
+    - button "Sign in" [ref=e574]
+  - group
+    - DisclosureTriangle "Demo access" [expanded=false]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e577]
+  - image
+- alert

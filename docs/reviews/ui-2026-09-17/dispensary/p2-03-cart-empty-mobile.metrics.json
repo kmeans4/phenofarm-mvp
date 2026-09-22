@@ -1,0 +1,272 @@
+{
+  "controls": [
+    {
+      "font": "16px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Search",
+      "width": 46,
+      "x": 232,
+      "y": 12
+    },
+    {
+      "font": "16px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "18",
+      "width": 40,
+      "x": 286,
+      "y": 12
+    },
+    {
+      "font": "16px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Open Dispensary Portal navigation menu",
+      "width": 40,
+      "x": 334,
+      "y": 12
+    },
+    {
+      "font": "12px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Add",
+      "width": 66,
+      "x": 262,
+      "y": 532
+    },
+    {
+      "font": "12px",
+      "height": 40,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Add",
+      "width": 66,
+      "x": 262,
+      "y": 655
+    },
+    {
+      "font": "14px",
+      "height": 40,
+      "href": "/dispensary/catalog",
+      "lineHeight": "20px",
+      "role": null,
+      "tag": "A",
+      "text": "Browse products",
+      "width": 292,
+      "x": 49,
+      "y": 752
+    },
+    {
+      "font": "14px",
+      "height": 40,
+      "href": "/dispensary/saved",
+      "lineHeight": "20px",
+      "role": null,
+      "tag": "A",
+      "text": "Open saved workspace",
+      "width": 292,
+      "x": 49,
+      "y": 800
+    },
+    {
+      "font": "16px",
+      "height": 44,
+      "href": null,
+      "lineHeight": "24px",
+      "role": null,
+      "tag": "BUTTON",
+      "text": "Open messages",
+      "width": 44,
+      "x": 334,
+      "y": 788
+    }
+  ],
+  "document": {
+    "height": 969,
+    "width": 390
+  },
+  "headings": [
+    {
+      "font": "32px",
+      "height": 32,
+      "href": null,
+      "lineHeight": "32px",
+      "role": null,
+      "tag": "H1",
+      "text": "Request draft",
+      "width": 358,
+      "x": 16,
+      "y": 121
+    },
+    {
+      "font": "20px",
+      "height": 28,
+      "href": null,
+      "lineHeight": "28px",
+      "role": null,
+      "tag": "H2",
+      "text": "Start a request from the catalog",
+      "width": 292,
+      "x": 49,
+      "y": 335
+    },
+    {
+      "font": "14px",
+      "height": 20,
+      "href": null,
+      "lineHeight": "20px",
+      "role": null,
+      "tag": "H3",
+      "text": "Quick add suggestions",
+      "width": 292,
+      "x": 49,
+      "y": 455
+    }
+  ],
+  "overflow": [],
+  "smallText": [
+    {
+      "font": "10px",
+      "height": 15,
+      "href": null,
+      "lineHeight": "15px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "DISPENSARY",
+      "width": 94,
+      "x": 66,
+      "y": 36
+    },
+    {
+      "font": "11px",
+      "height": 17,
+      "href": null,
+      "lineHeight": "16.5px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "18",
+      "width": 20,
+      "x": 305,
+      "y": 24
+    },
+    {
+      "font": "11px",
+      "height": 17,
+      "href": null,
+      "lineHeight": "16.5px",
+      "role": null,
+      "tag": "P",
+      "text": "WHOLESALE REQUEST",
+      "width": 358,
+      "x": 16,
+      "y": 96
+    },
+    {
+      "font": "12px",
+      "height": 32,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "P",
+      "text": "Based on your saved products and recent request history.",
+      "width": 292,
+      "x": 49,
+      "y": 475
+    },
+    {
+      "font": "11px",
+      "height": 21,
+      "href": null,
+      "lineHeight": "16.5px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "Favorite",
+      "width": 56,
+      "x": 62,
+      "y": 560
+    },
+    {
+      "font": "12px",
+      "height": 16,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "P",
+      "text": "Vermont Nurseries",
+      "width": 188,
+      "x": 62,
+      "y": 585
+    },
+    {
+      "font": "12px",
+      "height": 16,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "P",
+      "text": "Quote only · 25 available",
+      "width": 188,
+      "x": 62,
+      "y": 605
+    },
+    {
+      "font": "11px",
+      "height": 21,
+      "href": null,
+      "lineHeight": "16.5px",
+      "role": null,
+      "tag": "SPAN",
+      "text": "Recent",
+      "width": 50,
+      "x": 200,
+      "y": 655
+    },
+    {
+      "font": "12px",
+      "height": 16,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "P",
+      "text": "Vermont Nurseries",
+      "width": 188,
+      "x": 62,
+      "y": 679
+    },
+    {
+      "font": "12px",
+      "height": 16,
+      "href": null,
+      "lineHeight": "16px",
+      "role": null,
+      "tag": "P",
+      "text": "$25.00/gram · 240 available",
+      "width": 188,
+      "x": 62,
+      "y": 699
+    }
+  ],
+  "text": "P\nPhenoFarm\nDISPENSARY\n18\n\nWHOLESALE REQUEST\n\nRequest draft\n\nBuild a wholesale request for growers to review. PhenoFarm does not collect wholesale payment.\n\n+\nStart a request from the catalog\n\nAdd products first, then confirm logistics and direct payment terms in one review step. No wholesale payment is collected in PhenoFarm.\n\nQuick add suggestions\n\nBased on your saved products and recent request history.\n\nMystery Pricing Batch\n\nFavorite\n\nVermont Nurseries\n\nQuote only · 25 available\n\nAdd\n\nPurple Haze Flowers\n\nRecent\n\nVermont Nurseries\n\n$25.00/gram · 240 available\n\nAdd\nBrowse products\nOpen saved workspace",
+  "title": "PhenoFarm - B2B Cannabis Marketplace",
+  "url": "http://localhost:3144/dispensary/cart",
+  "viewport": {
+    "height": 844,
+    "width": 390
+  }
+}

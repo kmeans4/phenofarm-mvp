@@ -1,0 +1,76 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e2938]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2939]
+    - StaticText "Notifications"
+    - StaticText "17"
+  - navigation "Portal navigation" [ref=e2940]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2943]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2944]
+      - StaticText "Catalog"
+    - link "Products" [ref=e2945]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2946]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2947]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2948]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2949]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2950]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2951]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2952]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2941]
+- main
+  - sectionheader
+    - heading "Edit strain" [level=1, ref=e2953]
+  - form
+    - LabelText
+      - StaticText "Name *"
+    - combobox "Name *" [required, ref=e2954]: Audit Test Kush
+      - StaticText "Audit Test Kush"
+    - LabelText
+      - StaticText "Type *"
+    - combobox "Type *" [expanded=false, ref=e2955]: Hybrid
+      - MenuListPopup
+        - option "Select strain type" [ref=e2962]
+        - option "Indica" [ref=e2963]
+        - option "Sativa" [ref=e2964]
+        - option "Hybrid" [selected, ref=e2965]
+        - option "Sativa Dom. Hybrid" [ref=e2966]
+        - option "Indica Dom. Hybrid" [ref=e2967]
+    - group
+      - DisclosureTriangle "About strain types" [expanded=false]
+        - StaticText "About strain types"
+    - LabelText
+      - StaticText "Genetics"
+    - textbox "Genetics" [ref=e2956]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e2957]
+    - LabelText
+      - StaticText "Growing notes"
+    - textbox "Growing notes" [ref=e2958]
+    - button "Save Changes" [ref=e2959]
+    - button "Cancel" [ref=e2960]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2961]
+  - button "Open messages" [ref=e2942]
+- region "Notifications alt+T" [ref=e2937]
+- alert

@@ -1,0 +1,193 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e1172]
+- button "Notifications" [expanded=false, ref=e1173]
+  - StaticText "16"
+- button "Open Grower navigation menu" [expanded=false, ref=e1174]
+- main
+  - link "Products" [ref=e1175]
+    - image
+    - StaticText "Products"
+  - sectionheader
+    - heading "Edit product" [level=1, ref=e1177]
+  - form
+    - navigation "Product sections" [ref=e1178]
+      - link "Basics" [ref=e1181]
+      - link "Pricing" [ref=e1182]
+      - link "Stock" [ref=e1183]
+      - link "Details" [ref=e1184]
+    - generic
+      - heading "Basics" [level=3, ref=e1185]
+      - LabelText
+        - StaticText "Name *"
+      - textbox "Name *" [ref=e1186]: Purple Haze Flowers
+        - StaticText "Purple Haze Flowers"
+      - LabelText
+        - StaticText "Product Type *"
+      - combobox "Product Type *" [expanded=false, ref=e1187]: Flower
+        - MenuListPopup
+          - option "Select a product type" [ref=e1215]
+          - option "Bulk Extract" [ref=e1216]
+          - option "Cartridge" [ref=e1217]
+          - option "Edibles" [ref=e1218]
+          - option "Beverages" [ref=e1219]
+          - option "Flower" [selected, ref=e1220]
+          - option "Live Plant" [ref=e1221]
+          - option "Plant Material" [ref=e1222]
+          - option "Prepack" [ref=e1223]
+          - option "Preroll" [ref=e1224]
+          - option "Tincture" [ref=e1225]
+          - option "Topicals & Wellness" [ref=e1226]
+      - LabelText
+        - StaticText "Sub Type"
+      - combobox "Sub Type" [expanded=false, ref=e1188]: Indoor
+        - MenuListPopup
+          - option "Select a sub type" [ref=e1227]
+          - option "Indoor" [selected, ref=e1228]
+          - option "A Bud" [ref=e1229]
+          - option "B Bud" [ref=e1230]
+          - option "C Bud" [ref=e1231]
+          - option "Infused Flower" [ref=e1232]
+          - option "Popcorn" [ref=e1233]
+          - option "Other (custom)" [ref=e1234]
+      - LabelText
+        - StaticText "Strain"
+      - combobox [expanded=false, ref=e1189]: Purple Haze
+        - MenuListPopup
+          - option "Select a strain (optional)" [ref=e1235]
+          - option "Assorted" [ref=e1236]
+          - option "Audit Test Kush • Hybrid" [ref=e1237]
+          - option "Purple Haze" [selected, ref=e1238]
+          - option "Silver Haze" [ref=e1239]
+      - button "+ New" [ref=e1190]
+      - LabelText
+        - StaticText "Batch"
+      - combobox [expanded=false, ref=e1191]: Select a batch (optional)
+        - MenuListPopup
+          - option "Select a batch (optional)" [disabled, ref=e1240]
+      - button "+ New" [ref=e1192]
+      - StaticText "No batches for this strain."
+    - generic
+      - heading "Pricing" [level=3, ref=e1193]
+      - LabelText
+        - StaticText "Price ($) *"
+      - spinbutton "Price ($) *" [ref=e1194]: 25
+        - StaticText "25"
+      - LabelText
+        - StaticText "Unit *"
+      - combobox "Unit *" [expanded=false, ref=e1195]: Gram
+        - MenuListPopup
+          - option "Select a unit" [ref=e1241]
+          - option "Gram" [selected, ref=e1242]
+          - option "Half Ounce" [ref=e1243]
+          - option "Ounce" [ref=e1244]
+          - option "Eighth" [ref=e1245]
+          - option "Quarter" [ref=e1246]
+          - option "Unit" [ref=e1247]
+          - option "Pack" [ref=e1248]
+          - option "Each" [ref=e1249]
+          - option "Lb" [ref=e1250]
+      - LabelText
+        - StaticText "Price visibility"
+      - paragraph
+        - StaticText "Quote-only listings hide the price."
+      - button "Show price" [ref=e1196]
+        - StaticText "Show price"
+      - button "Quote only" [ref=e1197]
+        - StaticText "Quote only"
+    - generic
+      - heading "Stock" [level=3, ref=e1198]
+      - LabelText
+        - StaticText "Stock *"
+      - spinbutton "Stock *" [ref=e1199]: 240
+        - StaticText "240"
+      - LabelText
+        - StaticText "SKU"
+      - textbox "SKU" [ref=e1200]
+      - LabelText
+        - StaticText "Brand"
+      - textbox "Brand" [ref=e1201]
+      - LabelText
+        - StaticText "Available"
+      - paragraph
+        - StaticText "Buyers can request this product"
+      - button "Mark product unavailable" [ref=e1202]
+    - group
+      - DisclosureTriangle "More details & photos Cannabinoids, harvest date, description and photos. Optional" [expanded=true]
+        - heading "More details & photos" [level=3, ref=e1210]
+        - paragraph
+          - StaticText "Cannabinoids, harvest date, description and photos."
+        - StaticText "Optional"
+      - heading "Cannabinoids" [level=3, ref=e1203]
+      - LabelText
+        - StaticText "THC Min (%)"
+      - spinbutton "THC Min (%)" [ref=e1204]: 22
+        - StaticText "22"
+      - LabelText
+        - StaticText "THC Max (%)"
+      - spinbutton "THC Max (%)" [ref=e1205]: 22
+        - StaticText "22"
+      - LabelText
+        - StaticText "CBD Min (%)"
+      - spinbutton "CBD Min (%)" [ref=e1206]: 0.5
+        - StaticText "0.5"
+      - LabelText
+        - StaticText "CBD Max (%)"
+      - spinbutton "CBD Max (%)" [ref=e1207]: 0.5
+        - StaticText "0.5"
+      - LabelText
+        - StaticText "Harvest Date"
+      - Date "Harvest Date"
+        - generic
+          - spinbutton "Month Month" [ref=e1251]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e1252]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e1253]: 0
+            - StaticText "yyyy"
+        - button "Show date picker" [ref=e1211]
+      - LabelText
+        - StaticText "Description"
+      - textbox "Description" [ref=e1208]: Indica-dominant hybrid with notes of grape and spice
+        - StaticText "Indica-dominant hybrid with notes of grape and spice"
+      - paragraph
+        - StaticText "52/2000 characters"
+      - generic
+        - LabelText
+          - StaticText "Product Images"
+        - paragraph
+          - StaticText "Up to 2 photos · JPG, PNG, WebP · 1MB each"
+        - button "Choose Files" [ref=e1212]: No file chosen
+        - image "Product image preview 1"
+        - button "Remove" [ref=e1213]
+        - paragraph
+          - StaticText "1/2 image slots used."
+    - complementary
+      - heading "Summary" [level=3, ref=e1209]
+      - StaticText "Available"
+      - DescriptionList
+        - term "Listing"
+        - definition
+          - StaticText "Purple Haze Flowers"
+        - term "Type"
+        - definition
+          - StaticText "Flower"
+        - term "Price"
+        - definition
+          - StaticText "$25/g"
+        - term "Stock"
+        - definition
+          - StaticText "240 g"
+        - term "Visibility"
+        - definition
+          - StaticText "Available · price visible"
+  - button "Cancel" [ref=e1179]
+  - button "Save changes" [ref=e1180]
+- button "Open messages" [ref=e1176]
+- region "Notifications alt+T" [ref=e1171]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1214]
+  - image
+- alert

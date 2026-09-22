@@ -1,0 +1,75 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e2297]
+- button "Notifications" [expanded=false, ref=e2298]
+  - StaticText "16"
+- button "Open Grower navigation menu" [expanded=false, ref=e2299]
+- main
+  - sectionheader
+    - heading "Customers" [level=1, ref=e2303]
+    - paragraph
+      - StaticText "Saved contacts and buyers"
+    - link "Add customer" [ref=e2304]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Customers"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "Active · 90 days"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "Requests"
+    - paragraph
+      - StaticText "20"
+  - link "View Green Vermont Dispensary" [ref=e2300]
+    - paragraph
+      - StaticText "Green Vermont Dispensary"
+    - paragraph
+      - StaticText "License: VT-RTL-2024-001"
+    - paragraph
+      - StaticText "Email:dispensary@greenvermont.com"
+    - paragraph
+      - StaticText "Phone:(802) 555-0145"
+    - paragraph
+      - StaticText "Location:Burlington, VT"
+    - paragraph
+      - StaticText "Last request:Jul 9, 2026"
+    - paragraph
+      - StaticText "Delivered value:$0.00"
+    - StaticText "PhenoFarm member"
+    - StaticText "19"
+    - StaticText " request"
+    - StaticText "s"
+    - link "Details" [ref=e2305]
+    - link "Statement" [ref=e2306]
+    - link "Requests" [ref=e2307]
+    - button "Message" [ref=e2308]
+  - link "View Maple Street Market" [ref=e2301]
+    - paragraph
+      - StaticText "Maple Street Market"
+    - paragraph
+      - StaticText "License: VT-UI-2026-104"
+    - paragraph
+      - StaticText "Alex Morgan"
+    - paragraph
+      - StaticText "Email:orders@example.test"
+    - paragraph
+      - StaticText "Phone:802-555-0142"
+    - paragraph
+      - StaticText "Location:Burlington, VT"
+    - paragraph
+      - StaticText "Last request:Sep 13, 2026"
+    - paragraph
+      - StaticText "Delivered value:$450.00"
+    - StaticText "1"
+    - StaticText " request"
+    - link "Edit contact" [ref=e2309]
+    - link "Statement" [ref=e2310]
+    - link "Requests" [ref=e2311]
+    - button "Message" [ref=e2312]
+- button "Open messages" [ref=e2302]
+- region "Notifications alt+T" [ref=e2296]
+- alert

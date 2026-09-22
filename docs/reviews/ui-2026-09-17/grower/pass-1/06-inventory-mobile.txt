@@ -1,0 +1,110 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e701]
+- button "Notifications" [expanded=false, ref=e702]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e703]
+- main
+  - sectionheader
+    - heading "Inventory" [level=1, ref=e718]
+    - paragraph
+      - StaticText "Adjust product stock inline, review low inventory, and jump into full product edits."
+    - link "+ Add Product" [ref=e719]
+    - link "Update Stock" [ref=e720]
+  - paragraph
+    - StaticText "Total Products"
+  - paragraph
+    - StaticText "3"
+  - paragraph
+    - StaticText "Total Value"
+  - paragraph
+    - StaticText "$10000.00"
+  - paragraph
+    - StaticText "Estimated stock value"
+  - image "List price times on-hand stock, including quote-only products"
+  - paragraph
+    - StaticText "Low Stock"
+  - paragraph
+    - StaticText "0"
+  - heading "Product Inventory" [level=2, ref=e704]
+  - paragraph
+    - StaticText "Adjust on-hand stock inline. Changes save as absolute quantities."
+  - generic "Inventory filters"
+    - button "All 3" [ref=e721]
+      - StaticText "All"
+      - StaticText "3"
+    - button "Low stock 0" [ref=e722]
+      - StaticText "Low stock"
+      - StaticText "0"
+    - button "Out of stock 0" [ref=e723]
+      - StaticText "Out of stock"
+      - StaticText "0"
+    - button "Unavailable 0" [ref=e724]
+      - StaticText "Unavailable"
+      - StaticText "0"
+  - StaticText "Mystery Pricing Batch"
+  - StaticText "Assorted"
+  - StaticText "Available"
+  - paragraph
+    - StaticText "Type"
+  - paragraph
+    - StaticText "Flower - Greenhouse"
+  - paragraph
+    - StaticText "Price"
+  - paragraph
+    - StaticText "$40.00/eighth"
+  - paragraph
+    - StaticText "Inventory"
+  - button "Decrease stock for Mystery Pricing Batch" [ref=e705]
+  - spinbutton "Stock quantity for Mystery Pricing Batch" [ref=e706]: 25
+    - StaticText "25"
+  - button "Increase stock for Mystery Pricing Batch" [ref=e707]
+  - paragraph
+    - StaticText "25eighths"
+  - link "Edit product" [ref=e708]
+  - StaticText "Silver Haze Concentrate"
+  - StaticText "Silver Haze"
+  - StaticText "Available"
+  - paragraph
+    - StaticText "Type"
+  - paragraph
+    - StaticText "Concentrate - Live Resin"
+  - paragraph
+    - StaticText "Price"
+  - paragraph
+    - StaticText "$60.00/gram"
+  - paragraph
+    - StaticText "Inventory"
+  - button "Decrease stock for Silver Haze Concentrate" [ref=e709]
+  - spinbutton "Stock quantity for Silver Haze Concentrate" [ref=e710]: 50
+    - StaticText "50"
+  - button "Increase stock for Silver Haze Concentrate" [ref=e711]
+  - paragraph
+    - StaticText "50grams"
+  - link "Edit product" [ref=e712]
+  - StaticText "Purple Haze Flowers"
+  - StaticText "Purple Haze"
+  - StaticText "Available"
+  - paragraph
+    - StaticText "Type"
+  - paragraph
+    - StaticText "Flower - Indoor"
+  - paragraph
+    - StaticText "Price"
+  - paragraph
+    - StaticText "$25.00/gram"
+  - paragraph
+    - StaticText "Inventory"
+  - button "Decrease stock for Purple Haze Flowers" [ref=e713]
+  - spinbutton "Stock quantity for Purple Haze Flowers" [ref=e714]: 240
+    - StaticText "240"
+  - button "Increase stock for Purple Haze Flowers" [ref=e715]
+  - paragraph
+    - StaticText "240grams"
+  - link "Edit product" [ref=e716]
+- button "Open messages" [ref=e717]
+- region "Notifications alt+T" [ref=e700]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e725]
+  - image
+- alert

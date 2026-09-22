@@ -1,0 +1,56 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e1927] clickable [onclick]
+  - button "Open messages" [ref=e1931]
+- button "Search" [ref=e1928]
+- button "Notifications" [expanded=false, ref=e1929]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e1930]
+- main
+  - sectionheader
+    - heading "Add strain" [level=1, ref=e1932]
+  - form
+    - LabelText
+      - StaticText "Name *"
+    - combobox "Name *" [required, ref=e1933]
+    - LabelText
+      - StaticText "Type *"
+    - combobox "Type *" [expanded=false, ref=e1934]: Select strain type
+      - MenuListPopup
+        - option "Select strain type" [selected, ref=e1940]
+        - option "Indica" [ref=e1941]
+        - option "Sativa" [ref=e1942]
+        - option "Hybrid" [ref=e1943]
+        - option "Sativa Dom. Hybrid" [ref=e1944]
+        - option "Indica Dom. Hybrid" [ref=e1945]
+    - group
+      - DisclosureTriangle "About strain types" [expanded=true]
+        - StaticText "About strain types"
+      - paragraph
+        - StaticText "Indica"
+        - StaticText " — Generally selected for indica-leaning genetics and buyer expectations."
+      - paragraph
+        - StaticText "Sativa"
+        - StaticText " — Generally selected for sativa-leaning genetics and buyer expectations."
+      - paragraph
+        - StaticText "Hybrid"
+        - StaticText " — Balanced hybrid genetics without a strong indica or sativa lean."
+      - paragraph
+        - StaticText "Sativa Dom. Hybrid"
+        - StaticText " — Hybrid genetics that lean sativa in growth traits or buyer positioning."
+      - paragraph
+        - StaticText "Indica Dom. Hybrid"
+        - StaticText " — Hybrid genetics that lean indica in growth traits or buyer positioning."
+    - LabelText
+      - StaticText "Genetics"
+    - textbox "Genetics" [ref=e1935]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e1936]
+    - LabelText
+      - StaticText "Growing notes"
+    - textbox "Growing notes" [ref=e1937]
+    - button "Add strain" [disabled, ref=e1938]
+    - button "Cancel" [ref=e1939]
+- region "Notifications alt+T" [ref=e1926]
+- alert

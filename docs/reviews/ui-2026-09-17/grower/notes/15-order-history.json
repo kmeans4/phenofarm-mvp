@@ -1,0 +1,47 @@
+{
+  "slug": "15-order-history",
+  "route": "/grower/orders/history",
+  "pass1": {
+    "inspected": [
+      "pass-1/15-order-history-desktop.png",
+      "pass-1/15-order-history-mobile.png"
+    ],
+    "strengths": [
+      "Delivered/cancelled separation is explicit and the desktop history table is concise."
+    ],
+    "issues": [
+      {
+        "key": "history-mobile-table",
+        "priority": "high",
+        "viewport": "mobile",
+        "observation": "The history table clips estimated value, status and View actions to the right; long request IDs wrap to three/four lines and outweigh buyer/date. A user cannot inspect a request from the visible mobile columns.",
+        "recommendation": "Use mobile history rows with customer, shortened reference, closed date, value and status plus a visible open action. Preserve complete references in the detail page or copy control."
+      },
+      {
+        "key": "history-summary-density",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "Four full-width metrics occupy about490px; the two-row history list begins near y930. ‘Historical Requests’, ‘Delivered & Cancelled Requests’ and filter counts repeat the same summary.",
+        "recommendation": "Use ‘History’ with a compact ‘2 requests ·1 delivered ·1 cancelled’ summary and delivered value beside it. Shorten navigation to ‘Active requests’; remove the second long list heading."
+      }
+    ],
+    "limits": [
+      "No request opened from table or status changed; current records are local fixture history."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/15-order-history-desktop.png",
+      "pass-2/15-order-history-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed nearly 500px of stacked mobile metrics and long wrapped IDs; value, status and actions remain offscreen. Sparse desktop space is record density, not a defect.",
+    "confirmedIssueKeys": [
+      "history-mobile-table",
+      "history-summary-density"
+    ],
+    "newIssues": [],
+    "source": "root-pass2-notes.md"
+  }
+}

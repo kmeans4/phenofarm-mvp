@@ -1,0 +1,93 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e260]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e261]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e262]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e265]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e266]
+      - StaticText "Catalog"
+    - link "Products" [ref=e267]
+      - StaticText "Products"
+    - link "Inventory" [ref=e268]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e269]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e270]
+      - StaticText "Strains"
+    - link "Batches" [ref=e271]
+      - StaticText "Batches"
+    - link "Customers" [ref=e272]
+      - StaticText "Customers"
+    - link "Reports" [ref=e273]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e274]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e263]
+- main
+  - sectionheader
+    - heading "Plans" [level=1, ref=e275]
+    - paragraph
+      - StaticText "Software subscriptions only. Wholesale settlement stays directly between businesses."
+  - generic
+    - StaticText "Current plan: "
+    - strong
+      - StaticText "Free"
+  - paragraph
+    - StaticText "Paid upgrades are unavailable. "
+    - link "Contact support" [ref=e276]
+    - StaticText "."
+  - heading "Free" [level=2, ref=e277]
+  - StaticText "Current plan"
+  - paragraph
+    - StaticText "Evaluate the marketplace workflow before enabling paid plans."
+  - paragraph
+    - StaticText "$0"
+  - paragraph
+    - StaticText "/mo"
+  - group
+    - DisclosureTriangle "Plan features" [expanded=false]
+      - StaticText "Plan features"
+  - StaticText "Selected subscription plan"
+  - StaticText "Most popular"
+  - heading "Pro" [level=2, ref=e278]
+  - paragraph
+    - StaticText "Cultivator subscription for active wholesale teams."
+  - paragraph
+    - StaticText "$249"
+  - paragraph
+    - StaticText "/mo ($199/mo billed annually)"
+  - group
+    - DisclosureTriangle "Plan features" [expanded=false]
+      - StaticText "Plan features"
+  - paragraph
+    - StaticText "Checkout unavailable"
+  - heading "Business" [level=2, ref=e279]
+  - paragraph
+    - StaticText "For multi-license operations that need deeper integrations."
+  - paragraph
+    - StaticText "Custom"
+  - group
+    - DisclosureTriangle "Plan features" [expanded=false]
+      - StaticText "Plan features"
+  - link "Contact sales" [ref=e281]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e280]
+  - button "Open messages" [ref=e264]
+- region "Notifications alt+T" [ref=e259]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e282]
+  - image
+- alert

@@ -1,5 +1,4 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import EditOrderForm from './components/EditOrderForm';
@@ -8,13 +7,11 @@ async function fetchOrder(id: string, growerId: string) {
   const order = await db.order.findUnique({
     where: { id, growerId },
     include: {
-      dispensary: true,
+      dispensary: { select: { id: true, businessName: true, phone: true, address: true, city: true, state: true, zip: true, isOffPlatform: true } },
       items: {
         include: {
           product: {
-            include: {
-              strain: { select: { id: true, name: true } }
-            }
+            select: { id: true, name: true, unit: true, inventoryQty: true, strain: { select: { name: true } } }
           },
         },
       },
@@ -24,22 +21,33 @@ async function fetchOrder(id: string, growerId: string) {
   if (!order) return null;
   
   return {
-    ...order,
+    id: order.id,
+    orderId: order.orderId,
+    status: order.status,
     totalAmount: Number(order.totalAmount),
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
     shippingFee: Number(order.shippingFee),
+    notes: order.notes,
+    dispensary: {
+      businessName: order.dispensary.businessName,
+      phone: order.dispensary.phone,
+      address: order.dispensary.address,
+      city: order.dispensary.city,
+      state: order.dispensary.state,
+    },
     items: order.items.map((item) => ({
-      ...item,
+      id: item.id,
+      productId: item.productId,
+      quantity: item.quantity,
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
+      maxQuantity: item.quantity + Number(item.product.inventoryQty || 0),
       product: {
-        ...item.product,
-        // Use strain relation or legacy field
-        strain: item.product.strain?.name || item.product.strainLegacy,
-        // Use new schema fields
-        productType: item.product.productType,
-        subType: item.product.subType,
+        id: item.product.id,
+        name: item.product.name,
+        unit: item.product.unit,
+        strain: item.product.strain?.name || null,
       },
     })),
   };
@@ -55,7 +63,7 @@ interface PageProps {
 }
 
 export default async function EditOrderPage({ params }: PageProps) {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   if (!session) {
     redirect('/auth/sign_in');
@@ -63,7 +71,7 @@ export default async function EditOrderPage({ params }: PageProps) {
 
   const user = session.user as ExtendedUser;
 
-  if (user.role !== 'GROWER') {
+  if (user.role !== 'GROWER' || !user.growerId) {
     redirect('/dashboard');
   }
 

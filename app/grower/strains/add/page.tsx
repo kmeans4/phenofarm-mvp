@@ -1,11 +1,20 @@
 'use client';
 
+import { safeInternalPath } from '@/app/components/ui/safeNavigation';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { Card, CardContent } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { PageHeader } from '@/app/components/ui/PageHeader';
 import { toast } from '@/app/hooks/useToast';
-import { STRAIN_TYPES, STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
+import {
+  COMMON_STRAIN_NAMES,
+  STRAIN_TYPES,
+  STRAIN_TYPE_DESCRIPTIONS,
+  STRAIN_TYPE_FULL_LABELS,
+  STRAIN_TYPE_LABELS,
+  StrainTypeValue,
+} from '@/lib/strain-types';
 
 interface StrainFormData {
   name: string;
@@ -18,7 +27,7 @@ interface StrainFormData {
 export default function AddStrainPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const returnUrl = searchParams?.get('returnUrl');
+  const returnUrl = safeInternalPath(searchParams?.get('returnUrl'), '');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<StrainFormData>({
@@ -66,14 +75,14 @@ export default function AddStrainPage() {
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         throw new Error(data.error || 'Failed to create strain');
       }
 
       const newStrain = await response.json();
       toast.success('Strain created');
       if (returnUrl) {
-        sessionStorage.setItem('newlyCreatedStrainId', newStrain.id || '');
+        try { sessionStorage.setItem('newlyCreatedStrainId', newStrain.id || ''); } catch { /* Storage is optional. */ }
         router.push(returnUrl);
       } else {
         router.push('/grower/strains');
@@ -86,11 +95,8 @@ export default function AddStrainPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto space-y-5 sm:space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Add New Strain</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-1">Create a new cannabis genetics entry</p>
-      </div>
+    <div className="w-full max-w-2xl mx-auto space-y-3 sm:space-y-6">
+      <PageHeader title="Add strain" />
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -99,59 +105,73 @@ export default function AddStrainPage() {
       )}
 
       <Card>
-        <CardHeader>
-          <CardTitle>Strain Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
+        <CardContent className="pt-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Strain Name *
+                Name *
               </label>
               <input
                 id="name"
                 type="text"
+                list="common-strain-names"
                 required
                 value={formData.name}
                 onChange={(e) => handleChange('name', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="e.g., Blueberries NF, OG Kush, Sour Diesel"
+                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="e.g., OG Kush"
               />
+              <datalist id="common-strain-names">
+                {COMMON_STRAIN_NAMES.map((name) => (
+                  <option key={name} value={name} />
+                ))}
+              </datalist>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="strainType" className="block text-sm font-medium text-gray-700">
-                Strain Type *
+                Type *
               </label>
               <select
                 id="strainType"
                 required
                 value={formData.strainType}
                 onChange={(e) => handleChange('strainType', e.target.value as StrainTypeValue)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
               >
                 <option value="">Select strain type</option>
                 {STRAIN_TYPES.map((type) => (
                   <option key={type} value={type}>{STRAIN_TYPE_LABELS[type]}</option>
                 ))}
               </select>
+              <details className="text-xs text-gray-600"><summary className="min-h-10 cursor-pointer py-2.5 text-sm text-green-700">About strain types</summary><div className="mt-2 grid gap-2 rounded-lg bg-gray-50 p-3 sm:grid-cols-2">
+                {STRAIN_TYPES.map((type) => (
+                  <p key={type}>
+                    <span className="font-semibold text-gray-700" title={STRAIN_TYPE_FULL_LABELS[type]}>
+                      {STRAIN_TYPE_LABELS[type]}
+                    </span>
+                    <span className="text-gray-400"> — </span>
+                    {STRAIN_TYPE_DESCRIPTIONS[type]}
+                  </p>
+                ))}
+              </div></details>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="genetics" className="block text-sm font-medium text-gray-700">
-                Genetics / Lineage
+                Genetics
               </label>
               <input
                 id="genetics"
                 type="text"
                 value={formData.genetics}
                 onChange={(e) => handleChange('genetics', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="e.g., Blueberries x Nevada, Chemdawg x Diesel"
+                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="e.g., Chemdawg × Diesel"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description
               </label>
@@ -160,33 +180,33 @@ export default function AddStrainPage() {
                 rows={3}
                 value={formData.description}
                 onChange={(e) => handleChange('description', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="General description of the strain..."
+                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Aroma, flavor and effects"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="growerNotes" className="block text-sm font-medium text-gray-700">
-                Grower Notes
+                Growing notes
               </label>
               <textarea
                 id="growerNotes"
-                rows={4}
+                rows={3}
                 value={formData.growerNotes}
                 onChange={(e) => handleChange('growerNotes', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Notes about growing characteristics, flavor profile, effects, etc."
+                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Cultivation observations, yields and conditions"
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-              <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={!canSubmit}>
-                {loading ? 'Creating...' : 'Create Strain'}
+            <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+              <Button type="submit" variant="primary" className="flex-1 sm:flex-none" disabled={!canSubmit}>
+                {loading ? 'Creating...' : 'Add strain'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                className="w-full sm:w-auto"
+                className="flex-1 sm:flex-none"
                 onClick={() => router.push('/grower/strains')}
                 disabled={loading}
               >

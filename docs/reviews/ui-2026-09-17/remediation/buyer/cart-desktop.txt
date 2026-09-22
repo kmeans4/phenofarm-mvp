@@ -1,0 +1,101 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e415]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e416]
+    - StaticText "Notifications"
+    - StaticText "18"
+  - navigation "Portal navigation" [ref=e417]
+    - link "Dashboard" [ref=e422]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e423]
+      - StaticText "Catalog"
+    - link "Request Draft 2" [ref=e424]
+      - StaticText "Request Draft"
+      - StaticText "2"
+    - link "Orders 17" [ref=e425]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e426]
+      - StaticText "Saved"
+    - link "Settings" [ref=e427]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e418]
+- main
+  - sectionheader
+    - heading "Request draft" [level=1, ref=e428]
+  - navigation "Draft sections" [ref=e419]
+    - button "Items" [ref=e429]
+    - button "Logistics" [ref=e430]
+    - button "Terms" [ref=e431]
+  - button "Use standard terms" [ref=e420]
+  - generic
+    - paragraph
+      - StaticText "Purple Haze Flowers"
+    - paragraph
+      - StaticText "Vermont Nurseries • $25/Gram"
+    - button "Decrease quantity for Purple Haze Flowers" [ref=e432]
+      - StaticText "-"
+    - spinbutton "Quantity for Purple Haze Flowers" [ref=e433]: 2
+      - StaticText "2"
+    - button "Increase quantity for Purple Haze Flowers" [ref=e434]
+      - StaticText "+"
+    - paragraph
+      - StaticText "$50.00"
+    - button "Remove Purple Haze Flowers from draft" [ref=e435]
+    - heading "Logistics" [level=3, ref=e439]
+    - LabelText
+      - StaticText "Fulfillment method"
+    - combobox "Fulfillment method" [expanded=false, ref=e440]: Flexible
+      - MenuListPopup
+        - option "Flexible" [selected, ref=e450]
+        - option "Pickup" [ref=e451]
+        - option "Delivery requested" [ref=e452]
+        - option "Coordinate with grower" [ref=e453]
+    - LabelText
+      - StaticText "Requested window (optional)"
+    - textbox "Requested window (optional)" [ref=e441]
+    - paragraph
+      - StaticText "0/120"
+    - heading "Terms and Notes" [level=3, ref=e442]
+    - LabelText
+      - StaticText "Payment terms"
+    - combobox "Payment terms" [expanded=false, ref=e443]: Handled directly
+      - MenuListPopup
+        - option "Handled directly" [selected, ref=e454]
+        - option "Net 15" [ref=e455]
+        - option "Net 30" [ref=e456]
+        - option "ACH" [ref=e457]
+        - option "Check" [ref=e458]
+        - option "COD" [ref=e459]
+    - paragraph
+      - StaticText "Arrange payment directly with the grower."
+    - LabelText
+      - StaticText "Notes (optional)"
+    - button "Pickup" [ref=e444]
+    - button "Delivery" [ref=e445]
+    - button "Substitutions" [ref=e446]
+    - button "Payment terms" [ref=e447]
+    - textbox "Notes (optional)" [ref=e448]
+    - paragraph
+      - StaticText "0/500"
+    - heading "Request Summary" [level=3, ref=e436]
+    - StaticText "Total"
+    - StaticText "$"
+    - StaticText "50.00"
+    - paragraph
+      - StaticText "1 item · 1 grower"
+    - button "Review Request" [ref=e437]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e438]
+  - button "Open messages" [ref=e421]
+- region "Notifications alt+T" [ref=e414]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e449]
+  - image
+- alert

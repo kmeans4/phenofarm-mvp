@@ -1,9 +1,26 @@
 'use client';
 
-import React from 'react';
+import type React from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Badge } from '@/app/components/ui/Badge';
+import {
+  BarChart3,
+  Boxes,
+  Building2,
+  CreditCard,
+  Gauge,
+  LayoutGrid,
+  Leaf,
+  Package,
+  Settings,
+  ShoppingBag,
+  ShoppingCart,
+  SlidersHorizontal,
+  Sprout,
+  Users,
+  type LucideIcon,
+} from 'lucide-react';
 
 interface NavLink {
   name: string;
@@ -13,8 +30,35 @@ interface NavLink {
   badgeComponent?: React.ReactNode;
 }
 
+const iconBySegment: Record<string, LucideIcon> = {
+  dashboard: Gauge,
+  catalog: LayoutGrid,
+  marketplace: ShoppingBag,
+  products: Package,
+  inventory: Boxes,
+  orders: ShoppingCart,
+  reports: BarChart3,
+  strains: Leaf,
+  batches: Sprout,
+  customers: Users,
+  pricing: CreditCard,
+  settings: Settings,
+  users: Users,
+  growers: Sprout,
+  dispensaries: Building2,
+  admin: SlidersHorizontal,
+  saved: Leaf,
+  cart: ShoppingCart,
+};
+
+function getLinkIcon(href: string): LucideIcon {
+  const segment = href.split('/').filter(Boolean).pop() || 'dashboard';
+  return iconBySegment[segment] || LayoutGrid;
+}
+
 export function ClientNav({ links }: { links: NavLink[] }) {
   const pathname = usePathname() || '';
+  const hasGroups = links.length > 7 && links.some((link) => Boolean(link.group));
   
   const isActive = (href: string): boolean => {
     // Handle both grower and dispensary paths
@@ -25,35 +69,41 @@ export function ClientNav({ links }: { links: NavLink[] }) {
   };
 
   return (
-    <nav className="px-3 py-2 md:px-2 md:py-3 lg:px-4 lg:py-3 space-y-1">
+    <nav className="space-y-1 px-3 py-3" aria-label="Portal navigation">
       {links.map((link, index) => {
         const active = isActive(link.href);
-        const group = link.group || 'Main';
-        const previousGroup = links[index - 1]?.group || 'Main';
-        const showGroup = group !== previousGroup;
+        const Icon = getLinkIcon(link.href);
+        const previousGroup = links[index - 1]?.group;
+        const showGroup = hasGroups && link.group && link.group !== previousGroup;
         return (
-          <React.Fragment key={link.href}>
-            {showGroup && (
-              <div className="px-3 pb-1 pt-3 first:pt-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
-                {group}
+          <div key={link.href}>
+            {showGroup ? (
+              <div className="font-metadata px-3 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5f7562] first:pt-0">
+                {link.group}
               </div>
-            )}
+            ) : null}
             <Link
               href={link.href}
-              className={`flex items-center justify-between px-3 py-2.5 md:px-3 md:py-2.5 lg:px-4 lg:py-2.5 rounded-lg transition-colors text-sm ${
+              aria-current={active ? 'page' : undefined}
+              className={`flex min-h-9 items-center justify-between rounded-[9px] px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6fd08a] ${
                 active
-                  ? 'bg-green-100 text-green-700 font-medium border-l-4 border-green-600'
-                  : 'text-gray-700 hover:bg-green-50 hover:text-green-600'
+                  ? 'bg-[#294c39] font-semibold text-[#f2f5ee] shadow-[inset_3px_0_0_#6fd08a]'
+                  : 'text-[#a9bcad] hover:bg-white/[0.06] hover:text-[#f2f5ee]'
               }`}
             >
-              <span>{link.name}</span>
+              <span className="flex min-w-0 items-center gap-3">
+                <Icon className="h-[17px] w-[17px] shrink-0" strokeWidth={1.8} />
+                <span className="truncate">{link.name}</span>
+              </span>
               {(link.badge && link.badge > 0) ? (
-                <Badge variant="warning" className="ml-2">{link.badge}</Badge>
+                <Badge variant="warning" className="ml-2 shrink-0 border-0 bg-[#e0c07a] px-2 py-0 text-[10px] text-[#3a2c08]">
+                  {link.badge}
+                </Badge>
               ) : link.badgeComponent ? (
-                <span className="ml-2">{link.badgeComponent}</span>
+                <span className="ml-2 shrink-0">{link.badgeComponent}</span>
               ) : null}
             </Link>
-          </React.Fragment>
+          </div>
         );
       })}
     </nav>

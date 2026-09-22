@@ -1,0 +1,590 @@
+[
+  {
+    "id": "M-B01",
+    "routes": [
+      "/dispensary/dashboard",
+      "/dispensary/catalog",
+      "/dispensary/orders",
+      "/dispensary/saved"
+    ],
+    "title": "Stacked buyer headings consumed the first screen",
+    "before": "Repeated introductory text and full-width catalog actions pushed useful information downward.",
+    "change": "Removed redundant introduction text, used compact inline actions on short headings, and kept the business-name dashboard heading readable.",
+    "files": [
+      "app/dispensary/dashboard/page.tsx",
+      "app/dispensary/catalog/CatalogContent.tsx",
+      "app/dispensary/orders/page.tsx",
+      "app/dispensary/saved/SavedContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/dashboard-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/catalog-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/orders-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/saved-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_dashboard-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_catalog-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_saved-360.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Inspected all affected base pages at360/390/430/1440; compact headers and actions fit."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B02",
+    "routes": [
+      "/dispensary/dashboard",
+      "/dispensary/orders"
+    ],
+    "title": "Request cards repeated a separate date row",
+    "before": "Each request used three rows and large outer gaps, reducing visible history.",
+    "change": "Placed abbreviated date with the request number, kept year visible, allowed long grower names to wrap, and tightened rows and Recent requests header.",
+    "files": [
+      "app/dispensary/components/OrdersTable.tsx",
+      "app/dispensary/dashboard/page.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/dashboard-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/orders-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_dashboard-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/orders-filtered-360.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Inspected both request lists at four widths and filtered Cancelled status on360: one matching result."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B03",
+    "routes": [
+      "/dispensary/catalog",
+      "/dispensary/grower/[id]",
+      "/dispensary/saved"
+    ],
+    "title": "Catalog cards and quantity controls were too tall",
+    "before": "Full-width product images and separate quantity/Add rows repeated vertically on every product.",
+    "change": "Used phone thumbnails beside identity, compact fact badges, and quantity/Add on one row. Kept 40px stepper targets and 16px numeric inputs; retained full accessible Add label.",
+    "files": [
+      "app/dispensary/catalog/CatalogContent.tsx",
+      "app/dispensary/catalog/components/AddToCartButton.tsx",
+      "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/catalog-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/shop-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_catalog-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_grower__id_-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/cart-filled-plain-360.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Final catalog quantity increased, manually entered4, and Add produced7 from the existing3; cart manually edited back to3.",
+        "Parent sixth-case layout suite passed; no quantity/Add clipping."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B04",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "title": "Catalog controls clipped labels and nested padding narrowed products",
+    "before": "The default grouping label clipped in the phone select; grower sections nested large padding around narrow cards.",
+    "change": "Shortened sort labels, kept select text at 16px on phones, reduced mobile group/card inset, and shortened Shop action.",
+    "files": [
+      "app/dispensary/catalog/CatalogContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/catalog-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/catalog-list-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_catalog-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/catalog-filter-applied-360.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Desktop comparison caught flex-child whitespace loss in View Shop; explicit responsive margin added and linted.",
+        "Catalog filters open/apply/dismiss checked at360\u00d7640; sort/view controls and final four-width base pages inspected."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B05",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "title": "Comparison actions displaced the attributes being compared",
+    "before": "Repeated product-action rows appeared before the attribute matrix and the unit warning used two lines with large padding.",
+    "change": "Moved full-width action rows after the attribute matrix, shortened the warning, and tightened matrix spacing while preserving scroll and separate accessible action rows.",
+    "files": [
+      "app/dispensary/catalog/CatalogContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/compare-360-viewport.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/compare-360-viewport.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/compare-actions-360-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Three-product compare inspected at360\u00d7800; all eight attribute rows visible before actions; below-fold Add/message controls reachable; Escape dismissed."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B06",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "title": "Price-alert and saved-filter dialogs nested padding twice",
+    "before": "The target-price dialog had large inner padding inside shared Modal padding, narrowing the input and adding empty vertical space. The saved-filter dialog used the same nested wrapper.",
+    "change": "Removed nested panel padding, compacted footer spacing, and clarified the price-check helper.",
+    "files": [
+      "app/dispensary/catalog/CatalogContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/price-alert-360-viewport.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/price-alert-360-viewport.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/save-filter-360-viewport.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/mobile-save-filter-360-short-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Price-alert after-state inspected; Save Filter inspected at360\u00d7640 after a fresh draft Flower selection and at desktop then resized."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B07",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "title": "Message templates wrapped into extra rows",
+    "before": "A Templates heading and long chips used multiple lines before the message field.",
+    "change": "Used Pricing, Availability, and Intro labels in one wrapping row with 40px targets; retained full accessible template names and existing message text.",
+    "files": [
+      "app/dispensary/catalog/CatalogContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/catalog-message-360-viewport.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/catalog-message-360-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Compact Pricing/Availability/Intro chips and composer inspected on360; no message submitted."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B08",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "title": "Empty draft suggestions repeated category and pricing labels",
+    "before": "Favorite/Recent pills and Quote only metadata repeated information around a clear Request pricing action; navigation buttons stacked.",
+    "change": "Simplified Suggested products, removed repeated pills, abbreviated units, shortened copy, and placed navigation actions together.",
+    "files": [
+      "app/dispensary/cart/page.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/cart-empty-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_cart-360.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Empty cart suggested products and both navigation actions inspected at360/390/430/1440."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B09",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "title": "Filled draft items used oversized image and separate spacious controls",
+    "before": "80px images and wide gaps inflated each item; small quantity targets were difficult on phones.",
+    "change": "Used 56px phone thumbnails, compact identity/unit text, and an aligned quantity/total/remove row with 40px targets and 16px input.",
+    "files": [
+      "app/dispensary/cart/page.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/cart-filled-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/cart-filled-plain-360.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Final local cart plus/minus and typed quantity preserved the3\u00d7$25=$75 total; item and controls fit360."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B10",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "title": "Draft forms and templates consumed unnecessary vertical space",
+    "before": "Standard terms had a separate row, four note-template chips wrapped, long placeholder copy filled the textarea, and Review appeared twice on phones.",
+    "change": "Placed defaults under a Templates menu, used a note-template select, shortened field copy, tightened section spacing, and kept one mobile Review action with the desktop/tablet summary action intact.",
+    "files": [
+      "app/dispensary/cart/page.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/cart-filled-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/cart-filled-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/cart-note-template-360-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Templates menu opened and standard terms applied locally; Pickup note template populated its textarea; section navigation and lower summary remained reachable."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B11",
+    "routes": [
+      "/dispensary/cart"
+    ],
+    "title": "Request review summary was unnecessarily tall",
+    "before": "Four summary cells used large outer padding and long labels; stock-check notice added more height.",
+    "change": "Compacted cell insets, used Growers and Terms labels, and shortened notice spacing. Preserved 40px Edit targets and fixed footer.",
+    "files": [
+      "app/dispensary/cart/page.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/cart-review-360-viewport.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/cart-review-360-short-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Final360\u00d7640 Review shows both Back and Submit request entirely inside the viewport; returned with Back without submitting."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B12",
+    "routes": [
+      "/dispensary/saved"
+    ],
+    "title": "Favorites sort and grid wasted scarce phone space",
+    "before": "Recently Added was clipped and grid images took 160px before product details.",
+    "change": "Used Newest and short Price/THC sort labels, contained complete images in 80px phone panels, reduced mobile card inset, and kept 40px actions.",
+    "files": [
+      "app/dispensary/favorites/FavoritesContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/saved-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/saved-grid-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/favorites-grid-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/favorites-sort-list-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_saved-360.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Grid/list, Price:high sort, More/Clear confirmation and dismiss, and Recent tab inspected on360; final base pages checked at four widths."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B13",
+    "routes": [
+      "/dispensary/saved?tab=alerts"
+    ],
+    "title": "Price-alert image stood alone above the item",
+    "before": "A separate image row made one active alert about 350px tall.",
+    "change": "Placed a 56px thumbnail beside product identity, retained paired Current/Target cards, and aligned alert actions at the edge.",
+    "files": [
+      "app/dispensary/price-alerts/PriceAlertsContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/alerts-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/alerts-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/alerts-triggered-empty-360.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Alerts card and triggered-only empty state inspected on360; current/target values, target editor and More controls reachable."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B14",
+    "routes": [
+      "/dispensary/grower/[id]"
+    ],
+    "title": "Grower shop repeated tall product presentation",
+    "before": "Full-width image bands and stacked quantity controls made three products extend beyond 2200px; inline filter panel was spacious. With an active type filter, the phone sort dropdown narrowed and clipped long Price/THC direction labels.",
+    "change": "Used compact mobile product identity, shared inline quantity/Add controls, smaller filter inset with 40px chips, and a four-row message composer. Shortened Newest, Price, and THC sort labels while retaining their values and sort behavior.",
+    "files": [
+      "app/dispensary/grower/[id]/GrowerShopContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/shop-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/shop-filters-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/shop-list-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/shop-sort-active-clipping-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_grower__id_-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/shop-message-360-viewport.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/shop-filters-list-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/shop-sort-filter-360-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Fresh stable-build active-filter view exposed sort-label clipping; five label-only changes applied and scoped ESLint passed.",
+        "Final shop Flower filter returned2 products in list view; pricing composer opened and cancelled without submission.",
+        "Final rebuilt360px active-filter/list view inspected: Price: high and both selected-filter chips display fully; all actions remain inside cards."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B15",
+    "routes": [
+      "/dispensary/orders/[id]"
+    ],
+    "title": "Order details stacked facts and large gaps",
+    "before": "Timeline/history and request-details blocks used extra space between sections; every request detail occupied its own row.",
+    "change": "Tightened section gaps, kept 40px timeline/history disclosure targets, reduced mobile totals inset, and used two columns for request details.",
+    "files": [
+      "app/dispensary/orders/[id]/page.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/detail-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/detail-expanded-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_orders__id_-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/detail-expanded-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/withdraw-360-viewport.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/detail-lower-360-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Timeline/history and withdraw-confirmation states inspected; final lower items,total,terms and buyer action controls visible at360."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B16",
+    "routes": [
+      "/dispensary/settings"
+    ],
+    "title": "Settings helper and account section repeated unnecessary space",
+    "before": "Address helper wrapped with unnecessary details; Account label and Sign out stacked. Shared logo controls also needed mobile treatment.",
+    "change": "Shortened the address helper, normalized field labels, and aligned account controls. Root owns compact shared LogoUpload and header fixes.",
+    "files": [
+      "app/dispensary/settings/components/SettingsForm.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/settings-360.png"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_dispensary_settings-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/settings-lower-360-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Scoped ESLint passed",
+        "Reviewed task-only diff against pre-edit source copy",
+        "Final description field focused without editing; lower logo controls, Account/Sign out and fixed Save button visible together at360."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B17",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "title": "Mobile filter trigger reported the wrong expanded state",
+    "before": "The phone filter sheet was visible, but the trigger read expanded=false and retained inactive styling because it only tracked the desktop sidebar state.",
+    "change": "Both aria-expanded and active styling now reflect either open filter surface.",
+    "files": [
+      "app/dispensary/catalog/CatalogContent.tsx"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/filter-expanded-mismatch-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/filter-expanded-mismatch-360.txt"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/filters-360-short-viewport.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/filters-360-short.txt",
+        "docs/reviews/mobile-2026-09-17/buyer/after/saved-presets-360-short-viewport.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/saved-presets-360-short.txt"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Fresh open-sheet snapshot confirmed trigger expanded=false",
+        "Scoped ESLint passed after one-line state-expression correction",
+        "Final open sheet trigger reports expanded=true, closed reportsfalse; desktop/phone transitions close hidden surface and release body scrolling."
+      ],
+      "limitations": []
+    }
+  },
+  {
+    "id": "M-B18",
+    "routes": [
+      "/dispensary/catalog"
+    ],
+    "title": "Saved filter controls were missing from the mobile filter sheet",
+    "before": "Save Current Filter and saved presets existed only in the desktop sidebar. Phone users could adjust filters but could not save, apply, or delete a saved preset. Crossing the desktop breakpoint also left the hidden filter surface marked open.",
+    "change": "Added saved presets with the existing apply/delete callbacks to a collapsible section, and paired Save filter with Apply filters in the fixed footer. Save uses current sheet selections before opening the existing name dialog. The hidden filter surface closes at the desktop breakpoint.",
+    "files": [
+      "app/dispensary/catalog/CatalogContent.tsx",
+      "app/dispensary/catalog/components/MobileFilterSheet.tsx",
+      "tests/buyer-ui-layout-regressions.spec.ts"
+    ],
+    "evidence": {
+      "before": [
+        "docs/reviews/mobile-2026-09-17/buyer/before/saved-filters-unavailable-360.png",
+        "docs/reviews/mobile-2026-09-17/buyer/before/saved-filters-unavailable-360.txt",
+        "docs/reviews/mobile-2026-09-17/buyer/before/source/CatalogContent.tsx.txt",
+        "docs/reviews/mobile-2026-09-17/buyer/before/source/MobileFilterSheet.tsx.txt"
+      ],
+      "after": [
+        "docs/reviews/mobile-2026-09-17/buyer/after/saved-presets-360-short-viewport.png",
+        "docs/reviews/mobile-2026-09-17/buyer/after/mobile-save-filter-360-short-viewport.png"
+      ]
+    },
+    "verification": {
+      "status": "passed",
+      "checks": [
+        "Targeted ESLint passed for both source files and added regression test",
+        "Reviewed draft-state eligibility and exact existing collection callbacks",
+        "Save Filter dialog inspected at desktop then resized to 360px before the mobile entry point was added",
+        "Added intercepted collection regression: draft selection, persisted payload, existing preset apply/delete control reachability, and breakpoint cleanup without database writes",
+        "Final360\u00d7640 presets and both footer actions visible; initial Save disabled, fresh draft Flower enables it and appears in name-dialog preview.",
+        "Existing preset applies Flower, closes sheet, updates URL and sets expanded=false.",
+        "Parent ran new intercepted endpoint regression successfully: saved payload includes draft Flower and preserves existing preset; no database write.",
+        "Both resize directions remove hidden filter surface and body overflow returns visible."
+      ],
+      "limitations": [
+        "Saved preset data was supplied through request interception; the payload regression also intercepts writes to avoid altering the cloned account."
+      ]
+    }
+  }
+]

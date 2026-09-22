@@ -1,0 +1,132 @@
+{
+  "target": "production",
+  "origin": "https://phenofarm-mvp.vercel.app",
+  "action": "verify",
+  "startedAt": "2026-09-18T13:06:39.107Z",
+  "checks": [
+    {
+      "name": "Real password sign-in resolves only the temporary QA grower",
+      "passed": true
+    },
+    {
+      "name": "Database and authenticated reads retain image, PDF and logo URLs; product stays hidden",
+      "passed": true
+    },
+    {
+      "name": "product image: Blob bytes and MIME type match",
+      "passed": true,
+      "sha256": "8947f974aca5daf58b32043397564a7020c5062537b1cffd169fd1337bec30b3",
+      "byteLength": 377
+    },
+    {
+      "name": "product PDF: Blob bytes and MIME type match",
+      "passed": true,
+      "sha256": "70065940b5bdac751e2113c2715f329ead2bb4d841a531cc2cefe3fedfe024b7",
+      "byteLength": 659
+    },
+    {
+      "name": "grower logo: Blob bytes and MIME type match",
+      "passed": true,
+      "sha256": "6e348590c811a2082b4285d7f421f58558a466823ec1fee45c930fae8b23c83e",
+      "byteLength": 247
+    },
+    {
+      "name": "Real editor Save changes submits the remote image URL and preserves image/PDF records",
+      "passed": true
+    },
+    {
+      "name": "Database and authenticated reads retain image, PDF and logo URLs; product stays hidden",
+      "passed": true
+    },
+    {
+      "name": "product-editor: 1440px preview loads with no overflow",
+      "passed": true
+    },
+    {
+      "name": "settings: 1440px preview loads with no overflow",
+      "passed": true
+    },
+    {
+      "name": "product-editor: 390px preview loads with no overflow",
+      "passed": true
+    },
+    {
+      "name": "settings: 390px preview loads with no overflow",
+      "passed": true
+    },
+    {
+      "name": "Product editor and settings have no browser runtime errors",
+      "passed": true
+    }
+  ],
+  "screenshots": [
+    {
+      "screen": "product-editor",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "file": "screenshots/product-editor-1440.png",
+      "geometry": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "height": 2289
+      },
+      "inspected": true,
+      "inspection": "Viewed entire fresh post-migration production capture: green product Blob preview remains visible after editor save, zero stock and Hidden state retained; layout intact.",
+      "sha256": "5d149e5874d372d72e6f71b1b46e39bfa83f026ae24b7cd55ab5022b74f3c594"
+    },
+    {
+      "screen": "settings",
+      "viewport": {
+        "width": 1440,
+        "height": 1000
+      },
+      "file": "screenshots/settings-1440.png",
+      "geometry": {
+        "width": 1440,
+        "scrollWidth": 1440,
+        "height": 2084
+      },
+      "inspected": true,
+      "inspection": "Viewed entire fresh post-migration production capture: purple company Blob logo renders at this width; layout intact.",
+      "sha256": "a7b10dc5435a4a28e5e040a1314ccaf92a1635f956b69e67ff84d7771d9215a7"
+    },
+    {
+      "screen": "product-editor",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "screenshots/product-editor-390.png",
+      "geometry": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 2359
+      },
+      "inspected": true,
+      "inspection": "Viewed entire fresh post-migration production capture: green product Blob preview remains visible after editor save, zero stock and Hidden state retained; layout intact.",
+      "sha256": "97714c1924af9bcadcbc1ae02058e61c8fd824ec37d227a606f6c16c15e7dffd"
+    },
+    {
+      "screen": "settings",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "file": "screenshots/settings-390.png",
+      "geometry": {
+        "width": 390,
+        "scrollWidth": 390,
+        "height": 2654
+      },
+      "inspected": true,
+      "inspection": "Viewed entire fresh post-migration production capture: purple company Blob logo renders at this width; layout intact.",
+      "sha256": "91c8dd023172af53525fc4f6cf8112e400981573b6ae4b517768d2f82e16c57c"
+    }
+  ],
+  "status": "passed",
+  "finishedAt": "2026-09-18T13:06:49.753Z",
+  "visualInspectionCompletedAt": "2026-09-18T13:09:06.980551+00:00",
+  "scope": "Production alias recheck after final migrations. Synthetic QA account only. Authentication email activation is excluded."
+}

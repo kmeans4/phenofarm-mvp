@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { customerSelect, customerWhere } from '@/lib/customers';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { Prisma } from '@prisma/client';
 
 const normalizeOptionalString = (value?: string | null) => {
   const trimmed = value?.trim();
-  return trimmed ? trimmed : '';
+  return trimmed ? trimmed : null;
 };
 
 // GET single customer
@@ -20,19 +21,15 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (session.user.role !== 'GROWER') {
+    if (session.user.role !== 'GROWER' || !session.user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const customerId = (await context.params).id;
 
-    const dispensary = await db.dispensary.findUnique({
-      where: { id: customerId },
-      include: {
-        user: {
-          select: { email: true, name: true },
-        },
-      },
+    const dispensary = await db.dispensary.findFirst({
+      where: { id: customerId, ...customerWhere(session.user.growerId) },
+      select: customerSelect,
     });
 
     if (!dispensary) {
@@ -41,8 +38,8 @@ export async function GET(
 
     return NextResponse.json({
       ...dispensary,
-      email: dispensary.user?.email,
-      contactName: dispensary.user?.name,
+      email: dispensary.user?.email || dispensary.offPlatformEmail,
+      contactName: dispensary.user?.name || dispensary.contactName,
     }, { status: 200 });
   } catch (error) {
     console.error('Error fetching customer:', error);
@@ -62,7 +59,7 @@ export async function PUT(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (session.user.role !== 'GROWER') {
+    if (session.user.role !== 'GROWER' || !session.user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -70,49 +67,45 @@ export async function PUT(
 
     const existingDispensary = await db.dispensary.findUnique({
       where: { id: customerId },
-      include: { user: true },
+      select: { id: true, userId: true, createdByGrowerId: true },
     });
 
     if (!existingDispensary) {
       return NextResponse.json({ error: 'Dispensary not found' }, { status: 404 });
     }
 
-    const body = await request.json();
+    if (existingDispensary.userId || existingDispensary.createdByGrowerId !== session.user.growerId) {
+      return NextResponse.json({ error: 'Only your own off-platform customer records can be edited' }, { status: 403 });
+    }
+    const body = await request.json().catch(() => null);
+    if (!body || typeof body !== 'object' || Array.isArray(body) || Object.values(body).some(value => value !== undefined && value !== null && typeof value !== 'string')) return NextResponse.json({ error: 'Customer fields must be text' }, { status: 400 });
+    if (Object.values(body).some(value => typeof value === 'string' && value.length > 5000)) return NextResponse.json({ error: 'Customer field is too long' }, { status: 400 });
     const { businessName, contactName, email, phone, address, city, state, zipCode, licenseNumber, website, description } = body;
-    const isPlatformManaged = Boolean(existingDispensary.userId);
 
-    if (!isPlatformManaged && businessName !== undefined && !businessName.trim()) {
+    if (businessName !== undefined && (typeof businessName !== 'string' || !businessName.trim() || businessName.trim().length > 200)) {
       return NextResponse.json({ error: 'Business name is required' }, { status: 400 });
     }
 
-    if (!isPlatformManaged && email !== undefined) {
+    const updateData: Prisma.DispensaryUpdateInput = {};
+    if (email !== undefined && email !== null) {
       const normalizedEmail = email.trim().toLowerCase();
-      if (!normalizedEmail) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail) || normalizedEmail.length > 254) {
         return NextResponse.json({ error: 'Email is required' }, { status: 400 });
       }
 
-      const existingUser = await db.user.findFirst({
-        where: {
-          email: normalizedEmail,
-          NOT: { id: existingDispensary.userId },
-        },
-      });
-
-      if (existingUser) {
-        return NextResponse.json({ error: 'Email already exists' }, { status: 409 });
-      }
+      updateData.offPlatformEmail = normalizedEmail;
     }
 
-    const updateData: Prisma.DispensaryUpdateInput = {};
-    if (!isPlatformManaged && businessName !== undefined) updateData.businessName = businessName.trim();
-    if (!isPlatformManaged && phone !== undefined) updateData.phone = normalizeOptionalString(phone);
-    if (!isPlatformManaged && address !== undefined) updateData.address = normalizeOptionalString(address);
-    if (!isPlatformManaged && city !== undefined) updateData.city = normalizeOptionalString(city);
-    if (!isPlatformManaged && state !== undefined) updateData.state = normalizeOptionalString(state) || 'VT';
-    if (!isPlatformManaged && zipCode !== undefined) updateData.zip = normalizeOptionalString(zipCode);
-    if (!isPlatformManaged && licenseNumber !== undefined) updateData.licenseNumber = normalizeOptionalString(licenseNumber);
-    if (!isPlatformManaged && website !== undefined) updateData.website = normalizeOptionalString(website);
-    if (!isPlatformManaged && description !== undefined) updateData.description = normalizeOptionalString(description);
+    if (businessName !== undefined) updateData.businessName = businessName.trim();
+    if (phone !== undefined) updateData.phone = normalizeOptionalString(phone);
+    if (address !== undefined) updateData.address = normalizeOptionalString(address);
+    if (city !== undefined) updateData.city = normalizeOptionalString(city);
+    if (state !== undefined) updateData.state = normalizeOptionalString(state) || 'VT';
+    if (zipCode !== undefined) updateData.zip = normalizeOptionalString(zipCode);
+    if (licenseNumber !== undefined) updateData.licenseNumber = normalizeOptionalString(licenseNumber);
+    if (website !== undefined) updateData.website = normalizeOptionalString(website);
+    if (description !== undefined) updateData.description = normalizeOptionalString(description);
+    if (contactName !== undefined) updateData.contactName = normalizeOptionalString(contactName);
 
     if (Object.keys(updateData).length > 0) {
       await db.dispensary.update({
@@ -121,28 +114,15 @@ export async function PUT(
       });
     }
 
-    if (!isPlatformManaged && (email !== undefined || contactName !== undefined)) {
-      const userUpdateData: Prisma.UserUpdateInput = {};
-      if (email !== undefined) userUpdateData.email = email.trim().toLowerCase();
-      if (contactName !== undefined) userUpdateData.name = contactName;
-      
-      await db.user.update({
-        where: { id: existingDispensary.userId },
-        data: userUpdateData,
-      });
-    }
-
     const finalDispensary = await db.dispensary.findUnique({
       where: { id: customerId },
-      include: {
-        user: { select: { email: true, name: true } },
-      },
+      select: customerSelect,
     });
 
     return NextResponse.json({
       ...finalDispensary,
-      email: finalDispensary?.user?.email,
-      contactName: finalDispensary?.user?.name,
+      email: finalDispensary?.user?.email || finalDispensary?.offPlatformEmail,
+      contactName: finalDispensary?.user?.name || finalDispensary?.contactName,
     }, { status: 200 });
   } catch (error) {
     console.error('Error updating customer:', error);
@@ -162,7 +142,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    if (session.user.role !== 'GROWER') {
+    if (session.user.role !== 'GROWER' || !session.user.growerId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -176,7 +156,14 @@ export async function DELETE(
       return NextResponse.json({ error: 'Dispensary not found' }, { status: 404 });
     }
 
-    await db.dispensary.delete({ where: { id: customerId } });
+    const removed = await db.dispensary.deleteMany({
+      where: {
+        id: customerId, userId: null, isOffPlatform: true,
+        createdByGrowerId: session.user.growerId,
+        orders: { none: {} }, conversations: { none: {} }, acceptedQuotes: { none: {} },
+      },
+    });
+    if (!removed.count) return NextResponse.json({ error: 'Customer accounts and records with history must be retained' }, { status: 409 });
 
     return NextResponse.json({ message: 'Dispensary deleted successfully' }, { status: 200 });
   } catch (error) {

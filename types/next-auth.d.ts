@@ -10,6 +10,7 @@ declare module 'next-auth' {
       growerId?: string;
       dispensaryId?: string;
       name?: string | null;
+      sessionVersion: number;
     } & DefaultSession['user'];
   }
 
@@ -19,6 +20,7 @@ declare module 'next-auth' {
     role: UserRole;
     growerId?: string;
     dispensaryId?: string;
+    sessionVersion: number;
   }
 }
 
@@ -29,5 +31,6 @@ declare module 'next-auth/jwt' {
     email: string;
     growerId?: string;
     dispensaryId?: string;
+    sessionVersion: number;
   }
 }

@@ -1,16 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+
+import { isLicenseExpired } from '@/lib/license';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
+import { Button } from '@/app/components/ui/Button';
 import { LogoUpload } from '@/app/components/settings/LogoUpload';
-import { SignOutButton } from '@/app/components/SignOutButton';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useToast } from '@/app/hooks/useToast';
 import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
 import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
+import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useLocalDraft } from '@/app/hooks/useLocalDraft';
 
-interface SettingsData {
+export interface SettingsData {
   businessName: string;
   licenseNumber: string;
   licenseExpiry: string;
@@ -79,9 +83,8 @@ const validateLicenseNumber = (license: string): string | undefined => {
 const validateLicenseExpiry = (expiry: string): string | undefined => {
   if (!expiry) return 'License expiry date is required';
   const expiryDate = new Date(expiry);
-  const now = new Date();
   if (isNaN(expiryDate.getTime())) return 'Invalid date format';
-  if (expiryDate < now) return 'License expiry must be in the future';
+  if (isLicenseExpired(expiryDate)) return 'License expiry must be today or later';
   return undefined;
 };
 
@@ -109,16 +112,17 @@ const DEFAULT_FORM_DATA: SettingsData = {
   logo: '',
 };
 
-export function SettingsForm() {
-  const [loading, setLoading] = useState(true);
+export function SettingsForm({ initialSettings }: { initialSettings?: SettingsData }) {
+  const [loading, setLoading] = useState(!initialSettings);
+  const pendingRef = useRef(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   
-  const [formData, setFormData] = useState<SettingsData>(DEFAULT_FORM_DATA);
-  const [initialData, setInitialData] = useState<SettingsData>(DEFAULT_FORM_DATA);
+  const [formData, setFormData] = useState<SettingsData>(initialSettings || DEFAULT_FORM_DATA);
+  const [initialData, setInitialData] = useState<SettingsData>(initialSettings || DEFAULT_FORM_DATA);
   
   const { update, showToast } = useToast();
   
@@ -127,12 +131,18 @@ export function SettingsForm() {
     message: 'You have unsaved changes in your settings. Are you sure you want to leave?',
   });
 
-  const settingsDraft = useLocalDraft<SettingsData>({
+  const draftValue = useMemo(() => {
+    const value = { ...formData };
+    delete (value as Partial<SettingsData>).logo;
+    delete (value as Partial<SettingsData>).email;
+    return value as Omit<SettingsData, 'logo' | 'email'>;
+  }, [formData]);
+  const settingsDraft = useLocalDraft<Omit<SettingsData, 'logo' | 'email'>>({
     key: 'phenofarm:draft:grower-settings',
-    value: formData,
+    value: draftValue,
     enabled: !loading,
-    onRestore: (value) => setFormData((prev) => ({ ...prev, ...value })),
-    shouldSave: (value) => JSON.stringify(value) !== JSON.stringify(initialData),
+    onRestore: (value) => setFormData((prev) => ({ ...prev, ...value, logo: prev.logo, email: prev.email })),
+    shouldSave: () => isDirty,
   });
   const clearSettingsDraft = settingsDraft.clearDraft;
 
@@ -183,6 +193,7 @@ export function SettingsForm() {
   }, []);
 
   useEffect(() => {
+    if (initialSettings) return;
     const controller = new AbortController();
     let isMounted = true;
 
@@ -226,7 +237,7 @@ export function SettingsForm() {
       isMounted = false;
       controller.abort();
     };
-  }, [showToast]);
+  }, [initialSettings, showToast]);
 
   const handleAddressSelect = (address: {
     fullAddress: string;
@@ -244,10 +255,19 @@ export function SettingsForm() {
     }));
   };
 
-  const handleLogoUpload = async (logoBase64: string) => {
-    const nextData = { ...formData, logo: logoBase64 };
-    setFormData(nextData);
-    await handleSave(true, nextData);
+  const handleLogoUpload = async (logo: string) => {
+    if (pendingRef.current) throw new Error('Wait for your current save to finish.');
+    pendingRef.current = true;
+    setSaving(true);
+    try {
+      const response = await fetch('/api/grower/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logo }) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Could not save logo.');
+      const savedLogo = typeof data.logo === 'string' ? data.logo : logo;
+      setFormData((current) => ({ ...current, logo: savedLogo }));
+      setInitialData((current) => ({ ...current, logo: savedLogo }));
+      showToast('success', 'Logo saved');
+    } finally { pendingRef.current = false; setSaving(false); }
   };
 
   const handleChange = (field: keyof SettingsData) => (
@@ -271,88 +291,40 @@ export function SettingsForm() {
     validateField(field, formData[field] as string);
   };
 
-  const handleSave = useCallback(async (isLogoSave = false, dataOverride?: SettingsData) => {
-    if (!isLogoSave) {
-      const isValid = validateForm();
-
-      if (!isValid) {
-        setTouched({
-          businessName: true,
-          email: true,
-          phone: true,
-          website: true,
-          licenseNumber: true,
-          licenseExpiry: true,
-        });
-        setError('Please fix the errors above before saving.');
-        showToast('error', 'Please fix validation errors before saving');
-        return;
-      }
+  const handleSave = useCallback(async () => {
+    if (pendingRef.current) return;
+    if (!validateForm()) {
+      setTouched({ businessName: true, email: true, phone: true, website: true, licenseNumber: true, licenseExpiry: true });
+      setError('Please fix the errors above before saving.');
+      return;
     }
-
-    const payload = dataOverride ?? formData;
-
+    pendingRef.current = true;
     setSaving(true);
     setError('');
-    if (!isLogoSave) setSaved(false);
-
+    setSaved(false);
     try {
-      const itemName = isLogoSave ? 'Logo' : 'Settings';
-      await update(
-        itemName,
-        fetch('/api/grower/settings', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        }).then(async (res) => {
-          if (!res.ok) {
-            const data = await res.json();
-            throw new Error(data.error || 'Failed to save');
-          }
-          return res.json();
-        }),
-        { duration: 3000 }
-      );
-
-      setInitialData(payload);
+      await update('Settings', fetch('/api/grower/settings', {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(draftValue),
+      }).then(async (res) => {
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Failed to save settings.');
+        return data;
+      }), { duration: 3000 });
+      setInitialData(formData);
       clearSettingsDraft();
       resetDirtyState();
-
-      if (!isLogoSave) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
-      }
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to save settings';
-      setError(msg);
-      showToast('error', 'Failed to save', { description: msg });
-    } finally {
-      setSaving(false);
-    }
-  }, [clearSettingsDraft, formData, resetDirtyState, update, showToast, validateForm]);
+      setSaved(true);
+    } catch (err) { setError(err instanceof Error ? err.message : 'Failed to save settings.'); }
+    finally { pendingRef.current = false; setSaving(false); }
+  }, [clearSettingsDraft, draftValue, formData, resetDirtyState, update, validateForm]);
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        if (!saving && !loading) {
-          handleSave(false);
-        }
-      }
-      
-      if (e.key === 'Escape' && !loading) {
-        setFormData(initialData);
-        setTouched({});
-        setFieldErrors({});
-        setError('');
-        setIsDirty(false);
-        showToast('info', 'Changes discarded');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleSave, saving, loading, initialData, setIsDirty, showToast]);
+    if (!saved) return;
+    const timeout = window.setTimeout(() => setSaved(false), 3000);
+    return () => window.clearTimeout(timeout);
+  }, [saved]);
+  useKeyboardShortcuts({ onSave: handleSave, isDirty, enabled: !loading && !saving });
 
   if (loading) {
     return (
@@ -364,32 +336,11 @@ export function SettingsForm() {
 
   return (
     <div className="space-y-4 sm:space-y-6">
-      <div className="hidden sm:flex items-center gap-4 text-xs text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
-        <span className="flex items-center gap-1">
-          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Ctrl</kbd>
-          <span>+</span>
-          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">S</kbd>
-          <span className="ml-1">to save</span>
-        </span>
-        <span className="text-gray-300">|</span>
-        <span className="flex items-center gap-1">
-          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Esc</kbd>
-          <span className="ml-1">to cancel</span>
-        </span>
-      </div>
-
-      <div className="rounded-lg border border-green-100 bg-green-50 px-4 py-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-green-800">Required first</p>
-        <p className="mt-1 text-sm text-green-900">
-          Finish business name, license, expiry date, and email first. Logo, address, website, and description can be completed later.
-        </p>
-      </div>
-
-      <DraftAutosaveStatus
+      {isDirty && <DraftAutosaveStatus
         savedAt={settingsDraft.savedAt}
         label="Settings browser draft"
         onClear={settingsDraft.clearDraft}
-      />
+      />}
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start gap-3">
@@ -409,39 +360,21 @@ export function SettingsForm() {
         </div>
       )}
 
-      {isDirty && (
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
-          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-          <span>You have unsaved changes. Don&apos;t forget to save before leaving.</span>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="space-y-4">
+        <div id="business-profile" className="scroll-mt-36 lg:scroll-mt-20 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Company Logo</h2>
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Business profile</h2>
           </div>
-          <div className="p-4 sm:p-6">
-            <LogoUpload 
-              currentLogo={formData.logo} 
-              onUpload={handleLogoUpload} 
-            />
-          </div>
-        </div>
+          <div className="grid gap-3 p-4 sm:gap-4 sm:p-6 md:grid-cols-2">
+            <p className="text-xs text-gray-500 md:col-span-2">* Required</p>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Business Information</h2>
-          </div>
-          <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Name <span className="text-red-500">*</span>
+              <label htmlFor="profile-businessName" className="block text-sm font-medium text-gray-700 mb-1">
+                Name <span className="text-red-500">*</span>
               </label>
               <input 
                 type="text" 
+                id="profile-businessName"
                 value={formData.businessName}
                 onChange={handleChange('businessName')}
                 onBlur={handleBlur('businessName')}
@@ -463,11 +396,12 @@ export function SettingsForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contact Name <span className="text-gray-400 text-xs">(optional)</span>
+              <label htmlFor="profile-contactName" className="block text-sm font-medium text-gray-700 mb-1">
+                Contact
               </label>
               <input 
                 type="text" 
+                id="profile-contactName"
                 value={formData.contactName}
                 onChange={handleChange('contactName')}
                 placeholder="Primary contact person"
@@ -476,11 +410,12 @@ export function SettingsForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business License Number <span className="text-red-500">*</span>
+              <label htmlFor="profile-licenseNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                License number <span className="text-red-500">*</span>
               </label>
               <input 
                 type="text" 
+                id="profile-licenseNumber"
                 value={formData.licenseNumber}
                 onChange={handleChange('licenseNumber')}
                 onBlur={handleBlur('licenseNumber')}
@@ -502,11 +437,12 @@ export function SettingsForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                License Expiry Date <span className="text-red-500">*</span>
+              <label htmlFor="profile-licenseExpiry" className="block text-sm font-medium text-gray-700 mb-1">
+                License expiry <span className="text-red-500">*</span>
               </label>
               <input 
                 type="date" 
+                id="profile-licenseExpiry"
                 value={formData.licenseExpiry}
                 onChange={handleChange('licenseExpiry')}
                 onBlur={handleBlur('licenseExpiry')}
@@ -527,14 +463,15 @@ export function SettingsForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Email <span className="text-red-500">*</span>
+              <label htmlFor="profile-email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email <span className="text-red-500">*</span>
               </label>
               <input 
                 type="email" 
+                id="profile-email"
                 value={formData.email}
-                onChange={handleChange('email')}
-                onBlur={handleBlur('email')}
+                readOnly
+                aria-describedby="account-email-help"
                 className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
                   touched.email && fieldErrors.email
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
@@ -542,6 +479,9 @@ export function SettingsForm() {
                 }`}
                 placeholder="business@example.com"
               />
+              <p id="account-email-help" className="mt-1 text-sm text-gray-600">
+                Verified login address. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-green-700 underline">Change email</Link>
+              </p>
               {touched.email && fieldErrors.email && (
                 <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -553,11 +493,12 @@ export function SettingsForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Phone <span className="text-gray-400 text-xs">(optional)</span>
+              <label htmlFor="profile-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                Phone
               </label>
               <input 
                 type="tel" 
+                id="profile-phone"
                 value={formData.phone}
                 onChange={handleChange('phone')}
                 onBlur={handleBlur('phone')}
@@ -579,24 +520,26 @@ export function SettingsForm() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Address <span className="text-green-600 text-xs font-medium">(Autocomplete)</span>
+              <label htmlFor="profile-address" className="block text-sm font-medium text-gray-700 mb-1">
+                Address
               </label>
               <AddressAutocomplete
+                id="profile-address"
                 value={formData.address}
                 onChange={(value) => setFormData(prev => ({ ...prev, address: value }))}
                 onSelect={handleAddressSelect}
                 placeholder="Type your address..."
               />
-              <p className="text-xs text-gray-500 mt-1">Type 3+ characters to see suggestions (includes city, state, ZIP)</p>
+              <p className="text-xs text-gray-500 mt-1">Includes city, state and ZIP.</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Website <span className="text-gray-400 text-xs">(optional)</span>
+              <label htmlFor="profile-website" className="block text-sm font-medium text-gray-700 mb-1">
+                Website
               </label>
               <input 
                 type="url" 
+                id="profile-website"
                 value={formData.website}
                 onChange={handleChange('website')}
                 onBlur={handleBlur('website')}
@@ -617,12 +560,13 @@ export function SettingsForm() {
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Description <span className="text-gray-400 text-xs">(optional)</span>
+            <div className="md:col-span-2">
+              <label htmlFor="profile-description" className="block text-sm font-medium text-gray-700 mb-1">
+                Description
               </label>
               <textarea 
-                rows={3}
+                rows={2}
+                id="profile-description"
                 value={formData.description}
                 onChange={handleChange('description')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
@@ -632,25 +576,29 @@ export function SettingsForm() {
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-base font-semibold text-gray-900">Account</h2>
-            <p className="mt-1 text-sm text-gray-600">Sign out of your grower account from this device.</p>
+        <div id="branding" className="self-start scroll-mt-36 lg:scroll-mt-20 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Logo</h2>
           </div>
-          <div className="self-start sm:self-auto">
-            <SignOutButton />
+          <div className="p-4 sm:p-6">
+            <LogoUpload
+              currentLogo={formData.logo}
+              onUpload={handleLogoUpload}
+              disabled={saving}
+            />
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end pt-2 sm:pt-4">
-        <button 
-          onClick={() => handleSave(false)}
+      {isDirty && <div className="sticky bottom-4 z-20 hidden items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:flex">
+        <p className="text-sm text-gray-600">Unsaved profile changes</p>
+        <Button
+          type="button"
+          variant="primary"
+          onClick={() => handleSave()}
           disabled={saving}
-          className="w-full sm:w-auto bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="min-w-[9rem]"
         >
           {saving ? (
             <span className="flex items-center gap-2">
@@ -661,17 +609,17 @@ export function SettingsForm() {
               Saving...
             </span>
           ) : (
-            'Save Changes'
+            'Save profile'
           )}
-        </button>
-      </div>
+        </Button>
+      </div>}
 
-      <StickyMobileActionBar
-        primaryLabel={saving ? 'Saving...' : 'Save settings'}
-        onPrimary={() => void handleSave(false)}
+      {isDirty && <StickyMobileActionBar
+        primaryLabel={saving ? 'Saving...' : 'Save profile'}
+        onPrimary={() => void handleSave()}
         disabled={saving}
-        helperText="Settings drafts save in this browser."
-      />
+        helperText="Unsaved profile changes"
+      />}
     </div>
   );
 }

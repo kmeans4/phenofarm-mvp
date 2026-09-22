@@ -1,0 +1,55 @@
+{
+  "slug": "16-order-add",
+  "route": "/grower/orders/add",
+  "pass1": {
+    "inspected": [
+      "pass-1/16-order-add-desktop.png",
+      "pass-1/16-order-add-mobile.png"
+    ],
+    "strengths": [
+      "Buyer selection is required before recording; empty Items area makes the next step understandable."
+    ],
+    "issues": [
+      {
+        "key": "direct-request-jargon",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "‘Record Direct Request’ repeats in title and button; subtitle uses ‘outside PhenoFarm payment rails’. Search placeholder and helper both describe filtering by business/city.",
+        "recommendation": "Use ‘Record request’, with one clear note ‘For orders arranged directly with a buyer. Payment is handled outside PhenoFarm.’ Keep a single search placeholder ‘Search buyers by name or city’ and remove the duplicate helper."
+      },
+      {
+        "key": "direct-request-flow-density",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "Two stacked action buttons and an instruction precede the form, while Notes and a full-width shipping field come before Items. The empty Items panel starts at y769, and its Add button is near the floating message launcher.",
+        "recommendation": "Order the form Buyer → Items → shipping/notes. Use ‘Add item’ inside a compact empty state instead of a separate header button plus two explanatory lines; keep a single save action at the end or in a compact sticky footer."
+      }
+    ],
+    "limits": [
+      "No buyer, products, fields, or request submitted."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/16-order-add-desktop.png",
+      "pass-2/16-order-add-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed verbose request/payment copy and optional fields placed before Items. It also identified the floating message launcher partly overlapping Add item on mobile. No row was added by the independent reviewer; the separate 16a state covers the unsaved row.",
+    "confirmedIssueKeys": [
+      "direct-request-jargon",
+      "direct-request-flow-density"
+    ],
+    "newIssues": [
+      {
+        "key": "request-add-launcher-overlap",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "The floating message button partly overlaps Add item at the initial mobile viewport: launcher x334–378/y788–832; Add x289–357/y769–809. This competes with the next required form action.",
+        "recommendation": "Reserve space around the floating launcher or move it away from form action rows. Keep Add item fully visible and tappable."
+      }
+    ],
+    "source": "root-pass2-notes.md"
+  }
+}

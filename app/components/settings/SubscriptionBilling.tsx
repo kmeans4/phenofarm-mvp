@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { Check, Minus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
 
-interface SubscriptionData {
+export interface SubscriptionData {
   plan: string;
   status: string;
   currentPeriodEnd: string | null;
@@ -15,53 +16,40 @@ interface SubscriptionData {
   portalAvailable: boolean;
 }
 
-export function SubscriptionBilling() {
-  const [subscription, setSubscription] = useState<SubscriptionData | null>(null);
-  const [loading, setLoading] = useState(true);
+export function SubscriptionBilling({ initialData }: { initialData?: SubscriptionData | null }) {
+  const [subscription, setSubscription] = useState<SubscriptionData | null>(initialData || null);
+  const [loading, setLoading] = useState(initialData === undefined);
+  const [loadError, setLoadError] = useState(initialData === null ? 'Subscription details could not be loaded.' : '');
+  const pendingRef = useRef(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchSubscription();
-  }, []);
+  useEffect(() => { if (initialData === undefined) void fetchSubscription(); }, [initialData]);
 
   const fetchSubscription = async () => {
+    setLoading(true);
+    setLoadError('');
     try {
       const res = await fetch('/api/grower/subscription');
-      if (res.ok) {
-        const data = await res.json();
-        setSubscription(data);
-      } else {
-        // No subscription yet - show default
-        setSubscription({
-          plan: 'free',
-          status: 'inactive',
-          currentPeriodEnd: null,
-          cancelAtPeriodEnd: false,
-          checkoutConfigured: false,
-          proCheckoutConfigured: false,
-          businessCheckoutConfigured: false,
-          portalAvailable: false,
-        });
-      }
-    } catch (err) {
-      console.error('Failed to load subscription:', err);
-      setSubscription({
-        plan: 'free',
-        status: 'inactive',
-        currentPeriodEnd: null,
-        cancelAtPeriodEnd: false,
-        checkoutConfigured: false,
-        proCheckoutConfigured: false,
-        businessCheckoutConfigured: false,
-        portalAvailable: false,
-      });
-    } finally {
-      setLoading(false);
-    }
+      if (!res.ok) throw new Error('Subscription details could not be loaded. Your plan has not changed.');
+      const data = await res.json();
+      if (!data || typeof data.plan !== 'string' || typeof data.status !== 'string') throw new Error('Invalid subscription response.');
+      setSubscription(data);
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Subscription details could not be loaded.');
+    } finally { setLoading(false); }
+  };
+
+  const navigateToStripe = (value: unknown) => {
+    if (typeof value !== 'string') throw new Error('Billing returned an invalid link.');
+    const url = new URL(value);
+    if (url.protocol !== 'https:' || !['checkout.stripe.com', 'billing.stripe.com'].includes(url.hostname) || url.username || url.password) throw new Error('Billing returned an invalid link.');
+    window.location.assign(url.href);
   };
 
   const startCheckout = async (plan: 'pro' | 'business') => {
+    if (pendingRef.current) return;
+    pendingRef.current = true;
     setActionLoading(plan);
     setActionError(null);
 
@@ -77,14 +65,17 @@ export function SubscriptionBilling() {
         throw new Error(data.error || 'Could not start subscription checkout');
       }
 
-      window.location.href = data.url;
+      navigateToStripe(data.url);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Could not start subscription checkout');
+      pendingRef.current = false;
       setActionLoading(null);
     }
   };
 
   const openPortal = async () => {
+    if (pendingRef.current) return;
+    pendingRef.current = true;
     setActionLoading('portal');
     setActionError(null);
 
@@ -96,9 +87,10 @@ export function SubscriptionBilling() {
         throw new Error(data.error || 'Could not open subscription portal');
       }
 
-      window.location.href = data.url;
+      navigateToStripe(data.url);
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Could not open subscription portal');
+      pendingRef.current = false;
       setActionLoading(null);
     }
   };
@@ -133,26 +125,27 @@ export function SubscriptionBilling() {
     );
   }
 
-  if (!subscription) {
-    return null;
+  if (loadError || !subscription) {
+    return <Card><CardContent className="space-y-3 p-6"><p role="alert" className="text-sm text-red-700">{loadError || 'Subscription details are unavailable.'}</p><Button type="button" variant="outline" onClick={() => void fetchSubscription()}>Retry</Button></CardContent></Card>;
   }
+
+  const planFeatureRows = [
+    { label: 'Expanded catalog listings', included: subscription.plan !== 'free' },
+    { label: 'Priority grower support', included: subscription.plan !== 'free' },
+    { label: 'Estimated request value reports', included: true },
+    { label: 'Advanced integrations', included: subscription.plan === 'business' },
+  ];
 
   return (
     <Card className="border-green-200">
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
-          <span>Cultivator Subscription</span>
+          <span>Subscription</span>
           {getPlanBadge(subscription?.plan || 'free')}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
-        <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-950">
-          <p className="font-medium">This is the only payment flow in PhenoFarm.</p>
-          <p className="mt-1">
-            Growers pay PhenoFarm a software subscription. Wholesale order payments are handled directly between
-            buyers and sellers outside the app.
-          </p>
-        </div>
+      <CardContent className="space-y-4">
+        <p className="text-sm text-gray-600">Software subscription only. Wholesale payment stays directly between businesses.</p>
 
         {actionError && (
           <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
@@ -172,16 +165,19 @@ export function SubscriptionBilling() {
                 {subscription?.plan === 'free' 
                   ? subscription.checkoutConfigured
                     ? 'Starter access'
-                    : 'Starter access while Stripe price IDs are configured'
+                    : 'Starter access'
                   : subscription?.status === 'active' ? 'Active' : 'Inactive'}
               </p>
             </div>
             <div className="text-right">
               <p className="text-2xl font-bold text-gray-900">
-                {subscription?.plan === 'free' ? '$0' : 
-                 subscription?.plan === 'pro' ? '$49' : '$149'}
-                <span className="text-sm font-normal text-gray-500">/mo</span>
+                {subscription?.plan === 'free' ? '$0' :
+                 subscription?.plan === 'pro' ? '$249' : 'Custom'}
+                {subscription?.plan !== 'business' && <span className="text-sm font-normal text-gray-500">/mo</span>}
               </p>
+              {subscription?.plan === 'pro' && (
+                <p className="text-xs text-gray-500">$199/mo billed annually</p>
+              )}
             </div>
           </div>
           
@@ -195,98 +191,42 @@ export function SubscriptionBilling() {
         </div>
 
         {/* Plan Features */}
-        <div className="border-t pt-4">
-          <h4 className="text-sm font-medium text-gray-700 mb-3">Plan Features</h4>
+        <details className="border-t pt-3">
+          <summary className="cursor-pointer py-2 text-sm font-medium text-gray-700">Plan features</summary>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            <div className="flex items-center gap-2">
-              <span className={`w-4 h-4 rounded-full flex items-center justify-center ${subscription?.plan !== 'free' ? 'bg-green-500' : 'bg-gray-300'}`}>
-                {subscription?.plan !== 'free' && <span className="text-white text-xs">✓</span>}
-              </span>
-              <span className={subscription?.plan !== 'free' ? 'text-gray-700' : 'text-gray-400'}>Expanded catalog listings</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={`w-4 h-4 rounded-full flex items-center justify-center ${subscription?.plan !== 'free' ? 'bg-green-500' : 'bg-gray-300'}`}>
-                {subscription?.plan !== 'free' && <span className="text-white text-xs">✓</span>}
-              </span>
-              <span className={subscription?.plan !== 'free' ? 'text-gray-700' : 'text-gray-400'}>Priority grower support</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="w-4 h-4 rounded-full bg-green-500 flex items-center justify-center">
-                <span className="text-white text-xs">✓</span>
-              </span>
-              <span className="text-gray-700">Estimated request value reports</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={`w-4 h-4 rounded-full flex items-center justify-center ${subscription?.plan === 'business' ? 'bg-green-500' : 'bg-gray-300'}`}>
-                {subscription?.plan === 'business' && <span className="text-white text-xs">✓</span>}
-              </span>
-              <span className={subscription?.plan === 'business' ? 'text-gray-700' : 'text-gray-400'}>Advanced integrations</span>
-            </div>
+            {planFeatureRows.map((feature) => (
+              <div key={feature.label} className="flex items-center gap-2">
+                <span
+                  aria-label={feature.included ? 'Included' : 'Not included'}
+                  className={`flex h-5 w-5 flex-none items-center justify-center rounded-full ${
+                    feature.included ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-400'
+                  }`}
+                >
+                  {feature.included ? (
+                    <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                  ) : (
+                    <Minus className="h-3.5 w-3.5" aria-hidden="true" />
+                  )}
+                </span>
+                <span className={feature.included ? 'text-gray-700' : 'text-gray-400'}>{feature.label}</span>
+              </div>
+            ))}
           </div>
-        </div>
+        </details>
 
-        {/* Actions */}
-        <div className="flex gap-3 border-t pt-4">
-          {subscription?.plan === 'free' ? (
-            <Button
-              className="flex-1 bg-green-600 hover:bg-green-700"
-              disabled={!subscription.proCheckoutConfigured || actionLoading !== null}
-              title={subscription.proCheckoutConfigured ? 'Start Stripe subscription checkout' : 'Add STRIPE_PRO_PRICE_ID to enable checkout'}
-              onClick={() => startCheckout('pro')}
-            >
-              {actionLoading === 'pro' ? 'Starting Checkout...' : 'Upgrade Cultivator Plan'}
+        <div className="flex flex-wrap gap-3 border-t pt-4">
+          {subscription.plan === 'free' && !subscription.portalAvailable && (
+            <Button disabled={!subscription.proCheckoutConfigured || actionLoading !== null} onClick={() => startCheckout('pro')}>
+              {actionLoading === 'pro' ? 'Opening checkout...' : 'Upgrade to Pro'}
             </Button>
-          ) : subscription?.plan === 'pro' ? (
-            <>
-              <Button
-                className="flex-1 bg-purple-600 hover:bg-purple-700"
-                disabled={!subscription.businessCheckoutConfigured || actionLoading !== null}
-                title={subscription.businessCheckoutConfigured ? 'Start Stripe subscription checkout' : 'Add STRIPE_BUSINESS_PRICE_ID to enable checkout'}
-                onClick={() => startCheckout('business')}
-              >
-                {actionLoading === 'business' ? 'Starting Checkout...' : 'Switch to Business'}
-              </Button>
-              <Button
-                variant="outline"
-                className="text-red-600 border-red-300 hover:bg-red-50"
-                disabled={!subscription.portalAvailable || actionLoading !== null}
-                title={subscription.portalAvailable ? 'Open Stripe customer portal' : 'Customer portal is available after checkout'}
-                onClick={openPortal}
-              >
-                Manage
-              </Button>
-            </>
-          ) : (
-            <Button
-              variant="outline"
-              className="flex-1 text-red-600 border-red-300 hover:bg-red-50"
-              disabled={!subscription.portalAvailable || actionLoading !== null}
-              title={subscription.portalAvailable ? 'Open Stripe customer portal' : 'Customer portal is available after checkout'}
-              onClick={openPortal}
-            >
-              {actionLoading === 'portal' ? 'Opening Portal...' : 'Manage Subscription'}
+          )}
+          {subscription.portalAvailable && (
+            <Button variant="outline" disabled={actionLoading !== null} onClick={openPortal}>
+              {actionLoading === 'portal' ? 'Opening billing...' : 'Manage Subscription'}
             </Button>
           )}
         </div>
-
-        {/* Billing History Link */}
-        <div className="text-center">
-          <Button
-            variant="link"
-            className="text-sm text-gray-500"
-            disabled={!subscription?.portalAvailable || actionLoading !== null}
-            title={subscription?.portalAvailable ? 'Open Stripe customer portal' : 'Customer portal is available after checkout'}
-            onClick={openPortal}
-          >
-            Manage Subscription
-          </Button>
-        </div>
-
-        {!subscription.checkoutConfigured && (
-          <div className="rounded-lg bg-gray-50 p-3 text-xs text-gray-600">
-            Add STRIPE_PRO_PRICE_ID or STRIPE_BUSINESS_PRICE_ID in the environment to enable Stripe Billing checkout.
-          </div>
-        )}
+        {!subscription.checkoutConfigured && <p className="text-sm text-gray-600">Online subscription checkout is currently unavailable.</p>}
       </CardContent>
     </Card>
   );

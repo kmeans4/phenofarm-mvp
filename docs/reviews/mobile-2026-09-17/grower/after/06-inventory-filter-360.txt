@@ -1,0 +1,41 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e1912] clickable [onclick]
+  - button "Open messages" [ref=e1918]
+- button "Search" [ref=e1913]
+- button "Notifications" [expanded=false, ref=e1914]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e1915]
+- main
+  - sectionheader
+    - heading "Inventory" [level=1, ref=e1919]
+    - link "Add product" [ref=e1920]
+    - link "Update stock" [ref=e1921]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Products"
+    - paragraph
+      - StaticText "3"
+    - paragraph
+      - StaticText "Stock value"
+    - paragraph
+      - StaticText "$10,000"
+    - paragraph
+      - StaticText "Low stock"
+    - paragraph
+      - StaticText "0"
+  - paragraph
+    - StaticText "Stock edits save automatically."
+  - LabelText
+    - StaticText "Filter inventory"
+  - combobox "Filter inventory" [expanded=false, ref=e1916]: Low stock (0)
+    - MenuListPopup
+      - option "All (3)" [ref=e1922]
+      - option "Low stock (0)" [selected, ref=e1923]
+      - option "Out of stock (0)" [ref=e1924]
+      - option "Unavailable (0)" [ref=e1925]
+  - heading "No products in this filter" [level=3, ref=e1917]
+  - paragraph
+    - StaticText "Switch filters to see the rest of your inventory."
+- region "Notifications alt+T" [ref=e1911]
+- alert

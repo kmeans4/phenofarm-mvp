@@ -1,10 +1,9 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from "@/lib/auth-helpers";
 import { redirect } from "next/navigation";
 import CatalogContent from "./CatalogContent";
 
 export default async function DispensaryCatalogPage() {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
   
   if (!session) {
     redirect('/auth/sign_in');

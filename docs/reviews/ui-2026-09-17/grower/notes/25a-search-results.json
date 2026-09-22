@@ -1,0 +1,28 @@
+{
+  "slug": "25a-search-results",
+  "route": "/grower/dashboard",
+  "state": "Search query Purple",
+  "pass1": {
+    "inspected": [
+      "pass-1/25a-search-results-desktop.png",
+      "pass-1/25a-search-results-mobile.png"
+    ],
+    "strengths": [
+      "Results are compact, readable and distinguish product from strain; price/stock context is restrained."
+    ],
+    "issues": [],
+    "noNewIssue": "No additional copy/density issue in the populated results beyond shared mobile search footer wording.",
+    "limits": [
+      "Read-only search query typed; no result action activated. Sparse result count reflects the fixture, so unused result area is not a defect."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/25a-search-results-desktop.png",
+      "pass-2/25a-search-results-mobile.png"
+    ],
+    "notes": "Fresh Purple query at both widths again returns two compact, readable results. No new issue in the result rows; the shared mobile keyboard footer concern remains covered under the empty search state. No result was opened.",
+    "confirmedIssueKeys": [],
+    "newIssues": []
+  }
+}

@@ -1,0 +1,94 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e1947] clickable [onclick]
+  - button "Open messages" [ref=e1951]
+- button "Search" [ref=e1948]
+- button "Notifications" [expanded=false, ref=e1949]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e1950]
+- main
+  - sectionheader
+    - heading "Edit batch" [level=1, ref=e1952]
+  - form
+    - LabelText
+      - StaticText "Batch # *"
+    - button "Generate" [ref=e1953]
+    - textbox "Batch # *" [required, ref=e1954]: VN-2026-0912
+      - StaticText "VN-2026-0912"
+    - LabelText
+      - StaticText "Lot #"
+    - textbox "Lot #" [ref=e1955]: VT-A104
+      - StaticText "VT-A104"
+    - LabelText
+      - StaticText "Harvest date *"
+    - Date "Harvest date *": 2026-09-12
+      - generic
+        - spinbutton "Month Month" [ref=e1974]: 9
+          - StaticText "09"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e1975]: 12
+          - StaticText "12"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e1976]: 2026
+          - StaticText "2026"
+      - button "Show date picker Show date picker" [ref=e1971]
+    - LabelText
+      - StaticText "Strain *"
+    - combobox "Strain *" [expanded=false, ref=e1956]: Audit Test Kush
+      - MenuListPopup
+        - option "Select a strain" [ref=e1977]
+        - option "Assorted " [ref=e1978]
+        - option "Audit Test Kush " [selected, ref=e1979]
+        - option "Purple Haze " [ref=e1980]
+        - option "Silver Haze " [ref=e1981]
+    - heading "Lab Results" [level=3, ref=e1957]
+    - LabelText
+      - StaticText "THC (%)"
+    - spinbutton "THC (%)" [ref=e1958]: 24.799999237060547
+      - StaticText "24.8"
+    - LabelText
+      - StaticText "CBD (%)"
+    - spinbutton "CBD (%)" [ref=e1959]: 0.6000000238418579
+      - StaticText "0.6"
+    - LabelText
+      - StaticText "Total (%)"
+    - spinbutton "Total (%)" [ref=e1960]: 27.200000762939453
+      - StaticText "27.2"
+    - group "Terpenes"
+      - Legend
+        - StaticText "Terpenes"
+      - LabelText
+        - StaticText "Terpene"
+        - textbox "Terpene" [required, ref=e1982]
+      - LabelText
+        - StaticText "%"
+        - spinbutton "%" [required, ref=e1983]
+      - button "Remove terpene 1" [ref=e1972]
+        - StaticText "×"
+      - button "Add terpene" [ref=e1973]
+    - heading "Lab PDFs" [level=4, ref=e1961]
+    - paragraph
+      - StaticText "PDF · 2MB max each"
+    - LabelText
+      - StaticText "Potency"
+    - button "Potency" [ref=e1962]: No file chosen
+    - button "Upload Potency PDF" [ref=e1963]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Pesticides"
+    - button "Pesticides" [ref=e1964]: No file chosen
+    - button "Upload Pesticides PDF" [ref=e1965]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Microbials"
+    - button "Microbials" [ref=e1966]: No file chosen
+    - button "Upload Microbials PDF" [ref=e1967]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Notes" [ref=e1968]: Fall greenhouse harvest. Cured and ready for wholesale orders.
+      - StaticText "Fall greenhouse harvest. Cured and ready for wholesale orders."
+    - button "Save Changes" [ref=e1969]
+    - button "Cancel" [ref=e1970]
+- region "Notifications alt+T" [ref=e1946]
+- alert

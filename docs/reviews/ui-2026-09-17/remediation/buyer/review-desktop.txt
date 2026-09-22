@@ -1,0 +1,178 @@
+- generic
+  - complementary
+    - StaticText "P"
+    - StaticText "PhenoFarm"
+    - StaticText "DISPENSARY"
+    - button "Search" [ref=e254]
+      - StaticText "Search..."
+      - StaticText "⌘K"
+    - button "Notifications" [expanded=false, ref=e255]
+      - StaticText "Notifications"
+      - StaticText "18"
+    - navigation "Portal navigation" [ref=e256]
+      - link "Dashboard" [ref=e258]
+        - StaticText "Dashboard"
+      - link "Catalog" [ref=e259]
+        - StaticText "Catalog"
+      - link "Request Draft View draft 2" [ref=e260]
+        - StaticText "Request Draft"
+        - link "View draft 2" [ref=e265]
+          - StaticText "View draft"
+          - StaticText "2"
+      - link "Orders 17" [ref=e261]
+        - StaticText "Orders"
+        - StaticText "17"
+      - link "Saved" [ref=e262]
+        - StaticText "Saved"
+      - link "Settings" [ref=e263]
+        - StaticText "Settings"
+    - StaticText "GV"
+    - StaticText "Green Vermont Dispensary"
+    - StaticText "Verified buyer"
+    - button "Sign out" [ref=e257]
+  - main
+    - sectionheader
+      - paragraph
+        - StaticText "WHOLESALE REQUEST"
+      - heading "Request draft" [level=1, ref=e229]
+      - paragraph
+        - StaticText "Build a wholesale request for growers to review. PhenoFarm does not collect wholesale payment."
+    - button "Items" [ref=e205]
+      - StaticText "Items"
+    - button "Logistics" [ref=e206]
+      - StaticText "Logistics"
+    - button "Terms" [ref=e207]
+      - StaticText "Terms"
+    - button "4 Review" [ref=e208]
+      - StaticText "4"
+      - StaticText "Review"
+    - paragraph
+      - StaticText "Smart request defaults"
+    - paragraph
+      - StaticText "Reuse the logistics, terms, and notes that worked last time."
+    - button "Use standard terms" [ref=e209]
+    - StaticText "Prices and inventory refreshed. Unavailable items remain in your draft for review."
+    - paragraph
+      - StaticText "Purple Haze Flowers"
+    - paragraph
+      - StaticText "Vermont Nurseries • $25/Gram"
+    - button "Decrease quantity for Purple Haze Flowers" [ref=e210]
+      - StaticText "-"
+    - spinbutton "Quantity for Purple Haze Flowers" [ref=e211]: 2
+      - StaticText "2"
+    - button "Increase quantity for Purple Haze Flowers" [ref=e212]
+      - StaticText "+"
+    - paragraph
+      - StaticText "$50.00"
+    - button "Remove Purple Haze Flowers from draft" [ref=e213]
+    - heading "Logistics" [level=3, ref=e214]
+    - LabelText
+      - StaticText "Fulfillment method"
+    - combobox "Fulfillment method" [expanded=false, ref=e215]: Flexible
+      - MenuListPopup
+        - option "Flexible" [selected, ref=e232]
+        - option "Pickup" [ref=e233]
+        - option "Delivery requested" [ref=e234]
+        - option "Coordinate with grower" [ref=e235]
+    - LabelText
+      - StaticText "Requested window (optional)"
+    - textbox "Requested window (optional)" [ref=e216]
+    - paragraph
+      - StaticText "0/120"
+    - heading "Terms and Notes" [level=3, ref=e217]
+    - LabelText
+      - StaticText "Direct payment terms"
+    - combobox "Direct payment terms" [expanded=false, ref=e218]: Handled directly
+      - MenuListPopup
+        - option "Handled directly" [selected, ref=e236]
+        - option "Net 15" [ref=e237]
+        - option "Net 30" [ref=e238]
+        - option "ACH" [ref=e239]
+        - option "Check" [ref=e240]
+        - option "COD" [ref=e241]
+    - paragraph
+      - StaticText "Informational only. PhenoFarm does not process wholesale settlement."
+    - LabelText
+      - StaticText "Notes or special instructions"
+    - button "Pickup" [ref=e219]
+    - button "Delivery" [ref=e220]
+    - button "Substitutions" [ref=e221]
+    - button "Payment terms" [ref=e222]
+    - textbox "Notes or special instructions" [ref=e223]
+    - paragraph
+      - StaticText "0/500"
+    - heading "Request Summary" [level=3, ref=e224]
+    - StaticText "Total"
+    - StaticText "$"
+    - StaticText "50.00"
+    - StaticText "Payment terms are coordinated directly between buyer and grower."
+    - StaticText "This draft will create one grower request."
+    - StaticText "Fulfillment"
+    - StaticText "Flexible"
+    - StaticText "Payment terms"
+    - StaticText "Handled directly"
+    - paragraph
+      - StaticText "Optional fixes before review"
+    - button "Add a timing window A pickup, delivery, or flexible receiving window reduces follow-up messages." [ref=e225]
+      - StaticText "Add a timing window"
+      - StaticText "A pickup, delivery, or flexible receiving window reduces follow-up messages."
+    - button "Add a short note Receiving instructions, substitutions, or PO context help growers respond faster." [ref=e226]
+      - StaticText "Add a short note"
+      - StaticText "Receiving instructions, substitutions, or PO context help growers respond faster."
+    - button "Review Request" [ref=e227]
+  - generic
+    - button "Open recent activity" [expanded=false, ref=e264]
+    - button "Open messages" [ref=e228]
+  - region "Notifications alt+T" [ref=e201]
+  - button "Open Next.js Dev Tools" [expanded=false, ref=e242]
+    - image
+  - button "Open issues overlay" [ref=e243]
+    - StaticText "2"
+    - StaticText "Issue"
+  - button "Collapse issues badge" [ref=e244]
+    - image
+  - alert
+  - dialog "Review request"
+    - heading "Review request" [level=2, ref=e245]
+    - button "Close request review" [ref=e246]
+      - StaticText "✕"
+    - paragraph
+      - StaticText "Items"
+    - paragraph
+      - StaticText "1 item"
+    - button "Edit" [ref=e247]
+    - paragraph
+      - StaticText "Grower requests"
+    - paragraph
+      - StaticText "1"
+    - button "Edit" [ref=e248]
+    - paragraph
+      - StaticText "Fulfillment"
+    - paragraph
+      - StaticText "Flexible"
+    - button "Edit" [ref=e249]
+    - paragraph
+      - StaticText "Direct terms"
+    - paragraph
+      - StaticText "Handled directly"
+    - button "Edit" [ref=e250]
+    - heading "Vermont Nurseries" [level=3, ref=e251]
+    - paragraph
+      - StaticText "Vermont buyers · Handled directly"
+    - StaticText "$"
+    - StaticText "50.00"
+    - list
+      - listitem [level=1]
+        - StaticText "2"
+        - StaticText " × "
+        - StaticText "Purple Haze Flowers"
+        - StaticText "$"
+        - StaticText "50.00"
+    - StaticText "Inventory is checked again when you submit. If quantities changed, the draft will be adjusted before any request is created."
+    - StaticText "Total"
+    - StaticText "$"
+    - StaticText "50.00"
+    - paragraph
+      - StaticText "Payment arranged with the grower."
+    - button "Back" [ref=e252]
+    - button "Submit request" [ref=e253]
