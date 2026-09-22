@@ -18,7 +18,7 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 | PF-094 | Fixed: layout and alerts share an account-scoped session refresh promise; failed requests remain retryable, manual refresh still forces an update, and browser storage is optional. One locked SQL update plus batched notifications replaces per-alert writes. Four regression checks passed, including five concurrent refreshes producing one notification and malformed-response preservation. TypeScript passed. |
 | PF-112 | Fixed: batch lists omit both testResults and terpenes. One SQL projection counts document objects without transferring their content. API regression passed with null/array/malformed document containers and multi-megabyte legacy values while detail data remains available. |
 | PF-116 | Fixed: quantity edits retain persisted agreed-price snapshots; newly added lines use the current database catalog price. Client unitPrice is ignored and no longer submitted by the editor. Dirty detection compares editable fields and line identity/quantity. Three checks passed, including zero-price tampering, inventory reconciliation/cancellation, accepted-quote consumption, and rendered server pages. |
-| PF-121 | Pending |
+| PF-121 | Already fixed in the reviewed checkpoint: messages use after/afterId cursors and merge lightweight offer updates; both fetch functions stop when document.hidden. Five checks passed for incremental API reads, hidden-tab silence, closed drawer, late responses, draft isolation, and retrying failed/aborted read acknowledgements. Added explicit hidden-tab/cursor regression. |
 | N-001 | Pending |
 | N-002 | Pending |
 | N-003 | Pending |

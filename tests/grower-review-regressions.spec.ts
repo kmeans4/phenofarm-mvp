@@ -253,6 +253,30 @@ test('chat loads only visible threads, ignores late responses and keeps drafts s
   expect(messageRequests).toHaveLength(count); expect(conversationRequests).toHaveLength(beforeSend);
 });
 
+test('chat polling uses message cursors and makes no requests while the tab is hidden', async ({ page }) => {
+  await authenticate(page); await page.setViewportSize({ width: 390, height: 844 });
+  const requests: string[] = [];
+  await page.route('**/api/messages/conversations', async route => { requests.push(route.request().url()); await route.fulfill({ json: { conversations: [conversation('A')] } }); });
+  await page.route('**/api/messages/conversations/A/messages*', async route => {
+    requests.push(route.request().url());
+    await route.fulfill({ json: { messages: route.request().url().includes('after=') ? [] : [message('cursor-A', 'Cursor message')], offerUpdates: [] } });
+  });
+  await page.route('**/api/messages/conversations/A/read', route => route.fulfill({ json: { ok: true } }));
+  await page.clock.install();
+  await page.goto('/grower/products');
+  await page.getByRole('button', { name: 'Open messages', exact: true }).click();
+  await page.getByTestId('conversation-item').click();
+  await expect(page.getByText('Cursor message', { exact: true })).toBeVisible();
+  await page.clock.fastForward(13000);
+  await expect.poll(() => requests.some(url => url.includes('afterId=cursor-A'))).toBe(true);
+  await page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => true }); document.dispatchEvent(new Event('visibilitychange')); });
+  const count = requests.length;
+  await page.clock.fastForward(31000);
+  expect(requests.length).toBe(count);
+  await page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, get: () => false }); document.dispatchEvent(new Event('visibilitychange')); });
+  await expect.poll(() => requests.length).toBeGreaterThan(count);
+});
+
 async function pngFixture(page: Page) {
   const data = await page.evaluate(() => { const canvas = document.createElement('canvas'); canvas.width = 2; canvas.height = 2; const ctx = canvas.getContext('2d')!; ctx.fillStyle = '#00aa55'; ctx.fillRect(0, 0, 2, 2); return canvas.toDataURL('image/png').split(',')[1]; });
   return { name: 'review.png', mimeType: 'image/png', buffer: Buffer.from(data, 'base64') };
