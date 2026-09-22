@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from "next/navigation";
-import { db } from "@/lib/db";
+import { getGrowerProductPage } from "@/lib/grower-products";
+import { Pagination } from "@/app/components/ui/Pagination";
 import { PageHeader } from "@/app/components/ui/PageHeader";
 import { InventoryClient, InventoryProduct } from "./InventoryClient";
 
-export default async function GrowerInventoryPage() {
+export default async function GrowerInventoryPage({ searchParams }: { searchParams: Promise<{ page?: string; view?: string }> }) {
   const session = await getAuthSession();
   
   if (!session) {
@@ -16,23 +17,10 @@ export default async function GrowerInventoryPage() {
   
   if (sessionUser.role !== 'GROWER' || !sessionUser.growerId) redirect('/dashboard');
 
-  // Fetch products for this grower with strain info
-  const rawProducts = await db.product.findMany({
-    where: { growerId: sessionUser.growerId, isDeleted: false },
-    select: {
-      id: true,
-      name: true,
-      productType: true,
-      subType: true,
-      price: true,
-      inventoryQty: true,
-      unit: true,
-      isAvailable: true,
-      strain: { select: { id: true, name: true } },
-      createdAt: true,
-    },
-    orderBy: { createdAt: 'desc' },
-  });
+  const query = await searchParams;
+  const view = ['all', 'low-stock', 'out-of-stock', 'unavailable'].includes(query.view || '') ? query.view! : 'all';
+  const result = await getGrowerProductPage(sessionUser.growerId, new URLSearchParams({ page: query.page || '1', pageSize: '25', view }));
+  const rawProducts = result.products;
 
   // Convert Decimal prices to numbers and use new schema fields
   const products: InventoryProduct[] = rawProducts.map((p) => ({
@@ -63,7 +51,8 @@ export default async function GrowerInventoryPage() {
         }
       />
 
-      <InventoryClient initialProducts={products} />
+      <InventoryClient initialProducts={products} view={view as "all" | "low-stock" | "out-of-stock" | "unavailable"} counts={result.counts} inventoryValue={result.inventoryValue} />
+      <Pagination page={result.page} pageSize={result.pageSize} total={result.total} basePath="/grower/inventory" query={{ view }} label="products" />
     </div>
   );
 }

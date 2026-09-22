@@ -9,7 +9,7 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 | PF-002 | Fixed: SQL projects only the first bounded image URL; catalog, favorites, alerts, and storefronts serve durable URLs directly. Legacy fallback is authenticated, owner-scoped, size-limited, and privately cached. Encoded upload transport still converts to storage URLs before persistence (verified by the product/batch API regression); existing production migration is recorded in the September 18 rollout. Four focused API/browser tests passed, including desktop/mobile legacy compatibility and oversized second-image exclusion. Logo remains selected only where the settings form renders it, as a persisted URL. |
 | PF-005 | Skipped: METRC, per user instruction. |
 | PF-009 | Fixed: testimonials and CTA copy now render on the server through small motion boundaries; FAQ uses native, keyboard-accessible details and works with JavaScript disabled. Motion was already lazy-loaded and standalone output removed. Interactive pricing/tours retained. Desktop/mobile + no-JavaScript browser check passed. |
-| PF-038 | Pending |
+| PF-038 | Fixed: product GET always returns a capped page; inventory shares the server query with global SQL totals and filters. Stock/order pickers use debounced, abortable server searches and explicit more-results controls. Four focused browser/API runs passed (55 products, three inventory pages, search beyond the first page, mobile overflow, preserved quantity editing); TypeScript passed. |
 | PF-069 | Pending |
 | PF-071 | Pending |
 | PF-072 | Pending |

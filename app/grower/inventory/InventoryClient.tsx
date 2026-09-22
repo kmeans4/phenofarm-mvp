@@ -1,6 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, useTransition } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Minus, Plus } from 'lucide-react';
 import { Button } from '@/app/components/ui/Button';
@@ -42,20 +43,20 @@ function InventoryStatusBadge({ isAvailable, quantity }: { isAvailable?: boolean
   return <span className="rounded-full bg-green-100 px-2 py-1 text-xs font-medium text-green-800">Available</span>;
 }
 
-function matchesFilter(product: InventoryProduct, filter: InventoryFilter) {
-  if (filter === 'low-stock') return product.inventoryQty > 0 && product.inventoryQty <= LOW_STOCK_THRESHOLD;
-  if (filter === 'out-of-stock') return product.inventoryQty <= 0;
-  if (filter === 'unavailable') return !product.isAvailable;
-  return true;
-}
-
 interface InventoryClientProps {
   initialProducts: InventoryProduct[];
+  view: InventoryFilter;
+  counts: Record<string, number>;
+  inventoryValue: number;
 }
 
-export function InventoryClient({ initialProducts }: InventoryClientProps) {
+export function InventoryClient({ initialProducts, view, counts, inventoryValue }: InventoryClientProps) {
   const [products, setProducts] = useState(initialProducts);
-  const [activeFilter, setActiveFilter] = useState<InventoryFilter>('all');
+  const router = useRouter();
+  const [navigating, startTransition] = useTransition();
+  const activeFilter = view;
+  const setActiveFilter = (filter: InventoryFilter) => startTransition(() => router.push(`/grower/inventory?view=${filter}`));
+  useEffect(() => { setProducts(initialProducts); setQuantityDrafts({}); }, [initialProducts]);
   const [quantityDrafts, setQuantityDrafts] = useState<Record<string, string>>({});
   const [pendingProductIds, setPendingProductIds] = useState<Set<string>>(new Set());
   const productsRef = useRef(initialProducts);
@@ -64,42 +65,18 @@ export function InventoryClient({ initialProducts }: InventoryClientProps) {
     productsRef.current = products;
   }, [products]);
 
-  const totalValue = useMemo(
-    () => products.reduce((sum, product) => sum + ((product.price || 0) * (product.inventoryQty || 0)), 0),
-    [products],
-  );
-
-  const lowStockCount = useMemo(
-    () => products.filter((product) => product.inventoryQty > 0 && product.inventoryQty <= LOW_STOCK_THRESHOLD).length,
-    [products],
-  );
-
-  const filterOptions = useMemo(
-    () => [
-      { key: 'all' as const, label: 'All', count: products.length },
-      {
-        key: 'low-stock' as const,
-        label: 'Low stock',
-        count: products.filter((product) => product.inventoryQty > 0 && product.inventoryQty <= LOW_STOCK_THRESHOLD).length,
-      },
-      {
-        key: 'out-of-stock' as const,
-        label: 'Out of stock',
-        count: products.filter((product) => product.inventoryQty <= 0).length,
-      },
-      {
-        key: 'unavailable' as const,
-        label: 'Unavailable',
-        count: products.filter((product) => !product.isAvailable).length,
-      },
-    ],
-    [products],
-  );
-
-  const filteredProducts = useMemo(
-    () => products.filter((product) => matchesFilter(product, activeFilter)),
-    [activeFilter, products],
-  );
+  const totalValue = inventoryValue + products.reduce((sum, product) => {
+    const original = initialProducts.find(item => item.id === product.id);
+    return sum + product.price * (product.inventoryQty - (original?.inventoryQty ?? product.inventoryQty));
+  }, 0);
+  const lowStockCount = counts['low-stock'] || 0;
+  const filterOptions = useMemo(() => [
+    { key: 'all' as const, label: 'All', count: counts.all || 0 },
+    { key: 'low-stock' as const, label: 'Low stock', count: counts['low-stock'] || 0 },
+    { key: 'out-of-stock' as const, label: 'Out of stock', count: counts['out-of-stock'] || 0 },
+    { key: 'unavailable' as const, label: 'Unavailable', count: counts.unavailable || 0 },
+  ], [counts]);
+  const filteredProducts = products;
 
   const setPending = (productId: string, isPending: boolean) => {
     setPendingProductIds((prev) => {
@@ -166,6 +143,7 @@ export function InventoryClient({ initialProducts }: InventoryClientProps) {
       )));
       setQuantityDrafts((prev) => ({ ...prev, [productId]: String(safeQuantity) }));
 
+      router.refresh();
       toast.success('Stock updated', {
         description: `${product.name} is now ${safeQuantity} ${formatProductUnit(product.unit)}.`,
         action: options.showUndo === false ? undefined : {
@@ -250,7 +228,7 @@ export function InventoryClient({ initialProducts }: InventoryClientProps) {
     );
   };
 
-  if (products.length === 0) {
+  if (counts.all === 0) {
     return (
       <>
         <OperationsSummary items={[{label: 'Products', value: 0}, {label: 'Stock value', value: '$0'}, {label: 'Low stock', value: 0}]} />
@@ -284,7 +262,7 @@ export function InventoryClient({ initialProducts }: InventoryClientProps) {
 
   return (
     <>
-      <OperationsSummary items={[{label: 'Products', value: products.length}, {label: 'Stock value', value: formatProductMoney(totalValue)}, {label: 'Low stock', value: lowStockCount}]} />
+      <OperationsSummary items={[{label: 'Products', value: counts.all}, {label: 'Stock value', value: formatProductMoney(totalValue)}, {label: 'Low stock', value: lowStockCount}]} />
 
       <p className="hidden text-xs text-gray-500 sm:block">Stock value = list price × quantity on hand.</p>
       <div className="rounded-lg border border-gray-200 bg-white shadow-sm">
@@ -294,7 +272,7 @@ export function InventoryClient({ initialProducts }: InventoryClientProps) {
               <p className="text-sm text-gray-500">Stock edits save automatically.</p>
             </div>
             <label className="sr-only" htmlFor="inventory-mobile-filter">Filter inventory</label>
-            <select id="inventory-mobile-filter" value={activeFilter} onChange={(event) => setActiveFilter(event.target.value as InventoryFilter)} className="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-base sm:hidden">
+            <select id="inventory-mobile-filter" disabled={navigating} value={activeFilter} onChange={(event) => setActiveFilter(event.target.value as InventoryFilter)} className="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-base sm:hidden">
               {filterOptions.map((filter) => <option key={filter.key} value={filter.key}>{filter.label} ({filter.count})</option>)}
             </select>
             <div className="hidden flex-wrap gap-2 sm:flex" aria-label="Inventory filters">
@@ -302,6 +280,7 @@ export function InventoryClient({ initialProducts }: InventoryClientProps) {
                 <button
                   key={filter.key}
                   type="button"
+                  disabled={navigating}
                   onClick={() => setActiveFilter(filter.key)}
                   aria-pressed={activeFilter === filter.key}
                   className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${

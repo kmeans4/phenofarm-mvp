@@ -84,6 +84,35 @@ test('paged catalog keeps focus, avoids session refetch and applies bulk changes
   await page.screenshot({ path: '/tmp/phenofarm-remediation/grower-products-mobile.png', fullPage: true });
 });
 
+test('product lists default to bounded pages and inventory and pickers reach later products', async ({ page, request }) => {
+  await authenticate(page);
+  const response = await request.get('/api/products', { headers: { Cookie: `next-auth.session-token=${token}` } });
+  expect(response.status()).toBe(200);
+  const result = await response.json();
+  expect(result.products).toHaveLength(50);
+  expect(result.total).toBe(55);
+  await page.goto('/grower/inventory');
+  await expect(page.getByRole('navigation', { name: 'Pagination' })).toContainText('Page 1 of 3');
+  await page.getByRole('link', { name: 'Next', exact: true }).click();
+  await expect(page.getByRole('navigation', { name: 'Pagination' })).toContainText('Page 2 of 3');
+  await page.getByRole('link', { name: 'Next', exact: true }).click();
+  await expect(page.getByRole('navigation', { name: 'Pagination' })).toContainText('Page 3 of 3');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await noOverflow(page);
+  await page.goto('/grower/inventory/add');
+  await page.getByPlaceholder('Search products').fill('Review Product 00');
+  await page.getByRole('button', { name: /Review Product 00/ }).click();
+  await expect(page.locator('#stock-quantity')).toHaveValue('20');
+  await page.goto('/grower/orders/add');
+  await page.getByPlaceholder('Search products').fill('Review Product 54');
+  await expect(page.getByRole('button', { name: 'Add item', exact: true })).toBeEnabled();
+  await expect.poll(async () => page.locator('#order-product-search').inputValue()).toBe('Review Product 54');
+  await page.waitForResponse(response => response.url().includes('search=Review+Product+54'));
+  await page.getByRole('button', { name: 'Add item', exact: true }).click();
+  await expect(page.locator('select').first().locator('option:checked')).toHaveText('Review Product 54');
+  await noOverflow(page);
+});
+
 test('product drafts restore explicitly, exclude images, stay account scoped and survive unavailable storage', async ({ page }) => {
   await authenticate(page);
   await page.goto('/grower/products/add');

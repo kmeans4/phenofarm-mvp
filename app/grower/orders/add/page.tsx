@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useGrowerProductOptions } from '@/app/hooks/useGrowerProductOptions';
 import { Product } from '@/types';
 import { PageHeader } from '@/app/components/ui/PageHeader';
 import { formatProductUnit } from '@/lib/product-display';
@@ -25,13 +26,20 @@ type DirectRequestItem = {
 export default function AddOrderPage() {
   const router = useRouter();
   const [dispensaries, setDispensaries] = useState<DispensaryOption[]>([]);
-  const [products, setProducts] = useState<Product[]>([]);
+  const [productSearch, setProductSearch] = useState('');
+  const { options: productOptions, loading: loadingProducts, error: productError, hasMore, loadMore } = useGrowerProductOptions<Product>(productSearch, 'active');
+  const pickedProducts = useRef(new Map<string, Product>());
   const [formData, setFormData] = useState<{dispensaryId: string; items: DirectRequestItem[]; notes: string; shippingFee: string}>({
     dispensaryId: '',
     items: [] as DirectRequestItem[],
     notes: '',
     shippingFee: '0',
   });
+  const products = useMemo(() => {
+    const selected = formData.items.map(item => pickedProducts.current.get(item.productId)).filter((product): product is Product => Boolean(product));
+    return [...new Map([...productOptions, ...selected].map(product => [product.id, product])).values()];
+  }, [productOptions, formData.items]);
+  useEffect(() => { pickedProducts.current = new Map(products.map(product => [product.id, product])); }, [products]);
   const [dispensaryQuery, setDispensaryQuery] = useState('');
   const [isDispensaryListOpen, setIsDispensaryListOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -44,21 +52,13 @@ export default function AddOrderPage() {
 
   const loadData = async () => {
     try {
-      const [dispRes, prodRes] = await Promise.all([
-        fetch('/api/dispensaries'),
-        fetch('/api/products')
-      ]);
-      if (!dispRes.ok || !prodRes.ok) throw new Error('Could not load customers and products. Please reload and try again.');
+      const dispRes = await fetch('/api/dispensaries');
+      if (!dispRes.ok) throw new Error('Could not load customers and products. Please reload and try again.');
       if (dispRes.ok) {
         const dispData = await dispRes.json();
         setDispensaries(Array.isArray(dispData) ? dispData : []);
       }
-      if (prodRes.ok) {
-        const prodData = await prodRes.json();
-        if (Array.isArray(prodData)) {
-          setProducts(prodData.filter((p) => (p?.inventoryQty || 0) > 0 && p?.isAvailable));
-        }
-      }
+
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Could not load request options.');
     } finally {
@@ -431,10 +431,15 @@ export default function AddOrderPage() {
             </button>
           </div>
           <div className="p-3 sm:p-4">
+            <label className="sr-only" htmlFor="order-product-search">Search products</label>
+            <input id="order-product-search" type="search" value={productSearch} onChange={event => setProductSearch(event.target.value)} placeholder="Search products" className="mb-3 w-full rounded-lg border px-3 py-2 text-base" />
+            {productError && <p role="alert" className="text-sm text-red-600">{productError}</p>}
+            {hasMore && <button type="button" disabled={loadingProducts} onClick={loadMore} className="mb-3 min-h-10 text-sm text-green-700">More products</button>}
+            {loadingProducts && <p className="text-sm text-gray-500">Loading products…</p>}
             {products.length === 0 ? (
               <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-                <p className="text-gray-700 font-medium mb-2">No products available to add</p>
-                <p className="text-sm text-gray-500 mb-4">Next step: create at least one product before building an order.</p>
+                <p className="text-gray-700 font-medium mb-2">No matching products</p>
+                <p className="text-sm text-gray-500 mb-4">Search for another product or add a listing.</p>
                 <Link href="/grower/products/add" className="text-green-600 hover:text-green-700 font-medium">
                   Add a product
                 </Link>

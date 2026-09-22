@@ -1,6 +1,7 @@
 'use client';
 
-import { useMemo, useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
+import { useGrowerProductOptions } from '@/app/hooks/useGrowerProductOptions';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { PageHeader } from '@/app/components/ui/PageHeader';
@@ -20,53 +21,17 @@ export default function UpdateStockPage() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
-  const [products, setProducts] = useState<StockProduct[]>([]);
-  const [loading, setLoading] = useState(true);
 
   const [productId, setProductId] = useState('');
   const [productSearch, setProductSearch] = useState('');
   const [quantity, setQuantity] = useState('');
 
   const pendingRef = useRef(false);
-  useEffect(() => { loadProducts(); }, []);
-
-  const loadProducts = async () => {
-    try {
-      const response = await fetch('/api/products');
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(Array.isArray(data) ? data : []);
-      }
-    } catch (err) {
-      console.error('Error:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const selectedProduct = products.find((p) => p?.id === productId);
-  const filteredProducts = useMemo(() => {
-    const query = productSearch.trim().toLowerCase();
-    const candidates = query
-      ? products.filter((product) => {
-          const haystack = [
-            product.name,
-            product.productType,
-            product.subType,
-            product.strain?.name,
-          ]
-            .filter(Boolean)
-            .join(' ')
-            .toLowerCase();
-
-          return haystack.includes(query);
-        })
-      : products;
-
-    return candidates.slice(0, 8);
-  }, [productSearch, products]);
+  const [selectedProduct, setSelectedProduct] = useState<StockProduct | null>(null);
+  const { options: filteredProducts, loading, error: loadError, hasMore, loadMore } = useGrowerProductOptions<StockProduct>(productSearch);
 
   const handleProductPick = (product: StockProduct) => {
+    setSelectedProduct(product);
     setProductId(product.id);
     setProductSearch(product.name || '');
     setQuantity(String(product.inventoryQty ?? 0));
@@ -105,13 +70,6 @@ export default function UpdateStockPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto w-full max-w-2xl space-y-3 sm:space-y-5">
@@ -133,6 +91,7 @@ export default function UpdateStockPage() {
                 onChange={(event) => {
                   setProductSearch(event.target.value);
                   setProductId('');
+                  setSelectedProduct(null);
                 }}
                 className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-600"
                 placeholder="Search products"
@@ -166,8 +125,9 @@ export default function UpdateStockPage() {
                     </button>
                   ))
                 ) : (
-                  <div className="px-3 py-4 text-sm text-gray-500">No products match that search.</div>
+                  <div className="px-3 py-4 text-sm text-gray-500">{loading ? 'Loading products…' : loadError || 'No products match that search.'}</div>
                 )}
+              {hasMore && <button type="button" disabled={loading} onClick={loadMore} className="w-full px-3 py-2 text-sm text-green-700">More products</button>}
               </div>}
 
               {selectedProduct && (
