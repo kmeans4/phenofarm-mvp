@@ -30,24 +30,49 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
   const [loading, setLoading] = useState(true);
   const [panelPosition, setPanelPosition] = useState<{ left: number; top: number; maxHeight: number } | undefined>();
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const inFlight = useRef<AbortController | null>(null);
+  const mutating = useRef(false);
+  const [error, setError] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
-    try {
-      const response = await fetch('/api/notifications');
-      const data = await response.json().catch(() => ({}));
-      if (response.ok) {
-        setItems(Array.isArray(data.notifications) ? data.notifications : []);
-        setUnreadCount(Number(data.unreadCount) || 0);
-      }
-    } finally {
-      setLoading(false);
+    // Responsive layouts mount two bells. Only the visible one owns polling.
+    if (document.hidden || !triggerRef.current?.getClientRects().length) {
+      inFlight.current?.abort();
+      inFlight.current = null;
+      return;
     }
-  }, []);
+    if (inFlight.current || mutating.current) return;
+    const controller = new AbortController();
+    inFlight.current = controller;
+    try {
+      const response = await fetch(open ? '/api/notifications' : '/api/notifications?countOnly=true', { signal: controller.signal });
+      const data = await response.json();
+      if (!response.ok || !Number.isFinite(data.unreadCount) || (open && !Array.isArray(data.notifications))) throw new Error('Invalid notifications');
+      if (controller.signal.aborted) return;
+      if (open) setItems(data.notifications);
+      setUnreadCount(data.unreadCount);
+      setError(null);
+    } catch {
+      if (!controller.signal.aborted) setError('Notifications could not be loaded. Try again.');
+    } finally {
+      if (!controller.signal.aborted) setLoading(false);
+      if (inFlight.current === controller) inFlight.current = null;
+    }
+  }, [open]);
 
   useEffect(() => {
-    load();
-    const interval = window.setInterval(load, 60_000);
-    return () => window.clearInterval(interval);
+    void load();
+    const interval = window.setInterval(() => void load(), 60_000);
+    document.addEventListener('visibilitychange', load);
+    window.addEventListener('resize', load);
+    return () => {
+      window.clearInterval(interval);
+      document.removeEventListener('visibilitychange', load);
+      window.removeEventListener('resize', load);
+      inFlight.current?.abort();
+      inFlight.current = null;
+    };
   }, [load]);
 
   useEffect(() => {
@@ -83,30 +108,39 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
     return () => window.removeEventListener('resize', positionPanel);
   }, [open, positionPanel]);
 
-  const markAllRead = async () => {
-    await fetch('/api/notifications', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ markAllRead: true }),
-    });
-    setUnreadCount(0);
-    setItems((current) => current.map((item) => ({ ...item, readAt: item.readAt || new Date().toISOString() })));
+  const markRead = async (body: { id?: string; markAllRead?: boolean }) => {
+    if (mutating.current) return false;
+    mutating.current = true;
+    setSaving(true);
+    inFlight.current?.abort();
+    inFlight.current = null;
+    try {
+      const response = await fetch('/api/notifications', {
+        method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+      });
+      if (!response.ok) throw new Error('Read acknowledgement failed');
+      setError(null);
+      setUnreadCount(count => body.markAllRead ? 0 : Math.max(0, count - 1));
+      setItems(current => current.map(item => body.markAllRead || item.id === body.id ? { ...item, readAt: item.readAt || new Date().toISOString() } : item));
+      return true;
+    } catch {
+      setError('Could not mark notifications as read. Try again.');
+      return false;
+    } finally {
+      mutating.current = false;
+      setSaving(false);
+      setLoading(false);
+    }
   };
 
   const openNotification = async (item: NotificationItem) => {
-    if (!item.readAt) {
-      await fetch('/api/notifications', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: item.id }),
-      });
-    }
+    if (!item.readAt && !await markRead({ id: item.id })) return;
     setOpen(false);
     router.push(item.href);
   };
 
   const renderItem = (item: NotificationItem) => (
-    <button key={item.id} type="button" onClick={() => openNotification(item)} className={`block w-full border-b border-gray-100 px-4 py-3 text-left hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 ${item.readAt ? '' : 'bg-green-50/60'}`}>
+    <button key={item.id} type="button" onClick={() => openNotification(item)} disabled={saving} className={`block w-full border-b border-gray-100 px-4 py-3 text-left hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 ${item.readAt ? '' : 'bg-green-50/60'}`}>
       <span className="flex items-start justify-between gap-3">
         <span className="min-w-0"><span className="block text-sm font-semibold text-gray-900">{item.title}</span><span className="mt-1 block text-sm text-gray-600">{item.body}</span></span>
         <time className="shrink-0 text-xs text-gray-500" dateTime={item.createdAt} title={new Date(item.createdAt).toLocaleString()}>{relativeTime(item.createdAt)}</time>
@@ -119,7 +153,7 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
       <button
         ref={triggerRef}
         type="button"
-        onClick={() => { positionPanel(); setOpen((value) => !value); }}
+        onClick={() => { positionPanel(); if (!open) setLoading(true); setOpen((value) => !value); }}
         aria-label="Notifications"
         aria-expanded={open}
         className={compact
@@ -145,7 +179,7 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
                 {unreadCount > 0 && <p className="text-xs text-gray-500">{unreadCount} unread</p>}
               </div>
               <div className="flex items-center gap-1">
-                {unreadCount > 0 && <button type="button" onClick={markAllRead} className="inline-flex min-h-10 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-green-700 hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600" disabled={unreadCount === 0}>
+                {unreadCount > 0 && <button type="button" onClick={() => void markRead({ markAllRead: true })} className="inline-flex min-h-10 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-green-700 hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600" disabled={saving}>
                   <CheckCheck className="h-4 w-4" /> Mark all read
                 </button>}
                 <button type="button" onClick={() => setOpen(false)} aria-label="Close notifications" className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600">
@@ -153,6 +187,7 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
                 </button>
               </div>
             </header>
+            {error && <div role="alert" className="px-4 py-2 text-sm text-red-700">{error} <button type="button" onClick={() => void load()} className="font-semibold underline">Retry</button></div>}
             <div className="min-h-0 flex-1 overflow-y-auto">
               {loading ? (
                 <p className="flex items-center gap-2 p-4 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /> Loading...</p>

@@ -6,7 +6,12 @@ export async function GET(request: NextRequest) {
   const session = await getAuthSession();
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const cursor = new URL(request.url).searchParams.get('cursor');
+  const params = new URL(request.url).searchParams;
+  if (params.get('countOnly') === 'true') {
+    const unreadCount = await db.notification.count({ where: { userId: session.user.id, readAt: null } });
+    return NextResponse.json({ unreadCount });
+  }
+  const cursor = params.get('cursor');
   const notifications = await db.notification.findMany({
     where: { userId: session.user.id },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],

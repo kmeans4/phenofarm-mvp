@@ -273,6 +273,65 @@ test('layout and alerts share one automatic refresh and manual refresh stays ava
   await expect(refresh).toBeEnabled();
 });
 
+test('notification count endpoint omits bodies and remains scoped to the signed-in account', async ({ request }) => {
+  await db.notification.createMany({ data: [
+    { userId: buyerUserId, type: 'ORDER_STATUS_UPDATED', title: prefix, body: 'Private buyer notification', href: '/dispensary/orders' },
+    { userId: growerUserId, type: 'ORDER_STATUS_UPDATED', title: prefix, body: 'Other account notification', href: '/grower/orders' },
+  ] });
+  const count = await buyerRequest(request, '/api/notifications?countOnly=true');
+  expect(count.status()).toBe(200);
+  expect(await count.json()).toEqual({ unreadCount: await db.notification.count({ where: { userId: buyerUserId, readAt: null } }) });
+  const full = await (await buyerRequest(request, '/api/notifications')).json();
+  expect(full.notifications.every((item: { userId: string }) => item.userId === buyerUserId)).toBe(true);
+});
+
+test('notification bells poll only visible counts, load details on open, and preserve failed read acknowledgements', async ({ page, context }) => {
+  await authenticate(context);
+  await page.clock.install();
+  const reads: string[] = [];
+  let failMarkRead = true;
+  let unreadCount = 3;
+  await page.route('**/api/notifications*', async route => {
+    if (route.request().method() === 'PATCH') {
+      if (failMarkRead) return route.fulfill({ status: 500, json: { error: 'Retry' } });
+      unreadCount = 0;
+      return route.fulfill({ json: { success: true } });
+    }
+    const countOnly = new URL(route.request().url()).searchParams.get('countOnly') === 'true';
+    reads.push(countOnly ? 'count' : 'details');
+    await route.fulfill({ json: countOnly ? { unreadCount } : { unreadCount, notifications: [1, 2, 3].map(id => ({ id: String(id), title: 'Revised quote', body: 'Same buyer and product', href: '/dispensary/orders', readAt: unreadCount ? null : new Date().toISOString(), createdAt: new Date().toISOString() })) } });
+  });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto('/dispensary/settings');
+  const trigger = page.getByRole('button', { name: 'Notifications', exact: true }).locator('visible=true');
+  await expect(trigger).toContainText('3');
+  expect(reads).toEqual(['count']);
+  await page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, value: true }); document.dispatchEvent(new Event('visibilitychange')); });
+  await page.clock.fastForward(180000);
+  expect(reads).toEqual(['count']);
+  await page.evaluate(() => { Object.defineProperty(document, 'hidden', { configurable: true, value: false }); document.dispatchEvent(new Event('visibilitychange')); });
+  await expect.poll(() => reads.length).toBe(2);
+  await trigger.click();
+  const panel = page.getByRole('region', { name: 'Notifications panel' });
+  await expect(panel.locator('summary')).toContainText('Revised quote · 3');
+  expect(reads.filter(value => value === 'details')).toHaveLength(1);
+  await panel.getByRole('button', { name: 'Mark all read' }).click();
+  await expect(panel.getByRole('alert')).toContainText('Could not mark');
+  await expect(panel).toContainText('3 unread');
+  failMarkRead = false;
+  await panel.getByRole('button', { name: 'Mark all read' }).click();
+  await expect(panel.getByText('3 unread')).toHaveCount(0);
+  await page.keyboard.press('Escape');
+  await expect(trigger).toBeFocused();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await trigger.click();
+  await expect(panel.locator('summary')).toContainText('Revised quote · 3');
+  const box = await panel.boundingBox();
+  expect(box!.x).toBeGreaterThanOrEqual(0); expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+  await page.keyboard.press('Escape');
+  await expect(trigger).toBeFocused();
+});
+
 test('catalog latest search wins; mounting does not write collections', async ({ page, context }) => {
   await authenticate(context);
   const writes: string[] = [];
