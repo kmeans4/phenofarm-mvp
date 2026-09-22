@@ -1,13 +1,11 @@
 'use client';
 
 import { useEffect } from 'react';
+import { refreshSessionPriceAlerts } from './refresh-price-alerts';
 
-export function PriceAlertSessionRefresh() {
+export function PriceAlertSessionRefresh({ userId }: { userId: string }) {
   useEffect(() => {
-    const key = 'phenofarm-price-alerts-refreshed';
-    if (sessionStorage.getItem(key)) return;
-    sessionStorage.setItem(key, new Date().toISOString());
-    void fetch('/api/dispensary/price-alerts/refresh', { method: 'POST' });
-  }, []);
+    void refreshSessionPriceAlerts(userId).catch(() => { /* The alerts page can retry and display the failure. */ });
+  }, [userId]);
   return null;
 }

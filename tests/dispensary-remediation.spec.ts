@@ -196,6 +196,40 @@ test('collection diffs preserve existing IDs, out-of-stock favorites, and stored
   expect((await refresh.json()).alerts.map((item: { id: string }) => item.id)).toContain(alert.id);
 });
 
+test('concurrent price refreshes update once and notify only for visible price drops', async ({ request }) => {
+  const headers = { Cookie: `next-auth.session-token=${cookie}` };
+  await db.dispensaryPriceAlert.upsert({ where: { dispensaryId_productId: { dispensaryId: buyerId, productId: stockId } }, create: { dispensaryId: buyerId, productId: stockId, targetPrice: 10, currentPrice: 12.5 }, update: { targetPrice: 10, currentPrice: 12.5, isTriggered: false, triggeredAt: null } });
+  await db.notification.deleteMany({ where: { userId: buyerUserId, type: 'PRICE_ALERT_TRIGGERED' } });
+  await db.product.update({ where: { id: stockId }, data: { price: 8 } });
+  try {
+    const responses = await Promise.all(Array.from({ length: 5 }, () => request.post('/api/dispensary/price-alerts/refresh', { headers })));
+    expect(responses.map(response => response.status())).toEqual([200, 200, 200, 200, 200]);
+    const alert = await db.dispensaryPriceAlert.findUniqueOrThrow({ where: { dispensaryId_productId: { dispensaryId: buyerId, productId: stockId } } });
+    expect(Number(alert.currentPrice)).toBe(8); expect(Number(alert.originalPrice)).toBe(12.5); expect(alert.isTriggered).toBe(true);
+    expect(await db.notification.count({ where: { userId: buyerUserId, type: 'PRICE_ALERT_TRIGGERED' } })).toBe(1);
+  } finally {
+    await db.product.update({ where: { id: stockId }, data: { price: 12.5 } });
+    await db.dispensaryPriceAlert.updateMany({ where: { dispensaryId: buyerId, productId: stockId }, data: { currentPrice: 12.5, isTriggered: false, triggeredAt: null } });
+  }
+});
+
+test('layout and alerts share one automatic refresh and manual refresh stays available', async ({ page, context }) => {
+  await authenticate(context);
+  let refreshes = 0;
+  await page.route('**/api/dispensary/price-alerts/refresh', async route => {
+    refreshes++;
+    await new Promise(resolve => setTimeout(resolve, 200));
+    await route.fulfill({ json: { alerts: [] } });
+  });
+  await page.goto('/dispensary/saved?tab=alerts');
+  const refresh = page.getByRole('button', { name: 'Refresh prices', exact: true });
+  await expect(refresh).toBeEnabled();
+  await expect.poll(() => refreshes).toBe(1);
+  await refresh.click();
+  await expect.poll(() => refreshes).toBe(2);
+  await expect(refresh).toBeEnabled();
+});
+
 test('catalog latest search wins; mounting does not write collections', async ({ page, context }) => {
   await authenticate(context);
   const writes: string[] = [];

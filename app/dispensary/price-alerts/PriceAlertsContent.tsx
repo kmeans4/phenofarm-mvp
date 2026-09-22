@@ -1,6 +1,8 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useSession } from 'next-auth/react';
+import { refreshSessionPriceAlerts } from '../refresh-price-alerts';
 import { useRouter } from 'next/navigation';
 import { useBuyerCollection } from '../hooks/useBuyerCollection';
 import Link from "next/link";
@@ -54,6 +56,7 @@ interface PriceAlertsContentProps {
 
 export default function PriceAlertsContent({ embedded = false }: PriceAlertsContentProps) {
   const router = useRouter();
+  const userId = useSession().data?.user?.id;
   const { items: alerts, setItems: setAlerts, ready, error: syncError, mergeRefresh } = useBuyerCollection('price-alerts', normalizeAlerts);
   const [refreshError, setRefreshError] = useState('');
   const [activeTab, setActiveTab] = useState<AlertTab>('active');
@@ -61,17 +64,15 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
   const [showClearConfirm, setShowClearConfirm] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const refreshingRef = useRef(false);
-  const refreshPrices = useCallback(async () => {
-    if (refreshingRef.current) return;
+  const refreshPrices = useCallback(async (force = false) => {
+    if (refreshingRef.current || !userId) return;
     refreshingRef.current = true; setRefreshing(true); setRefreshError('');
     try {
-      const response = await fetch('/api/dispensary/price-alerts/refresh', { method: 'POST' });
-      const data = await response.json();
-      if (!response.ok || !Array.isArray(data.alerts) || normalizeAlerts(data.alerts).length !== data.alerts.length) throw new Error('Could not refresh prices. Your saved alerts have been kept.');
-      mergeRefresh(data.alerts);
+      const data = await refreshSessionPriceAlerts(userId, force);
+      if (data) mergeRefresh(normalizeAlerts(data));
     } catch (error) { setRefreshError(error instanceof Error ? error.message : 'Could not refresh prices.'); }
     finally { refreshingRef.current = false; setRefreshing(false); }
-  }, [mergeRefresh]);
+  }, [mergeRefresh, userId]);
   useEffect(() => { if (ready) void refreshPrices(); }, [ready, refreshPrices]);
 
   // Remove single alert
@@ -171,7 +172,7 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
       <div className="flex flex-wrap items-center justify-between gap-2">
         <p className="text-xs text-gray-500">{explainerText}</p>
         <div className="flex items-center gap-2">
-          <button type="button" aria-label="Refresh prices" onClick={refreshPrices} disabled={refreshing} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-green-700 disabled:opacity-50"><RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />{refreshing ? 'Refreshing…' : 'Refresh'}</button>
+          <button type="button" aria-label="Refresh prices" onClick={() => void refreshPrices(true)} disabled={refreshing} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-green-700 disabled:opacity-50"><RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />{refreshing ? 'Refreshing…' : 'Refresh'}</button>
           {alerts.length > 0 && <details className="relative"><summary className="flex min-h-10 cursor-pointer items-center px-2 text-sm text-gray-600">More</summary><div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border bg-white p-1 shadow-lg">{clearAllButton}</div></details>}
         </div>
       </div>
