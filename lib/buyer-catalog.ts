@@ -43,6 +43,8 @@ export async function getBuyerCatalog(dispensaryId: string, searchParams: URLSea
       inventoryQty: { gt: 0 },
       grower: marketplaceGrowerWhere(),
     };
+    const growerId = searchParams.get('growerId');
+    if (growerId) where.growerId = growerId;
     const andClauses: Prisma.ProductWhereInput[] = [];
     if (searchParams.get('favorites') === 'true') {
       if (searchParams.has('favoriteIds')) where.id = { in: normalizeProductIds(searchParams.get('favoriteIds')?.split(',')) };
@@ -156,11 +158,12 @@ export async function getBuyerCatalog(dispensaryId: string, searchParams: URLSea
           orderBy = [{ name: 'desc' }, { id: 'desc' }];
           break;
         default:
-          orderBy = [{ grower: { businessName: 'asc' } }, { name: 'asc' }, { id: 'asc' }];
+          orderBy = growerId ? [{ createdAt: 'desc' }, { id: 'asc' }] : [{ grower: { businessName: 'asc' } }, { name: 'asc' }, { id: 'asc' }];
       }
     }
 
-    const productTypeFacetWhere: Prisma.ProductWhereInput = { ...where };
+    const productTypeFacetWhere: Prisma.ProductWhereInput = {
+      ...(growerId ? { growerId } : {}), ...where };
     delete productTypeFacetWhere.productType;
 
     const [total, productTypeRows, trendingRows, regularProducts] = await Promise.all([

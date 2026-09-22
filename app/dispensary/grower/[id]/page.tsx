@@ -1,9 +1,8 @@
-import { productImagesById } from '@/lib/product-images';
+import { getBuyerCatalog } from '@/lib/buyer-catalog';
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth-helpers";
-import { buyerProductSelect } from "@/lib/buyer-products";
 import { 
   MapPin, 
   Phone, 
@@ -16,11 +15,11 @@ import {
 import { PageHeader } from "@/app/components/ui/PageHeader";
 import { DEFAULT_COMMERCIAL_TERMS } from "@/lib/ux-workflow";
 import GrowerShopContent from "./GrowerShopContent";
-import { toSafeProductType } from "@/lib/product-serializers";
 import { marketplaceGrowerWhere } from "@/lib/license";
 
 interface GrowerPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ search?: string }>;
 }
 
 async function getGrowerWithProducts(id: string) {
@@ -32,7 +31,6 @@ async function getGrowerWithProducts(id: string) {
         city: true, state: true, phone: true, website: true, licenseNumber: true,
         commercialMinimumOrder: true, commercialFulfillmentMethods: true, commercialFulfillmentRegion: true,
         commercialPaymentTerms: true, commercialResponseWindow: true, commercialContactNote: true,
-        products: { where: { isAvailable: true, isDeleted: false, status: 'PUBLISHED', inventoryQty: { gt: 0 } }, select: buyerProductSelect, orderBy: { createdAt: 'desc' } },
         _count: { select: { products: { where: { isAvailable: true, isDeleted: false, status: 'PUBLISHED', inventoryQty: { gt: 0 } } } } },
       },
     }),
@@ -45,24 +43,6 @@ async function getGrowerWithProducts(id: string) {
   ]);
 
   return grower ? { ...grower, fulfilledRequests } : null;
-}
-
-async function serializeShopProducts(products: NonNullable<Awaited<ReturnType<typeof getGrowerWithProducts>>>['products']) {
-  const images = await productImagesById(products.map(product => product.id));
-  return products.map((product) => ({
-    id: product.id,
-    name: product.name,
-    price: product.isPriceVisible ? Number(product.price) : null,
-    isPriceVisible: product.isPriceVisible,
-    strain: product.strain ? { name: product.strain.name } : null,
-    productType: toSafeProductType(product.productType),
-    subType: product.subType,
-    unit: product.unit,
-    batch: product.batch ? { thc: product.batch.thc != null ? Number(product.batch.thc) : null } : null,
-    thc: product.thcMax != null ? Number(product.thcMax) : product.thcMin != null ? Number(product.thcMin) : null,
-    inventoryQty: product.inventoryQty,
-    images: images.get(product.id) || [],
-  }));
 }
 
 function getInitials(name: string) {
@@ -81,12 +61,16 @@ function displayTerm(value: string | null | undefined, fallback: string) {
   return value?.trim() || fallback;
 }
 
-export default async function GrowerPage({ params }: GrowerPageProps) {
+export default async function GrowerPage({ params, searchParams }: GrowerPageProps) {
   const session = await getAuthSession();
   if (!session) redirect('/auth/sign_in');
   if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) redirect('/dashboard');
   const { id } = await params;
-  const grower = await getGrowerWithProducts(id);
+  const query = await searchParams;
+  const [grower, catalog] = await Promise.all([
+    getGrowerWithProducts(id),
+    getBuyerCatalog(session.user.dispensaryId, new URLSearchParams({ growerId: id, limit: '24', search: query.search || '' })),
+  ]);
 
   if (!grower) {
     notFound();
@@ -200,8 +184,8 @@ export default async function GrowerPage({ params }: GrowerPageProps) {
         {' · '}{commercialTerms.minimumOrder}
       </p>
 
-      <GrowerShopContent
-        products={await serializeShopProducts(grower.products)}
+      <GrowerShopContent key={grower.id}
+        initialData={catalog}
         growerName={grower.businessName}
         growerId={grower.id}
       />

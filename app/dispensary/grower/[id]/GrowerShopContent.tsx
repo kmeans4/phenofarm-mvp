@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { BuyerCatalogPage } from '@/lib/buyer-catalog';
 import { 
   LayoutGrid, 
   List as ListIcon, 
@@ -44,12 +45,16 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'name-desc', label: 'Name: Z-A' },
 ];
 
+function shopProducts(data: BuyerCatalogPage): Product[] {
+  return data.products.map(product => ({ ...product, strain: product.strain ? { name: product.strain } : null, batch: { thc: product.thc } }));
+}
+
 export default function GrowerShopContent({ 
-  products,
+  initialData,
   growerName,
   growerId 
 }: { 
-  products: Product[];
+  initialData: BuyerCatalogPage;
   growerName: string;
   growerId: string;
 }) {
@@ -68,60 +73,47 @@ export default function GrowerShopContent({
   const [messageSuccess, setMessageSuccess] = useState('');
   const [messageError, setMessageError] = useState('');
 
-  // Get unique product types for filter
-  const productTypes = useMemo(() => {
-    const types = [...new Set(products.map(p => p.productType).filter(Boolean))];
-    return types.sort();
-  }, [products]);
+  const [products, setProducts] = useState(() => shopProducts(initialData));
+  const [total, setTotal] = useState(initialData.total);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(initialData.hasMore);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [productTypes, setProductTypes] = useState(() => Object.keys(initialData.productTypeCounts).sort());
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+  useEffect(() => {
+    const timer = setTimeout(() => { setDebouncedSearch(searchQuery); setPage(1); }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  const key = JSON.stringify([growerId, debouncedSearch, selectedType, sortBy, page]);
+  const hydratedKey = useRef<string | null>(key);
+  useEffect(() => {
+    if (hydratedKey.current === key) return;
+    hydratedKey.current = null;
+    const controller = new AbortController();
+    setLoading(true); setLoadError('');
+    const params = new URLSearchParams({ growerId, search: debouncedSearch, sortBy, page: String(page), limit: '24' });
+    if (selectedType) params.set('productTypes', selectedType);
+    fetch(`/api/dispensary/catalog?${params}`, { signal: controller.signal }).then(async response => {
+      if (!response.ok) throw new Error('Could not load products. Try again.');
+      const data: BuyerCatalogPage = await response.json();
+      if (controller.signal.aborted) return;
+      const next = shopProducts(data);
+      setProducts(previous => page === 1 ? next : [...new Map([...previous, ...next].map(product => [product.id, product])).values()]);
+      setTotal(data.total); setHasMore(data.hasMore); setProductTypes(Object.keys(data.productTypeCounts).sort());
+    }).catch(error => { if (!controller.signal.aborted) setLoadError(error.message); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [key, growerId, debouncedSearch, selectedType, sortBy, page]);
+  const filteredProducts = products;
 
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
-
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(p => 
-        p.name.toLowerCase().includes(query) ||
-        (p.strain?.name && p.strain.name.toLowerCase().includes(query)) ||
-        (p.productType && p.productType.toLowerCase().includes(query))
-      );
-    }
-
-    // Apply type filter
-    if (selectedType) {
-      result = result.filter(p => p.productType === selectedType);
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'price-asc':
-        result.sort((a, b) => Number(a.price == null) - Number(b.price == null) || ((a.price ?? 0) - (b.price ?? 0)));
-        break;
-      case 'price-desc':
-        result.sort((a, b) => Number(a.price == null) - Number(b.price == null) || ((b.price ?? 0) - (a.price ?? 0)));
-        break;
-      case 'thc-asc':
-        result.sort((a, b) => ((a.batch?.thc ?? a.thc ?? 0) - (b.batch?.thc ?? b.thc ?? 0)));
-        break;
-      case 'thc-desc':
-        result.sort((a, b) => ((b.batch?.thc ?? b.thc ?? 0) - (a.batch?.thc ?? a.thc ?? 0)));
-        break;
-      case 'name-asc':
-        result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name-desc':
-        result.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-    }
-
-    return result;
-  }, [products, searchQuery, selectedType, sortBy]);
+  const changeType = (value: string | null) => { setPage(1); setSelectedType(value); };
+  const changeSort = (value: SortOption) => { setPage(1); setSortBy(value); };
 
   const clearFilters = () => {
     setSearchQuery('');
-    setSelectedType(null);
-    setSortBy('default');
+    changeType(null);
+    changeSort('default');
   };
 
   const openMessageModal = (product: Product, mode: 'REQUEST_PRICING' | 'QUESTION') => {
@@ -197,7 +189,7 @@ export default function GrowerShopContent({
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-xl font-semibold text-gray-900">Products ({filteredProducts.length})</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Products ({total})</h2>
         </div>
         
         {/* Controls */}
@@ -218,7 +210,7 @@ export default function GrowerShopContent({
           <div className="relative">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
+              onChange={(e) => changeSort(e.target.value as SortOption)}
               aria-label="Sort products" className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer text-base sm:text-sm"
             >
               {SORT_OPTIONS.map(option => (
@@ -288,7 +280,7 @@ export default function GrowerShopContent({
           {sortBy !== 'default' && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-50 text-purple-700 text-sm rounded-full">
               {SORT_OPTIONS.find(o => o.value === sortBy)?.label}
-              <button onClick={() => setSortBy('default')} className="hover:text-purple-900">
+              <button onClick={() => changeSort('default')} className="hover:text-purple-900">
                 <X size={14} />
               </button>
             </span>
@@ -296,7 +288,7 @@ export default function GrowerShopContent({
           {selectedType && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full">
               Type: {selectedType}
-              <button onClick={() => setSelectedType(null)} className="hover:text-green-900">
+              <button onClick={() => changeType(null)} className="hover:text-green-900">
                 <X size={14} />
               </button>
             </span>
@@ -321,7 +313,7 @@ export default function GrowerShopContent({
       {/* Product Type Filters (Desktop) */}
       <div className="hidden lg:flex flex-wrap gap-2">
         <button
-          onClick={() => setSelectedType(null)}
+          onClick={() => changeType(null)}
           className={`min-h-10 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             !selectedType 
               ? 'bg-green-600 text-white' 
@@ -333,7 +325,7 @@ export default function GrowerShopContent({
         {productTypes.map(type => (
           <button
             key={type}
-            onClick={() => setSelectedType(type === selectedType ? null : type)}
+            onClick={() => changeType(type === selectedType ? null : type)}
             className={`min-h-10 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedType === type 
                 ? 'bg-green-600 text-white' 
@@ -351,7 +343,7 @@ export default function GrowerShopContent({
           <h3 className="font-semibold text-gray-900">Product type</h3>
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => setSelectedType(null)}
+              onClick={() => changeType(null)}
               className={`min-h-10 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 !selectedType 
                   ? 'bg-green-600 text-white' 
@@ -363,7 +355,7 @@ export default function GrowerShopContent({
             {productTypes.map(type => (
               <button
                 key={type}
-                onClick={() => setSelectedType(type === selectedType ? null : type)}
+                onClick={() => changeType(type === selectedType ? null : type)}
                 className={`min-h-10 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   selectedType === type 
                     ? 'bg-green-600 text-white' 
@@ -378,6 +370,9 @@ export default function GrowerShopContent({
       )}
 
       {/* Products Grid/List */}
+      {loadError && <p role="alert" className="text-sm text-red-600">{loadError}</p>}
+      {loading && <p role="status" className="text-sm text-gray-500">Loading products…</p>}
+      {hasMore && <button type="button" disabled={loading} onClick={() => setPage(value => value + 1)} className="min-h-10 rounded-lg border px-4 py-2 text-sm">More products</button>}
       {filteredProducts.length > 0 ? (
         <>
           {viewMode === 'grid' ? (

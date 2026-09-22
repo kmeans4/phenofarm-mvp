@@ -142,6 +142,26 @@ test('buyer catalog safely paginates, combines filters and suppresses hidden/del
   finally { await db.grower.update({ where: { id: growerId }, data: { isVerified: true } }); }
 });
 
+test('storefront pages and searches the entire grower catalog without mixing other shops', async ({ page, context, request }) => {
+  const name = `${prefix}-paged-`;
+  await db.product.createMany({ data: Array.from({ length: 50 }, (_, index) => ({ growerId, name: `${name}${String(index).padStart(2, '0')}`, price: 12, productType: 'Flower', unit: 'Gram', inventoryQty: 10, isAvailable: true })) });
+  try {
+    await authenticate(context);
+    await page.goto(`/dispensary/grower/${growerId}`);
+    await expect(page.getByRole('heading', { name: 'Products (52)', exact: true })).toBeVisible();
+    const scoped = await buyerRequest(request, `/api/dispensary/catalog?growerId=${growerId}&limit=24`);
+    expect((await scoped.json()).products.every((product: { grower: { id: string } }) => product.grower.id === growerId)).toBe(true);
+    await expect(page.getByRole('heading', { name: new RegExp(prefix) })).toHaveCount(25);
+    await page.getByRole('button', { name: 'More products', exact: true }).click();
+    await expect(page.getByRole('heading', { name: new RegExp(prefix) })).toHaveCount(49);
+    await page.getByLabel('Search products', { exact: true }).fill(`${name}49`);
+    await expect(page.getByRole('heading', { name: 'Products (1)', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: `${name}49`, exact: true })).toBeVisible();
+    await page.setViewportSize({ width: 390, height: 844 });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+  } finally { await db.product.deleteMany({ where: { growerId, name: { startsWith: name } } }); }
+});
+
 test('cart validation targets exact IDs and retains unavailable products without hidden prices', async ({ request }) => {
   const response = await request.post('/api/dispensary/cart/validate', { headers: { Cookie: `next-auth.session-token=${cookie}` }, data: { productIds: [stockId, unavailableId, deletedId, hiddenId, draftId] } });
   expect(response.status()).toBe(200);
