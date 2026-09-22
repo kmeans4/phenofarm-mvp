@@ -31,7 +31,6 @@ async function getGrowerWithProducts(id: string) {
         city: true, state: true, phone: true, website: true, licenseNumber: true,
         commercialMinimumOrder: true, commercialFulfillmentMethods: true, commercialFulfillmentRegion: true,
         commercialPaymentTerms: true, commercialResponseWindow: true, commercialContactNote: true,
-        _count: { select: { products: { where: { isAvailable: true, isDeleted: false, status: 'PUBLISHED', inventoryQty: { gt: 0 } } } } },
       },
     }),
     db.order.count({

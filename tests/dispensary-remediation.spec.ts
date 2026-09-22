@@ -162,6 +162,49 @@ test('storefront pages and searches the entire grower catalog without mixing oth
   } finally { await db.product.deleteMany({ where: { growerId, name: { startsWith: name } } }); }
 });
 
+test('catalog sorting uses displayed prices and potency across pages and cursor requests', async ({ request }) => {
+  const name = `${prefix}-sort-`;
+  const strain = await db.strain.create({ data: { growerId, name } });
+  const batch = await db.batch.create({ data: { growerId, strainId: strain.id, batchNumber: name, harvestDate: new Date(), thc: 10 } });
+  const defaults = { growerId, productType: 'Flower', unit: 'Gram', inventoryQty: 10, isAvailable: true };
+  const rows = await Promise.all([
+    db.product.create({ data: { ...defaults, name: `${name}A hidden`, price: 900, isPriceVisible: false } }),
+    db.product.create({ data: { ...defaults, name: `${name}Z hidden`, price: 0, isPriceVisible: false } }),
+    db.product.create({ data: { ...defaults, name: `${name}B batch`, price: 2, batchId: batch.id, thcMax: 90 } }),
+    db.product.create({ data: { ...defaults, name: `${name}C maximum`, price: 30, thcMax: 20, thcMin: 5 } }),
+    db.product.create({ data: { ...defaults, name: `${name}D minimum`, price: 10, thcMin: 15 } }),
+  ]);
+  const get = async (query: string) => {
+    const response = await buyerRequest(request, `/api/dispensary/catalog?growerId=${growerId}&search=${name}&${query}`);
+    expect(response.status()).toBe(200);
+    return response.json();
+  };
+  try {
+    for (const [sortBy, expected] of [
+      ['price-asc', [2, 4, 3, 0, 1]], ['price-desc', [3, 4, 2, 0, 1]],
+      ['thc-asc', [2, 4, 3, 0, 1]], ['thc-desc', [3, 4, 2, 0, 1]],
+    ] as const) {
+      const full = await get(`sortBy=${sortBy}`);
+      expect(full.products.map((row: { id: string }) => row.id)).toEqual(expected.map(index => rows[index].id));
+      expect(full.products.slice(-2).map((row: { price: number | null }) => row.price)).toEqual([null, null]);
+      const first = await get(`sortBy=${sortBy}&limit=2`);
+      const second = await get(`sortBy=${sortBy}&limit=2&page=2`);
+      const cursor = await get(`sortBy=${sortBy}&limit=2&cursor=${first.nextCursor}`);
+      expect(second.products.map((row: { id: string }) => row.id)).toEqual(cursor.products.map((row: { id: string }) => row.id));
+      expect([...first.products, ...second.products].map(row => row.id)).toEqual(expected.slice(0, 4).map(index => rows[index].id));
+    }
+    expect((await get('thcRanges=low')).products.map((row: { id: string }) => row.id)).toEqual([rows[2].id]);
+    expect((await get(`favorites=true&favoriteIds=${rows[4].id}`)).products.map((row: { id: string }) => row.id)).toEqual([rows[4].id]);
+    expect((await get('favorites=true&favoriteIds=')).products).toEqual([]);
+    const search = await buyerRequest(request, `/api/dispensary/catalog?search=${encodeURIComponent(name + '%')}`);
+    expect((await search.json()).products).toEqual([]);
+  } finally {
+    await db.product.deleteMany({ where: { id: { in: rows.map(row => row.id) } } });
+    await db.batch.delete({ where: { id: batch.id } });
+    await db.strain.delete({ where: { id: strain.id } });
+  }
+});
+
 test('cart validation targets exact IDs and retains unavailable products without hidden prices', async ({ request }) => {
   const response = await request.post('/api/dispensary/cart/validate', { headers: { Cookie: `next-auth.session-token=${cookie}` }, data: { productIds: [stockId, unavailableId, deletedId, hiddenId, draftId] } });
   expect(response.status()).toBe(200);
