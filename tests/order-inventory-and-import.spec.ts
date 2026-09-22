@@ -812,6 +812,43 @@ test('direct orders use catalog prices, audit explicit overrides, and atomically
   } finally { await cleanupByPrefix(prefix); }
 });
 
+test('order edits close zero stock and snapshot a new line price after its inventory lock', async () => {
+  const prefix = `pf-edit-lock-${Date.now()}`;
+  try {
+    const account = await createGrowerAndDispensary(prefix);
+    const product = await db.product.create({ data: { growerId: account.grower.id, name: prefix, price: 7, inventoryQty: 2 } });
+    const added = await db.product.create({ data: { growerId: account.grower.id, name: `${prefix}-added`, price: 8, inventoryQty: 1 } });
+    const api = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { cookie: await sessionCookie(account.growerUser) } });
+    try {
+      const response = await api.post('/api/orders', { data: { dispensaryId: account.dispensary.id, items: [{ productId: product.id, quantity: 1 }] } });
+      expect(response.status()).toBe(201); const order = await response.json();
+      const increased = await api.put(`/api/orders/${order.id}`, { data: { items: [{ id: order.items[0].id, quantity: 2 }] } });
+      expect(increased.status()).toBe(200);
+      expect(await db.product.findUnique({ where: { id: product.id }, select: { inventoryQty: true, isAvailable: true } })).toEqual({ inventoryQty: 0, isAvailable: false });
+      let locked!: () => void; let release!: () => void;
+      const ready = new Promise<void>(resolve => { locked = resolve; });
+      const released = new Promise<void>(resolve => { release = resolve; });
+      const priceUpdate = db.$transaction(async tx => {
+        await tx.product.update({ where: { id: added.id }, data: { price: 19 } });
+        locked(); await released;
+      }, { timeout: 15000 });
+      try {
+        await ready;
+        const adding = api.put(`/api/orders/${order.id}`, { data: { items: [{ id: order.items[0].id, quantity: 2 }, { productId: added.id, quantity: 1, unitPrice: 0 }] } });
+        await expect.poll(async () => {
+          const rows = await db.$queryRaw<{ count: number }[]>`SELECT COUNT(*)::int AS count FROM pg_stat_activity WHERE datname = current_database() AND state = 'active' AND wait_event_type = 'Lock' AND query ILIKE '%UPDATE%products%'`;
+          return rows[0].count;
+        }).toBeGreaterThan(0);
+        release(); await priceUpdate;
+        const result = await adding; expect(result.status()).toBe(200);
+        const item = (await result.json()).items.find((item: { productId: string }) => item.productId === added.id);
+        expect(Number(item.unitPrice)).toBe(19); expect(Number(item.catalogUnitPrice)).toBe(19);
+        expect(await db.product.findUnique({ where: { id: added.id }, select: { inventoryQty: true, isAvailable: true } })).toEqual({ inventoryQty: 0, isAvailable: false });
+      } finally { release(); await priceUpdate; }
+    } finally { await api.dispose(); }
+  } finally { await cleanupByPrefix(prefix); }
+});
+
 test('buyer order unread markers respect each conversation read time and sender', async ({ page, context }) => {
   const prefix = `pf-buyer-unread-${Date.now()}`;
   try {

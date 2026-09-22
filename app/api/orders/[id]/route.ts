@@ -321,6 +321,7 @@ export async function PUT(
                   available: Number(latest?.inventoryQty || 0),
                 }]);
               }
+              await tx.product.updateMany({ where: { id: existingItem.productId, growerId: user.growerId, inventoryQty: 0 }, data: { isAvailable: false } });
             } else if (quantityDelta < 0) {
               await restoreInventory(tx, existingItem.productId, Math.abs(quantityDelta));
             }
@@ -337,7 +338,7 @@ export async function PUT(
             const productId = item.productId!;
             const product = await tx.product.findFirst({
               where: { id: productId, growerId: user.growerId, isDeleted: false },
-              select: { id: true, name: true, price: true, inventoryQty: true, isAvailable: true },
+              select: { id: true, name: true, inventoryQty: true, isAvailable: true },
             });
 
             if (!product || !product.isAvailable || product.inventoryQty < item.quantity) {
@@ -349,7 +350,6 @@ export async function PUT(
               }]);
             }
 
-            const unitPrice = Number(product.price);
             const updateResult = await tx.product.updateMany({
               where: {
                 id: productId,
@@ -374,6 +374,10 @@ export async function PUT(
               }]);
             }
 
+            await tx.product.updateMany({ where: { id: productId, growerId: user.growerId, inventoryQty: 0 }, data: { isAvailable: false } });
+            // Read the price after acquiring the inventory row lock.
+            const pricedProduct = await tx.product.findUniqueOrThrow({ where: { id: productId }, select: { price: true } });
+            const unitPrice = Number(pricedProduct.price);
             await tx.orderItem.create({
               data: {
                 orderId,
