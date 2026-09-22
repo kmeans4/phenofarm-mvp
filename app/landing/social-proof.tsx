@@ -1,7 +1,4 @@
-'use client';
-
-import { m as motion } from 'framer-motion';
-import { SectionHeading } from './motion';
+import { SectionHeading, Reveal } from './motion';
 
 const testimonials = [
   {
@@ -35,14 +32,10 @@ export function SocialProof() {
 
         <div className="mt-16 grid gap-4 md:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <motion.figure
+            <Reveal as="figure"
               key={testimonial.author}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.3 }}
-              transition={{ duration: 0.55, delay: index * 0.08 }}
-              whileHover={{ y: -4 }}
-              className="flex flex-col justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-7 transition-colors hover:border-emerald-500/20"
+              delay={index * 0.08}
+              className="flex flex-col justify-between rounded-2xl border border-white/[0.06] bg-white/[0.02] p-7 transition-[transform,border-color] motion-safe:hover:-translate-y-1 hover:border-emerald-500/20"
             >
               <blockquote className="text-pretty text-[15px] leading-relaxed text-gray-300">
                 &ldquo;{testimonial.quote}&rdquo;
@@ -56,7 +49,7 @@ export function SocialProof() {
                   <div className="text-xs text-gray-500">{testimonial.role}</div>
                 </div>
               </figcaption>
-            </motion.figure>
+            </Reveal>
           ))}
         </div>
 

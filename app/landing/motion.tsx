@@ -5,6 +5,20 @@ import { animate, LazyMotion, m, useInView, useReducedMotion } from 'framer-moti
 
 const loadFeatures = () => import('./motion-features').then((module) => module.default);
 
+// Static section contents are rendered on the server and passed through this
+// small animation boundary; they do not become part of the client bundle.
+export function Reveal({ children, className, delay = 0, as = 'div' }: {
+  children: React.ReactNode; className?: string; delay?: number; as?: 'div' | 'figure';
+}) {
+  const reduced = useReducedMotion();
+  const Component = as === 'figure' ? m.figure : m.div;
+  return <Component initial={{ opacity: 0, y: reduced ? 0 : 24 }}
+    whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }}
+    transition={{ duration: reduced ? 0 : 0.55, delay: reduced ? 0 : delay }} className={className}>
+    {children}
+  </Component>;
+}
+
 export function MarketingMotion({ children }: { children: React.ReactNode }) {
   return (
     <LazyMotion features={loadFeatures} strict>

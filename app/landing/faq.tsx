@@ -1,7 +1,3 @@
-'use client';
-
-import { useState } from 'react';
-import { AnimatePresence, m as motion } from 'framer-motion';
 import { Plus } from 'lucide-react';
 import { SectionHeading } from './motion';
 
@@ -33,51 +29,21 @@ const FAQS = [
 ];
 
 export function Faq() {
-  const [open, setOpen] = useState<number | null>(0);
-
   return (
     <section id="faq" className="relative scroll-mt-20 border-t border-white/[0.06] py-28 md:py-36">
       <div className="mx-auto max-w-3xl px-6">
         <SectionHeading eyebrow="FAQ" title="Straight answers" />
 
         <div className="mt-14 divide-y divide-white/[0.06] rounded-2xl border border-white/[0.06] bg-white/[0.015]">
-          {FAQS.map((faq, i) => {
-            const isOpen = open === i;
-            return (
-              <div key={faq.q}>
-                <button
-                  type="button"
-                  aria-expanded={isOpen}
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  className="flex w-full items-center justify-between gap-4 px-6 py-5 text-left"
-                >
-                  <span className={`text-[15px] font-medium transition-colors ${isOpen ? 'text-white' : 'text-gray-300'}`}>
-                    {faq.q}
-                  </span>
-                  <motion.span
-                    animate={{ rotate: isOpen ? 45 : 0 }}
-                    transition={{ duration: 0.2 }}
-                    className={`shrink-0 ${isOpen ? 'text-emerald-400' : 'text-gray-500'}`}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </motion.span>
-                </button>
-                <AnimatePresence initial={false}>
-                  {isOpen && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-                      className="overflow-hidden"
-                    >
-                      <p className="px-6 pb-6 text-sm leading-relaxed text-gray-400">{faq.a}</p>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            );
-          })}
+          {FAQS.map((faq, i) => (
+            <details key={faq.q} name="landing-faq" open={i === 0} className="group">
+              <summary className="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left [&::-webkit-details-marker]:hidden">
+                <span className="text-[15px] font-medium text-gray-300 group-open:text-white">{faq.q}</span>
+                <Plus className="h-4 w-4 shrink-0 text-gray-500 transition-transform group-open:rotate-45 group-open:text-emerald-400 motion-reduce:transition-none" />
+              </summary>
+              <p className="px-6 pb-6 text-sm leading-relaxed text-gray-400">{faq.a}</p>
+            </details>
+          ))}
         </div>
       </div>
     </section>
