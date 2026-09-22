@@ -176,12 +176,21 @@ test('product, strain, and batch APIs validate boundaries, races, and list paylo
   const listedBatch = batchList.find((row: { id: string }) => row.id === createdBatch.id);
   expect(listedBatch).toBeTruthy();
   expect(listedBatch).not.toHaveProperty('testResults');
+  expect(listedBatch).not.toHaveProperty('terpenes');
   expect(listedBatch.labDocumentCount).toBe(1);
 
   const batchDetailResponse = await grower.api.get(`/api/batches/${createdBatch.id}`);
   expect(batchDetailResponse.status()).toBe(200);
   const batchDetail = await batchDetailResponse.json();
   expect(batchDetail.testResults.labDocuments.coa.dataUrl).toBe(persistedDataUrl);
+  for (const [labDocuments, expected] of [[null, 0], [[], 0], [{ coa: { dataUrl: 'x'.repeat(1000000) }, bad: 'text', invalid: [] }, 1]] as const) {
+    await db.batch.update({ where: { id: createdBatch.id }, data: { testResults: { labDocuments }, terpenes: { legacy: 'x'.repeat(1000000) } } });
+    const summary = await grower.api.get('/api/batches');
+    expect(summary.status()).toBe(200);
+    const row = (await summary.json()).find((batch: { id: string }) => batch.id === createdBatch.id);
+    expect(row.labDocumentCount).toBe(expected);
+    expect(JSON.stringify(row).length).toBeLessThan(3000);
+  }
 });
 
 test('admin access, pagination, mobile navigation, seed method guard, and verification redirects work', async ({ page }) => {

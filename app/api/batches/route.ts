@@ -77,13 +77,6 @@ function validateJson(value: unknown, label: string, maxLength: number) {
   return null;
 }
 
-function countLabDocuments(value: unknown) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) return 0;
-  const documents = (value as { labDocuments?: unknown }).labDocuments;
-  if (!documents || typeof documents !== 'object' || Array.isArray(documents)) return 0;
-  return Object.values(documents).filter((document) => document && typeof document === 'object').length;
-}
-
 function isUniqueConstraintError(error: unknown) {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
 }
@@ -123,23 +116,25 @@ export async function GET(request: NextRequest) {
         thc: true,
         cbd: true,
         totalCannabinoids: true,
-        terpenes: true,
         coaDocumentUrl: true,
         notes: true,
         growerId: true,
         createdAt: true,
         updatedAt: true,
-        testResults: true,
         strain: { select: { id: true, name: true, genetics: true } },
         _count: { select: { products: true } },
       },
       orderBy: { harvestDate: 'desc' },
     });
 
-    const batches = rows.map(({ testResults, ...batch }) => ({
-      ...batch,
-      labDocumentCount: countLabDocuments(testResults),
-    }));
+    const counts = rows.length ? await db.$queryRaw<Array<{ id: string; count: number }>>(Prisma.sql`
+      SELECT id, (SELECT COUNT(*)::integer FROM jsonb_each(
+        CASE WHEN jsonb_typeof("testResults"->'labDocuments') = 'object'
+          THEN "testResults"->'labDocuments' ELSE '{}'::jsonb END
+      ) document WHERE jsonb_typeof(document.value) = 'object') AS count
+      FROM batches WHERE "growerId" = ${growerId} AND id IN (${Prisma.join(rows.map(row => row.id))})`) : [];
+    const countById = new Map(counts.map(row => [row.id, row.count]));
+    const batches = rows.map(batch => ({ ...batch, labDocumentCount: countById.get(batch.id) || 0 }));
     return NextResponse.json(batches, { status: 200 });
   } catch (error) {
     console.error('Error fetching batches:', error);
