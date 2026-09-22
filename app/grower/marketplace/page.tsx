@@ -1,3 +1,4 @@
+import { productImagesById } from '@/lib/product-images';
 import { getThcBadgeColor, getCbdBadgeColor, getStrainTypeColor } from '@/lib/product-badges';
 import Link from "next/link";
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -195,9 +196,11 @@ export default async function GrowerMarketplacePage() {
   // Buyers only see available, non-deleted listings — preview the same set
   const rawProducts = await db.product.findMany({
     where: { growerId: user.growerId, isDeleted: false, isAvailable: true },
-    select: { id: true, name: true, price: true, isPriceVisible: true, productType: true, subType: true, unit: true, thcMin: true, thcMax: true, cbdMin: true, cbdMax: true, images: true, inventoryQty: true, strain: { select: { name: true, strainType: true } }, batch: { select: { thc: true, cbd: true } } },
+    select: { id: true, name: true, price: true, isPriceVisible: true, productType: true, subType: true, unit: true, thcMin: true, thcMax: true, cbdMin: true, cbdMax: true, inventoryQty: true, strain: { select: { name: true, strainType: true } }, batch: { select: { thc: true, cbd: true } } },
     orderBy: { createdAt: 'desc' },
   });
+
+  const productImages = await productImagesById(rawProducts.map(product => product.id));
 
   const growerProfile = {
     id: user.growerId,
@@ -208,6 +211,7 @@ export default async function GrowerMarketplacePage() {
   // Match buyer cards: batch lab values take precedence over product ranges.
   const products: MarketplaceProduct[] = rawProducts.map((p) => ({
     ...p,
+    images: productImages.get(p.id) || [],
     price: Number(p.price) || 0,
     thc: p.batch?.thc != null ? Number(p.batch.thc) : p.thcMax != null ? Number(p.thcMax) : p.thcMin != null ? Number(p.thcMin) : null,
     cbd: p.batch?.cbd != null ? Number(p.batch.cbd) : p.cbdMax != null ? Number(p.cbdMax) : p.cbdMin != null ? Number(p.cbdMin) : null,

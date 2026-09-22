@@ -1,8 +1,9 @@
+import { productImagesById } from '@/lib/product-images';
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth-helpers";
-import { buyerProductSelect, productThumbnail } from "@/lib/buyer-products";
+import { buyerProductSelect } from "@/lib/buyer-products";
 import { 
   MapPin, 
   Phone, 
@@ -46,7 +47,8 @@ async function getGrowerWithProducts(id: string) {
   return grower ? { ...grower, fulfilledRequests } : null;
 }
 
-function serializeShopProducts(products: NonNullable<Awaited<ReturnType<typeof getGrowerWithProducts>>>['products']) {
+async function serializeShopProducts(products: NonNullable<Awaited<ReturnType<typeof getGrowerWithProducts>>>['products']) {
+  const images = await productImagesById(products.map(product => product.id));
   return products.map((product) => ({
     id: product.id,
     name: product.name,
@@ -59,7 +61,7 @@ function serializeShopProducts(products: NonNullable<Awaited<ReturnType<typeof g
     batch: product.batch ? { thc: product.batch.thc != null ? Number(product.batch.thc) : null } : null,
     thc: product.thcMax != null ? Number(product.thcMax) : product.thcMin != null ? Number(product.thcMin) : null,
     inventoryQty: product.inventoryQty,
-    images: [productThumbnail(product.id)],
+    images: images.get(product.id) || [],
   }));
 }
 
@@ -199,7 +201,7 @@ export default async function GrowerPage({ params }: GrowerPageProps) {
       </p>
 
       <GrowerShopContent
-        products={serializeShopProducts(grower.products)}
+        products={await serializeShopProducts(grower.products)}
         growerName={grower.businessName}
         growerId={grower.id}
       />

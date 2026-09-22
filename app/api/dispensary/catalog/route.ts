@@ -5,7 +5,7 @@ import { expandProductTypeFilters } from '@/lib/product-types';
 import { Prisma } from '@prisma/client';
 import { apiError, logApiError } from '@/lib/api-response';
 import { marketplaceGrowerWhere } from '@/lib/license';
-import { buyerProductSelect, serializeBuyerProduct, parsePage, normalizeProductIds } from '@/lib/buyer-products';
+import { buyerProductSelect, serializeBuyerProducts, parsePage, normalizeProductIds } from '@/lib/buyer-products';
 
 /**
  * Dispensary Catalog API
@@ -234,7 +234,7 @@ export async function GET(request: NextRequest) {
     }, {});
 
     const hasMore = products.length > limit;
-    const serializedProducts = products.slice(0, limit).map(serializeBuyerProduct);
+    const serializedProducts = await serializeBuyerProducts(products.slice(0, limit));
 
     return NextResponse.json(
       {

@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client';
 import { marketplaceGrowerWhere } from '@/lib/license';
+import { productImagesById } from '@/lib/product-images';
 
 // List payloads deliberately exclude image blobs and unused legacy/test fields.
 export const buyerProductSelect = {
@@ -20,7 +21,7 @@ export function productThumbnail(id: string) {
   return `/api/dispensary/products/${encodeURIComponent(id)}/thumbnail`;
 }
 
-export function serializeBuyerProduct(product: Prisma.ProductGetPayload<{ select: typeof buyerProductSelect }>) {
+export function serializeBuyerProduct(product: Prisma.ProductGetPayload<{ select: typeof buyerProductSelect }>, images: string[] = []) {
   const number = (value: unknown) => value == null ? null : Number(value);
   return {
     id: product.id, name: product.name,
@@ -31,13 +32,18 @@ export function serializeBuyerProduct(product: Prisma.ProductGetPayload<{ select
     subType: product.subType, unit: product.unit,
     thc: number(product.batch?.thc ?? product.thcMax ?? product.thcMin),
     cbd: number(product.batch?.cbd ?? product.cbdMax ?? product.cbdMin),
-    images: [productThumbnail(product.id)], inventoryQty: product.inventoryQty,
+    images, inventoryQty: product.inventoryQty,
     isAvailable: product.isAvailable && product.inventoryQty > 0,
     createdAt: product.createdAt,
     grower: { id: product.grower.id, businessName: product.grower.businessName,
       location: [product.grower.city, product.grower.state].filter(Boolean).join(', ') || null,
       isVerified: product.grower.isVerified },
   };
+}
+
+export async function serializeBuyerProducts(products: Prisma.ProductGetPayload<{ select: typeof buyerProductSelect }>[]) {
+  const images = await productImagesById(products.map(product => product.id));
+  return products.map(product => serializeBuyerProduct(product, images.get(product.id)));
 }
 
 export function parsePage(value: string | null, fallback = 1, maximum = 100000) {

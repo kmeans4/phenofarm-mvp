@@ -111,6 +111,22 @@ test('grower storefront loads authenticated thumbnails and legacy logos in grid 
   expect(errors).toEqual([]);
 });
 
+test('catalog sends direct image URLs without forwarding legacy image bodies', async ({ request }) => {
+  const previous = await db.product.findUniqueOrThrow({ where: { id: stockId }, select: { images: true } });
+  const url = 'https://example.com/catalog-photo.png';
+  try {
+    await db.product.update({ where: { id: stockId }, data: { images: [url, 'data:image/png;base64,' + 'A'.repeat(2000000)] } });
+    const response = await buyerRequest(request, `/api/dispensary/catalog?productIds=${stockId}&search=${prefix}`);
+    expect(response.status()).toBe(200);
+    const products = (await response.json()).products;
+    expect(products.find((row: { id: string }) => row.id === stockId).images).toEqual([url]);
+    expect(JSON.stringify(products).length).toBeLessThan(10000);
+    await db.product.update({ where: { id: stockId }, data: { images: [] } });
+    const empty = await buyerRequest(request, `/api/dispensary/catalog?search=${prefix}`);
+    expect((await empty.json()).products.find((row: { id: string }) => row.id === stockId).images).toEqual([]);
+  } finally { await db.product.update({ where: { id: stockId }, data: { images: previous.images } }); }
+});
+
 test('buyer catalog safely paginates, combines filters and suppresses hidden/deleted/unverified products', async ({ request }) => {
   const response = await buyerRequest(request, `/api/dispensary/catalog?search=${prefix}&page=abc&limit=abc`);
   expect(response.status()).toBe(200);

@@ -3,7 +3,7 @@ import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { createNotification } from '@/lib/notifications';
 import { buyerProductWhere } from '@/lib/buyer-products';
-import { buyerAlertInclude, serializeBuyerAlert } from '@/lib/buyer-alerts';
+import { buyerAlertInclude, serializeBuyerAlerts } from '@/lib/buyer-alerts';
 
 export async function POST() {
   const session = await getAuthSession();
@@ -25,6 +25,6 @@ export async function POST() {
       }
     });
     const refreshed = await db.dispensaryPriceAlert.findMany({ where: { dispensaryId, product: buyerProductWhere() }, orderBy: { createdAt: 'desc' }, include: buyerAlertInclude });
-    return NextResponse.json({ alerts: refreshed.map(serializeBuyerAlert) });
+    return NextResponse.json({ alerts: await serializeBuyerAlerts(refreshed) });
   } catch (error) { console.error('Unable to refresh alerts', error); return NextResponse.json({ error: 'Unable to refresh alerts. Existing alerts are unchanged.' }, { status: 500 }); }
 }

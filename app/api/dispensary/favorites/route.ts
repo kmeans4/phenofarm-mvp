@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { buyerProductSelect, serializeBuyerProduct, normalizeProductIds, buyerProductWhere } from "@/lib/buyer-products";
+import { buyerProductSelect, serializeBuyerProducts, normalizeProductIds, buyerProductWhere } from "@/lib/buyer-products";
 import { db } from "@/lib/db";
 import { getAuthSession } from "@/lib/auth-helpers";
 
@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       },
       select: buyerProductSelect,
     });
-    const formattedProducts = products.map(serializeBuyerProduct);
+    const formattedProducts = await serializeBuyerProducts(products);
 
     return NextResponse.json({ products: formattedProducts });
   } catch (error) {

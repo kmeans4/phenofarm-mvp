@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { buyerProductWhere, normalizeProductIds } from '@/lib/buyer-products';
-import { buyerAlertInclude, serializeBuyerAlert } from '@/lib/buyer-alerts';
+import { buyerAlertInclude, serializeBuyerAlerts } from '@/lib/buyer-alerts';
 import { Prisma } from '@prisma/client';
 
 async function requireDispensary() {
@@ -15,7 +15,7 @@ export async function GET() {
   const auth = await requireDispensary(); if ('error' in auth) return auth.error;
   try {
     const alerts = await db.dispensaryPriceAlert.findMany({ where: { dispensaryId: auth.dispensaryId, product: buyerProductWhere() }, orderBy: { createdAt: 'desc' }, include: buyerAlertInclude });
-    return NextResponse.json({ alerts: alerts.map(serializeBuyerAlert) });
+    return NextResponse.json({ alerts: await serializeBuyerAlerts(alerts) });
   } catch (error) { console.error('Error loading alerts', error); return NextResponse.json({ error: 'Unable to load alerts.' }, { status: 500 }); }
 }
 async function save(request: Request, replace: boolean) {
