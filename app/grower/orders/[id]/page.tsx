@@ -47,6 +47,8 @@ interface OrderDetail {
     id: string;
     quantity: number;
     unitPrice: number;
+    catalogUnitPrice: number | null;
+    priceOverrideReason: string | null;
     totalPrice: number;
     quoted: boolean;
     quoteAcceptedAt: Date | null;
@@ -88,6 +90,7 @@ async function fetchOrder(id: string, growerId: string): Promise<OrderDetail | n
       items: order.items.map((item) => ({
         ...item,
         unitPrice: Number(item.unitPrice),
+        catalogUnitPrice: item.catalogUnitPrice == null ? null : Number(item.catalogUnitPrice),
         totalPrice: Number(item.totalPrice),
         quoted: Boolean(item.acceptedQuoteId),
         quoteAcceptedAt: item.acceptedQuote?.acceptedAt || null,
@@ -367,6 +370,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                           <div>
                             <p className="font-medium text-sm sm:text-base text-gray-900">{item.product?.name || 'Unknown Product'}</p>
                             {item.quoted ? <p className="mt-1 text-xs font-semibold text-green-700">Priced by accepted quote{item.quoteAcceptedAt ? ` from ${format(item.quoteAcceptedAt, 'MMM d, yyyy')}` : ''}</p> : null}
+                            {item.priceOverrideReason && <p className="mt-1 text-xs text-gray-500">{item.priceOverrideReason} · Catalog {formatCurrency(item.catalogUnitPrice ?? item.unitPrice)}</p>}
                             {item.product?.strain && (
                               <p className="text-xs sm:text-sm text-gray-500">{item.product.strain}</p>
                             )}
@@ -412,6 +416,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                       <span>{formatCurrency(item.unitPrice)}/{formatProductUnit(item.product?.unit)}</span>
                       <span className="font-medium text-gray-900">Qty: {item.quantity}</span>
                     </div>
+                    {item.priceOverrideReason && <p className="mt-1 text-xs text-gray-500">{item.priceOverrideReason} · Catalog {formatCurrency(item.catalogUnitPrice ?? item.unitPrice)}</p>}
                   </div>
                 ))}
               </div>

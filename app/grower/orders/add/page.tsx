@@ -21,6 +21,7 @@ type DirectRequestItem = {
   productId: string;
   quantity: number | string;
   unitPrice: number;
+  priceOverrideReason: string;
 };
 
 export default function AddOrderPage() {
@@ -164,6 +165,7 @@ export default function AddOrderPage() {
       productId: firstProduct?.id || '',
       quantity: 1,
       unitPrice: typeof firstProduct?.price === 'number' ? firstProduct.price : 0,
+      priceOverrideReason: '',
     };
     setError(null);
     setFormData((prev) => ({ ...prev, items: [...prev.items, newItem] }));
@@ -213,6 +215,7 @@ export default function AddOrderPage() {
         const product = products.find((p) => p?.id === value);
         if (product) {
           newItems[index].unitPrice = typeof product?.price === 'number' ? product.price : 0;
+          newItems[index].priceOverrideReason = '';
         }
 
         const maxForLine = getRemainingForLine(newItems, String(value), index);
@@ -239,6 +242,9 @@ export default function AddOrderPage() {
   const shippingFee = parseFloat(formData?.shippingFee || '0') || 0;
   const calculateTotal = () => (Math.round(calculateSubtotal() * 100) + Math.round(calculateTax() * 100) + Math.round(shippingFee * 100)) / 100;
 
+  const hasCustomPrice = (item: DirectRequestItem) => item.unitPrice !== Number(getProductById(item.productId)?.price);
+  const hasInvalidPrice = formData.items.some(item => !Number.isFinite(item.unitPrice) || item.unitPrice < 0 || item.unitPrice > 999999.99
+    || (hasCustomPrice(item) && !item.priceOverrideReason.trim()));
   const hasInvalidQuantities = formData.items.some((item) => (!Number.isInteger(Number(item.quantity)) || Number(item.quantity) <= 0));
   const inventoryIssues = getInventoryIssues(formData.items);
   const firstInventoryIssue = inventoryIssues[0];
@@ -247,6 +253,7 @@ export default function AddOrderPage() {
     if (!formData.dispensaryId) return 'Select a dispensary before recording the request.';
     if (formData.items.length === 0) return 'Add at least one product line item.';
     if (hasInvalidQuantities) return 'Each line item needs a quantity of at least 1.';
+    if (hasInvalidPrice) return 'Add a reason for each custom price.';
     if (firstInventoryIssue) {
       return `Adjust ${firstInventoryIssue.productName}; requested ${firstInventoryIssue.requested}, available ${firstInventoryIssue.available}.`;
     }
@@ -257,7 +264,7 @@ export default function AddOrderPage() {
     !isSubmitting &&
     Boolean(formData.dispensaryId) &&
     formData.items.length > 0 &&
-    !hasInvalidQuantities &&
+    !hasInvalidQuantities && !hasInvalidPrice &&
     inventoryIssues.length === 0
   );
 
@@ -271,6 +278,8 @@ export default function AddOrderPage() {
         setError('Please add at least one product');
       } else if (hasInvalidQuantities) {
         setError('Each line item must have a quantity of at least 1.');
+      } else if (hasInvalidPrice) {
+        setError('Add a valid amount and a reason for each custom price.');
       } else if (firstInventoryIssue) {
         setError(`Not enough inventory for ${firstInventoryIssue.productName} (requested ${firstInventoryIssue.requested}, available ${firstInventoryIssue.available}).`);
       }
@@ -285,7 +294,7 @@ export default function AddOrderPage() {
       const sanitizedItems = formData.items.map((item) => ({
         productId: item.productId,
         quantity: Number(item.quantity),
-        unitPrice: Number(item.unitPrice),
+        ...(hasCustomPrice(item) ? { priceOverride: { unitPrice: Number(item.unitPrice), reason: item.priceOverrideReason.trim() } } : {}),
       }));
 
       const response = await fetch('/api/orders', {
@@ -507,6 +516,8 @@ export default function AddOrderPage() {
                               type="number"
                               min="0"
                               step="0.01"
+                              max="999999.99"
+                              aria-label={`Agreed price for ${product?.name || 'product'}`}
                               value={item.unitPrice}
                               onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
                               className="min-h-10 min-w-0 flex-1 border-0 px-3 py-2 text-base focus:outline-none"
@@ -526,6 +537,13 @@ export default function AddOrderPage() {
                           </button>
                         </div>
                       </div>
+
+                      {hasCustomPrice(item) && <div>
+                        <label htmlFor={`price-note-${index}`} className="mb-1 block text-xs text-gray-600">Price note <span className="text-gray-500">· Catalog ${Number(product?.price || 0).toFixed(2)}</span></label>
+                        <input id={`price-note-${index}`} value={item.priceOverrideReason} maxLength={240} required placeholder="e.g. Volume discount"
+                          onChange={event => handleItemChange(index, 'priceOverrideReason', event.target.value)}
+                          className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600" />
+                      </div>}
 
                       <div className="flex flex-wrap items-center gap-2 text-xs">
                         <button type="button" onClick={() => handleRemoveItem(index)} className="order-last ml-auto min-h-10 rounded px-2 py-2 text-sm text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 sm:hidden">Remove</button>

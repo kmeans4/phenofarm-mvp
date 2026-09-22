@@ -746,6 +746,72 @@ test('grower can accept, prepare, mark ready, deliver, and batch-update valid re
   }
 });
 
+test('direct orders use catalog prices, audit explicit overrides, and atomically close sold-out inventory', async ({ page, context }) => {
+  const prefix = `pf-price-audit-${Date.now()}`;
+  try {
+    const account = await createGrowerAndDispensary(prefix);
+    const product = await db.product.create({ data: { growerId: account.grower.id, name: `${prefix} Flower`, productType: 'Flower', unit: 'Gram', price: 12.3, inventoryQty: 5, isPriceVisible: false } });
+    const api = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { cookie: await sessionCookie(account.growerUser) } });
+    const buyer = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { cookie: await sessionCookie(account.dispensaryUser) } });
+    try {
+      const payload = { dispensaryId: account.dispensary.id, items: [{ productId: product.id, quantity: 1, unitPrice: 0 }], notes: null };
+      expect((await buyer.post('/api/orders', { data: payload })).status()).toBe(403);
+      const tampered = await api.post('/api/orders', { data: payload });
+      expect(tampered.status()).toBe(201);
+      const catalogOrder = await tampered.json();
+      expect(Number(catalogOrder.subtotal)).toBe(12.3);
+      expect(Number(catalogOrder.items[0].catalogUnitPrice)).toBe(12.3);
+      expect(catalogOrder.items[0].priceOverrideReason).toBeNull();
+      for (const priceOverride of [{ unitPrice: 0, reason: '' }, { unitPrice: -1, reason: 'Invalid' }, { unitPrice: null, reason: 'Invalid' }, { unitPrice: 1.001, reason: 'Invalid' }]) {
+        expect((await api.post('/api/orders', { data: { ...payload, items: [{ productId: product.id, quantity: 1, priceOverride }] } })).status()).toBe(400);
+      }
+      const negotiated = await api.post('/api/orders', { data: { ...payload, items: [{ productId: product.id, quantity: 4, priceOverride: { unitPrice: 10.5, reason: 'Volume discount' } }] } });
+      expect(negotiated.status()).toBe(201);
+      const agreed = await negotiated.json();
+      expect(Number(agreed.subtotal)).toBe(42);
+      expect(agreed.items[0].priceOverrideReason).toBe('Volume discount');
+      expect(Number(agreed.items[0].catalogUnitPrice)).toBe(12.3);
+      expect(await db.product.findUnique({ where: { id: product.id }, select: { inventoryQty: true, isAvailable: true } })).toEqual({ inventoryQty: 0, isAvailable: false });
+      const event = await db.orderStatusEvent.findFirstOrThrow({ where: { orderId: agreed.id } });
+      expect(event.actorUserId).toBe(account.growerUser.id);
+      const edit = await api.put(`/api/orders/${agreed.id}`, { data: { items: [{ id: agreed.items[0].id, quantity: 3, unitPrice: 0 }], shippingFee: 0, tax: 0 } });
+      expect(edit.status()).toBe(200);
+      const retained = await db.orderItem.findUniqueOrThrow({ where: { id: agreed.items[0].id } });
+      expect(Number(retained.unitPrice)).toBe(10.5); expect(Number(retained.catalogUnitPrice)).toBe(12.3); expect(retained.priceOverrideReason).toBe('Volume discount');
+      const buyerOrders = await (await buyer.get('/api/orders')).json();
+      for (const order of buyerOrders.orders) for (const item of order.items) {
+        expect(item).not.toHaveProperty('catalogUnitPrice'); expect(item).not.toHaveProperty('priceOverrideReason');
+      }
+      // Two simultaneous requests for the last unit cannot oversell.
+      const raced = await Promise.all([api.post('/api/orders', { data: payload }), api.post('/api/orders', { data: payload })]);
+      expect(raced.map(response => response.status()).sort()).toEqual([201, 409]);
+      expect(await productInventory(product.id)).toBe(0);
+      await context.addCookies([{ name: 'next-auth.session-token', value: await sessionToken(account.growerUser), url: baseURL }]);
+      const uiProduct = await db.product.create({ data: { growerId: account.grower.id, name: `${prefix} UI`, productType: 'Flower', unit: 'Gram', price: 12.3, inventoryQty: 4 } });
+      for (const width of [1440, 390]) {
+        await page.setViewportSize({ width, height: 900 });
+        await page.goto('/grower/orders/add');
+        await page.getByPlaceholder('Search by name or city').fill(account.dispensary.businessName);
+        await page.getByRole('option', { name: account.dispensary.businessName, exact: false }).click();
+        await page.getByRole('button', { name: 'Add item', exact: true }).click();
+        await page.getByLabel(`Agreed price for ${uiProduct.name}`).fill('9.50');
+        await expect(page.getByRole('button', { name: 'Record request', exact: true })).toBeDisabled();
+        await page.getByLabel('Price note', { exact: false }).fill('Phone agreement');
+        expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(true);
+        const response = page.waitForResponse(response => new URL(response.url()).pathname === '/api/orders' && response.request().method() === 'POST');
+        await page.getByRole('button', { name: 'Record request', exact: true }).click();
+        const savedResponse = await response;
+        expect(savedResponse.status()).toBe(201);
+        const saved = await savedResponse.json();
+        expect(saved.items[0].priceOverrideReason).toBe('Phone agreement');
+        await expect(page).toHaveURL(/\/grower\/orders$/);
+        await page.goto(`/grower/orders/${saved.id}`);
+        await expect(page.getByText('Phone agreement · Catalog $12.30').locator('visible=true')).toBeVisible();
+      }
+    } finally { await api.dispose(); await buyer.dispose(); }
+  } finally { await cleanupByPrefix(prefix); }
+});
+
 test('grower attention summary includes new requests, unread buyer messages, cancellations, and status changes', async () => {
   const prefix = `pf-attn-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 

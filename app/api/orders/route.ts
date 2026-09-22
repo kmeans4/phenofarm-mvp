@@ -20,7 +20,7 @@ import { createWithOrderIdRetry } from '@/lib/order-id';
 interface OrderItemInput {
   productId: string;
   quantity: number;
-  unitPrice: number;
+  priceOverride?: { unitPrice: number; reason: string };
 }
 
 interface InventoryIssue {
@@ -29,6 +29,8 @@ interface InventoryIssue {
   requested: number;
   available: number;
 }
+
+class OrderValidationError extends Error {}
 
 class InventoryConflictError extends Error {
   issues: InventoryIssue[];
@@ -50,12 +52,12 @@ class InventoryConflictError extends Error {
  * - items (required): Array of order items, each containing:
  *   - productId (string): ID of the product
  *   - quantity (number): Quantity ordered
- *   - unitPrice (number): Price per unit
+ *   - priceOverride (optional): Explicit agreed unit price plus a required reason
  * - notes (optional): Order notes or special instructions
  * - shippingFee (optional): Shipping cost as number
  * 
  * Business Logic:
- * - Subtotal is calculated from items (quantity * unitPrice)
+ * - Catalog prices are read under inventory locks; explicit owner overrides are audited
  * - Tax is not calculated or collected by PhenoFarm
  * - Total amount = subtotal + optional shipping estimate
  * - Order status is set to 'PENDING' on creation
@@ -92,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     const safeShippingFee = shippingFee === undefined ? 0 : Number(shippingFee);
-    if (!Number.isFinite(safeShippingFee) || safeShippingFee < 0 || safeShippingFee > 999999.99 || (notes !== undefined && (typeof notes !== 'string' || notes.length > 1000))) {
+    if (!Number.isFinite(safeShippingFee) || safeShippingFee < 0 || safeShippingFee > 999999.99 || (notes != null && (typeof notes !== 'string' || notes.length > 1000))) {
       return NextResponse.json({ error: 'Invalid shipping fee or notes' }, { status: 400 });
     }
     // Verify dispensary license status
@@ -134,19 +136,25 @@ export async function POST(request: NextRequest) {
     const normalizedItems: OrderItemInput[] = items.map((item: Partial<OrderItemInput>) => ({
       productId: String(item.productId || ''),
       quantity: Number(item.quantity),
-      unitPrice: Number(item.unitPrice),
+      ...(item.priceOverride !== undefined ? { priceOverride: {
+        unitPrice: typeof item.priceOverride?.unitPrice === 'number' ? item.priceOverride.unitPrice : NaN,
+        reason: typeof item.priceOverride?.reason === 'string' ? item.priceOverride.reason.trim() : '',
+      } } : {}),
     }));
 
     const invalidItem = normalizedItems.some((item) =>
       !item.productId ||
       !Number.isInteger(item.quantity) ||
       item.quantity <= 0 || item.quantity > 9999 ||
-      !Number.isFinite(item.unitPrice) ||
-      item.unitPrice < 0 || item.unitPrice > 999999.99
+      (item.priceOverride !== undefined && (
+        !Number.isFinite(item.priceOverride.unitPrice) || item.priceOverride.unitPrice < 0 || item.priceOverride.unitPrice > 999999.99 ||
+        Math.abs(item.priceOverride.unitPrice * 100 - Math.round(item.priceOverride.unitPrice * 100)) > 0.000001 ||
+        !item.priceOverride.reason || item.priceOverride.reason.length > 240
+      ))
     );
 
     if (invalidItem) {
-      return NextResponse.json({ error: 'Invalid order items. Check product, quantity, and price.' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid order items. Custom prices require a valid amount and a reason (up to 240 characters).' }, { status: 400 });
     }
 
     const requestedByProduct = new Map<string, number>();
@@ -202,13 +210,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Calculate totals
-    const subtotal = normalizedItems.reduce((sum, item) => sum + Math.round(item.quantity * item.unitPrice * 100), 0) / 100;
-    const tax = 0;
-
-
     const order = await createWithOrderIdRetry((orderId) => db.$transaction(async (tx) => {
-      for (const [productId, requested] of requestedByProduct.entries()) {
+      for (const [productId, requested] of [...requestedByProduct.entries()].sort(([a], [b]) => a.localeCompare(b))) {
         const updateResult = await tx.product.updateMany({
           where: {
             id: productId,
@@ -239,6 +242,20 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      await tx.product.updateMany({ where: { growerId, id: { in: productIds }, inventoryQty: 0 }, data: { isAvailable: false } });
+      // Inventory updates hold the product locks through price snapshot + order creation.
+      const pricedProducts = await tx.product.findMany({ where: { id: { in: productIds }, growerId }, select: { id: true, price: true } });
+      const catalogPrices = new Map(pricedProducts.map(product => [product.id, Number(product.price)]));
+      const pricedItems = normalizedItems.map(item => {
+        const catalogUnitPrice = catalogPrices.get(item.productId);
+        if (catalogUnitPrice === undefined) throw new OrderValidationError('A selected product is no longer available.');
+        const unitPrice = item.priceOverride?.unitPrice ?? catalogUnitPrice;
+        return { ...item, unitPrice, catalogUnitPrice, priceOverrideReason: item.priceOverride?.reason || null };
+      });
+      const subtotal = pricedItems.reduce((sum, item) => sum + Math.round(item.quantity * item.unitPrice * 100), 0) / 100;
+      const tax = 0;
+      if (Math.round((subtotal + safeShippingFee) * 100) > 9999999999) throw new OrderValidationError('Order total exceeds the supported amount.');
+
       const createdOrder = await tx.order.create({
         data: {
           growerId,
@@ -252,11 +269,13 @@ export async function POST(request: NextRequest) {
           notes: notes || null,
           createdBy: 'GROWER',
           items: {
-            create: normalizedItems.map((item: OrderItemInput) => ({
+            create: pricedItems.map((item) => ({
               product: { connect: { id: item.productId } },
               grower: { connect: { id: growerId } },
               quantity: item.quantity,
               unitPrice: item.unitPrice,
+              catalogUnitPrice: item.catalogUnitPrice,
+              priceOverrideReason: item.priceOverrideReason,
               totalPrice: Math.round(item.quantity * item.unitPrice * 100) / 100,
             })),
           },
@@ -290,6 +309,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
+    if (error instanceof OrderValidationError) return NextResponse.json({ error: error.message }, { status: 400 });
     if (error instanceof InventoryConflictError) {
       return NextResponse.json(
         {
@@ -352,7 +372,11 @@ export async function GET(request: NextRequest) {
         : { dispensaryId: user.dispensaryId },
       include: {
         dispensary: { select: { businessName: true } },
-        items: { include: { product: { select: { name: true } } } },
+        items: { select: {
+          id: true, orderId: true, productId: true, growerId: true, quantity: true, unitPrice: true, totalPrice: true, createdAt: true, acceptedQuoteId: true,
+          catalogUnitPrice: user.role === 'GROWER', priceOverrideReason: user.role === 'GROWER',
+          product: { select: { name: true } },
+        } },
       },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: take + 1,

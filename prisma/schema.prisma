@@ -279,6 +279,8 @@ model OrderItem {
   growerId        String
   quantity        Int            @default(1)
   unitPrice       Decimal        @db.Decimal(10, 2)
+  catalogUnitPrice Decimal?       @db.Decimal(10, 2)
+  priceOverrideReason String?     @db.VarChar(240)
   totalPrice      Decimal        @db.Decimal(10, 2)
   createdAt       DateTime       @default(now())
   acceptedQuoteId String?

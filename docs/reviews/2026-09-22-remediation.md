@@ -1,6 +1,6 @@
 # September 22 review remediation
 
-Sources: the checkpoint review at `2a5775f` (reviews `d2379f6`) and the full review at `72fc09f` (reviews older `main`, `d3114dd`). Their original documents are preserved alongside this log. Changes are made and reviewed sequentially on `codex/project-checkpoint-2026-09-22` / draft PR #1. No production deployment or database mutation is part of this work.
+Sources: the checkpoint review at `2a5775f` (reviews `d2379f6`) and the full review at `72fc09f` (reviews older `main`, `d3114dd`). Their original documents are preserved alongside this log. Changes are made and reviewed sequentially on `codex/project-checkpoint-2026-09-22` / draft PR #1. No production deployment or production database mutation is part of this work.
 
 The checkpoint independently marked 113 of the original 126 findings fixed. The remaining items are tracked below; full-review new IDs use `Full N-` to distinguish them from checkpoint IDs.
 
@@ -25,7 +25,7 @@ The checkpoint independently marked 113 of the original 126 findings fixed. The 
 | N-004 | Fixed: closed bells fetch only an unread count; details load only while the panel is open. Hidden tabs and hidden responsive bells stop polling, overlapping requests are suppressed/aborted, and failed read acknowledgements preserve unread state. Two scoped API/desktop/mobile browser checks passed, including virtual-clock hidden-tab silence, one active bell, grouped details, retry, focus restoration, and mobile bounds. TypeScript and focused lint passed. |
 | N-005 | Fixed: registration commits the user and role profile atomically before returning success; only verification delivery is deferred. Duplicate addresses retain the same generic response and cannot overwrite accounts; rate limiting no longer returns a false creation success. Four auth checks passed, including concurrent duplicate signup, immediate persisted-account lookup, mailbox verification, role preservation, and injected grower/buyer profile-storage failures returning 503 with no orphan account. |
 | N-006 | Fixed: removed demo emails/password and their public access block from the sign-in page in every build. Both 360px and 1440px real signup/verification/sign-in/recovery browser workflows passed after removal. |
-| N-007 | Pending |
+| N-007 | Fixed: direct orders default to locked database catalog prices. Deliberate custom prices require a bounded amount and reason, stored with the catalog snapshot and existing actor history; buyers do not receive internal audit fields. Quantity edits preserve those snapshots. Zero stock atomically clears availability. Five focused API/browser checks passed across concurrency, totals, tampering, override validation/privacy, edit/cancel/fulfillment, and desktop/mobile recording/detail. TypeScript and focused lint passed. Additive migration `20260922010000_order_price_audit` was applied only to the isolated local clone; it must precede a future release. |
 | N-008 | Pending |
 | N-009 | Pending |
 | Full N-001 | Already fixed: managed customers are explicit off-platform contacts, without unusable User/password records. |

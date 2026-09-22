@@ -381,6 +381,7 @@ export async function PUT(
                 growerId: user.growerId!,
                 quantity: item.quantity,
                 unitPrice,
+                catalogUnitPrice: unitPrice,
                 totalPrice: Math.round(item.quantity * unitPrice * 100) / 100,
               },
             });
