@@ -24,6 +24,8 @@ jobs:
 
       - name: Verify
         env:
-          # Build-only placeholder; verification must not connect to live data.
+          # Build-only values; verification must not connect to live services.
           DATABASE_URL: postgresql://ci:ci@127.0.0.1:1/phenofarm_ci_build
-        run: npm run verify
+          NEXTAUTH_URL: http://localhost:3000
+          NEXT_PUBLIC_API_URL: http://localhost:3000
+        run: AUTH_SECRET="$(openssl rand -hex 32)" npm run verify
