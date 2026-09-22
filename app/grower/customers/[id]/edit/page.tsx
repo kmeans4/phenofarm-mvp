@@ -1,6 +1,6 @@
 import { getAuthSession } from "@/lib/auth-helpers";
 import { customerSelect, customerWhere } from "@/lib/customers";
-import { redirect } from "next/navigation";
+import { redirect, notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { ExtendedUser } from "@/types";
 import EditCustomerForm from "./components/EditCustomerForm";
@@ -67,7 +67,7 @@ export default async function EditCustomerPage({ params }: PageProps) {
   const customer = await fetchCustomer(id, user.growerId);
 
   if (!customer) {
-    redirect('/grower/customers');
+    notFound();
   }
 
   return <EditCustomerForm customer={customer} />;

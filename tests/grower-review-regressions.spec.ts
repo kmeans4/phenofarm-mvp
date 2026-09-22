@@ -127,6 +127,16 @@ test('marketplace preview pages published in-stock listings and keeps global tot
   } finally { await db.product.update({ where: { id: productId }, data: { status: 'PUBLISHED' } }); }
 });
 
+test('missing and foreign edit records show not found without redirecting to a list', async ({ page }) => {
+  await authenticate(page, otherToken);
+  for (const path of [`/grower/orders/${orderId}/edit`, `/grower/customers/${buyerId}/edit`, '/grower/orders/missing/edit', '/grower/customers/missing/edit']) {
+    await page.goto(path);
+    await expect(page.getByRole('heading', { name: 'Page not found', exact: true })).toBeVisible();
+    expect(new URL(page.url()).pathname).toBe(path);
+    await expect(page.getByText('Review Buyer', { exact: true })).toHaveCount(0);
+  }
+});
+
 test('product drafts restore explicitly, exclude images, stay account scoped and survive unavailable storage', async ({ page }) => {
   await authenticate(page);
   await page.goto('/grower/products/add');

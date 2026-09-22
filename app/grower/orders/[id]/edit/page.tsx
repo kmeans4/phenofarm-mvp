@@ -1,5 +1,5 @@
 import { getAuthSession } from '@/lib/auth-helpers';
-import { redirect } from 'next/navigation';
+import { redirect, notFound } from 'next/navigation';
 import { db } from '@/lib/db';
 import EditOrderForm from './components/EditOrderForm';
 
@@ -79,7 +79,7 @@ export default async function EditOrderPage({ params }: PageProps) {
   const order = await fetchOrder(id, user.growerId!);
 
   if (!order) {
-    redirect('/grower/orders');
+    notFound();
   }
 
   return <EditOrderForm order={order} />;
