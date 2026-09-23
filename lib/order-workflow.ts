@@ -113,21 +113,32 @@ export function parseOrderRequestNotes(notes: string | null) {
     buyerNotes: '',
   };
 
-  if (!notes) return { details: parsed, legacyNotes: '' };
+  if (!notes) return { details: parsed, legacyNotes: '', notesText: '' };
 
   const legacyLines: string[] = [];
+  const visibleLines: string[] = [];
+  let freeText = false;
 
   for (const line of notes.split('\n')) {
     const [rawKey, ...rest] = line.split(':');
     const value = rest.join(':').trim();
     const key = rawKey.trim().toLowerCase();
 
-    if (key === 'fulfillment method') parsed.fulfillmentMethod = value;
-    else if (key === 'requested window') parsed.requestedWindow = value;
-    else if (key === 'payment terms') parsed.paymentTerms = value;
-    else if (key === 'buyer notes') parsed.buyerNotes = value;
-    else if (line.trim()) legacyLines.push(line.trim());
+    // Only the initial structured header is metadata. Everything after buyer
+    // notes (including later settlement records) is free text and must survive.
+    if (!freeText && rest.length && key === 'fulfillment method' && !parsed.fulfillmentMethod) parsed.fulfillmentMethod = value;
+    else if (!freeText && rest.length && key === 'requested window' && !parsed.requestedWindow) parsed.requestedWindow = value;
+    else if (!freeText && rest.length && key === 'payment terms' && !parsed.paymentTerms) parsed.paymentTerms = value;
+    else if (!freeText && rest.length && key === 'buyer notes') {
+      parsed.buyerNotes = value;
+      visibleLines.push(value);
+      freeText = true;
+    } else {
+      legacyLines.push(line);
+      visibleLines.push(line);
+      if (line.trim()) freeText = true;
+    }
   }
 
-  return { details: parsed, legacyNotes: legacyLines.join('\n') };
+  return { details: parsed, legacyNotes: legacyLines.join('\n').trim(), notesText: visibleLines.join('\n').trim() };
 }

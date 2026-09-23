@@ -170,7 +170,7 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
       <PageHeader
         title={<span className="flex min-w-0 flex-col gap-1"><span>Request</span><span title={order.orderId} className="max-w-full break-all font-sans text-base font-semibold leading-tight text-pf-muted sm:text-lg">#{order.orderId}</span></span>}
         description={getOrderStatusHelp(order.status)}
-        actions={<><StatusBadge status={order.status} /><OrderRecordExport order={{ orderId: order.orderId, createdAt: order.createdAt.toISOString(), status: getOrderStatusLabel(order.status), grower: order.grower.businessName, buyer: order.dispensary.businessName, subtotal: order.subtotal, tax: order.tax, shippingFee: order.shippingFee, total: order.totalAmount, items: order.items.map((item) => ({ name: item.product?.name || 'Unknown product', quantity: item.quantity, unit: item.product?.unit || 'unit', unitPrice: item.unitPrice, totalPrice: item.totalPrice, quoted: item.quoted })) }} /></>}
+        actions={<><StatusBadge status={order.status} /><OrderRecordExport order={{ orderId: order.orderId, notes: order.notes, createdAt: order.createdAt.toISOString(), status: getOrderStatusLabel(order.status), grower: order.grower.businessName, buyer: order.dispensary.businessName, subtotal: order.subtotal, tax: order.tax, shippingFee: order.shippingFee, total: order.totalAmount, items: order.items.map((item) => ({ name: item.product?.name || 'Unknown product', quantity: item.quantity, unit: item.product?.unit || 'unit', unitPrice: item.unitPrice, totalPrice: item.totalPrice, quoted: item.quoted })) }} /></>}
         className="mb-4 sm:mb-6"
       />
 
@@ -326,10 +326,10 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
                 <p>{requestNotes.details.paymentTerms || 'Handled directly'}</p>
               </div>
             </div>
-            {(requestNotes.details.buyerNotes || requestNotes.legacyNotes) && (
+            {(requestNotes.notesText) && (
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-pf-muted">Notes</p>
-                <p className="whitespace-pre-wrap">{requestNotes.details.buyerNotes || requestNotes.legacyNotes}</p>
+                <p className="whitespace-pre-wrap break-words">{requestNotes.notesText}</p>
               </div>
             )}
           </CardContent>

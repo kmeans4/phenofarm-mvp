@@ -1,0 +1,2 @@
+Request ID,Created,Status,Grower,Buyer,Product,Quantity,Unit,Unit price,Line total,Pricing source,Subtotal,Recorded tax,Shipping estimate,Total,Settlement
+ORD-20260923-NB5GTM,2026-09-23T20:55:53.559Z,Delivered,QA TEST ONLY qa-rc-1790196380657 g1,QA TEST ONLY qa-rc-1790196380657 b1,QA TEST ONLY NOT FOR SALE qa-rc-1790196380657,3,Gram,7.50,22.50,Accepted quote,22.50,0.00,0.00,22.50,Settled directly between businesses — no funds processed by PhenoFarm

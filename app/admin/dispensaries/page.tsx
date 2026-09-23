@@ -18,6 +18,7 @@ interface DispensaryWithUser {
   isVerified: boolean;
   licenseStatus: string;
   createdAt: Date;
+  updatedAt: Date;
   user: {
     email: string | null;
     name: string | null;
@@ -191,6 +192,7 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                 ) : null}
                 <ConfirmActionButton
                   actionUrl={`/admin/dispensaries/${d.id}/verify`}
+                  actionBody={{ verified: !d.isVerified, expectedUpdatedAt: d.updatedAt.toISOString() }}
                   successMessage={`${d.businessName} ${d.isVerified ? 'unverified' : 'verified'}.`}
                   confirmMessage={`${d.isVerified ? 'Remove marketplace verification from' : 'Verify marketplace access for'} ${d.businessName}?`}
                   confirmTitle={d.isVerified ? 'Remove verification?' : 'Verify dispensary?'}
@@ -275,6 +277,7 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                     <td className="px-4 py-3 text-right">
                       <ConfirmActionButton
                         actionUrl={`/admin/dispensaries/${d.id}/verify`}
+                  actionBody={{ verified: !d.isVerified, expectedUpdatedAt: d.updatedAt.toISOString() }}
                         successMessage={`${d.businessName} ${d.isVerified ? 'unverified' : 'verified'}.`}
                         confirmMessage={`${d.isVerified ? 'Remove marketplace verification from' : 'Verify marketplace access for'} ${d.businessName}?`}
                         confirmTitle={d.isVerified ? 'Remove verification?' : 'Verify dispensary?'}

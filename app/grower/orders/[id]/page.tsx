@@ -323,7 +323,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               Edit
             </Link>
             <PrintButton />
-            <OrderRecordExport order={{ orderId: order.orderId, createdAt: order.createdAt.toISOString(), status: getOrderStatusLabel(order.status), grower: order.grower.businessName, buyer: order.dispensary.businessName, subtotal: order.subtotal, tax: order.tax, shippingFee: order.shippingFee, total: order.totalAmount, items: order.items.map((item) => ({ name: item.product?.name || 'Unknown product', quantity: item.quantity, unit: item.product?.unit || 'unit', unitPrice: item.unitPrice, totalPrice: item.totalPrice, quoted: item.quoted })) }} />
+            <OrderRecordExport order={{ orderId: order.orderId, notes: order.notes, createdAt: order.createdAt.toISOString(), status: getOrderStatusLabel(order.status), grower: order.grower.businessName, buyer: order.dispensary.businessName, subtotal: order.subtotal, tax: order.tax, shippingFee: order.shippingFee, total: order.totalAmount, items: order.items.map((item) => ({ name: item.product?.name || 'Unknown product', quantity: item.quantity, unit: item.product?.unit || 'unit', unitPrice: item.unitPrice, totalPrice: item.totalPrice, quoted: item.quoted })) }} />
               </div>
             </details>
           </>
@@ -477,10 +477,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                     <p className="text-sm text-pf-text">{requestNotes.details.paymentTerms || 'Handled directly'}</p>
                   </div>
                 </div>
-                {(requestNotes.details.buyerNotes || requestNotes.legacyNotes) && (
+                {(requestNotes.notesText) && (
                   <div>
                     <p className="text-xs font-medium text-pf-muted">Notes</p>
-                    <p className="text-pf-secondary whitespace-pre-wrap">{requestNotes.details.buyerNotes || requestNotes.legacyNotes}</p>
+                    <p className="text-sm text-pf-secondary whitespace-pre-wrap break-words">{requestNotes.notesText}</p>
                   </div>
                 )}
               </CardContent>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { createPortal } from 'react-dom';
 import { useFocusTrap } from '@/app/hooks/useFocusTrap';
@@ -36,6 +37,24 @@ interface RequestDraftDetails {
   fulfillmentMethod: string;
   requestedWindow: string;
   paymentTerms: string;
+}
+
+interface PendingSubmission {
+  key: string;
+  cart: Cart;
+  notes: string;
+  details: RequestDraftDetails;
+}
+
+function readPendingSubmission(storageKey: string): PendingSubmission | null {
+  const raw = localStorage.getItem(storageKey);
+  if (!raw) return null;
+  const value = JSON.parse(raw) as PendingSubmission;
+  if (!value || typeof value.key !== 'string' || !/^[a-zA-Z0-9_-]{16,128}$/.test(value.key)
+    || !Array.isArray(value.cart?.items) || !value.cart.items.length || typeof value.notes !== 'string' || !value.details) {
+    throw new Error('Your saved request could not be read. Check your requests before submitting again.');
+  }
+  return value;
 }
 
 interface SuggestedProduct {
@@ -94,6 +113,10 @@ function normalizeSuggestion(product: Omit<SuggestedProduct, 'source'>, source: 
 
 export default function DispensaryCartPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const submissionStorageKey = session?.user?.id ? `phenofarm:pending-request:${session.user.id}` : null;
+  const [pendingSubmission, setPendingSubmission] = useState<PendingSubmission | null>(null);
+  const [submissionStorageError, setSubmissionStorageError] = useState('');
   const [cart, setCart] = useState<Cart>({ items: [], subtotal: 0, tax: 0, total: 0 });
   const [mounted, setMounted] = useState(false);
   const [submittingRequest, setSubmittingRequest] = useState(false);
@@ -180,16 +203,23 @@ export default function DispensaryCartPage() {
   }, []);
 
   useEffect(() => {
+    if (!submissionStorageKey) return;
     const saved = readCart();
     setCart(saved);
     setMounted(true);
     const controller = new AbortController();
-    void syncCartWithLiveInventory(saved, controller.signal);
+    try {
+      const pending = readPendingSubmission(submissionStorageKey);
+      setPendingSubmission(pending);
+      if (!pending) void syncCartWithLiveInventory(saved, controller.signal);
+    } catch {
+      setSubmissionStorageError('Your saved request could not be read. Check your requests before submitting again.');
+    }
     try {
       setSavedRequestDefaults(JSON.parse(localStorage.getItem(REQUEST_DEFAULTS_STORAGE_KEY) || 'null'));
     } catch { setSavedRequestDefaults(null); }
     return () => controller.abort();
-  }, [syncCartWithLiveInventory]);
+  }, [submissionStorageKey, syncCartWithLiveInventory]);
 
   useEffect(() => {
     if (mounted && !writeCart(cart)) setInventoryAdjustmentNotice('This browser could not save the latest draft. Please free up storage before leaving.');
@@ -427,8 +457,8 @@ export default function DispensaryCartPage() {
   };
 
   const handleSubmitRequest = async () => {
-    if (submittingRef.current || inventorySyncing) return;
-    if (!cart.items.length || cart.items.some(item => item.unavailable || item.requiresQuote)) {
+    if (submittingRef.current || inventorySyncing || !submissionStorageKey || submissionStorageError) return;
+    if (!pendingSubmission && (!cart.items.length || cart.items.some(item => item.unavailable || item.requiresQuote))) {
       setRequestError('Remove unavailable items or obtain pricing for items that require a quote before submitting.'); return;
     }
     submittingRef.current = true;
@@ -438,23 +468,40 @@ export default function DispensaryCartPage() {
     setInventoryAdjustmentNotice('');
 
     try {
-      const notes = buildOrderRequestNotes({
-        fulfillmentMethod,
-        requestedWindow,
-        paymentTerms,
-        buyerNotes: orderNotes,
-      });
-
+      // Persist before sending. Reuse the original payload after reload even if its
+      // inventory is sold out or its quote has since been consumed by this request.
+      const prepare = () => {
+        const stored = readPendingSubmission(submissionStorageKey) || pendingSubmission;
+        if (stored) {
+          localStorage.setItem(submissionStorageKey, JSON.stringify(stored));
+          return stored;
+        }
+        const details = { orderNotes, fulfillmentMethod, requestedWindow, paymentTerms };
+        const attempt: PendingSubmission = { key: crypto.randomUUID(), cart,
+          notes: buildOrderRequestNotes({ ...details, buyerNotes: orderNotes }), details };
+        localStorage.setItem(submissionStorageKey, JSON.stringify(attempt));
+        return attempt;
+      };
+      const attempt = navigator.locks
+        ? await navigator.locks.request(submissionStorageKey, prepare) : prepare();
+      setPendingSubmission(attempt);
+      setShowRequestReview(false);
       const response = await fetch('/api/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: cart.items, notes }),
+        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': attempt.key },
+        body: JSON.stringify({ items: attempt.cart.items, notes: attempt.notes }),
       });
 
       const data = await response.json().catch(() => ({}));
       const issues = Array.isArray(data.issues) ? data.issues : [];
 
       if (!response.ok) {
+        // A validation conflict is definitive. Network/server failures can follow a
+        // commit, so their receipt must survive until a successful confirmation.
+        if ((response.status === 400 || response.status === 409) && data.code !== 'SUBMISSION_CONFLICT') {
+          localStorage.removeItem(submissionStorageKey);
+          setPendingSubmission(null);
+        }
         setCheckoutIssues(issues);
         if (issues.length > 0) {
           setInventoryAdjustmentNotice('Review each inventory conflict and adjust the draft before submitting again.');
@@ -463,11 +510,16 @@ export default function DispensaryCartPage() {
       }
 
       if (!Array.isArray(data.orders) || !data.orders.length || data.orders.some((order: { orderedProductIds?: unknown }) => !Array.isArray(order.orderedProductIds))) {
-        throw new Error('Request confirmation was incomplete. Your draft has been kept; check your orders before trying again.');
+        throw new Error('Confirmation was interrupted. Check the request again to recover it safely.');
       }
-      const remaining = removeOrderedItems(cart, data.orders);
+      const remaining = removeOrderedItems(readCart(), data.orders);
+      // Save the remaining draft before forgetting the receipt; a crash between
+      // these writes can safely replay the confirmed request once more.
+      if (!writeCart(remaining)) throw new Error('Your request was received, but this browser could not save the confirmation. Free up browser storage and check the request again.');
+      localStorage.removeItem(submissionStorageKey);
+      setPendingSubmission(null);
       setCheckoutIssues(issues);
-      persistRequestDefaults({ orderNotes, fulfillmentMethod, requestedWindow, paymentTerms });
+      persistRequestDefaults(attempt.details);
       setCart(remaining);
       writeCart(remaining);
       if (remaining.items.length) {
@@ -485,7 +537,7 @@ export default function DispensaryCartPage() {
       setSuccessRedirectPaused(false);
       setRequestSuccess(true);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Request submission failed';
+      const message = err instanceof Error && err.name !== 'TypeError' ? err.message : 'Confirmation was interrupted. Check the request again to recover it safely.';
       setRequestError(message);
     } finally {
       submittingRef.current = false;
@@ -527,6 +579,27 @@ export default function DispensaryCartPage() {
             </span>
           </div>
         </div>
+      </div>
+    );
+  }
+
+  if (pendingSubmission || submissionStorageError) {
+    return (
+      <div className="mx-auto max-w-2xl">
+        <Card>
+          <CardHeader><CardTitle>{submittingRequest ? 'Sending request…' : 'Confirm your request'}</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-pf-muted">{submittingRequest ? 'Keep this page open while we confirm your request.' : 'Check this saved request to retrieve its confirmation. It will not be submitted twice.'}</p>
+            {pendingSubmission && <ul className="divide-y divide-pf-line text-sm text-pf-text">{pendingSubmission.cart.items.map(item => (
+              <li key={item.id} className="flex justify-between gap-3 py-2"><span className="min-w-0 break-words">{item.name}</span><span className="shrink-0">{item.quantity} {formatProductUnit(item.unit)}</span></li>
+            ))}</ul>}
+            {(requestError || submissionStorageError) && <p role="alert" className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">{submissionStorageError || requestError}</p>}
+            <div className="flex flex-wrap gap-3">
+              {pendingSubmission && !submissionStorageError && <button type="button" disabled={submittingRequest} onClick={handleSubmitRequest} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] disabled:opacity-60">{submittingRequest ? <><Loader2 className="h-4 w-4 animate-spin" />Confirming…</> : 'Check request'}</button>}
+              <Link href="/dispensary/orders" className="inline-flex min-h-11 items-center text-sm text-pf-accent">View requests</Link>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }

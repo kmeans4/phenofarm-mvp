@@ -133,6 +133,7 @@ model Dispensary {
   user               User?                       @relation(fields: [userId], references: [id], onDelete: Cascade)
   orders             Order[]
   acceptedQuotes     AcceptedQuote[]
+  orderSubmissions   OrderRequestSubmission[]
 
   @@index([createdByGrowerId])
   @@map("dispensaries")
@@ -239,6 +240,19 @@ model Product {
   @@index([strainId])
   @@index([batchId])
   @@map("products")
+}
+
+model OrderRequestSubmission {
+  id           String     @id @default(cuid())
+  dispensaryId String
+  key          String     @db.VarChar(128)
+  payloadHash  String     @db.Char(64)
+  receipt      Json       @default("{\"orders\":[],\"quotedItems\":[]}")
+  createdAt    DateTime   @default(now())
+  dispensary   Dispensary @relation(fields: [dispensaryId], references: [id], onDelete: Cascade)
+
+  @@unique([dispensaryId, key])
+  @@map("order_request_submissions")
 }
 
 model Order {

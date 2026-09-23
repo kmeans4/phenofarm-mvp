@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { test, expect, request as requests, type APIRequestContext } from '@playwright/test';
 import { PrismaClient, type UserRole } from '@prisma/client';
 import { encode } from 'next-auth/jwt';
@@ -156,9 +157,9 @@ test('checkout validates input, reports partial success, and blocks hidden price
   const one = await account('GROWER'); const two = await account('GROWER'); const buyer = await account('DISPENSARY');
   const available = await product(one.grower!.id); const soldOut = await product(two.grower!.id, { inventoryQty: 0 }); const hidden = await product(one.grower!.id, { isPriceVisible: false });
   expect((await buyer.api.post('/api/checkout', { data: '{broken', headers: { 'content-type': 'application/json' } })).status()).toBe(400);
-  expect((await buyer.api.post('/api/checkout', { data: { items: [{ id: hidden.id, growerId: one.grower!.id, price: 0, quantity: 1 }] } })).status()).toBe(409);
+  expect((await buyer.api.post('/api/checkout', { headers: { 'Idempotency-Key': randomUUID() }, data: { items: [{ id: hidden.id, growerId: one.grower!.id, price: 0, quantity: 1 }] } })).status()).toBe(409);
   expect((await db.product.findUniqueOrThrow({ where: { id: hidden.id } })).inventoryQty).toBe(10);
-  const response = await buyer.api.post('/api/checkout', { data: { items: [available,soldOut].map(item => ({ id: item.id, growerId: item.growerId, price: Number(item.price), quantity: 1 })) } });
+  const response = await buyer.api.post('/api/checkout', { headers: { 'Idempotency-Key': randomUUID() }, data: { items: [available,soldOut].map(item => ({ id: item.id, growerId: item.growerId, price: Number(item.price), quantity: 1 })) } });
   expect(response.status(), await response.text()).toBe(200);
   const data = await response.json(); expect(data.orders).toHaveLength(1); expect(data.orders[0].orderedProductIds).toEqual([available.id]); expect(data.orders[0].growerId).toBe(one.grower!.id); expect(data.issues[0].productId).toBe(soldOut.id);
   expect((await one.api.post('/api/orders', { data: { dispensaryId: buyer.dispensary!.id, items: [{ productId: available.id, quantity: 1, unitPrice: 1 }], shippingFee: -1 } })).status()).toBe(400);
@@ -325,9 +326,9 @@ test('hidden-price quote must cover the full order quantity and offer acceptance
   expect(accepted.map(response => response.status()).sort()).toEqual([200,409]);
   expect(await db.acceptedQuote.count({ where: { messageId: offer.id } })).toBe(1);
   const data = { items: [{ id: item.id, growerId: owner.grower!.id, price: 0, quantity: 2 }] };
-  expect((await buyer.api.post('/api/checkout', { data })).status()).toBe(409);
+  expect((await buyer.api.post('/api/checkout', { headers: { 'Idempotency-Key': randomUUID() }, data })).status()).toBe(409);
   expect((await db.product.findUniqueOrThrow({ where: { id: item.id } })).inventoryQty).toBe(10);
   expect((await db.acceptedQuote.findUniqueOrThrow({ where: { messageId: offer.id } })).consumedByOrderId).toBeNull();
   data.items[0].quantity = 1;
-  expect((await buyer.api.post('/api/checkout', { data })).status()).toBe(200);
+  expect((await buyer.api.post('/api/checkout', { headers: { 'Idempotency-Key': randomUUID() }, data })).status()).toBe(200);
 });

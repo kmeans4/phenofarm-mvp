@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createHash } from 'node:crypto';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
 import { formatLicenseExpiry, isLicenseExpired } from '@/lib/license';
@@ -39,6 +40,11 @@ interface QuotedItemResult {
   quantity: number;
   unitPrice: number;
   acceptedQuoteId: string;
+}
+
+interface SubmissionReceipt {
+  orders: { id: string; orderId: string; growerId: string; orderedProductIds: string[] }[];
+  quotedItems: QuotedItemResult[];
 }
 
 interface CheckoutIssue {
@@ -119,30 +125,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Dispensary not found' }, { status: 404 });
     }
 
-    if (isLicenseExpired(dispensary.licenseExpiry)) {
-      await db.dispensary.update({
-        where: { id: dispensaryId },
-        data: { licenseStatus: 'expired', isVerified: false },
-      });
-      return NextResponse.json(
-        {
-          error: `License expired ${formatLicenseExpiry(dispensary.licenseExpiry!)} - update it in Settings; ordering resumes after re-verification`,
-          code: 'LICENSE_EXPIRED',
-          licenseStatus: 'expired',
-        },
-        { status: 403 }
-      );
-    }
-
-    if (dispensary.licenseStatus !== 'verified') {
-      return NextResponse.json(
-        {
-          error: 'License verification required. This dispensary must have a verified license to submit order requests.',
-          code: 'LICENSE_NOT_VERIFIED',
-          licenseStatus: dispensary.licenseStatus,
-        },
-        { status: 403 }
-      );
+    const submissionKey = request.headers.get('Idempotency-Key');
+    if (!submissionKey || !/^[a-zA-Z0-9_-]{16,128}$/.test(submissionKey)) {
+      return NextResponse.json({ error: 'Refresh your request draft before submitting again.' }, { status: 400 });
     }
 
     const body = await request.json().catch(() => null);
@@ -183,6 +168,25 @@ export async function POST(request: NextRequest) {
       consolidated.set(key, existing ? { ...existing, quantity: existing.quantity + item.quantity } : item);
     }
 
+    if ([...consolidated.values()].some(item => item.quantity > 9999)) {
+      return NextResponse.json({ error: 'Invalid cart quantities' }, { status: 400 });
+    }
+    // Bind the key to the complete intent, independently of mutable inventory and quotes.
+    // Display prices are deliberately excluded; the server owns the actual price.
+    const payloadHash = createHash('sha256').update(JSON.stringify({
+      items: [...consolidated.values()].map(({ id, growerId, quantity }) => ({ id, growerId, quantity }))
+        .sort((a, b) => a.growerId.localeCompare(b.growerId) || a.id.localeCompare(b.id)),
+      notes: notes || '',
+    })).digest('hex');
+    const submission = await db.orderRequestSubmission.upsert({
+      where: { dispensaryId_key: { dispensaryId, key: submissionKey } },
+      create: { dispensaryId, key: submissionKey, payloadHash },
+      update: {},
+    });
+    if (submission.payloadHash !== payloadHash) {
+      return NextResponse.json({ error: 'This request has already been submitted with different details. Check your requests.', code: 'SUBMISSION_CONFLICT' }, { status: 409 });
+    }
+
     // Group items by grower
     const byGrower: Record<string, CartItem[]> = {};
     consolidated.forEach((item) => {
@@ -190,9 +194,22 @@ export async function POST(request: NextRequest) {
       byGrower[item.growerId].push(item);
     });
 
-    const orders: { id: string; orderId: string; growerId: string; orderedProductIds: string[] }[] = [];
+    const savedReceipt = submission.receipt as unknown as SubmissionReceipt;
+    if (savedReceipt.orders.length === Object.keys(byGrower).length) {
+      return NextResponse.json({ success: true, ...savedReceipt, orderCount: savedReceipt.orders.length });
+    }
+    if (isLicenseExpired(dispensary.licenseExpiry)) {
+      await db.dispensary.update({ where: { id: dispensaryId }, data: { licenseStatus: 'expired', isVerified: false } });
+      return NextResponse.json({ error: `License expired ${formatLicenseExpiry(dispensary.licenseExpiry!)} - update it in Settings; ordering resumes after re-verification`, code: 'LICENSE_EXPIRED', licenseStatus: 'expired' }, { status: 403 });
+    }
+    if (dispensary.licenseStatus !== 'verified') {
+      return NextResponse.json({ error: 'License verification required. This dispensary must have a verified license to submit order requests.', code: 'LICENSE_NOT_VERIFIED', licenseStatus: dispensary.licenseStatus }, { status: 403 });
+    }
+
+    const orders: SubmissionReceipt['orders'] = [];
     const quotedItems: QuotedItemResult[] = [];
     const issues: CheckoutIssue[] = [];
+    let uncertainResult = false;
 
     for (const [growerId, growerItems] of Object.entries(byGrower)) {
       try {
@@ -202,48 +219,55 @@ export async function POST(request: NextRequest) {
         }
 
         const productIds = Array.from(requestedByProduct.keys());
-        const products = await db.product.findMany({
-          where: {
-            id: { in: productIds },
-            growerId,
-            isDeleted: false,
-            status: 'PUBLISHED',
-            grower: marketplaceGrowerWhere(),
-          },
-          select: {
-            id: true,
-            name: true,
-            price: true,
-            inventoryQty: true,
-            isAvailable: true,
-            isPriceVisible: true,
-            grower: { select: { userId: true, businessName: true } },
-          },
-        });
-
-        const productById = new Map(products.map((product) => [product.id, product]));
-        const growerIssues: CheckoutIssue[] = [];
-
-        for (const [productId, requested] of requestedByProduct.entries()) {
-          const product = productById.get(productId);
-          const available = Number(product?.inventoryQty || 0);
-
-          if (!product || !product.isAvailable || requested > available) {
-            growerIssues.push({
-              productId,
-              productName: product?.name || 'Unknown product',
-              requested,
-              available,
-            });
-          }
-        }
-
-        if (growerIssues.length > 0) {
-          issues.push(...growerIssues);
-          continue;
-        }
-
         const result = await createWithOrderIdRetry((orderId) => db.$transaction(async (tx) => {
+          // Serialize repeats of this intent. The order, inventory, notifications and
+          // receipt commit together, so a dropped response cannot submit it twice.
+          await tx.$queryRaw`SELECT id FROM order_request_submissions WHERE id = ${submission.id} FOR UPDATE`;
+          const saved = await tx.orderRequestSubmission.findUniqueOrThrow({ where: { id: submission.id } });
+          const receipt = saved.receipt as unknown as SubmissionReceipt;
+          const previous = receipt.orders.find(order => order.growerId === growerId);
+          if (previous) return { order: previous, quotedItems: receipt.quotedItems.filter(item => previous.orderedProductIds.includes(item.productId)) };
+
+          const products = await tx.product.findMany({
+            where: {
+              id: { in: productIds },
+              growerId,
+              isDeleted: false,
+              status: 'PUBLISHED',
+              grower: marketplaceGrowerWhere(),
+            },
+            select: {
+              id: true,
+              name: true,
+              price: true,
+              inventoryQty: true,
+              isAvailable: true,
+              isPriceVisible: true,
+              grower: { select: { userId: true, businessName: true } },
+            },
+          });
+
+          const productById = new Map(products.map((product) => [product.id, product]));
+          const growerIssues: CheckoutIssue[] = [];
+
+          for (const [productId, requested] of requestedByProduct.entries()) {
+            const product = productById.get(productId);
+            const available = Number(product?.inventoryQty || 0);
+
+            if (!product || !product.isAvailable || requested > available) {
+              growerIssues.push({
+                productId,
+                productName: product?.name || 'Unknown product',
+                requested,
+                available,
+              });
+            }
+          }
+
+          if (growerIssues.length > 0) {
+            throw new CheckoutConflictError(growerIssues);
+          }
+
           let subtotal = 0;
           const orderItems: OrderItemData[] = [];
           const orderQuotedItems: QuotedItemResult[] = [];
@@ -378,19 +402,28 @@ export async function POST(request: NextRequest) {
             href: `/grower/orders/${createdOrder.id}`,
           });
 
-          return { order: createdOrder, quotedItems: orderQuotedItems };
-        }));
+          const order = { id: createdOrder.id, orderId: createdOrder.orderId, growerId, orderedProductIds: productIds };
+          await tx.orderRequestSubmission.update({ where: { id: submission.id }, data: {
+            receipt: { orders: [...receipt.orders, order], quotedItems: [...receipt.quotedItems, ...orderQuotedItems].map(item => ({ ...item })) },
+          } });
+          return { order, quotedItems: orderQuotedItems };
+        }, { timeout: 15_000 }));
 
-        orders.push({ id: result.order.id, orderId: result.order.orderId, growerId, orderedProductIds: productIds });
+        orders.push(result.order);
         quotedItems.push(...result.quotedItems);
       } catch (error) {
         if (error instanceof CheckoutConflictError) {
           issues.push(...error.issues);
           continue;
         }
+        uncertainResult = true;
         console.error('Unable to submit grower request:', error);
         issues.push(...growerItems.map(item => ({ productId: item.id, productName: 'Product', requested: item.quantity, available: 0, reason: 'This request could not be submitted. Please retry.' })));
       }
+    }
+
+    if (uncertainResult) {
+      return NextResponse.json({ error: 'Your request could not be fully confirmed. Check the request again to safely finish it.', orders, issues }, { status: 503 });
     }
 
     if (orders.length === 0) {

@@ -305,7 +305,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
     try {
       await update('Settings', fetch('/api/grower/settings', {
         method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(draftValue),
+        body: JSON.stringify({ ...draftValue, email: formData.email }),
       }).then(async (res) => {
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || 'Failed to save settings.');

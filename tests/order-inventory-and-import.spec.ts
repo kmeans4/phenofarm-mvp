@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { test, expect, request as playwrightRequest } from '@playwright/test';
 import { ConversationMessageType, PrismaClient, UserRole } from '@prisma/client';
 import { encode } from 'next-auth/jwt';
@@ -245,13 +246,13 @@ test('accepted quote is consumed once and checkout then falls back to list price
     const api = await playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { Cookie: await sessionCookie(account.dispensaryUser), Accept: 'application/json' } });
     const accepted = await api.post(`/api/messages/messages/${offer.id}/offer-action`, { data: { action: 'ACCEPT' } });
     expect(accepted.ok()).toBeTruthy();
-    const firstCheckout = await api.post('/api/checkout', { data: { items: [{ id: product.id, growerId: account.grower.id, price: 999, quantity: 1 }, { id: product.id, growerId: account.grower.id, price: 1, quantity: 1 }], notes: 'Direct settlement test' } });
+    const firstCheckout = await api.post('/api/checkout', { headers: { 'Idempotency-Key': randomUUID() }, data: { items: [{ id: product.id, growerId: account.grower.id, price: 999, quantity: 1 }, { id: product.id, growerId: account.grower.id, price: 1, quantity: 1 }], notes: 'Direct settlement test' } });
     expect(firstCheckout.ok()).toBeTruthy();
     const firstBody = await firstCheckout.json();
     const firstItem = await db.orderItem.findFirstOrThrow({ where: { orderId: firstBody.orders[0].id, productId: product.id }, include: { acceptedQuote: true } });
     expect(Number(firstItem.unitPrice)).toBe(55);
     expect(firstItem.acceptedQuote?.consumedByOrderId).toBe(firstBody.orders[0].id);
-    const secondCheckout = await api.post('/api/checkout', { data: { items: [{ id: product.id, growerId: account.grower.id, price: 1, quantity: 1 }] } });
+    const secondCheckout = await api.post('/api/checkout', { headers: { 'Idempotency-Key': randomUUID() }, data: { items: [{ id: product.id, growerId: account.grower.id, price: 1, quantity: 1 }] } });
     expect(secondCheckout.ok()).toBeTruthy();
     const secondBody = await secondCheckout.json();
     const secondItem = await db.orderItem.findFirstOrThrow({ where: { orderId: secondBody.orders[0].id, productId: product.id } });
