@@ -53,7 +53,6 @@ const PLAN_CONFIGS: PlanConfig[] = [
       'Unlimited product listings',
       'Higher usage limits',
       'CSV bulk upload',
-      'Metrc integration ready',
       'Priority support',
     ],
     highlighted: true,

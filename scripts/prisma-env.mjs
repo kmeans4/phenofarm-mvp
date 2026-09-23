@@ -5,7 +5,10 @@ import { promises as fsPromises } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-const EXCLUDED_DESTRUCTIVE_MIGRATION = '20260710030000_drop_dead_payment_cart_session_tables';
+const EXCLUDED_DESTRUCTIVE_MIGRATIONS = [
+  '20260710030000_drop_dead_payment_cart_session_tables',
+  '20260923010000_remove_retired_tracking_integration',
+];
 
 function parseEnv(file) {
   const values = {};
@@ -51,7 +54,7 @@ async function createAdditiveSchema() {
   await fsPromises.mkdir(targetMigrationsDir, { recursive: true });
   await fsPromises.cp(path.join(sourcePrismaDir, 'schema.prisma'), path.join(tempSchemaDir, 'schema.prisma'));
   for (const entry of await fsPromises.readdir(sourceMigrationsDir, { withFileTypes: true })) {
-    if (entry.isDirectory() && entry.name === EXCLUDED_DESTRUCTIVE_MIGRATION) continue;
+    if (entry.isDirectory() && EXCLUDED_DESTRUCTIVE_MIGRATIONS.includes(entry.name)) continue;
     await fsPromises.cp(path.join(sourceMigrationsDir, entry.name), path.join(targetMigrationsDir, entry.name), { recursive: true });
   }
   return path.join(tempSchemaDir, 'schema.prisma');
@@ -127,7 +130,7 @@ async function main() {
           .filter((entry) => entry.isDirectory())
           .map((entry) => entry.name)
           .sort();
-        console.log(JSON.stringify({ phase, excludedMigration: EXCLUDED_DESTRUCTIVE_MIGRATION, migrations: migrationEntries }, null, 2));
+        console.log(JSON.stringify({ phase, excludedMigrations: EXCLUDED_DESTRUCTIVE_MIGRATIONS, migrations: migrationEntries }, null, 2));
         return;
       }
     }

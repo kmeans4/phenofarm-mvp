@@ -115,7 +115,6 @@ Apply these to each grower page and add/edit flow:
 - `/grower/reports`
 - `/grower/settings`
 - `/grower/pricing`
-- `/grower/metrc-sync`
 
 Per page check:
 1. No horizontal overflow

@@ -19,8 +19,8 @@ const FAQS = [
     a: 'Yes. Every listing has per-product price visibility: show a list price openly, or mark it quote-only so buyers request pricing and negotiate terms in a recorded thread.',
   },
   {
-    q: 'Is PhenoFarm compliance-ready?',
-    a: 'Listings carry strain, batch, THC/CBD, and COA lab documents (potency, pesticide, microbial). Metrc integration is prepared for state tracking as it rolls out.',
+    q: 'What product records can we keep?',
+    a: 'Listings carry strain, batch, THC/CBD, and COA lab documents (potency, pesticide, microbial).',
   },
   {
     q: 'How do we evaluate it?',

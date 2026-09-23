@@ -57,4 +57,3 @@ _Last updated: 2026-03-23_
 | 23 | `/grower/reports` | DONE | Export actions now stack full-width on mobile instead of cramped side-by-side controls. |
 | 24 | `/grower/settings` | DONE | Verified page already mobile-compliant with responsive spacing/actions; no additional layout patch required in this pass. |
 | 25 | `/grower/pricing` | DONE | Mobile header and create actions now use full-width CTA behavior for clearer tap targets. |
-| 26 | `/grower/metrc-sync` | DONE | Header CTA now full-width on mobile and sync-frequency control stacks with full-width select to prevent crowding. |

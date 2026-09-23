@@ -40,7 +40,6 @@ This document describes all environment variables required for the PhenoFarm app
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `NEXT_PUBLIC_API_URL` | `http://localhost:3000` | Public API base URL |
-| `NEXT_PUBLIC_APP_URL` | `http://localhost:3000` | Public app URL (used for METRC sync) |
 
 ### Server Configuration (Standalone Mode)
 
@@ -85,7 +84,6 @@ STRIPE_WEBHOOK_SECRET=test
 
 # Optional overrides
 NEXT_PUBLIC_API_URL=http://localhost:3000
-NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ### Production (Vercel)
@@ -100,7 +98,6 @@ STRIPE_SECRET_KEY=sk_live_...
 STRIPE_PUBLISHABLE_KEY=pk_live_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 NEXT_PUBLIC_API_URL=https://your-domain.com
-NEXT_PUBLIC_APP_URL=https://your-domain.com
 ```
 
 **Critical:** Never use test keys (`sk_test_`, `pk_test_`) in production. Always use live keys.
