@@ -1,0 +1,78 @@
+{
+  "accepted_quotes": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "batches": {
+    "count": 4,
+    "hash": "98445a052155425712f65d240e6208882946b2f01648b7cc30f49186de03387c"
+  },
+  "conversation_messages": {
+    "count": 15,
+    "hash": "13825a74c72111c7ad2ba80c5bcf717a1d933d436c5a5b1d22bbbb6d86ead053"
+  },
+  "conversations": {
+    "count": 1,
+    "hash": "588624ae03cb1a2c78364ec250a44a9fa8d24cc0a402727e7ce559dd8013e58c"
+  },
+  "dispensaries": {
+    "count": 3,
+    "hash": "c3a5ed6d24ca3f34a4487f0f19ad7621b86ac4b30f6d13a87d8e82904ddac816"
+  },
+  "dispensary_favorite_products": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "dispensary_price_alerts": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "dispensary_saved_filters": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "growers": {
+    "count": 1,
+    "hash": "72d46df3c67d3b4b9f4276966bbc0108a2aca972a720fecd425fd749178ac968"
+  },
+  "notifications": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "order_items": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "order_request_submissions": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "order_status_events": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "orders": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "product_type_configs": {
+    "count": 15,
+    "hash": "e1887a35ab0f7455a0a8c91f63fd304af018a88235db9206793ac5789ecec8ca"
+  },
+  "products": {
+    "count": 4,
+    "hash": "6d0b9d379d67777f347a599f655cb47cb25de7bd2cb6d2a73c86e1631b3b775d"
+  },
+  "strains": {
+    "count": 3,
+    "hash": "1e3d3e8d60b6eca8b1244570ceb6184339df0deffe06b6c1533c835ed9a1c6b7"
+  },
+  "stripe_webhook_events": {
+    "count": 0,
+    "hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "users": {
+    "count": 5,
+    "hash": "8961105ab6cf6ddf5b5c66f47ff138550ef223d6ccde28e916b98f7f853aadfc"
+  }
+}

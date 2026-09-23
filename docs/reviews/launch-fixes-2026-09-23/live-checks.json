@@ -88,5 +88,15 @@
     "name": "Live revocation is idempotent and an older approval cannot restore access",
     "passed": true,
     "at": "2026-09-23T22:03:57.093Z"
+  },
+  {
+    "name": "Final production mobile order layout keeps date and grower name visible",
+    "passed": true,
+    "at": "2026-09-23T22:10:57.322Z"
+  },
+  {
+    "name": "Synthetic production fixtures removed without changing existing business records",
+    "passed": true,
+    "at": "2026-09-23T22:11:21.009Z"
   }
 ]

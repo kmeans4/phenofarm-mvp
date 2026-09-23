@@ -14,7 +14,7 @@
 - Team ID: `team_APmavOTWRi3vWAznGnDEny9T`
 - Project name: `phenofarm-mvp`
 - Project ID: `prj_9pLewagwNf3uOA2sle3r0O3RlQkv`
-- Latest production deployment: `phenofarm-ohtolskyn-kevin-means-projects.vercel.app`
+- Verified production code release (September 23, 2026): `phenofarm-8wxiiqpg6-kevin-means-projects.vercel.app`; inspect the canonical alias for the latest deployment.
 - Production domains:
   - `phenofarm-mvp.vercel.app`
   - `phenofarm-mvp-kevin-means-projects.vercel.app`
@@ -35,6 +35,13 @@
   - `STRIPE_PUBLISHABLE_KEY`
   - `STRIPE_WEBHOOK_SECRET`
   - `NEXT_PUBLIC_API_URL`
+
+### Account email
+- Provider: Resend, connected through Vercel Marketplace.
+- Verified sending domain: `phenoshop.app` (email DNS at Porkbun; this does not move website hosting).
+- Production sender: `PhenoFarm <accounts@phenoshop.app>`.
+- Production configuration: `AUTH_MAIL_PROVIDER=resend`, `AUTH_MAIL_FROM`, `RESEND_API_KEY`, and `AUTH_REQUIRE_EMAIL_VERIFICATION=true`.
+- Signup, verification, and reset were exercised live on September 23, 2026; the user confirmed the sender test reached their Yahoo inbox. Existing unverified users must follow their verification email before signing in.
 
 ## Working commands
 - Install: `npm install`
