@@ -496,7 +496,7 @@ export default function DispensaryCartPage() {
   if (!mounted) {
     return (
       <div className="max-w-5xl mx-auto">
-        <PageHeader title="Order Request Draft" description="Loading your request draft..." className="mb-4 sm:mb-6" />
+        <PageHeader title="Order Request Draft" description="Loading your request draft..." className="mb-4" />
       </div>
     );
   }
@@ -505,24 +505,24 @@ export default function DispensaryCartPage() {
     return (
       <div className="mx-auto max-w-2xl">
         <div
-          className="rounded-2xl border border-green-200 bg-white p-8 text-center shadow-sm"
+          className="rounded-2xl border border-pf-accent-line bg-pf-surface px-4 py-6 text-center sm:p-6 shadow-sm"
           onMouseEnter={() => setSuccessRedirectPaused(true)}
           onFocusCapture={() => setSuccessRedirectPaused(true)}
           onTouchStart={() => setSuccessRedirectPaused(true)}
         >
-          <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-green-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Order Request Submitted</h1>
-          <p className="mt-2 text-gray-600">
-            The grower will review the request. Wholesale settlement stays direct between buyer and grower.
+          <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-pf-accent" />
+          <h1 className="text-xl font-semibold text-pf-text">Request submitted</h1>
+          <p className="mt-2 text-sm text-pf-muted">
+            The grower will review your request. Arrange payment directly with them.
           </p>
           <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
             <Link
               href="/dispensary/orders"
-              className="inline-flex h-10 items-center justify-center rounded-lg bg-green-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
             >
-              View requests now
+              View requests
             </Link>
-            <span className="inline-flex h-10 items-center justify-center text-sm text-gray-500">
+            <span className="inline-flex h-10 items-center justify-center text-sm text-pf-muted">
               {successRedirectPaused ? 'Redirect paused' : 'Redirecting in 5 seconds'}
             </span>
           </div>
@@ -561,20 +561,20 @@ export default function DispensaryCartPage() {
       <PageHeader
         title="Request draft"
         description={isEmpty ? "Build a request for your grower." : undefined}
-        className="mb-4 sm:mb-6"
+        className="mb-4"
       />
 
       {!isEmpty && (
         <div className="mb-4 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-1">
           <nav aria-label="Draft sections" className="flex gap-2 text-sm">
-            {builderSteps.filter(step => step.key !== 'review').map(step => <button key={step.key} type="button" onClick={() => { setBuilderStep(step.key); document.getElementById(`draft-${step.key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} aria-pressed={builderStep === step.key} className={`min-h-10 rounded-lg px-3 ${builderStep === step.key ? 'bg-green-100 font-semibold text-green-900' : 'text-gray-600 hover:bg-gray-100'}`}>{step.label}</button>)}
+            {builderSteps.filter(step => step.key !== 'review').map(step => <button key={step.key} type="button" onClick={() => { setBuilderStep(step.key); document.getElementById(`draft-${step.key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} aria-pressed={builderStep === step.key} className={`min-h-10 rounded-lg px-3 ${builderStep === step.key ? 'bg-pf-accent-bg font-semibold text-pf-accent' : 'text-pf-muted hover:bg-pf-surface'}`}>{step.label}</button>)}
           </nav>
           <details className="relative">
-            <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-green-800">Templates</summary>
-            <div className="absolute right-0 z-10 mt-1 w-48 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
-              {savedRequestDefaults && <button type="button" onClick={() => applyRequestDefaults(savedRequestDefaults)} className="min-h-10 w-full rounded px-3 text-left text-sm text-gray-700 hover:bg-gray-50">Reuse last request</button>}
-              <button type="button" onClick={() => applyRequestDefaults(DEFAULT_REQUEST_DEFAULTS)} className="min-h-10 w-full rounded px-3 text-left text-sm text-green-800 hover:bg-green-50">Use standard terms</button>
+            <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-pf-accent">Templates</summary>
+            <div className="absolute right-0 z-10 mt-1 w-48 rounded-lg border border-pf-line bg-pf-surface p-1 shadow-lg">
+              {savedRequestDefaults && <button type="button" onClick={() => applyRequestDefaults(savedRequestDefaults)} className="min-h-10 w-full rounded px-3 text-left text-sm text-pf-secondary hover:bg-pf-canvas">Reuse last request</button>}
+              <button type="button" onClick={() => applyRequestDefaults(DEFAULT_REQUEST_DEFAULTS)} className="min-h-10 w-full rounded px-3 text-left text-sm text-pf-accent hover:bg-pf-accent-bg">Use standard terms</button>
             </div>
           </details>
           </div>
@@ -590,17 +590,17 @@ export default function DispensaryCartPage() {
       {(requestError || inventoryAdjustmentNotice) && (
         <div className="mb-4 space-y-3">
           {requestError && (
-            <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700">{requestError}</div>
+            <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger">{requestError}</div>
           )}
           {inventoryAdjustmentNotice && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-blue-800">
+            <div className="p-4 bg-pf-info-bg border border-pf-info-line rounded-lg text-pf-info">
               {inventoryAdjustmentNotice}
             </div>
           )}
           {checkoutIssues.length > 0 && (
-            <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm font-semibold text-amber-900 mb-2">Inventory conflicts</p>
-              <ul className="space-y-2 text-sm text-amber-900">
+            <div className="p-4 bg-pf-warning-bg border border-pf-warning-line rounded-lg">
+              <p className="text-sm font-semibold text-pf-warning mb-2">Inventory conflicts</p>
+              <ul className="space-y-2 text-sm text-pf-warning">
                 {checkoutIssues.map((issue) => {
                   const currentItem = cart.items.find((item) => item.id === issue.productId);
                   const alreadyAdjusted = !currentItem || currentItem.quantity <= issue.available;
@@ -608,11 +608,11 @@ export default function DispensaryCartPage() {
                   return (
                     <li
                       key={`${issue.productId}-${issue.requested}`}
-                      className="flex flex-col gap-3 rounded-lg border border-amber-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                      className="flex flex-col gap-3 rounded-lg border border-pf-warning-line bg-pf-surface px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
                     >
                       <div>
-                        <p className="font-semibold text-amber-950">{issue.productName}</p>
-                        <p className="mt-1 text-xs text-amber-800">
+                        <p className="font-semibold text-pf-warning">{issue.productName}</p>
+                        <p className="mt-1 text-xs text-pf-warning">
                           Requested {issue.requested} · Available {issue.available}
                         </p>
                       </div>
@@ -620,7 +620,7 @@ export default function DispensaryCartPage() {
                         type="button"
                         onClick={() => applySingleInventoryAdjustment(issue)}
                         disabled={alreadyAdjusted}
-                        className="inline-flex h-9 items-center justify-center rounded-lg border border-amber-300 px-3 text-xs font-semibold text-amber-900 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                        className="inline-flex h-9 items-center justify-center rounded-lg border border-pf-warning-line px-3 text-xs font-semibold text-pf-warning transition-colors hover:bg-pf-warning-bg disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                       >
                         {alreadyAdjusted ? 'Adjusted' : issue.available > 0 ? `Adjust to ${issue.available}` : 'Remove item'}
                       </button>
@@ -634,33 +634,33 @@ export default function DispensaryCartPage() {
       )}
 
       {isEmpty ? (
-        <Card className="p-5 sm:p-8 text-center">
-          <h2 className="text-xl font-semibold text-gray-900">Your draft is empty</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+        <Card className="px-4 py-6 text-center">
+          <h2 className="text-xl font-semibold text-pf-text">Your draft is empty</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm text-pf-muted">
             Add products to get started.
           </p>
           {(suggestionsLoading || suggestedProducts.length > 0) && (
             <div className="mx-auto mt-6 max-w-2xl text-left">
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900">Suggested products</h3>
+                  <h3 className="text-sm font-semibold text-pf-text">Suggested products</h3>
                 </div>
-                {suggestionsLoading && <Loader2 className="h-4 w-4 animate-spin text-green-600" />}
+                {suggestionsLoading && <Loader2 className="h-4 w-4 animate-spin text-pf-accent" />}
               </div>
               <div className="grid gap-2 sm:grid-cols-2">
                 {suggestionsLoading
                   ? Array.from({ length: 2 }).map((_, index) => (
-                      <div key={index} className="h-20 animate-pulse rounded-lg border border-gray-200 bg-gray-50" />
+                      <div key={index} className="h-20 animate-pulse rounded-lg border border-pf-line bg-pf-canvas" />
                     ))
                   : suggestedProducts.map((product) => (
-                      <div key={product.id} className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+                      <div key={product.id} className="rounded-lg border border-pf-line bg-pf-surface p-3 shadow-sm">
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
                             <div className="flex flex-wrap items-center gap-2">
-                              <p className="truncate text-sm font-semibold text-gray-900">{product.name}</p>
+                              <p className="truncate text-sm font-semibold text-pf-text">{product.name}</p>
                             </div>
-                            <p className="mt-1 text-xs text-gray-500">{product.grower.businessName}</p>
-                            <p className="mt-1 text-xs text-gray-600">
+                            <p className="mt-1 text-xs text-pf-muted">{product.grower.businessName}</p>
+                            <p className="mt-1 text-xs text-pf-muted">
                               {product.isPriceVisible ? `$${(product.price ?? 0).toFixed(2)}${product.unit ? `/${formatProductUnit(product.unit)}` : ''}` : ''}
                               {product.isPriceVisible ? ' · ' : ''}
                               {product.inventoryQty} available
@@ -669,7 +669,7 @@ export default function DispensaryCartPage() {
                           <button
                             type="button"
                             onClick={() => product.isPriceVisible ? addSuggestedProduct(product) : router.push(`/dispensary/catalog?product=${encodeURIComponent(product.id)}&search=${encodeURIComponent(product.name)}`)}
-                            className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green-600 px-3 text-xs font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                            className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-[#032116] transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                           >
                             {product.isPriceVisible && <Plus className="h-3.5 w-3.5" />}
                             {product.isPriceVisible ? 'Add' : 'Request pricing'}
@@ -681,16 +681,16 @@ export default function DispensaryCartPage() {
             </div>
           )}
           <div className="mt-4 flex flex-wrap justify-center gap-2 sm:mt-6">
-            <Link href="/dispensary/catalog" className="inline-flex h-10 items-center justify-center rounded-lg bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-700">
+            <Link href="/dispensary/catalog" className="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] hover:bg-emerald-400">
               Browse catalog
             </Link>
-            <Link href="/dispensary/saved" className="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+            <Link href="/dispensary/saved" className="inline-flex h-10 items-center justify-center rounded-lg border border-pf-line-strong px-4 text-sm font-semibold text-pf-secondary hover:bg-pf-canvas">
               Saved
             </Link>
           </div>
         </Card>
       ) : (
-        <div id="draft-items" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div id="draft-items" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2 space-y-4">
             {cart.items.map(item => {
               const atMax = item.quantity >= item.maxQty;
@@ -700,11 +700,11 @@ export default function DispensaryCartPage() {
                     <ProductImage src={item.image} alt={item.name} productType={item.productType} className="h-14 w-14 shrink-0 rounded-lg sm:h-20 sm:w-20" />
                     <div className="min-w-0 flex-1">
                       <p className="break-words text-sm font-semibold sm:text-base">{item.name}</p>
-                      <p className="text-xs text-gray-500 sm:text-sm">{item.grower} · ${item.price}/{formatProductUnit(item.unit)}</p>
-                      {item.acceptedQuoteId ? <p className="mt-1 inline-flex rounded-full bg-green-50 px-2 py-1 text-xs font-semibold text-green-800 ring-1 ring-green-200">Quoted: ${item.quotedUnitPrice?.toFixed(2)}/{formatProductUnit(item.unit)} × up to {item.quotedQuantity}</p> : null}
+                      <p className="text-xs text-pf-muted sm:text-sm">{item.grower} · ${item.price}/{formatProductUnit(item.unit)}</p>
+                      {item.acceptedQuoteId ? <p className="mt-1 inline-flex rounded-full bg-pf-accent-bg px-2 py-1 text-xs font-semibold text-pf-accent ring-1 ring-pf-accent-line">Quoted: ${item.quotedUnitPrice?.toFixed(2)}/{formatProductUnit(item.unit)} × up to {item.quotedQuantity}</p> : null}
                     </div>
                     <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
-                      <div className="flex items-center rounded border border-gray-300">
+                      <div className="flex items-center rounded border border-pf-line-strong">
                         <button aria-label={`Decrease quantity for ${item.name}`}
                         onClick={() => updateQuantity(item.id, -1)} className="h-10 w-10">-</button>
                         <input
@@ -712,7 +712,7 @@ export default function DispensaryCartPage() {
                           aria-label={`Quantity for ${item.name}`}
                         value={item.quantity}
                           onChange={(e) => setExactQuantity(item.id, parseInt(e.target.value) || 1)}
-                          className="h-10 w-12 text-center text-base border-x border-gray-300"
+                          className="h-10 w-12 text-center text-base border-x border-pf-line-strong"
                         />
                         <button
                           aria-label={`Increase quantity for ${item.name}`}
@@ -723,7 +723,7 @@ export default function DispensaryCartPage() {
                       </div>
                       <p className="font-bold">${getLineTotal(item).toFixed(2)}</p>
                       <button aria-label={`Remove ${item.name} from draft`}
-                      onClick={() => removeItem(item.id)} className="flex h-10 w-10 items-center justify-center rounded-lg text-red-600 hover:bg-red-50">
+                      onClick={() => removeItem(item.id)} className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-danger hover:bg-pf-danger-bg">
                         <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
@@ -732,13 +732,13 @@ export default function DispensaryCartPage() {
               );
             })}
 
-            <section id="draft-logistics" className="scroll-mt-24"><Card className={builderStep === 'logistics' ? 'ring-2 ring-green-500' : ''}>
+            <section id="draft-logistics" className="scroll-mt-24"><Card className={builderStep === 'logistics' ? 'ring-2 ring-emerald-400' : ''}>
               <CardHeader className="pb-2">
                 <CardTitle>Logistics</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4 pt-0 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="fulfillment-method-page" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="fulfillment-method-page" className="block text-sm font-medium text-pf-secondary">
                     Fulfillment
                   </label>
                   <select
@@ -748,7 +748,7 @@ export default function DispensaryCartPage() {
                       setFulfillmentMethod(event.target.value);
                       setBuilderStep('logistics');
                     }}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    className="mt-1 w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base sm:text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
                   >
                     <option>Flexible</option>
                     <option>Pickup</option>
@@ -758,8 +758,8 @@ export default function DispensaryCartPage() {
                 </div>
 
                 <div>
-                  <label htmlFor="requested-window-page" className="block text-sm font-medium text-gray-700">
-                    Requested window <span className="text-xs font-normal text-gray-400">(optional)</span>
+                  <label htmlFor="requested-window-page" className="block text-sm font-medium text-pf-secondary">
+                    Requested window <span className="text-xs font-normal text-pf-muted">(optional)</span>
                   </label>
                   <input
                     id="requested-window-page"
@@ -769,22 +769,22 @@ export default function DispensaryCartPage() {
                       setBuilderStep('logistics');
                     }}
                     maxLength={120}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    className="mt-1 w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base sm:text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
                     placeholder="e.g. Tuesday morning"
                   />
-                  <p className="mt-1 text-right text-xs text-gray-500">{requestedWindow.length}/120</p>
+                  <p className="mt-1 text-right text-xs text-pf-muted">{requestedWindow.length}/120</p>
                 </div>
               </CardContent>
             </Card>
 
             </section>
-            <section id="draft-terms" className="scroll-mt-24"><Card className={builderStep === 'terms' ? 'ring-2 ring-green-500' : ''}>
+            <section id="draft-terms" className="scroll-mt-24"><Card className={builderStep === 'terms' ? 'ring-2 ring-emerald-400' : ''}>
               <CardHeader className="pb-2">
                 <CardTitle>Terms</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4 pt-0">
                 <div>
-                  <label htmlFor="payment-terms-page" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="payment-terms-page" className="block text-sm font-medium text-pf-secondary">
                     Payment terms
                   </label>
                   <select
@@ -794,21 +794,21 @@ export default function DispensaryCartPage() {
                       setPaymentTerms(event.target.value);
                       setBuilderStep('terms');
                     }}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    className="mt-1 w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base sm:text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
                   >
                     {PAYMENT_TERMS_OPTIONS.map((option) => (
                       <option key={option}>{option}</option>
                     ))}
                   </select>
-                  <p className="mt-1 text-xs text-gray-500">Arrange payment directly with the grower.</p>
+                  <p className="mt-1 text-xs text-pf-muted">Arrange payment directly with the grower.</p>
                 </div>
 
                 <div>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <label htmlFor="request-notes-page" className="block text-sm font-medium text-gray-700">
-                      Notes <span className="font-normal text-gray-500">(optional)</span>
+                    <label htmlFor="request-notes-page" className="block text-sm font-medium text-pf-secondary">
+                      Notes <span className="font-normal text-pf-muted">(optional)</span>
                     </label>
-                    <select aria-label="Add a note template" value="" onChange={event => { if (event.target.value) applyNoteTemplate(event.target.value); }} className="min-h-10 rounded-lg border border-gray-300 bg-white px-3 text-base sm:text-sm">
+                    <select aria-label="Add a note template" value="" onChange={event => { if (event.target.value) applyNoteTemplate(event.target.value); }} className="min-h-10 rounded-lg border border-pf-line-strong bg-pf-surface px-3 text-base sm:text-sm">
                       <option value="">Add note template…</option>
                       {REQUEST_NOTE_TEMPLATES.map(template => <option key={template.label} value={template.body}>{template.label}</option>)}
                     </select>
@@ -822,10 +822,10 @@ export default function DispensaryCartPage() {
                     }}
                     rows={3}
                     maxLength={500}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    className="mt-1 w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base sm:text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
                     placeholder="Delivery details, PO number, or other notes."
                   />
-                  <p className="mt-1 text-right text-xs text-gray-500">{orderNotes.length}/500</p>
+                  <p className="mt-1 text-right text-xs text-pf-muted">{orderNotes.length}/500</p>
                 </div>
               </CardContent>
             </Card></section>
@@ -835,19 +835,19 @@ export default function DispensaryCartPage() {
             <CardHeader className="pb-2"><CardTitle>Summary</CardTitle></CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between"><span>Total</span><span>${cart.subtotal.toFixed(2)}</span></div>
-              <p className="text-sm text-gray-500">{cart.items.length} item{cart.items.length === 1 ? '' : 's'} · {Object.keys(growerGroups).length} grower{Object.keys(growerGroups).length === 1 ? '' : 's'}</p>
+              <p className="text-sm text-pf-muted">{cart.items.length} item{cart.items.length === 1 ? '' : 's'} · {Object.keys(growerGroups).length} grower{Object.keys(growerGroups).length === 1 ? '' : 's'}</p>
               <button
                 onClick={() => {
                   setBuilderStep('review');
                   setShowRequestReview(true);
                 }}
                 disabled={submittingRequest || !requestDetailsReady}
-                className="hidden w-full bg-green-600 text-white py-3 rounded-lg sm:block hover:bg-green-700 disabled:opacity-50"
+                className="hidden w-full bg-emerald-500 text-[#032116] py-3 rounded-lg sm:block hover:bg-emerald-400 disabled:opacity-50"
               >
                 Review Request
               </button>
               {!requestDetailsReady && (
-                <p className="text-xs text-red-600">
+                <p className="text-xs text-pf-danger">
                   Add at least one item and confirm fulfillment and direct payment terms before review.
                 </p>
               )}
@@ -858,16 +858,16 @@ export default function DispensaryCartPage() {
 
       {showRequestReview && createPortal(
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-          <div ref={reviewRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="request-review-title" className="flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
-            <div className="shrink-0 border-b border-gray-200 bg-gray-50 px-4 py-3">
+          <div ref={reviewRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="request-review-title" className="flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-pf-line bg-pf-surface shadow-2xl">
+            <div className="shrink-0 border-b border-pf-line bg-pf-canvas px-4 py-3">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 id="request-review-title" className="text-xl font-bold text-gray-900">Review request</h2>
+                  <h2 id="request-review-title" className="text-lg font-semibold text-pf-text">Review request</h2>
                 </div>
                 <button
                   type="button"
                   onClick={() => setShowRequestReview(false)}
-                  className="rounded-lg p-2 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                  className="rounded-lg p-2 text-pf-muted hover:bg-pf-raised hover:text-pf-text"
                   aria-label="Close request review"
                 >
                   ✕
@@ -876,7 +876,7 @@ export default function DispensaryCartPage() {
             </div>
 
             <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 space-y-4">
-              <div className="rounded-xl border border-gray-200 bg-gray-50 p-2 sm:p-4">
+              <div className="rounded-xl border border-pf-line bg-pf-canvas p-2 sm:p-4">
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { label: 'Items', value: `${cart.items.length} item${cart.items.length === 1 ? '' : 's'}`, step: 'items' as BuilderStep },
@@ -884,11 +884,11 @@ export default function DispensaryCartPage() {
                     { label: 'Fulfillment', value: fulfillmentMethod || 'Not set', step: 'logistics' as BuilderStep },
                     { label: 'Terms', value: paymentTerms || 'Not set', step: 'terms' as BuilderStep },
                   ].map((item) => (
-                    <div key={item.label} className="rounded-lg bg-white px-2 py-2 ring-1 ring-gray-200 sm:px-3">
+                    <div key={item.label} className="rounded-lg bg-pf-surface px-2 py-2 ring-1 ring-pf-line sm:px-3">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <p className="text-xs font-medium text-gray-500">{item.label}</p>
-                          <p className="mt-0.5 text-sm font-semibold text-gray-900">{item.value}</p>
+                          <p className="text-xs font-medium text-pf-muted">{item.label}</p>
+                          <p className="mt-0.5 text-sm font-semibold text-pf-text">{item.value}</p>
                         </div>
                         <button
                           type="button"
@@ -896,7 +896,7 @@ export default function DispensaryCartPage() {
                             setShowRequestReview(false);
                             setBuilderStep(item.step);
                           }}
-                          className="inline-flex min-h-10 min-w-10 items-center justify-center text-xs font-semibold text-green-700 hover:text-green-800"
+                          className="inline-flex min-h-10 min-w-10 items-center justify-center text-xs font-semibold text-pf-accent hover:text-pf-accent"
                         >
                           Edit
                         </button>
@@ -914,17 +914,17 @@ export default function DispensaryCartPage() {
                   };
 
                   return (
-                    <div key={growerId} className="rounded-lg border border-gray-200 p-4">
+                    <div key={growerId} className="rounded-lg border border-pf-line p-3">
                       <div className="flex items-start justify-between gap-3">
                         <div>
-                          <h3 className="font-semibold text-gray-900">{group.grower}</h3>
-                          <p className="mt-1 text-xs text-gray-500">
+                          <h3 className="font-semibold text-pf-text">{group.grower}</h3>
+                          <p className="mt-1 text-xs text-pf-muted">
                             {terms.fulfillmentRegion} · {terms.paymentTerms}
                           </p>
                         </div>
-                        <span className="text-sm font-semibold text-gray-700">${group.subtotal.toFixed(2)}</span>
+                        <span className="text-sm font-semibold text-pf-secondary">${group.subtotal.toFixed(2)}</span>
                       </div>
-                      <ul className="mt-3 space-y-2 text-sm text-gray-700">
+                      <ul className="mt-3 space-y-2 text-sm text-pf-secondary">
                         {group.items.map((item) => (
                           <li key={item.id} className="flex justify-between gap-3">
                             <span>{item.quantity} × {item.name}</span>
@@ -937,22 +937,22 @@ export default function DispensaryCartPage() {
                 })}
               </div>
 
-              <div className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900 sm:p-4 sm:text-sm">
+              <div className="rounded-lg bg-pf-warning-bg p-3 text-xs text-pf-warning sm:p-4 sm:text-sm">
                 Stock is checked before submission. Any changes return to your draft.
               </div>
             </div>
 
-            <div className="shrink-0 border-t border-gray-200 bg-white px-4 py-3">
+            <div className="shrink-0 border-t border-pf-line bg-pf-surface px-4 py-3">
               <div className="mb-3 space-y-1 text-sm">
                 <div className="flex justify-between text-base font-bold"><span>Total</span><span>${cart.subtotal.toFixed(2)}</span></div>
-                <p className="text-xs text-gray-500">Payment arranged with the grower.</p>
+                <p className="text-xs text-pf-muted">Payment arranged with the grower.</p>
               </div>
               <div className="flex items-stretch justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowRequestReview(false)}
                   disabled={submittingRequest || inventorySyncing}
-                  className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                  className="rounded-lg border border-pf-line-strong px-4 py-2 text-pf-secondary hover:bg-pf-canvas disabled:opacity-50"
                 >
                   Back
                 </button>
@@ -960,7 +960,7 @@ export default function DispensaryCartPage() {
                   type="button"
                   onClick={handleSubmitRequest}
                   disabled={submittingRequest || inventorySyncing}
-                  className="rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 disabled:opacity-50"
+                  className="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-[#032116] hover:bg-emerald-400 disabled:opacity-50"
                 >
                   {submittingRequest ? 'Submitting Request...' : 'Submit request'}
                 </button>
@@ -986,7 +986,7 @@ export default function DispensaryCartPage() {
           secondary={
             <Link
               href="/dispensary/catalog"
-              className="rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700"
+              className="rounded-lg border border-pf-line-strong px-4 py-3 text-sm font-semibold text-pf-secondary"
             >
               Add items
             </Link>

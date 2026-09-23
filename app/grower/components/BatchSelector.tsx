@@ -45,8 +45,8 @@ interface BatchFormData {
   notes: string;
 }
 
-const INPUT_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
-const TEXTAREA_CLASSES = "w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const INPUT_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const TEXTAREA_CLASSES = "w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent";
 
 export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelectorProps) {
   const [batches, setBatches] = useState<Batch[]>([]);
@@ -222,7 +222,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
       </div>
 
       {batches.length === 0 && !showCreateForm && (
-        <div className="text-xs text-gray-500">
+        <div className="text-xs text-pf-muted">
           No batches for this strain.
         </div>
       )}
@@ -239,18 +239,18 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
             role="dialog"
             aria-modal="true"
             aria-labelledby="create-batch-dialog-title"
-            className="w-full max-w-3xl rounded-xl bg-white shadow-2xl my-1 sm:my-8"
+            className="w-full max-w-3xl rounded-xl bg-pf-surface shadow-2xl my-1 sm:my-8"
           >
-            <div className="flex items-center justify-between border-b border-gray-200 px-3 py-3 sm:px-6 sm:py-4">
+            <div className="flex items-center justify-between border-b border-pf-line px-3 py-3 sm:px-6 sm:py-4">
               <div>
-                <h3 id="create-batch-dialog-title" className="text-lg font-semibold sm:text-xl text-gray-900">New batch</h3>
+                <h3 id="create-batch-dialog-title" className="text-lg font-semibold sm:text-xl text-pf-text">New batch</h3>
 
               </div>
               <button
                 ref={closeCreateButtonRef}
                 type="button"
                 onClick={closeCreateForm}
-                className="flex h-10 w-10 shrink-0 items-center justify-center text-gray-500 hover:text-gray-700 text-2xl leading-none"
+                className="flex h-10 w-10 shrink-0 items-center justify-center text-pf-muted hover:text-pf-secondary text-2xl leading-none"
                 aria-label="Close batch creation"
               >
                 ×
@@ -259,14 +259,14 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
 
             <div className="p-3 space-y-3 sm:p-6 sm:space-y-6">
               {error && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">
+                <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger">
                   {error}
                 </div>
               )}
 
               <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Batch # *</label>
+                  <label className="block text-sm font-medium text-pf-secondary">Batch # *</label>
                   <input
                     type="text"
                     value={formData.batchNumber}
@@ -276,7 +276,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
                   />
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Lot #</label>
+                  <label className="block text-sm font-medium text-pf-secondary">Lot #</label>
                   <input
                     type="text"
                     value={formData.lotNumber}
@@ -289,7 +289,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
 
               <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Harvest date *</label>
+                  <label className="block text-sm font-medium text-pf-secondary">Harvest date *</label>
                   <input
                     type="date"
                     value={formData.harvestDate}
@@ -298,17 +298,17 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
                   />
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Strain *</label>
+                  <label className="block text-sm font-medium text-pf-secondary">Strain *</label>
                   {strainId ? (
                     <div className="space-y-1.5 sm:space-y-2">
-                      <div className="min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-700 flex items-center">
+                      <div className="min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line rounded-lg bg-pf-canvas text-pf-secondary flex items-center">
                         {strains.find((strain) => strain.id === formData.strainId)?.name || 'Selected strain'}
                         {(() => {
                           const selected = strains.find((strain) => strain.id === formData.strainId);
                           return selected?.genetics ? ` (${selected.genetics})` : '';
                         })()}
                       </div>
-                      <p className="text-xs text-gray-500">Uses the product’s strain.</p>
+                      <p className="text-xs text-pf-muted">Uses the product’s strain.</p>
                     </div>
                   ) : (
                     <select
@@ -327,19 +327,19 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
                 </div>
               </div>
 
-              <div className="border-t border-gray-200 pt-3 sm:pt-6">
-                <h4 className="text-base font-semibold text-gray-900 mb-3 sm:text-lg sm:mb-4">Lab Results</h4>
+              <div className="border-t border-pf-line pt-3 sm:pt-6">
+                <h4 className="text-base font-semibold text-pf-text mb-3 sm:text-lg sm:mb-4">Lab Results</h4>
                 <div className="grid grid-cols-3 gap-2 sm:gap-6">
                   <div className="space-y-1.5 sm:space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">THC (%)</label>
+                    <label className="block text-sm font-medium text-pf-secondary">THC (%)</label>
                     <input type="number" step="0.01" min="0" max="100" value={formData.thc} onChange={(e) => setFormData(prev => ({ ...prev, thc: e.target.value }))} className={INPUT_CLASSES} placeholder="18.5" />
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">CBD (%)</label>
+                    <label className="block text-sm font-medium text-pf-secondary">CBD (%)</label>
                     <input type="number" step="0.01" min="0" max="100" value={formData.cbd} onChange={(e) => setFormData(prev => ({ ...prev, cbd: e.target.value }))} className={INPUT_CLASSES} placeholder="0.5" />
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
-                    <label className="block text-sm font-medium text-gray-700">Total (%)</label>
+                    <label className="block text-sm font-medium text-pf-secondary">Total (%)</label>
                     <input type="number" step="0.01" min="0" max="100" value={formData.totalCannabinoids} onChange={(e) => setFormData(prev => ({ ...prev, totalCannabinoids: e.target.value }))} className={INPUT_CLASSES} placeholder="22.0" />
                   </div>
                 </div>
@@ -353,12 +353,12 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
               />
 
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Notes</label>
+                <label className="block text-sm font-medium text-pf-secondary">Notes</label>
                 <textarea value={formData.notes} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} className={TEXTAREA_CLASSES} rows={3} placeholder="Batch notes" />
               </div>
             </div>
 
-            <div className="flex gap-4 px-3 py-3 sm:px-6 sm:py-4 border-t border-gray-200">
+            <div className="flex gap-4 px-3 py-3 sm:px-6 sm:py-4 border-t border-pf-line">
               <Button type="button" variant="primary" disabled={creating || uploadingDocuments} onClick={handleCreateBatch}>
                 {creating ? 'Creating...' : 'Add batch'}
               </Button>
@@ -375,7 +375,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
         <a 
           href={`/grower/batches/${batchId}/edit`} 
           target="_blank"
-          className="inline-flex min-h-10 items-center text-sm text-green-600 hover:underline"
+          className="inline-flex min-h-10 items-center text-sm text-pf-accent hover:underline"
         >
           Batch details →
         </a>

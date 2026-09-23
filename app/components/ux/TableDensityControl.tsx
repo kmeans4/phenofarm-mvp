@@ -15,8 +15,8 @@ export function TableDensityControl({
 }: TableDensityControlProps) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-xs font-medium text-gray-500">{label}</span>
-      <div className="inline-flex rounded-lg border border-gray-200 bg-gray-50 p-1">
+      <span className="text-xs font-medium text-pf-muted">{label}</span>
+      <div className="inline-flex rounded-lg border border-pf-line bg-pf-canvas p-1">
         {(['comfortable', 'compact'] as const).map((mode) => (
           <button
             key={mode}
@@ -25,9 +25,9 @@ export function TableDensityControl({
             aria-pressed={value === mode}
             className={`rounded-md px-2.5 py-1 text-xs font-semibold transition ${
               value === mode
-                ? 'bg-white text-green-700 shadow-sm ring-1 ring-green-200'
-                : 'text-gray-600 hover:bg-white'
-            } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2`}
+                ? 'bg-pf-surface text-pf-accent shadow-sm ring-1 ring-pf-accent-line'
+                : 'text-pf-muted hover:bg-pf-surface'
+            } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas`}
           >
             {mode === 'comfortable' ? 'Comfort' : 'Compact'}
           </button>

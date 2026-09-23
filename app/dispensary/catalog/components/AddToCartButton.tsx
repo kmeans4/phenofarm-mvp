@@ -71,23 +71,23 @@ export default function AddToCartButton({
         onClick={() => addToCart(1)}
         disabled={loading || isOutOfStock || added}
         className={`
-          min-h-10 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2
+          min-h-10 rounded-lg flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas
           ${compactLabel ? 'px-4 py-2 text-sm font-semibold' : 'p-2.5'}
           ${added
-            ? 'bg-green-700 text-white scale-105 shadow-md'
+            ? 'bg-emerald-500 text-[#032116]'
             : isOutOfStock
-              ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+              ? 'bg-pf-surface text-pf-muted cursor-not-allowed'
               : loading
-                ? 'bg-green-600 text-white cursor-wait'
-                : 'bg-green-600 text-white hover:bg-green-700 hover:scale-105 hover:shadow-md active:scale-95'
+                ? 'bg-emerald-500 text-[#032116] cursor-wait'
+                : 'bg-emerald-500 text-[#032116] hover:bg-emerald-400'
           }
         `}
-        title={isOutOfStock ? 'Out of Stock' : `Add 1 unit to request draft • ${product.inventoryQty} in stock`}
+        title={isOutOfStock ? 'Out of stock' : `Add 1 unit to request draft • ${product.inventoryQty} in stock`}
       >
         {loading ? (
           <Loader2 size={20} className="animate-spin" />
         ) : added ? (
-          <Check size={20} className="animate-bounce" />
+          <Check size={20} />
         ) : isOutOfStock ? (
           <ClipboardList size={20} className="opacity-50" />
         ) : (
@@ -104,13 +104,13 @@ export default function AddToCartButton({
   return (
     <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2 sm:block sm:space-y-2">
       <div className="flex items-center justify-between">
-        <span className="hidden text-sm text-gray-600 font-medium sm:inline">Qty:</span>
-        <div className="flex items-center border-2 border-gray-200 rounded-lg overflow-hidden focus-within:border-green-500 transition-colors">
+        <span className="hidden text-sm text-pf-muted font-medium sm:inline">Qty:</span>
+        <div className="flex items-center border border-pf-line-strong rounded-lg overflow-hidden focus-within:border-emerald-400 transition-colors">
           <button type="button"
             aria-label={`Decrease quantity for ${product.name}`}
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
             disabled={loading || isOutOfStock}
-            className="h-10 w-10 shrink-0 hover:bg-gray-100 text-gray-600 disabled:opacity-40 transition-colors font-medium"
+            className="h-10 w-10 shrink-0 hover:bg-pf-raised text-pf-secondary disabled:opacity-40 transition-colors font-medium"
           >
             −
           </button>
@@ -121,14 +121,14 @@ export default function AddToCartButton({
             max={product.inventoryQty}
             value={quantity}
             onChange={(e) => setQuantity(Math.max(1, Math.min(product.inventoryQty, parseInt(e.target.value) || 1)))}
-            className="h-10 w-11 min-w-0 text-center text-base border-x-2 border-gray-200 focus:outline-none bg-transparent font-medium sm:w-14"
+            className="h-10 w-11 min-w-0 text-center text-base border-x border-pf-line-strong focus:outline-none bg-transparent font-medium sm:w-14"
             disabled={loading || isOutOfStock}
           />
           <button type="button"
             aria-label={`Increase quantity for ${product.name}`}
             onClick={() => setQuantity(Math.min(product.inventoryQty, quantity + 1))}
             disabled={loading || isOutOfStock}
-            className="h-10 w-10 shrink-0 hover:bg-gray-100 text-gray-600 disabled:opacity-40 transition-colors font-medium"
+            className="h-10 w-10 shrink-0 hover:bg-pf-raised text-pf-secondary disabled:opacity-40 transition-colors font-medium"
           >
             +
           </button>
@@ -140,14 +140,14 @@ export default function AddToCartButton({
         onClick={() => addToCart()}
         disabled={loading || isOutOfStock}
         className={`
-          min-h-11 w-full px-2 py-2.5 rounded-lg flex items-center justify-center gap-1 text-sm font-semibold transition-all duration-200 sm:gap-2 sm:text-base
+          min-h-11 w-full px-2 py-2.5 rounded-lg flex items-center justify-center gap-1 text-sm font-semibold transition-colors sm:gap-2
           ${added
-            ? 'bg-green-700 text-white shadow-md scale-[1.02]'
+            ? 'bg-emerald-500 text-[#032116]'
             : isOutOfStock
-              ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              ? 'bg-pf-raised text-pf-muted cursor-not-allowed'
               : loading
-                ? 'bg-green-600 text-white cursor-wait'
-                : 'bg-green-600 text-white hover:bg-green-700 hover:shadow-lg hover:scale-[1.01] active:scale-[0.99]'
+                ? 'bg-emerald-500 text-[#032116] cursor-wait'
+                : 'bg-emerald-500 text-[#032116] hover:bg-emerald-400'
           }
         `}
       >
@@ -164,7 +164,7 @@ export default function AddToCartButton({
         ) : isOutOfStock ? (
           <>
             <ClipboardList size={18} />
-            <span>Out of Stock</span>
+            <span>Out of stock</span>
           </>
         ) : (
           <>
@@ -175,7 +175,7 @@ export default function AddToCartButton({
       </button>
 
       <div className="col-span-2 flex items-center justify-center gap-2">
-        <span className={`text-xs ${isOutOfStock ? 'text-red-500' : isLowStock ? 'text-orange-500' : 'text-gray-500'}`}>
+        <span className={`text-xs ${isOutOfStock ? 'text-pf-danger' : isLowStock ? 'text-pf-warning' : 'text-pf-muted'}`}>
           {isOutOfStock ? 'Out of stock' : isLowStock ? `Only ${product.inventoryQty} left` : `${product.inventoryQty} available`}
         </span>
       </div>

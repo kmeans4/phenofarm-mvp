@@ -194,18 +194,18 @@ export function AddressAutocomplete({
           onFocus={() => value.length >= 3 && suggestions.length > 0 && setIsOpen(true)}
           placeholder={placeholder}
           disabled={disabled}
-          className={`w-full rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 text-gray-900 placeholder-gray-500 focus:border-green-500 focus:ring-1 focus:ring-green-500 disabled:bg-gray-100 disabled:cursor-not-allowed ${className}`}
+          className={`w-full rounded-lg border border-pf-line-strong bg-pf-surface px-4 py-2 pr-10 text-pf-text placeholder-pf-muted focus:border-green-500 focus:ring-1 focus:ring-emerald-400 disabled:bg-pf-surface disabled:cursor-not-allowed ${className}`}
         />
         {isLoading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <svg className="animate-spin h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24">
+            <svg className="animate-spin h-5 w-5 text-pf-muted" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
           </div>
         )}
         {!isLoading && (
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-pf-muted">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -215,19 +215,19 @@ export function AddressAutocomplete({
       </div>
 
       {isOpen && suggestions.length > 0 && (
-        <ul className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-60 overflow-auto">
+        <ul className="absolute z-50 w-full mt-1 bg-pf-surface border border-pf-line rounded-lg shadow-lg max-h-60 overflow-auto">
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
               onClick={() => handleSelect(suggestion)}
               className={`px-4 py-3 cursor-pointer text-sm ${
                 index === highlightedIndex
-                  ? 'bg-green-50 text-green-900'
-                  : 'text-gray-700 hover:bg-gray-50'
+                  ? 'bg-pf-accent-bg text-pf-accent'
+                  : 'text-pf-secondary hover:bg-pf-canvas'
               }`}
             >
-              <div className="font-medium text-gray-900">{suggestion.display_name}</div>
-              <div className="text-xs text-gray-500 mt-0.5">
+              <div className="font-medium text-pf-text">{suggestion.display_name}</div>
+              <div className="text-xs text-pf-muted mt-0.5">
                 {suggestion.address.road} {suggestion.address.house_number && `#${suggestion.address.house_number}`}
               </div>
             </li>

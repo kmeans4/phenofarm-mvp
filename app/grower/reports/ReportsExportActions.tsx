@@ -250,7 +250,7 @@ export function ReportsExportActions({
           type="button"
           onClick={exportPdf}
           aria-label="Export PDF"
-          className="min-h-10 rounded-lg bg-gray-200 px-3 py-2 text-xs font-medium text-gray-900 transition-colors hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
+          className="min-h-10 rounded-lg bg-pf-raised px-3 py-2 text-xs font-medium text-pf-text transition-colors hover:bg-pf-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
         >
           PDF
         </button>
@@ -258,7 +258,7 @@ export function ReportsExportActions({
           type="button"
           onClick={exportCsv}
           aria-label="Export CSV"
-          className="min-h-10 rounded-lg bg-gray-200 px-3 py-2 text-xs font-medium text-gray-900 transition-colors hover:bg-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
+          className="min-h-10 rounded-lg bg-pf-raised px-3 py-2 text-xs font-medium text-pf-text transition-colors hover:bg-pf-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
         >
           CSV
         </button>

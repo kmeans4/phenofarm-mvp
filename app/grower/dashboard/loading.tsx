@@ -2,7 +2,7 @@ import { Skeleton } from "@/app/components/ui/skeleton";
 
 function StatCardSkeleton() {
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+    <div className="bg-pf-surface p-4 rounded-lg shadow-sm border border-pf-line">
       <Skeleton className="h-4 w-24 mb-2" />
       <div className="flex items-baseline gap-2 mt-1">
         <Skeleton className="h-8 w-16" />
@@ -14,7 +14,7 @@ function StatCardSkeleton() {
 
 function QuickActionSkeleton() {
   return (
-    <div className="block p-5 rounded-xl border border-gray-200">
+    <div className="block p-5 rounded-xl border border-pf-line">
       <div className="flex items-start gap-4">
         <Skeleton className="w-12 h-12 rounded-lg" />
         <div className="flex-1">
@@ -28,7 +28,7 @@ function QuickActionSkeleton() {
 
 function ActivityItemSkeleton() {
   return (
-    <div className="flex gap-4 py-4 border-b border-gray-100 last:border-0">
+    <div className="flex gap-4 py-4 border-b border-pf-line last:border-0">
       <Skeleton className="flex-shrink-0 w-10 h-10 rounded-full" />
       <div className="flex-1 min-w-0 space-y-2">
         <Skeleton className="h-4 w-3/4" />
@@ -79,7 +79,7 @@ export default function DashboardLoading() {
       </div>
 
       {/* Revenue Chart Skeleton */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-6">
         <Skeleton className="h-6 w-48 mb-4" />
         <div className="h-64 flex items-end justify-between gap-2 px-4">
           {Array.from({ length: 7 }).map((_, i) => (
@@ -89,8 +89,8 @@ export default function DashboardLoading() {
       </div>
 
       {/* Recent Activity Skeleton */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+      <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line">
+        <div className="px-6 py-4 border-b border-pf-line flex justify-between items-center">
           <Skeleton className="h-6 w-32" />
           <Skeleton className="h-4 w-16" />
         </div>

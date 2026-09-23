@@ -98,8 +98,8 @@ export default function StrainsPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading strains...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pf-accent mx-auto mb-4"></div>
+          <p className="text-pf-muted">Loading strains...</p>
         </div>
       </div>
     );
@@ -118,8 +118,8 @@ export default function StrainsPage() {
       />
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{error}</p>
+        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg">
+          <p className="text-pf-danger">{error}</p>
           <Button variant="secondary" onClick={fetchStrains} className="mt-2">Retry</Button>
         </div>
       )}
@@ -128,13 +128,13 @@ export default function StrainsPage() {
 
       {/* View Toggle */}
       <div className="flex justify-start sm:justify-end">
-        <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
+        <div className="flex items-center gap-1 bg-pf-surface p-1 rounded-lg">
           <button
             onClick={() => handleViewModeChange('card')}
             className={`flex min-h-10 min-w-10 items-center justify-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
               viewMode === 'card'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                : 'text-pf-muted hover:text-pf-text'
             }`}
             title="Card View"
           >
@@ -147,8 +147,8 @@ export default function StrainsPage() {
             onClick={() => handleViewModeChange('list')}
             className={`flex min-h-10 min-w-10 items-center justify-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
               viewMode === 'list'
-                ? 'bg-white text-gray-900 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
+                ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                : 'text-pf-muted hover:text-pf-text'
             }`}
             title="List View"
           >
@@ -165,44 +165,44 @@ export default function StrainsPage() {
         viewMode === 'card' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {strains.map((strain) => (
-              <div key={strain.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+              <div key={strain.id} className="bg-pf-surface rounded-xl shadow-sm border border-pf-line overflow-hidden hover:shadow-md transition-shadow">
                 <div className="p-3 sm:p-4">
                   <div className="flex justify-between items-start">
                     <div className="min-w-0">
-                      <h3 className="font-semibold text-gray-900">{strain.name}</h3>
+                      <h3 className="font-semibold text-pf-text">{strain.name}</h3>
                       {strain.strainType && (
-                        <p className="text-xs text-gray-500 mt-1">{STRAIN_TYPE_LABELS[strain.strainType]}</p>
+                        <p className="text-xs text-pf-muted mt-1">{STRAIN_TYPE_LABELS[strain.strainType]}</p>
                       )}
                       {strain.genetics && (
-                        <p className="text-sm text-gray-500 mt-1">{strain.genetics}</p>
+                        <p className="text-sm text-pf-muted mt-1">{strain.genetics}</p>
                       )}
                     </div>
                   </div>
 
                   {strain.description && (
-                    <p className="text-sm text-gray-600 mt-3 line-clamp-2">{strain.description}</p>
+                    <p className="text-sm text-pf-muted mt-3 line-clamp-2">{strain.description}</p>
                   )}
 
                   {strain.growerNotes && (
-                    <p className="text-sm text-gray-500 mt-2 italic line-clamp-2">{strain.growerNotes}</p>
+                    <p className="text-sm text-pf-muted mt-2 italic line-clamp-2">{strain.growerNotes}</p>
                   )}
 
                   <div className="flex items-center gap-3 mt-1 text-sm sm:mt-4">
                     <Link
                       href={batchesHref(strain.id)}
-                      className="inline-flex min-h-10 items-center rounded-md text-gray-500 underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                      className="inline-flex min-h-10 items-center rounded-md text-pf-muted underline-offset-4 hover:text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                     >
                       {pluralize(strain._count.batches, 'batch', 'batches')}
                     </Link>
                     <Link
                       href={productsHref(strain.id)}
-                      className="inline-flex min-h-10 items-center rounded-md text-gray-500 underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                      className="inline-flex min-h-10 items-center rounded-md text-pf-muted underline-offset-4 hover:text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                     >
                       {pluralize(strain._count.products, 'product')}
                     </Link>
                   </div>
 
-                  <div className="flex flex-wrap items-center gap-2 mt-1 pt-2 border-t sm:mt-3 sm:pt-3 border-gray-100">
+                  <div className="flex flex-wrap items-center gap-2 mt-1 pt-2 border-t sm:mt-3 sm:pt-3 border-pf-line">
                     <Button variant="outline" size="sm" asChild className="flex-1">
                       <Link href={'/grower/strains/' + strain.id + '/edit'} className="inline-flex w-full justify-center">Edit</Link>
                     </Button>
@@ -223,45 +223,45 @@ export default function StrainsPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
             <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
               <table className="w-full min-w-[620px]">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-pf-canvas border-b border-pf-line">
                   <tr>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Strain</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genetics</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batches</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Strain</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Genetics</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Batches</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Products</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-pf-line">
                   {strains.map((strain) => (
-                    <tr key={strain.id} className="hover:bg-gray-50 transition-colors">
+                    <tr key={strain.id} className="hover:bg-pf-canvas transition-colors">
                       <td className="px-3 sm:px-4 py-2 sm:py-3">
-                        <div className="font-medium text-sm sm:text-base text-gray-900">{strain.name}</div>
+                        <div className="font-medium text-sm sm:text-base text-pf-text">{strain.name}</div>
                         {strain.strainType && (
-                          <div className="text-xs text-gray-500">{STRAIN_TYPE_LABELS[strain.strainType]}</div>
+                          <div className="text-xs text-pf-muted">{STRAIN_TYPE_LABELS[strain.strainType]}</div>
                         )}
                         {strain.description && (
-                          <div className="text-xs sm:text-sm text-gray-500 line-clamp-1">{strain.description}</div>
+                          <div className="text-xs sm:text-sm text-pf-muted line-clamp-1">{strain.description}</div>
                         )}
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-pf-muted">
                         {strain.genetics || '-'}
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-pf-muted">
                         <Link
                           href={batchesHref(strain.id)}
-                          className="inline-flex min-h-10 items-center rounded-md underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                          className="inline-flex min-h-10 items-center rounded-md underline-offset-4 hover:text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                         >
                           {strain._count.batches}
                         </Link>
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-pf-muted">
                         <Link
                           href={productsHref(strain.id)}
-                          className="inline-flex min-h-10 items-center rounded-md underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                          className="inline-flex min-h-10 items-center rounded-md underline-offset-4 hover:text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                         >
                           {strain._count.products}
                         </Link>
@@ -291,17 +291,16 @@ export default function StrainsPage() {
           </div>
         )
       ) : (
-        <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pf-surface flex items-center justify-center">
+            <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No strains yet</h3>
-          <p className="text-gray-500 mb-2 max-w-sm mx-auto">
-            Start building your genetics library by adding your first strain.
+          <h3 className="text-lg font-semibold text-pf-text mb-2">No strains yet</h3>
+          <p className="text-sm text-pf-muted mb-4 max-w-sm mx-auto">
+            Add strains to organize your batches and products.
           </p>
-          <p className="text-sm text-gray-500 mb-6">Next step: use your strain when creating batches and products.</p>
           <Button variant="primary" asChild>
             <Link href="/grower/strains/add">Add your first strain</Link>
           </Button>

@@ -12,7 +12,7 @@ export function RecordActions({ name, actions }: { name: string; actions: Record
   return <>
     <Button type="button" variant="outline" size="sm" aria-label={`More actions for ${name}`} onClick={() => setOpen(true)}>More</Button>
     <Modal open={open} onClose={() => setOpen(false)} title="More actions" className="max-w-sm">
-      <p className="mb-3 break-words text-sm text-gray-600">{name}</p>
+      <p className="mb-3 break-words text-sm text-pf-muted">{name}</p>
       <div className="grid gap-2">
         {actions.map((action) => action.href ? (
           <Button key={action.label} asChild variant="outline" className="w-full justify-start"><Link href={action.href} onClick={() => setOpen(false)}>{action.label}</Link></Button>

@@ -167,14 +167,14 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
 
 
   return (
-    <div className={embedded ? "" : "pb-20 sm:pb-24"}>
-      {syncError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-red-700">{syncError}</p>}
-      <div className={embedded ? "pb-4" : "space-y-6"}>
-        {!embedded && <PageHeader title="Favorites" actions={<Link href="/dispensary/catalog" className="min-h-10 text-green-700">Browse catalog</Link>} />}
+    <div className={embedded ? "" : "pb-4"}>
+      {syncError && <p role="alert" className="rounded-lg bg-pf-danger-bg p-3 text-pf-danger">{syncError}</p>}
+      <div className={embedded ? "pb-4" : "space-y-4"}>
+        {!embedded && <PageHeader title="Favorites" actions={<Link href="/dispensary/catalog" className="min-h-10 text-pf-accent">Browse catalog</Link>} />}
 
         {/* Controls */}
         {favoriteProducts.length > 0 && (
-          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-gray-200 bg-white p-3">
+          <div className="mb-4 flex flex-wrap items-center gap-2 rounded-xl border border-pf-line bg-pf-surface p-3">
             <div className="min-w-0 flex-1">
               {/* Sort Dropdown */}
               <div className="min-w-0">
@@ -182,7 +182,7 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
                   aria-label="Sort favorites"
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
-                  className="w-full text-base sm:text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  className="w-full text-base sm:text-sm border border-pf-line-strong rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                 >
                   {SORT_OPTIONS.map(opt => (
                     <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -192,12 +192,12 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
             </div>
 
             {/* View Mode Toggle */}
-            <div className="flex items-center rounded-lg bg-gray-100 p-1">
+            <div className="flex items-center rounded-lg bg-pf-surface p-1">
               <button
                 aria-label="Grid view" aria-pressed={viewMode === 'grid'}
                 onClick={() => setViewMode('grid')}
-                className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
-                  viewMode === 'grid' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${
+                  viewMode === 'grid' ? 'bg-pf-accent-bg text-pf-accent' : 'text-pf-muted hover:text-pf-text'
                 }`}
               >
                 <LayoutGrid size={18} />
@@ -206,8 +206,8 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
               <button
                 aria-label="List view" aria-pressed={viewMode === 'list'}
                 onClick={() => setViewMode('list')}
-                className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
-                  viewMode === 'list' ? 'bg-white text-green-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'
+                className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${
+                  viewMode === 'list' ? 'bg-pf-accent-bg text-pf-accent' : 'text-pf-muted hover:text-pf-text'
                 }`}
               >
                 <ListIcon size={18} />
@@ -215,34 +215,34 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
               </button>
             </div>
             <details className="relative ml-auto">
-              <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-gray-600">More</summary>
-              <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border bg-white p-1 shadow-lg"><button type="button" onClick={() => setShowClearConfirm(true)} className="min-h-10 w-full rounded px-3 text-left text-sm text-red-700 hover:bg-red-50">Clear favorites</button></div>
+              <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-pf-muted">More</summary>
+              <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-pf-line bg-pf-surface p-1 shadow-lg"><button type="button" onClick={() => setShowClearConfirm(true)} className="min-h-10 w-full rounded px-3 text-left text-sm text-pf-danger hover:bg-pf-danger-bg">Clear favorites</button></div>
             </details>
           </div>
         )}
 
         {/* Content */}
         {(isLoading && !syncError) ? (
-          <div className="flex flex-col items-center justify-center py-20">
-            <Loader2 className="w-10 h-10 text-green-600 animate-spin mb-4" />
-            <p className="text-gray-600">Loading your favorites...</p>
+          <div className="flex flex-col items-center justify-center py-10">
+            <Loader2 className="w-10 h-10 text-pf-accent animate-spin mb-4" />
+            <p className="text-pf-muted">Loading your favorites...</p>
           </div>
         ) : favoriteProducts.length === 0 ? (
           /* Empty State */
-          <div className="text-center py-16 sm:py-20 bg-white rounded-2xl shadow-sm border border-gray-200">
-            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Heart className="w-10 h-10 text-red-300" />
+          <div className="rounded-xl border border-pf-line bg-pf-surface px-4 py-8 text-center sm:py-10">
+            <div className="w-12 h-12 bg-pf-accent-bg rounded-full flex items-center justify-center mx-auto mb-3">
+              <Heart className="w-6 h-6 text-pf-accent" />
             </div>
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">No favorites yet</h3>
-            <p className="text-gray-500 mb-6 max-w-md mx-auto">
-              Start building your collection by clicking the heart icon on products you love. Your favorites will appear here.
+            <h3 className="text-base font-semibold text-pf-text mb-2">No favorites yet</h3>
+            <p className="mx-auto mb-4 max-w-sm text-sm text-pf-muted">
+              Tap a product’s heart in the catalog to save it here.
             </p>
             <Link
               href="/dispensary/catalog"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
+              className="inline-flex items-center gap-2 min-h-10 px-4 py-2 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 transition-colors font-medium"
             >
               <ShoppingCart size={20} />
-              Browse Catalog
+              Browse catalog
             </Link>
           </div>
         ) : (
@@ -279,9 +279,9 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
 
         {/* Clear All Confirmation Modal */}
         <Modal open={showClearConfirm} onClose={() => setShowClearConfirm(false)} title="Clear favorites?" className="max-w-md">
-          <p className="mb-5 text-sm text-gray-600">Remove your saved products? You can save them again from the catalog.</p>
+          <p className="mb-5 text-sm text-pf-muted">Remove your saved products? You can save them again from the catalog.</p>
           <div className="flex justify-end gap-3">
-            <button type="button" onClick={() => setShowClearConfirm(false)} className="min-h-10 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100">Cancel</button>
+            <button type="button" onClick={() => setShowClearConfirm(false)} className="min-h-10 rounded-lg px-4 py-2 text-pf-secondary hover:bg-pf-surface">Cancel</button>
             <button type="button" onClick={clearAllFavorites} className="min-h-10 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">Clear favorites</button>
           </div>
         </Modal>
@@ -313,14 +313,14 @@ function FavoriteCard({
      product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all duration-300 group">
+    <div className="bg-pf-surface border border-pf-line rounded-xl overflow-hidden hover:border-pf-line-strong transition-colors group">
       {/* Image */}
-      <div className={`relative overflow-hidden bg-green-50 ${product.images?.[0] ? 'h-20 sm:h-40' : 'h-20 sm:h-24'}`}>
+      <div className={`relative overflow-hidden bg-pf-accent-bg ${product.images?.[0] ? 'h-24 sm:h-40' : 'h-16 sm:h-20'}`}>
         <button
           type="button"
           onClick={onRemove}
           aria-label={`Remove ${product.name} from favorites`}
-          className="absolute top-2 right-2 z-10 min-h-10 min-w-10 p-2 bg-white/90 backdrop-blur-sm rounded-lg text-red-500 shadow-sm transition-all hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+          className="absolute top-2 right-2 z-10 min-h-10 min-w-10 p-2 bg-pf-surface/95 backdrop-blur-sm rounded-lg text-pf-danger shadow-sm transition-all hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
           title="Remove from favorites"
         >
           <HeartOff size={16} />
@@ -338,9 +338,9 @@ function FavoriteCard({
       <div className="p-3 sm:p-4">
         {/* Name & Verified */}
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="font-semibold text-gray-900 line-clamp-2">{product.name}</h3>
+          <h3 className="text-sm font-semibold text-pf-text line-clamp-2 sm:text-base">{product.name}</h3>
           {product.grower.isVerified && (
-            <span className="text-green-600 flex-shrink-0" title="Verified Grower">
+            <span className="text-pf-accent flex-shrink-0" title="Verified Grower">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
               </svg>
@@ -349,8 +349,8 @@ function FavoriteCard({
         </div>
 
         {/* Grower */}
-        <p className="text-sm text-gray-500 mb-2">
-          by <Link href={`/dispensary/grower/${product.grower.id}`} className="inline-flex min-h-10 items-center text-green-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+        <p className="text-sm text-pf-muted mb-2">
+          by <Link href={`/dispensary/grower/${product.grower.id}`} className="inline-flex min-h-10 items-center text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
             {product.grower.businessName}
           </Link>
         </p>
@@ -372,12 +372,12 @@ function FavoriteCard({
         )}
 
         {/* Price & Actions */}
-        <div className="pt-3 border-t border-gray-100">
+        <div className="pt-3 border-t border-pf-line">
           {product.isPriceVisible ? (
             <div className="space-y-3">
               <div>
-                <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
-                <span className="text-sm text-gray-500 ml-1">/ {displayUnit(product.unit)}</span>
+                <span className="text-xl font-bold text-pf-accent">${product.price.toFixed(2)}</span>
+                <span className="text-sm text-pf-muted ml-1">/ {displayUnit(product.unit)}</span>
               </div>
               <AddToCartButton
                 product={product}
@@ -391,7 +391,7 @@ function FavoriteCard({
                 type="button"
                 onClick={onRequestPricing}
                 disabled={isOpeningPricing}
-                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 {isOpeningPricing && <Loader2 className="h-4 w-4 animate-spin" />}
                 Request pricing
@@ -400,7 +400,7 @@ function FavoriteCard({
                 type="button"
                 onClick={onMessageGrower}
                 disabled={isOpeningMessage}
-                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-50 hover:text-green-800 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg hover:text-pf-accent disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 {isOpeningMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
                 Message grower
@@ -430,24 +430,24 @@ function FavoriteListItem({
   isOpeningMessage: boolean;
 }) {
   return (
-    <article data-product-row className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-xl border border-gray-200 bg-white p-3 sm:p-4 sm:flex sm:items-center">
-      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-green-50"><ProductImage src={product.images?.[0]} alt={product.name} productType={product.productType} className="h-full w-full" /></div>
+    <article data-product-row className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-xl border border-pf-line bg-pf-surface p-3 sm:p-4 sm:flex sm:items-center">
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-pf-accent-bg"><ProductImage src={product.images?.[0]} alt={product.name} productType={product.productType} className="h-full w-full" /></div>
       <div className="min-w-0 flex-1">
-        <h3 className="font-semibold text-gray-900">{product.name}</h3>
-        <Link href={`/dispensary/grower/${product.grower.id}`} className="mt-1 inline-block text-sm text-green-700 hover:underline">{product.grower.businessName}</Link>
-        <div className="mt-2 flex flex-wrap gap-2 text-xs text-gray-600">
+        <h3 className="font-semibold text-pf-text">{product.name}</h3>
+        <Link href={`/dispensary/grower/${product.grower.id}`} className="mt-1 inline-block text-sm text-pf-accent hover:underline">{product.grower.businessName}</Link>
+        <div className="mt-2 flex flex-wrap gap-2 text-xs text-pf-muted">
           {product.productType && <span>{product.productType}</span>}
           {product.thc != null && <span>THC {product.thc}%</span>}
           <span>{product.inventoryQty} available</span>
         </div>
       </div>
-      <div className="col-span-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-gray-100 pt-3 sm:max-w-xs sm:border-0 sm:pt-0">
+      <div className="col-span-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-pf-line pt-3 sm:max-w-xs sm:border-0 sm:pt-0">
         {product.isPriceVisible ? <>
-          <span data-product-price className="text-lg font-bold text-green-700">${product.price.toFixed(2)}<span className="text-sm font-normal text-gray-500">/{displayUnit(product.unit)}</span></span>
+          <span data-product-price className="text-lg font-bold text-pf-accent">${product.price.toFixed(2)}<span className="text-sm font-normal text-pf-muted">/{displayUnit(product.unit)}</span></span>
           <AddToCartButton product={product} growerName={product.grower.businessName} growerId={product.grower.id} compact compactLabel="Add" />
-        </> : <button type="button" onClick={onRequestPricing} disabled={isOpeningPricing} className="min-h-10 flex-1 rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 disabled:opacity-60">{isOpeningPricing ? 'Opening…' : 'Request pricing'}</button>}
-        <button type="button" onClick={onMessageGrower} disabled={isOpeningMessage} className="min-h-10 px-2 text-sm font-medium text-green-700 hover:underline disabled:opacity-60">{isOpeningMessage ? 'Opening…' : 'Message'}</button>
-        <button type="button" onClick={onRemove} aria-label={`Remove ${product.name} from favorites`} className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600"><HeartOff size={18} /></button>
+        </> : <button type="button" onClick={onRequestPricing} disabled={isOpeningPricing} className="min-h-10 flex-1 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent disabled:opacity-60">{isOpeningPricing ? 'Opening…' : 'Request pricing'}</button>}
+        <button type="button" onClick={onMessageGrower} disabled={isOpeningMessage} className="min-h-10 px-2 text-sm font-medium text-pf-accent hover:underline disabled:opacity-60">{isOpeningMessage ? 'Opening…' : 'Message'}</button>
+        <button type="button" onClick={onRemove} aria-label={`Remove ${product.name} from favorites`} className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-muted hover:bg-pf-danger-bg hover:text-pf-danger"><HeartOff size={18} /></button>
       </div>
     </article>
   );

@@ -12,6 +12,7 @@ import { RecordActions } from '../components/RecordActions';
 import { formatProductMoney, formatProductUnit } from '@/lib/product-display';
 import { deleteRecord } from '@/app/components/ui/deleteRecord';
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
+import { Modal } from '@/app/components/ui/Modal';
 import { ErrorState, LoadingState } from '@/app/components/ui/FetchState';
 import { toast } from '@/app/hooks/useToast';
 import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
@@ -103,10 +104,10 @@ const formatInventoryUnit = (unit: string | null | undefined, qty: number): stri
 
 function QuoteOnlyBadge({ compact = false }: { compact?: boolean }) {
   return (
-    <span className={`inline-flex items-center rounded-full border border-amber-200 bg-amber-50 font-semibold text-amber-800 ${
+    <span title="Price hidden from buyers" className={`inline-flex items-center rounded-full border border-pf-warning-line bg-pf-warning-bg font-semibold text-pf-warning ${
       compact ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
     }`}>
-      Quote only — price hidden from buyers
+      Quote only
     </span>
   );
 }
@@ -242,25 +243,25 @@ interface ProductControls {
     const strainTypeLabel = getStrainTypeLabel(product);
 
     return (
-      <div id={`product-card-${product.id}`} className={`bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200 scroll-mt-24 ${selectedProductIds.has(product.id) ? 'ring-2 ring-green-500' : ''}`}>
+      <div id={`product-card-${product.id}`} className={`bg-pf-surface rounded-xl shadow-sm border border-pf-line overflow-hidden hover:shadow-md transition-all duration-200 scroll-mt-24 ${selectedProductIds.has(product.id) ? 'ring-2 ring-pf-accent' : ''}`}>
         {/* Card Header */}
-        <div className={`${cardPaddingClass} border-b border-gray-100`}>
+        <div className={`${cardPaddingClass} border-b border-pf-line`}>
           <div className="flex justify-between items-start gap-2">
             <div className="flex min-w-0 flex-1 items-start gap-2">
               <input
                 type="checkbox"
                 checked={selectedProductIds.has(product.id)}
                 onChange={() => toggleProductSelection(product.id)}
-                className="mt-1 h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                className="mt-1 h-4 w-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
                 aria-label={`Select ${product.name}`}
               />
               <div className="min-w-0 flex-1">
-              <p className="font-semibold text-gray-900 truncate">{product?.name || 'Unnamed Product'}</p>
+              <p className="font-semibold text-pf-text truncate">{product?.name || 'Unnamed Product'}</p>
               {strainName && (
                 <div className="flex items-center gap-2 min-w-0">
-                  <p className="text-sm text-gray-500 truncate">{strainName}</p>
+                  <p className="text-sm text-pf-muted truncate">{strainName}</p>
                   {strainTypeLabel && (
-                    <span className="text-[11px] uppercase tracking-wide text-gray-400">{strainTypeLabel}</span>
+                    <span className="text-[11px] uppercase tracking-wide text-pf-muted">{strainTypeLabel}</span>
                   )}
                 </div>
               )}
@@ -269,13 +270,13 @@ interface ProductControls {
             <span
               className={'px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ' + (
                 (product?.inventoryQty || 0) <= 0
-                  ? 'bg-red-100 text-red-700 border border-red-200'
+                  ? 'bg-pf-danger-bg text-pf-danger border border-pf-danger-line'
                   : product?.isAvailable
-                    ? 'bg-green-100 text-green-700 border border-green-200'
-                    : 'bg-gray-100 text-gray-700 border border-gray-200'
+                    ? 'bg-pf-accent-bg text-pf-accent border border-pf-accent-line'
+                    : 'bg-pf-surface text-pf-secondary border border-pf-line'
               )}
             >
-              {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Out of Stock'}
+              {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Hidden'}
             </span>
           </div>
         </div>
@@ -284,7 +285,7 @@ interface ProductControls {
         <div className={cardPaddingClass}>
           <div className="flex justify-between items-baseline mb-3">
             <div className="min-w-0">
-              <p className={`${compactMode ? 'text-xl' : 'text-2xl'} font-bold text-gray-900`}>
+              <p className={`${compactMode ? 'text-xl' : 'text-2xl'} font-bold text-pf-text`}>
                 ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
               </p>
               {!product.isPriceVisible && (
@@ -293,35 +294,35 @@ interface ProductControls {
                 </div>
               )}
             </div>
-            <p className="text-sm text-gray-500">per {product?.unit || 'unit'}</p>
+            <p className="text-sm text-pf-muted">per {product?.unit || 'unit'}</p>
           </div>
 
           {/* Additional Info */}
           <div className="space-y-1 mb-3">
             {product?.productType && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-pf-muted">
                 <span className="font-medium">Type:</span> {product.productType}
               </p>
             )}
             {product?.batch?.batchNumber && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-pf-muted">
                 <span className="font-medium">Batch:</span> {product.batch.batchNumber}
               </p>
             )}
           </div>
 
-          <div className="flex items-center gap-2 text-sm text-gray-600 mb-4">
+          <div className="flex items-center gap-2 text-sm text-pf-muted mb-4">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
-            <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
+            <span className={(product?.inventoryQty || 0) <= 5 ? 'text-pf-danger font-medium' : ''}>
               {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} In Stock`}
             </span>
           </div>
 
           {/* Action Buttons */}
-          <div className="mt-4 flex items-center gap-2 border-t border-gray-100 pt-4">
-            <Button variant="primary" size="sm" asChild className="flex-1">
+          <div className="mt-4 flex items-center gap-2 border-t border-pf-line pt-4">
+            <Button variant="outline" size="sm" asChild className="flex-1">
               <Link href={'/grower/products/' + product?.id + '/edit'}>
                 <Pencil className="mr-1.5 h-4 w-4" />
                 Edit
@@ -351,20 +352,14 @@ interface ProductControls {
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
-              {openActionMenuId === product.id && (
-                <>
-                  <button
-                    type="button"
-                    className="fixed inset-0 z-10 cursor-default"
-                    aria-label="Close product action menu"
-                    onClick={() => setOpenActionMenuId(null)}
-                  />
-                  <div className="absolute right-0 top-full z-20 mt-2 w-44 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+              <Modal open={openActionMenuId === product.id} onClose={() => setOpenActionMenuId(null)} title="More actions" className="max-w-sm">
+                  <p className="mb-3 break-words text-sm text-pf-muted">{product.name}</p>
+                  <div className="grid gap-2">
                     <button
                       type="button"
                       onClick={() => duplicateProduct(product)}
                       disabled={duplicatingProductId === product.id}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 disabled:cursor-not-allowed disabled:opacity-60"
+                      className="flex min-h-10 w-full items-center gap-2 rounded-lg border border-pf-line px-3 py-2 text-left text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent disabled:cursor-not-allowed disabled:opacity-60"
                     >
                       <Copy className="h-4 w-4" />
                       {duplicatingProductId === product.id ? 'Duplicating...' : 'Duplicate'}
@@ -375,14 +370,13 @@ interface ProductControls {
                         setOpenActionMenuId(null);
                         setDeleteCandidate(product);
                       }}
-                      className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm font-medium text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600"
+                      className="flex min-h-10 w-full items-center gap-2 rounded-lg border border-pf-line px-3 py-2 text-left text-sm font-medium text-pf-danger hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent"
                     >
                       <Trash2 className="h-4 w-4" />
                       Delete
                     </button>
                   </div>
-                </>
-              )}
+              </Modal>
             </div>
           </div>
         </div>
@@ -392,15 +386,15 @@ interface ProductControls {
 
   function MobileProduct({ product, controls }: { product: Product; controls: ProductControls }) {
     const pending = controls.pendingProductIds.has(product.id);
-    return <article className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+    return <article className="rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
       <div className="flex items-start gap-3">
         <label className="-ml-2 -mt-1 flex h-10 w-10 shrink-0 items-center justify-center"><input type="checkbox" checked={controls.selectedProductIds.has(product.id)} onChange={() => controls.toggleProductSelection(product.id)} aria-label={`Select ${product.name}`} className="h-4 w-4" /></label>
-        <div className="min-w-0 flex-1"><h3 className="text-sm font-semibold break-words">{product.name}</h3><p className="mt-1 text-xs text-gray-500">{[product.productType, getStrainName(product)].filter(Boolean).join(' · ')}</p></div>
-        <span className="shrink-0 text-xs text-gray-600">{product.inventoryQty <= 0 ? 'No stock' : product.isAvailable ? 'Live' : 'Hidden'}</span>
+        <div className="min-w-0 flex-1"><h3 className="text-sm font-semibold break-words">{product.name}</h3><p className="mt-1 text-xs text-pf-muted">{[product.productType, getStrainName(product)].filter(Boolean).join(' · ')}</p></div>
+        <span className="shrink-0 text-xs text-pf-muted">{product.inventoryQty <= 0 ? 'No stock' : product.isAvailable ? 'Live' : 'Hidden'}</span>
       </div>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm"><p className="font-semibold">{formatProductMoney(product.price)}/{formatProductUnit(product.unit)}{!product.isPriceVisible && <span className="ml-2 text-xs font-normal text-blue-700">Quote only</span>}</p><p>Stock: {product.inventoryQty.toLocaleString()} {formatProductUnit(product.unit)}</p></div>
-      <div className="mt-2 flex items-center gap-2 border-t border-gray-100 pt-2">
-        <Button asChild size="sm" variant="primary"><Link href={`/grower/products/${product.id}/edit`}>Edit</Link></Button>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm"><p className="font-semibold">{formatProductMoney(product.price)}/{formatProductUnit(product.unit)}{!product.isPriceVisible && <span className="ml-2 text-xs font-normal text-pf-info">Quote only</span>}</p><p>Stock: {product.inventoryQty.toLocaleString()} {formatProductUnit(product.unit)}</p></div>
+      <div className="mt-2 flex items-center gap-2 border-t border-pf-line pt-2">
+        <Button asChild size="sm" variant="outline"><Link href={`/grower/products/${product.id}/edit`}>Edit</Link></Button>
         <Button size="sm" variant="outline" disabled={pending || product.inventoryQty <= 0 && !product.isAvailable} aria-pressed={product.isAvailable} onClick={() => controls.toggleAvailability(product.id, product.isAvailable)}>{product.isAvailable ? 'Hide' : 'Enable'}</Button>
         <RecordActions name={product.name} actions={[{label: 'Duplicate', onSelect: () => { if (!controls.duplicatingProductId) void controls.duplicateProduct(product); }}, {label: 'Delete', destructive: true, onSelect: () => controls.setDeleteCandidate(product)}]} />
       </div>
@@ -413,53 +407,53 @@ interface ProductControls {
     const strainTypeLabel = getStrainTypeLabel(product);
 
     return (
-      <tr id={`product-row-${product.id}`} className={`hover:bg-gray-50 transition-colors ${selectedProductIds.has(product.id) ? 'bg-green-50/60' : ''}`}>
+      <tr id={`product-row-${product.id}`} className={`hover:bg-pf-canvas transition-colors ${selectedProductIds.has(product.id) ? 'bg-pf-accent-bg/60' : ''}`}>
         <td className={tableCellClass}>
           <input
             type="checkbox"
             checked={selectedProductIds.has(product.id)}
             onChange={() => toggleProductSelection(product.id)}
-            className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+            className="h-4 w-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
             aria-label={`Select ${product.name}`}
           />
         </td>
         <td className={tableCellClass}>
-          <div className="font-medium text-sm sm:text-base text-gray-900">{product?.name || 'Unnamed'}</div>
+          <div className="font-medium text-sm sm:text-base text-pf-text">{product?.name || 'Unnamed'}</div>
           {strainName && (
             <div className="flex items-center gap-2">
-              <div className="text-xs sm:text-sm text-gray-500">{strainName}</div>
-              {strainTypeLabel && <span className="text-[10px] sm:text-[11px] uppercase tracking-wide text-gray-400">{strainTypeLabel}</span>}
+              <div className="text-xs sm:text-sm text-pf-muted">{strainName}</div>
+              {strainTypeLabel && <span className="text-[10px] sm:text-[11px] uppercase tracking-wide text-pf-muted">{strainTypeLabel}</span>}
             </div>
           )}
         </td>
-        <td className={`${tableCellClass} text-gray-600`}>
+        <td className={`${tableCellClass} text-pf-muted`}>
           {product?.productType || '-'}
         </td>
         <td className={tableCellClass}>
           <span className={`px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-medium ${
             (product?.inventoryQty || 0) <= 0
-              ? 'bg-red-100 text-red-700'
+              ? 'bg-pf-danger-bg text-pf-danger'
               : product?.isAvailable
-                ? 'bg-green-100 text-green-700'
-                : 'bg-gray-100 text-gray-700'
+                ? 'bg-pf-accent-bg text-pf-accent'
+                : 'bg-pf-surface text-pf-secondary'
           }`}>
-            {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Out of Stock'}
+            {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Hidden'}
           </span>
         </td>
-        <td className={`${tableCellClass} text-gray-900 font-medium`}>
+        <td className={`${tableCellClass} text-pf-text font-medium`}>
           <div className="flex flex-col items-start gap-1">
             <span>${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}</span>
             {!product.isPriceVisible && <QuoteOnlyBadge compact />}
           </div>
         </td>
-        <td className={`${tableCellClass} text-gray-600`}>
-          <span className={(product?.inventoryQty || 0) <= 5 ? 'text-red-600 font-medium' : ''}>
+        <td className={`${tableCellClass} text-pf-muted`}>
+          <span className={(product?.inventoryQty || 0) <= 5 ? 'text-pf-danger font-medium' : ''}>
             {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} ${formatInventoryUnit(product?.unit, product?.inventoryQty || 0)}`}
           </span>
         </td>
         <td className={tableCellClass}>
           <div className="flex items-center gap-2">
-            <Button variant="primary" size="sm" asChild>
+            <Button variant="outline" size="sm" asChild>
               <Link href={'/grower/products/' + product?.id + '/edit'}>
                 <Pencil className="mr-1.5 h-4 w-4" />
                 Edit
@@ -476,10 +470,9 @@ interface ProductControls {
               >
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
-              {openActionMenuId === product.id ? (
-                <>
-                  <button type="button" className="fixed inset-0 z-10 cursor-default" aria-label="Close product action menu" onClick={() => setOpenActionMenuId(null)} />
-                  <div className="absolute right-0 top-full z-20 mt-2 w-48 rounded-lg border border-gray-200 bg-white py-1 shadow-lg">
+              <Modal open={openActionMenuId === product.id} onClose={() => setOpenActionMenuId(null)} title="More actions" className="max-w-sm">
+                  <p className="mb-3 break-words text-sm text-pf-muted">{product.name}</p>
+                  <div className="grid gap-2">
                     <button
                       type="button"
                       onClick={() => {
@@ -487,7 +480,7 @@ interface ProductControls {
                         toggleAvailability(product.id, product.isAvailable);
                       }}
                       disabled={pendingProductIds.has(product.id) || (product.inventoryQty || 0) <= 0 && !product.isAvailable}
-                      className="flex min-h-10 w-full items-center px-3 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 disabled:opacity-50"
+                      className="flex min-h-10 w-full items-center rounded-lg border border-pf-line px-3 text-left text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent disabled:opacity-50"
                     >
                       {product.isAvailable ? 'Disable listing' : 'Enable listing'}
                     </button>
@@ -495,7 +488,7 @@ interface ProductControls {
                       type="button"
                       onClick={() => duplicateProduct(product)}
                       disabled={duplicatingProductId === product.id}
-                      className="flex min-h-10 w-full items-center gap-2 px-3 text-left text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 disabled:opacity-50"
+                      className="flex min-h-10 w-full items-center gap-2 rounded-lg border border-pf-line px-3 text-left text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent disabled:opacity-50"
                     >
                       <Copy className="h-4 w-4" />
                       {duplicatingProductId === product.id ? 'Duplicating...' : 'Duplicate'}
@@ -506,14 +499,13 @@ interface ProductControls {
                         setOpenActionMenuId(null);
                         setDeleteCandidate(product);
                       }}
-                      className="flex min-h-10 w-full items-center gap-2 px-3 text-left text-sm font-medium text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600"
+                      className="flex min-h-10 w-full items-center gap-2 rounded-lg border border-pf-line px-3 text-left text-sm font-medium text-pf-danger hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent"
                     >
                       <Trash2 className="h-4 w-4" />
                       Delete
                     </button>
                   </div>
-                </>
-              ) : null}
+              </Modal>
             </div>
           </div>
         </td>
@@ -525,29 +517,29 @@ interface ProductControls {
   const ProductTable = ({ products, ...controls }: { products: Product[] } & ProductControls) => {
     const { allVisibleSelected, toggleVisibleSelection } = controls;
     return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
       <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
         <table className="w-full min-w-[640px]">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-pf-canvas border-b border-pf-line">
             <tr>
               <th className="px-3 sm:px-4 py-2 sm:py-3 text-left">
                 <input
                   type="checkbox"
                   checked={allVisibleSelected}
                   onChange={toggleVisibleSelection}
-                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  className="h-4 w-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
                   aria-label="Select all visible products"
                 />
               </th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Product</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Inventory</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Product</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Type</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Status</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Price</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Inventory</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-pf-line">
             {products.map((product) => (
               <ProductRow {...controls} key={product.id} product={product} />
             ))}
@@ -1227,14 +1219,14 @@ export default function GrowerProductsPage() {
       </div>
 
       {growerAccess && (!growerAccess.isVerified || isLicenseExpired(growerAccess.licenseExpiry)) ? (
-        <section className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"><strong>Listings are hidden from buyers.</strong> PhenoFarm must verify your account and current license before products appear in the marketplace. <Link href="/grower/settings#business-profile" className="font-semibold underline">Review license details</Link></section>
+        <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4 text-sm text-pf-warning"><strong>Listings are hidden from buyers.</strong> PhenoFarm must verify your account and current license before products appear in the marketplace. <Link href="/grower/settings#business-profile" className="font-semibold underline">Review license details</Link></section>
       ) : null}
 
       {showQuickCreate && (
-        <form onSubmit={submitQuickProduct} className="rounded-xl border border-green-100 bg-green-50 p-3 shadow-sm sm:p-4">
+        <form onSubmit={submitQuickProduct} className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-3 shadow-sm sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <h2 className="text-base font-semibold text-gray-900">Quick add</h2>
+              <h2 className="text-base font-semibold text-pf-text">Quick add</h2>
             </div>
             <button
               type="button"
@@ -1242,7 +1234,7 @@ export default function GrowerProductsPage() {
                 resetQuickProduct();
                 setShowQuickCreate(false);
               }}
-              className="self-start rounded-lg border border-green-200 bg-white px-3 py-2 text-sm font-medium text-green-800 hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="self-start rounded-lg border border-pf-accent-line bg-pf-surface px-3 py-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
             >
               Close
             </button>
@@ -1252,7 +1244,7 @@ export default function GrowerProductsPage() {
             <button
               type="button"
               onClick={() => applyQuickDefaults(catalogDefaults)}
-              className="rounded-full border border-green-200 bg-white px-3 py-1 text-xs font-semibold text-green-800 hover:bg-green-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="rounded-full border border-pf-accent-line bg-pf-surface px-3 py-1 text-xs font-semibold text-pf-accent hover:bg-pf-accent-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
             >
               Catalog defaults
             </button>
@@ -1263,13 +1255,13 @@ export default function GrowerProductsPage() {
                   applyQuickDefaults(savedProductDefaults);
                   setQuickDraftRestored(true);
                 }}
-                className="rounded-full border border-gray-300 bg-white px-3 py-1 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="rounded-full border border-pf-line-strong bg-pf-surface px-3 py-1 text-xs font-semibold text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               >
                 Last listing
               </button>
             )}
             {quickDraftRestored ? (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-green-900">
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-pf-accent">
                 Draft restored
                 <button
                   type="button"
@@ -1277,7 +1269,7 @@ export default function GrowerProductsPage() {
                     resetQuickProduct();
                     setQuickDraftRestored(false);
                   }}
-                  className="min-h-10 rounded px-2 text-green-700 underline underline-offset-2 hover:text-green-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"
+                  className="min-h-10 rounded px-2 text-pf-accent underline underline-offset-2 hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent"
                 >
                   Clear
                 </button>
@@ -1286,35 +1278,35 @@ export default function GrowerProductsPage() {
           </div>
 
           {quickError && (
-            <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{quickError}{/free plan|upgrade/i.test(quickError) ? <> <Link href="/grower/pricing" className="font-semibold underline">Compare plans</Link></> : null}</p>
+            <p className="mt-3 rounded-lg border border-pf-danger-line bg-pf-danger-bg px-3 py-2 text-sm text-pf-danger">{quickError}{/free plan|upgrade/i.test(quickError) ? <> <Link href="/grower/pricing" className="font-semibold underline">Compare plans</Link></> : null}</p>
           )}
 
           <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-6">
-            <label className="col-span-2 text-sm font-medium text-gray-700">
+            <label className="col-span-2 text-sm font-medium text-pf-secondary">
               Product name
               <input
                 value={quickProduct.name}
                 onChange={(event) => setQuickProduct((prev) => ({ ...prev, name: event.target.value }))}
-                className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent"
                 placeholder="Blueberries NF"
               />
             </label>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-pf-secondary">
               Type
               <input
                 value={quickProduct.productType}
                 onChange={(event) => setQuickProduct((prev) => ({ ...prev, productType: event.target.value }))}
-                className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent"
                 placeholder="Flower"
               />
             </label>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-pf-secondary">
               Unit
-              <select value={quickProduct.unit} onChange={(event) => setQuickProduct((prev) => ({ ...prev, unit: event.target.value }))} className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500 sm:text-sm">
+              <select value={quickProduct.unit} onChange={(event) => setQuickProduct((prev) => ({ ...prev, unit: event.target.value }))} className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent sm:text-sm">
                 {['Gram', 'Half Ounce', 'Ounce', 'Eighth', 'Quarter', 'Unit', 'Pack', 'Each', 'Lb'].map((unit) => <option key={unit}>{unit}</option>)}
               </select>
             </label>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-pf-secondary">
               Price
               <input
                 type="number"
@@ -1322,11 +1314,11 @@ export default function GrowerProductsPage() {
                 step="0.01"
                 value={quickProduct.price}
                 onChange={(event) => setQuickProduct((prev) => ({ ...prev, price: event.target.value }))}
-                className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent"
                 placeholder="45.00"
               />
             </label>
-            <label className="text-sm font-medium text-gray-700">
+            <label className="text-sm font-medium text-pf-secondary">
               Inventory
               <input
                 type="number"
@@ -1334,7 +1326,7 @@ export default function GrowerProductsPage() {
                 step="1"
                 value={quickProduct.inventoryQty}
                 onChange={(event) => setQuickProduct((prev) => ({ ...prev, inventoryQty: event.target.value }))}
-                className="mt-1 min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent"
                 placeholder="0"
               />
             </label>
@@ -1342,12 +1334,12 @@ export default function GrowerProductsPage() {
 
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-              <label className="flex min-h-10 items-center gap-2 rounded-lg border border-green-200 bg-white px-3 py-2 text-sm font-medium text-green-900">
+              <label className="flex min-h-10 items-center gap-2 rounded-lg border border-pf-accent-line bg-pf-surface px-3 py-2 text-sm font-medium text-pf-accent">
                 <input
                   type="checkbox"
                   checked={quickProduct.isPriceVisible}
                   onChange={(event) => setQuickProduct((prev) => ({ ...prev, isPriceVisible: event.target.checked }))}
-                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-600"
+                  className="h-4 w-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
                 />
                 Show price to buyers
               </label>
@@ -1362,12 +1354,12 @@ export default function GrowerProductsPage() {
       {bulkMessage && (
         <div className={`rounded-lg border px-4 py-3 text-sm ${
           bulkMessage.type === 'success'
-            ? 'border-green-200 bg-green-50 text-green-800'
-            : 'border-red-200 bg-red-50 text-red-700'
+            ? 'border-pf-accent-line bg-pf-accent-bg text-pf-accent'
+            : 'border-pf-danger-line bg-pf-danger-bg text-pf-danger'
         }`}>
           <div className="flex items-center justify-between gap-3">
             <span>{bulkMessage.text}</span>
-            <button type="button" onClick={() => setBulkMessage(null)} className="rounded text-xs font-semibold opacity-75 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+            <button type="button" onClick={() => setBulkMessage(null)} className="rounded text-xs font-semibold opacity-75 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2">
               Dismiss
             </button>
           </div>
@@ -1377,22 +1369,22 @@ export default function GrowerProductsPage() {
       <OperationsSummary items={[{label: 'Products', value: totalProducts}, {label: 'Stock value', value: formatProductMoney(totalValue)}, {label: 'Available', value: availableCount}]} />
 
       {(strainFilterId || batchFilterId) && (
-        <div className="flex flex-col gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-4 py-3 text-sm text-pf-accent sm:flex-row sm:items-center sm:justify-between">
           <p>
             Showing products for <span className="font-semibold">{activeCatalogFilterLabel}</span>.
           </p>
-          <Button variant="outline" size="sm" asChild className="bg-white">
+          <Button variant="outline" size="sm" asChild className="bg-pf-surface">
             <Link href="/grower/products">Clear filter</Link>
           </Button>
         </div>
       )}
 
-      <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+      <div className="rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
         <label htmlFor="product-mobile-filter" className="sr-only">Filter products</label>
-        <select id="product-mobile-filter" value={workflowView} onChange={(event) => handleWorkflowViewChange(event.target.value as WorkflowView)} className="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-base sm:hidden">
+        <select id="product-mobile-filter" value={workflowView} onChange={(event) => handleWorkflowViewChange(event.target.value as WorkflowView)} className="min-h-10 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 text-base sm:hidden">
           {workflowViewOptions.map((view) => <option key={view.key} value={view.key}>{view.label} ({view.count})</option>)}
         </select>
-        <p className="mb-2 hidden text-xs font-medium text-gray-500 sm:block">Filter</p>
+        <p className="mb-2 hidden text-xs font-medium text-pf-muted sm:block">Filter</p>
         <div className="hidden flex-wrap gap-2 sm:flex">
           {workflowViewOptions.map((view) => (
             <button
@@ -1403,13 +1395,13 @@ export default function GrowerProductsPage() {
               aria-label={`${view.label}: ${view.count} products`}
               className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
                 workflowView === view.key
-                  ? 'bg-green-600 text-white shadow-sm'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
-              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2`}
+                  ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                  : 'bg-pf-canvas text-pf-secondary hover:bg-pf-surface'
+              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2`}
             >
               <span>{view.label}</span>
               <span className={`rounded-full px-2 py-0.5 text-xs ${
-                workflowView === view.key ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+                workflowView === view.key ? 'bg-pf-accent/15 text-pf-accent' : 'bg-pf-surface text-pf-muted ring-1 ring-pf-line'
               }`}>
                 {view.count}
               </span>
@@ -1419,7 +1411,7 @@ export default function GrowerProductsPage() {
       </div>
 
       {/* Filter Tabs & Display Controls */}
-      <div className="bg-white p-2 sm:p-3 rounded-xl shadow-sm border border-gray-200">
+      <div className="bg-pf-surface p-2 sm:p-3 rounded-xl shadow-sm border border-pf-line">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           {/* Filter Tabs */}
           <div className="flex flex-wrap gap-1">
@@ -1432,9 +1424,9 @@ export default function GrowerProductsPage() {
                 aria-label={tab.key === 'all' ? 'Show all products' : `Group products by ${tab.label}`}
                 className={`flex items-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
                   activeFilter === tab.key
-                    ? 'bg-green-600 text-white shadow-sm'
-                    : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2`}
+                    ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                    : 'text-pf-muted hover:bg-pf-surface hover:text-pf-text'
+                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2`}
               >
                 <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
@@ -1459,7 +1451,7 @@ export default function GrowerProductsPage() {
               className="w-full justify-between gap-3 sm:w-auto"
             >
               <span>Display</span>
-              <span className="text-xs font-normal text-gray-500">
+              <span className="text-xs font-normal text-pf-muted">
                 {viewMode === 'card' ? 'Cards' : 'List'} · {compactMode ? 'Compact' : 'Comfort'}
               </span>
             </Button>
@@ -1471,14 +1463,14 @@ export default function GrowerProductsPage() {
                   aria-label="Close display settings"
                   onClick={() => setShowDisplayMenu(false)}
                 />
-                <div className="absolute right-0 top-full z-20 mt-2 w-full rounded-xl border border-gray-200 bg-white p-3 shadow-lg sm:w-72">
+                <div className="absolute right-0 top-full z-20 mt-2 w-full rounded-xl border border-pf-line bg-pf-surface p-3 shadow-lg sm:w-72">
                   <div className="space-y-4">
                     <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Density</p>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-pf-muted">Density</p>
                       <TableDensityControl value={tableDensity} onChange={handleDensityChange} label="Rows" />
                     </div>
                     <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">View</p>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-pf-muted">View</p>
                       <div className="grid grid-cols-2 gap-2">
                         <button
                           type="button"
@@ -1489,9 +1481,9 @@ export default function GrowerProductsPage() {
                           aria-pressed={viewMode === 'card'}
                           className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                             viewMode === 'card'
-                              ? 'bg-green-600 text-white shadow-sm'
-                              : 'border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                          } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2`}
+                              ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                              : 'border border-pf-line text-pf-muted hover:bg-pf-canvas hover:text-pf-text'
+                          } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2`}
                           title="Card view"
                         >
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1508,9 +1500,9 @@ export default function GrowerProductsPage() {
                           aria-pressed={viewMode === 'list'}
                           className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
                             viewMode === 'list'
-                              ? 'bg-green-600 text-white shadow-sm'
-                              : 'border border-gray-200 text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                          } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2`}
+                              ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                              : 'border border-pf-line text-pf-muted hover:bg-pf-canvas hover:text-pf-text'
+                          } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2`}
                           title="List view"
                         >
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1529,17 +1521,17 @@ export default function GrowerProductsPage() {
       </div>
 
       {workflowProducts.length > 0 && selectedCount > 0 && (
-        <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+        <div className="rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div className="flex flex-wrap items-center gap-2">
               <button
                 type="button"
                 onClick={toggleVisibleSelection}
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="rounded-lg border border-pf-line-strong px-3 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               >
                 {allVisibleSelected ? 'Clear all' : 'Select all'}
               </button>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-pf-muted">
                 {selectedCount} selected
               </span>
             </div>
@@ -1550,12 +1542,12 @@ export default function GrowerProductsPage() {
 
       {selectedCount > 0 && (
         <div className="fixed inset-x-0 z-40 px-4 pointer-events-none" style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-xl pointer-events-auto sm:flex-row sm:items-center sm:justify-between">
+          <div className="mx-auto flex max-w-5xl flex-col gap-3 rounded-2xl border border-pf-line bg-pf-surface p-3 shadow-xl pointer-events-auto sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <p className="text-sm font-semibold text-gray-900">
+              <p className="text-sm font-semibold text-pf-text">
                 {selectedCount} product{selectedCount === 1 ? '' : 's'} selected
               </p>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-pf-muted">
                 {bulkUpdating ? 'Updating...' : 'Choose an action for the selected listings.'}
               </p>
             </div>
@@ -1596,14 +1588,14 @@ export default function GrowerProductsPage() {
             <div key={groupName} className="space-y-3 sm:space-y-4">
               {/* Group Header */}
               {activeFilter !== 'all' && <div className="flex items-center gap-4">
-                <div className="h-px flex-1 bg-gray-200"></div>
-                <div className="flex items-center gap-2 bg-gray-50 px-4 py-2 rounded-full">
-                  <span className="text-sm font-semibold text-gray-700">{groupName}</span>
-                  <span className="text-xs text-gray-500 bg-white px-2 py-0.5 rounded-full border border-gray-200">
+                <div className="h-px flex-1 bg-pf-raised"></div>
+                <div className="flex items-center gap-2 bg-pf-canvas px-4 py-2 rounded-full">
+                  <span className="text-sm font-semibold text-pf-secondary">{groupName}</span>
+                  <span className="text-xs text-pf-muted bg-pf-surface px-2 py-0.5 rounded-full border border-pf-line">
                     {groups[groupName]?.length || 0}
                   </span>
                 </div>
-                <div className="h-px flex-1 bg-gray-200"></div>
+                <div className="h-px flex-1 bg-pf-raised"></div>
               </div>}
 
               <div className="space-y-3 sm:hidden">{groups[groupName]?.map(product => <MobileProduct key={product.id} product={product} controls={productControls} />)}</div>
@@ -1614,9 +1606,9 @@ export default function GrowerProductsPage() {
           ))}
         </div>
       ) : totalProducts > 0 ? (
-        <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No products in this view</h3>
-          <p className="text-gray-500 mb-5 max-w-sm mx-auto">
+        <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
+          <h3 className="text-lg font-semibold text-pf-text mb-2">No products in this view</h3>
+          <p className="text-pf-muted mb-5 max-w-sm mx-auto">
             Clear filters to see all products.
           </p>
           <Button type="button" variant="secondary" onClick={() => handleWorkflowViewChange('all')}>
@@ -1624,17 +1616,16 @@ export default function GrowerProductsPage() {
           </Button>
         </div>
       ) : (
-        <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-            <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
+          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pf-surface flex items-center justify-center">
+            <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No products yet</h3>
-          <p className="text-gray-500 mb-2 max-w-sm mx-auto">
-            Add your first product to make your catalog visible to dispensary buyers.
+          <h3 className="text-lg font-semibold text-pf-text mb-2">No products yet</h3>
+          <p className="text-sm text-pf-muted mb-4 max-w-sm mx-auto">
+            Add a product to start your buyer catalog.
           </p>
-          <p className="text-sm text-gray-500 mb-6">Tip: include clear pricing and accurate inventory so buyers can place orders confidently.</p>
           <div className="flex flex-col justify-center gap-2 sm:flex-row">
             <Button
               type="button"
@@ -1646,14 +1637,14 @@ export default function GrowerProductsPage() {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
             >
-              Quick add first listing
+              Quick add
             </Button>
             <Button variant="primary" asChild className="shrink-0">
               <Link href="/grower/products/add">
                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
-                Full product form
+                Add product
               </Link>
             </Button>
           </div>

@@ -328,14 +328,14 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="relative z-[100000] flex h-full w-full max-w-none flex-col overflow-hidden rounded-none bg-white shadow-2xl sm:h-auto sm:max-w-2xl sm:rounded-xl"
+        className="relative z-[100000] flex h-full w-full max-w-none flex-col overflow-hidden rounded-none bg-pf-surface shadow-2xl sm:h-auto sm:max-w-2xl sm:rounded-xl"
         onKeyDown={handleModalKeyDown}
       >
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 border-b px-4 py-3">
+        <div className="flex items-center justify-between gap-3 border-b border-pf-line px-4 py-3">
           <h2 id={titleId} className="sr-only">Search PhenoFarm</h2>
           <div className="flex items-center gap-3 flex-1">
-            <Search className="w-5 h-5 text-gray-400" />
+            <Search className="w-5 h-5 text-pf-muted" />
             <input
               ref={inputRef}
               type="text"
@@ -343,12 +343,12 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
               aria-label={isDispensaryRoute ? 'Search products, requests, growers, and strains' : 'Search products, requests, customers, and strains'}
               aria-controls={resultsId}
               aria-activedescendant={activeIndex >= 0 ? `${resultsId}-result-${activeIndex}` : undefined}
-              className="flex-1 rounded-md min-w-0 px-1 py-1 text-base sm:text-lg outline-none placeholder:text-gray-400 focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="flex-1 rounded-md min-w-0 px-1 py-1 text-base sm:text-lg outline-none placeholder:text-pf-muted focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               autoFocus
             />
-            <kbd className="hidden sm:inline-flex items-center px-2 py-1 text-xs font-mono bg-gray-100 rounded">
+            <kbd className="hidden sm:inline-flex items-center px-2 py-1 text-xs font-mono bg-pf-surface rounded">
               ESC
             </kbd>
           </div>
@@ -356,26 +356,26 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
             type="button"
             onClick={closeDialog}
             onMouseDown={(event) => event.preventDefault()}
-            className="ml-2 rounded-lg p-1.5 transition-colors hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="ml-2 rounded-lg p-1.5 transition-colors hover:bg-pf-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
             aria-label="Close search"
           >
-            <X className="w-5 h-5 text-gray-500" />
+            <X className="w-5 h-5 text-pf-muted" />
           </button>
         </div>
 
         {/* Results Area */}
         <div id={resultsId} className="min-h-0 flex-1 overflow-y-auto sm:max-h-96 sm:flex-none">
           {loading ? (
-            <div className="flex items-center justify-center gap-3 px-4 py-8 text-gray-500">
+            <div className="flex items-center justify-center gap-3 px-4 py-8 text-pf-muted">
               <Loader2 className="h-5 w-5 animate-spin" />
               <p className="text-sm">Searching...</p>
             </div>
-          ) : searchError ? (<p role="alert" className="px-4 py-8 text-sm text-red-700">{searchError}</p>) : query.trim().length < 2 ? (
-            <div className="px-4 py-8 text-center text-gray-500">
+          ) : searchError ? (<p role="alert" className="px-4 py-8 text-sm text-pf-danger">{searchError}</p>) : query.trim().length < 2 ? (
+            <div className="px-4 py-8 text-center text-pf-muted">
               <p className="text-sm">{query.trim().length === 0 ? 'Products, requests, businesses and strains' : 'Type at least 2 characters'}</p>
               {query.trim().length === 0 && recentQueries.length > 0 ? (
                 <div className="mt-5">
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-400">Recent searches</p>
+                  <p className="text-xs font-medium uppercase tracking-wide text-pf-muted">Recent searches</p>
                   <div className="mt-3 flex flex-wrap justify-center gap-2">
                     {recentQueries.map((recentQuery) => (
                       <button
@@ -385,7 +385,7 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
                           setQuery(recentQuery);
                           inputRef.current?.focus();
                         }}
-                        className="rounded-full bg-green-50 px-3 py-1.5 text-xs font-medium text-green-700 ring-1 ring-green-200 transition-colors hover:bg-green-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                        className="rounded-full bg-pf-accent-bg px-3 py-1.5 text-xs font-medium text-pf-accent ring-1 ring-pf-accent-line transition-colors hover:bg-pf-accent-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
                       >
                         {recentQuery}
                       </button>
@@ -396,12 +396,12 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
 
             </div>
           ) : results.length === 0 ? (
-            <div className="px-4 py-8 text-center text-gray-500">
-              <p className="text-sm font-medium text-gray-700">No results for &apos;{query.trim()}&apos;</p>
-              <p className="mt-1 text-sm text-gray-500">Check spelling or try a product, order, customer, or strain name.</p>
+            <div className="px-4 py-8 text-center text-pf-muted">
+              <p className="text-sm font-medium text-pf-secondary">No results for &apos;{query.trim()}&apos;</p>
+              <p className="mt-1 text-sm text-pf-muted">Check spelling or try a product, order, customer, or strain name.</p>
             </div>
           ) : (
-            <div className="divide-y" role="listbox" aria-label="Search results">
+            <div className="divide-y divide-pf-line" role="listbox" aria-label="Search results">
               {results.map((result, index) => {
                 const Icon = typeIcons[result.type];
                 const quickActions = getQuickActions(result);
@@ -414,7 +414,7 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
                     id={`${resultsId}-result-${index}`}
                     role="option"
                     aria-selected={isActive}
-                    className={`group relative transition-colors ${isActive ? 'bg-green-50' : 'hover:bg-gray-50'}`}
+                    className={`group relative transition-colors ${isActive ? 'bg-pf-accent-bg' : 'hover:bg-pf-canvas'}`}
                     onMouseEnter={() => setActiveIndex(index)}
                   >
                     <button
@@ -427,24 +427,24 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
                         event.preventDefault();
                       }}
                       onFocus={() => setActiveIndex(index)}
-                      className={`flex w-full items-start gap-3 px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 ${secondaryActions.length > 0 ? 'pr-24 sm:pr-28' : 'pr-4'}`}
+                      className={`flex w-full items-start gap-3 px-4 py-3 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-400 ${secondaryActions.length > 0 ? 'pr-24 sm:pr-28' : 'pr-4'}`}
                       aria-label={`${primaryAction.label}: ${result.title}`}
                     >
                       <div className="flex-shrink-0">
-                        <div className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center">
-                          <Icon className="w-4 h-4 text-gray-600" />
+                        <div className="w-8 h-8 rounded-lg bg-pf-surface flex items-center justify-center">
+                          <Icon className="w-4 h-4 text-pf-muted" />
                         </div>
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
+                        <p className="text-sm font-medium text-pf-text truncate">
                           {result.title}
                         </p>
-                        <p className="truncate text-xs text-gray-500">
+                        <p className="truncate text-xs text-pf-muted">
                           {result.subtitle}
                         </p>
                       </div>
                       <div className="hidden flex-shrink-0 sm:block">
-                        <span className="text-xs text-gray-400 capitalize">
+                        <span className="text-xs text-pf-muted capitalize">
                           {typeLabels[result.type]}
                         </span>
                       </div>
@@ -462,7 +462,7 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
                               aria-label={`${action.label}: ${result.title}`}
                               onClick={() => handleResultClick(action.href)}
                               onMouseDown={(event) => event.preventDefault()}
-                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-gray-500 ring-1 ring-gray-200 transition-colors hover:bg-green-50 hover:text-green-700 hover:ring-green-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-pf-surface text-pf-muted ring-1 ring-pf-line transition-colors hover:bg-pf-accent-bg hover:text-pf-accent hover:ring-pf-accent-line focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
                             >
                               <ActionIcon className="h-4 w-4" aria-hidden="true" />
                             </button>
@@ -478,7 +478,7 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
         </div>
 
         {/* Footer */}
-        <div className="flex justify-between gap-3 border-t bg-gray-50 px-4 py-2 text-xs text-gray-500">
+        <div className="flex justify-between gap-3 border-t border-pf-line bg-pf-canvas px-4 py-2 text-xs text-pf-muted">
           <span>{query.trim().length >= 2 ? `${results.length} result${results.length === 1 ? '' : 's'}` : ''}</span>
           <span className="hidden sm:inline">↑↓ navigate · ↵ open · esc close</span>
         </div>
@@ -492,7 +492,7 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
       {variant === 'icon' ? (
         <button
           onClick={(event) => openDialog(event.currentTarget)}
-          className={`flex h-10 w-10 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors hover:bg-gray-50 hover:text-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${className}`}
+          className={`flex h-10 w-10 items-center justify-center rounded-lg border border-pf-line bg-pf-surface text-pf-muted transition-colors hover:bg-pf-canvas hover:text-pf-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas ${className}`}
           aria-label="Search"
           title="Search"
         >
@@ -501,14 +501,14 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
       ) : (
         <button
           onClick={(event) => openDialog(event.currentTarget)}
-          className={`group flex w-full items-center justify-between rounded-lg border border-gray-200 bg-gray-50 px-3 py-2.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${className}`}
+          className={`group flex w-full items-center justify-between rounded-lg border border-pf-line bg-pf-canvas px-3 py-2.5 text-pf-muted transition-colors hover:bg-pf-surface hover:text-pf-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas ${className}`}
           aria-label="Search"
         >
           <div className="flex items-center gap-2">
             <Search className="w-4 h-4" />
             <span className="text-sm">Search...</span>
           </div>
-          <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs bg-white border border-gray-200 rounded text-gray-400">
+          <kbd className="hidden sm:inline-flex items-center px-1.5 py-0.5 text-xs bg-pf-surface border border-pf-line rounded text-pf-muted">
             ⌘K
           </kbd>
         </button>
@@ -521,7 +521,7 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
 }
 
 export function SearchTrigger({ variant = 'default', className = '' }: SearchDialogProps) {
-  return <button type="button" aria-label="Search" title="Search" onClick={(event) => window.dispatchEvent(new CustomEvent('phenofarm:open-search', { detail: { trigger: event.currentTarget } }))} className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white text-gray-600 hover:bg-gray-50 ${variant === 'icon' ? 'w-10 shrink-0' : 'px-3'} ${className}`}>
+  return <button type="button" aria-label="Search" title="Search" onClick={(event) => window.dispatchEvent(new CustomEvent('phenofarm:open-search', { detail: { trigger: event.currentTarget } }))} className={`inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-pf-line bg-pf-surface text-pf-muted hover:bg-pf-canvas ${variant === 'icon' ? 'w-10 shrink-0' : 'px-3'} ${className}`}>
     <Search className="h-5 w-5" />{variant === 'default' && <span>Search...</span>}
   </button>;
 }

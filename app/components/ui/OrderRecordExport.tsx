@@ -11,5 +11,5 @@ export function OrderRecordExport({ order, label = 'Export CSV' }: { label?: str
     const blob = new Blob([[headers, ...rows].map((row) => row.map(cell).join(',')).join('\n')], { type: 'text/csv;charset=utf-8' });
     const href = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = href; link.download = `phenofarm-request-${order.orderId}.csv`; link.click(); URL.revokeObjectURL(href);
   }
-  return <button type="button" onClick={download} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-800 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600"><Download className="h-4 w-4" />{label}</button>;
+  return <button type="button" onClick={download} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-pf-line-strong bg-pf-surface px-4 text-sm font-semibold text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400"><Download className="h-4 w-4" />{label}</button>;
 }

@@ -69,10 +69,10 @@ function getRoleLabel(role: string) {
 function RoleBadge({ role }: { role: string }) {
   const className =
     role === "ADMIN"
-      ? "bg-gray-100 text-gray-800"
+      ? "bg-pf-surface text-pf-secondary"
       : role === "GROWER"
-        ? "bg-green-100 text-green-800"
-        : "bg-purple-100 text-purple-800";
+        ? "bg-pf-accent-bg text-pf-accent"
+        : "bg-pf-purple-bg text-pf-purple";
 
   return (
     <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ${className}`}>
@@ -88,11 +88,11 @@ function VerificationBadge({ user }: { user: UserWithBusiness }) {
 
   if (user.role === "GROWER") {
     return user.grower?.isVerified ? (
-      <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-200">
+      <span className="inline-flex items-center rounded-full bg-pf-accent-bg px-2.5 py-1 text-xs font-medium text-pf-accent ring-1 ring-inset ring-pf-accent-line">
         Verified
       </span>
     ) : (
-      <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-200">
+      <span className="inline-flex items-center rounded-full bg-pf-warning-bg px-2.5 py-1 text-xs font-medium text-pf-warning ring-1 ring-inset ring-pf-warning-line">
         Pending
       </span>
     );
@@ -100,7 +100,7 @@ function VerificationBadge({ user }: { user: UserWithBusiness }) {
 
   if (!user.dispensary) {
     return (
-      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+      <span className="inline-flex items-center rounded-full bg-pf-surface px-2.5 py-1 text-xs font-medium text-pf-secondary">
         No profile
       </span>
     );
@@ -108,7 +108,7 @@ function VerificationBadge({ user }: { user: UserWithBusiness }) {
 
   if (user.dispensary.isVerified && user.dispensary.licenseStatus === "verified") {
     return (
-      <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-200">
+      <span className="inline-flex items-center rounded-full bg-pf-accent-bg px-2.5 py-1 text-xs font-medium text-pf-accent ring-1 ring-inset ring-pf-accent-line">
         Verified
       </span>
     );
@@ -116,7 +116,7 @@ function VerificationBadge({ user }: { user: UserWithBusiness }) {
 
   if (user.dispensary.licenseStatus === "rejected") {
     return (
-      <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-200">
+      <span className="inline-flex items-center rounded-full bg-pf-danger-bg px-2.5 py-1 text-xs font-medium text-pf-danger ring-1 ring-inset ring-pf-danger-line">
         Rejected
       </span>
     );
@@ -124,14 +124,14 @@ function VerificationBadge({ user }: { user: UserWithBusiness }) {
 
   if (user.dispensary.licenseStatus === "expired") {
     return (
-      <span className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-200">
+      <span className="inline-flex items-center rounded-full bg-pf-danger-bg px-2.5 py-1 text-xs font-medium text-pf-danger ring-1 ring-inset ring-pf-danger-line">
         Expired
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-200">
+    <span className="inline-flex items-center rounded-full bg-pf-warning-bg px-2.5 py-1 text-xs font-medium text-pf-warning ring-1 ring-inset ring-pf-warning-line">
       Pending
     </span>
   );
@@ -142,7 +142,7 @@ function BusinessLink({ user }: { user: UserWithBusiness }) {
     return (
       <Link
         href={`/admin/growers?q=${encodeURIComponent(user.grower.businessName)}`}
-        className="inline-flex min-h-10 items-center font-medium text-green-700 hover:text-green-800 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+        className="inline-flex min-h-10 items-center font-medium text-pf-accent hover:text-pf-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
       >
         {user.grower.businessName}
       </Link>
@@ -153,14 +153,14 @@ function BusinessLink({ user }: { user: UserWithBusiness }) {
     return (
       <Link
         href={`/admin/dispensaries?q=${encodeURIComponent(user.dispensary.businessName)}`}
-        className="inline-flex min-h-10 items-center font-medium text-green-700 hover:text-green-800 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+        className="inline-flex min-h-10 items-center font-medium text-pf-accent hover:text-pf-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
       >
         {user.dispensary.businessName}
       </Link>
     );
   }
 
-  return <span className="text-gray-500">-</span>;
+  return <span className="text-pf-muted">-</span>;
 }
 
 export default async function AdminUsersPage({ searchParams }: { searchParams?: AdminUsersSearchParams }) {
@@ -213,14 +213,14 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
   const pageCount = Math.max(1, Math.ceil(totalUserCount / PAGE_SIZE));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <div className="space-y-4">
         <PageHeader
           compact
           title="Users"
           description="View accounts and verification."
           actions={
-            <form method="GET" className="flex w-full flex-wrap gap-2 rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:flex-row lg:max-w-xl">
+            <form method="GET" className="flex w-full flex-wrap gap-2 rounded-lg border border-pf-line bg-pf-surface p-3 shadow-sm sm:flex-row lg:max-w-xl">
               {role !== "all" ? <input type="hidden" name="role" value={role} /> : null}
               <label className="sr-only" htmlFor="admin-user-search">Search users</label>
               <input
@@ -229,18 +229,18 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
                 type="search"
                 defaultValue={query}
                 placeholder="Email or name"
-                className="min-h-10 min-w-0 flex-1 rounded-md border border-gray-300 px-3 text-base focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 sm:text-sm"
+                className="min-h-10 min-w-0 flex-1 rounded-md border border-pf-line-strong px-3 text-base focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent/20 sm:text-sm"
               />
               <button
                 type="submit"
-                className="min-h-10 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="min-h-10 rounded-md bg-emerald-500 px-4 text-sm font-semibold text-pf-canvas hover:bg-emerald-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 Search
               </button>
               {hasFilters ? (
                 <Link
                   href="/admin/users"
-                  className="inline-flex min-h-10 items-center justify-center rounded-md border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  className="inline-flex min-h-10 items-center justify-center rounded-md border border-pf-line-strong px-4 text-sm font-medium text-pf-secondary hover:bg-pf-raised focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                 >
                   Clear
                 </Link>
@@ -257,10 +257,10 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
                   key={filter.value}
                   href={buildUsersHref(filter.value, query)}
                   aria-current={active ? "page" : undefined}
-                  className={`inline-flex items-center rounded-full px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
+                  className={`inline-flex min-h-10 items-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${
                     active
-                      ? "bg-green-600 text-white"
-                      : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+                      ? "bg-emerald-500 text-pf-canvas"
+                      : "border border-pf-line bg-pf-surface text-pf-secondary hover:bg-pf-raised"
                   }`}
                 >
                   {filter.label}
@@ -268,26 +268,26 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
               );
             })}
           </div>
-          <p className="text-sm text-gray-600">{resultCountLabel}</p>
+          <p className="text-sm text-pf-muted">{resultCountLabel}</p>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-pf-surface rounded-lg border border-pf-line overflow-hidden">
         {users.length === 0 ? (
-          <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 mx-6 mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="px-4 py-8 text-center sm:py-10">
+            <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-pf-raised flex items-center justify-center">
+              <svg className="w-5 h-5 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No users yet</h3>
-            <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-              {hasFilters ? "Try a different role or search term." : "Users will appear here once they sign up through the registration page."}
+            <h3 className="text-base font-semibold text-pf-text mb-1">{hasFilters ? 'No matching users' : 'No users yet'}</h3>
+            <p className="text-sm text-pf-muted mb-4 max-w-sm mx-auto">
+              {hasFilters ? "Try a different role or search term." : "Registered accounts appear here."}
             </p>
             {hasFilters ? (
               <Link
                 href="/admin/users"
-                className="inline-flex items-center justify-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="inline-flex items-center justify-center rounded-md border border-pf-line-strong px-4 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-raised focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 Clear filters
               </Link>
@@ -295,41 +295,41 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
           </div>
         ) : (
           <>
-          <div className="divide-y divide-gray-200 md:hidden">
+          <div className="divide-y divide-pf-line md:hidden">
             {users.map((u) => (
               <article key={`mobile-${u.id}`} className="space-y-2 p-3">
-                <div className="flex items-start justify-between gap-3">
-                  <a href={`mailto:${u.email}`} className="inline-flex min-h-10 min-w-0 items-center break-all font-medium text-gray-900 hover:text-green-700 hover:underline">{u.email}</a>
-                  <RoleBadge role={u.role} />
-                </div>
+                <a href={`mailto:${u.email}`} className="inline-flex min-h-10 min-w-0 items-center break-all text-sm font-medium text-pf-text hover:text-pf-accent hover:underline">{u.email}</a>
                 {u.role !== "ADMIN" ? (
                   <div className="flex items-center justify-between gap-3 text-sm">
-                    <div className="min-w-0 text-gray-700"><BusinessLink user={u} /></div>
+                    <div className="min-w-0 text-pf-secondary"><BusinessLink user={u} /></div>
                     <VerificationBadge user={u} />
                   </div>
                 ) : null}
-                <p className="text-xs text-gray-500">Joined {new Date(u.createdAt).toLocaleDateString()}</p>
+                <div className="flex items-center justify-between gap-3">
+                  <p className="text-xs text-pf-muted">Joined {new Date(u.createdAt).toLocaleDateString()}</p>
+                  <RoleBadge role={u.role} />
+                </div>
               </article>
             ))}
           </div>
           <div className="hidden overflow-x-auto md:block">
             <table className="w-full min-w-[860px]">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-pf-canvas border-b border-pf-line">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Role</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Business</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Verified</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Joined</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Role</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Business</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Verified</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Joined</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-pf-line">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 font-medium text-gray-900">
+                  <tr key={u.id} className="hover:bg-pf-raised">
+                    <td className="px-4 py-3 font-medium text-pf-text">
                       <a
                         href={`mailto:${u.email}`}
-                        className="hover:text-green-700 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                        className="hover:text-pf-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                       >
                         {u.email}
                       </a>
@@ -337,13 +337,13 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
                     <td className="px-4 py-3">
                       <RoleBadge role={u.role} />
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-pf-muted">
                       <BusinessLink user={u} />
                     </td>
                     <td className="px-4 py-3">
                       <VerificationBadge user={u} />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-sm text-pf-muted">
                       {new Date(u.createdAt).toLocaleDateString()}
                     </td>
                   </tr>
@@ -359,16 +359,16 @@ export default async function AdminUsersPage({ searchParams }: { searchParams?: 
           {page > 1 ? (
             <Link
               href={buildUsersHref(role, query, page - 1)}
-              className="inline-flex min-h-10 items-center rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex min-h-10 items-center rounded-md border border-pf-line-strong px-3 text-sm font-medium text-pf-secondary hover:bg-pf-raised"
             >
               Previous
             </Link>
           ) : <span />}
-          <span className="text-sm text-gray-600">Page {page} of {pageCount}</span>
+          <span className="text-sm text-pf-muted">Page {page} of {pageCount}</span>
           {page < pageCount ? (
             <Link
               href={buildUsersHref(role, query, page + 1)}
-              className="inline-flex min-h-10 items-center rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex min-h-10 items-center rounded-md border border-pf-line-strong px-3 text-sm font-medium text-pf-secondary hover:bg-pf-raised"
             >
               Next
             </Link>

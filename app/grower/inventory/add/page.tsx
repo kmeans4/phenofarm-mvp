@@ -76,14 +76,14 @@ export default function UpdateStockPage() {
       <PageHeader title="Update stock" />
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">{error}</div>
+        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger">{error}</div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line">
           <div className="p-3 space-y-3 sm:p-4 sm:space-y-4">
             <div>
-              <label htmlFor="stock-product-search" className="block text-sm font-medium text-gray-700 mb-1">Product *</label>
+              <label htmlFor="stock-product-search" className="block text-sm font-medium text-pf-secondary mb-1">Product *</label>
               <input
                 id="stock-product-search"
                 type="search"
@@ -93,52 +93,52 @@ export default function UpdateStockPage() {
                   setProductId('');
                   setSelectedProduct(null);
                 }}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                className="w-full rounded-lg border border-pf-line-strong px-3 py-2 focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent"
                 placeholder="Search products"
                 autoComplete="off"
 
               />
 
 
-              {!selectedProduct && <div className="mt-2 max-h-72 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-sm">
+              {!selectedProduct && <div className="mt-2 max-h-72 overflow-y-auto rounded-lg border border-pf-line bg-pf-surface shadow-sm">
                 {filteredProducts.length > 0 ? (
                   filteredProducts.map((product) => (
                     <button
                       key={product.id}
                       type="button"
                       onClick={() => handleProductPick(product)}
-                      className={`flex w-full items-start justify-between gap-3 border-b border-gray-100 px-3 py-2 text-left text-sm last:border-b-0 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 ${
-                        product.id === productId ? 'bg-green-50 text-green-900' : 'text-gray-800'
+                      className={`flex w-full items-start justify-between gap-3 border-b border-pf-line px-3 py-2 text-left text-sm last:border-b-0 hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent ${
+                        product.id === productId ? 'bg-pf-accent-bg text-pf-accent' : 'text-pf-secondary'
                       }`}
                     >
                       <span>
                         <span className="block font-semibold">{product.name || 'Unnamed product'}</span>
-                        <span className="block text-xs text-gray-500">
+                        <span className="block text-xs text-pf-muted">
                           {[product.productType, product.subType, product.strain?.name]
                             .filter(Boolean)
                             .join(' · ') || 'No type or strain'}
                         </span>
                       </span>
-                      <span className="shrink-0 text-xs font-medium text-gray-500">
+                      <span className="shrink-0 text-xs font-medium text-pf-muted">
                         {product.inventoryQty ?? 0} {formatProductUnit(product.unit)}
                       </span>
                     </button>
                   ))
                 ) : (
-                  <div className="px-3 py-4 text-sm text-gray-500">{loading ? 'Loading products…' : loadError || 'No products match that search.'}</div>
+                  <div className="px-3 py-4 text-sm text-pf-muted">{loading ? 'Loading products…' : loadError || 'No products match that search.'}</div>
                 )}
-              {hasMore && <button type="button" disabled={loading} onClick={loadMore} className="w-full px-3 py-2 text-sm text-green-700">{loadError ? 'Retry products' : 'More products'}</button>}
+              {hasMore && <button type="button" disabled={loading} onClick={loadMore} className="w-full px-3 py-2 text-sm text-pf-accent">{loadError ? 'Retry products' : 'More products'}</button>}
               </div>}
 
               {selectedProduct && (
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-pf-muted">
                   Current stock: {selectedProduct.inventoryQty ?? 0} {formatProductUnit(selectedProduct.unit)}
                 </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="stock-quantity" className="block text-sm font-medium text-gray-700 mb-1">Stock on hand *</label>
+              <label htmlFor="stock-quantity" className="block text-sm font-medium text-pf-secondary mb-1">Stock on hand *</label>
               <input
                 id="stock-quantity"
                 type="number"
@@ -146,26 +146,26 @@ export default function UpdateStockPage() {
                 min="0"
                 value={quantity}
                 onChange={(e) => setQuantity(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                className="w-full rounded-lg border border-pf-line-strong px-3 py-2 focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent"
                 placeholder="0"
               />
-              <p className="mt-1 text-xs text-gray-500">Replaces the current stock.</p>
+              <p className="mt-1 text-xs text-pf-muted">Replaces the current stock.</p>
             </div>
           </div>
         </div>
 
         <div className="flex flex-wrap gap-3">
-          <Link href="/grower/inventory" className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-center hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:w-auto">Cancel</Link>
+          <Link href="/grower/inventory" className="flex-1 rounded-lg border border-pf-line-strong px-4 py-2 text-center hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:w-auto">Cancel</Link>
           <button
             type="submit"
             disabled={isSubmitting || !productId || quantity === ''}
-            className="flex-1 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
+            className="flex-1 rounded-lg bg-emerald-500 px-4 py-2 text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 disabled:opacity-50 sm:w-auto"
           >
             {isSubmitting ? 'Saving...' : 'Save stock'}
           </button>
         </div>
       </form>
-      <Link href="/grower/products/add" className="inline-flex min-h-10 items-center text-sm font-medium text-green-700 hover:underline">Add a new product →</Link>
+      <Link href="/grower/products/add" className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent hover:underline">Add a new product →</Link>
     </div>
   );
 }

@@ -130,12 +130,12 @@ export default async function GrowerReportsPage({
 
   // Status color mapping for improved visual
   const statusColors: Record<string, { bg: string; text: string; bar: string }> = {
-    PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-800', bar: 'bg-yellow-500' },
-    CONFIRMED: { bg: 'bg-blue-100', text: 'text-blue-800', bar: 'bg-blue-500' },
-    PROCESSING: { bg: 'bg-purple-100', text: 'text-purple-800', bar: 'bg-purple-500' },
-    SHIPPED: { bg: 'bg-indigo-100', text: 'text-indigo-800', bar: 'bg-indigo-500' },
-    DELIVERED: { bg: 'bg-green-100', text: 'text-green-800', bar: 'bg-green-500' },
-    CANCELLED: { bg: 'bg-red-100', text: 'text-red-800', bar: 'bg-red-500' },
+    PENDING: { bg: 'bg-pf-warning-bg', text: 'text-pf-warning', bar: 'bg-pf-warning' },
+    CONFIRMED: { bg: 'bg-pf-info-bg', text: 'text-pf-info', bar: 'bg-pf-info' },
+    PROCESSING: { bg: 'bg-pf-purple-bg', text: 'text-pf-purple', bar: 'bg-pf-purple' },
+    SHIPPED: { bg: 'bg-pf-purple-bg', text: 'text-pf-purple', bar: 'bg-pf-purple' },
+    DELIVERED: { bg: 'bg-pf-accent-bg', text: 'text-pf-accent', bar: 'bg-pf-accent' },
+    CANCELLED: { bg: 'bg-pf-danger-bg', text: 'text-pf-danger', bar: 'bg-pf-danger' },
   };
 
   return (
@@ -161,8 +161,8 @@ export default async function GrowerReportsPage({
         }
       />
 
-      <div className="flex items-center justify-between gap-2 rounded-lg border border-gray-200 bg-white p-2 shadow-sm">
-        <p className="sr-only sm:not-sr-only text-sm font-medium text-gray-700">Date range</p>
+      <div className="flex items-center justify-between gap-2 rounded-lg border border-pf-line bg-pf-surface p-2 shadow-sm">
+        <p className="sr-only sm:not-sr-only text-sm font-medium text-pf-secondary">Date range</p>
         <div className="flex flex-wrap gap-2" aria-label="Report date range">
           {REPORT_RANGE_OPTIONS.map((option) => {
             const active = selectedRange === option.key;
@@ -173,10 +173,10 @@ export default async function GrowerReportsPage({
                 href={href}
                 aria-label={option.label}
                 aria-current={active ? 'page' : undefined}
-                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
+                className={`rounded-lg px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 ${
                   active
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                    : 'bg-pf-canvas text-pf-secondary hover:bg-pf-surface'
                 }`}
               >
                 {option.key === '12m' ? '12mo' : option.key === 'all' ? 'All' : option.key}
@@ -193,8 +193,8 @@ export default async function GrowerReportsPage({
           title="Delivered value"
           value={`$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
           helperText={`${delivered?._count._all || 0} delivered request${delivered?._count._all === 1 ? '' : 's'}`}
-          className="border-green-200 bg-green-50"
-          valueClassName="text-green-700 sm:text-3xl"
+          className="border-pf-accent-line bg-pf-accent-bg"
+          valueClassName="text-pf-accent sm:text-3xl"
         />
         <StatCard compact title="Requests" value={totalOrders} helperText={`${activeOrders} active`} valueClassName="sm:text-3xl" />
         <StatCard compact title="Customers" value={activeCustomers} valueClassName="sm:text-3xl" />
@@ -204,10 +204,10 @@ export default async function GrowerReportsPage({
       {/* Charts Row - Improved Mobile Responsiveness */}
       <div className="grid grid-cols-1 items-start lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Monthly delivered value chart */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6">
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-3 sm:p-6">
           <div className="flex items-center justify-between mb-3 sm:mb-4">
             <h2 className="text-base sm:text-lg font-semibold">Delivered value by month</h2>
-            {monthlyRevenue.length > 6 && <span className="text-xs text-gray-400 sm:hidden">← swipe →</span>}
+            {monthlyRevenue.length > 6 && <span className="text-xs text-pf-muted sm:hidden">← swipe →</span>}
           </div>
           {monthlyRevenue.length > 0 ? (
             <div className="relative">
@@ -219,11 +219,11 @@ export default async function GrowerReportsPage({
                     return (
                       <div key={month.month}>
                         <div className="mb-1 flex items-center justify-between gap-2 text-sm">
-                          <span className="text-gray-600">{formatCalendarMonth(month.month)}</span>
-                          <span className="font-semibold text-green-700">${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                          <span className="text-pf-muted">{formatCalendarMonth(month.month)}</span>
+                          <span className="font-semibold text-pf-accent">${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
                         </div>
-                        <div className="h-2 overflow-hidden rounded-full bg-gray-100" aria-hidden="true">
-                          <div className="h-full rounded-full bg-green-500" style={{ width: `${maxRevenue > 0 ? revenue / maxRevenue * 100 : 0}%` }} />
+                        <div className="h-2 overflow-hidden rounded-full bg-pf-surface" aria-hidden="true">
+                          <div className="h-full rounded-full bg-pf-accent" style={{ width: `${maxRevenue > 0 ? revenue / maxRevenue * 100 : 0}%` }} />
                         </div>
                       </div>
                     );
@@ -231,9 +231,9 @@ export default async function GrowerReportsPage({
                 </div>
               )}
               {/* Mobile scroll hint - enhanced */}
-              {monthlyRevenue.length > 6 && <div className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none bg-gradient-to-l from-white via-white/80 to-transparent pl-4 pr-1">
-                <div className="bg-gray-100 rounded-full p-1.5 shadow-sm">
-                  <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {monthlyRevenue.length > 6 && <div className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none bg-gradient-to-l from-pf-surface via-pf-surface/80 to-transparent pl-4 pr-1">
+                <div className="bg-pf-surface rounded-full p-1.5 shadow-sm">
+                  <svg className="w-4 h-4 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                   </svg>
                 </div>
@@ -253,20 +253,20 @@ export default async function GrowerReportsPage({
                     <div key={idx} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[44px] max-w-[88px] sm:min-w-[52px] snap-center">
                       <div className="w-full flex flex-col items-center justify-end h-24 group cursor-pointer">
                         {/* Tooltip */}
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity mb-1 px-2 py-1 bg-gray-800 text-white text-xs rounded whitespace-nowrap z-20 hidden sm:block">
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity mb-1 px-2 py-1 bg-pf-raised text-pf-text text-xs rounded whitespace-nowrap z-20 hidden sm:block">
                           ${revenue.toLocaleString()}
                         </div>
                         <div 
-                          className="w-full bg-green-500 rounded-t hover:bg-green-600 transition-colors"
+                          className="w-full bg-pf-accent rounded-t hover:bg-pf-accent/80 transition-colors"
                           title={`${monthTitle}: $${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                           style={{ height: `${Math.max(height, 4)}%`, minHeight: '4px' }}
                         />
                       </div>
-                      <span className="text-xs text-gray-500 whitespace-nowrap font-medium">
+                      <span className="text-xs text-pf-muted whitespace-nowrap font-medium">
                         {monthLabel}
                       </span>
                       {revenue > 0 && (
-                        <span className="text-xs font-medium text-gray-600 whitespace-nowrap">
+                        <span className="text-xs font-medium text-pf-muted whitespace-nowrap">
                           {revenue >= 1000 ? `$${(revenue / 1000).toFixed(0)}k` : `$${revenue}`}
                         </span>
                       )}
@@ -277,24 +277,24 @@ export default async function GrowerReportsPage({
             </div>
           ) : (
             <div className="h-36 sm:h-48 flex flex-col items-center justify-center px-4 text-center text-sm">
-              <p className="font-medium text-gray-900">
+              <p className="font-medium text-pf-text">
                 {totalOrders > 0 ? 'No delivered request value in this range' : 'No request value yet'}
               </p>
-              <p className="mt-1 max-w-sm text-gray-500">
+              <p className="mt-1 max-w-sm text-pf-muted">
                 {totalOrders > 0
                   ? `The trend uses delivered requests in ${rangeSentence}; submitted, ready, and cancelled requests are excluded.`
                   : 'Delivered requests will appear here after buyers submit requests and fulfillment is complete.'}
               </p>
-              <Link href={totalOrders > 0 ? '/grower/orders' : '/grower/products/add'} className="mt-3 text-sm font-medium text-green-700 hover:text-green-800">
+              <Link href={totalOrders > 0 ? '/grower/orders' : '/grower/products/add'} className="mt-3 text-sm font-medium text-pf-accent hover:text-pf-accent">
                 {totalOrders > 0 ? 'Review requests' : 'Add product'}
               </Link>
             </div>
           )}
         </div>
 
-        {/* Requests by Status */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6">
-          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Requests by Status</h2>
+        {/* Requests by status */}
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-3 sm:p-6">
+          <h2 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Requests by status</h2>
           <div className="space-y-2 sm:space-y-3">
             {Object.entries(ordersByStatus).filter(([, count]) => count > 0).map(([status, count]) => {
               const total = Object.values(ordersByStatus).reduce((a, b) => a + b, 0);
@@ -305,22 +305,22 @@ export default async function GrowerReportsPage({
                 <Link
                   key={status}
                   href={getStatusHref(status)}
-                  className="group block rounded-lg p-2 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  className="group block rounded-lg p-2 transition-colors hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                   aria-label={`View ${statusLabel} requests`}
                 >
                   <div className="flex justify-between text-xs sm:text-sm mb-1">
                     <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full ${colors?.bar || 'bg-gray-500'}`} />
-                      <span className="text-gray-600 group-hover:text-gray-900">{statusLabel}</span>
+                      <span className={`w-2 h-2 rounded-full ${colors?.bar || 'bg-pf-hover'}`} />
+                      <span className="text-pf-muted group-hover:text-pf-text">{statusLabel}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="font-medium">{count}</span>
-                      <span className="text-gray-400 text-xs">({percentage.toFixed(0)}%)</span>
+                      <span className="text-pf-muted text-xs">({percentage.toFixed(0)}%)</span>
                     </div>
                   </div>
-                  <div className="h-2 sm:h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 sm:h-2.5 bg-pf-surface rounded-full overflow-hidden">
                     <div 
-                      className={`h-full ${colors?.bar || 'bg-gray-500'} rounded-full transition-all duration-500 group-hover:opacity-80`}
+                      className={`h-full ${colors?.bar || 'bg-pf-hover'} rounded-full transition-all duration-500 group-hover:opacity-80`}
                       style={{ width: `${percentage}%` }}
                     />
                   </div>
@@ -330,10 +330,10 @@ export default async function GrowerReportsPage({
           </div>
           {Object.values(ordersByStatus).some((count) => count === 0) && (
             <details className="mt-3 text-sm">
-              <summary className="min-h-10 cursor-pointer py-2 text-gray-500">Empty statuses</summary>
+              <summary className="min-h-10 cursor-pointer py-2 text-pf-muted">Empty statuses</summary>
               <div className="flex flex-wrap gap-2 py-2">
                 {Object.entries(ordersByStatus).filter(([, count]) => count === 0).map(([status]) => (
-                  <Link key={status} href={getStatusHref(status)} className="rounded-lg border px-3 py-2 text-gray-600">{getOrderStatusLabel(status)} · 0</Link>
+                  <Link key={status} href={getStatusHref(status)} className="rounded-lg border border-pf-line px-3 py-2 text-pf-muted hover:bg-pf-hover">{getOrderStatusLabel(status)} · 0</Link>
                 ))}
               </div>
             </details>
@@ -341,72 +341,72 @@ export default async function GrowerReportsPage({
         </div>
       </div>
 
-      {/* Top Products & Customers - Responsive Grid */}
+      {/* Top products & Customers - Responsive Grid */}
       <div className="grid grid-cols-1 items-start lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* Top Products */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
-            <h2 className="text-base sm:text-lg font-semibold">Top Products</h2>
+        {/* Top products */}
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-pf-line">
+            <h2 className="text-base sm:text-lg font-semibold">Top products</h2>
           </div>
           {topProducts.length > 0 ? (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-pf-line">
               {topProducts.map((product, idx) => (
                 <div key={idx} className="px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <span className="w-6 h-6 rounded-full bg-green-100 text-green-700 text-xs sm:text-sm font-medium flex items-center justify-center flex-shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-pf-accent-bg text-pf-accent text-xs sm:text-sm font-medium flex items-center justify-center flex-shrink-0">
                       {idx + 1}
                     </span>
-                    <span className="font-medium text-gray-900 text-sm sm:text-base truncate">{product.productName}</span>
+                    <span className="font-medium text-pf-text text-sm sm:text-base truncate">{product.productName}</span>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-semibold text-green-600 text-sm sm:text-base">${Number(product.revenue).toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">{product.quantity} units</p>
+                    <p className="font-semibold text-pf-accent text-sm sm:text-base">${Number(product.revenue).toLocaleString()}</p>
+                    <p className="text-xs text-pf-muted">{product.quantity} units</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="p-6 sm:p-8 text-center text-sm">
-              <p className="font-medium text-gray-900">No delivered product value yet</p>
-              <p className="mx-auto mt-1 max-w-sm text-gray-500">
+              <p className="font-medium text-pf-text">No delivered product value yet</p>
+              <p className="mx-auto mt-1 max-w-sm text-pf-muted">
                 Product rankings include only line items from delivered requests in {rangeSentence}.
               </p>
-              <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
+              <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-pf-accent hover:text-pf-accent">
                 Open catalog workspace
               </Link>
             </div>
           )}
         </div>
 
-        {/* Top Customers */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200">
-            <h2 className="text-base sm:text-lg font-semibold">Top Customers</h2>
+        {/* Top customers */}
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-pf-line">
+            <h2 className="text-base sm:text-lg font-semibold">Top customers</h2>
           </div>
           {topCustomers.length > 0 ? (
-            <div className="divide-y divide-gray-100">
+            <div className="divide-y divide-pf-line">
               {topCustomers.map((customer, idx) => (
                 <div key={idx} className="px-4 sm:px-6 py-3 flex items-center justify-between gap-3">
                   <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-                    <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-700 text-xs sm:text-sm font-medium flex items-center justify-center flex-shrink-0">
+                    <span className="w-6 h-6 rounded-full bg-pf-info-bg text-pf-info text-xs sm:text-sm font-medium flex items-center justify-center flex-shrink-0">
                       {idx + 1}
                     </span>
-                    <span className="font-medium text-gray-900 text-sm sm:text-base truncate">{customer.dispensaryName}</span>
+                    <span className="font-medium text-pf-text text-sm sm:text-base truncate">{customer.dispensaryName}</span>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="font-semibold text-green-600 text-sm sm:text-base">${Number(customer.revenue).toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">{customer.orderCount} request{Number(customer.orderCount) === 1 ? '' : 's'}</p>
+                    <p className="font-semibold text-pf-accent text-sm sm:text-base">${Number(customer.revenue).toLocaleString()}</p>
+                    <p className="text-xs text-pf-muted">{customer.orderCount} request{Number(customer.orderCount) === 1 ? '' : 's'}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
             <div className="p-6 sm:p-8 text-center text-sm">
-              <p className="font-medium text-gray-900">No delivered customer value yet</p>
-              <p className="mx-auto mt-1 max-w-sm text-gray-500">
+              <p className="font-medium text-pf-text">No delivered customer value yet</p>
+              <p className="mx-auto mt-1 max-w-sm text-pf-muted">
                 Customer rankings are based on delivered request value in {rangeSentence}.
               </p>
-              <Link href="/grower/orders" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
+              <Link href="/grower/orders" className="mt-3 inline-flex text-sm font-medium text-pf-accent hover:text-pf-accent">
                 View request history
               </Link>
             </div>
@@ -414,63 +414,63 @@ export default async function GrowerReportsPage({
         </div>
       </div>
 
-      {/* Recent Requests Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="text-base sm:text-lg font-semibold">Recent Requests</h2>
-          <Link href="/grower/orders" className="text-xs sm:text-sm text-green-600 hover:text-green-700 font-medium">
+      {/* Recent requests Table */}
+      <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-pf-line flex justify-between items-center">
+          <h2 className="text-base sm:text-lg font-semibold">Recent requests</h2>
+          <Link href="/grower/orders" className="text-xs sm:text-sm text-pf-accent hover:text-pf-accent font-medium">
             View all
           </Link>
         </div>
         {recentOrders.length === 0 ? (
-          <div className="p-6 sm:p-12 text-center text-sm">
-            <p className="font-medium text-gray-900">No requests yet</p>
-            <p className="mx-auto mt-1 max-w-sm text-gray-500">
+          <div className="p-5 sm:p-8 text-center text-sm">
+            <p className="font-medium text-pf-text">No requests yet</p>
+            <p className="mx-auto mt-1 max-w-sm text-pf-muted">
               Requests created in {rangeSentence} will appear here before they count toward delivered request value.
             </p>
-            <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-green-700 hover:text-green-800">
+            <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-pf-accent hover:text-pf-accent">
               Open catalog workspace
             </Link>
           </div>
         ) : (
           <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-pf-line">
+              <thead className="bg-pf-canvas">
                 <tr>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Request</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Customer</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Date</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-medium text-gray-500 uppercase">Est. value</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase">Request</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase hidden sm:table-cell">Customer</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase">Status</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase hidden md:table-cell">Date</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-medium text-pf-muted uppercase">Est. value</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-pf-surface divide-y divide-pf-line">
                 {recentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap font-medium text-gray-900 text-xs sm:text-sm">
-                      <Link href={`/grower/orders/${order.id}`} className="block max-w-[150px] whitespace-normal text-green-700 hover:underline sm:hidden">
+                  <tr key={order.id} className="hover:bg-pf-canvas">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap font-medium text-pf-text text-xs sm:text-sm">
+                      <Link href={`/grower/orders/${order.id}`} className="block max-w-[150px] whitespace-normal text-pf-accent hover:underline sm:hidden">
                         {order.dispensary?.businessName || 'Unknown'}
-                        <span className="mt-1 block text-xs font-normal text-gray-500">{format(order.createdAt, 'MMM d')} · #{order.orderId.slice(-6)}</span>
+                        <span className="mt-1 block text-xs font-normal text-pf-muted">{format(order.createdAt, 'MMM d')} · #{order.orderId.slice(-6)}</span>
                       </Link>
                       <span className="hidden sm:inline">#{order.orderId.slice(-8)}</span>
                     </td>
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-pf-muted hidden sm:table-cell">
                       {order.dispensary?.businessName || 'Unknown'}
                     </td>
                     <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
                       <span className={`inline-flex px-2 py-0.5 text-[11px] sm:text-xs font-medium rounded-full ${
-                        order.status === 'DELIVERED' ? 'bg-green-100 text-green-800' :
-                        order.status === 'PENDING' ? 'bg-yellow-100 text-yellow-800' :
-                        order.status === 'CANCELLED' ? 'bg-red-100 text-red-800' :
-                        'bg-gray-100 text-gray-800'
+                        order.status === 'DELIVERED' ? 'bg-pf-accent-bg text-pf-accent' :
+                        order.status === 'PENDING' ? 'bg-pf-warning-bg text-pf-warning' :
+                        order.status === 'CANCELLED' ? 'bg-pf-danger-bg text-pf-danger' :
+                        'bg-pf-surface text-pf-secondary'
                       }`}>
                         {getOrderStatusLabel(order.status)}
                       </span>
                     </td>
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden md:table-cell">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-pf-muted hidden md:table-cell">
                       {format(order.createdAt, 'MMM d, yyyy')}
                     </td>
-                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-bold text-green-600 text-right">
+                    <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-bold text-pf-accent text-right">
                       ${Number(order.totalAmount).toFixed(2)}
                     </td>
                   </tr>

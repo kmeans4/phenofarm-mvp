@@ -42,7 +42,7 @@ export function CopyToClipboardButton({ value, label }: CopyToClipboardButtonPro
     <button
       type="button"
       onClick={handleCopy}
-      className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+      className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-pf-line bg-pf-raised px-2.5 py-1.5 text-xs font-semibold text-pf-secondary hover:bg-pf-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
       aria-label={label}
     >
       {copied ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}

@@ -99,83 +99,83 @@ export default function AddCustomerPage() {
       <PageHeader title="Add customer" />
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600">{error}</div>
+        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger">{error}</div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line">
           <div className="p-4 space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label htmlFor="customer-businessName" className="block text-sm font-medium text-gray-700 mb-1">Business Name *</label>
+                <label htmlFor="customer-businessName" className="block text-sm font-medium text-pf-secondary mb-1">Business Name *</label>
                 <input id="customer-businessName" type="text" required value={formData.businessName}
                   onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                 />
               </div>
               <div>
-                <label htmlFor="customer-contactName" className="block text-sm font-medium text-gray-700 mb-1">Contact Name *</label>
+                <label htmlFor="customer-contactName" className="block text-sm font-medium text-pf-secondary mb-1">Contact Name *</label>
                 <input id="customer-contactName" type="text" required value={formData.contactName}
                   onChange={(e) => setFormData({ ...formData, contactName: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                 />
               </div>
               <div>
-                <label htmlFor="customer-email" className="block text-sm font-medium text-gray-700 mb-1">Email *</label>
+                <label htmlFor="customer-email" className="block text-sm font-medium text-pf-secondary mb-1">Email *</label>
                 <input id="customer-email" type="email" required value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                 />
               </div>
               <div>
-                <label htmlFor="customer-phone" className="block text-sm font-medium text-gray-700 mb-1">Phone *</label>
+                <label htmlFor="customer-phone" className="block text-sm font-medium text-pf-secondary mb-1">Phone *</label>
                 <input id="customer-phone" type="tel" required value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                  className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                 />
               </div>
             </div>
 
-            <details className="rounded-lg border border-gray-200 px-3">
-              <summary className="min-h-10 cursor-pointer py-2 text-sm font-medium text-gray-700">Address & license <span className="font-normal text-gray-500">(optional)</span></summary>
+            <details className="rounded-lg border border-pf-line px-3">
+              <summary className="min-h-10 cursor-pointer py-2 text-sm font-medium text-pf-secondary">Address & license <span className="font-normal text-pf-muted">(optional)</span></summary>
               <div className="space-y-3 pb-3 sm:space-y-4">
                 <div>
-                  <label htmlFor="customer-address" className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                  <label htmlFor="customer-address" className="block text-sm font-medium text-pf-secondary mb-1">Address</label>
                   <input id="customer-address" type="text" value={formData.address}
                     onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                   <div className="col-span-2 sm:col-span-1">
-                    <label htmlFor="customer-city" className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                    <label htmlFor="customer-city" className="block text-sm font-medium text-pf-secondary mb-1">City</label>
                     <input id="customer-city" type="text" value={formData.city}
                       onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                     />
                   </div>
                   <div>
-                    <label htmlFor="customer-state" className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                    <label htmlFor="customer-state" className="block text-sm font-medium text-pf-secondary mb-1">State</label>
                     <input id="customer-state" type="text" value={formData.state}
                       onChange={(e) => setFormData({ ...formData, state: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                     />
                   </div>
                   <div>
-                    <label htmlFor="customer-zipCode" className="block text-sm font-medium text-gray-700 mb-1">ZIP</label>
+                    <label htmlFor="customer-zipCode" className="block text-sm font-medium text-pf-secondary mb-1">ZIP</label>
                     <input id="customer-zipCode" type="text" value={formData.zipCode}
                       onChange={(e) => setFormData({ ...formData, zipCode: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label htmlFor="customer-licenseNumber" className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                  <label htmlFor="customer-licenseNumber" className="block text-sm font-medium text-pf-secondary mb-1">License Number</label>
                   <input id="customer-licenseNumber" type="text" value={formData.licenseNumber}
                     onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                    className="w-full px-3 py-2 border border-pf-line-strong rounded-lg"
                     placeholder="VT-DISP-XXXXX"
                   />
                 </div>
@@ -187,14 +187,14 @@ export default function AddCustomerPage() {
         <div className="flex gap-3">
           <Link
             href="/grower/customers"
-            className={`flex-1 sm:flex-none text-center px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
+            className={`flex-1 sm:flex-none text-center px-4 py-2 border border-pf-line-strong rounded-lg hover:bg-pf-canvas ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}
           >
             Cancel
           </Link>
           <button
             type="submit"
             disabled={!canSubmit}
-            className="flex-1 sm:flex-none whitespace-nowrap px-4 py-2 text-sm sm:text-base bg-green-600 text-white rounded-lg disabled:opacity-50"
+            className="flex-1 sm:flex-none whitespace-nowrap px-4 py-2 text-sm sm:text-base bg-emerald-500 text-[#032116] rounded-lg disabled:opacity-50"
           >
             {isSubmitting ? 'Adding...' : 'Add customer'}
           </button>

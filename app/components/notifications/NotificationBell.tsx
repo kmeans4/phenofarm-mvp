@@ -140,10 +140,10 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
   };
 
   const renderItem = (item: NotificationItem) => (
-    <button key={item.id} type="button" onClick={() => openNotification(item)} disabled={saving} className={`block w-full border-b border-gray-100 px-4 py-3 text-left hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600 ${item.readAt ? '' : 'bg-green-50/60'}`}>
+    <button key={item.id} type="button" onClick={() => openNotification(item)} disabled={saving} className={`block w-full border-b border-pf-line px-4 py-3 text-left hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-400 ${item.readAt ? '' : 'bg-pf-accent-bg/60'}`}>
       <span className="flex items-start justify-between gap-3">
-        <span className="min-w-0"><span className="block text-sm font-semibold text-gray-900">{item.title}</span><span className="mt-1 block text-sm text-gray-600">{item.body}</span></span>
-        <time className="shrink-0 text-xs text-gray-500" dateTime={item.createdAt} title={new Date(item.createdAt).toLocaleString()}>{relativeTime(item.createdAt)}</time>
+        <span className="min-w-0"><span className="block text-sm font-semibold text-pf-text">{item.title}</span><span className="mt-1 block text-sm text-pf-muted">{item.body}</span></span>
+        <time className="shrink-0 text-xs text-pf-muted" dateTime={item.createdAt} title={new Date(item.createdAt).toLocaleString()}>{relativeTime(item.createdAt)}</time>
       </span>
     </button>
   );
@@ -163,7 +163,7 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
         <Bell className="h-4 w-4" />
         {!compact ? <span>Notifications</span> : null}
         {unreadCount > 0 ? (
-          <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-amber-400 px-1 text-[11px] font-bold text-amber-950">
+          <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-pf-warning-bg px-1 text-[11px] font-bold text-pf-warning">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         ) : null}
@@ -172,32 +172,32 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
       {open ? createPortal(
         <>
           <button type="button" aria-label="Close notifications" onClick={() => setOpen(false)} className="fixed inset-0 z-[110] cursor-default bg-black/20" />
-          <section data-notifications-panel style={panelPosition} className="fixed right-3 top-16 z-[111] flex max-h-[min(36rem,calc(100vh-5rem))] w-[min(24rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl" aria-label="Notifications panel">
-            <header className="flex items-center justify-between gap-3 border-b border-gray-200 px-4 py-3">
+          <section data-notifications-panel style={panelPosition} className="fixed right-3 top-16 z-[111] flex max-h-[min(36rem,calc(100vh-5rem))] w-[min(24rem,calc(100vw-1.5rem))] flex-col overflow-hidden rounded-xl border border-pf-line bg-pf-surface shadow-2xl" aria-label="Notifications panel">
+            <header className="flex items-center justify-between gap-3 border-b border-pf-line px-4 py-3">
               <div>
-                <h2 className="font-semibold text-gray-900">Notifications</h2>
-                {unreadCount > 0 && <p className="text-xs text-gray-500">{unreadCount} unread</p>}
+                <h2 className="font-semibold text-pf-text">Notifications</h2>
+                {unreadCount > 0 && <p className="text-xs text-pf-muted">{unreadCount} unread</p>}
               </div>
               <div className="flex items-center gap-1">
-                {unreadCount > 0 && <button type="button" onClick={() => void markRead({ markAllRead: true })} className="inline-flex min-h-10 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-green-700 hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600" disabled={saving}>
+                {unreadCount > 0 && <button type="button" onClick={() => void markRead({ markAllRead: true })} className="inline-flex min-h-10 items-center gap-1 rounded-lg px-2 text-xs font-semibold text-pf-accent hover:bg-pf-accent-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400" disabled={saving}>
                   <CheckCheck className="h-4 w-4" /> Mark all read
                 </button>}
-                <button type="button" onClick={() => setOpen(false)} aria-label="Close notifications" className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600">
+                <button type="button" onClick={() => setOpen(false)} aria-label="Close notifications" className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-muted hover:bg-pf-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">
                   <X className="h-4 w-4" />
                 </button>
               </div>
             </header>
-            {error && <div role="alert" className="px-4 py-2 text-sm text-red-700">{error} <button type="button" onClick={() => void load()} className="font-semibold underline">Retry</button></div>}
+            {error && <div role="alert" className="px-4 py-2 text-sm text-pf-danger">{error} <button type="button" onClick={() => void load()} className="font-semibold underline">Retry</button></div>}
             <div className="min-h-0 flex-1 overflow-y-auto">
               {loading ? (
-                <p className="flex items-center gap-2 p-4 text-sm text-gray-500"><Loader2 className="h-4 w-4 animate-spin" /> Loading...</p>
+                <p className="flex items-center gap-2 p-4 text-sm text-pf-muted"><Loader2 className="h-4 w-4 animate-spin" /> Loading...</p>
               ) : items.length === 0 ? (
-                <p className="p-6 text-center text-sm text-gray-500">No notifications yet.</p>
+                <p className="p-6 text-center text-sm text-pf-muted">No notifications yet.</p>
               ) : groups.map((group) => group.length === 1 ? renderItem(group[0]) : (
-                <details key={group[0].id} className="border-b border-gray-100">
-                  <summary className={`cursor-pointer px-4 py-3 text-sm ${group.some(item => !item.readAt) ? 'bg-green-50/60' : ''}`}>
-                    <span className="font-semibold text-gray-900">{group[0].title} · {group.length}</span>
-                    <span className="mt-1 block text-gray-600">{group[0].body}</span>
+                <details key={group[0].id} className="border-b border-pf-line">
+                  <summary className={`cursor-pointer px-4 py-3 text-sm ${group.some(item => !item.readAt) ? 'bg-pf-accent-bg/60' : ''}`}>
+                    <span className="font-semibold text-pf-text">{group[0].title} · {group.length}</span>
+                    <span className="mt-1 block text-pf-muted">{group[0].body}</span>
                   </summary>
                   {group.map(item => renderItem(item))}
                 </details>

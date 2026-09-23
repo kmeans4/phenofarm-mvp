@@ -18,8 +18,8 @@ interface StrainSelectorProps {
 }
 
 // Consistent input styles - h-10 matches text inputs
-const INPUT_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
-const SMALL_INPUT_CLASSES = "min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const INPUT_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const SMALL_INPUT_CLASSES = "min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent";
 
 export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps) {
   const [strains, setStrains] = useState<Strain[]>([]);
@@ -102,7 +102,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
 
   if (loading) {
     return (
-      <div className="h-10 bg-gray-100 animate-pulse rounded-lg"></div>
+      <div className="h-10 bg-pf-surface animate-pulse rounded-lg"></div>
     );
   }
 
@@ -141,14 +141,14 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
       </div>
 
       {showCreateForm && (
-        <div className="p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3" onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); event.stopPropagation(); void handleCreateStrain(); } }}>
+        <div className="p-3 sm:p-4 bg-pf-canvas rounded-lg border border-pf-line space-y-3" onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); event.stopPropagation(); void handleCreateStrain(); } }}>
           <div className="flex items-center justify-between">
-            <span className="font-medium text-gray-700">New strain</span>
+            <span className="font-medium text-pf-secondary">New strain</span>
             <button 
               type="button"
               onClick={() => setShowCreateForm(false)}
               aria-label="Close strain form"
-              className="flex h-10 w-10 items-center justify-center text-xl text-gray-500 hover:text-gray-700"
+              className="flex h-10 w-10 items-center justify-center text-xl text-pf-muted hover:text-pf-secondary"
             >
               ×
             </button>

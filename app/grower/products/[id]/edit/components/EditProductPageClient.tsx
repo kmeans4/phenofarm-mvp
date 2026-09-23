@@ -70,7 +70,7 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
       <div className="space-y-3">
         <Link
           href="/grower/products"
-          className="inline-flex items-center gap-2 rounded-md px-1 py-1 text-sm font-medium text-green-700 hover:text-green-800 hover:bg-green-50"
+          className="inline-flex items-center gap-2 rounded-md px-1 py-1 text-sm font-medium text-pf-accent hover:text-pf-accent hover:bg-pf-accent-bg"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

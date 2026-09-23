@@ -28,20 +28,20 @@ export function LicenseVerificationCard() {
   }
 
   if (submitted) {
-    return <section className="rounded-xl border border-green-200 bg-green-50 p-5"><p className="flex items-center gap-2 font-semibold text-green-900"><BadgeCheck className="h-5 w-5" /> Submitted for review</p><p className="mt-1 text-sm text-green-800">PhenoFarm verifies license details within 1 business day.</p></section>;
+    return <section className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-4"><p className="flex items-center gap-2 font-semibold text-pf-accent"><BadgeCheck className="h-5 w-5" /> Submitted for review</p><p className="mt-1 text-sm text-pf-accent">PhenoFarm verifies license details within 1 business day.</p></section>;
   }
 
   return (
-    <section className="rounded-xl border border-amber-300 bg-amber-50 p-5">
-      <h2 className="text-lg font-semibold text-amber-950">Get verified to start ordering</h2>
-      <p className="mt-1 text-sm text-amber-900">Submit your Vermont license details. Ordering unlocks after PhenoFarm reviews them.</p>
+    <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4">
+      <h2 className="text-base font-semibold text-pf-warning">Verify your license</h2>
+      <p className="mt-1 text-sm text-pf-warning">Requests unlock after we verify your Vermont license.</p>
       <form onSubmit={submit} className="mt-4 grid gap-3 sm:grid-cols-[1fr_12rem_auto] sm:items-end">
-        <label className="text-sm font-medium text-gray-800">License number<input value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} required className="mt-1 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600" /></label>
-        <label className="text-sm font-medium text-gray-800">Expiry<input type="date" min={startOfLicenseDay().toISOString().slice(0, 10)} value={licenseExpiry} onChange={(e) => setLicenseExpiry(e.target.value)} required className="mt-1 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600" /></label>
-        <button disabled={submitting} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-green-700 px-4 text-sm font-semibold text-white hover:bg-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 disabled:opacity-60">{submitting && <Loader2 className="h-4 w-4 animate-spin" />}Submit</button>
+        <label className="text-sm font-medium text-pf-secondary">License number<input value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} required className="mt-1 h-10 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400" /></label>
+        <label className="text-sm font-medium text-pf-secondary">Expiry<input type="date" min={startOfLicenseDay().toISOString().slice(0, 10)} value={licenseExpiry} onChange={(e) => setLicenseExpiry(e.target.value)} required className="mt-1 h-10 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400" /></label>
+        <button disabled={submitting} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:opacity-60">{submitting && <Loader2 className="h-4 w-4 animate-spin" />}Submit</button>
       </form>
-      {error ? <p role="alert" className="mt-3 text-sm font-medium text-red-700">{error}</p> : null}
-      <Link href="/dispensary/settings#license" className="mt-3 inline-flex text-sm font-semibold text-amber-900 underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600">Complete all license details in Settings</Link>
+      {error ? <p role="alert" className="mt-3 text-sm font-medium text-pf-danger">{error}</p> : null}
+      <Link href="/dispensary/settings#license" className="mt-3 inline-flex text-sm font-semibold text-pf-warning underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">License settings</Link>
     </section>
   );
 }

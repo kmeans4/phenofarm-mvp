@@ -48,88 +48,57 @@ function SetupNextStepsCard({
   primaryAction: PrimaryAction;
   complete: boolean;
 }) {
-  const completeCount = items.filter((item) => item.complete).length;
-  const percent = items.length ? Math.round((completeCount / items.length) * 100) : 0;
-
-  if (complete) {
-    return (
-      <Link href="/dispensary/settings#license-verification" className="inline-flex min-h-10 items-center gap-2 text-sm font-medium text-green-700">
-        <CheckCircle2 className="h-4 w-4" aria-hidden="true" /> Verified buyer
-      </Link>
-    );
-  }
+  const pendingItems = items.filter((item) => !item.complete);
+  const completedItems = items.filter((item) => item.complete);
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm lg:pr-16">
-      <div className="rounded-xl border border-green-200 bg-green-50 p-4">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-wide text-green-700">Setup & next steps</p>
-            <h2 className="mt-1 text-lg font-semibold text-green-950">{primaryAction.title}</h2>
-            <p className="mt-1 text-sm text-green-900">{primaryAction.description}</p>
-          </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            {primaryAction.secondaryHref && primaryAction.secondaryCta && (
-              <Link
-                href={primaryAction.secondaryHref}
-                className="inline-flex h-10 items-center justify-center rounded-lg border border-green-200 bg-white px-4 text-sm font-semibold text-green-800 transition-colors hover:bg-green-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-              >
-                {primaryAction.secondaryCta}
-              </Link>
-            )}
-            <Link
-              href={primaryAction.href}
-              className="inline-flex h-10 items-center justify-center rounded-lg bg-green-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-            >
-              {primaryAction.cta}
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h3 className="text-base font-semibold text-gray-900">Buyer readiness</h3>
-          <p className="mt-1 text-sm text-gray-600">{completeCount} of {items.length} complete</p>
-        </div>
-        <div className="min-w-[140px]">
-          <div className="h-2 overflow-hidden rounded-full bg-gray-100">
-            <div className="h-full rounded-full bg-green-600" style={{ width: `${percent}%` }} />
-          </div>
-          <p className="mt-1 text-right text-xs font-medium text-gray-500">{percent}% ready</p>
-        </div>
-      </div>
-
-      <div className="mt-4 divide-y divide-gray-100">
-        {items.map((item) => (
-          <div key={item.label} className="flex flex-col gap-3 py-3 first:pt-0 last:pb-0 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex min-w-0 gap-3">
-              <span className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
-                item.complete ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-              }`} aria-hidden="true">
-                {item.complete ? <CheckCircle2 className="h-4 w-4" /> : <CircleAlert className="h-4 w-4" />}
-              </span>
-              <div className="min-w-0">
-                <p className="text-sm font-semibold text-gray-900">{item.label}</p>
-                <p className="mt-0.5 text-sm text-gray-600">{item.description}</p>
+    <details className="rounded-xl border border-pf-line bg-pf-surface px-4">
+      <summary className="min-h-11 cursor-pointer content-center text-sm font-semibold text-pf-text">
+        {complete ? 'Setup complete' : `Setup · ${pendingItems.length} left`}
+      </summary>
+      <div className="space-y-3 border-t border-pf-line pb-3 pt-1">
+        {pendingItems.length > 0 && (
+          <div className="divide-y divide-pf-line">
+            {pendingItems.map((item) => (
+              <div key={item.label} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-2">
+                <p className="flex min-w-0 items-center gap-2 text-sm font-medium text-pf-text">
+                  <CircleAlert className="h-4 w-4 shrink-0 text-pf-warning" aria-hidden="true" />
+                  {item.label}
+                </p>
+                <Link href={item.href} className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg">
+                  {item.cta || 'Finish setup'}
+                </Link>
+                <p className="col-span-2 pl-6 text-xs text-pf-muted">{item.description}</p>
               </div>
-            </div>
-            {item.complete ? (
-              <span className="shrink-0 self-start rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700 ring-1 ring-green-100 sm:self-auto">
-                Complete
-              </span>
-            ) : (
-              <Link
-                href={item.href}
-                className="inline-flex h-9 shrink-0 items-center justify-center rounded-lg border border-gray-200 bg-white px-3 text-sm font-semibold text-green-700 transition-colors hover:bg-green-50 hover:text-green-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
-              >
-                {item.cta || 'Finish setup'}
-              </Link>
-            )}
+            ))}
           </div>
-        ))}
+        )}
+
+        {completedItems.length > 0 && (
+          <details className="rounded-lg border border-pf-line bg-pf-canvas px-3">
+            <summary className="min-h-10 cursor-pointer content-center text-xs font-medium text-pf-muted">Completed ({completedItems.length})</summary>
+            <div className="divide-y divide-pf-line pb-2">
+              {completedItems.map((item) => (
+                <Link key={item.label} href={item.href} className="flex min-h-10 items-start gap-2 py-2 text-sm hover:text-pf-accent">
+                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-pf-accent" aria-hidden="true" />
+                  <span className="min-w-0"><span className="block font-medium">{item.label}</span><span className="mt-0.5 block text-xs text-pf-muted">{item.description}</span></span>
+                </Link>
+              ))}
+            </div>
+          </details>
+        )}
+
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-lg bg-pf-accent-bg px-3 py-2">
+          <p className="min-w-0 text-xs text-pf-secondary" title={primaryAction.description}>{primaryAction.title}</p>
+          <div className="flex flex-wrap items-center gap-2">
+            {primaryAction.secondaryHref && primaryAction.secondaryCta && (
+              <Link href={primaryAction.secondaryHref} className="inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-medium text-pf-secondary hover:bg-pf-raised">{primaryAction.secondaryCta}</Link>
+            )}
+            <Link href={primaryAction.href} className="inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-pf-accent hover:bg-pf-raised">{primaryAction.cta}</Link>
+          </div>
+        </div>
       </div>
-    </section>
+    </details>
   );
 }
 
@@ -311,58 +280,57 @@ export default async function DispensaryDashboardPage() {
   }));
 
   return (
-    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
+    <div className="space-y-4">
       <PageHeader
-        title={data.profile?.businessName || 'Dispensary dashboard'}
+        title="Overview"
+        mobileInlineActions
         actions={
-          <Link href="/dispensary/catalog" className="inline-flex w-full sm:w-auto items-center justify-center rounded-md text-sm font-medium bg-green-600 text-white hover:bg-green-700 h-10 px-4 py-2">
-            Browse Catalog
+          <Link href="/dispensary/catalog" className="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-3 text-sm font-medium text-[#032116] hover:bg-emerald-400">
+            Browse catalog
           </Link>
         }
       />
 
-      {data.profile?.licenseStatus === 'pending_review' && !data.profile.licenseNumber ? <LicenseVerificationCard /> : null}
+      {data.profile?.licenseStatus === 'pending_review' && !data.profile.licenseNumber ? <LicenseVerificationCard /> : !hasLicense ? (
+        <Link href="/dispensary/settings#license-verification" className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-pf-warning-line bg-pf-warning-bg px-3 py-2 text-sm text-pf-warning">
+          <span className="flex min-w-0 items-center gap-2"><CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />License verification needed</span>
+          <span className="shrink-0 font-medium">Review →</span>
+        </Link>
+      ) : null}
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {hasOrders ? (
           <>
             <StatCard title="Request value" value={`$${data.trackedOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} />
-            <StatCard title="Awaiting response" value={data.pendingOrders} valueClassName="text-blue-600" />
-            <StatCard title="Growers" value={data.activeGrowers} valueClassName="text-yellow-600" />
-            <StatCard title="In progress" value={Math.max(0, data.activeOrders - data.pendingOrders)} valueClassName="text-green-600" />
+            <StatCard title="Awaiting response" value={data.pendingOrders} valueClassName="text-pf-info" />
+            <StatCard title="Growers" value={data.activeGrowers} valueClassName="text-pf-warning" />
+            <StatCard title="In progress" value={Math.max(0, data.activeOrders - data.pendingOrders)} valueClassName="text-pf-accent" />
           </>
         ) : (
           <>
-            <StatCard title="Request value" value="$0.00" helperText="No data yet" isEmpty valueClassName="text-gray-400" />
-            <StatCard title="Awaiting response" value="0" helperText="No data yet" isEmpty valueClassName="text-gray-400" />
-            <StatCard title="Growers" value="0" helperText="No data yet" isEmpty valueClassName="text-gray-400" />
-            <StatCard title="In progress" value="0" helperText="No data yet" isEmpty valueClassName="text-gray-400" />
+            <StatCard title="Request value" value="$0.00" helperText="No data yet" isEmpty valueClassName="text-pf-muted" />
+            <StatCard title="Awaiting response" value="0" helperText="No data yet" isEmpty valueClassName="text-pf-muted" />
+            <StatCard title="Growers" value="0" helperText="No data yet" isEmpty valueClassName="text-pf-muted" />
+            <StatCard title="In progress" value="0" helperText="No data yet" isEmpty valueClassName="text-pf-muted" />
           </>
         )}
       </div>
 
-      <div className={setupComplete ? 'flex flex-wrap items-center justify-between gap-2' : 'space-y-3'}>
-        <SetupNextStepsCard items={setupItems} primaryAction={primaryAction} complete={setupComplete} />
-        <details className="text-xs text-gray-500">
-          <summary className="w-fit cursor-pointer py-2">About these totals</summary>
-          <p className="mt-1 max-w-2xl">Request value excludes cancelled requests. Awaiting response means the grower has not accepted yet. In progress includes accepted requests through fulfillment.</p>
-        </details>
-      </div>
 
-      <Link href="/dispensary/saved" className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-sm hover:border-green-200 focus-visible:ring-2 focus-visible:ring-green-600">
-        <span className="font-semibold text-gray-900">Saved</span>
-        <span className="text-gray-600">Favorites {data.favoriteCount} · Alerts {data.priceAlertCount}</span>
+      <Link href="/dispensary/saved" className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border border-pf-line bg-pf-surface px-4 py-3 text-sm shadow-sm hover:border-pf-accent-line focus-visible:ring-2 focus-visible:ring-emerald-400">
+        <span className="font-semibold text-pf-text">Saved</span>
+        <span className="text-pf-muted">Favorites {data.favoriteCount} · Alerts {data.priceAlertCount}</span>
       </Link>
 
       {/* Recent requests with date filter */}
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-pf-surface shadow-sm border border-pf-line">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <h3 className="text-base font-semibold text-gray-900 sm:text-lg">Recent requests</h3>
+              <h3 className="text-base font-semibold text-pf-text sm:text-lg">Recent requests</h3>
             </div>
-            <Link href="/dispensary/orders" className="inline-flex min-h-10 items-center text-sm font-medium text-green-700 hover:text-green-800">
+            <Link href="/dispensary/orders" className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent hover:text-pf-accent">
               View all
             </Link>
           </div>
@@ -379,11 +347,20 @@ export default async function DispensaryDashboardPage() {
         </CardContent>
       </Card>
 
+      <div className="space-y-1">
+        <SetupNextStepsCard items={setupItems} primaryAction={primaryAction} complete={setupComplete} />
+        <details className="text-xs text-pf-muted">
+          <summary className="w-fit cursor-pointer py-2">About these totals</summary>
+          <p className="mt-1 max-w-2xl">Request value excludes cancelled requests. Awaiting response means the grower has not accepted yet. In progress includes accepted requests through fulfillment.</p>
+        </details>
+      </div>
+
+
       {/* Featured Products & 7-Day Order Value */}
       <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-3 sm:gap-4">
-        <Card className="bg-white shadow-sm border border-gray-200">
+        <Card className="bg-pf-surface shadow-sm border border-pf-line">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">Recently Requested</h3>
+            <h3 className="text-lg font-semibold text-pf-text">Recently requested</h3>
           </CardHeader>
           <CardContent>
             {data.featuredProducts.length === 0 ? (
@@ -394,18 +371,18 @@ export default async function DispensaryDashboardPage() {
                   </svg>
                 }
                 title="No products yet"
-                description="Products you request will appear here for quick repeat-request context."
-                action={{ label: 'Browse Catalog', href: '/dispensary/catalog' }}
+                description="Requested products appear here for easy reference."
+                action={{ label: 'Browse catalog', href: '/dispensary/catalog' }}
               />
             ) : (
               <div className="space-y-3">
                 {data.featuredProducts.map((product) => (
-                  <div key={product.productId} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                  <div key={product.productId} className="flex justify-between items-center gap-3 py-2 border-b border-pf-line last:border-0">
                     <div>
-                      <p className="font-medium text-gray-900">{product.name}</p>
-                      <p className="text-xs text-gray-500">{product.category} • from {product.grower}</p>
+                      <p className="break-words text-sm font-medium text-pf-text">{product.name}</p>
+                      <p className="text-xs text-pf-muted">{product.category} • from {product.grower}</p>
                     </div>
-                    <span className="text-sm font-bold text-gray-900">${product.pricePerUnit.toFixed(2)}</span>
+                    <span className="text-sm font-bold text-pf-text">${product.pricePerUnit.toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -413,22 +390,22 @@ export default async function DispensaryDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-white shadow-sm border border-gray-200">
+        <Card className="bg-pf-surface shadow-sm border border-pf-line">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-gray-900">7-Day Request Value</h3>
+            <h3 className="text-lg font-semibold text-pf-text">7-day request value</h3>
           </CardHeader>
           <CardContent>
             {!hasSpending ? (
-              <p className="text-sm text-gray-500">No requests this week.</p>
+              <p className="text-sm text-pf-muted">No requests this week.</p>
             ) : (
               <div className="h-40 sm:h-48 flex items-end justify-between gap-1 sm:gap-2 px-2 sm:px-0 overflow-x-auto pb-1">
                 {data.last7Days.map((day, index) => (
-                  <div key={index} className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[36px]">
-                    <div className="w-full flex flex-col gap-1">
-                      <div className="w-full bg-green-500 rounded-t-lg" style={{ height: `${Math.min((day.revenue / maxDailySpend) * 100, 100)}%` }} />
+                  <div key={index} className="flex h-full flex-1 flex-col items-center gap-1 sm:gap-2 min-w-[36px]">
+                    <div className="flex min-h-0 w-full flex-1 items-end">
+                      <div className="w-full bg-emerald-500 rounded-t-sm" style={{ height: `${Math.min((day.revenue / maxDailySpend) * 100, 100)}%` }} />
                     </div>
-                    <span className="text-xs text-gray-500">{day.day}</span>
-                    <span className="text-xs font-medium text-green-600">${Math.round(day.revenue)}</span>
+                    <span className="text-xs text-pf-muted">{day.day}</span>
+                    <span className="text-xs font-medium text-pf-accent">${Math.round(day.revenue)}</span>
                   </div>
                 ))}
               </div>
@@ -439,20 +416,20 @@ export default async function DispensaryDashboardPage() {
 
       {/* Getting Started Banner - only show when no data */}
       {!hasOrders && (
-        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+        <div className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h3 className="flex items-center gap-2 text-lg font-semibold text-blue-900">
+              <h3 className="flex items-center gap-2 text-base font-semibold text-pf-accent">
                 <Store className="h-5 w-5" />
-                Welcome to PhenoFarm!
+                Find your next grower
               </h3>
-              <p className="text-blue-700 mt-1">Get started by browsing grower catalogs and finding products for your next request.</p>
+              <p className="mt-1 text-sm text-pf-secondary">Browse grower catalogs to start a request.</p>
             </div>
             <Link 
               href="/dispensary/catalog" 
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium transition-colors whitespace-nowrap"
+              className="px-4 py-2 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 text-sm font-medium transition-colors whitespace-nowrap"
             >
-              Browse Catalog
+              Browse catalog
             </Link>
           </div>
         </div>

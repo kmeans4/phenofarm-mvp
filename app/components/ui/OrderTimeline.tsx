@@ -61,14 +61,14 @@ function formatStepDate(date: Date | null, state: TimelineState) {
 }
 
 function getStepClasses(state: TimelineState) {
-  if (state === 'complete') return 'border-green-600 bg-green-600 text-white';
-  if (state === 'current') return 'border-green-600 bg-white text-green-700 ring-4 ring-green-100';
-  return 'border-gray-200 bg-gray-50 text-gray-400';
+  if (state === 'complete') return 'border-green-600 bg-emerald-500 text-[#032116]';
+  if (state === 'current') return 'border-green-600 bg-pf-surface text-pf-accent ring-4 ring-pf-accent-line';
+  return 'border-pf-line bg-pf-canvas text-pf-muted';
 }
 
 function getLabelClasses(state: TimelineState) {
-  if (state === 'complete' || state === 'current') return 'text-gray-900';
-  return 'text-gray-400';
+  if (state === 'complete' || state === 'current') return 'text-pf-text';
+  return 'text-pf-muted';
 }
 
 export function OrderTimeline({
@@ -94,16 +94,16 @@ export function OrderTimeline({
 
   if (currentStatus === 'CANCELLED') {
     return (
-      <Card className={`border-red-200 bg-red-50 ${className}`}>
+      <Card className={`border-pf-danger-line bg-pf-danger-bg ${className}`}>
         <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-red-900">{title}</CardTitle>
+          <CardTitle className="text-lg text-pf-danger">{title}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex items-center gap-3">
-            <XCircle className="h-10 w-10 shrink-0 text-red-600" />
+            <XCircle className="h-10 w-10 shrink-0 text-pf-danger" />
             <div>
-              <p className="font-semibold text-red-900">Request cancelled</p>
-              <p className="text-sm text-red-800">{cancelledDescription}</p>
+              <p className="font-semibold text-pf-danger">Request cancelled</p>
+              <p className="text-sm text-pf-danger">{cancelledDescription}</p>
             </div>
           </div>
         </CardContent>
@@ -112,13 +112,13 @@ export function OrderTimeline({
   }
 
   return (
-    <Card className={`bg-white shadow-sm border border-gray-200 ${className}`}>
+    <Card className={`bg-pf-surface shadow-sm border border-pf-line ${className}`}>
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">{title}</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="relative px-2 sm:px-4">
-          <div className="absolute left-5 right-5 top-5 hidden h-0.5 bg-gray-200 sm:block" aria-hidden="true">
+          <div className="absolute left-5 right-5 top-5 hidden h-0.5 bg-pf-raised sm:block" aria-hidden="true">
             <div className="h-full bg-green-500 transition-all duration-500" style={{ width: progressWidth }} />
           </div>
 
@@ -137,7 +137,7 @@ export function OrderTimeline({
                     <span className={`block text-sm font-semibold leading-tight sm:text-xs ${getLabelClasses(state)}`}>
                       {step.label}
                     </span>
-                    {(date || state === 'current') && <span className="mt-1 block break-words text-[11px] text-gray-500">
+                    {(date || state === 'current') && <span className="mt-1 block break-words text-[11px] text-pf-muted">
                       {formatStepDate(date, state)}
                     </span>}
                   </span>
@@ -147,7 +147,7 @@ export function OrderTimeline({
           </ol>
         </div>
 
-        <p className="mt-4 text-sm text-gray-600">{currentStep.description}</p>
+        <p className="mt-4 text-sm text-pf-muted">{currentStep.description}</p>
       </CardContent>
     </Card>
   );

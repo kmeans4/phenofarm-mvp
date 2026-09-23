@@ -205,15 +205,15 @@ export default function EditBatchPage() {
   if (fetching) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pf-accent"></div>
       </div>
     );
   }
 
   if (!batch) {
     return (
-      <div className="text-center py-16">
-        <h2 className="text-2xl font-bold text-gray-900">Batch not found</h2>
+      <div className="text-center py-8 sm:py-12">
+        <h2 className="text-2xl font-bold text-pf-text">Batch not found</h2>
         <Button variant="primary" className="mt-4" onClick={() => router.push('/grower/batches')}>
           Back to Batches
         </Button>
@@ -226,8 +226,8 @@ export default function EditBatchPage() {
       <PageHeader title="Edit batch" />
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{error}</p>
+        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg">
+          <p className="text-pf-danger">{error}</p>
         </div>
       )}
 
@@ -235,9 +235,9 @@ export default function EditBatchPage() {
         <CardContent className="pt-4">
           <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
-              <div className="space-y-1.5 sm:space-y-2">
+              <div className="min-w-0 space-y-1.5 sm:space-y-2">
                 <div className="flex items-center justify-between gap-3">
-                  <label htmlFor="batchNumber" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="batchNumber" className="block text-sm font-medium text-pf-secondary">
                     Batch # *
                   </label>
                   <Button type="button" variant="outline" size="sm" onClick={applySuggestedBatchNumber}>
@@ -250,13 +250,13 @@ export default function EditBatchPage() {
                   required
                   value={formData.batchNumber}
                   onChange={(e) => handleChange('batchNumber', e.target.value)}
-                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                   placeholder="Batch number"
                 />
               </div>
 
-              <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="lotNumber" className="block text-sm font-medium text-gray-700">
+              <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                <label htmlFor="lotNumber" className="block text-sm font-medium text-pf-secondary">
                   Lot #
                 </label>
                 <input
@@ -264,15 +264,15 @@ export default function EditBatchPage() {
                   type="text"
                   value={formData.lotNumber}
                   onChange={(e) => handleChange('lotNumber', e.target.value)}
-                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                   placeholder="Internal or lab lot"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
-              <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="harvestDate" className="block text-sm font-medium text-gray-700">
+              <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                <label htmlFor="harvestDate" className="block text-sm font-medium text-pf-secondary">
                   Harvest date *
                 </label>
                 <input
@@ -282,12 +282,12 @@ export default function EditBatchPage() {
                   max={todayDate}
                   value={formData.harvestDate}
                   onChange={(e) => handleChange('harvestDate', e.target.value)}
-                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                 />
               </div>
 
-              <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="strainId" className="block text-sm font-medium text-gray-700">
+              <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                <label htmlFor="strainId" className="block text-sm font-medium text-pf-secondary">
                   Strain *
                 </label>
                 <select
@@ -295,7 +295,7 @@ export default function EditBatchPage() {
                   required
                   value={formData.strainId}
                   onChange={(e) => handleChange('strainId', e.target.value)}
-                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                 >
                   <option value="">Select a strain</option>
                   {strains.map(strain => (
@@ -308,11 +308,11 @@ export default function EditBatchPage() {
             </div>
 
             {/* Lab Results */}
-            <div className="border-t border-gray-200 pt-4 sm:pt-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-3 sm:text-lg sm:mb-4">Lab Results</h3>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="thc" className="block text-sm font-medium text-gray-700">
+            <div className="border-t border-pf-line pt-4 sm:pt-6">
+              <h3 className="text-base font-semibold text-pf-text mb-3 sm:text-lg sm:mb-4">Lab results</h3>
+              <div className="grid min-w-0 grid-cols-3 gap-2 sm:gap-3">
+                <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                  <label htmlFor="thc" className="block text-sm font-medium text-pf-secondary">
                     THC (%)
                   </label>
                   <input
@@ -323,13 +323,13 @@ export default function EditBatchPage() {
                     max="100"
                     value={formData.thc}
                     onChange={(e) => handleChange('thc', e.target.value)}
-                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                     placeholder="18.5"
                   />
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="cbd" className="block text-sm font-medium text-gray-700">
+                <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                  <label htmlFor="cbd" className="block text-sm font-medium text-pf-secondary">
                     CBD (%)
                   </label>
                   <input
@@ -340,13 +340,13 @@ export default function EditBatchPage() {
                     max="100"
                     value={formData.cbd}
                     onChange={(e) => handleChange('cbd', e.target.value)}
-                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                     placeholder="0.5"
                   />
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="totalCannabinoids" className="block text-sm font-medium text-gray-700">
+                <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                  <label htmlFor="totalCannabinoids" className="block text-sm font-medium text-pf-secondary">
                     Total (%)
                   </label>
                   <input
@@ -357,7 +357,7 @@ export default function EditBatchPage() {
                     max="100"
                     value={formData.totalCannabinoids}
                     onChange={(e) => handleChange('totalCannabinoids', e.target.value)}
-                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                     placeholder="22.0"
                   />
                 </div>
@@ -365,20 +365,20 @@ export default function EditBatchPage() {
             </div>
 
             <fieldset className="space-y-3">
-              <legend className="mb-2 text-sm font-medium text-gray-700">Terpenes</legend>
+              <legend className="mb-2 text-sm font-medium text-pf-secondary">Terpenes</legend>
               {unrecognizedTerpenes && !terpenesEdited ? (
-                <div className="space-y-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                <div className="space-y-2 rounded-lg bg-pf-warning-bg p-3 text-sm text-pf-warning">
                   <p>Existing terpene details will be kept. Replace them to enter percentages here.</p>
                   <Button type="button" variant="outline" size="sm" onClick={() => { setTerpenesEdited(true); setTerpeneRows([]); }}>Replace terpene details</Button>
                 </div>
               ) : <>
                 {terpeneRows.map((row, index) => (
                   <div key={row.id} className="grid grid-cols-[minmax(0,1fr)_5rem_auto] items-end gap-2">
-                    <label className="min-w-0 text-sm text-gray-700">Terpene
-                      <input value={row.name} required placeholder="Myrcene" onChange={(event) => { setTerpenesEdited(true); setTerpeneRows((rows) => rows.map((item) => item.id === row.id ? { ...item, name: event.target.value } : item)); }} className="mt-1 h-10 w-full rounded-lg border border-gray-300 px-3 text-base" />
+                    <label className="min-w-0 text-sm text-pf-secondary">Terpene
+                      <input value={row.name} required placeholder="Myrcene" onChange={(event) => { setTerpenesEdited(true); setTerpeneRows((rows) => rows.map((item) => item.id === row.id ? { ...item, name: event.target.value } : item)); }} className="mt-1 h-10 w-full rounded-lg border border-pf-line-strong px-3 text-base" />
                     </label>
-                    <label className="text-sm text-gray-700">%
-                      <input type="number" value={row.percentage} required min="0" max="100" step="0.01" onChange={(event) => { setTerpenesEdited(true); setTerpeneRows((rows) => rows.map((item) => item.id === row.id ? { ...item, percentage: event.target.value } : item)); }} className="mt-1 h-10 w-full rounded-lg border border-gray-300 px-2 text-base" />
+                    <label className="text-sm text-pf-secondary">%
+                      <input type="number" value={row.percentage} required min="0" max="100" step="0.01" onChange={(event) => { setTerpenesEdited(true); setTerpeneRows((rows) => rows.map((item) => item.id === row.id ? { ...item, percentage: event.target.value } : item)); }} className="mt-1 h-10 w-full rounded-lg border border-pf-line-strong px-2 text-base" />
                     </label>
                     <Button type="button" variant="ghost" aria-label={`Remove terpene ${index + 1}`} onClick={() => { setTerpenesEdited(true); setTerpeneRows((rows) => rows.filter((item) => item.id !== row.id)); }}>×</Button>
                   </div>
@@ -394,8 +394,8 @@ export default function EditBatchPage() {
               onError={setError}
             />
 
-            <div className="space-y-1.5 sm:space-y-2">
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+            <div className="min-w-0 space-y-1.5 sm:space-y-2">
+              <label htmlFor="notes" className="block text-sm font-medium text-pf-secondary">
                 Notes
               </label>
               <textarea
@@ -403,12 +403,12 @@ export default function EditBatchPage() {
                 rows={3}
                 value={formData.notes}
                 onChange={(e) => handleChange('notes', e.target.value)}
-                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                 placeholder="Batch notes"
               />
             </div>
 
-            <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+            <div className="flex flex-wrap gap-3 pt-4 border-t border-pf-line">
               <Button type="submit" variant="primary" className="flex-1 sm:flex-none" disabled={!canSubmit}>
                 {loading ? 'Saving...' : 'Save Changes'}
               </Button>

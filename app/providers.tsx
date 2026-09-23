@@ -17,10 +17,12 @@ export function Providers({
       {children}
       <Toaster 
         position="bottom-right"
+        theme="dark"
         toastOptions={{
           style: {
-            background: '#fff',
-            border: '1px solid #e5e7eb',
+            background: '#16201b',
+            border: '1px solid #41564a',
+            color: '#f1f5f2',
           },
         }}
       />

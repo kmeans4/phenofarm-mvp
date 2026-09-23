@@ -100,7 +100,7 @@ export default function CustomersList({ customers }: CustomersListProps) {
 
   return (
     <>
-      <div className="sm:hidden divide-y divide-gray-100">
+      <div className="sm:hidden divide-y divide-pf-line">
         {customers.map((customer) => (
           <div
             key={customer.id}
@@ -108,45 +108,45 @@ export default function CustomersList({ customers }: CustomersListProps) {
             tabIndex={0}
             onClick={() => openCustomer(customer.id)}
             onKeyDown={(event) => handleRowKeyDown(event, customer.id)}
-            className="cursor-pointer p-3 space-y-2 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600"
+            className="cursor-pointer p-3 space-y-2 transition-colors hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent"
             aria-label={`View ${customer.businessName}`}
           >
             <div>
-              <p className="break-words font-medium text-gray-900">{customer.businessName}</p>
+              <p className="break-words font-medium text-pf-text">{customer.businessName}</p>
               {customer.licenseNumber && (
-                <p className="mt-1 text-xs text-gray-500">License: {customer.licenseNumber}</p>
+                <p className="mt-1 text-xs text-pf-muted">License: {customer.licenseNumber}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 gap-1 text-sm text-gray-600">
+            <div className="grid grid-cols-1 gap-1 text-sm text-pf-muted">
               {customer.contactName && customer.contactName !== customer.businessName && <p>{customer.contactName}</p>}
               <p className="break-all"><span className="sr-only">Email: </span>{displayValue(customer.email)}</p>
               <p><span className="sr-only">Phone: </span>{displayValue(customer.phone)}</p>
               <p><span className="sr-only">Location: </span>{formatLocation(customer)}</p>
               <div className="flex flex-wrap justify-between gap-x-3 gap-y-1 pt-1 text-xs">
-                <p><span className="text-gray-500">Last request:</span> {customer.lastOrderDateLabel}</p>
-                <p><span className="text-gray-500">Delivered:</span> {customer.totalDeliveredValueLabel}</p>
+                <p><span className="text-pf-muted">Last request:</span> {customer.lastOrderDateLabel}</p>
+                <p><span className="text-pf-muted">Delivered:</span> {customer.totalDeliveredValueLabel}</p>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 text-xs">
               {customer.isPlatformMember && (
-                <span className="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-1 font-medium text-blue-700">
+                <span className="inline-flex items-center rounded-full bg-pf-info-bg px-2.5 py-1 font-medium text-pf-info">
                   PhenoFarm member
                 </span>
               )}
-              <span className="inline-flex items-center rounded-full bg-green-50 px-2.5 py-1 font-medium text-green-700">
+              <span className="inline-flex items-center rounded-full bg-pf-accent-bg px-2.5 py-1 font-medium text-pf-accent">
                 {customer.orderCount} request{customer.orderCount === 1 ? '' : 's'}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Link href={customerHref(customer.id)} onClick={stopPropagation} className="rounded-lg border border-gray-200 px-3 py-2 text-center text-sm font-medium text-green-700">{customer.canEdit ? 'Edit contact' : 'Details'}</Link>
-              <Link href={`/grower/customers/${customer.id}/statement`} onClick={stopPropagation} className="rounded-lg border border-gray-200 px-3 py-2 text-center text-sm font-medium text-green-700">Statement</Link>
+              <Link href={customerHref(customer.id)} onClick={stopPropagation} className="rounded-lg border border-pf-line px-3 py-2 text-center text-sm font-medium text-pf-accent">{customer.canEdit ? 'Edit contact' : 'Details'}</Link>
+              <Link href={`/grower/customers/${customer.id}/statement`} onClick={stopPropagation} className="rounded-lg border border-pf-line px-3 py-2 text-center text-sm font-medium text-pf-accent">Statement</Link>
               <Link
                 href={requestsHref(customer.id)}
                 onClick={stopPropagation}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-pf-line-strong px-3 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               >
                 <ClipboardList className="h-4 w-4" aria-hidden="true" />
                 Requests
@@ -155,7 +155,7 @@ export default function CustomersList({ customers }: CustomersListProps) {
                 type="button"
                 onClick={(event) => openMessage(event, customer)}
                 disabled={openingMessageFor === customer.id}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               >
                 {openingMessageFor === customer.id ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
@@ -170,18 +170,18 @@ export default function CustomersList({ customers }: CustomersListProps) {
       </div>
 
       <div className="hidden md:block overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-pf-line">
+          <thead className="bg-pf-canvas">
             <tr>
-              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-gray-500 sm:px-6">Business</th>
-              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-gray-500 sm:px-6">Contact</th>
-              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-gray-500 sm:px-6">Last request</th>
-              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-gray-500 sm:px-6">Delivered value</th>
-              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-gray-500 sm:px-6">Location</th>
-              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-gray-500 sm:px-6">Actions</th>
+              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6">Business</th>
+              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6">Contact</th>
+              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6">Last request</th>
+              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6">Delivered value</th>
+              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6">Location</th>
+              <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200 bg-white">
+          <tbody className="divide-y divide-pf-line bg-pf-surface">
             {customers.map((customer) => (
               <tr
                 key={customer.id}
@@ -189,34 +189,34 @@ export default function CustomersList({ customers }: CustomersListProps) {
                 tabIndex={0}
                 onClick={() => openCustomer(customer.id)}
                 onKeyDown={(event) => handleRowKeyDown(event, customer.id)}
-                className="cursor-pointer transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600"
+                className="cursor-pointer transition-colors hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent"
                 aria-label={`View ${customer.businessName}`}
               >
                 <td className="px-3 py-3 sm:px-6">
-                  <div className="font-medium text-gray-900">{customer.businessName}</div>
-                  {customer.licenseNumber && <div className="text-xs text-gray-500">License: {customer.licenseNumber}</div>}
+                  <div className="font-medium text-pf-text">{customer.businessName}</div>
+                  {customer.licenseNumber && <div className="text-xs text-pf-muted">License: {customer.licenseNumber}</div>}
                   {customer.isPlatformMember && (
-                    <span className="mt-1 inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700">
+                    <span className="mt-1 inline-flex items-center rounded-full bg-pf-info-bg px-2 py-0.5 text-xs font-medium text-pf-info">
                       PhenoFarm member
                     </span>
                   )}
                 </td>
-                <td className="px-3 py-3 text-sm text-gray-600 sm:px-6">
+                <td className="px-3 py-3 text-sm text-pf-muted sm:px-6">
                   {customer.contactName !== customer.businessName && <div>{displayValue(customer.contactName)}</div>}
-                  <div className="text-xs text-gray-500">{displayValue(customer.email)}</div>
-                  <div className="text-xs text-gray-500">{displayValue(customer.phone)}</div>
+                  <div className="text-xs text-pf-muted">{displayValue(customer.email)}</div>
+                  <div className="text-xs text-pf-muted">{displayValue(customer.phone)}</div>
                 </td>
-                <td className="px-3 py-3 text-sm text-gray-600 sm:px-6">{customer.lastOrderDateLabel}</td>
-                <td className="px-3 py-3 text-sm font-semibold text-gray-900 sm:px-6">{customer.totalDeliveredValueLabel}</td>
-                <td className="px-3 py-3 text-sm text-gray-600 sm:px-6">{formatLocation(customer)}</td>
+                <td className="px-3 py-3 text-sm text-pf-muted sm:px-6">{customer.lastOrderDateLabel}</td>
+                <td className="px-3 py-3 text-sm font-semibold text-pf-text sm:px-6">{customer.totalDeliveredValueLabel}</td>
+                <td className="px-3 py-3 text-sm text-pf-muted sm:px-6">{formatLocation(customer)}</td>
                 <td className="px-3 py-3 sm:px-6">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Link href={customerHref(customer.id)} onClick={stopPropagation} className="rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-green-700">{customer.canEdit ? 'Edit contact' : 'Details'}</Link>
-                    <Link href={`/grower/customers/${customer.id}/statement`} onClick={stopPropagation} className="rounded-lg border border-gray-200 px-2.5 py-1.5 text-xs font-medium text-green-700">Statement</Link>
+                    <Link href={customerHref(customer.id)} onClick={stopPropagation} className="rounded-lg border border-pf-line px-2.5 py-1.5 text-xs font-medium text-pf-accent">{customer.canEdit ? 'Edit contact' : 'Details'}</Link>
+                    <Link href={`/grower/customers/${customer.id}/statement`} onClick={stopPropagation} className="rounded-lg border border-pf-line px-2.5 py-1.5 text-xs font-medium text-pf-accent">Statement</Link>
                     <Link
                       href={requestsHref(customer.id)}
                       onClick={stopPropagation}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 px-2.5 py-1.5 text-xs font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-pf-line-strong px-2.5 py-1.5 text-xs font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                     >
                       <ClipboardList className="h-3.5 w-3.5" aria-hidden="true" />
                       Requests
@@ -225,7 +225,7 @@ export default function CustomersList({ customers }: CustomersListProps) {
                       type="button"
                       onClick={(event) => openMessage(event, customer)}
                       disabled={openingMessageFor === customer.id}
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-green-200 bg-green-50 px-2.5 py-1.5 text-xs font-medium text-green-700 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                      className="inline-flex items-center gap-1.5 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-2.5 py-1.5 text-xs font-medium text-pf-accent hover:bg-pf-accent-bg disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                     >
                       {openingMessageFor === customer.id ? (
                         <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
@@ -242,7 +242,7 @@ export default function CustomersList({ customers }: CustomersListProps) {
         </table>
       </div>
 
-      <div className="hidden divide-y divide-gray-100 sm:block md:hidden">
+      <div className="hidden divide-y divide-pf-line sm:block md:hidden">
         {customers.map((customer) => (
           <div
             key={customer.id}
@@ -250,45 +250,45 @@ export default function CustomersList({ customers }: CustomersListProps) {
             tabIndex={0}
             onClick={() => openCustomer(customer.id)}
             onKeyDown={(event) => handleRowKeyDown(event, customer.id)}
-            className="cursor-pointer p-4 space-y-3 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600"
+            className="cursor-pointer p-4 space-y-3 transition-colors hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent"
             aria-label={`View ${customer.businessName}`}
           >
             <div className="flex items-start justify-between gap-3">
               <div>
-                <p className="font-medium text-gray-900">{customer.businessName}</p>
-                <p className="mt-1 text-sm text-gray-500">{customer.contactName !== customer.businessName ? `${displayValue(customer.contactName)} · ` : ''}{displayValue(customer.email)}</p>
+                <p className="font-medium text-pf-text">{customer.businessName}</p>
+                <p className="mt-1 text-sm text-pf-muted">{customer.contactName !== customer.businessName ? `${displayValue(customer.contactName)} · ` : ''}{displayValue(customer.email)}</p>
               </div>
-              <span className="shrink-0 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700">
+              <span className="shrink-0 rounded-full bg-pf-accent-bg px-2.5 py-1 text-xs font-medium text-pf-accent">
                 {customer.orderCount} request{customer.orderCount === 1 ? '' : 's'}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 text-sm text-gray-600">
+            <div className="grid grid-cols-2 gap-3 text-sm text-pf-muted">
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-400">Last request</p>
+                <p className="text-xs uppercase tracking-wide text-pf-muted">Last request</p>
                 <p className="mt-1">{customer.lastOrderDateLabel}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-400">Delivered value</p>
-                <p className="mt-1 font-semibold text-gray-900">{customer.totalDeliveredValueLabel}</p>
+                <p className="text-xs uppercase tracking-wide text-pf-muted">Delivered value</p>
+                <p className="mt-1 font-semibold text-pf-text">{customer.totalDeliveredValueLabel}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-400">Phone</p>
+                <p className="text-xs uppercase tracking-wide text-pf-muted">Phone</p>
                 <p className="mt-1">{displayValue(customer.phone)}</p>
               </div>
               <div>
-                <p className="text-xs uppercase tracking-wide text-gray-400">Location</p>
+                <p className="text-xs uppercase tracking-wide text-pf-muted">Location</p>
                 <p className="mt-1">{formatLocation(customer)}</p>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
-              <Link href={customerHref(customer.id)} onClick={stopPropagation} className="rounded-lg border border-gray-200 px-3 py-2 text-center text-sm font-medium text-green-700">{customer.canEdit ? 'Edit contact' : 'Details'}</Link>
-              <Link href={`/grower/customers/${customer.id}/statement`} onClick={stopPropagation} className="rounded-lg border border-gray-200 px-3 py-2 text-center text-sm font-medium text-green-700">Statement</Link>
+              <Link href={customerHref(customer.id)} onClick={stopPropagation} className="rounded-lg border border-pf-line px-3 py-2 text-center text-sm font-medium text-pf-accent">{customer.canEdit ? 'Edit contact' : 'Details'}</Link>
+              <Link href={`/grower/customers/${customer.id}/statement`} onClick={stopPropagation} className="rounded-lg border border-pf-line px-3 py-2 text-center text-sm font-medium text-pf-accent">Statement</Link>
               <Link
                 href={requestsHref(customer.id)}
                 onClick={stopPropagation}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-pf-line-strong px-3 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               >
                 <ClipboardList className="h-4 w-4" aria-hidden="true" />
                 Requests
@@ -297,7 +297,7 @@ export default function CustomersList({ customers }: CustomersListProps) {
                 type="button"
                 onClick={(event) => openMessage(event, customer)}
                 disabled={openingMessageFor === customer.id}
-                className="inline-flex items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               >
                 {openingMessageFor === customer.id ? (
                   <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />

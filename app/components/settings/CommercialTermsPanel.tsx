@@ -7,7 +7,7 @@ import {
   type CommercialTermsDefaults,
 } from '@/lib/ux-workflow';
 
-const FIELD_CLASS = 'mt-1 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500';
+const FIELD_CLASS = 'mt-1 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 py-2 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-emerald-400';
 
 export function CommercialTermsPanel({ initialData }: { initialData?: { terms: CommercialTermsDefaults; savedAt: string | null } }) {
   const [terms, setTerms] = useState<CommercialTermsDefaults>(initialData?.terms || DEFAULT_COMMERCIAL_TERMS);
@@ -89,11 +89,11 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
   };
 
   return (
-    <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <section className="rounded-xl border border-pf-line bg-pf-surface p-4 shadow-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-base sm:text-lg font-semibold text-gray-900">Commercial terms</h2>
-          <p className="mt-1 text-sm text-gray-600">
+          <h2 className="text-base sm:text-lg font-semibold text-pf-text">Commercial terms</h2>
+          <p className="mt-1 text-sm text-pf-muted">
             Shown to buyers on your shop.
           </p>
         </div>
@@ -109,16 +109,16 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
 
       <div className="mt-4 space-y-3">
         {savedAt && (
-          <p className="rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600">
+          <p className="rounded-lg bg-pf-canvas px-3 py-2 text-sm text-pf-muted">
             Last saved {new Date(savedAt).toLocaleString()}
           </p>
         )}
-        {statusMessage && <p className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{statusMessage}</p>}
-        {errorMessage && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{errorMessage}</p>}
+        {statusMessage && <p className="rounded-lg bg-pf-accent-bg px-3 py-2 text-sm text-pf-accent">{statusMessage}</p>}
+        {errorMessage && <p className="rounded-lg bg-pf-danger-bg px-3 py-2 text-sm text-pf-danger">{errorMessage}</p>}
       </div>
 
       <div className={`mt-3 grid gap-3 sm:mt-4 sm:gap-4 md:grid-cols-2 ${isLoading ? 'opacity-60' : ''}`}>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-pf-secondary">
           Default MOQ
           <input
             value={terms.minimumOrder}
@@ -129,7 +129,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
           />
         </label>
 
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-pf-secondary">
           Fulfillment
           <input
             value={terms.fulfillmentMethods}
@@ -140,7 +140,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
           />
         </label>
 
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-pf-secondary">
           Region
           <input
             value={terms.fulfillmentRegion}
@@ -151,7 +151,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
           />
         </label>
 
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-pf-secondary">
           Payment terms
           <input
             value={terms.paymentTerms}
@@ -162,7 +162,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
           />
         </label>
 
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-pf-secondary">
           Response time
           <input
             value={terms.responseWindow}
@@ -173,7 +173,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
           />
         </label>
 
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block text-sm font-medium text-pf-secondary">
           Contact note
           <textarea
             rows={2}
@@ -186,7 +186,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
         </label>
       </div>
 
-      <p className="mt-4 rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-900">
+      <p className="mt-4 rounded-lg bg-pf-info-bg px-3 py-2 text-xs text-pf-info">
         Defaults only; confirm final terms with each buyer.
       </p>
     </section>

@@ -115,10 +115,10 @@ const formatPhoneNumber = (value: string): string => {
   return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`;
 };
 
-const INPUT_CLASSES = "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
-const INPUT_ERROR_CLASSES = "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
-const READONLY_VALUE_CLASSES = "w-full rounded-lg bg-gray-50 px-0 py-2 text-base text-gray-900";
-const READONLY_LABEL_CLASSES = "block text-sm font-medium text-gray-500 mb-1";
+const INPUT_CLASSES = "w-full px-3 py-2 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-pf-accent focus:border-transparent";
+const INPUT_ERROR_CLASSES = "w-full px-3 py-2 border border-pf-danger rounded-lg focus:ring-2 focus:ring-pf-danger focus:border-transparent bg-pf-danger-bg";
+const READONLY_VALUE_CLASSES = "w-full rounded-lg bg-pf-canvas px-0 py-2 text-base text-pf-text";
+const READONLY_LABEL_CLASSES = "block text-sm font-medium text-pf-muted mb-1";
 
 export default function EditCustomerForm({ customer }: { customer: Customer }) {
   const router = useRouter();
@@ -306,11 +306,11 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
 
   return (
     <div className="w-full space-y-5 sm:space-y-6 max-w-3xl mx-auto">
-      <div className="flex items-center justify-between gap-3 text-sm font-medium text-green-700"><Link href="/grower/customers" className="py-2 hover:underline">← Customers</Link><Link href={`/grower/customers/${customer.id}/statement`} className="rounded-lg border border-gray-200 bg-white px-3 py-2 hover:bg-green-50">Statement</Link></div>
+      <div className="flex items-center justify-between gap-3 text-sm font-medium text-pf-accent"><Link href="/grower/customers" className="py-2 hover:underline">← Customers</Link><Link href={`/grower/customers/${customer.id}/statement`} className="rounded-lg border border-pf-line bg-pf-surface px-3 py-2 hover:bg-pf-accent-bg">Statement</Link></div>
       <PageHeader title={isPlatformManaged ? 'Customer details' : 'Edit customer'} />
 
       {isDirty && (
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-center gap-2">
+        <div className="p-4 bg-pf-warning-bg border border-pf-warning-line rounded-lg text-pf-warning flex items-center gap-2">
           <svg className="w-5 h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
           </svg>
@@ -319,8 +319,8 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h2 className="text-base font-semibold text-gray-900 mb-3 sm:mb-4 sm:text-lg">Business</h2>
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-4">
+          <h2 className="text-base font-semibold text-pf-text mb-3 sm:mb-4 sm:text-lg">Business</h2>
           
           {isPlatformManaged ? (
             <div className="space-y-3 sm:space-y-4">
@@ -348,7 +348,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           ) : (
             <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-pf-secondary mb-1">
                   Business Name *
                 </label>
                 <input
@@ -360,13 +360,13 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   placeholder="Enter business name"
                 />
                 {errors.businessName && touched.businessName && (
-                  <p className="text-sm text-red-600 mt-1">{errors.businessName}</p>
+                  <p className="text-sm text-pf-danger mt-1">{errors.businessName}</p>
                 )}
               </div>
 
               <div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-pf-secondary mb-1">
                     License Number
                   </label>
                   <input
@@ -378,15 +378,15 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                     placeholder="License #"
                   />
                   {errors.licenseNumber && touched.licenseNumber && (
-                    <p className="text-sm text-red-600 mt-1">{errors.licenseNumber}</p>
+                    <p className="text-sm text-pf-danger mt-1">{errors.licenseNumber}</p>
                   )}
                 </div>
               </div>
-              <details className="rounded-lg border border-gray-200 px-3" open={Boolean(formData.website || formData.description || (errors.website && touched.website) || (errors.description && touched.description))}>
-                <summary className="min-h-10 cursor-pointer py-2 text-sm font-medium text-gray-700">Website & description{((errors.website && touched.website) || (errors.description && touched.description)) && <span className="ml-2 text-xs text-red-600">Check fields</span>}</summary>
+              <details className="rounded-lg border border-pf-line px-3" open={Boolean(formData.website || formData.description || (errors.website && touched.website) || (errors.description && touched.description))}>
+                <summary className="min-h-10 cursor-pointer py-2 text-sm font-medium text-pf-secondary">Website & description{((errors.website && touched.website) || (errors.description && touched.description)) && <span className="ml-2 text-xs text-pf-danger">Check fields</span>}</summary>
                 <div className="space-y-3 pb-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-pf-secondary mb-1">
                       Website
                     </label>
                     <input
@@ -398,12 +398,12 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                       placeholder="https://..."
                     />
                     {errors.website && touched.website && (
-                      <p className="text-sm text-red-600 mt-1">{errors.website}</p>
+                      <p className="text-sm text-pf-danger mt-1">{errors.website}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-pf-secondary mb-1">
                       Description
                     </label>
                     <textarea
@@ -412,14 +412,14 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                       onChange={(e) => handleChange('description', e.target.value)}
                       onBlur={() => handleBlur('description')}
                       className={errors.description && touched.description
-                        ? "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50"
-                        : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"}
+                        ? "w-full px-3 py-2 border border-pf-danger rounded-lg focus:ring-2 focus:ring-pf-danger focus:border-transparent bg-pf-danger-bg"
+                        : "w-full px-3 py-2 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-pf-accent"}
                       placeholder="Brief description..."
                     />
                     {errors.description && touched.description && (
-                      <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+                      <p className="text-sm text-pf-danger mt-1">{errors.description}</p>
                     )}
-                    <p className="text-xs text-gray-500 text-right mt-1">
+                    <p className="text-xs text-pf-muted text-right mt-1">
                       {formData.description.length}/500
                     </p>
                   </div>
@@ -429,8 +429,8 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h2 className="text-base font-semibold text-gray-900 mb-3 sm:mb-4 sm:text-lg">Contact</h2>
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-4">
+          <h2 className="text-base font-semibold text-pf-text mb-3 sm:mb-4 sm:text-lg">Contact</h2>
           
           {isPlatformManaged ? (
             <div className="space-y-3 sm:space-y-4">
@@ -454,7 +454,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
             <div className="space-y-3 sm:space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-pf-secondary mb-1">
                     Contact Person
                   </label>
                   <input
@@ -466,7 +466,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-pf-secondary mb-1">
                     Email
                   </label>
                   <input
@@ -478,13 +478,13 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                     placeholder="email@example.com"
                   />
                   {errors.email && touched.email && (
-                    <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+                    <p className="text-sm text-pf-danger mt-1">{errors.email}</p>
                   )}
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-pf-secondary mb-1">
                   Phone
                 </label>
                 <input
@@ -496,15 +496,15 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   placeholder="(555) 123-4567"
                 />
                 {errors.phone && touched.phone && (
-                  <p className="text-sm text-red-600 mt-1">{errors.phone}</p>
+                  <p className="text-sm text-pf-danger mt-1">{errors.phone}</p>
                 )}
               </div>
             </div>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
-          <h2 className="text-base font-semibold text-gray-900 mb-3 sm:mb-4 sm:text-lg">Address</h2>
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-4">
+          <h2 className="text-base font-semibold text-pf-text mb-3 sm:mb-4 sm:text-lg">Address</h2>
           
           {isPlatformManaged ? (
             <div className="space-y-3 sm:space-y-4">
@@ -531,7 +531,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           ) : (
             <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-pf-secondary mb-1">
                   Street Address
                 </label>
                 <input
@@ -545,7 +545,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
                 <div className="col-span-2 sm:col-span-1">
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-pf-secondary mb-1">
                     City
                   </label>
                   <input
@@ -557,7 +557,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-pf-secondary mb-1">
                     State
                   </label>
                   <select
@@ -573,7 +573,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-pf-secondary mb-1">
                     ZIP
                   </label>
                   <input
@@ -585,7 +585,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                     placeholder="12345"
                   />
                   {errors.zipCode && touched.zipCode && (
-                    <p className="text-sm text-red-600 mt-1">{errors.zipCode}</p>
+                    <p className="text-sm text-pf-danger mt-1">{errors.zipCode}</p>
                   )}
                 </div>
               </div>
@@ -593,13 +593,13 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           )}
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-gray-200 sm:pt-4">
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-pf-line sm:pt-4">
           {!isPlatformManaged && <div className="self-start"><RecordActions name={customer.businessName} actions={[{label: 'Delete contact', destructive: true, onSelect: () => setDeleteConfirmOpen(true)}]} /></div>}
 
           <div className="ml-auto flex gap-2 sm:gap-3">
             <Link
               href="/grower/customers"
-              className="flex-1 sm:flex-none whitespace-nowrap text-center px-3 py-2 text-sm sm:px-4 sm:text-base border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 sm:flex-none whitespace-nowrap text-center px-3 py-2 text-sm sm:px-4 sm:text-base border border-pf-line-strong rounded-lg hover:bg-pf-canvas transition-colors"
             >
               Cancel
             </Link>
@@ -607,7 +607,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
               <button
                 type="submit"
                 disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
-                className="flex-1 sm:flex-none whitespace-nowrap px-3 py-2 text-sm sm:px-4 sm:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 sm:flex-none whitespace-nowrap px-3 py-2 text-sm sm:px-4 sm:text-base bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {isSubmitting ? 'Saving...' : 'Save changes'}
               </button>

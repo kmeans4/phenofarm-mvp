@@ -69,7 +69,7 @@ export function ClientNav({ links }: { links: NavLink[] }) {
   };
 
   return (
-    <nav className="space-y-1 px-3 py-3" aria-label="Portal navigation">
+    <nav className="space-y-1 px-0 py-3" aria-label="Portal navigation">
       {links.map((link, index) => {
         const active = isActive(link.href);
         const Icon = getLinkIcon(link.href);
@@ -78,17 +78,17 @@ export function ClientNav({ links }: { links: NavLink[] }) {
         return (
           <div key={link.href}>
             {showGroup ? (
-              <div className="font-metadata px-3 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-[#5f7562] first:pt-0">
+              <div className="font-metadata px-3 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-pf-muted first:pt-0">
                 {link.group}
               </div>
             ) : null}
             <Link
               href={link.href}
               aria-current={active ? 'page' : undefined}
-              className={`flex min-h-9 items-center justify-between rounded-[9px] px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6fd08a] ${
+              className={`flex min-h-10 items-center justify-between rounded-[9px] px-3 py-1.5 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34d9a2] ${
                 active
-                  ? 'bg-[#294c39] font-semibold text-[#f2f5ee] shadow-[inset_3px_0_0_#6fd08a]'
-                  : 'text-[#a9bcad] hover:bg-white/[0.06] hover:text-[#f2f5ee]'
+                  ? 'bg-pf-accent-bg font-semibold text-pf-text shadow-[inset_3px_0_0_#34d9a2]'
+                  : 'text-pf-secondary hover:bg-white/[0.06] hover:text-pf-text'
               }`}
             >
               <span className="flex min-w-0 items-center gap-3">
@@ -96,7 +96,7 @@ export function ClientNav({ links }: { links: NavLink[] }) {
                 <span className="truncate">{link.name}</span>
               </span>
               {(link.badge && link.badge > 0) ? (
-                <Badge variant="warning" className="ml-2 shrink-0 border-0 bg-[#e0c07a] px-2 py-0 text-[10px] text-[#3a2c08]">
+                <Badge variant="warning" className="ml-2 shrink-0 border-0 bg-pf-accent-bg px-2 py-0 text-[10px] text-pf-accent">
                   {link.badge}
                 </Badge>
               ) : link.badgeComponent ? (

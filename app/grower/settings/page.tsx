@@ -68,8 +68,8 @@ export default async function GrowerSettingsPage() {
           <section id="integrations" className="scroll-mt-6">
             <Card>
               <CardHeader><CardTitle>Integrations</CardTitle></CardHeader>
-              <CardContent className="text-sm text-gray-700">
-                <p className="font-semibold text-gray-900">Metrc state-tracking sync</p>
+              <CardContent className="text-sm text-pf-secondary">
+                <p className="font-semibold text-pf-text">Metrc state-tracking sync</p>
                 <p className="mt-1">In development. Your batch and COA records are structured for future synchronization; no automatic Metrc sync runs today.</p>
               </CardContent>
             </Card>

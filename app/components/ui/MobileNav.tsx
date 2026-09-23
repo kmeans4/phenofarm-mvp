@@ -80,7 +80,7 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
         ref={menuButtonRef}
         type="button"
         onClick={openMenu}
-        className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-white/10 bg-white/5 text-[#c4d1c6] transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6fd08a]"
+        className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-white/10 bg-white/5 text-pf-secondary transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34d9a2]"
         aria-label={`Open ${portalLabel} navigation menu`}
         aria-expanded={isOpen}
         aria-controls={drawerId}
@@ -103,7 +103,7 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
-            className="fixed inset-y-0 right-0 z-50 flex h-full w-80 max-w-[calc(100vw-2rem)] flex-col bg-[#16251c] shadow-2xl"
+            className="fixed inset-y-0 right-0 z-50 flex h-full w-80 max-w-[calc(100vw-2rem)] flex-col bg-pf-canvas shadow-2xl"
           >
             <div className="flex items-center justify-between border-b border-white/[0.07] px-4 py-2">
               <div>
@@ -115,7 +115,7 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
                 ref={closeButtonRef}
                 type="button"
                 onClick={closeMenu}
-                className="flex h-10 w-10 items-center justify-center rounded-lg text-[#c4d1c6] transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6fd08a]"
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-secondary transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34d9a2]"
                 aria-label="Close navigation menu"
               >
                 <X className="h-5 w-5" />
@@ -133,7 +133,7 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
                 return (
                   <div key={link.href}>
                     {showGroup && (
-                      <div className="font-metadata px-2 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7d947f]">
+                      <div className="font-metadata px-2 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-pf-muted">
                         {group}
                       </div>
                     )}
@@ -141,10 +141,10 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
                       href={link.href}
                       onClick={closeMenu}
                       aria-current={active ? 'page' : undefined}
-                      className={`flex min-h-11 items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
+                      className={`flex min-h-11 items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas ${
                         active
-                          ? 'bg-[#294c39] font-semibold text-[#f2f5ee] shadow-[inset_3px_0_0_#6fd08a]'
-                          : 'text-[#a9bcad] hover:bg-white/[0.06] hover:text-white'
+                          ? 'bg-pf-accent-bg font-semibold text-pf-text shadow-[inset_3px_0_0_#34d9a2]'
+                          : 'text-pf-secondary hover:bg-white/[0.06] hover:text-white'
                       }`}
                     >
                       <span className="min-w-0 truncate">{link.name}</span>
@@ -164,7 +164,7 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
             <div className="mt-auto border-t border-white/[0.07] px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
               <div className="mb-1 rounded-lg bg-white/[0.05] px-3 py-2">
                 <p className="truncate text-sm font-semibold text-[#e3ebe3]">{accountName || 'PhenoFarm account'}</p>
-                <p className="text-xs font-medium text-[#7d947f]">{roleLabel}</p>
+                <p className="text-xs font-medium text-pf-muted">{roleLabel}</p>
               </div>
               <button
                 type="button"

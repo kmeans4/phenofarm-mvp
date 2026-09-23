@@ -31,7 +31,7 @@ export function SettingsSectionNav({ sections }: { sections: SettingsSection[] }
   }, [sections]);
 
   return (
-    <nav aria-label="Settings sections" className="rounded-lg border border-gray-200 bg-white p-1 shadow-sm">
+    <nav aria-label="Settings sections" className="rounded-lg border border-pf-line bg-pf-surface p-1 shadow-sm">
       <div className="flex gap-1 overflow-x-auto">
         {sections.map((section) => {
           const active = section.id === activeId;
@@ -40,8 +40,8 @@ export function SettingsSectionNav({ sections }: { sections: SettingsSection[] }
               key={section.id}
               href={`#${section.id}`}
               aria-current={active ? 'location' : undefined}
-              className={`flex min-h-10 shrink-0 items-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
-                active ? 'bg-green-50 text-green-800' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+              className={`flex min-h-10 shrink-0 items-center rounded-md px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 ${
+                active ? 'bg-pf-accent-bg text-pf-accent' : 'text-pf-muted hover:bg-pf-canvas hover:text-pf-text'
               }`}
             >
               {section.label}

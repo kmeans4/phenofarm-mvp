@@ -144,18 +144,18 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
   };
 
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+    <div className="rounded-xl border border-pf-line bg-pf-surface p-4 shadow-sm">
       <h2 className="sr-only">Buyer actions</h2>
-      {createdBy === 'GROWER' ? <p className="mt-2 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">{isOffPlatform ? 'Off-platform record' : buyerAcknowledgedAt ? 'Recorded by grower · Confirmed' : 'Recorded by grower'}</p> : null}
+      {createdBy === 'GROWER' ? <p className="mt-2 inline-flex rounded-full bg-pf-info-bg px-3 py-1 text-xs font-semibold text-pf-info">{isOffPlatform ? 'Off-platform record' : buyerAcknowledgedAt ? 'Recorded by grower · Confirmed' : 'Recorded by grower'}</p> : null}
 
 
       <div className="flex flex-wrap gap-2 [&>button]:min-h-10">
-        {needsAcknowledgment ? <button type="button" onClick={confirmRecordedRequest} disabled={sendingAction !== null} className="rounded-lg bg-green-700 px-4 py-2 text-sm font-semibold text-white hover:bg-green-800 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-green-600">Confirm request</button> : null}
+        {needsAcknowledgment ? <button type="button" onClick={confirmRecordedRequest} disabled={sendingAction !== null} className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#032116] hover:bg-emerald-400 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-emerald-400">Confirm request</button> : null}
         <button
           type="button"
           onClick={() => sendGrowerMessage(canRequestUpdate ? 'update' : 'message')}
           disabled={sendingAction !== null}
-          className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          className="rounded-lg border border-pf-line-strong px-4 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
         >
           {sendingAction === 'message' || sendingAction === 'update' ? 'Opening...' : 'Message grower'}
         </button>
@@ -167,7 +167,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
             type="button"
             onClick={() => setShowWithdrawConfirm(true)}
             disabled={sendingAction !== null}
-            className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 hover:bg-red-100 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+            className="rounded-lg border border-pf-danger-line bg-pf-danger-bg px-4 py-2 text-sm font-semibold text-pf-danger hover:bg-pf-danger-bg disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           >
             {sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw request'}
           </button>
@@ -178,7 +178,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
             type="button"
             onClick={() => sendGrowerMessage('cancel')}
             disabled={sendingAction !== null}
-            className="rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-100 disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2"
+            className="rounded-lg border border-pf-danger-line bg-pf-danger-bg px-4 py-2 text-sm font-medium text-pf-danger hover:bg-pf-danger-bg disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           >
             {sendingAction === 'cancel' ? 'Opening...' : 'Ask to cancel'}
           </button>
@@ -189,7 +189,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
             type="button"
             onClick={reorder}
             disabled={!canReorder}
-            className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-[#032116] hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           >
             Reorder available items
           </button>
@@ -197,7 +197,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
       </div>
 
       {messageStatus && (
-        <p className="mt-3 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-700">{messageStatus}</p>
+        <p className="mt-3 rounded-lg bg-pf-canvas px-3 py-2 text-sm text-pf-secondary">{messageStatus}</p>
       )}
 
       <ConfirmDialog

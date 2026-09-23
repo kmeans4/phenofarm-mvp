@@ -16,7 +16,7 @@ export default async function DispensarySettingsPage() {
   if (!settings) notFound();
 
   return (
-    <div className="space-y-5 sm:space-y-6 pb-20 sm:pb-24">
+    <div className="space-y-4">
       <PageHeader title="Settings" description="Manage your account and preferences" />
       
       <div className="mt-5 sm:mt-6">

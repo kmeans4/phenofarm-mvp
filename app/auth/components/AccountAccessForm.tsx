@@ -14,7 +14,7 @@ const actions: Record<Mode, string> = {
   'request-reset': 'Send reset link', 'request-verification': 'Send verification link', reset: 'Reset password',
   verify: 'Verify email', 'change-email': 'Send confirmation link', 'confirm-email-change': 'Confirm new email',
 };
-const fieldClass = 'w-full rounded-xl border border-gray-300 bg-white px-3 py-3 text-base text-gray-900 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:opacity-60';
+const fieldClass = 'w-full rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 text-base text-pf-text focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:opacity-60';
 
 export function AccountAccessForm({ mode, currentEmail, sent = false }: { mode: Mode; currentEmail?: string; sent?: boolean }) {
   const [email, setEmail] = useState('');
@@ -62,22 +62,22 @@ export function AccountAccessForm({ mode, currentEmail, sent = false }: { mode: 
 
   if (done) return (
     <div className="space-y-4">
-      <div role="status" className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm leading-6 text-green-950">
+      <div role="status" className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-3 text-sm leading-5 text-pf-accent">
         {requestsEmail
           ? <>If this address is eligible, an email will arrive shortly. Check your spam folder. {mode === 'change-email' && 'Your login email stays the same until you confirm the new address.'}</>
           : mode === 'reset' ? 'Your password was reset and your email is verified. Sign in with your new password. All previous sessions are signed out.'
           : mode === 'verify' ? 'Your email is verified. You can now sign in.'
           : 'Your login email has changed. Sign in with your new email and existing password. Previous sessions are signed out.'}
       </div>
-      {requestsEmail && <button type="button" onClick={() => setDone(false)} className="inline-flex min-h-10 items-center text-sm font-medium text-green-700 underline">Try again or use another email</button>}
-      <Link href="/auth/sign_in" className="flex min-h-11 items-center justify-center rounded-xl bg-green-700 px-4 py-2 text-sm font-semibold text-white">Back to sign in</Link>
+      {requestsEmail && <button type="button" onClick={() => setDone(false)} className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent underline">Try again or use another email</button>}
+      <Link href="/auth/sign_in" className="flex min-h-11 items-center justify-center rounded-xl bg-emerald-500 px-4 py-2 text-sm font-semibold text-pf-canvas hover:bg-emerald-400">Back to sign in</Link>
     </div>
   );
 
   return (
     <form onSubmit={submit} className="space-y-4">
-      {sent && <p role="status" className="rounded-xl bg-green-50 p-3 text-sm leading-6 text-green-950">Check your inbox for a verification link. You will need the password you chose. Enter your email below if you need another link.</p>}
-      {currentEmail && <p className="break-words text-sm text-gray-600">Current login: <strong>{currentEmail}</strong></p>}
+      {sent && <p role="status" className="rounded-xl bg-pf-accent-bg p-3 text-sm leading-5 text-pf-accent">Check your inbox for a verification link. You will need the password you chose. Enter your email below if you need another link.</p>}
+      {currentEmail && <p className="break-words text-sm text-pf-muted">Current login: <strong>{currentEmail}</strong></p>}
       {requestsEmail && <div>
         <label htmlFor="account-email" className="mb-1 block text-sm font-medium">{mode === 'change-email' ? 'New email' : 'Email'}</label>
         <input id="account-email" type="email" autoComplete="email" autoCapitalize="none" autoCorrect="off" maxLength={254} required value={email} onChange={e => setEmail(e.target.value)} disabled={pending} className={fieldClass} />
@@ -85,15 +85,15 @@ export function AccountAccessForm({ mode, currentEmail, sent = false }: { mode: 
       {needsPassword && <div>
         <label htmlFor="account-password" className="mb-1 block text-sm font-medium">{mode === 'reset' ? 'New password' : 'Current password'}</label>
         <input id="account-password" type="password" autoComplete={mode === 'reset' ? 'new-password' : 'current-password'} required value={password} onChange={e => setPassword(e.target.value)} disabled={pending} className={fieldClass} aria-describedby="account-password-help" />
-        <p id="account-password-help" className="mt-1 text-sm text-gray-600">{mode === 'reset' ? 'At least 12 characters.' : mode === 'verify' ? 'Use the password you chose for this account.' : 'Confirm it is you before changing your login.'}</p>
+        <p id="account-password-help" className="mt-1 text-xs leading-5 text-pf-muted">{mode === 'reset' ? 'At least 12 characters.' : mode === 'verify' ? 'Use the password you chose for this account.' : 'Confirm it is you before changing your login.'}</p>
       </div>}
       {mode === 'reset' && <div>
         <label htmlFor="confirm-password" className="mb-1 block text-sm font-medium">Confirm new password</label>
         <input id="confirm-password" type="password" autoComplete="new-password" required value={confirmation} onChange={e => setConfirmation(e.target.value)} disabled={pending} className={fieldClass} />
       </div>}
-      {error && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm leading-6 text-red-800">{error}</p>}
-      <button disabled={pending} type="submit" className="flex min-h-11 w-full items-center justify-center rounded-xl bg-green-700 px-4 py-3 text-sm font-semibold text-white hover:bg-green-800 disabled:opacity-60">{pending ? 'Please wait…' : actions[mode]}</button>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-green-700">
+      {error && <p role="alert" className="rounded-xl border border-pf-danger-line bg-pf-danger-bg p-3 text-sm leading-5 text-pf-danger">{error}</p>}
+      <button disabled={pending} type="submit" className="flex min-h-11 w-full items-center justify-center rounded-xl bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-pf-canvas hover:bg-emerald-400 disabled:opacity-60">{pending ? 'Please wait…' : actions[mode]}</button>
+      <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-pf-accent">
         {['reset', 'verify', 'change-email'].includes(mode) && <Link href="/auth/forgot-password" className="inline-flex min-h-10 items-center underline">{mode === 'reset' ? 'Request a new link' : 'Forgot password?'}</Link>}
         {mode === 'verify' && <Link href="/auth/verify-email" className="inline-flex min-h-10 items-center underline">Resend verification</Link>}
         {mode === 'confirm-email-change' && <Link href="/auth/change-email" className="inline-flex min-h-10 items-center underline">Request a new change</Link>}

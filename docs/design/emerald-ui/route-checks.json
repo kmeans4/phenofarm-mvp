@@ -1,0 +1,1048 @@
+[
+  {
+    "label": "grower-overview",
+    "background": "rgb(7, 11, 9)",
+    "details": 3,
+    "errors": false,
+    "scrollWidth": 360,
+    "title": "Overview",
+    "url": "/grower/dashboard",
+    "width": 360
+  },
+  {
+    "label": "grower-catalog",
+    "details": 2,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Catalog",
+    "url": "/grower/catalog",
+    "width": 360
+  },
+  {
+    "label": "grower-products",
+    "background": "rgb(7, 11, 9)",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "mainWidth": 360,
+    "scrollWidth": 360,
+    "title": "Products",
+    "url": "/grower/products",
+    "width": 360
+  },
+  {
+    "label": "grower-product-add",
+    "background": "rgb(7, 11, 9)",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "mainWidth": 360,
+    "scrollWidth": 360,
+    "title": "Add product",
+    "url": "/grower/products/add",
+    "width": 360
+  },
+  {
+    "label": "grower-product-edit",
+    "background": "rgb(7, 11, 9)",
+    "details": 1,
+    "errors": false,
+    "scrollWidth": 360,
+    "title": "Edit product",
+    "url": "/grower/products/cmuebtw1z000aek6a7b8uz6hz/edit",
+    "width": 360
+  },
+  {
+    "label": "grower-inventory",
+    "background": "rgb(7, 11, 9)",
+    "details": 0,
+    "errors": false,
+    "scrollWidth": 360,
+    "title": "Inventory",
+    "url": "/grower/inventory",
+    "width": 360
+  },
+  {
+    "label": "grower-inventory-add",
+    "background": "rgb(7, 11, 9)",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "mainWidth": 360,
+    "scrollWidth": 360,
+    "title": "Update stock",
+    "url": "/grower/inventory/add",
+    "width": 360
+  },
+  {
+    "label": "grower-orders",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Requests",
+    "url": "/grower/orders",
+    "width": 360
+  },
+  {
+    "label": "grower-order-add",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Record request",
+    "url": "/grower/orders/add",
+    "width": 360
+  },
+  {
+    "label": "grower-order-detail",
+    "details": 3,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Request",
+    "url": "/grower/orders/cmuebtw22000iek6awumw45gj",
+    "width": 360
+  },
+  {
+    "label": "grower-order-edit",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Edit request#REQ-2481",
+    "url": "/grower/orders/cmuebtw22000iek6awumw45gj/edit",
+    "width": 360
+  },
+  {
+    "label": "grower-order-history",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "HistoryRequest history",
+    "url": "/grower/orders/history",
+    "width": 360
+  },
+  {
+    "label": "grower-customers",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Customers",
+    "url": "/grower/customers",
+    "width": 360
+  },
+  {
+    "label": "grower-customer-add",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Add customer",
+    "url": "/grower/customers/add",
+    "width": 360
+  },
+  {
+    "label": "grower-customer-edit",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Customer details",
+    "url": "/grower/customers/cmuebtw1l0003ek6ajsz54uzk/edit",
+    "width": 360
+  },
+  {
+    "label": "grower-statement",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Statement",
+    "url": "/grower/customers/cmuebtw1l0003ek6ajsz54uzk/statement",
+    "width": 360
+  },
+  {
+    "label": "grower-strains",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Strains",
+    "url": "/grower/strains",
+    "width": 360
+  },
+  {
+    "label": "grower-strain-add",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Add strain",
+    "url": "/grower/strains/add",
+    "width": 360
+  },
+  {
+    "label": "grower-strain-edit",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Edit strain",
+    "url": "/grower/strains/5a00f373-71c4-4045-85dc-6b33b374a4a5/edit",
+    "width": 360
+  },
+  {
+    "label": "grower-batches",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Batches",
+    "url": "/grower/batches",
+    "width": 360
+  },
+  {
+    "label": "grower-batch-add",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Add batch",
+    "url": "/grower/batches/add",
+    "width": 360
+  },
+  {
+    "label": "grower-batch-edit",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Edit batch",
+    "url": "/grower/batches/5bb179df-639d-4f39-aa43-de60f1705a67/edit",
+    "width": 360
+  },
+  {
+    "label": "grower-marketplace",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Marketplace preview",
+    "url": "/grower/marketplace",
+    "width": 360
+  },
+  {
+    "label": "grower-reports",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Reports",
+    "url": "/grower/reports",
+    "width": 360
+  },
+  {
+    "label": "grower-settings",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Settings",
+    "url": "/grower/settings",
+    "width": 360
+  },
+  {
+    "label": "grower-pricing",
+    "details": 3,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Plans",
+    "url": "/grower/pricing",
+    "width": 360
+  },
+  {
+    "label": "grower-overview",
+    "details": 3,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Overview",
+    "url": "/grower/dashboard",
+    "width": 1440
+  },
+  {
+    "label": "grower-catalog",
+    "details": 2,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Catalog",
+    "url": "/grower/catalog",
+    "width": 1440
+  },
+  {
+    "label": "grower-products",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Products",
+    "url": "/grower/products",
+    "width": 1440
+  },
+  {
+    "label": "grower-product-add",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Add product",
+    "url": "/grower/products/add",
+    "width": 1440
+  },
+  {
+    "label": "grower-product-edit",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Edit product",
+    "url": "/grower/products/cmuebtw1z000aek6a7b8uz6hz/edit",
+    "width": 1440
+  },
+  {
+    "label": "grower-inventory",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Inventory",
+    "url": "/grower/inventory",
+    "width": 1440
+  },
+  {
+    "label": "grower-inventory-add",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Update stock",
+    "url": "/grower/inventory/add",
+    "width": 1440
+  },
+  {
+    "label": "grower-orders",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Requests",
+    "url": "/grower/orders",
+    "width": 1440
+  },
+  {
+    "label": "grower-order-add",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Record request",
+    "url": "/grower/orders/add",
+    "width": 1440
+  },
+  {
+    "label": "grower-order-detail",
+    "details": 3,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Request",
+    "url": "/grower/orders/cmuebtw22000iek6awumw45gj",
+    "width": 1440
+  },
+  {
+    "label": "grower-order-edit",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Edit request#REQ-2481",
+    "url": "/grower/orders/cmuebtw22000iek6awumw45gj/edit",
+    "width": 1440
+  },
+  {
+    "label": "grower-order-history",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "HistoryRequest history",
+    "url": "/grower/orders/history",
+    "width": 1440
+  },
+  {
+    "label": "grower-customers",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Customers",
+    "url": "/grower/customers",
+    "width": 1440
+  },
+  {
+    "label": "grower-customer-add",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Add customer",
+    "url": "/grower/customers/add",
+    "width": 1440
+  },
+  {
+    "label": "grower-customer-edit",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Customer details",
+    "url": "/grower/customers/cmuebtw1l0003ek6ajsz54uzk/edit",
+    "width": 1440
+  },
+  {
+    "label": "grower-statement",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Statement",
+    "url": "/grower/customers/cmuebtw1l0003ek6ajsz54uzk/statement",
+    "width": 1440
+  },
+  {
+    "label": "grower-strains",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Strains",
+    "url": "/grower/strains",
+    "width": 1440
+  },
+  {
+    "label": "grower-strain-add",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Add strain",
+    "url": "/grower/strains/add",
+    "width": 1440
+  },
+  {
+    "label": "grower-strain-edit",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Edit strain",
+    "url": "/grower/strains/5a00f373-71c4-4045-85dc-6b33b374a4a5/edit",
+    "width": 1440
+  },
+  {
+    "label": "grower-batches",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Batches",
+    "url": "/grower/batches",
+    "width": 1440
+  },
+  {
+    "label": "grower-batch-add",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Add batch",
+    "url": "/grower/batches/add",
+    "width": 1440
+  },
+  {
+    "label": "grower-batch-edit",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Edit batch",
+    "url": "/grower/batches/5bb179df-639d-4f39-aa43-de60f1705a67/edit",
+    "width": 1440
+  },
+  {
+    "label": "grower-marketplace",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Marketplace preview",
+    "url": "/grower/marketplace",
+    "width": 1440
+  },
+  {
+    "label": "grower-reports",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Reports",
+    "url": "/grower/reports",
+    "width": 1440
+  },
+  {
+    "label": "grower-settings",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Settings",
+    "url": "/grower/settings",
+    "width": 1440
+  },
+  {
+    "label": "grower-pricing",
+    "details": 3,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Plans",
+    "url": "/grower/pricing",
+    "width": 1440
+  },
+  {
+    "label": "buyer-catalog",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Catalog",
+    "url": "/dispensary/catalog",
+    "width": 360
+  },
+  {
+    "label": "buyer-storefront",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Valley Green Farms",
+    "url": "/dispensary/grower/cmuebtw1a0001ek6agxqssoec",
+    "width": 360
+  },
+  {
+    "label": "buyer-draft",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Request draft",
+    "url": "/dispensary/cart",
+    "width": 360
+  },
+  {
+    "label": "buyer-orders",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Orders",
+    "url": "/dispensary/orders",
+    "width": 360
+  },
+  {
+    "label": "buyer-order-detail",
+    "details": 2,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Request#REQ-2481",
+    "url": "/dispensary/orders/cmuebtw22000iek6awumw45gj",
+    "width": 360
+  },
+  {
+    "label": "buyer-saved",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Saved",
+    "url": "/dispensary/saved",
+    "width": 360
+  },
+  {
+    "label": "buyer-favorites",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Saved",
+    "url": "/dispensary/saved",
+    "width": 360
+  },
+  {
+    "label": "buyer-alerts",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Saved",
+    "url": "/dispensary/saved",
+    "width": 360
+  },
+  {
+    "label": "buyer-settings",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Settings",
+    "url": "/dispensary/settings",
+    "width": 360
+  },
+  {
+    "label": "buyer-overview",
+    "details": 3,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Overview",
+    "url": "/dispensary/dashboard",
+    "width": 1440
+  },
+  {
+    "label": "buyer-catalog",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Catalog",
+    "url": "/dispensary/catalog",
+    "width": 1440
+  },
+  {
+    "label": "buyer-storefront",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Valley Green Farms",
+    "url": "/dispensary/grower/cmuebtw1a0001ek6agxqssoec",
+    "width": 1440
+  },
+  {
+    "label": "buyer-draft",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Request draft",
+    "url": "/dispensary/cart",
+    "width": 1440
+  },
+  {
+    "label": "buyer-orders",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Orders",
+    "url": "/dispensary/orders",
+    "width": 1440
+  },
+  {
+    "label": "buyer-order-detail",
+    "details": 2,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Request#REQ-2481",
+    "url": "/dispensary/orders/cmuebtw22000iek6awumw45gj",
+    "width": 1440
+  },
+  {
+    "label": "buyer-saved",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Saved",
+    "url": "/dispensary/saved",
+    "width": 1440
+  },
+  {
+    "label": "buyer-favorites",
+    "details": 1,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Saved",
+    "url": "/dispensary/saved",
+    "width": 1440
+  },
+  {
+    "label": "buyer-alerts",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Saved",
+    "url": "/dispensary/saved",
+    "width": 1440
+  },
+  {
+    "label": "buyer-settings",
+    "details": 0,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 1440,
+    "title": "Settings",
+    "url": "/dispensary/settings",
+    "width": 1440
+  },
+  {
+    "label": "buyer-overview",
+    "details": 3,
+    "errors": false,
+    "loading": false,
+    "scrollWidth": 360,
+    "title": "Overview",
+    "url": "/dispensary/dashboard",
+    "width": 360
+  },
+  {
+    "label": "sign-in",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Wholesale workflows, without payment confusion.",
+    "url": "/auth/sign_in",
+    "width": 360
+  },
+  {
+    "label": "sign-up",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Build your verified profile.",
+    "url": "/auth/sign_up",
+    "width": 360
+  },
+  {
+    "label": "forgot-password",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Reset your password",
+    "url": "/auth/forgot-password",
+    "width": 360
+  },
+  {
+    "label": "reset-password",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Choose a new password",
+    "url": "/auth/reset-password",
+    "width": 360
+  },
+  {
+    "label": "verify-email",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Check your email",
+    "url": "/auth/verify-email",
+    "width": 360
+  },
+  {
+    "label": "change-email",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Change your email",
+    "url": "/auth/change-email",
+    "width": 360
+  },
+  {
+    "label": "confirm-email",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Confirm your new email",
+    "url": "/auth/confirm-email-change",
+    "width": 360
+  },
+  {
+    "label": "auth-error",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Need access? We can help.",
+    "url": "/auth/error",
+    "width": 360
+  },
+  {
+    "label": "sign-in",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Wholesale workflows, without payment confusion.",
+    "url": "/auth/sign_in",
+    "width": 1440
+  },
+  {
+    "label": "sign-up",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Build your verified profile.",
+    "url": "/auth/sign_up",
+    "width": 1440
+  },
+  {
+    "label": "forgot-password",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Reset your password",
+    "url": "/auth/forgot-password",
+    "width": 1440
+  },
+  {
+    "label": "reset-password",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Choose a new password",
+    "url": "/auth/reset-password",
+    "width": 1440
+  },
+  {
+    "label": "verify-email",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Check your email",
+    "url": "/auth/verify-email",
+    "width": 1440
+  },
+  {
+    "label": "change-email",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Change your email",
+    "url": "/auth/change-email",
+    "width": 1440
+  },
+  {
+    "label": "confirm-email",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Confirm your new email",
+    "url": "/auth/confirm-email-change",
+    "width": 1440
+  },
+  {
+    "label": "auth-error",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Need access? We can help.",
+    "url": "/auth/error",
+    "width": 1440
+  },
+  {
+    "label": "landing",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Licensed wholesale, engineered like software",
+    "url": "/",
+    "width": 360
+  },
+  {
+    "label": "help",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Marketplace help",
+    "url": "/help",
+    "width": 360
+  },
+  {
+    "label": "contact",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Wholesale workflow help.",
+    "url": "/contact",
+    "width": 360
+  },
+  {
+    "label": "privacy",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Privacy Policy",
+    "url": "/legal/privacy",
+    "width": 360
+  },
+  {
+    "label": "terms",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Terms of Service",
+    "url": "/legal/terms",
+    "width": 360
+  },
+  {
+    "label": "cookies",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Cookie Notice",
+    "url": "/legal/cookies",
+    "width": 360
+  },
+  {
+    "label": "not-found",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Page not found",
+    "url": "/review-nonexistent-page",
+    "width": 360
+  },
+  {
+    "label": "landing",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Licensed wholesale, engineered like software",
+    "url": "/",
+    "width": 1440
+  },
+  {
+    "label": "help",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Marketplace help",
+    "url": "/help",
+    "width": 1440
+  },
+  {
+    "label": "contact",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Wholesale workflow help.",
+    "url": "/contact",
+    "width": 1440
+  },
+  {
+    "label": "privacy",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Privacy Policy",
+    "url": "/legal/privacy",
+    "width": 1440
+  },
+  {
+    "label": "terms",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Terms of Service",
+    "url": "/legal/terms",
+    "width": 1440
+  },
+  {
+    "label": "cookies",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Cookie Notice",
+    "url": "/legal/cookies",
+    "width": 1440
+  },
+  {
+    "label": "not-found",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Page not found",
+    "url": "/review-nonexistent-page",
+    "width": 1440
+  },
+  {
+    "label": "admin-overview",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Overview",
+    "url": "/admin/dashboard",
+    "width": 360
+  },
+  {
+    "label": "admin-users",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Users",
+    "url": "/admin/users",
+    "width": 360
+  },
+  {
+    "label": "admin-growers",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Growers",
+    "url": "/admin/growers",
+    "width": 360
+  },
+  {
+    "label": "admin-dispensaries",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Dispensaries",
+    "url": "/admin/dispensaries",
+    "width": 360
+  },
+  {
+    "label": "admin-settings",
+    "error": false,
+    "scrollWidth": 360,
+    "title": "Settings",
+    "url": "/admin/settings",
+    "width": 360
+  },
+  {
+    "label": "admin-overview",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Overview",
+    "url": "/admin/dashboard",
+    "width": 1440
+  },
+  {
+    "label": "admin-users",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Users",
+    "url": "/admin/users",
+    "width": 1440
+  },
+  {
+    "label": "admin-growers",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Growers",
+    "url": "/admin/growers",
+    "width": 1440
+  },
+  {
+    "label": "admin-dispensaries",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Dispensaries",
+    "url": "/admin/dispensaries",
+    "width": 1440
+  },
+  {
+    "label": "admin-settings",
+    "error": false,
+    "scrollWidth": 1440,
+    "title": "Settings",
+    "url": "/admin/settings",
+    "width": 1440
+  }
+]

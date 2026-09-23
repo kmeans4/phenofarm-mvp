@@ -114,7 +114,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
   const pageCount = Math.max(1, Math.ceil(totalGrowerCount / PAGE_SIZE));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <div className="space-y-2">
         <PageHeader
           compact
@@ -136,18 +136,18 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
         />
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-pf-surface rounded-lg border border-pf-line overflow-hidden">
         {growers.length === 0 ? (
-          <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 mx-6 mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="px-4 py-8 text-center sm:py-10">
+            <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-pf-raised flex items-center justify-center">
+              <svg className="w-5 h-5 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{hasFilters ? 'No matching growers' : 'No growers yet'}</h3>
-            <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-              {hasFilters ? 'Try a different search or status filter.' : 'Growers will appear here once they register on the platform.'}
+            <h3 className="text-base font-semibold text-pf-text mb-1">{hasFilters ? 'No matching growers' : 'No growers yet'}</h3>
+            <p className="text-sm text-pf-muted mb-4 max-w-sm mx-auto">
+              {hasFilters ? 'Try a different search or status filter.' : 'Registered growers appear here.'}
             </p>
             {hasFilters ? (
               <Button variant="secondary" asChild>
@@ -166,28 +166,28 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
           </div>
         ) : (
           <>
-          <div className="divide-y divide-gray-200 xl:hidden">
+          <div className="divide-y divide-pf-line xl:hidden">
             {growers.map((g) => (
               <article key={`mobile-${g.id}`} className="space-y-3 p-3">
-                <div className="flex items-start justify-between gap-3">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
                   <div className="min-w-0">
-                    <h2 className="truncate font-semibold text-gray-900">{g.businessName}</h2>
+                    <h2 className="break-words text-sm font-semibold text-pf-text">{g.businessName}</h2>
                     {g.user?.email ? (
-                      <a href={`mailto:${g.user.email}`} className="inline-flex min-h-10 items-center break-all text-sm font-medium text-green-700 hover:underline">
+                      <a href={`mailto:${g.user.email}`} className="inline-flex min-h-10 items-center break-all text-sm font-medium text-pf-accent hover:underline">
                         {g.user.email}
                       </a>
                     ) : null}
                   </div>
-                  <div className="flex shrink-0 flex-wrap justify-end gap-1.5">
-                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${g.isVerified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                  <div className="flex flex-wrap gap-1.5 sm:shrink-0 sm:justify-end">
+                    <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${g.isVerified ? 'bg-pf-accent-bg text-pf-accent' : 'bg-pf-warning-bg text-pf-warning'}`}>
                       {g.isVerified ? 'Verified' : 'Pending'}
                     </span>
                     <SubscriptionStatusBadge plan={g.subscriptionPlan} status={g.subscriptionStatus} currentPeriodEnd={g.subscriptionCurrentPeriodEnd} />
                   </div>
                 </div>
                 <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
-                  <div><dt className="text-xs font-medium uppercase text-gray-500">License</dt><dd className="mt-1 text-gray-800">{g.licenseNumber || 'Not provided'}</dd></div>
-                  <div><dt className="text-xs font-medium uppercase text-gray-500">Expiry</dt><dd className="mt-1"><LicenseExpiryBadge expiresAt={g.licenseExpiry} /></dd></div>
+                  <div><dt className="text-xs font-medium uppercase text-pf-muted">License</dt><dd className="mt-1 break-all text-pf-secondary">{g.licenseNumber || 'Not provided'}</dd></div>
+                  <div><dt className="text-xs font-medium uppercase text-pf-muted">Expiry</dt><dd className="mt-1"><LicenseExpiryBadge expiresAt={g.licenseExpiry} /></dd></div>
                 </dl>
                 <ConfirmActionButton
                   actionUrl={`/admin/growers/${g.id}/verify`}
@@ -195,7 +195,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                   confirmMessage={`${g.isVerified ? 'Remove marketplace verification from' : 'Verify marketplace access for'} ${g.businessName}?`}
                   confirmTitle={g.isVerified ? 'Remove verification?' : 'Verify grower?'}
                   confirmLabel={g.isVerified ? 'Remove verification' : 'Verify'}
-                  className={`inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${g.isVerified ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                  className={`inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${g.isVerified ? 'border border-pf-line bg-pf-raised text-pf-secondary hover:bg-pf-hover' : 'bg-emerald-500 text-pf-canvas hover:bg-emerald-400'}`}
                 >
                   {g.isVerified ? 'Unverify' : 'Verify grower'}
                 </ConfirmActionButton>
@@ -204,29 +204,29 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
           </div>
           <div className="hidden overflow-x-auto xl:block">
             <table className="w-full min-w-[980px]">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-pf-canvas border-b border-pf-line">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Business</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">License</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Expiry</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Subscription</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Joined</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Business</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">License</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Expiry</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Subscription</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Joined</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-pf-muted uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-pf-line">
                 {growers.map((g) => (
-                  <tr key={g.id} className="hover:bg-gray-50">
+                  <tr key={g.id} className="hover:bg-pf-raised">
                     <td className="px-4 py-3">
-                      <span className="font-medium text-gray-900">{g.businessName}</span>
+                      <span className="font-medium text-pf-text">{g.businessName}</span>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">
+                    <td className="px-4 py-3 text-pf-muted">
                       {g.user?.email ? (
                         <a
                           href={`mailto:${g.user.email}`}
-                          className="font-medium text-green-700 hover:text-green-800 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                          className="font-medium text-pf-accent hover:text-pf-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                         >
                           {g.user.email}
                         </a>
@@ -234,15 +234,15 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                         '-'
                       )}
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{g.licenseNumber || '-'}</td>
+                    <td className="px-4 py-3 text-pf-muted">{g.licenseNumber || '-'}</td>
                     <td className="px-4 py-3">
                       <LicenseExpiryBadge expiresAt={g.licenseExpiry} />
                     </td>
                     <td className="px-4 py-3">
                       <span className={'inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ' + (
-                        g.isVerified 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
+                        g.isVerified
+                          ? 'bg-pf-accent-bg text-pf-accent'
+                          : 'bg-pf-warning-bg text-pf-warning'
                       )}>
                         {g.isVerified ? 'Verified' : 'Pending'}
                       </span>
@@ -254,7 +254,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                         currentPeriodEnd={g.subscriptionCurrentPeriodEnd}
                       />
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-sm text-pf-muted">
                       {new Date(g.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -264,10 +264,10 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                         confirmMessage={`${g.isVerified ? 'Remove marketplace verification from' : 'Verify marketplace access for'} ${g.businessName}?`}
                         confirmTitle={g.isVerified ? 'Remove verification?' : 'Verify grower?'}
                         confirmLabel={g.isVerified ? 'Remove verification' : 'Verify'}
-                        className={'inline-flex h-10 items-center rounded-md px-3 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ' + (
+                        className={'inline-flex h-10 items-center rounded-md px-3 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:opacity-60 ' + (
                           g.isVerified
-                            ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            : 'bg-green-600 text-white hover:bg-green-700'
+                            ? 'border border-pf-line bg-pf-raised text-pf-secondary hover:bg-pf-hover'
+                            : 'bg-emerald-500 text-pf-canvas hover:bg-emerald-400'
                         )}
                       >
                         {g.isVerified ? 'Unverify' : 'Verify'}
@@ -286,16 +286,16 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
           {page > 1 ? (
             <Link
               href={buildGrowersHref(query, status, page - 1)}
-              className="inline-flex min-h-10 items-center rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex min-h-10 items-center rounded-md border border-pf-line-strong px-3 text-sm font-medium text-pf-secondary hover:bg-pf-raised"
             >
               Previous
             </Link>
           ) : <span />}
-          <span className="text-sm text-gray-600">Page {page} of {pageCount}</span>
+          <span className="text-sm text-pf-muted">Page {page} of {pageCount}</span>
           {page < pageCount ? (
             <Link
               href={buildGrowersHref(query, status, page + 1)}
-              className="inline-flex min-h-10 items-center rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex min-h-10 items-center rounded-md border border-pf-line-strong px-3 text-sm font-medium text-pf-secondary hover:bg-pf-raised"
             >
               Next
             </Link>

@@ -1,3 +1,4 @@
+import { PortalDesktopHeader } from '@/app/components/ui/PortalDesktopHeader';
 import type { Session } from 'next-auth';
 import { redirect } from "next/navigation";
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -21,7 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const accountName = user.name || user.email || 'PhenoFarm admin';
 
   const navLinks = [
-    { name: 'Dashboard', href: '/admin/dashboard', group: 'Operations' },
+    { name: 'Overview', href: '/admin/dashboard', group: 'Operations' },
     { name: 'Users', href: '/admin/users', group: 'Accounts' },
     { name: 'Growers', href: '/admin/growers', group: 'Accounts' },
     { name: 'Dispensaries', href: '/admin/dispensaries', group: 'Accounts' },
@@ -30,9 +31,9 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <Providers session={session as Session}>
-      <div className="pf-portal min-h-screen w-full bg-gray-50">
+      <div className="pf-portal min-h-screen w-full bg-pf-canvas">
       {/* Mobile Header */}
-      <div className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.07] bg-[#16251c] lg:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.07] bg-pf-canvas lg:hidden">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
             <PortalBrand portalLabel="Admin" />
@@ -51,12 +52,10 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="sticky top-0 hidden h-screen w-60 flex-shrink-0 flex-col bg-[#16251c] px-4 py-5 lg:flex">
+        <aside className="sticky top-0 hidden h-screen w-60 flex-shrink-0 flex-col border-r border-pf-line bg-pf-canvas px-3 py-5 lg:flex">
           <div className="flex-shrink-0 px-1 pb-4">
             <PortalBrand portalLabel="Admin" />
-            <div className="mt-3">
-              <NotificationBell />
-            </div>
+
           </div>
 
           <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto py-2">
@@ -67,7 +66,8 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
         {/* Main Content */}
         <main className="w-full min-w-0 flex-1 pt-16 lg:pt-0">
-          <div className="mx-auto max-w-7xl p-4 md:p-7 lg:p-8">
+          <PortalDesktopHeader accountName={accountName} role="admin" />
+          <div className="mx-auto max-w-[1440px] p-4 md:p-6">
             {children}
           </div>
         </main>

@@ -190,7 +190,7 @@ export function PricingPlans() {
   if (loading) {
     return (
       <Card>
-        <CardContent className="p-6 text-center text-gray-500">
+        <CardContent className="p-6 text-center text-pf-muted">
           Loading subscription plans...
         </CardContent>
       </Card>
@@ -206,13 +206,13 @@ export function PricingPlans() {
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3 text-sm">
-        <div><span className="text-gray-500">Current plan: </span><strong>{currentPlanName}</strong>
-          {renewalDate && <p className="mt-1 text-xs text-gray-500">{currentSubscription.cancelAtPeriodEnd ? 'Cancels' : 'Renews'} {renewalDate}</p>}
+        <div><span className="text-pf-muted">Current plan: </span><strong>{currentPlanName}</strong>
+          {renewalDate && <p className="mt-1 text-xs text-pf-muted">{currentSubscription.cancelAtPeriodEnd ? 'Cancels' : 'Renews'} {renewalDate}</p>}
         </div>
         {currentSubscription.portalAvailable && <Button type="button" variant="outline" onClick={openPortal} disabled={actionLoading !== null}>{actionLoading === 'portal' ? 'Opening billing...' : 'Manage billing'}</Button>}
       </div>
-      {actionError && <p role="alert" className="rounded-lg bg-red-50 p-3 text-sm text-red-700">{actionError}</p>}
-      {!billingConfigured && <p className="text-sm text-gray-600">Paid upgrades are unavailable. <a className="text-green-700 underline" href="/contact">Contact support</a>.</p>}
+      {actionError && <p role="alert" className="rounded-lg bg-pf-danger-bg p-3 text-sm text-pf-danger">{actionError}</p>}
+      {!billingConfigured && <p className="text-sm text-pf-muted">Paid upgrades are unavailable. <a className="text-pf-accent underline" href="/contact">Contact support</a>.</p>}
 
       <div className="grid grid-cols-1 gap-4 sm:gap-5 lg:grid-cols-3">
         {PLAN_CONFIGS.map((plan) => {
@@ -224,13 +224,13 @@ export function PricingPlans() {
           return (
             <section
               key={plan.id}
-              className={`relative flex rounded-lg border bg-white p-4 sm:p-6 shadow-sm ${
-                plan.highlighted ? 'border-green-300 ring-1 ring-green-200' : 'border-gray-200'
+              className={`relative flex rounded-lg border bg-pf-surface p-4 sm:p-6 shadow-sm ${
+                plan.highlighted ? 'border-pf-accent-line ring-1 ring-pf-accent-line' : 'border-pf-line'
               }`}
             >
               <div className="flex min-h-full w-full flex-col">
                 {plan.highlighted ? (
-                  <span className="absolute -top-3 left-6 rounded-full bg-green-600 px-3 py-1 text-xs font-semibold text-white">
+                  <span className="absolute -top-3 left-6 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-[#032116]">
                     Most popular
                   </span>
                 ) : null}
@@ -238,24 +238,24 @@ export function PricingPlans() {
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex flex-wrap items-center gap-2">
-                      <h2 className="text-lg font-semibold text-gray-900">{plan.name}</h2>
+                      <h2 className="text-lg font-semibold text-pf-text">{plan.name}</h2>
                       {isCurrent ? <Badge variant="success">Current plan</Badge> : null}
                     </div>
-                    <p className="mt-2 text-sm text-gray-600">{plan.description}</p>
+                    <p className="mt-2 text-sm text-pf-muted">{plan.description}</p>
                   </div>
                 </div>
 
                 <div className="mt-3">
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900">{plan.price}</p>
-                  {plan.priceDetail ? <p className="mt-1 text-sm text-gray-500">{plan.priceDetail}</p> : null}
+                  <p className="text-2xl sm:text-3xl font-bold text-pf-text">{plan.price}</p>
+                  {plan.priceDetail ? <p className="mt-1 text-sm text-pf-muted">{plan.priceDetail}</p> : null}
                 </div>
 
-                <details className="mt-3 flex-1 text-sm text-gray-700">
+                <details className="mt-3 flex-1 text-sm text-pf-secondary">
                   <summary className="min-h-10 cursor-pointer py-2 font-medium">Plan features</summary>
                   <ul className="mt-2 space-y-2">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex gap-2">
-                      <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-green-600" aria-hidden="true" />
+                      <CheckCircle2 className="mt-0.5 h-4 w-4 flex-none text-pf-accent" aria-hidden="true" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -274,7 +274,7 @@ export function PricingPlans() {
                       <a href="mailto:support@phenofarm.com?subject=PhenoFarm%20Business%20plan">Contact sales</a>
                     </Button>
                   ) : !billingConfigured ? (
-                    <p className="rounded-lg bg-gray-50 px-3 py-2 text-center text-sm text-gray-500">
+                    <p className="rounded-lg bg-pf-canvas px-3 py-2 text-center text-sm text-pf-muted">
                       Checkout unavailable
                     </p>
                   ) : plan.id === 'free' ? (
@@ -291,7 +291,8 @@ export function PricingPlans() {
                   ) : (
                     <Button
                       type="button"
-                      className="w-full bg-green-600 hover:bg-green-700"
+                      variant="primary"
+                      className="w-full"
                       onClick={() => startCheckout('pro')}
                       disabled={!canCheckout || actionLoading !== null}
                       title={canCheckout ? 'Start Stripe subscription checkout' : 'Paid upgrades are currently unavailable'}

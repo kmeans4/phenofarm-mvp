@@ -168,32 +168,32 @@ export function OrdersTable({
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) {
       return (
-        <svg className="w-4 h-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg className="w-4 h-4 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
         </svg>
       );
     }
     return sortDirection === 'asc' ? (
-      <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4 text-pf-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
       </svg>
     ) : (
-      <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <svg className="w-4 h-4 text-pf-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
       </svg>
     );
   };
   const compactMode = compact || tableDensity === 'compact';
   const cellClass = compactMode ? 'px-4 py-1.5 text-xs' : 'px-4 py-3 text-sm';
-  const mobileCardClass = 'rounded-xl border border-gray-200 bg-white p-3 shadow-sm';
+  const mobileCardClass = 'rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm';
 
   return (
     <>
       {showWorkflowViews && (
-        <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+        <div className="mb-4 rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
           <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-semibold text-gray-900">Saved workflow views</p>
-            <p className="text-xs text-gray-500">Jump to the requests most likely to need your next action.</p>
+            <p className="text-sm font-semibold text-pf-text">Saved workflow views</p>
+            <p className="text-xs text-pf-muted">Jump to the requests most likely to need your next action.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {orderViews.map((view) => (
@@ -207,13 +207,13 @@ export function OrdersTable({
                 aria-label={`${view.label}: ${view.count} requests`}
                 className={`rounded-lg px-3 py-2 text-sm font-medium ${
                   orderView === view.key
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    ? 'bg-emerald-500 text-[#032116]'
+                    : 'bg-pf-canvas text-pf-secondary hover:bg-pf-surface'
                 }`}
               >
                 {view.label}
                 <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-                  orderView === view.key ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+                  orderView === view.key ? 'bg-black/10 text-[#032116]' : 'bg-pf-surface text-pf-muted ring-1 ring-pf-line'
                 }`}>
                   {view.count}
                 </span>
@@ -225,9 +225,9 @@ export function OrdersTable({
 
       {/* Filters */}
       {showFilters && (
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 mb-4">
           <div className="relative flex-1">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
@@ -235,7 +235,7 @@ export function OrdersTable({
               placeholder="Search requests..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2 rounded-lg border border-pf-line-strong focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
             />
           </div>
           <div className="sm:self-center">
@@ -247,7 +247,7 @@ export function OrdersTable({
       {/* Mobile order cards */}
       <div className="space-y-2 md:hidden">
         {filteredOrders.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-300 bg-gray-50 px-4 py-8 text-center text-gray-500">
+          <div className="rounded-xl border border-dashed border-pf-line-strong bg-pf-canvas px-4 py-8 text-center text-pf-muted">
             {searchQuery
               ? 'No requests match your filters'
               : 'No requests yet'}
@@ -255,22 +255,22 @@ export function OrdersTable({
         ) : (
           visibleOrders.slice(0, compact ? 3 : visibleOrders.length).map((order) => (
             <Link key={order.id} href={`/dispensary/orders/${order.id}`} aria-label={`View request ${order.orderId}`}
-              className={`${mobileCardClass} block transition-colors hover:border-green-200 hover:bg-green-50/40 focus-visible:ring-2 focus-visible:ring-green-600`}>
+              className={`${mobileCardClass} block transition-colors hover:border-pf-accent-line hover:bg-pf-accent-bg/40 focus-visible:ring-2 focus-visible:ring-emerald-400`}>
               <div className="flex items-center justify-between gap-2">
-                <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-gray-900" title={order.orderId}>
+                <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-pf-text" title={order.orderId}>
                   #{shortOrderId(order.orderId)}
-                  <time dateTime={new Date(order.createdAt).toISOString()} title={format(new Date(order.createdAt), 'MMM d, yyyy')} className="text-xs font-normal text-gray-500">{format(new Date(order.createdAt), 'MMM d, yy')}</time>
-                  {order.hasUnreadMessages ? <span className="h-2 w-2 shrink-0 rounded-full bg-green-600" aria-label="Unread grower message" /> : null}
+                  <time dateTime={new Date(order.createdAt).toISOString()} title={format(new Date(order.createdAt), 'MMM d, yyyy')} className="text-xs font-normal text-pf-muted">{format(new Date(order.createdAt), 'MMM d, yy')}</time>
+                  {order.hasUnreadMessages ? <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-label="Unread grower message" /> : null}
                 </span>
                 <Badge variant={getBadgeVariant(order.status)}>{statusLabels[order.status] || order.status}</Badge>
               </div>
               <div className="mt-1 flex items-start justify-between gap-3 text-sm">
                 <div className="min-w-0">
-                  <p className="break-words text-gray-700">{order.grower?.businessName || 'Unknown grower'}</p>
+                  <p className="break-words text-pf-secondary">{order.grower?.businessName || 'Unknown grower'}</p>
                 </div>
-                <span className="shrink-0 font-semibold text-gray-900">${Number(order.totalAmount).toFixed(2)}</span>
+                <span className="shrink-0 font-semibold text-pf-text">${Number(order.totalAmount).toFixed(2)}</span>
               </div>
-              {order.createdBy === 'GROWER' ? <p className="mt-1 text-xs text-blue-800">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</p> : null}
+              {order.createdBy === 'GROWER' ? <p className="mt-1 text-xs text-pf-info">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</p> : null}
             </Link>
           ))
         )}
@@ -280,47 +280,47 @@ export function OrdersTable({
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-gray-200">
+            <tr className="border-b border-pf-line">
               <th 
-                className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
+                className={`${cellClass} font-medium text-pf-secondary cursor-pointer hover:bg-pf-canvas`}
                 aria-sort={sortField === 'orderId' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
-                <button type="button" onClick={() => handleSort('orderId')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-green-600">
+                <button type="button" onClick={() => handleSort('orderId')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-emerald-400">
                   Request # {getSortIcon('orderId')}
                 </button>
               </th>
-              <th className={`${cellClass} font-medium text-gray-700`}>Grower</th>
+              <th className={`${cellClass} font-medium text-pf-secondary`}>Grower</th>
               <th 
-                className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
+                className={`${cellClass} font-medium text-pf-secondary cursor-pointer hover:bg-pf-canvas`}
                 aria-sort={sortField === 'date' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
-                <button type="button" onClick={() => handleSort('date')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-green-600">
+                <button type="button" onClick={() => handleSort('date')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-emerald-400">
                   Date {getSortIcon('date')}
                 </button>
               </th>
               <th 
-                className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
+                className={`${cellClass} font-medium text-pf-secondary cursor-pointer hover:bg-pf-canvas`}
                 aria-sort={sortField === 'total' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
-                <button type="button" onClick={() => handleSort('total')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-green-600">
+                <button type="button" onClick={() => handleSort('total')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-emerald-400">
                   Est. value {getSortIcon('total')}
                 </button>
               </th>
               <th 
-                className={`${cellClass} font-medium text-gray-700 cursor-pointer hover:bg-gray-50`}
+                className={`${cellClass} font-medium text-pf-secondary cursor-pointer hover:bg-pf-canvas`}
                 aria-sort={sortField === 'status' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
               >
-                <button type="button" onClick={() => handleSort('status')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-green-600">
+                <button type="button" onClick={() => handleSort('status')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-emerald-400">
                   Status {getSortIcon('status')}
                 </button>
               </th>
-              <th className={`${cellClass} font-medium text-gray-700`}>Actions</th>
+              <th className={`${cellClass} font-medium text-pf-secondary`}>Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-200">
+          <tbody className="divide-y divide-pf-line">
             {visibleOrders.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
+                <td colSpan={6} className="px-4 py-8 text-center text-pf-muted">
                   {searchQuery
                     ? 'No requests match your filters' 
                     : 'No requests yet'}
@@ -340,24 +340,24 @@ export function OrdersTable({
                       navigateToOrder(order.id);
                     }
                   }}
-                  className="cursor-pointer transition-colors hover:bg-green-50/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-green-600"
+                  className="cursor-pointer transition-colors hover:bg-pf-accent-bg/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-400"
                 >
                   <td className={cellClass}>
-                    <div className="flex items-center gap-2 font-medium text-gray-900">
+                    <div className="flex items-center gap-2 font-medium text-pf-text">
                       #{order.orderId}
                       {order.hasUnreadMessages ? (
-                        <span className="h-2 w-2 rounded-full bg-green-600" title="Unread grower message" aria-label="Unread grower message" />
+                        <span className="h-2 w-2 rounded-full bg-emerald-500" title="Unread grower message" aria-label="Unread grower message" />
                       ) : null}
                     </div>
-                    {order.createdBy === 'GROWER' ? <span className="mt-1 inline-flex rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-800">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</span> : null}
+                    {order.createdBy === 'GROWER' ? <span className="mt-1 inline-flex rounded-full bg-pf-info-bg px-2 py-0.5 text-[11px] font-semibold text-pf-info">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</span> : null}
                   </td>
-                  <td className={`${cellClass} text-gray-600`}>
+                  <td className={`${cellClass} text-pf-muted`}>
                     {order.grower?.businessName || 'Unknown'}
                   </td>
-                  <td className={`${cellClass} text-gray-600`}>
+                  <td className={`${cellClass} text-pf-muted`}>
                     {format(new Date(order.createdAt), 'MMM d, yyyy')}
                   </td>
-                  <td className={`${cellClass} font-bold text-gray-900`}>
+                  <td className={`${cellClass} font-bold text-pf-text`}>
                     ${Number(order.totalAmount).toFixed(2)}
                   </td>
                   <td className={cellClass}>
@@ -369,7 +369,7 @@ export function OrdersTable({
                     <Link 
                       href={'/dispensary/orders/' + order.id}
                       onClick={(event) => event.stopPropagation()}
-                      className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                      className="text-pf-info hover:text-pf-info font-medium text-sm"
                     >
                       View
                     </Link>
@@ -383,7 +383,7 @@ export function OrdersTable({
 
       {/* Results count */}
       {showResultCount && filteredOrders.length > 0 && (
-        <div className="mt-4 text-sm text-gray-500">
+        <div className="mt-4 text-sm text-pf-muted">
           Showing {visibleOrders.length} of {initialOrders.length} requests
         </div>
       )}

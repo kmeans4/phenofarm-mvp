@@ -117,14 +117,14 @@ export default function FilterSidebar({
     (filters.inStockOnly ? 1 : 0);
 
   const sidebarContent = (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col text-sm">
       {/* Header */}
-      <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+      <div className="p-4 border-b border-pf-line flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Filter size={20} className="text-green-600" />
-          <h2 className="font-semibold text-gray-900">Filters</h2>
+          <Filter size={20} className="text-pf-accent" />
+          <h2 className="font-semibold text-pf-text">Filters</h2>
           {activeFilterCount > 0 && (
-            <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-0.5 rounded-full">
+            <span className="bg-pf-accent-bg text-pf-accent text-xs font-medium px-2 py-0.5 rounded-full">
               {activeFilterCount}
             </span>
           )}
@@ -133,81 +133,81 @@ export default function FilterSidebar({
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
-              className="text-sm text-gray-500 hover:text-red-600 transition-colors"
+              className="text-sm text-pf-muted hover:text-pf-danger transition-colors"
             >
               Clear all
             </button>
           )}
           <button
             onClick={onClose}
-            className="lg:hidden p-1 hover:bg-gray-100 rounded"
+            aria-label="Close filters" className="lg:hidden flex h-10 w-10 items-center justify-center hover:bg-pf-raised rounded-lg"
           >
-            <X size={20} className="text-gray-500" />
+            <X size={20} className="text-pf-muted" />
           </button>
         </div>
       </div>
 
       {/* Results count */}
-      <div className="px-4 py-2 bg-gray-50 text-sm text-gray-600 border-b border-gray-200">
-        Showing {filteredCount} of {totalProducts} products
+      <div className="px-4 py-2 bg-pf-canvas text-sm text-pf-muted border-b border-pf-line">
+        {filteredCount} of {totalProducts} products
       </div>
 
       {/* Scrollable filter sections */}
       <div className="flex-1 overflow-y-auto">
         {/* In Stock Only */}
-        <div className="border-b border-gray-200">
+        <div className="border-b border-pf-line">
           <button
             onClick={() => toggleSection('stock')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-pf-canvas transition-colors"
           >
-            <span className="font-medium text-gray-900">Availability</span>
+            <span className="font-medium text-pf-text">Availability</span>
             {expandedSections.stock ? (
-              <ChevronUp size={18} className="text-gray-400" />
+              <ChevronUp size={18} className="text-pf-muted" />
             ) : (
-              <ChevronDown size={18} className="text-gray-400" />
+              <ChevronDown size={18} className="text-pf-muted" />
             )}
           </button>
           {expandedSections.stock && (
             <div className="px-4 pb-4">
-              <label className="flex items-center gap-2 cursor-pointer">
+              <label className="flex min-h-9 items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={filters.inStockOnly}
                   onChange={(e) =>
                     onFilterChange({ ...filters, inStockOnly: e.target.checked })
                   }
-                  className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                  className="w-4 h-4 rounded border-pf-line-strong text-pf-accent focus:ring-emerald-400"
                 />
-                <span className="text-gray-700">In stock only</span>
+                <span className="text-pf-secondary">In stock only</span>
               </label>
             </div>
           )}
         </div>
 
-        {/* Product Type */}
-        <div className="border-b border-gray-200">
+        {/* Product type */}
+        <div className="border-b border-pf-line">
           <button
             onClick={() => toggleSection('productType')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-pf-canvas transition-colors"
           >
-            <span className="font-medium text-gray-900">Product Type</span>
+            <span className="font-medium text-pf-text">Product type</span>
             {expandedSections.productType ? (
-              <ChevronUp size={18} className="text-gray-400" />
+              <ChevronUp size={18} className="text-pf-muted" />
             ) : (
-              <ChevronDown size={18} className="text-gray-400" />
+              <ChevronDown size={18} className="text-pf-muted" />
             )}
           </button>
           {expandedSections.productType && (
             <div className="px-4 pb-4 space-y-2">
               {availableProductTypes.map((type) => (
-                <label key={type} className="flex items-center gap-2 cursor-pointer">
+                <label key={type} className="flex min-h-9 items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={filters.productTypes.includes(type)}
                     onChange={() => handleProductTypeToggle(type)}
-                    className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    className="w-4 h-4 rounded border-pf-line-strong text-pf-accent focus:ring-emerald-400"
                   />
-                  <span className="text-gray-700">{type}</span>
+                  <span className="text-pf-secondary">{type}</span>
                 </label>
               ))}
             </div>
@@ -215,29 +215,29 @@ export default function FilterSidebar({
         </div>
 
         {/* THC Range */}
-        <div className="border-b border-gray-200">
+        <div className="border-b border-pf-line">
           <button
             onClick={() => toggleSection('thc')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-pf-canvas transition-colors"
           >
-            <span className="font-medium text-gray-900">THC Potency</span>
+            <span className="font-medium text-pf-text">THC</span>
             {expandedSections.thc ? (
-              <ChevronUp size={18} className="text-gray-400" />
+              <ChevronUp size={18} className="text-pf-muted" />
             ) : (
-              <ChevronDown size={18} className="text-gray-400" />
+              <ChevronDown size={18} className="text-pf-muted" />
             )}
           </button>
           {expandedSections.thc && (
             <div className="px-4 pb-4 space-y-2">
               {THC_RANGES.map((range) => (
-                <label key={range.value} className="flex items-center gap-2 cursor-pointer">
+                <label key={range.value} className="flex min-h-9 items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={filters.thcRanges.includes(range.value)}
                     onChange={() => handleThcRangeToggle(range.value)}
-                    className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    className="w-4 h-4 rounded border-pf-line-strong text-pf-accent focus:ring-emerald-400"
                   />
-                  <span className="text-gray-700">{range.label}</span>
+                  <span className="text-pf-secondary">{range.label}</span>
                 </label>
               ))}
             </div>
@@ -245,52 +245,52 @@ export default function FilterSidebar({
         </div>
 
         {/* CBD Range */}
-        <div className="border-b border-gray-200">
+        <div className="border-b border-pf-line">
           <button
             onClick={() => toggleSection('cbd')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-pf-canvas transition-colors"
           >
-            <span className="font-medium text-gray-900">CBD Content</span>
+            <span className="font-medium text-pf-text">CBD</span>
             {expandedSections.cbd ? (
-              <ChevronUp size={18} className="text-gray-400" />
+              <ChevronUp size={18} className="text-pf-muted" />
             ) : (
-              <ChevronDown size={18} className="text-gray-400" />
+              <ChevronDown size={18} className="text-pf-muted" />
             )}
           </button>
           {expandedSections.cbd && (
             <div className="px-4 pb-4 space-y-2">
               {CBD_RANGES.map((range) => (
-                <label key={range.value} className="flex items-center gap-2 cursor-pointer">
+                <label key={range.value} className="flex min-h-9 items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={filters.cbdRanges.includes(range.value)}
                     onChange={() => handleCbdRangeToggle(range.value)}
-                    className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    className="w-4 h-4 rounded border-pf-line-strong text-pf-accent focus:ring-emerald-400"
                   />
-                  <span className="text-gray-700">{range.label}</span>
+                  <span className="text-pf-secondary">{range.label}</span>
                 </label>
               ))}
             </div>
           )}
         </div>
 
-        {/* Price Range */}
-        <div className="border-b border-gray-200">
+        {/* Price */}
+        <div className="border-b border-pf-line">
           <button
             onClick={() => toggleSection('price')}
-            className="w-full px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-4 py-3 flex items-center justify-between hover:bg-pf-canvas transition-colors"
           >
-            <span className="font-medium text-gray-900">Price Range</span>
+            <span className="font-medium text-pf-text">Price</span>
             {expandedSections.price ? (
-              <ChevronUp size={18} className="text-gray-400" />
+              <ChevronUp size={18} className="text-pf-muted" />
             ) : (
-              <ChevronDown size={18} className="text-gray-400" />
+              <ChevronDown size={18} className="text-pf-muted" />
             )}
           </button>
           {expandedSections.price && (
             <div className="px-4 pb-4 space-y-2">
               {PRICE_RANGES.map((range) => (
-                <label key={range.value} className="flex items-center gap-2 cursor-pointer">
+                <label key={range.value} className="flex min-h-9 items-center gap-2 cursor-pointer">
                   <input
                     type="radio"
                     name="priceRange"
@@ -299,9 +299,9 @@ export default function FilterSidebar({
                       filters.priceRange.max === range.max
                     }
                     onChange={() => handlePriceRangeSelect(range.value)}
-                    className="w-4 h-4 border-gray-300 text-green-600 focus:ring-green-500"
+                    className="w-4 h-4 border-pf-line-strong text-pf-accent focus:ring-emerald-400"
                   />
-                  <span className="text-gray-700">{range.label}</span>
+                  <span className="text-pf-secondary">{range.label}</span>
                 </label>
               ))}
               {filters.priceRange.min !== null && (
@@ -312,7 +312,7 @@ export default function FilterSidebar({
                       priceRange: { min: null, max: null },
                     })
                   }
-                  className="text-sm text-green-600 hover:text-green-700 mt-2"
+                  className="text-sm text-pf-accent hover:text-pf-accent mt-2"
                 >
                   Clear price filter
                 </button>
@@ -327,8 +327,8 @@ export default function FilterSidebar({
   return (
     <>
       {/* Desktop sidebar (fixed width) */}
-      <div className="hidden lg:block w-72 flex-shrink-0">
-        <div className="sticky top-4 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden max-h-[calc(100vh-2rem)]">
+      <div className="hidden lg:block w-60 flex-shrink-0">
+        <div className="sticky top-4 bg-pf-surface rounded-xl shadow-sm border border-pf-line overflow-hidden max-h-[calc(100vh-2rem)]">
           {sidebarContent}
         </div>
       </div>
@@ -340,7 +340,7 @@ export default function FilterSidebar({
             className="lg:hidden fixed inset-0 bg-black/50 z-40"
             onClick={onClose}
           />
-          <div className="lg:hidden fixed inset-y-0 left-0 w-80 bg-white shadow-xl z-50">
+          <div className="lg:hidden fixed inset-y-0 left-0 w-80 max-w-[90vw] border-r border-pf-line bg-pf-surface shadow-xl z-50">
             {sidebarContent}
           </div>
         </>

@@ -57,9 +57,9 @@ function BuyerPreviewCard({ product }: { product: MarketplaceProduct }) {
     <div
       data-testid="marketplace-listing-card"
       data-product-id={product.id}
-      className="relative overflow-hidden rounded-xl border border-gray-200 bg-white transition-shadow hover:shadow-lg"
+      className="relative overflow-hidden rounded-xl border border-pf-line bg-pf-surface transition-shadow hover:shadow-lg"
     >
-      <div className="absolute left-3 top-3 h-16 w-16 overflow-hidden rounded-lg bg-gradient-to-br from-green-50 to-emerald-100 sm:relative sm:left-auto sm:top-auto sm:h-auto sm:w-auto sm:rounded-none">
+      <div className="absolute left-3 top-3 h-16 w-16 overflow-hidden rounded-lg bg-gradient-to-br from-pf-accent-bg to-pf-accent-bg sm:relative sm:left-auto sm:top-auto sm:h-auto sm:w-auto sm:rounded-none">
         <ProductImage
           src={firstImage}
           alt={product.name}
@@ -75,9 +75,9 @@ function BuyerPreviewCard({ product }: { product: MarketplaceProduct }) {
       <div className="p-3 sm:p-4">
         <div className="min-h-16 pl-[76px] sm:min-h-0 sm:pl-0">
         <div className="mb-2 flex items-start justify-between gap-2">
-          <h3 className="line-clamp-2 flex-1 font-semibold text-gray-900">{product.name}</h3>
+          <h3 className="line-clamp-2 flex-1 font-semibold text-pf-text">{product.name}</h3>
           {product.grower.isVerified && (
-            <span className="mt-0.5 text-green-600" title="Verified Grower">
+            <span className="mt-0.5 text-pf-accent" title="Verified Grower">
               <CheckCircle2 size={16} />
             </span>
           )}
@@ -105,33 +105,33 @@ function BuyerPreviewCard({ product }: { product: MarketplaceProduct }) {
             </span>
           )}
           {product.productType && (
-            <span className="rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">
+            <span className="rounded-full border border-pf-line bg-pf-surface px-2 py-0.5 text-xs font-medium text-pf-secondary">
               {product.productType}
             </span>
           )}
         </div>
 
-        <div className="mb-3 text-sm text-gray-600">
+        <div className="mb-3 text-sm text-pf-muted">
           {product.strainName && (
             <p className="mb-1">
-              <span className="text-gray-400">Strain:</span> {product.strainName}
+              <span className="text-pf-muted">Strain:</span> {product.strainName}
             </p>
           )}
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-pf-muted">
             {product.inventoryQty} {formatProductUnit(product.unit)} available
           </p>
         </div>
 
-        <div aria-hidden="true" className="pointer-events-none space-y-2 border-t border-gray-100 pt-3 opacity-80">
+        <div aria-hidden="true" className="pointer-events-none space-y-2 border-t border-pf-line pt-3 opacity-80">
           {product.isPriceVisible ? (
             <div className="flex items-center justify-between gap-2 sm:block sm:space-y-2">
               <div className="min-w-0 flex-1 break-words">
-                <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
-                <span className="ml-1 text-sm text-gray-500">/ {formatProductUnit(product.unit)}</span>
+                <span className="text-xl font-bold text-pf-accent">${product.price.toFixed(2)}</span>
+                <span className="ml-1 text-sm text-pf-muted">/ {formatProductUnit(product.unit)}</span>
               </div>
               <div
                 aria-hidden="true"
-                className="inline-flex min-h-10 flex-1 cursor-default items-center justify-center gap-1.5 rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white sm:w-full"
+                className="inline-flex min-h-10 flex-1 cursor-default items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-[#032116] sm:w-full"
               >
                 <Plus size={16} />
                 <span className="sm:hidden">Add</span><span className="hidden sm:inline">Add to draft</span>
@@ -140,7 +140,7 @@ function BuyerPreviewCard({ product }: { product: MarketplaceProduct }) {
           ) : (
             <div
               aria-hidden="true"
-              className="inline-flex w-full cursor-default items-center justify-center gap-2 rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700"
+              className="inline-flex w-full cursor-default items-center justify-center gap-2 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent"
             >
               Request pricing
             </div>
@@ -148,21 +148,21 @@ function BuyerPreviewCard({ product }: { product: MarketplaceProduct }) {
 
           <div
             aria-hidden="true"
-            className="inline-flex w-full cursor-default items-center justify-center rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-500"
+            className="inline-flex w-full cursor-default items-center justify-center rounded-lg border border-pf-line-strong px-3 py-2 text-sm font-medium text-pf-muted"
           >
             Message grower
           </div>
         </div>
 
-        <div className="mt-2 flex items-center justify-between gap-2 border-t border-gray-100 pt-2 sm:mt-3 sm:block sm:pt-3">
-          <p className="flex items-center gap-1.5 py-1 text-xs font-medium text-gray-500 sm:justify-center">
+        <div className="mt-2 flex items-center justify-between gap-2 border-t border-pf-line pt-2 sm:mt-3 sm:block sm:pt-3">
+          <p className="flex items-center gap-1.5 py-1 text-xs font-medium text-pf-muted sm:justify-center">
             <FileText size={14} />
             Lab results on request
           </p>
-          <div className="shrink-0 text-right sm:mt-3 sm:border-t sm:border-gray-100 sm:pt-3">
+          <div className="shrink-0 text-right sm:mt-3 sm:border-t sm:border-pf-line sm:pt-3">
           <Link
             href={`/grower/products/${product.id}/edit`}
-            className="inline-flex min-h-10 items-center text-sm font-medium text-green-700 underline-offset-4 hover:text-green-800 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent underline-offset-4 hover:text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
           >
             Edit listing
           </Link>
@@ -239,7 +239,7 @@ export default async function GrowerMarketplacePage({ searchParams }: { searchPa
         description="How buyers see your listings."
         mobileInlineActions
         actions={
-          <Link href="/grower/products/add" className="inline-flex min-h-10 items-center rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:px-4">
+          <Link href="/grower/products/add" className="inline-flex min-h-10 items-center rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:px-4">
             Add product
           </Link>
         }
@@ -248,22 +248,22 @@ export default async function GrowerMarketplacePage({ searchParams }: { searchPa
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
         <span><strong>{activeListings}</strong> active</span>
         <span><strong>{hiddenPriceListings}</strong> quote required</span>
-        <Link href="/grower/settings#commercial-terms" className="text-green-700 underline">Terms{savedMinimumOrder ? ` · MOQ ${savedMinimumOrder}` : ''}</Link>
+        <Link href="/grower/settings#commercial-terms" className="text-pf-accent underline">Terms{savedMinimumOrder ? ` · MOQ ${savedMinimumOrder}` : ''}</Link>
       </div>
       <div>
         <div>
           {products.length === 0 ? (
-            <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pf-surface flex items-center justify-center">
+                <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7h18M5 7l1 12h12l1-12M9 7V5a3 3 0 016 0v2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No active listings yet</h3>
-              <p className="text-gray-500 mb-2 max-w-md mx-auto">
+              <h3 className="text-lg font-semibold text-pf-text mb-2">No active listings yet</h3>
+              <p className="text-pf-muted mb-2 max-w-md mx-auto">
                 Add a product to make it available to buyers.
               </p>
-              <Link href="/grower/products/add" className="inline-flex items-center rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+              <Link href="/grower/products/add" className="inline-flex items-center rounded-lg bg-emerald-500 px-4 py-2 font-medium text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2">
                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
