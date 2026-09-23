@@ -480,7 +480,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 placeholder="business@example.com"
               />
               <p id="account-email-help" className="mt-1 text-sm text-gray-600">
-                Verified login address. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-green-700 underline">Change email</Link>
+                Login address. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-green-700 underline">Change email</Link>
               </p>
               {touched.email && fieldErrors.email && (
                 <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
