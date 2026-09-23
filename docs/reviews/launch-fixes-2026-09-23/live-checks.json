@@ -1,0 +1,102 @@
+[
+  {
+    "name": "Production baseline captured",
+    "passed": true,
+    "at": "2026-09-23T21:55:49.083Z"
+  },
+  {
+    "name": "Fresh grower signup, email verification and real login",
+    "passed": true,
+    "at": "2026-09-23T21:57:24.257Z"
+  },
+  {
+    "name": "Fresh dispensary signup, email verification and real login",
+    "passed": true,
+    "at": "2026-09-23T21:57:29.462Z"
+  },
+  {
+    "name": "Synthetic administrator provisioned and signed in",
+    "passed": true,
+    "at": "2026-09-23T21:57:31.237Z"
+  },
+  {
+    "name": "Production password reset changes only the synthetic grower and rejects replay",
+    "passed": true,
+    "at": "2026-09-23T21:57:36.638Z"
+  },
+  {
+    "name": "Live grower profile save persists and stays pending until review",
+    "passed": true,
+    "at": "2026-09-23T21:59:37.363Z"
+  },
+  {
+    "name": "Live dispensary profile save persists and stays pending until review",
+    "passed": true,
+    "at": "2026-09-23T21:59:38.173Z"
+  },
+  {
+    "name": "Live grower approvals remain approved after replay",
+    "passed": true,
+    "at": "2026-09-23T21:59:39.579Z"
+  },
+  {
+    "name": "Live dispensary approvals remain approved after replay",
+    "passed": true,
+    "at": "2026-09-23T21:59:41.000Z"
+  },
+  {
+    "name": "Quote-only product and accepted quote created through live UI",
+    "passed": true,
+    "at": "2026-09-23T22:01:54.739Z"
+  },
+  {
+    "name": "Live response loss and reload recover one order with one quote/inventory reservation",
+    "passed": true,
+    "at": "2026-09-23T22:01:58.398Z"
+  },
+  {
+    "name": "Pending CSV does not claim payment",
+    "passed": true,
+    "at": "2026-09-23T22:01:58.855Z"
+  },
+  {
+    "name": "Live fulfillment transitions preserve the reserved inventory",
+    "passed": true,
+    "at": "2026-09-23T22:02:01.430Z"
+  },
+  {
+    "name": "Saved settlement record appears for both parties and in CSV",
+    "passed": true,
+    "at": "2026-09-23T22:02:03.406Z"
+  },
+  {
+    "name": "Second synthetic buyer signs in for account-isolation tests",
+    "passed": true,
+    "at": "2026-09-23T22:02:32.676Z"
+  },
+  {
+    "name": "Another buyer cannot read the order or recover its receipt",
+    "passed": true,
+    "at": "2026-09-23T22:03:56.239Z"
+  },
+  {
+    "name": "Concurrent live orders cannot oversell and cancellation restores stock once",
+    "passed": true,
+    "at": "2026-09-23T22:03:56.809Z"
+  },
+  {
+    "name": "Live revocation is idempotent and an older approval cannot restore access",
+    "passed": true,
+    "at": "2026-09-23T22:03:57.093Z"
+  },
+  {
+    "name": "Final production mobile order layout keeps date and grower name visible",
+    "passed": true,
+    "at": "2026-09-23T22:10:57.322Z"
+  },
+  {
+    "name": "Synthetic production fixtures removed without changing existing business records",
+    "passed": true,
+    "at": "2026-09-23T22:11:21.009Z"
+  }
+]

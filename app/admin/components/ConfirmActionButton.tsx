@@ -1,7 +1,7 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
@@ -11,6 +11,7 @@ interface ConfirmActionButtonProps {
   className?: string;
   confirmMessage: string;
   actionUrl?: string;
+  actionBody?: Record<string, unknown>;
   successMessage?: string;
   confirmTitle?: string;
   confirmLabel?: string;
@@ -21,6 +22,7 @@ export function ConfirmActionButton({
   className,
   confirmMessage,
   actionUrl,
+  actionBody,
   successMessage,
   confirmTitle = 'Confirm admin action',
   confirmLabel = 'Confirm',
@@ -29,11 +31,12 @@ export function ConfirmActionButton({
   const [pendingForm, setPendingForm] = useState<HTMLFormElement | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const submittingRef = useRef(false);
 
   const open = actionUrl ? dialogOpen : Boolean(pendingForm);
 
   async function handleConfirm() {
-    if (submitting) return;
+    if (submittingRef.current) return;
 
     if (!actionUrl) {
       const form = pendingForm;
@@ -42,15 +45,21 @@ export function ConfirmActionButton({
       return;
     }
 
+    submittingRef.current = true;
     setSubmitting(true);
     try {
       const response = await fetch(actionUrl, {
         method: 'POST',
-        headers: { Accept: 'application/json' },
+        headers: { Accept: 'application/json', ...(actionBody ? { 'Content-Type': 'application/json' } : {}) },
+        ...(actionBody ? { body: JSON.stringify(actionBody) } : {}),
       });
       const payload = await response.json().catch(() => null) as { error?: string; message?: string } | null;
 
       if (!response.ok) {
+        if (response.status === 409) {
+          setDialogOpen(false);
+          router.refresh();
+        }
         throw new Error(payload?.error || 'Admin action failed');
       }
 
@@ -60,6 +69,7 @@ export function ConfirmActionButton({
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Admin action failed');
     } finally {
+      submittingRef.current = false;
       setSubmitting(false);
     }
   }
@@ -86,7 +96,7 @@ export function ConfirmActionButton({
         title={confirmTitle}
         description={confirmMessage}
         confirmLabel={submitting ? 'Working...' : confirmLabel}
-        intent="danger"
+        intent={actionBody?.verified === true ? 'default' : 'danger'}
         loading={submitting}
         onCancel={() => {
           if (submitting) return;

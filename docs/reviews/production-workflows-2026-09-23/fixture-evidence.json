@@ -1,0 +1,614 @@
+{
+  "run": "qa-rc-1790196380657",
+  "commit": "79bfae0d381e2adac8269eb7539598a9ce01fbb9",
+  "base": "https://phenofarm-mvp.vercel.app",
+  "accounts": [
+    {
+      "key": "g1",
+      "role": "GROWER",
+      "userId": "cmuekpfjz0000ekpjhau04rue",
+      "profileId": "cmuekpfjz0001ekpj0342zy5z"
+    },
+    {
+      "key": "g2",
+      "role": "GROWER",
+      "userId": "cmuekpftk0002ekpj6flphj11",
+      "profileId": "cmuekpftk0003ekpj4zbqiboc"
+    },
+    {
+      "key": "b1",
+      "role": "DISPENSARY",
+      "userId": "cmuekpfz30004ekpjb8skk5i6",
+      "profileId": "cmuekpfz30005ekpj7gd54er4"
+    },
+    {
+      "key": "b2",
+      "role": "DISPENSARY",
+      "userId": "cmuekpg5u0006ekpjxtf9636q",
+      "profileId": "cmuekpg5u0007ekpjvnxxhjri"
+    },
+    {
+      "key": "admin",
+      "role": "ADMIN",
+      "userId": "cmuekpgbh0008ekpjkx6e7ni8"
+    }
+  ],
+  "orders": [
+    {
+      "id": "cmuel3rvl000hlc044m9z0nkw",
+      "orderId": "ORD-20260923-OFVYH9",
+      "status": "PENDING",
+      "total": 37.5,
+      "notes": "QA TEST ONLY qa-rc-1790196380657",
+      "items": [
+        {
+          "productId": "cmuel3rqn000flc04rxsckm8h",
+          "quantity": 3,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel3t3u0007gm0aqdh7qpot",
+      "orderId": "ORD-20260923-IK05AX",
+      "status": "PENDING",
+      "total": 25,
+      "notes": "QA TEST ONLY qa-rc-1790196380657",
+      "items": [
+        {
+          "productId": "cmuel3srx0003gm0anblp4cy4",
+          "quantity": 2,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel3tyg0003gm09hqkc6gi8",
+      "orderId": "ORD-20260923-R807FM",
+      "status": "CANCELLED",
+      "total": 50,
+      "notes": "QA TEST ONLY qa-rc-1790196380657",
+      "items": [
+        {
+          "productId": "cmuel3trx0001gm095gqi5udw",
+          "quantity": 4,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        },
+        {
+          "from": "PENDING",
+          "to": "CANCELLED",
+          "actor": "GROWER"
+        }
+      ]
+    },
+    {
+      "id": "cmuel3ubv000ggm091fezq3lu",
+      "orderId": "ORD-20260923-EEVQEC",
+      "status": "CANCELLED",
+      "total": 25,
+      "notes": "QA TEST ONLY qa-rc-1790196380657",
+      "items": [
+        {
+          "productId": "cmuel3u92000egm09yvkblsqm",
+          "quantity": 2,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        },
+        {
+          "from": "PENDING",
+          "to": "CANCELLED",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel3uhj000rgm09gqz6tu4i",
+      "orderId": "ORD-20260923-3R0PP4",
+      "status": "CONFIRMED",
+      "total": 25,
+      "notes": "QA TEST ONLY qa-rc-1790196380657",
+      "items": [
+        {
+          "productId": "cmuel3u92000egm09yvkblsqm",
+          "quantity": 2,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        },
+        {
+          "from": "PENDING",
+          "to": "CONFIRMED",
+          "actor": "GROWER"
+        }
+      ]
+    },
+    {
+      "id": "cmuel5qh6000rjt0417ea2gop",
+      "orderId": "ORD-20260923-UL4IJ7",
+      "status": "PENDING",
+      "total": 12.5,
+      "notes": "Fulfillment method: Flexible\nRequested window: Coordinate with grower\nPayment terms: Handled directly\nBuyer notes: QA TEST ONLY recovery scenario QA TEST ONLY qa-rc-1790196380657 before-dispatch",
+      "items": [
+        {
+          "productId": "cmuel5pov000qlc04qfzut8w0",
+          "quantity": 1,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel5taw0001jn0432sjqt9v",
+      "orderId": "ORD-20260923-FMC5N5",
+      "status": "PENDING",
+      "total": 12.5,
+      "notes": "Fulfillment method: Flexible\nRequested window: Coordinate with grower\nPayment terms: Handled directly\nBuyer notes: QA TEST ONLY recovery scenario QA TEST ONLY qa-rc-1790196380657 lost-response",
+      "items": [
+        {
+          "productId": "cmuel5qla000yjt04z15yogzl",
+          "quantity": 1,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel5tmu0008jn04q6ckc3tw",
+      "orderId": "ORD-20260923-3MYBE0",
+      "status": "PENDING",
+      "total": 12.5,
+      "notes": "Fulfillment method: Flexible\nRequested window: Coordinate with grower\nPayment terms: Handled directly\nBuyer notes: QA TEST ONLY recovery scenario QA TEST ONLY qa-rc-1790196380657 lost-response",
+      "items": [
+        {
+          "productId": "cmuel5qla000yjt04z15yogzl",
+          "quantity": 1,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel3r5n000bjt049mgejpo0",
+      "orderId": "ORD-20260923-3ZWY40",
+      "status": "PENDING",
+      "total": 37.5,
+      "notes": "QA TEST ONLY qa-rc-1790196380657",
+      "items": [
+        {
+          "productId": "cmuel3r1w0009jt044h8b8f76",
+          "quantity": 3,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel3rem000kjt04zgnzyfwd",
+      "orderId": "ORD-20260923-8WY236",
+      "status": "PENDING",
+      "total": 25,
+      "notes": "QA TEST ONLY qa-rc-1790196380657",
+      "items": [
+        {
+          "productId": "cmuel3rbh000ijt04kn63ljxm",
+          "quantity": 2,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel3rfx0008lc04d1shsf8a",
+      "orderId": "ORD-20260923-5URNIO",
+      "status": "PENDING",
+      "total": 25,
+      "notes": "QA TEST ONLY qa-rc-1790196380657",
+      "items": [
+        {
+          "productId": "cmuel3rbh000ijt04kn63ljxm",
+          "quantity": 2,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuel1luf0001lc04gnfaszyd",
+      "orderId": "ORD-20260923-NB5GTM",
+      "status": "DELIVERED",
+      "total": 22.5,
+      "notes": "Fulfillment method: Pickup\nRequested window: QA TEST ONLY Tuesday morning\nPayment terms: Net 30\nBuyer notes: QA TEST ONLY; no physical goods or money will move. PO QA-001.\nQA TEST ONLY settlement record: paid directly by simulated ACH on 2026-09-23; reference QA-SETTLEMENT-001; amount 22.50. No real payment.",
+      "items": [
+        {
+          "productId": "cmuekyrcf0001l804zzxlsfr2",
+          "quantity": 3,
+          "unitPrice": 7.5,
+          "acceptedQuoteId": "cmuel1ksd000bl804ulvg68lw"
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        },
+        {
+          "from": "PENDING",
+          "to": "CONFIRMED",
+          "actor": "GROWER"
+        },
+        {
+          "from": "CONFIRMED",
+          "to": "PROCESSING",
+          "actor": "GROWER"
+        },
+        {
+          "from": "PROCESSING",
+          "to": "SHIPPED",
+          "actor": "GROWER"
+        },
+        {
+          "from": "SHIPPED",
+          "to": "DELIVERED",
+          "actor": "GROWER"
+        }
+      ]
+    },
+    {
+      "id": "cmuel85gl0010lc0436s7ixdb",
+      "orderId": "ORD-20260923-7EJMQV",
+      "status": "PENDING",
+      "total": 6.5,
+      "notes": null,
+      "items": [
+        {
+          "productId": "cmuekyrcf0001l804zzxlsfr2",
+          "quantity": 1,
+          "unitPrice": 6.5,
+          "acceptedQuoteId": "cmuel8597000wlc0477c25zth"
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuelb9a3000ljn04c0qi2zv7",
+      "orderId": "ORD-20260923-G0DH39",
+      "status": "PENDING",
+      "total": 12.5,
+      "notes": "QA TEST ONLY",
+      "items": [
+        {
+          "productId": "cmuelb97c000ql804m0wm5xa8",
+          "quantity": 1,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "GROWER"
+        }
+      ]
+    },
+    {
+      "id": "cmuel3uub0014gm09ca1x9oc0",
+      "orderId": "ORD-20260923-EERT52",
+      "status": "CANCELLED",
+      "total": 25,
+      "notes": "QA TEST ONLY direct payment Net 30",
+      "items": [
+        {
+          "productId": "cmuel3uqz0012gm090xz5utfg",
+          "quantity": 2,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "GROWER"
+        },
+        {
+          "from": "PENDING",
+          "to": "CANCELLED",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuelb7ev000fl8047tbdyo5q",
+      "orderId": "ORD-20260923-YWA80C",
+      "status": "PENDING",
+      "total": 12.5,
+      "notes": "Fulfillment method: Flexible\nRequested window: Coordinate with grower\nPayment terms: Handled directly",
+      "items": [
+        {
+          "productId": "cmuelb6q3001jlc04az91goht",
+          "quantity": 1,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuelb8vg001llc049uegt9a0",
+      "orderId": "ORD-20260923-KKGQM7",
+      "status": "PENDING",
+      "total": 125,
+      "notes": "QA TEST ONLY competing order",
+      "items": [
+        {
+          "productId": "cmuelb8el000ol80427omcdhs",
+          "quantity": 10,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    },
+    {
+      "id": "cmuelb8zu001slc04s9r0jmvc",
+      "orderId": "ORD-20260923-TWPYJA",
+      "status": "PENDING",
+      "total": 12.5,
+      "notes": "Fulfillment method: Flexible\nRequested window: Coordinate with grower\nPayment terms: Handled directly",
+      "items": [
+        {
+          "productId": "cmuelb8c2000ml804swjqgt7s",
+          "quantity": 1,
+          "unitPrice": 12.5,
+          "acceptedQuoteId": null
+        }
+      ],
+      "statusEvents": [
+        {
+          "from": null,
+          "to": "PENDING",
+          "actor": "DISPENSARY"
+        }
+      ]
+    }
+  ],
+  "products": [
+    {
+      "id": "cmuel3uqz0012gm090xz5utfg",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 grower-order",
+      "inventoryQty": 8,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3r1w0009jt044h8b8f76",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 concurrency",
+      "inventoryQty": 2,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuelb8el000ol80427omcdhs",
+      "name": "QA TEST ONLY qa-rc-1790196380657 ui-partial-failed",
+      "inventoryQty": 0,
+      "isAvailable": false,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3rbh000ijt04kn63ljxm",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 duplicate",
+      "inventoryQty": 6,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3rqn000flc04rxsckm8h",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 duplicate-lines",
+      "inventoryQty": 7,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3sdq0001gm0abb6zt6sk",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 rollback-good",
+      "inventoryQty": 5,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3siy000olc04ulgbfovn",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 rollback-short",
+      "inventoryQty": 1,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3su50005gm0amztdf449",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 partial-short",
+      "inventoryQty": 1,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3srx0003gm0anblp4cy4",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 partial-good",
+      "inventoryQty": 3,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3u92000egm09yvkblsqm",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 buyer-withdrawal",
+      "inventoryQty": 4,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel3trx0001gm095gqi5udw",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 cancel",
+      "inventoryQty": 4,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuelb8c2000ml804swjqgt7s",
+      "name": "QA TEST ONLY qa-rc-1790196380657 ui-partial-success",
+      "inventoryQty": 9,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel5pov000qlc04qfzut8w0",
+      "name": "QA TEST ONLY qa-rc-1790196380657 before-dispatch",
+      "inventoryQty": 9,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuel5qla000yjt04z15yogzl",
+      "name": "QA TEST ONLY qa-rc-1790196380657 lost-response",
+      "inventoryQty": 8,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuelb6q3001jlc04az91goht",
+      "name": "QA TEST ONLY qa-rc-1790196380657 double-tap",
+      "inventoryQty": 9,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuelb97c000ql804m0wm5xa8",
+      "name": "QA TEST ONLY qa-rc-1790196380657 edit-inventory",
+      "inventoryQty": 9,
+      "isAvailable": true,
+      "isPriceVisible": true,
+      "status": "PUBLISHED"
+    },
+    {
+      "id": "cmuekyrcf0001l804zzxlsfr2",
+      "name": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657",
+      "inventoryQty": 26,
+      "isAvailable": true,
+      "isPriceVisible": false,
+      "status": "PUBLISHED"
+    }
+  ],
+  "conversationCount": 1,
+  "messageCount": 5
+}

@@ -1,0 +1,3 @@
+Request ID,Created,Status,Grower,Buyer,Product,Quantity,Unit,Unit price,Line total,Pricing source,Subtotal,Recorded tax,Shipping estimate,Total,Fulfillment method,Requested window,Payment terms,Notes,Settlement
+ORD-20260923-VR3UV8,2026-09-23T22:01:57.087Z,Submitted,QA TEST ONLY phenofarm-qa-fixes-1790200547207 grower,QA TEST ONLY phenofarm-qa-fixes-1790200547207 dispensary,QA TEST ONLY NOT FOR SALE phenofarm-qa-fixes-1790200547207,2,Gram,7.50,15.00,Accepted quote,15.00,0.00,0.00,15.00,Pickup,QA Friday morning,Net 30,"QA TEST ONLY original agreement
+No real goods or money.",Arranged directly between businesses; payment status not tracked by PhenoFarm

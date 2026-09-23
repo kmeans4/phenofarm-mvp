@@ -1,0 +1,8 @@
+{
+  "domain": "phenoshop.app",
+  "provider": "Resend",
+  "domainStatus": "verified",
+  "emailId": "01a0d032-c492-7749-bac0-d33c6e2cca03",
+  "event": "delivered",
+  "userConfirmedInbox": true
+}

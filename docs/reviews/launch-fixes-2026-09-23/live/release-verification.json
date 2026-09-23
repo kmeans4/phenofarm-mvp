@@ -1,0 +1,29 @@
+{
+  "provider": "Resend",
+  "sender": "PhenoFarm <accounts@phenoshop.app>",
+  "senderTestInboxConfirmed": true,
+  "actualAccountEmails": [
+    {
+      "subject": "Verify your email — PhenoFarm",
+      "emailId": "01a0d044-e7b4-749f-885b-e4cacfc194e1",
+      "event": "delivered",
+      "createdAt": "2026-09-23 21:56:12.028000+00"
+    },
+    {
+      "subject": "Reset your password — PhenoFarm",
+      "emailId": "01a0d04c-bddb-7062-a0e3-375511c84106",
+      "event": "delivered",
+      "createdAt": "2026-09-23 22:04:45.598000+00"
+    }
+  ],
+  "userEmailVerificationComplete": false,
+  "productionMigrations": 23,
+  "newMigrationApplied": true,
+  "liveChecksPassed": 20,
+  "cleanup": {
+    "fixtureAccountsRemoved": 4,
+    "existingTablesUnchanged": 19,
+    "existingRecords": 51,
+    "blobUploads": 0
+  }
+}

@@ -20,6 +20,7 @@ interface GrowerWithUser {
   subscriptionStatus: string | null;
   subscriptionCurrentPeriodEnd: Date | null;
   createdAt: Date;
+  updatedAt: Date;
   user: {
     email: string | null;
     name: string | null;
@@ -191,6 +192,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                 </dl>
                 <ConfirmActionButton
                   actionUrl={`/admin/growers/${g.id}/verify`}
+                  actionBody={{ verified: !g.isVerified, expectedUpdatedAt: g.updatedAt.toISOString() }}
                   successMessage={`${g.businessName} ${g.isVerified ? 'unverified' : 'verified'}.`}
                   confirmMessage={`${g.isVerified ? 'Remove marketplace verification from' : 'Verify marketplace access for'} ${g.businessName}?`}
                   confirmTitle={g.isVerified ? 'Remove verification?' : 'Verify grower?'}
@@ -260,6 +262,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                     <td className="px-4 py-3 text-right">
                       <ConfirmActionButton
                         actionUrl={`/admin/growers/${g.id}/verify`}
+                  actionBody={{ verified: !g.isVerified, expectedUpdatedAt: g.updatedAt.toISOString() }}
                         successMessage={`${g.businessName} ${g.isVerified ? 'unverified' : 'verified'}.`}
                         confirmMessage={`${g.isVerified ? 'Remove marketplace verification from' : 'Verify marketplace access for'} ${g.businessName}?`}
                         confirmTitle={g.isVerified ? 'Remove verification?' : 'Verify grower?'}

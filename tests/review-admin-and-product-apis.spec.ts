@@ -218,17 +218,19 @@ test('admin access, pagination, mobile navigation, seed method guard, and verifi
   expect((await grower.api.get('/api/admin/seed')).status()).toBe(405);
   expect((await grower.api.post('/api/admin/seed')).status()).toBe(403);
 
-  const growerRedirect = await admin.api.post(`/admin/growers/${grower.grower!.id}/verify`, { maxRedirects: 0 });
+  const growerDecision = { verified: true, expectedUpdatedAt: grower.grower!.updatedAt.toISOString() };
+  const dispensaryDecision = { verified: true, expectedUpdatedAt: dispensary.dispensary!.updatedAt.toISOString() };
+  const growerRedirect = await admin.api.post(`/admin/growers/${grower.grower!.id}/verify`, { data: growerDecision, maxRedirects: 0 });
   expect(growerRedirect.status()).toBe(303);
   expect(growerRedirect.headers().location).toContain('/admin/growers');
   expect((await db.grower.findUniqueOrThrow({ where: { id: grower.grower!.id } })).isVerified).toBe(true);
-  expect((await admin.api.post(`/admin/growers/${grower.grower!.id}/verify`, { headers: { accept: 'application/json' } })).status()).toBe(200);
+  expect((await admin.api.post(`/admin/growers/${grower.grower!.id}/verify`, { data: growerDecision, headers: { accept: 'application/json' } })).status()).toBe(200);
 
-  const dispensaryRedirect = await admin.api.post(`/admin/dispensaries/${dispensary.dispensary!.id}/verify`, { maxRedirects: 0 });
+  const dispensaryRedirect = await admin.api.post(`/admin/dispensaries/${dispensary.dispensary!.id}/verify`, { data: dispensaryDecision, maxRedirects: 0 });
   expect(dispensaryRedirect.status()).toBe(303);
   expect(dispensaryRedirect.headers().location).toContain('/admin/dispensaries');
   expect((await db.dispensary.findUniqueOrThrow({ where: { id: dispensary.dispensary!.id } })).isVerified).toBe(true);
-  expect((await admin.api.post(`/admin/dispensaries/${dispensary.dispensary!.id}/verify`, { headers: { accept: 'application/json' } })).status()).toBe(200);
+  expect((await admin.api.post(`/admin/dispensaries/${dispensary.dispensary!.id}/verify`, { data: dispensaryDecision, headers: { accept: 'application/json' } })).status()).toBe(200);
 
   const q = encodeURIComponent(directoryPrefix);
   await addAdminCookie(page, admin.token);

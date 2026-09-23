@@ -1,0 +1,1007 @@
+{
+  "target": "https://phenofarm-mvp.vercel.app",
+  "commit": "79bfae0d381e2adac8269eb7539598a9ce01fbb9",
+  "deploymentId": "dpl_6VPuDJ7bmn4eDTagkxiyWdPqvwCy",
+  "run": "qa-rc-1790196380657",
+  "startedAt": "2026-09-23T20:46:24.070Z",
+  "finishedAt": "2026-09-23T21:05:40.054Z",
+  "configuration": {
+    "emailVerificationRequired": false,
+    "emailProviderConfigured": false,
+    "blobConfigured": true,
+    "stripeConfigured": false
+  },
+  "observations": [
+    {
+      "trialIndex": 0,
+      "at": "2026-09-23T20:46:24.070Z",
+      "name": "Production data baseline",
+      "outcome": "pass",
+      "detail": {
+        "tables": 19,
+        "records": 51
+      }
+    },
+    {
+      "trialIndex": 1,
+      "at": "2026-09-23T20:46:24.983Z",
+      "name": "Public grower signup",
+      "outcome": "blocked",
+      "detail": {
+        "outcome": "blocked",
+        "status": 503,
+        "message": "Sign-up is temporarily unavailable. Please try again later.",
+        "createdAccounts": 0
+      }
+    },
+    {
+      "trialIndex": 2,
+      "at": "2026-09-23T20:46:25.479Z",
+      "name": "Public dispensary signup",
+      "outcome": "blocked",
+      "detail": {
+        "outcome": "blocked",
+        "status": 503,
+        "message": "Sign-up is temporarily unavailable. Please try again later.",
+        "createdAccounts": 0
+      }
+    },
+    {
+      "trialIndex": 3,
+      "at": "2026-09-23T20:46:26.624Z",
+      "name": "Provision isolated pilot test accounts",
+      "outcome": "pass",
+      "detail": {
+        "accounts": 5,
+        "initialLicenseState": "unverified",
+        "method": "Direct database fixtures because public signup is blocked; no verification flags or sessions bypassed"
+      }
+    },
+    {
+      "trialIndex": 4,
+      "at": "2026-09-23T20:46:28.650Z",
+      "name": "Credential sign-in g1",
+      "outcome": "pass",
+      "detail": {
+        "role": "GROWER",
+        "login": "real credentials form",
+        "status": 200
+      }
+    },
+    {
+      "trialIndex": 5,
+      "at": "2026-09-23T20:46:31.064Z",
+      "name": "Credential sign-in g2",
+      "outcome": "pass",
+      "detail": {
+        "role": "GROWER",
+        "login": "real credentials form",
+        "status": 200
+      }
+    },
+    {
+      "trialIndex": 6,
+      "at": "2026-09-23T20:46:32.623Z",
+      "name": "Credential sign-in b1",
+      "outcome": "pass",
+      "detail": {
+        "role": "DISPENSARY",
+        "login": "real credentials form",
+        "status": 200
+      }
+    },
+    {
+      "trialIndex": 7,
+      "at": "2026-09-23T20:46:35.807Z",
+      "name": "Credential sign-in b2",
+      "outcome": "pass",
+      "detail": {
+        "role": "DISPENSARY",
+        "login": "real credentials form",
+        "status": 200
+      }
+    },
+    {
+      "trialIndex": 8,
+      "at": "2026-09-23T20:46:37.329Z",
+      "name": "Credential sign-in admin",
+      "outcome": "pass",
+      "detail": {
+        "role": "ADMIN",
+        "login": "real credentials form",
+        "status": 200
+      }
+    },
+    {
+      "trialIndex": 10,
+      "at": "2026-09-23T20:47:57.349Z",
+      "name": "Profile and license submission through UI b1",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "savedLicense": true,
+        "verification": "pending",
+        "reloadPersisted": true
+      }
+    },
+    {
+      "trialIndex": 13,
+      "at": "2026-09-23T20:47:57.650Z",
+      "name": "Unverified buyer cannot submit requests",
+      "outcome": "pass",
+      "detail": {
+        "status": 403,
+        "body": {
+          "error": "License verification required. This dispensary must have a verified license to submit order requests.",
+          "code": "LICENSE_NOT_VERIFIED",
+          "licenseStatus": "pending_review"
+        },
+        "requestId": "iad1::iad1::wn4p2-1790196477633-c8c62be65ad8"
+      }
+    },
+    {
+      "trialIndex": 14,
+      "at": "2026-09-23T20:47:57.747Z",
+      "name": "Grower cannot approve a buyer license",
+      "outcome": "pass",
+      "detail": {
+        "status": 401,
+        "unchanged": true
+      }
+    },
+    {
+      "trialIndex": 15,
+      "at": "2026-09-23T20:48:58.639Z",
+      "name": "Grower profile continuation via real API after UI failure",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "workaround": "Supplied the current email explicitly; original UI remains failed"
+      }
+    },
+    {
+      "trialIndex": 16,
+      "at": "2026-09-23T20:48:58.830Z",
+      "name": "Verify second-account profile persisted g2",
+      "outcome": "pass",
+      "detail": {
+        "persisted": true,
+        "correctsHarnessOnly": "Earlier status() logging error occurred after successful API save"
+      }
+    },
+    {
+      "trialIndex": 17,
+      "at": "2026-09-23T20:48:58.869Z",
+      "name": "Verify second-account profile persisted b2",
+      "outcome": "pass",
+      "detail": {
+        "persisted": true,
+        "correctsHarnessOnly": "Earlier status() logging error occurred after successful API save"
+      }
+    },
+    {
+      "trialIndex": 18,
+      "at": "2026-09-23T20:48:59.753Z",
+      "name": "Admin approval UI g1",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "persistedVerified": true
+      }
+    },
+    {
+      "trialIndex": 19,
+      "at": "2026-09-23T20:49:00.347Z",
+      "name": "Admin approval UI g2",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "persistedVerified": true
+      }
+    },
+    {
+      "trialIndex": 20,
+      "at": "2026-09-23T20:49:00.890Z",
+      "name": "Admin approval UI b1",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "persistedVerified": true
+      }
+    },
+    {
+      "trialIndex": 21,
+      "at": "2026-09-23T20:49:01.482Z",
+      "name": "Admin approval UI b2",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "persistedVerified": true
+      }
+    },
+    {
+      "trialIndex": 22,
+      "at": "2026-09-23T20:49:02.618Z",
+      "name": "Buyer sees approval without signing in again",
+      "outcome": "pass",
+      "detail": {
+        "status": 400,
+        "licenseGatePassed": true
+      }
+    },
+    {
+      "trialIndex": 23,
+      "at": "2026-09-23T20:53:37.605Z",
+      "name": "Create test strain through production API",
+      "outcome": "pass",
+      "detail": {
+        "created": true
+      }
+    },
+    {
+      "trialIndex": 24,
+      "at": "2026-09-23T20:53:39.609Z",
+      "name": "Real batch form with all three COA PDF uploads",
+      "outcome": "pass",
+      "detail": {
+        "status": 201,
+        "coas": 3,
+        "persisted": true
+      }
+    },
+    {
+      "trialIndex": 25,
+      "at": "2026-09-23T20:53:41.200Z",
+      "name": "Publish product with real image upload through UI",
+      "outcome": "pass",
+      "detail": {
+        "status": 201,
+        "inventory": 30,
+        "imagePersisted": true,
+        "quoteOnly": true
+      }
+    },
+    {
+      "trialIndex": 26,
+      "at": "2026-09-23T20:53:41.455Z",
+      "name": "Production Blob downloads persist with exact uploaded bytes",
+      "outcome": "pass",
+      "detail": {
+        "downloads": [
+          {
+            "status": 200,
+            "bytes": 11198
+          },
+          {
+            "status": 200,
+            "bytes": 11198
+          },
+          {
+            "status": 200,
+            "bytes": 11198
+          },
+          {
+            "status": 200,
+            "bytes": 13951
+          }
+        ]
+      }
+    },
+    {
+      "trialIndex": 27,
+      "at": "2026-09-23T20:54:57.018Z",
+      "name": "Buyer mobile catalog displays published product and requests pricing",
+      "outcome": "pass",
+      "detail": {
+        "status": 201,
+        "conversationCreated": true
+      }
+    },
+    {
+      "trialIndex": 35,
+      "at": "2026-09-23T20:55:51.487Z",
+      "name": "Buyer counters quote through mobile UI",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "counterCreated": true
+      }
+    },
+    {
+      "trialIndex": 36,
+      "at": "2026-09-23T20:55:52.399Z",
+      "name": "Grower accepts buyer counter through chat UI",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "unitPrice": 7.5,
+        "quantity": 3
+      }
+    },
+    {
+      "trialIndex": 37,
+      "at": "2026-09-23T20:55:53.731Z",
+      "name": "Accepted quote becomes mobile draft and order with direct payment terms",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "orderStatus": "PENDING",
+        "total": 22.5,
+        "inventory": 27,
+        "quoteConsumedOnce": true,
+        "termsPersisted": true
+      }
+    },
+    {
+      "trialIndex": 38,
+      "at": "2026-09-23T20:55:55.720Z",
+      "name": "Grower fulfills request through all live UI status actions",
+      "outcome": "pass",
+      "detail": {
+        "status": "DELIVERED",
+        "statusEvents": [
+          "PENDING",
+          "CONFIRMED",
+          "PROCESSING",
+          "SHIPPED",
+          "DELIVERED"
+        ],
+        "timestampsPersisted": true,
+        "stockUnchanged": true
+      }
+    },
+    {
+      "trialIndex": 39,
+      "at": "2026-09-23T20:55:55.977Z",
+      "name": "Buyer sees fulfillment and exports order record",
+      "outcome": "pass",
+      "detail": {
+        "downloaded": true,
+        "quotePriceIncluded": true,
+        "paymentTermsExported": false,
+        "settlementText": true
+      }
+    },
+    {
+      "trialIndex": 40,
+      "at": "2026-09-23T20:57:30.955Z",
+      "name": "Quote UI send persisted despite response-observer mismatch",
+      "outcome": "pass",
+      "detail": {
+        "persisted": true,
+        "status": "COUNTERED",
+        "harnessCorrection": "Previous observer caught read receipt; the quote itself was sent successfully"
+      }
+    },
+    {
+      "trialIndex": 41,
+      "at": "2026-09-23T20:57:32.430Z",
+      "name": "Cross-account and unauthenticated private access denied",
+      "outcome": "pass",
+      "detail": {
+        "checks": [
+          {
+            "actor": "g2",
+            "path": "/api/orders/ORDER",
+            "method": "GET",
+            "status": 404
+          },
+          {
+            "actor": "g2",
+            "path": "/api/orders/ORDER/status",
+            "method": "PATCH",
+            "status": 403
+          },
+          {
+            "actor": "g2",
+            "path": "/api/messages/conversations/CONVERSATION/messages",
+            "method": "GET",
+            "status": 403
+          },
+          {
+            "actor": "g2",
+            "path": "/api/messages/conversations/CONVERSATION/messages",
+            "method": "POST",
+            "status": 403
+          },
+          {
+            "actor": "g2",
+            "path": "/api/messages/messages/QUOTE/offer-action",
+            "method": "POST",
+            "status": 403
+          },
+          {
+            "actor": "b2",
+            "path": "/api/orders/ORDER",
+            "method": "GET",
+            "status": 403
+          },
+          {
+            "actor": "b2",
+            "path": "/api/orders/ORDER/status",
+            "method": "PATCH",
+            "status": 403
+          },
+          {
+            "actor": "b2",
+            "path": "/api/messages/conversations/CONVERSATION/messages",
+            "method": "GET",
+            "status": 403
+          },
+          {
+            "actor": "b2",
+            "path": "/api/messages/conversations/CONVERSATION/messages",
+            "method": "POST",
+            "status": 403
+          },
+          {
+            "actor": "b2",
+            "path": "/api/messages/messages/QUOTE/offer-action",
+            "method": "POST",
+            "status": 403
+          },
+          {
+            "actor": "anon",
+            "path": "/api/orders/ORDER",
+            "method": "GET",
+            "status": 401
+          },
+          {
+            "actor": "anon",
+            "path": "/api/orders/ORDER/status",
+            "method": "PATCH",
+            "status": 401
+          },
+          {
+            "actor": "anon",
+            "path": "/api/messages/conversations/CONVERSATION/messages",
+            "method": "GET",
+            "status": 401
+          },
+          {
+            "actor": "anon",
+            "path": "/api/messages/conversations/CONVERSATION/messages",
+            "method": "POST",
+            "status": 401
+          },
+          {
+            "actor": "anon",
+            "path": "/api/messages/messages/QUOTE/offer-action",
+            "method": "POST",
+            "status": 401
+          }
+        ]
+      }
+    },
+    {
+      "trialIndex": 42,
+      "at": "2026-09-23T20:57:33.088Z",
+      "name": "Other grower cannot edit product batch or attach files",
+      "outcome": "pass",
+      "detail": {
+        "statuses": [
+          404,
+          404,
+          404,
+          404,
+          404
+        ],
+        "unchanged": true
+      }
+    },
+    {
+      "trialIndex": 43,
+      "at": "2026-09-23T20:57:33.214Z",
+      "name": "Upload validation rejects forged document and buyer product image",
+      "outcome": "pass",
+      "detail": {
+        "badDocument": 400,
+        "buyerProductUpload": 403
+      }
+    },
+    {
+      "trialIndex": 44,
+      "at": "2026-09-23T20:57:33.477Z",
+      "name": "Consumed quote cannot be reused and stock rolls back",
+      "outcome": "pass",
+      "detail": {
+        "status": 409,
+        "inventoryUnchanged": true
+      }
+    },
+    {
+      "trialIndex": 45,
+      "at": "2026-09-23T20:57:33.854Z",
+      "name": "Concurrent buyers cannot oversell shared inventory",
+      "outcome": "pass",
+      "detail": {
+        "statuses": [
+          200,
+          409
+        ],
+        "orders": 1,
+        "inventory": 2,
+        "clientPriceIgnored": true
+      }
+    },
+    {
+      "trialIndex": 46,
+      "at": "2026-09-23T20:57:34.151Z",
+      "name": "Duplicate submissions with same idempotency key",
+      "outcome": "fail",
+      "detail": {
+        "outcome": "fail",
+        "statuses": [
+          200,
+          200
+        ],
+        "orders": 2,
+        "inventory": 6,
+        "expected": "one order per logical submission"
+      }
+    },
+    {
+      "trialIndex": 47,
+      "at": "2026-09-23T20:57:34.732Z",
+      "name": "Duplicate cart lines consolidate to one inventory reservation",
+      "outcome": "pass",
+      "detail": {
+        "lines": 1,
+        "quantity": 3,
+        "inventory": 7
+      }
+    },
+    {
+      "trialIndex": 48,
+      "at": "2026-09-23T20:57:35.755Z",
+      "name": "Failed same-grower order rolls back every line",
+      "outcome": "pass",
+      "detail": {
+        "status": 409,
+        "inventory": [
+          5,
+          1
+        ],
+        "orders": 0
+      }
+    },
+    {
+      "trialIndex": 49,
+      "at": "2026-09-23T20:57:36.629Z",
+      "name": "Mixed-grower request returns explicit partial success",
+      "outcome": "pass",
+      "detail": {
+        "status": 200,
+        "orders": 1,
+        "issues": [
+          {
+            "productId": "cmuel3su50005gm0amztdf449",
+            "productName": "QA TEST ONLY NOT FOR SALE qa-rc-1790196380657 partial-short",
+            "requested": 2,
+            "available": 1
+          }
+        ],
+        "inventory": [
+          3,
+          1
+        ]
+      }
+    },
+    {
+      "trialIndex": 50,
+      "at": "2026-09-23T20:57:37.661Z",
+      "name": "Concurrent cancellation restores inventory exactly once",
+      "outcome": "pass",
+      "detail": {
+        "statuses": [
+          409,
+          200
+        ],
+        "retry": 200,
+        "inventory": 4,
+        "available": true,
+        "cancellationEvents": 1
+      }
+    },
+    {
+      "trialIndex": 51,
+      "at": "2026-09-23T20:57:38.327Z",
+      "name": "Buyer withdrawal permitted only before acceptance",
+      "outcome": "pass",
+      "detail": {
+        "pendingWithdrawal": 200,
+        "acceptedWithdrawal": 409,
+        "buyerFulfillment": 403,
+        "invalidSkip": 400,
+        "inventory": 4
+      }
+    },
+    {
+      "trialIndex": 52,
+      "at": "2026-09-23T20:57:38.630Z",
+      "name": "Grower-created order reserves stock using server price",
+      "outcome": "pass",
+      "detail": {
+        "status": 201,
+        "price": 12.5,
+        "inventory": 6
+      }
+    },
+    {
+      "trialIndex": 53,
+      "at": "2026-09-23T20:57:39.309Z",
+      "name": "Duplicate approval request has idempotent effect",
+      "outcome": "fail",
+      "detail": {
+        "outcome": "fail",
+        "initialVerified": true,
+        "afterDuplicatePost": false,
+        "status": 200,
+        "restoredVerified": true
+      }
+    },
+    {
+      "trialIndex": 54,
+      "at": "2026-09-23T20:59:06.205Z",
+      "name": "Mobile failure before dispatch preserves draft and retry creates one order",
+      "outcome": "pass",
+      "detail": {
+        "fault": "client network failure injected before server request",
+        "retry": "real production request",
+        "orders": 1,
+        "inventory": 9
+      }
+    },
+    {
+      "trialIndex": 55,
+      "at": "2026-09-23T20:59:10.293Z",
+      "name": "Lost response after production commit followed by mobile retry",
+      "outcome": "fail",
+      "detail": {
+        "outcome": "fail",
+        "fault": "real production response deliberately dropped after server committed",
+        "firstStatus": 200,
+        "retryStatus": 200,
+        "orders": 2,
+        "inventory": 8,
+        "expected": "one logical order after retry"
+      }
+    },
+    {
+      "trialIndex": 58,
+      "at": "2026-09-23T20:59:17.408Z",
+      "name": "Buyer receives uploaded COA only where a UI download exists",
+      "outcome": "limited",
+      "detail": {
+        "outcome": "limited",
+        "catalogSays": "Labs on request",
+        "uploadedCoaLinks": 0,
+        "storageAlreadyVerified": true
+      }
+    },
+    {
+      "trialIndex": 59,
+      "at": "2026-09-23T21:00:57.418Z",
+      "name": "Recovery mail and verification requests use actual production configuration",
+      "outcome": "blocked",
+      "detail": {
+        "outcome": "blocked",
+        "reset": 503,
+        "verification": 503,
+        "error": "Email delivery is temporarily unavailable. Please try again later.",
+        "tokensCreated": 0,
+        "realDeliveryConfigured": false
+      }
+    },
+    {
+      "trialIndex": 61,
+      "at": "2026-09-23T21:00:58.059Z",
+      "name": "Private rendered order pages reject other accounts",
+      "outcome": "pass",
+      "detail": {
+        "checks": [
+          {
+            "actor": "g2",
+            "status": 200,
+            "privateProductAbsent": true
+          },
+          {
+            "actor": "b2",
+            "status": 200,
+            "privateProductAbsent": true
+          }
+        ]
+      }
+    },
+    {
+      "trialIndex": 62,
+      "at": "2026-09-23T21:00:58.268Z",
+      "name": "Hidden quote price is absent from buyer API",
+      "outcome": "pass",
+      "detail": {
+        "hiddenPrice": null,
+        "privatePriceNotLeaked": true
+      }
+    },
+    {
+      "trialIndex": 63,
+      "at": "2026-09-23T21:00:58.753Z",
+      "name": "Concurrent quote acceptance creates one accepted quote",
+      "outcome": "pass",
+      "detail": {
+        "selfAccept": 400,
+        "statuses": [
+          200,
+          409
+        ],
+        "acceptedQuotes": 1
+      }
+    },
+    {
+      "trialIndex": 69,
+      "at": "2026-09-23T21:01:00.472Z",
+      "name": "Saved settlement note is visible on both request detail pages",
+      "outcome": "fail",
+      "detail": {
+        "outcome": "fail",
+        "persistedInDatabaseAndEditForm": true,
+        "detailPages": [
+          {
+            "role": "grower",
+            "settlementNoteVisible": false
+          },
+          {
+            "role": "dispensary",
+            "settlementNoteVisible": false
+          }
+        ]
+      }
+    },
+    {
+      "trialIndex": 70,
+      "at": "2026-09-23T21:01:00.473Z",
+      "name": "Pending export settlement wording verification",
+      "outcome": "fail",
+      "detail": {
+        "outcome": "fail",
+        "status": "Submitted",
+        "claimsSettled": true,
+        "termsIncluded": false,
+        "harnessCorrection": "CSV uses display label Submitted instead of enum PENDING"
+      }
+    },
+    {
+      "trialIndex": 71,
+      "at": "2026-09-23T21:01:01.292Z",
+      "name": "Mobile buyer acknowledges and withdraws grower-recorded request",
+      "outcome": "pass",
+      "detail": {
+        "acknowledged": true,
+        "cancelled": true,
+        "inventoryRestored": 2
+      }
+    },
+    {
+      "trialIndex": 72,
+      "at": "2026-09-23T21:02:04.693Z",
+      "name": "Buyer license edit revokes approval with complete valid profile payload",
+      "outcome": "pass",
+      "detail": {
+        "status": 403,
+        "revoked": true,
+        "reapproved": true,
+        "harnessCorrection": "Supplied required licenseState"
+      }
+    },
+    {
+      "trialIndex": 73,
+      "at": "2026-09-23T21:02:05.014Z",
+      "name": "Expired buyer license blocks current login and renewal restores ordering",
+      "outcome": "pass",
+      "detail": {
+        "status": 403,
+        "code": "LICENSE_EXPIRED",
+        "setup": "test database expiry simulates elapsed time"
+      }
+    },
+    {
+      "trialIndex": 74,
+      "at": "2026-09-23T21:02:05.206Z",
+      "name": "Expired grower hidden and blocked with independently valid buyer",
+      "outcome": "pass",
+      "detail": {
+        "visibleProducts": 0,
+        "checkout": 409
+      }
+    },
+    {
+      "trialIndex": 75,
+      "at": "2026-09-23T21:02:05.296Z",
+      "name": "Quote quantity acts as a maximum cap, smaller order consumes single-use quote",
+      "outcome": "behavior",
+      "detail": {
+        "outcome": "behavior",
+        "quotedMaximum": 2,
+        "ordered": 1,
+        "quoteConsumed": true,
+        "harnessCorrection": "Earlier assertion incorrectly assumed exact quantity was required; implementation allows up to the quoted cap"
+      }
+    },
+    {
+      "trialIndex": 76,
+      "at": "2026-09-23T21:02:05.717Z",
+      "name": "Orders exceeding quote cap roll back inventory and leave quote usable",
+      "outcome": "pass",
+      "detail": {
+        "status": 409,
+        "stockUnchanged": true,
+        "quoteUsable": true
+      }
+    },
+    {
+      "trialIndex": 77,
+      "at": "2026-09-23T21:02:05.868Z",
+      "name": "Unconsumed expired quote rejected by production checkout",
+      "outcome": "pass",
+      "detail": {
+        "status": 409,
+        "stockUnchanged": true,
+        "setup": "test expiry only changed in database"
+      }
+    },
+    {
+      "trialIndex": 78,
+      "at": "2026-09-23T21:03:22.481Z",
+      "name": "Mobile rapid duplicate taps dispatch only one order request",
+      "outcome": "pass",
+      "detail": {
+        "dispatched": 1,
+        "orders": 1,
+        "realResponseDelayedMs": 750
+      }
+    },
+    {
+      "trialIndex": 79,
+      "at": "2026-09-23T21:03:23.638Z",
+      "name": "Partial success keeps only failed grower items in mobile draft",
+      "outcome": "pass",
+      "detail": {
+        "submittedOrders": 1,
+        "failedItemsRetained": true,
+        "successfulItemRemoved": true,
+        "reloadPreservedDraft": true
+      }
+    },
+    {
+      "trialIndex": 80,
+      "at": "2026-09-23T21:03:24.681Z",
+      "name": "Order edits reserve and return stock; failed increase rolls back",
+      "outcome": "pass",
+      "detail": {
+        "afterIncrease": 6,
+        "afterDecrease": 9,
+        "failedIncrease": 409,
+        "rollbackVerified": true
+      }
+    },
+    {
+      "trialIndex": 82,
+      "at": "2026-09-23T21:03:26.430Z",
+      "name": "Upload network failure leaves form usable and successful retry persists",
+      "outcome": "pass",
+      "detail": {
+        "failure": "injected before dispatch",
+        "retryUpload": 200,
+        "saved": true
+      }
+    },
+    {
+      "trialIndex": 83,
+      "at": "2026-09-23T21:04:31.842Z",
+      "name": "Delivered request mutation is rejected without changing inventory",
+      "outcome": "pass",
+      "detail": {
+        "edit": 409,
+        "cancel": 400,
+        "inventoryUnchanged": true,
+        "harnessCorrection": "Locked item edits return 409 instead of 400"
+      }
+    },
+    {
+      "trialIndex": 84,
+      "at": "2026-09-23T21:04:32.452Z",
+      "name": "Final reproduction of grower settings email field mismatch",
+      "outcome": "fail",
+      "detail": {
+        "outcome": "fail",
+        "status": 400,
+        "error": "Invalid email",
+        "requestOmitsEmail": true,
+        "existingLicenseUnchanged": true
+      }
+    },
+    {
+      "trialIndex": 85,
+      "at": "2026-09-23T21:04:32.978Z",
+      "name": "Final production export excludes saved settlement reference",
+      "outcome": "fail",
+      "detail": {
+        "outcome": "fail",
+        "savedReferenceExported": false,
+        "paymentTermsExported": false,
+        "settlementText": "Settled directly between businesses \u2014 no funds processed by PhenoFarm"
+      }
+    },
+    {
+      "trialIndex": 86,
+      "at": "2026-09-23T21:05:37.816Z",
+      "name": "Invalid recovery tokens preserve password hash and session version",
+      "outcome": "pass",
+      "detail": {
+        "unchangedHash": true,
+        "unchangedSessionVersion": true,
+        "unchangedEmailVerification": true
+      }
+    },
+    {
+      "trialIndex": 87,
+      "at": "2026-09-23T21:05:38.955Z",
+      "name": "Remove all fixture records transactionally without touching other businesses",
+      "outcome": "pass",
+      "detail": {
+        "orders": 18,
+        "conversations": 1,
+        "products": 17,
+        "batches": 1,
+        "strains": 1,
+        "users": 5
+      }
+    },
+    {
+      "trialIndex": 88,
+      "at": "2026-09-23T21:05:39.406Z",
+      "name": "Remove fixture Blob uploads and verify provider listing is empty",
+      "outcome": "pass",
+      "detail": {
+        "deletedBlobs": 5,
+        "ownerScopedPrefixesEmpty": true
+      }
+    },
+    {
+      "trialIndex": 89,
+      "at": "2026-09-23T21:05:40.054Z",
+      "name": "Original production data equals pre-test snapshot",
+      "outcome": "pass",
+      "detail": {
+        "tables": 19,
+        "originalRecords": 51,
+        "allCountsAndHashesMatch": true,
+        "excluded": "auth_rate_limits counters intentionally retain security audit state"
+      }
+    }
+  ],
+  "excludedTrials": {
+    "indices": [
+      9,
+      11,
+      12,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      56,
+      57,
+      60,
+      64,
+      65,
+      66,
+      67,
+      68,
+      81
+    ],
+    "reason": "Superseded harness attempts: incomplete selectors or payloads, response observer caught a read receipt, incorrect expected status, or incorrect assumption that quote quantity was an exact minimum. Confirmed app defects remain in final observations."
+  }
+}

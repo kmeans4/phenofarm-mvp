@@ -170,18 +170,18 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
       <PageHeader
         title={<span className="flex min-w-0 flex-col gap-1"><span>Request</span><span title={order.orderId} className="max-w-full break-all font-sans text-base font-semibold leading-tight text-pf-muted sm:text-lg">#{order.orderId}</span></span>}
         description={getOrderStatusHelp(order.status)}
-        actions={<><StatusBadge status={order.status} /><OrderRecordExport order={{ orderId: order.orderId, createdAt: order.createdAt.toISOString(), status: getOrderStatusLabel(order.status), grower: order.grower.businessName, buyer: order.dispensary.businessName, subtotal: order.subtotal, tax: order.tax, shippingFee: order.shippingFee, total: order.totalAmount, items: order.items.map((item) => ({ name: item.product?.name || 'Unknown product', quantity: item.quantity, unit: item.product?.unit || 'unit', unitPrice: item.unitPrice, totalPrice: item.totalPrice, quoted: item.quoted })) }} /></>}
+        actions={<><StatusBadge status={order.status} /><OrderRecordExport order={{ orderId: order.orderId, notes: order.notes, createdAt: order.createdAt.toISOString(), status: getOrderStatusLabel(order.status), grower: order.grower.businessName, buyer: order.dispensary.businessName, subtotal: order.subtotal, tax: order.tax, shippingFee: order.shippingFee, total: order.totalAmount, items: order.items.map((item) => ({ name: item.product?.name || 'Unknown product', quantity: item.quantity, unit: item.product?.unit || 'unit', unitPrice: item.unitPrice, totalPrice: item.totalPrice, quoted: item.quoted })) }} /></>}
         className="mb-4 sm:mb-6"
       />
 
-      <div className="mb-4 grid gap-px overflow-hidden rounded-lg border border-pf-line bg-pf-raised shadow-sm sm:grid-cols-2">
+      <div className="mb-4 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-pf-line bg-pf-raised shadow-sm sm:grid-cols-2">
         {[
           { label: 'Request date', value: format(order.createdAt, 'MMM dd, yyyy') },
           { label: 'Grower', value: order.grower?.businessName || 'Grower' },
         ].map((item) => (
-          <div key={item.label} className="flex items-center justify-between gap-4 bg-pf-surface px-4 py-3 sm:block sm:py-4">
-            <p className="text-xs font-semibold uppercase text-pf-muted">{item.label}</p>
-            <p className={`min-w-0 truncate text-sm font-semibold text-pf-text sm:mt-1 sm:text-base`}>{item.value}</p>
+          <div key={item.label} className="flex min-w-0 items-start justify-between gap-4 bg-pf-surface px-4 py-3 sm:block sm:py-4">
+            <p className="shrink-0 text-xs font-semibold uppercase text-pf-muted">{item.label}</p>
+            <p className="min-w-0 flex-1 break-words text-right text-sm font-semibold text-pf-text sm:mt-1 sm:text-left sm:text-base">{item.value}</p>
           </div>
         ))}
       </div>
@@ -326,10 +326,10 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
                 <p>{requestNotes.details.paymentTerms || 'Handled directly'}</p>
               </div>
             </div>
-            {(requestNotes.details.buyerNotes || requestNotes.legacyNotes) && (
+            {(requestNotes.notesText) && (
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-pf-muted">Notes</p>
-                <p className="whitespace-pre-wrap">{requestNotes.details.buyerNotes || requestNotes.legacyNotes}</p>
+                <p className="whitespace-pre-wrap break-words">{requestNotes.notesText}</p>
               </div>
             )}
           </CardContent>
