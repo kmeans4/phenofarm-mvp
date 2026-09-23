@@ -1,10 +1,11 @@
+import { PortalDesktopHeader } from '@/app/components/ui/PortalDesktopHeader';
 import type { Session } from 'next-auth';
 import { redirect } from "next/navigation";
 import { getAuthSession } from '@/lib/auth-helpers';
 import { Providers } from '@/app/providers';
 import { MobileNav } from "@/app/components/ui/MobileNav";
 import { ClientNav } from "./components/ClientNav";
-import { SearchDialog, SearchTrigger } from "@/app/components/SearchDialog";
+import { SearchTrigger } from "@/app/components/SearchDialog";
 import { PortalFloatingActions } from '@/app/components/ui/PortalFloatingActions';
 import { getGrowerAttentionSummary } from "@/lib/grower-attention";
 import { db } from "@/lib/db";
@@ -50,7 +51,7 @@ export default async function GrowerLayout({ children }: { children: React.React
   const requestAttention = attentionSummary?.counts.requestAttention || 0;
 
   const navLinks = [
-    { name: 'Dashboard', href: '/grower/dashboard', group: 'Sell' },
+    { name: 'Overview', href: '/grower/dashboard', group: 'Sell' },
     { name: 'Catalog', href: '/grower/catalog', group: 'Sell' },
     { name: 'Products', href: '/grower/products', group: 'Sell' },
     { name: 'Inventory', href: '/grower/inventory', group: 'Sell' },
@@ -64,9 +65,9 @@ export default async function GrowerLayout({ children }: { children: React.React
 
   return (
     <Providers session={session as Session}>
-      <div className="pf-portal min-h-screen w-full bg-gray-50">
+      <div className="pf-portal min-h-screen w-full bg-pf-canvas">
       {/* Mobile Header */}
-      <div className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.07] bg-[#16251c] md:hidden">
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.07] bg-pf-canvas md:hidden">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
             <PortalBrand portalLabel="Grower" compactOnMobile />
@@ -87,15 +88,10 @@ export default async function GrowerLayout({ children }: { children: React.React
 
       <div className="min-h-screen md:pl-60">
         {/* Tablet/Desktop Sidebar */}
-        <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col bg-[#16251c] px-4 py-5 md:flex">
+        <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col border-r border-pf-line bg-pf-canvas px-3 py-5 md:flex">
           <div className="flex-shrink-0 px-1 pb-3">
             <PortalBrand portalLabel="Grower" />
-            <div className="mt-3">
-              <SearchDialog className="!border-white/10 !bg-white/5 !text-[#a9bcad] hover:!bg-white/10 hover:!text-white [&_kbd]:!border-white/10 [&_kbd]:!bg-white/5" />
-            </div>
-            <div className="mt-2">
-              <NotificationBell />
-            </div>
+
           </div>
 
           <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto py-2">
@@ -105,8 +101,9 @@ export default async function GrowerLayout({ children }: { children: React.React
         </aside>
 
         {/* Main Content */}
-        <main className="flex min-h-screen w-full min-w-0 flex-col bg-gray-50 pt-16 md:pt-0">
-          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col p-4 pb-24 md:p-7 md:pb-24 lg:p-8 lg:pb-24">
+        <main className="flex min-h-screen w-full min-w-0 flex-col bg-pf-canvas pt-16 md:pt-0">
+          <PortalDesktopHeader accountName={accountName} role="grower" />
+          <div className="mx-auto flex w-full max-w-[1440px] flex-1 flex-col p-4 pb-24 md:p-6 md:pb-24">
             {children}
           </div>
         </main>

@@ -15,7 +15,7 @@ interface ClientNavProps {
 
 export function ClientNav({ links, mobile = false }: ClientNavProps) {
   const pathname = usePathname() || '';
-  
+
   const isActive = (href: string): boolean => {
     // Handle /admin/dashboard specially (exact match like grower/dispensary)
     if (href === '/admin/dashboard') {
@@ -34,13 +34,13 @@ export function ClientNav({ links, mobile = false }: ClientNavProps) {
         {links.map((link) => {
           const active = isActive(link.href);
           return (
-            <Link 
+            <Link
               key={link.href}
               href={link.href}
-              className={`px-3 py-1 text-sm rounded-full whitespace-nowrap ${
-                active 
-                  ? 'bg-green-600 text-white font-medium' 
-                  : 'text-gray-700 bg-gray-100 hover:bg-green-50 hover:text-green-600'
+              className={`inline-flex min-h-10 items-center px-3 py-1 text-sm rounded-lg whitespace-nowrap ${
+                active
+                  ? 'bg-pf-accent-bg text-pf-accent font-medium'
+                  : 'text-pf-secondary bg-pf-surface hover:bg-pf-accent-bg hover:text-pf-accent'
               }`}
             >
               {link.name}
@@ -56,13 +56,13 @@ export function ClientNav({ links, mobile = false }: ClientNavProps) {
       {links.map((link) => {
         const active = isActive(link.href);
         return (
-          <Link 
+          <Link
             key={link.href}
             href={link.href}
             className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
-              active 
-                ? 'bg-green-100 text-green-700 font-medium border-l-4 border-green-600' 
-                : 'text-gray-700 hover:bg-green-50 hover:text-green-600'
+              active
+                ? 'bg-pf-accent-bg text-pf-accent font-medium border-l-4 border-pf-accent'
+                : 'text-pf-secondary hover:bg-pf-accent-bg hover:text-pf-accent'
             }`}
           >
             {link.name}

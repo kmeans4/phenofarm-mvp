@@ -60,7 +60,7 @@ export default function MessageBuyerButton({
       type="button"
       onClick={openBuyerMessage}
       disabled={isOpening}
-      className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm font-semibold text-green-700 transition-colors hover:bg-green-100 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+      className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-semibold text-pf-accent transition-colors hover:bg-pf-accent-bg disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
     >
       {isOpening ? (
         <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />

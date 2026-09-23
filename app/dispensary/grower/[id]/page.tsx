@@ -91,22 +91,22 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-24">
+    <div className="space-y-4">
       <PageHeader
         title={grower.businessName}
-        description={grower.description || "Browse available products and request wholesale terms directly from this grower."}
+        description={grower.description || "Browse products and discuss terms with the grower."}
         actions={
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <Link
               href="/dispensary/catalog"
-              className="inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-pf-muted transition-colors hover:bg-pf-accent-bg hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
             >
               <ArrowLeft className="h-4 w-4" />
               Catalog
             </Link>
             <Link
               href="#shop-products"
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#032116] transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
             >
               <Package className="h-4 w-4" />
               Browse products
@@ -115,7 +115,7 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
         }
       />
 
-      <div className="rounded-xl border border-green-900/20 bg-gradient-to-r from-green-900 to-green-700 p-4 text-white shadow-sm sm:p-6">
+      <div className="rounded-xl border border-pf-line bg-pf-surface p-4 text-pf-text">
         <div className="flex items-start gap-4 sm:items-center">
           <div className="flex-shrink-0">
             {grower.logo ? (
@@ -125,11 +125,11 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
                 alt={grower.businessName}
                 width={112}
                 height={112}
-                className="h-14 w-14 rounded-2xl border-4 border-white/20 object-cover shadow-lg sm:h-20 sm:w-20"
+                className="h-14 w-14 rounded-xl border border-pf-line object-cover sm:h-16 sm:w-16"
               />
             ) : (
-              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-4 border-white/20 bg-gradient-to-br from-emerald-500 to-green-800 shadow-lg sm:h-20 sm:w-20">
-                <span className="text-3xl font-bold text-white">
+              <div className="flex h-14 w-14 items-center justify-center rounded-xl border border-pf-accent-line bg-pf-accent-bg sm:h-16 sm:w-16">
+                <span className="text-xl font-semibold text-pf-accent">
                   {getInitials(grower.businessName)}
                 </span>
               </div>
@@ -138,12 +138,12 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
 
           <div className="min-w-0 flex-1">
             {grower.isVerified && (
-              <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-green-500/20 px-3 py-1">
-                <CheckCircle className="h-5 w-5 text-green-300" />
-                <span className="text-sm font-medium text-green-100">Verified</span>
+              <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-pf-accent-bg px-3 py-1">
+                <CheckCircle className="h-5 w-5 text-pf-accent" />
+                <span className="text-sm font-medium text-pf-accent">Verified</span>
               </div>
             )}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-green-100">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-pf-secondary">
               {grower.city && grower.state && (
                 <span className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
@@ -161,7 +161,7 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
                   href={website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 rounded-sm transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-800"
+                  className="flex items-center gap-1 rounded-sm transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                 >
                   <Globe className="h-4 w-4" />
                   Website
@@ -178,7 +178,7 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
         </div>
       </div>
 
-      <p className="text-sm text-gray-600">
+      <p className="text-sm text-pf-muted">
         {commercialTerms.fulfillmentMethods === DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods ? 'Pickup or delivery' : commercialTerms.fulfillmentMethods}
         {' · '}{commercialTerms.minimumOrder}
       </p>
@@ -188,16 +188,16 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
         growerName={grower.businessName}
         growerId={grower.id}
       />
-      <details className="rounded-xl border border-gray-200 bg-white p-4">
-        <summary className="cursor-pointer text-sm font-semibold text-gray-900">Shop details</summary>
-        <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
-          <div><dt className="text-gray-500">Region</dt><dd>{commercialTerms.fulfillmentRegion}</dd></div>
-          <div><dt className="text-gray-500">Fulfillment</dt><dd>{commercialTerms.fulfillmentMethods}</dd></div>
-          <div><dt className="text-gray-500">Minimum</dt><dd>{commercialTerms.minimumOrder}</dd></div>
-          <div><dt className="text-gray-500">Replies</dt><dd>{commercialTerms.responseWindow === DEFAULT_COMMERCIAL_TERMS.responseWindow ? '1 business day' : commercialTerms.responseWindow}</dd></div>
-          <div><dt className="text-gray-500">Payment terms</dt><dd>{commercialTerms.paymentTerms === DEFAULT_COMMERCIAL_TERMS.paymentTerms ? 'Direct with grower' : commercialTerms.paymentTerms}</dd></div>
-          <div><dt className="text-gray-500">Requests fulfilled</dt><dd>{fulfilledRequests}</dd></div>
-          {commercialTerms.contactNote !== DEFAULT_COMMERCIAL_TERMS.contactNote && <div className="sm:col-span-2"><dt className="text-gray-500">Contact note</dt><dd>{commercialTerms.contactNote}</dd></div>}
+      <details className="rounded-xl border border-pf-line bg-pf-surface px-4 py-1">
+        <summary className="min-h-10 cursor-pointer content-center text-sm font-semibold text-pf-text">Shop details</summary>
+        <dl className="my-3 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+          <div><dt className="text-pf-muted">Region</dt><dd>{commercialTerms.fulfillmentRegion}</dd></div>
+          <div><dt className="text-pf-muted">Fulfillment</dt><dd>{commercialTerms.fulfillmentMethods}</dd></div>
+          <div><dt className="text-pf-muted">Minimum</dt><dd>{commercialTerms.minimumOrder}</dd></div>
+          <div><dt className="text-pf-muted">Replies</dt><dd>{commercialTerms.responseWindow === DEFAULT_COMMERCIAL_TERMS.responseWindow ? '1 business day' : commercialTerms.responseWindow}</dd></div>
+          <div><dt className="text-pf-muted">Payment terms</dt><dd>{commercialTerms.paymentTerms === DEFAULT_COMMERCIAL_TERMS.paymentTerms ? 'Direct with grower' : commercialTerms.paymentTerms}</dd></div>
+          <div><dt className="text-pf-muted">Requests fulfilled</dt><dd>{fulfilledRequests}</dd></div>
+          {commercialTerms.contactNote !== DEFAULT_COMMERCIAL_TERMS.contactNote && <div className="sm:col-span-2"><dt className="text-pf-muted">Contact note</dt><dd>{commercialTerms.contactNote}</dd></div>}
         </dl>
       </details>
     </div>

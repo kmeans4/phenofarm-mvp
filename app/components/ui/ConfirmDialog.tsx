@@ -48,7 +48,7 @@ export function ConfirmDialog({
 
   const confirmClasses = intent === 'danger'
     ? 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600'
-    : 'bg-green-600 text-white hover:bg-green-700 focus-visible:ring-green-600';
+    : 'bg-emerald-500 text-[#032116] hover:bg-emerald-400 focus-visible:ring-emerald-400';
 
   return createPortal(
     <div
@@ -64,25 +64,25 @@ export function ConfirmDialog({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        className="pf-dialog-panel-in w-full max-w-md rounded-lg bg-white shadow-2xl"
+        className="pf-dialog-panel-in w-full max-w-md rounded-lg bg-pf-surface shadow-2xl"
       >
-        <div className="flex items-start justify-between gap-4 border-b border-gray-200 p-5">
+        <div className="flex items-start justify-between gap-4 border-b border-pf-line p-5">
           <div className="flex min-w-0 items-start gap-3">
-            <span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${intent === 'danger' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+            <span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${intent === 'danger' ? 'bg-pf-danger-bg text-pf-danger' : 'bg-pf-accent-bg text-pf-accent'}`}>
               <AlertTriangle className="h-5 w-5" />
             </span>
             <div>
-              <h2 id={titleId} className="text-lg font-semibold text-gray-900">
+              <h2 id={titleId} className="text-lg font-semibold text-pf-text">
                 {title}
               </h2>
-              <p id={descriptionId} className="mt-1 text-sm leading-6 text-gray-600">{description}</p>
+              <p id={descriptionId} className="mt-1 text-sm leading-6 text-pf-muted">{description}</p>
             </div>
           </div>
           <button
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-gray-400 hover:bg-gray-100 hover:text-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-pf-muted hover:bg-pf-surface hover:text-pf-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
             aria-label="Close confirmation dialog"
           >
             <X className="h-5 w-5" />
@@ -94,7 +94,7 @@ export function ConfirmDialog({
             type="button"
             onClick={onCancel}
             disabled={loading}
-            className="inline-flex justify-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="inline-flex justify-center rounded-md border border-pf-line-strong bg-pf-surface px-4 py-2 text-sm font-semibold text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
           >
             {cancelLabel}
           </button>
@@ -104,7 +104,7 @@ export function ConfirmDialog({
             onClick={onConfirm}
             disabled={loading}
             aria-busy={loading}
-            className={`inline-flex justify-center rounded-md px-4 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ${confirmClasses}`}
+            className={`inline-flex justify-center rounded-md px-4 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 ring-offset-pf-canvas ${confirmClasses}`}
           >
             {loading ? 'Working...' : confirmLabel}
           </button>

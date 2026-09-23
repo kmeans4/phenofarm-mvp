@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from 'next'
-import { Hanken_Grotesk, IBM_Plex_Mono, Newsreader } from 'next/font/google'
+import { Hanken_Grotesk, IBM_Plex_Mono } from 'next/font/google'
 import './globals.css'
 
 const hankenGrotesk = Hanken_Grotesk({ subsets: ['latin'], variable: '--font-hanken-grotesk', display: 'swap' })
-const newsreader = Newsreader({ subsets: ['latin'], variable: '--font-newsreader', display: 'swap' })
 const ibmPlexMono = IBM_Plex_Mono({
   subsets: ['latin'],
   weight: ['400', '500', '600'],
@@ -26,8 +25,8 @@ export const viewport: Viewport = {
   initialScale: 1,
   viewportFit: 'cover',
   themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#16251c' },
-    { media: '(prefers-color-scheme: light)', color: '#f3efe6' },
+    { media: '(prefers-color-scheme: dark)', color: '#070b09' },
+    { media: '(prefers-color-scheme: light)', color: '#070b09' },
   ],
 }
 
@@ -37,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${hankenGrotesk.variable} ${newsreader.variable} ${ibmPlexMono.variable}`}>
+    <html lang="en" className={`${hankenGrotesk.variable} ${ibmPlexMono.variable}`}>
       <body>
         {children}
       </body>

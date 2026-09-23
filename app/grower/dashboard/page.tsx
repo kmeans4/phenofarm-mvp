@@ -5,16 +5,17 @@ import { db } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import { deliveredValueByDay } from '@/lib/dashboard-metrics';
 import Link from 'next/link';
-import { format, parseISO } from 'date-fns';
+import { format } from 'date-fns';
 import { EmptyState } from '@/app/components/ui/EmptyState';
 import { PageHeader } from '@/app/components/ui/PageHeader';
-import { OperationsSummary } from '../components/OperationsSummary';
 import { ActivityFeed } from './ActivityFeed';
 import { getGrowerPlan } from '@/lib/plans';
 import { getGrowerAttentionSummary } from '@/lib/grower-attention';
 import { GrowerAttentionPanel } from './GrowerAttentionPanel';
-import { DeliveredValueChartFrame } from './DeliveredValueChartFrame';
-import { Sprout } from 'lucide-react';
+import { DeliveredValueChart } from './DeliveredValueChart';
+import { OverviewRequests } from './OverviewRequests';
+import { ProductImage } from '@/app/components/ui/ProductImage';
+import { ArrowRight, ChevronRight, Plus, PackageCheck } from 'lucide-react';
 import { ensureWeeklyLicenseExpiryNotification } from '@/lib/notifications';
 
 interface SetupItem {
@@ -25,24 +26,19 @@ interface SetupItem {
   cta?: string;
 }
 
-function formatAxisCurrency(value: number) {
-  if (value >= 1000) return `$${Math.round(value / 1000)}k`;
-  return `$${Math.round(value).toLocaleString()}`;
-}
-
 function SetupNextStepsCard({ items }: { items: SetupItem[] }) {
   const pending = items.filter((item) => !item.complete);
   const completed = items.filter((item) => item.complete);
   return (
-    <details className="rounded-xl border border-gray-200 bg-white px-3 py-1 shadow-sm sm:p-4">
-      <summary className="min-h-10 cursor-pointer py-2.5 text-sm font-semibold text-gray-900 sm:min-h-0 sm:py-0">Setup · {pending.length ? `${pending.length} left` : 'Complete'}</summary>
-      <div className="mt-3 divide-y divide-gray-100">
+    <details className="rounded-xl border border-pf-line bg-pf-surface px-3 py-1 shadow-sm sm:p-4">
+      <summary className="min-h-10 cursor-pointer py-2.5 text-sm font-semibold text-pf-text sm:min-h-0 sm:py-0">Setup · {pending.length ? `${pending.length} left` : 'Complete'}</summary>
+      <div className="mt-3 divide-y divide-pf-line">
         {pending.map((item) => <div key={item.label} className="flex flex-wrap items-center justify-between gap-3 py-3">
-          <div className="min-w-0 flex-1"><p className="text-sm font-semibold">{item.label}</p><p className="mt-1 text-xs text-gray-600">{item.description}</p></div>
-          <Link href={item.href} className="rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-green-700 hover:bg-green-50">{item.cta || 'Continue'}</Link>
+          <div className="min-w-0 flex-1"><p className="text-sm font-semibold">{item.label}</p><p className="mt-1 text-xs text-pf-muted">{item.description}</p></div>
+          <Link href={item.href} className="rounded-lg border border-pf-line px-3 py-2 text-sm font-semibold text-pf-accent hover:bg-pf-accent-bg">{item.cta || 'Continue'}</Link>
         </div>)}
       </div>
-      {completed.length > 0 && <p className="mt-3 text-xs text-gray-500">Complete: {completed.map(item => item.label).join(', ')}.</p>}
+      {completed.length > 0 && <p className="mt-3 text-xs text-pf-muted">Complete: {completed.map(item => item.label).join(', ')}.</p>}
     </details>
   );
 }
@@ -55,10 +51,10 @@ function WholesaleValueChartEmpty({ hasOrders }: { hasOrders: boolean }) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
         </svg>
       }
-      title={hasOrders ? 'No delivered request value in the last 30 days' : 'No request value yet'}
+      title={hasOrders ? 'No deliveries in the last 30 days' : 'No delivered value yet'}
       description={
         hasOrders
-          ? 'This chart only counts requests marked delivered during the last 30 days. Submitted, accepted, ready, cancelled, and older requests stay out of this trend.'
+          ? 'Delivered requests appear here. Payment stays direct with buyers.'
           : 'Add products and receive delivered requests to see estimated value here.'
       }
       action={hasOrders ? { label: 'View all requests', href: '/grower/orders' } : { label: 'Add product', href: '/grower/products/add' }}
@@ -86,7 +82,7 @@ export default async function GrowerDashboardPage() {
 
   const tomorrow = new Date(); tomorrow.setHours(24, 0, 0, 0);
   const serverTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const [rawRecentOrders, customerTotals, activeProducts, lowStockProducts, growerProfile, revenueData, attentionSummary, orderStats] = await Promise.all([
+  const [rawRecentOrders, customerTotals, activeProducts, lowStockProducts, growerProfile, revenueData, attentionSummary, orderStats, lowStockItems, pendingOrders, progressingOrders] = await Promise.all([
     // Only the activity feed is limited; dashboard statistics use aggregate queries.
     db.order.findMany({
       where: { growerId: user.growerId },
@@ -147,6 +143,21 @@ export default async function GrowerDashboardPage() {
       userId: user.id,
     }),
     db.order.groupBy({ by: ['status'], where: { growerId: user.growerId }, _count: { _all: true }, _sum: { totalAmount: true } }),
+    db.product.findMany({
+      where: { growerId: user.growerId, isDeleted: false, inventoryQty: { lte: 10 } },
+      select: { id: true, name: true, inventoryQty: true, unit: true, productType: true, images: true },
+      orderBy: [{ inventoryQty: 'asc' }, { name: 'asc' }], take: 3,
+    }),
+    db.order.findMany({
+      where: { growerId: user.growerId, status: 'PENDING' },
+      select: { id: true, orderId: true, totalAmount: true, status: true, dispensary: { select: { businessName: true } } },
+      orderBy: { createdAt: 'desc' }, take: 4,
+    }),
+    db.order.findMany({
+      where: { growerId: user.growerId, status: { in: ['CONFIRMED', 'PROCESSING', 'SHIPPED'] } },
+      select: { id: true, orderId: true, totalAmount: true, status: true, dispensary: { select: { businessName: true } } },
+      orderBy: { updatedAt: 'desc' }, take: 4,
+    }),
   ]);
 
   const recentOrders = rawRecentOrders.map((order) => ({
@@ -168,7 +179,8 @@ export default async function GrowerDashboardPage() {
     lowStockProducts,
   };
 
-  const hasData = stats.totalOrders > 0 || stats.activeProducts > 0;
+  const activeRequestCount = orderStats.filter(item => ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(item.status)).reduce((sum, item) => sum + item._count._all, 0);
+  const delivered30DayValue = revenueData.reduce((sum, day) => sum + day.revenue, 0);
   await ensureWeeklyLicenseExpiryNotification({
     userId: user.id,
     expiry: growerProfile?.licenseExpiry || null,
@@ -209,7 +221,6 @@ export default async function GrowerDashboardPage() {
   });
 
   // Calculate max revenue for chart, avoid division by zero
-  const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1);
 
   // Serialize orders for client component
   const serializedOrders = recentOrders.map(order => ({
@@ -265,18 +276,20 @@ export default async function GrowerDashboardPage() {
       cta: 'Review requests',
     },
   ];
-  const midRevenue = maxRevenue / 2;
-  const chartAriaLabel = `Delivered request value bar chart for the last 30 days. Maximum daily value is ${formatAxisCurrency(maxRevenue)}.`;
 
   return (
-    <div className="space-y-3 sm:space-y-6 sm:pb-24">
+    <div className="space-y-4 sm:space-y-5">
       <PageHeader
-        eyebrow={<span className="hidden sm:inline">Good morning</span>}
-        title={growerProfile?.businessName || 'Grower dashboard'}
+        mobileInlineActions hideDescriptionOnMobile
+        className="sm:items-center [&_h1]:sm:text-[2.75rem]"
+        eyebrow={<span className="font-sans text-xs normal-case tracking-normal text-pf-muted">{format(new Date(), 'EEE, MMM d, yyyy')}</span>}
+        title="Overview"
+        description="Requests, inventory, and your wholesale business at a glance."
+        actions={<Link href="/grower/orders/add" className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] transition-colors hover:bg-emerald-400"><Plus className="h-4 w-4" />Record request</Link>}
       />
 
       {marketplaceHidden ? (
-        <section className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-950">
+        <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4 text-pf-warning">
           <h2 className="font-semibold">{licenseExpired ? 'License expired — listings are hidden' : 'Awaiting PhenoFarm verification'}</h2>
           <p className="mt-1 text-sm">Listings are hidden from buyers until your account and current license are verified. You can keep building and editing the catalog.</p>
           <Link href="/grower/settings#business-profile" className="mt-3 inline-flex text-sm font-semibold underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600">Review license details</Link>
@@ -284,91 +297,49 @@ export default async function GrowerDashboardPage() {
       ) : null}
 
       {growerProfile?.subscriptionStatus === 'past_due' ? (
-        <section className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-950">
+        <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4 text-pf-warning">
           <h2 className="font-semibold">Payment issue — update billing to keep Pro features</h2>
           <Link href="/grower/settings#subscription" className="mt-2 inline-flex text-sm font-semibold underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600">Manage billing</Link>
         </section>
       ) : growerProfile?.subscriptionCancelAtPeriodEnd ? (
-        <section className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">Your paid plan is scheduled to end. New listings and CSV import will follow Free plan limits afterward.</section>
+        <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4 text-sm text-pf-warning">Your paid plan is scheduled to end. New listings and CSV import will follow Free plan limits afterward.</section>
       ) : null}
 
-      <OperationsSummary items={[
-        { label: 'Requests', value: stats.totalOrders, href: '/grower/orders' },
-        { label: 'Delivered value', value: `$${Number(stats.deliveredWholesaleValue || 0).toLocaleString()}`, href: '/grower/reports' },
-        { label: 'Customers', value: stats.activeCustomers, href: '/grower/customers' },
-        { label: 'Products', value: stats.activeProducts, href: '/grower/catalog' },
-      ]} />
+      <section aria-label="Summary" className="pf-panel grid grid-cols-3 divide-x divide-pf-line">
+        {[
+          { label: 'Active requests', value: activeRequestCount, href: '/grower/orders', tone: 'text-pf-accent', note: 'Submitted to in transit' },
+          { label: 'Delivered value', value: `$${delivered30DayValue.toLocaleString()}`, href: '/grower/reports', tone: 'text-pf-text', note: 'Last 30 days' },
+          { label: 'Low stock', value: stats.lowStockProducts, href: '/grower/inventory', tone: 'text-pf-warning', note: '10 units or fewer' },
+        ].map(item => <Link key={item.label} href={item.href} className="min-w-0 px-3 py-4 transition-colors hover:bg-pf-raised sm:px-6 sm:py-5"><p className="text-[11px] text-pf-secondary sm:text-sm">{item.label}</p><p className={`mt-1 break-words text-xl font-semibold tracking-tight tabular-nums sm:text-3xl ${item.tone}`}>{item.value}</p><p className="mt-1 text-[10px] text-pf-muted sm:text-xs">{item.note}</p></Link>)}
+      </section>
+
+      <div className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">
+        <OverviewRequests
+          pending={pendingOrders.map(order => ({ id: order.id, orderId: order.orderId, buyer: order.dispensary.businessName, status: order.status, value: Number(order.totalAmount) }))}
+          inProgress={progressingOrders.map(order => ({ id: order.id, orderId: order.orderId, buyer: order.dispensary.businessName, status: order.status, value: Number(order.totalAmount) }))}
+          pendingCount={stats.pendingOrders} inProgressCount={activeRequestCount - stats.pendingOrders}
+        />
+        <section className="pf-panel flex flex-col" aria-labelledby="overview-inventory-title">
+          <div className="flex items-center justify-between gap-2 border-b border-pf-line px-4 py-4 sm:px-5"><h2 id="overview-inventory-title" className="text-base font-semibold">Inventory</h2><Link href="/grower/inventory" className="inline-flex min-h-8 items-center gap-1 text-xs font-medium text-pf-accent">View all <ArrowRight className="h-3.5 w-3.5" /></Link></div>
+          <div className="px-4 py-3 sm:px-5">
+            <p className="mb-2 text-sm font-medium">Low stock <span className="ml-2 rounded-full border border-pf-warning-line bg-pf-warning-bg px-2 py-0.5 text-xs text-pf-warning">{stats.lowStockProducts}</span></p>
+            {lowStockItems.length ? lowStockItems.map(product => <Link key={product.id} href={`/grower/products/${product.id}/edit`} className="flex items-center gap-3 border-t border-pf-line py-3 hover:bg-pf-raised">
+              <ProductImage src={product.images[0]} alt={product.name} showPlaceholderLabel={false} className="h-11 w-11 shrink-0 rounded-lg border border-pf-line" />
+              <div className="min-w-0 flex-1"><p className="truncate text-sm font-medium">{product.name}</p><p className="mt-0.5 truncate text-xs text-pf-muted">{product.productType || 'Product'} · {product.unit}</p></div>
+              <span className={`shrink-0 text-xs tabular-nums ${product.inventoryQty === 0 ? 'text-pf-danger' : 'text-pf-warning'}`}>{product.inventoryQty} left</span><ChevronRight className="h-4 w-4 shrink-0 text-pf-muted" />
+            </Link>) : <div className="flex flex-col items-center gap-2 py-8 text-center"><PackageCheck className="h-7 w-7 text-pf-accent" /><p className="text-sm">{stats.activeProducts ? 'Stock levels look good' : 'Your inventory starts here'}</p><Link href="/grower/products/add" className="text-xs text-pf-accent">Add a product</Link></div>}
+          </div>
+        </section>
+      </div>
+
+      <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        <section className="pf-panel p-4 sm:p-5">
+          {hasWholesaleValue ? <DeliveredValueChart days={chartData} /> : <><h2 className="text-base font-semibold">Delivered value</h2><p className="mt-1 text-xs text-pf-muted">Last 30 days</p><WholesaleValueChartEmpty hasOrders={stats.totalOrders > 0} /></>}
+        </section>
+        <section className="pf-panel p-4 sm:p-5"><ActivityFeed orders={serializedOrders} compact /></section>
+      </div>
       <GrowerAttentionPanel summary={attentionSummary} />
       <SetupNextStepsCard items={setupItems} />
-
-      {/* Delivered value chart */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-5">
-        <div className="mb-3 flex items-center justify-between sm:mb-4">
-          <h2 className="text-base font-semibold text-gray-900 sm:text-lg">Delivered value · 30 days</h2>
-        </div>
-        <p className="mb-3 text-xs text-gray-500">{format(parseISO(chartData[0].date), 'MMM d')}–{format(parseISO(chartData[chartData.length - 1].date), 'MMM d')} · Payment is arranged directly with buyers.</p>
-        {!hasWholesaleValue ? (
-          <WholesaleValueChartEmpty hasOrders={stats.totalOrders > 0} />
-        ) : (
-          <div className="flex min-w-0 gap-3" role="img" aria-label={chartAriaLabel}>
-            <div className="flex min-h-40 shrink-0 flex-col justify-between pb-12 text-right text-[10px] font-medium text-gray-400 sm:min-h-48 sm:text-xs" aria-hidden="true">
-              <span>{formatAxisCurrency(maxRevenue)}</span>
-              <span>{formatAxisCurrency(midRevenue)}</span>
-              <span>$0</span>
-            </div>
-            <DeliveredValueChartFrame>
-              <div className="flex h-40 min-w-full items-end justify-between gap-1 px-1 sm:h-48 sm:gap-2 sm:px-2 md:gap-3 md:px-4">
-                {chartData.map((day) => (
-                  <div key={day.date} className="flex min-w-[40px] flex-1 flex-col items-center gap-1 sm:min-w-[48px] sm:gap-2 md:min-w-[60px]">
-                    <div className="group flex h-28 w-full cursor-pointer flex-col items-center justify-end sm:h-36">
-                      <div className="z-20 mb-1 hidden whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100 sm:block">
-                        ${day.revenue.toLocaleString()}
-                      </div>
-                      <div
-                        className={`w-full rounded-t-lg transition-all duration-300 ${
-                          day.revenue > 0
-                            ? 'bg-green-500 group-hover:bg-green-600'
-                            : 'bg-gray-200'
-                        }`}
-                        style={{ height: `${Math.min((day.revenue / maxRevenue * 100), 100)}%`, minHeight: day.revenue > 0 ? '4px' : '2px' }}
-                      />
-                    </div>
-                    <span className="whitespace-nowrap text-[10px] font-medium text-gray-500 sm:text-xs">
-                      {format(parseISO(day.date), 'M/d')}
-                    </span>
-                    {day.revenue > 0 && (
-                      <span className="whitespace-nowrap text-[9px] font-medium text-gray-600 sm:text-xs">
-                        {day.revenue >= 1000 ? `$${(day.revenue / 1000).toFixed(0)}k` : `$${day.revenue}`}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </DeliveredValueChartFrame>
-          </div>
-        )}
-      </div>
-
-      {/* Recent Activity with Date Filter */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-4 sm:px-6 py-4 sm:py-6">
-          <ActivityFeed orders={serializedOrders} />
-        </div>
-      </div>
-
-      {/* Getting Started Banner - only show when no data */}
-      {!hasData && (
-        <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-4 sm:p-6">
-          <div>
-            <h3 className="flex items-center gap-2 text-base sm:text-lg font-semibold text-green-900">
-              <Sprout className="h-5 w-5" />
-              Welcome to PhenoFarm!
-            </h3>
-            <p className="text-sm text-green-700 mt-1">You are all set to launch once your first products and requests start coming in.</p>
-            <p className="text-xs sm:text-sm text-green-700/90 mt-1">Use the Products area when you are ready to build your catalog and publish listings.</p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

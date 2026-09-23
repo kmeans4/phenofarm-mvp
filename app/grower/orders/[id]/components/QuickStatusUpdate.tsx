@@ -14,43 +14,43 @@ interface QuickStatusUpdateProps {
 const STATUS_CONFIG = {
   PENDING: {
     label: getOrderStatusLabel('PENDING'),
-    color: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    color: 'bg-pf-warning-bg text-pf-warning border-pf-warning-line',
     actions: [
-      { status: 'CONFIRMED', label: 'Accept request', color: 'bg-green-700 hover:bg-green-800' },
-      { status: 'CANCELLED', label: 'Cancel request', color: 'bg-red-600 hover:bg-red-700' },
+      { status: 'CONFIRMED', label: 'Accept request', color: 'bg-emerald-500 text-[#032116] hover:bg-emerald-400' },
+      { status: 'CANCELLED', label: 'Cancel request', color: 'bg-pf-danger-bg text-pf-danger hover:bg-pf-danger-bg/80' },
     ]
   },
   CONFIRMED: {
     label: getOrderStatusLabel('CONFIRMED'),
-    color: 'bg-blue-100 text-blue-800 border-blue-200',
+    color: 'bg-pf-info-bg text-pf-info border-pf-info-line',
     actions: [
-      { status: 'PROCESSING', label: 'Start preparing', color: 'bg-purple-600 hover:bg-purple-700' },
-      { status: 'CANCELLED', label: 'Cancel request', color: 'bg-red-600 hover:bg-red-700' },
+      { status: 'PROCESSING', label: 'Start preparing', color: 'bg-pf-purple-bg text-pf-purple ring-1 ring-inset ring-pf-purple-line hover:bg-pf-purple-bg/80' },
+      { status: 'CANCELLED', label: 'Cancel request', color: 'bg-pf-danger-bg text-pf-danger hover:bg-pf-danger-bg/80' },
     ]
   },
   PROCESSING: {
     label: getOrderStatusLabel('PROCESSING'),
-    color: 'bg-purple-100 text-purple-800 border-purple-200',
+    color: 'bg-pf-purple-bg text-pf-purple border-pf-purple-line',
     actions: [
-      { status: 'SHIPPED', label: 'Mark ready / in transit', color: 'bg-orange-600 hover:bg-orange-700' },
-      { status: 'CANCELLED', label: 'Cancel request', color: 'bg-red-600 hover:bg-red-700' },
+      { status: 'SHIPPED', label: 'Mark ready / in transit', color: 'bg-pf-warning-bg text-pf-warning ring-1 ring-inset ring-pf-warning-line hover:bg-pf-warning-bg/80' },
+      { status: 'CANCELLED', label: 'Cancel request', color: 'bg-pf-danger-bg text-pf-danger hover:bg-pf-danger-bg/80' },
     ]
   },
   SHIPPED: {
     label: getOrderStatusLabel('SHIPPED'),
-    color: 'bg-orange-100 text-orange-800 border-orange-200',
+    color: 'bg-pf-warning-bg text-pf-warning border-pf-warning-line',
     actions: [
-      { status: 'DELIVERED', label: 'Mark delivered', color: 'bg-green-600 hover:bg-green-700' },
+      { status: 'DELIVERED', label: 'Mark delivered', color: 'bg-emerald-500 text-[#032116] hover:bg-emerald-400' },
     ]
   },
   DELIVERED: {
     label: getOrderStatusLabel('DELIVERED'),
-    color: 'bg-green-100 text-green-800 border-green-200',
+    color: 'bg-pf-accent-bg text-pf-accent border-pf-accent-line',
     actions: []
   },
   CANCELLED: {
     label: getOrderStatusLabel('CANCELLED'),
-    color: 'bg-red-100 text-red-800 border-red-200',
+    color: 'bg-pf-danger-bg text-pf-danger border-pf-danger-line',
     actions: []
   },
 };
@@ -108,11 +108,11 @@ export default function QuickStatusUpdate({ orderId, currentStatus }: QuickStatu
   if (currentStatus === 'DELIVERED' || currentStatus === 'CANCELLED') return null;
   
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4">
-      <h2 className="mb-2 text-sm sm:mb-3 font-semibold text-gray-900">Next action</h2>
+    <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-3 sm:p-4">
+      <h2 className="mb-2 text-sm sm:mb-3 font-semibold text-pf-text">Next action</h2>
       
       {error && (
-        <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div className="mb-4 p-3 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger text-sm">
           {error}
         </div>
       )}
@@ -133,8 +133,8 @@ export default function QuickStatusUpdate({ orderId, currentStatus }: QuickStatu
                 relative min-h-10 px-3 sm:px-4 py-2 rounded-lg text-sm font-medium
                 transition-colors disabled:cursor-not-allowed disabled:opacity-50
                 ${isDestructive && isConfirming
-                  ? 'bg-red-700 text-white hover:bg-red-800 ring-2 ring-red-300 ring-offset-2'
-                  : isDestructive ? 'border border-red-200 bg-white text-red-700 hover:bg-red-50' : `${action.color} text-white ${isConfirming ? 'ring-2 ring-green-300 ring-offset-2' : ''}`}
+                  ? 'bg-pf-danger-bg text-pf-danger hover:bg-pf-danger-bg/80 ring-2 ring-pf-danger-line ring-offset-2 ring-offset-pf-surface'
+                  : isDestructive ? 'border border-pf-danger-line bg-pf-surface text-pf-danger hover:bg-pf-danger-bg' : `${action.color} ${isConfirming ? 'ring-2 ring-pf-accent-line ring-offset-2 ring-offset-pf-surface' : ''}`}
               `}
             >
               {isActiveUpdate ? (
@@ -157,7 +157,7 @@ export default function QuickStatusUpdate({ orderId, currentStatus }: QuickStatu
           type="button"
           onClick={() => setShowConfirmation('')}
           disabled={isUpdating}
-          className="mt-2 min-h-10 rounded-md px-2 text-sm text-gray-500 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          className="mt-2 min-h-10 rounded-md px-2 text-sm text-pf-muted hover:text-pf-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
         >
           Cancel
         </button>

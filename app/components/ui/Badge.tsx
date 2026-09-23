@@ -6,17 +6,17 @@ export interface BadgeProps
     VariantProps<typeof badgeVariants> {}
 
 const badgeVariants = cva(
-  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2',
+  'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ring-offset-pf-canvas',
   {
     variants: {
       variant: {
-        default: 'border-transparent bg-gray-900 text-gray-50 hover:bg-gray-900/80',
-        secondary: 'border-transparent bg-gray-100 text-gray-900 hover:bg-gray-100/80',
-        error: 'border-transparent bg-red-500 text-gray-50 hover:bg-red-500/80',
-        success: 'border-transparent bg-green-100 text-green-800',
-        warning: 'border-transparent bg-yellow-100 text-yellow-800',
-        info: 'border-transparent bg-blue-100 text-blue-800',
-        danger: 'border-transparent bg-red-500 text-gray-50 hover:bg-red-500/80',
+        default: 'border-pf-line bg-pf-raised text-pf-secondary',
+        secondary: 'border-transparent bg-pf-surface text-pf-text hover:bg-pf-surface/80',
+        error: 'border-pf-danger-line bg-pf-danger-bg text-pf-danger',
+        success: 'border-transparent bg-pf-accent-bg text-pf-accent',
+        warning: 'border-transparent bg-pf-warning-bg text-pf-warning',
+        info: 'border-transparent bg-pf-info-bg text-pf-info',
+        danger: 'border-pf-danger-line bg-pf-danger-bg text-pf-danger',
       },
     },
     defaultVariants: {

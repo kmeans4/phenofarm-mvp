@@ -1,4 +1,4 @@
-import { CheckCircle2, CircleAlert, ShieldCheck } from "lucide-react";
+import { CheckCircle2, ChevronDown, CircleAlert, ShieldCheck } from "lucide-react";
 import { CopyToClipboardButton } from "@/app/admin/components/CopyToClipboardButton";
 import { PageHeader } from "@/app/components/ui/PageHeader";
 
@@ -29,7 +29,7 @@ function envStatus(key: string, label: string, helper: string): StatusItem {
 function StatusBadge({ status }: { status: StatusItem["status"] }) {
   if (status === "ready") {
     return (
-      <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
+      <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-pf-accent-bg px-2 py-1 text-xs font-semibold text-pf-accent">
         <CheckCircle2 className="h-3.5 w-3.5" />
         Configured
       </span>
@@ -38,7 +38,7 @@ function StatusBadge({ status }: { status: StatusItem["status"] }) {
 
   if (status === "attention") {
     return (
-      <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
+      <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-pf-warning-bg px-2 py-1 text-xs font-semibold text-pf-warning">
         <CircleAlert className="h-3.5 w-3.5" />
         Needs setup
       </span>
@@ -46,7 +46,7 @@ function StatusBadge({ status }: { status: StatusItem["status"] }) {
   }
 
   return (
-    <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+    <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-pf-surface px-2 py-1 text-xs font-semibold text-pf-secondary">
       <ShieldCheck className="h-3.5 w-3.5" />
       Policy
     </span>
@@ -83,65 +83,65 @@ export default async function AdminSettingsPage() {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <PageHeader
           compact
         title="Settings"
         description="View billing, support, and policies."
       />
 
-      <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-950">
+      <div className="rounded-lg border border-pf-accent-line bg-pf-accent-bg p-3 text-sm text-pf-accent">
         <p className="font-semibold">Settlement policy</p>
         <p className="mt-1">
           PhenoFarm bills only grower subscriptions. Wholesale payment stays between licensed businesses.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-        <section className="rounded-lg border border-gray-200 bg-white shadow-sm">
-          <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">Grower billing</h2>
-            <p className="mt-1 text-sm text-gray-500">Stripe subscription readiness.</p>
+      <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2">
+        <section className="rounded-lg border border-pf-line bg-pf-surface shadow-sm">
+          <div className="border-b border-pf-line bg-pf-canvas px-4 py-3">
+            <h2 className="text-base font-semibold text-pf-text">Grower billing</h2>
+            <p className="mt-1 text-sm text-pf-muted">Stripe subscription readiness.</p>
           </div>
-          <div className="border-b border-gray-100 bg-amber-50 px-6 py-3 text-xs text-amber-900">
+          <div className="border-b border-pf-line bg-pf-warning-bg px-4 py-3 text-xs text-pf-warning">
             {subscriptionConfig.some((item) => item.status === "attention") ? providerSetupLocation : "Stripe settings are ready for testing."}
           </div>
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-pf-line">
             {subscriptionConfig.filter(item => item.status === 'attention').map(item => (
-              <div key={item.label} className="px-4 py-3 sm:px-6">
+              <div key={item.label} className="px-4 py-3">
                 <div className="flex items-start justify-between gap-3">
-                  <p className="text-sm font-semibold text-gray-900">{item.label}</p>
+                  <p className="text-sm font-semibold text-pf-text">{item.label}</p>
                   <StatusBadge status={item.status} />
                 </div>
-                <p className="mt-1 text-xs text-gray-500">{item.helper}</p>
+                <p className="mt-1 text-xs text-pf-muted">{item.helper}</p>
               </div>
             ))}
           </div>
-          {subscriptionConfig.some(item => item.status === 'ready') && <details className="border-t border-gray-100 px-4 py-3 sm:px-6">
-            <summary className="cursor-pointer text-sm font-medium text-gray-700">{subscriptionConfig.filter(item => item.status === 'ready').length} configured</summary>
+          {subscriptionConfig.some(item => item.status === 'ready') && <details className="border-t border-pf-line px-4 py-1">
+            <summary className="min-h-10 cursor-pointer py-2 text-sm font-medium text-pf-secondary">{subscriptionConfig.filter(item => item.status === 'ready').length} configured</summary>
             <div className="mt-3 space-y-3">
               {subscriptionConfig.filter(item => item.status === 'ready').map(item => (
-                <div key={item.label} className="flex items-start justify-between gap-3"><span className="text-sm text-gray-700">{item.label}</span><StatusBadge status={item.status} /></div>
+                <div key={item.label} className="flex items-start justify-between gap-3"><span className="text-sm text-pf-secondary">{item.label}</span><StatusBadge status={item.status} /></div>
               ))}
             </div>
           </details>}
 
         </section>
 
-        <section className="rounded-lg border border-gray-200 bg-white shadow-sm">
-          <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">Support</h2>
+        <section className="rounded-lg border border-pf-line bg-pf-surface shadow-sm">
+          <div className="border-b border-pf-line bg-pf-canvas px-4 py-3">
+            <h2 className="text-base font-semibold text-pf-text">Support</h2>
           </div>
-          <dl className="divide-y divide-gray-100">
+          <dl className="divide-y divide-pf-line">
             {supportProfile.map((item) => (
-              <div key={item.label} className="grid gap-1 px-6 py-4 sm:grid-cols-[180px_1fr]">
-                <dt className="text-sm font-medium text-gray-500">{item.label}</dt>
-                <dd className="text-sm font-semibold text-gray-900">
+              <div key={item.label} className="grid min-w-0 gap-1 px-4 py-3">
+                <dt className="text-sm font-medium text-pf-muted">{item.label}</dt>
+                <dd className="text-sm font-semibold text-pf-text">
                   {item.value === supportEmail ? (
                     <div className="flex flex-wrap items-center gap-2">
                       <a
                         href={`mailto:${supportEmail}`}
-                        className="text-green-700 hover:text-green-800 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                        className="inline-flex min-h-10 items-center break-all text-pf-accent hover:text-pf-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                       >
                         {supportEmail}
                       </a>
@@ -154,18 +154,22 @@ export default async function AdminSettingsPage() {
           </dl>
         </section>
 
-        <section className="rounded-lg border border-gray-200 bg-white shadow-sm lg:col-span-2">
-          <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">Policies</h2>
+        <section className="rounded-lg border border-pf-line bg-pf-surface shadow-sm lg:col-span-2">
+          <div className="border-b border-pf-line bg-pf-canvas px-4 py-3">
+            <h2 className="text-base font-semibold text-pf-text">Policies</h2>
           </div>
-          <dl className="divide-y divide-gray-100">
+          <div className="divide-y divide-pf-line">
             {operationalPolicies.map(item => (
-              <div key={item.label} className="px-4 py-3 sm:px-6">
-                <div className="flex flex-wrap items-baseline justify-between gap-2"><dt className="text-sm font-semibold text-gray-900">{item.label}</dt><dd className="text-sm text-gray-600">{item.value}</dd></div>
-                <details className="mt-1 text-xs text-gray-500"><summary className="cursor-pointer">Details</summary><p className="mt-2 leading-5">{item.helper}</p></details>
-              </div>
+              <details key={item.label} className="group px-4">
+                <summary className="flex min-h-12 cursor-pointer list-none items-center gap-3 py-3 [&::-webkit-details-marker]:hidden">
+                  <span className="min-w-0 flex-1 text-sm font-semibold text-pf-text">{item.label}</span>
+                  <span className="text-right text-xs text-pf-muted">{item.value}</span>
+                  <ChevronDown className="h-4 w-4 shrink-0 text-pf-muted transition-transform group-open:rotate-180" aria-hidden="true" />
+                </summary>
+                <p className="pb-3 text-xs leading-5 text-pf-muted">{item.helper}</p>
+              </details>
             ))}
-          </dl>
+          </div>
         </section>
       </div>
 

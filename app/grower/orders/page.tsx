@@ -108,7 +108,7 @@ export default async function GrowerOrdersPage({
       />
 
       <OperationsSummary items={[{label: 'Requests', value: totalOrders}, {label: 'Active', value: activeCount}, {label: 'Needs review', value: pendingCount}, {label: 'Est. value', value: formatProductMoney(trackedWholesaleValue)}]} />
-      <p className="text-xs text-gray-500">Excludes cancelled requests. Payment is arranged directly.</p>
+      <p className="text-xs text-pf-muted">Excludes cancelled requests. Payment is arranged directly.</p>
 
       {/* Orders List with Batch Actions */}
       <OrdersList initialOrders={serializedOrders} customerFilterLabel={customerFilter?.businessName} />

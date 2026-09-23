@@ -111,8 +111,8 @@ export default function SignUpPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070908] text-gray-900 lg:grid lg:grid-cols-2">
-      <section className="relative hidden min-h-screen overflow-hidden bg-[#070908] px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
+    <main className="min-h-dvh bg-pf-canvas text-pf-text lg:grid lg:grid-cols-2">
+      <section className="relative hidden min-h-dvh overflow-hidden bg-pf-canvas px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-[-18rem] h-[40rem] w-[52rem] -translate-x-1/2 rounded-full bg-emerald-500/[0.09] blur-[130px]" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
@@ -120,7 +120,7 @@ export default function SignUpPage() {
         </div>
 
         <div className="relative">
-          <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
+          <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
               PF
             </span>
@@ -129,72 +129,72 @@ export default function SignUpPage() {
         </div>
 
         <div className="relative max-w-xl">
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400">
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-pf-accent">
             Join the licensed network
           </p>
           <h1 className="text-5xl font-semibold tracking-tight text-white xl:text-6xl">
             Build your verified profile.
           </h1>
-          <p className="mt-6 max-w-lg text-base leading-7 text-gray-400">
+          <p className="mt-6 max-w-lg text-base leading-7 text-pf-muted">
             One account covers grower catalog or dispensary buying workflows.
           </p>
 
           <div className="mt-10 grid gap-3">
             {['Marketplace identity from your business profile', 'License-aware dispensary ordering gates', 'Cultivator subscription billing only'].map((item) => (
               <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
-                <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-300" />
-                <span className="text-sm text-gray-300">{item}</span>
+                <ShieldCheck className="h-5 w-5 shrink-0 text-pf-accent" />
+                <span className="text-sm text-pf-secondary">{item}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="relative text-sm text-gray-500">
+        <p className="relative text-sm text-pf-muted">
           Already registered?{' '}
-          <Link href="/auth/sign_in" className="inline-flex min-h-10 items-center text-emerald-300 transition-colors hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
+          <Link href="/auth/sign_in" className="inline-flex min-h-10 items-center text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
             Sign in
           </Link>
         </p>
       </section>
 
-      <section className="flex min-h-screen items-center justify-center px-4 py-8 sm:px-6 lg:bg-gray-50 lg:px-8">
+      <section className="flex min-h-dvh items-start justify-center px-4 py-5 sm:items-center sm:px-6 sm:py-8 lg:px-8">
         <div className="w-full max-w-2xl">
-          <div className="mb-8 text-center lg:hidden">
-            <Link href="/" className="mx-auto inline-flex items-center gap-3 rounded-xl text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-lg font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
+          <div className="mb-5 text-center lg:hidden">
+            <Link href="/" className="mx-auto inline-flex items-center gap-3 rounded-xl text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-lg font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
                 PF
               </span>
               <span className="text-lg font-semibold">PhenoFarm</span>
             </Link>
           </div>
 
-          <div className="rounded-3xl border border-white/[0.08] bg-white p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-8 lg:border-gray-200 lg:shadow-sm">
+          <div className="rounded-xl border border-pf-line bg-pf-surface p-4 sm:p-6">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight text-gray-950">
+              <h2 className="text-2xl font-semibold tracking-tight text-pf-text sm:text-3xl">
                 Create your account
               </h2>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-sm text-pf-muted">
                 Already have an account?{' '}
-                <Link href="/auth/sign_in" className="inline-flex min-h-10 items-center font-medium text-green-700 transition-colors hover:text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+                <Link href="/auth/sign_in" className="inline-flex min-h-10 items-center font-medium text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
                   Sign in
                 </Link>
               </p>
             </div>
 
-            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
               {error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+                <div className="rounded-xl border border-pf-danger-line bg-pf-danger-bg px-4 py-3 text-sm text-pf-danger" role="alert">
                   {error}
                 </div>
               )}
 
-              <fieldset className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 sm:p-5">
-                <legend className="px-1 text-sm font-semibold text-gray-950">
+              <fieldset className="min-w-0 border-t border-pf-line pt-3">
+                <legend className="px-1 text-sm font-semibold text-pf-text">
                   Personal contact
                 </legend>
-                <div className="mt-3 grid gap-4 sm:grid-cols-2">
+                <div className="mt-2 grid grid-cols-2 gap-3">
                   <div>
-                    <label htmlFor="firstName" className="mb-2 block text-sm font-medium text-gray-700">
+                    <label htmlFor="firstName" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                       First Name *
                     </label>
                     <input
@@ -208,13 +208,13 @@ export default function SignUpPage() {
                       value={formData.firstName}
                       onChange={handleChange}
                       disabled={loading}
-                      className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                      className="relative block w-full appearance-none rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                       placeholder="First name"
                     />
                   </div>
 
                   <div>
-                    <label htmlFor="lastName" className="mb-2 block text-sm font-medium text-gray-700">
+                    <label htmlFor="lastName" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                       Last Name *
                     </label>
                     <input
@@ -228,20 +228,20 @@ export default function SignUpPage() {
                       value={formData.lastName}
                       onChange={handleChange}
                       disabled={loading}
-                      className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                      className="relative block w-full appearance-none rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                       placeholder="Last name"
                     />
                   </div>
                 </div>
               </fieldset>
 
-              <fieldset className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 sm:p-5">
-                <legend className="px-1 text-sm font-semibold text-gray-950">
+              <fieldset className="min-w-0 border-t border-pf-line pt-3">
+                <legend className="px-1 text-sm font-semibold text-pf-text">
                   Business profile
                 </legend>
-                <div className="mt-3 grid gap-4">
+                <div className="mt-2 grid gap-3">
                   <div>
-                    <label htmlFor="businessName" className="mb-2 block text-sm font-medium text-gray-700">
+                    <label htmlFor="businessName" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                       Business Name
                     </label>
                     <input
@@ -253,16 +253,16 @@ export default function SignUpPage() {
                       onChange={handleChange}
                       disabled={loading}
                       aria-describedby="businessName-helper"
-                      className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                      className="relative block w-full appearance-none rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                       placeholder="Business name"
                     />
-                    <p id="businessName-helper" className="mt-2 text-xs leading-5 text-gray-500">
-                      Shown to marketplace partners — defaults to your name if left blank.
+                    <p id="businessName-helper" className="mt-2 text-xs leading-5 text-pf-muted">
+                      Partners see this name. Leave blank to use your name.
                     </p>
                   </div>
 
                   <div>
-                    <label htmlFor="businessType" className="mb-2 block text-sm font-medium text-gray-700">
+                    <label htmlFor="businessType" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                       Business Type *
                     </label>
                     <select
@@ -272,13 +272,13 @@ export default function SignUpPage() {
                       onChange={handleChange}
                       disabled={loading}
                       aria-describedby={formData.businessType === 'dispensary' ? 'dispensary-license-note' : undefined}
-                      className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                      className="relative block w-full rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 text-base text-pf-text transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                     >
                       <option value="grower">Cannabis Grower</option>
                       <option value="dispensary">Dispensary/Retailer</option>
                     </select>
                     {formData.businessType === 'dispensary' && (
-                      <p id="dispensary-license-note" className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs leading-5 text-emerald-900">
+                      <p id="dispensary-license-note" className="mt-2 rounded-xl border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-xs leading-5 text-pf-accent">
                         Dispensaries submit license details after signup; ordering unlocks once PhenoFarm verifies the license.
                       </p>
                     )}
@@ -286,13 +286,13 @@ export default function SignUpPage() {
                 </div>
               </fieldset>
 
-              <fieldset className="rounded-2xl border border-gray-200 bg-gray-50/70 p-4 sm:p-5">
-                <legend className="px-1 text-sm font-semibold text-gray-950">
+              <fieldset className="min-w-0 border-t border-pf-line pt-3">
+                <legend className="px-1 text-sm font-semibold text-pf-text">
                   Account security
                 </legend>
-                <div className="mt-3 grid gap-4">
+                <div className="mt-2 grid gap-3">
                   <div>
-                    <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">
+                    <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                       Email address *
                     </label>
                     <input
@@ -308,14 +308,14 @@ export default function SignUpPage() {
                       value={formData.email}
                       onChange={handleChange}
                       disabled={loading}
-                      className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                      className="relative block w-full appearance-none rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                       placeholder="Email address"
                     />
                   </div>
 
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
-                      <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700">
+                      <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                         Password *
                       </label>
                       <div className="relative">
@@ -331,14 +331,14 @@ export default function SignUpPage() {
                           onBlur={() => setPasswordTouched(true)}
                           disabled={loading}
                           aria-describedby="password-strength-hint"
-                          className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 pr-12 text-base text-gray-900 placeholder:text-gray-500 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                          className="relative block w-full appearance-none rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 pr-12 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                           placeholder="Password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowPassword((current) => !current)}
                           disabled={loading}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md text-pf-muted transition-colors hover:bg-pf-hover hover:text-pf-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:opacity-50"
                           aria-label={showPassword ? 'Hide password' : 'Show password'}
                         >
                           {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -348,21 +348,21 @@ export default function SignUpPage() {
                         id="password-strength-hint"
                         className={`mt-2 flex items-center gap-1.5 text-xs leading-5 ${
                           (passwordTouched || formData.password.length > 0) && !passwordMeetsMinimum
-                            ? 'text-red-700'
+                            ? 'text-pf-danger'
                             : passwordMeetsMinimum
-                              ? 'text-green-700'
-                              : 'text-gray-500'
+                              ? 'text-pf-accent'
+                              : 'text-pf-muted'
                         }`}
                       >
                         {passwordMeetsMinimum && <CheckCircle2 className="h-3.5 w-3.5" />}
                         {passwordMeetsMinimum
-                          ? 'Password meets the minimum length.'
+                          ? 'Minimum length met.'
                           : `Use at least ${MIN_PASSWORD_LENGTH} characters.`}
                       </p>
                     </div>
 
                     <div>
-                      <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-gray-700">
+                      <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                         Confirm Password *
                       </label>
                       <div className="relative">
@@ -378,14 +378,14 @@ export default function SignUpPage() {
                           onBlur={() => setConfirmPasswordTouched(true)}
                           disabled={loading}
                           aria-describedby="password-match-hint"
-                          className="relative block w-full appearance-none rounded-xl border border-gray-300 bg-white px-4 py-3 pr-12 text-base text-gray-900 placeholder:text-gray-500 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                          className="relative block w-full appearance-none rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 pr-12 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                           placeholder="Confirm password"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword((current) => !current)}
                           disabled={loading}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                          className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md text-pf-muted transition-colors hover:bg-pf-hover hover:text-pf-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:opacity-50"
                           aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                         >
                           {showConfirmPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -395,10 +395,10 @@ export default function SignUpPage() {
                         id="password-match-hint"
                         className={`mt-2 flex items-center gap-1.5 text-xs leading-5 ${
                           passwordsMismatch
-                            ? 'text-red-700'
+                            ? 'text-pf-danger'
                             : passwordsMatch
-                              ? 'text-green-700'
-                              : 'text-gray-500'
+                              ? 'text-pf-accent'
+                              : 'text-pf-muted'
                         }`}
                       >
                         {passwordsMatch && <CheckCircle2 className="h-3.5 w-3.5" />}
@@ -418,7 +418,7 @@ export default function SignUpPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative inline-flex w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-green-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-green-700/70"
+                className="group relative inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-pf-canvas transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:bg-emerald-500/70"
               >
                 {loading ? (
                   <>
@@ -431,13 +431,13 @@ export default function SignUpPage() {
               </button>
             </form>
 
-            <div className="mt-6 border-t border-gray-200 pt-5 text-center text-sm text-gray-500">
+            <div className="mt-4 border-t border-pf-line pt-3 text-center text-sm text-pf-muted">
               By signing up, you agree to the{' '}
-              <Link href="/legal/terms" className="inline-flex min-h-10 items-center font-medium text-gray-700 transition-colors hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+              <Link href="/legal/terms" className="inline-flex min-h-10 items-center font-medium text-pf-secondary transition-colors hover:text-pf-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
                 Terms
               </Link>{' '}
               and{' '}
-              <Link href="/legal/privacy" className="inline-flex min-h-10 items-center font-medium text-gray-700 transition-colors hover:text-gray-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+              <Link href="/legal/privacy" className="inline-flex min-h-10 items-center font-medium text-pf-secondary transition-colors hover:text-pf-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
                 Privacy Policy
               </Link>
               .

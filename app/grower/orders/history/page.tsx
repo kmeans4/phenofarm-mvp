@@ -60,7 +60,7 @@ export default async function GrowerOrdersHistoryPage({
         title={<><span className="sm:hidden">History</span><span className="hidden sm:inline">Request history</span></>}
         actions={
           <Link href="/grower/orders" className="shrink-0">
-            <Button variant="outline" className="bg-white border-gray-300 hover:bg-gray-50 text-sm">
+            <Button variant="outline" className="bg-pf-surface border-pf-line-strong hover:bg-pf-canvas text-sm">
               <span className="sm:hidden">Active</span><span className="hidden sm:inline">Active requests</span>
             </Button>
           </Link>
@@ -69,7 +69,7 @@ export default async function GrowerOrdersHistoryPage({
 
       <OperationsSummary items={[{label: 'Requests', value: totalCount}, {label: 'Delivered', value: deliveredCount}, {label: 'Cancelled', value: cancelledCount}, {label: 'Delivered value', value: formatProductMoney(deliveredWholesaleValue)}]} />
 
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-pf-surface shadow-sm border border-pf-line">
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-wrap gap-1 sm:gap-2" aria-label="Request history status filter">
@@ -80,15 +80,15 @@ export default async function GrowerOrdersHistoryPage({
                     key={chip.key}
                     href={chip.href}
                     aria-current={active ? 'page' : undefined}
-                    className={`inline-flex min-h-10 items-center gap-1 rounded-lg px-2 py-2 sm:gap-2 sm:px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
+                    className={`inline-flex min-h-10 items-center gap-1 rounded-lg px-2 py-2 sm:gap-2 sm:px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 ${
                       active
-                        ? 'bg-green-600 text-white'
-                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                        ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                        : 'bg-pf-canvas text-pf-secondary hover:bg-pf-surface'
                     }`}
                   >
                     <span>{chip.label}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs ${
-                      active ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+                      active ? 'bg-pf-accent/15 text-pf-accent' : 'bg-pf-surface text-pf-muted ring-1 ring-pf-line'
                     }`}>
                       {chip.count}
                     </span>
@@ -100,26 +100,25 @@ export default async function GrowerOrdersHistoryPage({
         </CardHeader>
         <CardContent>
           {filteredOrders.length === 0 ? (
-            <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pf-surface flex items-center justify-center">
+                <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-pf-text mb-2">
                 {totalCount === 0 ? 'No request history yet' : 'No requests match this filter'}
               </h3>
-              <p className="text-gray-500 mb-2 max-w-md mx-auto">
+              <p className="text-sm text-pf-muted mb-4 max-w-md mx-auto">
                 {totalCount === 0
-                  ? 'Delivered and cancelled requests will appear here once active requests are closed out.'
+                  ? 'Delivered and cancelled requests appear here.'
                   : 'Switch filters to review another closed request status.'}
               </p>
               {totalCount === 0 ? (
                 <>
-                  <p className="text-sm text-gray-500 mb-6">Next step: review your active requests and update statuses as they progress.</p>
                   <Link
                     href="/grower/orders"
-                    className="inline-flex items-center rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    className="inline-flex items-center rounded-lg bg-emerald-500 px-4 py-2 font-medium text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                   >
                     Go to active requests
                   </Link>
@@ -127,7 +126,7 @@ export default async function GrowerOrdersHistoryPage({
               ) : (
                 <Link
                   href="/grower/orders/history"
-                  className="inline-flex items-center rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  className="inline-flex items-center rounded-lg bg-emerald-500 px-4 py-2 font-medium text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                 >
                   Show all history
                 </Link>
@@ -135,36 +134,36 @@ export default async function GrowerOrdersHistoryPage({
             </div>
           ) : (
             <>
-            <div className="space-y-2 sm:hidden">{filteredOrders.map(order => <article key={order.id} className="rounded-xl border border-gray-200 p-3">
-              <Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center break-all text-sm font-semibold text-green-700">#{order.orderId}</Link><p className="text-sm text-gray-600">{order.dispensary.businessName}</p>
+            <div className="space-y-2 sm:hidden">{filteredOrders.map(order => <article key={order.id} className="rounded-xl border border-pf-line p-3">
+              <Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center break-all text-sm font-semibold text-pf-accent">#{order.orderId}</Link><p className="text-sm text-pf-muted">{order.dispensary.businessName}</p>
               <div className="mt-1 flex flex-wrap items-center justify-between gap-2"><Badge variant={order.status === 'DELIVERED' ? 'success' : 'error'}>{getOrderStatusLabel(order.status)}</Badge><strong className="text-sm">{formatProductMoney(Number(order.totalAmount))}</strong></div>
-              <div className="mt-1 flex items-center justify-between gap-2 text-xs text-gray-500"><span>{format(order.updatedAt, 'MMM d, yyyy')}</span><Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-green-700">View →</Link></div>
+              <div className="mt-1 flex items-center justify-between gap-2 text-xs text-pf-muted"><span>{format(order.updatedAt, 'MMM d, yyyy')}</span><Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center rounded-lg border border-pf-line px-3 py-2 text-sm font-semibold text-pf-accent">View →</Link></div>
             </article>)}</div>
             <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-left border-collapse">
                 <thead>
-                  <tr className="border-b border-gray-200">
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Request #</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Customer</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Closed</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Est. value</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Status</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-gray-700">Actions</th>
+                  <tr className="border-b border-pf-line">
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-secondary">Request #</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-secondary">Customer</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-secondary">Closed</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-secondary">Est. value</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-secondary">Status</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-secondary">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-pf-line">
                   {filteredOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50">
+                    <tr key={order.id} className="hover:bg-pf-canvas">
                       <td className="px-3 sm:px-4 py-2 sm:py-3">
-                        <div className="font-medium text-gray-900">#{order.orderId}</div>
+                        <div className="font-medium text-pf-text">#{order.orderId}</div>
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-pf-muted">
                         {order.dispensary.businessName}
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-pf-muted">
                         {format(order.updatedAt, 'MMM d, yyyy')}
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-gray-900">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-bold text-pf-text">
                         ${Number(order.totalAmount).toFixed(2)}
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3">
@@ -175,7 +174,7 @@ export default async function GrowerOrdersHistoryPage({
                       <td className="px-3 sm:px-4 py-2 sm:py-3">
                         <Link 
                           href={`/grower/orders/${order.id}`}
-                          className="inline-flex min-h-10 items-center rounded text-xs font-medium text-green-600 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:text-sm"
+                          className="inline-flex min-h-10 items-center rounded text-xs font-medium text-pf-accent hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:text-sm"
                         >
                           View
                         </Link>

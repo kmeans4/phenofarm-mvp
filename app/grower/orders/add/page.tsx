@@ -332,8 +332,8 @@ export default function AddOrderPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pf-accent mx-auto mb-4"></div>
+          <p className="text-pf-muted">Loading...</p>
         </div>
       </div>
     );
@@ -343,13 +343,13 @@ export default function AddOrderPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="bg-green-100 rounded-full p-4 mx-auto mb-4">
-            <svg className="w-12 h-12 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="bg-pf-accent-bg rounded-full p-4 mx-auto mb-4">
+            <svg className="w-12 h-12 text-pf-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Direct Request Recorded</h2>
-          <p className="text-gray-600">Redirecting...</p>
+          <h2 className="text-2xl font-bold text-pf-text mb-2">Direct Request Recorded</h2>
+          <p className="text-pf-muted">Redirecting...</p>
         </div>
       </div>
     );
@@ -360,16 +360,16 @@ export default function AddOrderPage() {
       <PageHeader title="Record request" description="Record an agreement made directly with a buyer." />
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{error}</p>
+        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg">
+          <p className="text-pf-danger">{error}</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line">
           <div className="p-3 space-y-3 sm:p-4 sm:space-y-4">
             <div>
-              <label htmlFor="request-buyer" className="block text-sm font-medium text-gray-700 mb-1">Buyer *</label>
+              <label htmlFor="request-buyer" className="block text-sm font-medium text-pf-secondary mb-1">Buyer *</label>
               <div className="relative">
                 <input
                   id="request-buyer"
@@ -392,14 +392,14 @@ export default function AddOrderPage() {
                   aria-controls="dispensary-combobox-results"
                   aria-autocomplete="list"
                   placeholder="Search by name or city"
-                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  className="min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                   required
                 />
                 {isDispensaryListOpen && (
                   <div
                     id="dispensary-combobox-results"
                     role="listbox"
-                    className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"
+                    className="absolute z-30 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border border-pf-line bg-pf-surface shadow-lg"
                   >
                     {filteredDispensaries.length > 0 ? (
                       filteredDispensaries.map((dispensary) => (
@@ -410,14 +410,14 @@ export default function AddOrderPage() {
                           aria-selected={formData.dispensaryId === dispensary.id}
                           onMouseDown={(event) => event.preventDefault()}
                           onClick={() => selectDispensary(dispensary)}
-                          className="flex w-full flex-col px-3 py-2 text-left hover:bg-green-50 focus-visible:bg-green-50 focus-visible:outline-none"
+                          className="flex w-full flex-col px-3 py-2 text-left hover:bg-pf-accent-bg focus-visible:bg-pf-accent-bg focus-visible:outline-none"
                         >
-                          <span className="text-sm font-medium text-gray-900">{dispensary.businessName}</span>
-                          <span className="text-xs text-gray-500">{dispensary.city}, {dispensary.state}</span>
+                          <span className="text-sm font-medium text-pf-text">{dispensary.businessName}</span>
+                          <span className="text-xs text-pf-muted">{dispensary.city}, {dispensary.state}</span>
                         </button>
                       ))
                     ) : (
-                      <p className="px-3 py-3 text-sm text-gray-500">No dispensaries match that search.</p>
+                      <p className="px-3 py-3 text-sm text-pf-muted">No dispensaries match that search.</p>
                     )}
                   </div>
                 )}
@@ -426,14 +426,14 @@ export default function AddOrderPage() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div className="px-3 py-2 border-b border-gray-200 flex items-center justify-between gap-3 sm:p-4">
-            <h2 className="font-semibold text-gray-900">Items</h2>
+        <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line">
+          <div className="px-3 py-2 border-b border-pf-line flex items-center justify-between gap-3 sm:p-4">
+            <h2 className="font-semibold text-pf-text">Items</h2>
             <button
               type="button"
               onClick={handleAddItem}
               disabled={isSubmitting || !hasProductsAvailableToAdd}
-              className="min-h-10 rounded border px-3 py-2 text-sm hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              className="min-h-10 rounded-lg border border-pf-line-strong px-3 py-2 text-sm hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
               title={hasProductsAvailableToAdd ? 'Add product line' : 'All available products are already selected'}
             >
               Add item
@@ -441,20 +441,20 @@ export default function AddOrderPage() {
           </div>
           <div className="p-3 sm:p-4">
             <label className="sr-only" htmlFor="order-product-search">Search products</label>
-            <input id="order-product-search" type="search" value={productSearch} onChange={event => setProductSearch(event.target.value)} placeholder="Search products" className="mb-3 w-full rounded-lg border px-3 py-2 text-base" />
-            {productError && <p role="alert" className="text-sm text-red-600">{productError}</p>}
-            {hasMore && <button type="button" disabled={loadingProducts} onClick={loadMore} className="mb-3 min-h-10 text-sm text-green-700">{productError ? 'Retry products' : 'More products'}</button>}
-            {loadingProducts && <p className="text-sm text-gray-500">Loading products…</p>}
+            <input id="order-product-search" type="search" value={productSearch} onChange={event => setProductSearch(event.target.value)} placeholder="Search products" className="mb-3 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base" />
+            {productError && <p role="alert" className="text-sm text-pf-danger">{productError}</p>}
+            {hasMore && <button type="button" disabled={loadingProducts} onClick={loadMore} className="mb-3 min-h-10 text-sm text-pf-accent">{productError ? 'Retry products' : 'More products'}</button>}
+            {loadingProducts && <p className="text-sm text-pf-muted">Loading products…</p>}
             {products.length === 0 ? (
-              <div className="text-center py-10 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-                <p className="text-gray-700 font-medium mb-2">No matching products</p>
-                <p className="text-sm text-gray-500 mb-4">Search for another product or add a listing.</p>
-                <Link href="/grower/products/add" className="text-green-600 hover:text-green-700 font-medium">
+              <div className="text-center py-10 border-2 border-dashed border-pf-line-strong rounded-xl bg-pf-canvas">
+                <p className="text-pf-secondary font-medium mb-2">No matching products</p>
+                <p className="text-sm text-pf-muted mb-4">Search for another product or add a listing.</p>
+                <Link href="/grower/products/add" className="text-pf-accent hover:text-pf-accent font-medium">
                   Add a product
                 </Link>
               </div>
             ) : formData.items.length === 0 ? (
-              <p className="rounded-lg border border-dashed border-gray-300 bg-gray-50 px-3 py-5 text-center text-sm text-gray-600">Use Add item to choose products.</p>
+              <p className="rounded-lg border border-dashed border-pf-line-strong bg-pf-canvas px-3 py-5 text-center text-sm text-pf-muted">Use Add item to choose products.</p>
             ) : (
               <div className="space-y-4">
                 {formData.items.map((item, index: number) => {
@@ -465,14 +465,14 @@ export default function AddOrderPage() {
                   const isOverLimit = Number(item.quantity) > remainingForLine;
 
                   return (
-                    <div key={index} className="p-3 bg-gray-50 rounded-lg border space-y-2 sm:p-4 sm:space-y-3">
+                    <div key={index} className="p-3 bg-pf-canvas rounded-lg border border-pf-line space-y-2 sm:p-4 sm:space-y-3">
                       <div className="grid grid-cols-2 sm:grid-cols-[minmax(0,1fr)_8rem_9rem_auto] gap-3">
                         <div className="col-span-2 min-w-0 sm:col-span-1">
-                          <label className="block text-xs text-gray-500 mb-1">Product</label>
+                          <label className="block text-xs text-pf-muted mb-1">Product</label>
                           <select
                             value={item.productId}
                             onChange={(e) => handleItemChange(index, 'productId', e.target.value)}
-                            className="min-h-10 min-w-0 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                            className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                           >
                             {products.map((p) => {
                               const remainingForOption = getRemainingForLine(formData.items, p.id, index);
@@ -486,7 +486,7 @@ export default function AddOrderPage() {
                           </select>
                         </div>
                         <div className="min-w-0">
-                          <label className="block text-xs text-gray-500 mb-1">Qty</label>
+                          <label className="block text-xs text-pf-muted mb-1">Qty</label>
                           <div className="flex gap-2">
                             <input
                               type="number"
@@ -495,12 +495,12 @@ export default function AddOrderPage() {
                               value={item.quantity}
                               onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
                               onBlur={(e) => handleItemChange(index, 'quantity', Math.min(remainingForLine, Math.max(1, Math.floor(Number(e.target.value) || 1))))}
-                              className="min-h-10 min-w-0 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                              className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                             />
                             <button
                               type="button"
                               onClick={() => handleSetMaxQuantity(index)}
-                              className="min-h-10 rounded-lg border border-gray-300 px-2 py-2 text-sm font-medium hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                              className="min-h-10 rounded-lg border border-pf-line-strong px-2 py-2 text-sm font-medium hover:bg-pf-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                               title="Use maximum available quantity"
                             >
                               Max
@@ -508,10 +508,10 @@ export default function AddOrderPage() {
                           </div>
                         </div>
                         <div className="min-w-0">
-                          <label className="mb-1 flex items-center justify-between gap-2 text-xs text-gray-500">
+                          <label className="mb-1 flex items-center justify-between gap-2 text-xs text-pf-muted">
                             <span>Agreed price</span>
                           </label>
-                          <div className="flex overflow-hidden rounded-lg border border-gray-300 bg-white focus-within:ring-2 focus-within:ring-green-500">
+                          <div className="flex overflow-hidden rounded-lg border border-pf-line-strong bg-pf-surface focus-within:ring-2 focus-within:ring-pf-accent">
                             <input
                               type="number"
                               min="0"
@@ -522,7 +522,7 @@ export default function AddOrderPage() {
                               onChange={(e) => handleItemChange(index, 'unitPrice', parseFloat(e.target.value) || 0)}
                               className="min-h-10 min-w-0 flex-1 border-0 px-3 py-2 text-base focus:outline-none"
                             />
-                            <span className="flex items-center border-l border-gray-200 bg-gray-50 px-2 text-xs text-gray-500">
+                            <span className="flex items-center border-l border-pf-line bg-pf-canvas px-2 text-xs text-pf-muted">
                               / {formatProductUnit(product?.unit)}
                             </span>
                           </div>
@@ -531,7 +531,7 @@ export default function AddOrderPage() {
                           <button
                             type="button"
                             onClick={() => handleRemoveItem(index)}
-                            className="min-h-10 rounded px-2 py-2 text-sm text-right text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 sm:w-auto sm:text-right"
+                            className="min-h-10 rounded px-2 py-2 text-sm text-right text-pf-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-danger focus-visible:ring-offset-2 sm:w-auto sm:text-right"
                           >
                             Remove
                           </button>
@@ -539,24 +539,24 @@ export default function AddOrderPage() {
                       </div>
 
                       {hasCustomPrice(item) && <div>
-                        <label htmlFor={`price-note-${index}`} className="mb-1 block text-xs text-gray-600">Price note <span className="text-gray-500">· Catalog ${Number(product?.price || 0).toFixed(2)}</span></label>
+                        <label htmlFor={`price-note-${index}`} className="mb-1 block text-xs text-pf-muted">Price note <span className="text-pf-muted">· Catalog ${Number(product?.price || 0).toFixed(2)}</span></label>
                         <input id={`price-note-${index}`} value={item.priceOverrideReason} maxLength={240} required placeholder="e.g. Volume discount"
                           onChange={event => handleItemChange(index, 'priceOverrideReason', event.target.value)}
-                          className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600" />
+                          className="min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent" />
                       </div>}
 
                       <div className="flex flex-wrap items-center gap-2 text-xs">
-                        <button type="button" onClick={() => handleRemoveItem(index)} className="order-last ml-auto min-h-10 rounded px-2 py-2 text-sm text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 sm:hidden">Remove</button>
-                        <span className="inline-flex items-center px-2 py-1 rounded bg-white border border-gray-200 text-gray-600">
+                        <button type="button" onClick={() => handleRemoveItem(index)} className="order-last ml-auto min-h-10 rounded px-2 py-2 text-sm text-pf-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-danger sm:hidden">Remove</button>
+                        <span className="inline-flex items-center px-2 py-1 rounded bg-pf-surface border border-pf-line text-pf-muted">
                           <span className="font-semibold">{remainingForLine} {formatProductUnit(product?.unit)}</span>&nbsp;available
                         </span>
                         {isLowStock && (
-                          <span className="inline-flex items-center px-2 py-1 rounded bg-amber-50 border border-amber-200 text-amber-700">
+                          <span className="inline-flex items-center px-2 py-1 rounded bg-pf-warning-bg border border-pf-warning-line text-pf-warning">
                             Low stock
                           </span>
                         )}
                         {isOverLimit && (
-                          <span className="inline-flex items-center px-2 py-1 rounded bg-red-50 border border-red-200 text-red-700">
+                          <span className="inline-flex items-center px-2 py-1 rounded bg-pf-danger-bg border border-pf-danger-line text-pf-danger">
                             Requested quantity exceeds available stock
                           </span>
                         )}
@@ -569,19 +569,19 @@ export default function AddOrderPage() {
             )}
           </div>
         </div>
-        <details className="rounded-xl border border-gray-200 bg-white px-3 py-1 sm:p-4">
+        <details className="rounded-xl border border-pf-line bg-pf-surface px-3 py-1 sm:p-4">
           <summary className="min-h-10 cursor-pointer py-2.5 text-sm font-semibold sm:py-0">Shipping &amp; notes</summary>
           <div className="mt-2 grid gap-3 pb-2 sm:mt-4 sm:gap-4 sm:grid-cols-2 sm:pb-0">            <div>
-              <label htmlFor="request-notes" className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+              <label htmlFor="request-notes" className="block text-sm font-medium text-pf-secondary mb-1">Notes</label>
               <textarea id="request-notes"
                 value={formData.notes}
                 onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))}
                 rows={3}
-                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               />
             </div>
             <div>
-              <label htmlFor="request-shipping" className="block text-sm font-medium text-gray-700 mb-1">Shipping ($)</label>
+              <label htmlFor="request-shipping" className="block text-sm font-medium text-pf-secondary mb-1">Shipping ($)</label>
               <input
                 id="request-shipping"
                 type="number"
@@ -589,24 +589,24 @@ export default function AddOrderPage() {
                 step="0.01"
                 value={formData.shippingFee}
                 onChange={(e) => setFormData((prev) => ({ ...prev, shippingFee: e.target.value }))}
-                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               />
             </div>
           </div>
         </details>
-        {formData.items.length > 0 && <>                <div className="mt-6 p-4 bg-gray-100 rounded-lg">
+        {formData.items.length > 0 && <>                <div className="mt-4 space-y-2 border border-pf-line p-3 text-sm bg-pf-surface rounded-lg sm:p-4">
                   <div className="flex justify-between"><span>Subtotal</span><span>${calculateSubtotal().toFixed(2)}</span></div>
                   {calculateTax() > 0 && <div className="flex justify-between"><span>Recorded tax</span><span>${calculateTax().toFixed(2)}</span></div>}
                   <div className="flex justify-between"><span>Shipping</span><span>${shippingFee.toFixed(2)}</span></div>
-                  <div className="flex justify-between pt-2 border-t font-bold"><span>Est. total</span><span className="text-green-600">${calculateTotal().toFixed(2)}</span></div>
-                  <p className="pt-2 text-xs text-gray-500">Payment is arranged directly with the buyer.</p>
+                  <div className="flex justify-between pt-2 border-t border-pf-line font-bold"><span>Est. total</span><span className="text-pf-accent">${calculateTotal().toFixed(2)}</span></div>
+                  <p className="pt-2 text-xs text-pf-muted">Payment is arranged directly with the buyer.</p>
                 </div>
         </>}
         <div className="flex flex-wrap items-center gap-3">
-          <button type="submit" disabled={!canSubmitOrder} className="min-h-10 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{isSubmitting ? 'Saving...' : 'Record request'}</button>
-          <Link href="/grower/orders" className={`inline-flex min-h-10 items-center rounded-lg border border-gray-300 px-4 py-2 text-sm ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}>Cancel</Link>
+          <button type="submit" disabled={!canSubmitOrder} className="min-h-10 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#032116] disabled:opacity-50">{isSubmitting ? 'Saving...' : 'Record request'}</button>
+          <Link href="/grower/orders" className={`inline-flex min-h-10 items-center rounded-lg border border-pf-line-strong px-4 py-2 text-sm ${isSubmitting ? 'pointer-events-none opacity-50' : ''}`}>Cancel</Link>
         </div>
-        {submitHint && <p className="text-xs text-gray-500">{submitHint}</p>}
+        {submitHint && <p className="text-xs text-pf-muted">{submitHint}</p>}
       </form>
     </div>
   );

@@ -87,6 +87,7 @@ export function ConfirmActionButton({
         description={confirmMessage}
         confirmLabel={submitting ? 'Working...' : confirmLabel}
         intent="danger"
+        loading={submitting}
         onCancel={() => {
           if (submitting) return;
           setPendingForm(null);

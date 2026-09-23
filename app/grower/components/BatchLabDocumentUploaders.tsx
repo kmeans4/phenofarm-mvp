@@ -91,27 +91,27 @@ export function BatchLabDocumentUploaders({ value, onChange, onError, onUploadin
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-1">
-        <h4 className="text-sm font-medium text-gray-900">Lab PDFs</h4>
-        <p className="text-xs text-gray-600">
+        <h4 className="text-sm font-medium text-pf-text">Lab PDFs</h4>
+        <p className="text-xs text-pf-muted">
           PDF · {formatBytes(FILE_UPLOAD_LIMITS.batchLabDocumentMaxBytes)} max each
         </p>
       </div>
 
-      <div className="grid grid-cols-1 divide-y divide-gray-200 rounded-lg border border-gray-200">
+      <div className="grid grid-cols-1 divide-y divide-pf-line rounded-lg border border-pf-line">
         {BATCH_LAB_DOCUMENT_KEYS.map((key) => {
           const document = value[key];
 
           return (
-            <div key={key} className="flex flex-wrap items-center justify-between gap-2 bg-white px-3 py-2 sm:p-3">
+            <div key={key} className="flex flex-wrap items-center justify-between gap-2 bg-pf-surface px-3 py-2 sm:p-3">
               <div className="min-w-0 flex-1 space-y-1">
-                <label htmlFor={`lab-document-${key}`} className="block text-sm font-medium text-gray-700">
+                <label htmlFor={`lab-document-${key}`} className="block text-sm font-medium text-pf-secondary">
                   {BATCH_LAB_DOCUMENT_LABELS[key]}
                 </label>
                 {document ? (
-                  <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-green-200 bg-green-50 px-2.5 py-1 text-xs font-semibold text-green-700">
+                  <span className="inline-flex max-w-full items-center gap-1.5 rounded-full border border-pf-accent-line bg-pf-accent-bg px-2.5 py-1 text-xs font-semibold text-pf-accent">
                     <CheckCircle2 className="h-3.5 w-3.5 shrink-0" />
                     <span>Uploaded</span>
-                    <span className="max-w-44 truncate font-medium text-green-900">{document.fileName}</span>
+                    <span className="max-w-44 truncate font-medium text-pf-accent">{document.fileName}</span>
                   </span>
                 ) : null}
 
@@ -133,7 +133,7 @@ export function BatchLabDocumentUploaders({ value, onChange, onError, onUploadin
                   disabled={uploading || disabled}
                   aria-label={`${document ? 'Replace' : 'Upload'} ${BATCH_LAB_DOCUMENT_LABELS[key]} PDF`}
                   onClick={() => inputRefs.current[key]?.click()}
-                  className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  className="inline-flex items-center justify-center rounded-lg border border-pf-line-strong bg-pf-surface px-3 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                 >
                   {document ? 'Replace' : 'Upload'}
                 </button>
@@ -142,7 +142,7 @@ export function BatchLabDocumentUploaders({ value, onChange, onError, onUploadin
                     type="button"
                   disabled={uploading || disabled}
                     onClick={() => handleRemove(key)}
-                    className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    className="inline-flex items-center justify-center rounded-lg px-3 py-2 text-sm font-medium text-pf-danger hover:bg-pf-danger-bg hover:text-pf-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                   >
                     Remove
                   </button>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { ChevronDown } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 import { prepareImageUpload, uploadFile } from '@/app/components/uploads/uploadFile';
 import Link from 'next/link';
@@ -206,8 +207,8 @@ const validateImages = (images: string[]): string | undefined => {
   return undefined;
 };
 
-const INPUT_CLASSES = "w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
-const INPUT_ERROR_CLASSES = "w-full h-10 px-3 py-2 text-base sm:px-4 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
+const INPUT_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-pf-accent focus:border-transparent";
+const INPUT_ERROR_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-danger rounded-lg focus:ring-2 focus:ring-pf-danger focus:border-transparent bg-pf-danger-bg";
 
 interface ProductFormProps {
   growerBrand?: string;
@@ -629,22 +630,22 @@ export function ProductForm({
   return (
     <div className="mx-auto w-full max-w-5xl">
       {browserDraft.availableDraft && (
-        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
-          <p className="text-sm text-amber-900">Unsaved product draft found. Images are not stored in browser drafts.</p>
+        <div className="mb-4 rounded-lg border border-pf-warning-line bg-pf-warning-bg p-4">
+          <p className="text-sm text-pf-warning">Unsaved product draft found. Images are not stored in browser drafts.</p>
           <div className="mt-3 flex gap-3">
             <Button type="button" onClick={browserDraft.restoreDraft}>Restore draft</Button>
             <Button type="button" variant="outline" onClick={browserDraft.clearDraft}>Discard draft</Button>
           </div>
         </div>
       )}
-      {browserDraft.storageError && <p role="status" className="mb-4 text-sm text-amber-800">{browserDraft.storageError}</p>}
+      {browserDraft.storageError && <p role="status" className="mb-4 text-sm text-pf-warning">{browserDraft.storageError}</p>}
       <form
         id="product-form"
         onSubmit={handleSubmit}
         className="space-y-3 sm:space-y-6 lg:grid lg:grid-cols-[minmax(0,1.6fr)_minmax(270px,1fr)] lg:items-start lg:gap-6 lg:space-y-0"
       >
         <div className="space-y-3 sm:space-y-6">
-          <nav aria-label="Product sections" className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-green-700">
+          <nav aria-label="Product sections" className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-pf-accent">
             {FORM_SECTIONS.map((section) => <a key={section} href={`#product-${section.toLowerCase()}`} onClick={() => { if (section === 'Details') { const details = document.getElementById('product-details'); if (details instanceof HTMLDetailsElement) details.open = true; } }} className="inline-flex min-h-10 items-center py-2 hover:underline">{section}</a>)}
           </nav>
 
@@ -659,7 +660,7 @@ export function ProductForm({
               id={SUBMIT_ERROR_ID}
               role="alert"
               tabIndex={-1}
-              className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+              className="rounded-lg border border-pf-danger-line bg-pf-danger-bg px-4 py-3 text-sm text-pf-danger focus:outline-none focus:ring-2 focus:ring-pf-danger"
             >
               {submitError}{/free plan|upgrade/i.test(submitError) ? <> <Link href="/grower/pricing" className="font-semibold underline">Compare plans</Link></> : null}
             </div>
@@ -668,13 +669,13 @@ export function ProductForm({
           {!initialData.id && (
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <div className="flex w-full flex-wrap items-center justify-between gap-2">
-                <p className="text-xs text-gray-500">Defaults</p>
+                <p className="text-xs text-pf-muted">Defaults</p>
                 <div className="flex flex-wrap gap-2">
                   {savedDefaults && (
                     <button
                       type="button"
                       onClick={() => applyProductDefaults(savedDefaults)}
-                      className="rounded-lg border border-gray-300 bg-white min-h-10 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                      className="rounded-lg border border-pf-line-strong bg-pf-surface min-h-10 px-3 py-2 text-sm font-semibold text-pf-secondary hover:bg-pf-canvas"
                     >
                       Use last listing
                     </button>
@@ -682,7 +683,7 @@ export function ProductForm({
                   <button
                     type="button"
                     onClick={() => applyProductDefaults(DEFAULT_PRODUCT_DEFAULTS)}
-                    className="rounded-lg border border-green-200 bg-white min-h-10 px-3 py-2 text-sm font-semibold text-green-800 hover:bg-green-50"
+                    className="rounded-lg border border-pf-accent-line bg-pf-surface min-h-10 px-3 py-2 text-sm font-semibold text-pf-accent hover:bg-pf-accent-bg"
                   >
                     Reset defaults
                   </button>
@@ -692,7 +693,7 @@ export function ProductForm({
           )}
 
           {initialData.id && isDirty && (
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
+            <div className="p-4 bg-pf-warning-bg border border-pf-warning-line rounded-lg text-pf-warning flex items-start gap-3">
               <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
@@ -700,11 +701,11 @@ export function ProductForm({
             </div>
           )}
 
-            <section id="product-basics" className="scroll-mt-20 rounded-xl border border-gray-200 bg-white p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
-              <h3 className="text-base font-semibold text-gray-900">Basics</h3>
+            <section id="product-basics" className="scroll-mt-20 rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
+              <h3 className="text-base font-semibold text-pf-text">Basics</h3>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="name" className="block text-sm font-medium text-pf-secondary">
                 Name *
               </label>
               <input
@@ -717,7 +718,7 @@ export function ProductForm({
                 placeholder="Blueberries NF, 3.5g"
               />
               {errors.name && touched.name && (
-                <p className="text-sm text-red-600 mt-1">{errors.name}</p>
+                <p className="text-sm text-pf-danger mt-1">{errors.name}</p>
               )}
             </div>
 
@@ -735,12 +736,12 @@ export function ProductForm({
                 onSubTypeChange={(subType) => handleChange('subType', subType)}
               />
               {errors.productType && touched.productType && (
-                <p className="text-sm text-red-600 mt-1">{errors.productType}</p>
+                <p className="text-sm text-pf-danger mt-1">{errors.productType}</p>
               )}
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label htmlFor="strainId" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="strainId" className="block text-sm font-medium text-pf-secondary">
                 Strain
               </label>
               <StrainSelector
@@ -751,7 +752,7 @@ export function ProductForm({
 
             {formData.strainId ? (
               <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="batchId" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="batchId" className="block text-sm font-medium text-pf-secondary">
                   Batch
                 </label>
                 <BatchSelector
@@ -762,13 +763,13 @@ export function ProductForm({
               </div>
             ) : (
               <div className="hidden space-y-2 sm:block">
-                <label htmlFor="batchId" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="batchId" className="block text-sm font-medium text-pf-secondary">
                   Batch
                 </label>
                 <div
                   id="batchId"
                   tabIndex={-1}
-                  className="flex h-10 items-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                  className="flex h-10 items-center rounded-lg border border-dashed border-pf-line-strong bg-pf-canvas px-4 text-sm text-pf-muted focus:outline-none focus:ring-2 focus:ring-pf-accent"
                 >
                   Pick a strain to attach a batch
                 </div>
@@ -776,12 +777,12 @@ export function ProductForm({
             )}
             </section>
 
-            <section id="product-pricing" className="scroll-mt-20 rounded-xl border border-gray-200 bg-white p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
-              <h3 className="text-base font-semibold text-gray-900">Pricing</h3>
+            <section id="product-pricing" className="scroll-mt-20 rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
+              <h3 className="text-base font-semibold text-pf-text">Pricing</h3>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="price" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="price" className="block text-sm font-medium text-pf-secondary">
                   Price ($) *
                 </label>
                 <input
@@ -796,12 +797,12 @@ export function ProductForm({
                   placeholder="45.00"
                 />
                 {errors.price && touched.price && (
-                  <p className="text-sm text-red-600 mt-1">{errors.price}</p>
+                  <p className="text-sm text-pf-danger mt-1">{errors.price}</p>
                 )}
               </div>
 
               <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="unit" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="unit" className="block text-sm font-medium text-pf-secondary">
                   Unit *
                 </label>
                 <select
@@ -823,15 +824,15 @@ export function ProductForm({
                   ))}
                 </select>
                 {errors.unit && touched.unit && (
-                  <p className="text-sm text-red-600 mt-1">{errors.unit}</p>
+                  <p className="text-sm text-pf-danger mt-1">{errors.unit}</p>
                 )}
               </div>
             </div>
 
-            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50 space-y-2 sm:p-4 sm:space-y-3">
+            <div className="p-3 border border-pf-line rounded-lg bg-pf-canvas space-y-2 sm:p-4 sm:space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Price visibility</label>
-                <p className="text-xs text-gray-500 mt-1">Quote only hides the price.</p>
+                <label className="block text-sm font-medium text-pf-secondary">Price visibility</label>
+                <p className="text-xs text-pf-muted mt-1">Quote only hides the price.</p>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -839,8 +840,8 @@ export function ProductForm({
                   onClick={() => handleChange('isPriceVisible', true)}
                   className={`min-h-10 text-left px-3 py-2 rounded-lg border transition-colors ${
                     formData.isPriceVisible
-                      ? 'border-green-600 bg-green-50 text-green-700'
-                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+                      ? 'border-pf-accent bg-pf-accent-bg text-pf-accent'
+                      : 'border-pf-line-strong bg-pf-surface text-pf-secondary hover:bg-pf-hover'
                   }`}
                 >
                   <span className="block text-sm font-medium">Show price</span>
@@ -850,8 +851,8 @@ export function ProductForm({
                   onClick={() => handleChange('isPriceVisible', false)}
                   className={`min-h-10 text-left px-3 py-2 rounded-lg border transition-colors ${
                     !formData.isPriceVisible
-                      ? 'border-green-600 bg-green-50 text-green-700'
-                      : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
+                      ? 'border-pf-accent bg-pf-accent-bg text-pf-accent'
+                      : 'border-pf-line-strong bg-pf-surface text-pf-secondary hover:bg-pf-hover'
                   }`}
                 >
                   <span className="block text-sm font-medium">Quote only</span>
@@ -860,11 +861,11 @@ export function ProductForm({
             </div>
             </section>
 
-            <section id="product-stock" className="scroll-mt-20 rounded-xl border border-gray-200 bg-white p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
-              <h3 className="text-base font-semibold text-gray-900">Stock</h3>
+            <section id="product-stock" className="scroll-mt-20 rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
+              <h3 className="text-base font-semibold text-pf-text">Stock</h3>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label htmlFor="inventoryQty" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="inventoryQty" className="block text-sm font-medium text-pf-secondary">
                 Stock *
               </label>
               <input
@@ -878,13 +879,13 @@ export function ProductForm({
                 placeholder="100"
               />
               {errors.inventoryQty && touched.inventoryQty && (
-                <p className="text-sm text-red-600 mt-1">{errors.inventoryQty}</p>
+                <p className="text-sm text-pf-danger mt-1">{errors.inventoryQty}</p>
               )}
             </div>
 
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="sku" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="sku" className="block text-sm font-medium text-pf-secondary">
                   SKU
                 </label>
                 <input
@@ -897,12 +898,12 @@ export function ProductForm({
                   placeholder="BERRY-3.5G"
                 />
                 {errors.sku && touched.sku && (
-                  <p className="text-sm text-red-600 mt-1">{errors.sku}</p>
+                  <p className="text-sm text-pf-danger mt-1">{errors.sku}</p>
                 )}
               </div>
 
               <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="brand" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="brand" className="block text-sm font-medium text-pf-secondary">
                   Brand
                 </label>
                 <input
@@ -916,10 +917,10 @@ export function ProductForm({
               </div>
             </div>
 
-            <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-pf-line rounded-lg bg-pf-canvas">
               <div>
-                <label className="text-sm font-medium text-gray-700">Available</label>
-                <p className="text-xs text-gray-600 sm:text-sm">Buyers can request this product</p>
+                <label className="text-sm font-medium text-pf-secondary">Available</label>
+                <p className="text-xs text-pf-muted sm:text-sm">Buyers can request this product</p>
               </div>
               <button
                 type="button"
@@ -927,34 +928,34 @@ export function ProductForm({
                 aria-label={formData.isAvailable ? 'Mark product unavailable' : 'Mark product available'}
                 aria-pressed={formData.isAvailable}
                 className={`relative inline-flex h-10 w-14 shrink-0 items-center rounded-full transition-colors ${
-                  formData.isAvailable ? 'bg-green-600' : 'bg-gray-300'
+                  formData.isAvailable ? 'bg-pf-accent' : 'bg-pf-raised'
                 }`}
               >
                 <span
-                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                    formData.isAvailable ? 'translate-x-7' : 'translate-x-1'
+                  className={`inline-block h-6 w-6 transform rounded-full transition-transform ${
+                    formData.isAvailable ? 'translate-x-7 bg-pf-canvas' : 'translate-x-1 bg-pf-text'
                   }`}
                 />
               </button>
             </div>
             </section>
 
-            <details id="product-details" open={shouldOpenAdvanced} className="rounded-xl border border-gray-200 bg-gray-50 p-3 shadow-sm sm:p-4">
+            <details id="product-details" open={shouldOpenAdvanced} className="group/details rounded-xl border border-pf-line bg-pf-canvas p-3 shadow-sm sm:p-4">
               <summary className="min-h-10 cursor-pointer list-none py-2 sm:py-0">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <h3 className="text-base font-semibold text-gray-900">Details &amp; photos</h3>
-                    <p className="hidden text-sm text-gray-500 sm:block">Cannabinoids, harvest date, description and photos.</p>
+                    <h3 className="text-base font-semibold text-pf-text">Details &amp; photos</h3>
+                    <p className="hidden text-sm text-pf-muted sm:block">Cannabinoids, harvest date, description and photos.</p>
                   </div>
-                  <span className="rounded-full bg-white px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">Optional</span>
+                  <span className="flex shrink-0 items-center gap-2 text-xs text-pf-muted"><span className="rounded-full bg-pf-surface px-2 py-1 ring-1 ring-pf-line">Optional</span><ChevronDown className="h-4 w-4 transition-transform group-open/details:rotate-180" aria-hidden="true" /></span>
                 </div>
               </summary>
               <div className="mt-3 space-y-4 sm:mt-5 sm:space-y-6">
-            <div className="p-3 border border-gray-200 rounded-lg bg-white sm:p-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Cannabinoids</h3>
+            <div className="p-3 border border-pf-line rounded-lg bg-pf-surface sm:p-4">
+              <h3 className="text-sm font-medium text-pf-secondary mb-3">Cannabinoids</h3>
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="thcMin" className="block text-xs font-medium text-gray-600">
+                  <label htmlFor="thcMin" className="block text-xs font-medium text-pf-muted">
                     THC Min (%)
                   </label>
                   <input
@@ -970,11 +971,11 @@ export function ProductForm({
                     placeholder="e.g., 15"
                   />
                   {liveThcErrors.minError && (
-                    <p className="text-xs text-red-600 mt-1">{liveThcErrors.minError}</p>
+                    <p className="text-xs text-pf-danger mt-1">{liveThcErrors.minError}</p>
                   )}
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="thcMax" className="block text-xs font-medium text-gray-600">
+                  <label htmlFor="thcMax" className="block text-xs font-medium text-pf-muted">
                     THC Max (%)
                   </label>
                   <input
@@ -990,11 +991,11 @@ export function ProductForm({
                     placeholder="e.g., 25"
                   />
                   {liveThcErrors.maxError && (
-                    <p className="text-xs text-red-600 mt-1">{liveThcErrors.maxError}</p>
+                    <p className="text-xs text-pf-danger mt-1">{liveThcErrors.maxError}</p>
                   )}
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="cbdMin" className="block text-xs font-medium text-gray-600">
+                  <label htmlFor="cbdMin" className="block text-xs font-medium text-pf-muted">
                     CBD Min (%)
                   </label>
                   <input
@@ -1010,11 +1011,11 @@ export function ProductForm({
                     placeholder="e.g., 0"
                   />
                   {liveCbdErrors.minError && (
-                    <p className="text-xs text-red-600 mt-1">{liveCbdErrors.minError}</p>
+                    <p className="text-xs text-pf-danger mt-1">{liveCbdErrors.minError}</p>
                   )}
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="cbdMax" className="block text-xs font-medium text-gray-600">
+                  <label htmlFor="cbdMax" className="block text-xs font-medium text-pf-muted">
                     CBD Max (%)
                   </label>
                   <input
@@ -1030,14 +1031,14 @@ export function ProductForm({
                     placeholder="e.g., 1"
                   />
                   {liveCbdErrors.maxError && (
-                    <p className="text-xs text-red-600 mt-1">{liveCbdErrors.maxError}</p>
+                    <p className="text-xs text-pf-danger mt-1">{liveCbdErrors.maxError}</p>
                   )}
                 </div>
               </div>
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label htmlFor="harvestDate" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="harvestDate" className="block text-sm font-medium text-pf-secondary">
                 Harvest Date
               </label>
               <input
@@ -1050,12 +1051,12 @@ export function ProductForm({
                 className={liveHarvestDateError ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
               />
               {errors.harvestDate && touched.harvestDate && (
-                <p className="text-sm text-red-600 mt-1">{errors.harvestDate}</p>
+                <p className="text-sm text-pf-danger mt-1">{errors.harvestDate}</p>
               )}
             </div>
 
             <div className="space-y-1.5 sm:space-y-2">
-              <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="description" className="block text-sm font-medium text-pf-secondary">
                 Description
               </label>
               <textarea
@@ -1065,23 +1066,23 @@ export function ProductForm({
                 onChange={(e) => handleChange('description', e.target.value)}
                 onBlur={() => handleBlur('description')}
                 className={errors.description && touched.description 
-                  ? "w-full px-4 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50" 
-                  : "w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"}
+                  ? "w-full px-4 py-2 border border-pf-danger rounded-lg focus:ring-2 focus:ring-pf-danger focus:border-transparent bg-pf-danger-bg"
+                  : "w-full px-4 py-2 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-pf-accent focus:border-transparent"}
                 placeholder="Describe the product, effects, aroma, etc."
               />
               {errors.description && touched.description && (
-                <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+                <p className="text-sm text-pf-danger mt-1">{errors.description}</p>
               )}
-              <p className="text-xs text-gray-500 text-right">
+              <p className="text-xs text-pf-muted text-right">
                 {formData.description.length}/2000 characters
               </p>
             </div>
 
-            <div id="productImages" tabIndex={-1} className="space-y-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
-              <label className="block text-sm font-medium text-gray-700">
+            <div id="productImages" tabIndex={-1} className="space-y-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-accent focus:ring-offset-2">
+              <label className="block text-sm font-medium text-pf-secondary">
                 Product Images
               </label>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-pf-muted">
                 Up to {FILE_UPLOAD_LIMITS.productImagesMaxCount} photos · JPG, PNG, WebP · {formatBytes(FILE_UPLOAD_LIMITS.productImageMaxBytes)} each
               </p>
               <div className="flex items-center gap-4">
@@ -1092,26 +1093,26 @@ export function ProductForm({
                   multiple
                   onChange={handleImageChange}
                   disabled={imagePreviews.length >= FILE_UPLOAD_LIMITS.productImagesMaxCount || imageUploadProgress !== null}
-                  className="block w-full text-base text-gray-600 sm:text-sm
+                  className="block w-full text-base text-pf-muted sm:text-sm
                     file:mr-4 file:min-h-10 file:py-2 file:px-4
                     file:rounded-lg file:border-0
                     file:text-sm file:font-medium
-                    file:bg-green-50 file:text-green-700
-                    hover:file:bg-green-100
+                    file:bg-pf-accent-bg file:text-pf-accent
+                    hover:file:bg-pf-accent-bg
                     cursor-pointer
                     disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </div>
 
               {imageUploadProgress !== null && (
-                <div className="rounded-lg border border-green-100 bg-green-50 p-3">
-                  <div className="flex items-center justify-between text-xs font-medium text-green-800">
+                <div className="rounded-lg border border-pf-accent-line bg-pf-accent-bg p-3">
+                  <div className="flex items-center justify-between text-xs font-medium text-pf-accent">
                     <span>Preparing images</span>
                     <span>{imageUploadProgress}%</span>
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-green-100">
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-pf-accent-bg">
                     <div
-                      className="h-full rounded-full bg-green-600 transition-all"
+                      className="h-full rounded-full bg-pf-accent transition-all"
                       style={{ width: `${imageUploadProgress}%` }}
                     />
                   </div>
@@ -1121,19 +1122,19 @@ export function ProductForm({
               {imagePreviews.length > 0 && (
                 <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {imagePreviews.map((preview, index) => (
-                    <div key={`${preview}-${index}`} className="group rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
+                    <div key={`${preview}-${index}`} className="group rounded-xl border border-pf-line bg-pf-surface p-2 shadow-sm">
                       {/* eslint-disable-next-line @next/next/no-img-element -- Upload previews also support legacy data URLs. */}
                       <img
                         src={preview}
                         alt={`Product image preview ${index + 1}`}
                         width={160}
                         height={120}
-                        className="h-28 w-full rounded-lg border border-gray-200 object-cover"
+                        className="h-28 w-full rounded-lg border border-pf-line object-cover"
                       />
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="mt-2 min-h-10 w-full rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                        className="mt-2 min-h-10 w-full rounded-lg border border-pf-danger-line px-3 py-2 text-sm font-semibold text-pf-danger hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
                       >
                         Remove
                       </button>
@@ -1142,9 +1143,9 @@ export function ProductForm({
                 </div>
               )}
               {errors.images && (
-                <p className="text-sm text-red-600 mt-1">{errors.images}</p>
+                <p className="text-sm text-pf-danger mt-1">{errors.images}</p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-pf-muted">
                 {imagePreviews.length}/{FILE_UPLOAD_LIMITS.productImagesMaxCount} image slots used.
               </p>
             </div>
@@ -1153,20 +1154,20 @@ export function ProductForm({
         </div>
 
         <aside className="space-y-4 lg:sticky lg:top-6">
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 sm:p-4">
+            <div className="rounded-xl border border-pf-line bg-pf-canvas p-3 sm:p-4">
               <div className="flex items-center justify-between gap-2">
                 <div>
-                  <h3 className="text-sm font-semibold text-gray-900">Summary</h3>
+                  <h3 className="text-sm font-semibold text-pf-text">Summary</h3>
                 </div>
-                <span className="rounded-full bg-white px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
+                <span className="rounded-full bg-pf-surface px-2 py-1 text-xs font-medium text-pf-muted ring-1 ring-pf-line">
                   {formData.isAvailable ? 'Available' : 'Hidden'}
                 </span>
               </div>
               <dl className="mt-2 space-y-1.5 sm:mt-3 sm:space-y-2">
                 {saveSummary.map((item) => (
                   <div key={item.label} className="flex justify-between gap-3 text-sm">
-                    <dt className="shrink-0 text-gray-500">{item.label}</dt>
-                    <dd className="text-right font-medium text-gray-900 break-words">{item.value}</dd>
+                    <dt className="shrink-0 text-pf-muted">{item.label}</dt>
+                    <dd className="min-w-0 text-right font-medium text-pf-text break-words">{item.value}</dd>
                   </div>
                 ))}
               </dl>
@@ -1192,7 +1193,7 @@ export function ProductForm({
                   >
                     {isSubmitting ? 'Saving...' : 'Save draft'}
                   </Button>
-                  <p className="mt-1 max-w-52 text-xs text-gray-500">
+                  <p className="mt-1 max-w-52 text-xs text-pf-muted">
                     Hidden from buyers until published.
                   </p>
                 </div>
@@ -1220,7 +1221,7 @@ export function ProductForm({
           <button
             type="button"
             onClick={handleCancelRequest}
-            className="rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="rounded-lg border border-pf-line-strong px-4 py-3 text-sm font-semibold text-pf-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
           >
             Cancel
           </button>

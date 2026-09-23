@@ -15,9 +15,9 @@ interface GuidedFixPanelProps {
 }
 
 const severityClasses = {
-  critical: 'border-red-200 bg-red-50 text-red-950',
-  warning: 'border-amber-200 bg-amber-50 text-amber-950',
-  info: 'border-blue-200 bg-blue-50 text-blue-950',
+  critical: 'border-pf-danger-line bg-pf-danger-bg text-pf-danger',
+  warning: 'border-pf-warning-line bg-pf-warning-bg text-pf-warning',
+  info: 'border-pf-info-line bg-pf-info-bg text-pf-info',
 };
 
 export function GuidedFixPanel({
@@ -28,14 +28,14 @@ export function GuidedFixPanel({
   if (fixes.length === 0) return null;
 
   return (
-    <section className="rounded-xl border border-amber-200 bg-amber-50/70 p-4">
+    <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg/70 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Guided fixes</p>
-          <h2 className="mt-1 text-lg font-semibold text-amber-950">{title}</h2>
-          <p className="mt-1 text-sm text-amber-900">{description}</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-pf-warning">Guided fixes</p>
+          <h2 className="mt-1 text-lg font-semibold text-pf-warning">{title}</h2>
+          <p className="mt-1 text-sm text-pf-warning">{description}</p>
         </div>
-        <span className="self-start rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-800 ring-1 ring-amber-200">
+        <span className="self-start rounded-full bg-pf-surface px-3 py-1 text-xs font-semibold text-pf-warning ring-1 ring-pf-warning-line">
           {fixes.length} open
         </span>
       </div>

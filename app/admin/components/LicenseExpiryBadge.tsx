@@ -25,7 +25,7 @@ interface LicenseExpiryBadgeProps {
 export function LicenseExpiryBadge({ expiresAt }: LicenseExpiryBadgeProps) {
   if (!expiresAt) {
     return (
-      <span className="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-700">
+      <span className="inline-flex items-center rounded-full bg-pf-surface px-2.5 py-1 text-xs font-medium text-pf-secondary">
         Not on file
       </span>
     );
@@ -37,7 +37,7 @@ export function LicenseExpiryBadge({ expiresAt }: LicenseExpiryBadgeProps) {
   if (daysUntilExpiry < 0) {
     return (
       <span
-        className="inline-flex items-center rounded-full bg-red-50 px-2.5 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-200"
+        className="inline-flex items-center rounded-full bg-pf-danger-bg px-2.5 py-1 text-xs font-medium text-pf-danger ring-1 ring-inset ring-pf-danger-line"
         title={`Expired ${Math.abs(daysUntilExpiry)} days ago`}
       >
         Expired {formattedDate}
@@ -48,7 +48,7 @@ export function LicenseExpiryBadge({ expiresAt }: LicenseExpiryBadgeProps) {
   if (daysUntilExpiry <= 30) {
     return (
       <span
-        className="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-xs font-medium text-amber-800 ring-1 ring-inset ring-amber-200"
+        className="inline-flex items-center rounded-full bg-pf-warning-bg px-2.5 py-1 text-xs font-medium text-pf-warning ring-1 ring-inset ring-pf-warning-line"
         title={`${daysUntilExpiry} days until expiry`}
       >
         Expires {formattedDate}
@@ -57,7 +57,7 @@ export function LicenseExpiryBadge({ expiresAt }: LicenseExpiryBadgeProps) {
   }
 
   return (
-    <time dateTime={formatDateTime(expiresAt)} className="text-sm text-gray-700" title="License expiry is current">
+    <time dateTime={formatDateTime(expiresAt)} className="text-sm text-pf-secondary" title="License expiry is current">
       {formattedDate}
     </time>
   );

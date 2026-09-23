@@ -18,7 +18,7 @@ const options: { value: DateRange; label: string }[] = [
 ];
 
 export function DateRangeFilter({ value, onChange }: DateRangeFilterProps) {
-  return <select aria-label="Date range" value={value} onChange={(event) => onChange(event.target.value as DateRange)} className="rounded-lg border border-gray-300 bg-white min-h-10 px-3 py-2 text-base sm:text-sm text-gray-700 focus:ring-2 focus:ring-green-500">
+  return <select aria-label="Date range" value={value} onChange={(event) => onChange(event.target.value as DateRange)} className="rounded-lg border border-pf-line-strong bg-pf-surface min-h-10 px-3 py-2 text-base sm:text-sm text-pf-secondary focus:ring-2 focus:ring-emerald-400">
     {options.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
   </select>;
 }

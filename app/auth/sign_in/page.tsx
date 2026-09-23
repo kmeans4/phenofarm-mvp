@@ -63,8 +63,8 @@ export default function SignInSection() {
   };
 
   return (
-    <main className="min-h-screen bg-[#070908] text-gray-900 lg:grid lg:grid-cols-2">
-      <section className="relative hidden min-h-screen overflow-hidden bg-[#070908] px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
+    <main className="min-h-dvh bg-pf-canvas text-pf-text lg:grid lg:grid-cols-2">
+      <section className="relative hidden min-h-dvh overflow-hidden bg-pf-canvas px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-1/2 top-[-18rem] h-[40rem] w-[52rem] -translate-x-1/2 rounded-full bg-emerald-500/[0.09] blur-[130px]" />
           <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
@@ -72,7 +72,7 @@ export default function SignInSection() {
         </div>
 
         <div className="relative">
-          <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
+          <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
             <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
               PF
             </span>
@@ -81,62 +81,62 @@ export default function SignInSection() {
         </div>
 
         <div className="relative max-w-xl">
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400">
+          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-pf-accent">
             Licensed marketplace operations
           </p>
           <h1 className="text-5xl font-semibold tracking-tight text-white xl:text-6xl">
             Wholesale workflows, without payment confusion.
           </h1>
-          <p className="mt-6 max-w-lg text-base leading-7 text-gray-400">
+          <p className="mt-6 max-w-lg text-base leading-7 text-pf-muted">
             Manage catalog listings, buyer requests, order status, and subscription access. Settlement stays direct.
           </p>
 
           <div className="mt-10 grid gap-3">
             {['Direct grower to dispensary requests', 'Friendly order status tracking', 'Cultivator subscription billing only'].map((item) => (
               <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
-                <ShieldCheck className="h-5 w-5 shrink-0 text-emerald-300" />
-                <span className="text-sm text-gray-300">{item}</span>
+                <ShieldCheck className="h-5 w-5 shrink-0 text-pf-accent" />
+                <span className="text-sm text-pf-secondary">{item}</span>
               </div>
             ))}
           </div>
         </div>
 
-        <p className="relative text-sm text-gray-500">
+        <p className="relative text-sm text-pf-muted">
           Need access help?{' '}
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="text-emerald-300 transition-colors hover:text-emerald-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
             {SUPPORT_EMAIL}
           </a>
         </p>
       </section>
 
-      <section className="flex min-h-screen items-center justify-center px-4 py-8 sm:px-6 lg:bg-gray-50 lg:px-8">
+      <section className="flex min-h-dvh items-start justify-center px-4 py-5 sm:items-center sm:px-6 sm:py-8 lg:px-8">
         <div className="w-full max-w-md">
-          <div className="mb-8 text-center lg:hidden">
-            <Link href="/" className="mx-auto inline-flex items-center gap-3 rounded-xl text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-lg font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
+          <div className="mb-5 text-center lg:hidden">
+            <Link href="/" className="mx-auto inline-flex items-center gap-3 rounded-xl text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-lg font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
                 PF
               </span>
               <span className="text-lg font-semibold">PhenoFarm</span>
             </Link>
           </div>
 
-          <div className="rounded-3xl border border-white/[0.08] bg-white p-5 shadow-[0_24px_80px_rgba(0,0,0,0.28)] sm:p-8 lg:border-gray-200 lg:shadow-sm">
+          <div className="rounded-xl border border-pf-line bg-pf-surface p-4 sm:p-6">
             <div>
-              <h2 className="text-3xl font-bold tracking-tight text-gray-950">
+              <h2 className="text-2xl font-semibold tracking-tight text-pf-text sm:text-3xl">
                 Sign in to your account
               </h2>
-              <p className="mt-2 text-sm text-gray-600">
+              <p className="mt-2 text-sm text-pf-muted">
                 Or{' '}
-                <Link href="/auth/sign_up" className="inline-flex min-h-10 items-center font-medium text-green-700 transition-colors hover:text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+                <Link href="/auth/sign_up" className="inline-flex min-h-10 items-center font-medium text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
                   create a new account
                 </Link>
               </p>
             </div>
 
-            <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+            <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-700">
+                  <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                     Email address
                   </label>
                   <input
@@ -153,13 +153,13 @@ export default function SignInSection() {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     disabled={loading}
-                    className="relative block w-full appearance-none rounded-xl border border-gray-300 px-4 py-3 text-base text-gray-900 placeholder:text-gray-500 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                    className="relative block w-full appearance-none rounded-xl border border-pf-line-strong px-3 py-2.5 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                     placeholder="Email address"
                   />
                 </div>
 
                 <div>
-                  <label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-700">
+                  <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-pf-secondary">
                     Password
                   </label>
                   <div className="relative">
@@ -173,14 +173,14 @@ export default function SignInSection() {
                       value={password}
                       onChange={(event) => setPassword(event.target.value)}
                       disabled={loading}
-                      className="relative block w-full appearance-none rounded-xl border border-gray-300 px-4 py-3 pr-12 text-base text-gray-900 placeholder:text-gray-500 transition-colors focus:z-10 focus:border-green-600 focus:outline-none focus:ring-2 focus:ring-green-600 disabled:cursor-not-allowed disabled:bg-gray-100 disabled:text-gray-500"
+                      className="relative block w-full appearance-none rounded-xl border border-pf-line-strong px-3 py-2.5 pr-12 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                       placeholder="Password"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword((current) => !current)}
                       disabled={loading}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md text-pf-muted transition-colors hover:bg-pf-hover hover:text-pf-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:opacity-50"
                       aria-label={showPassword ? 'Hide password' : 'Show password'}
                     >
                       {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
@@ -190,12 +190,12 @@ export default function SignInSection() {
               </div>
 
               {error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert">
+                <div className="rounded-xl border border-pf-danger-line bg-pf-danger-bg px-4 py-3 text-sm text-pf-danger" role="alert">
                   {error}
                 </div>
               )}
 
-              <div className="flex flex-wrap justify-between gap-x-4 text-sm font-medium text-green-700">
+              <div className="flex flex-wrap justify-between gap-x-4 text-sm font-medium text-pf-accent">
                 <Link href="/auth/forgot-password" className="inline-flex min-h-10 items-center underline">Forgot password?</Link>
                 <Link href="/auth/verify-email" className="inline-flex min-h-10 items-center underline">Resend verification</Link>
               </div>
@@ -203,7 +203,7 @@ export default function SignInSection() {
               <button
                 type="submit"
                 disabled={loading}
-                className="group relative inline-flex w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-green-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-green-700/70"
+                className="group relative inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-pf-canvas transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:bg-emerald-500/70"
               >
                 {loading ? (
                   <>

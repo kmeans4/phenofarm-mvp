@@ -17,8 +17,8 @@ export function LoadingState({
   description = 'Please wait while we load this page.',
 }: LoadingStateProps) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-10 text-center shadow-sm">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-50 text-green-600">
+    <div className="rounded-xl border border-pf-line bg-pf-surface p-10 text-center shadow-sm">
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-pf-accent-bg text-pf-accent">
         <svg className="h-6 w-6 animate-spin" viewBox="0 0 24 24" fill="none">
           <circle
             className="opacity-25"
@@ -35,8 +35,8 @@ export function LoadingState({
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-      <p className="mx-auto mt-2 max-w-md text-sm text-gray-500">{description}</p>
+      <h3 className="text-lg font-semibold text-pf-text">{title}</h3>
+      <p className="mx-auto mt-2 max-w-md text-sm text-pf-muted">{description}</p>
     </div>
   );
 }
@@ -48,8 +48,8 @@ export function ErrorState({
   onRetry,
 }: ErrorStateProps) {
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-center">
-      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-red-100 text-red-600">
+    <div className="rounded-xl border border-pf-danger-line bg-pf-danger-bg p-6 text-center">
+      <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-pf-danger-bg text-pf-danger">
         <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
             strokeLinecap="round"
@@ -59,8 +59,8 @@ export function ErrorState({
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-red-900">{title}</h3>
-      <p className="mx-auto mt-2 max-w-md text-sm text-red-700">{description}</p>
+      <h3 className="text-lg font-semibold text-pf-danger">{title}</h3>
+      <p className="mx-auto mt-2 max-w-md text-sm text-pf-danger">{description}</p>
       <Button variant="secondary" onClick={onRetry} className="mt-4">
         {retryLabel}
       </Button>

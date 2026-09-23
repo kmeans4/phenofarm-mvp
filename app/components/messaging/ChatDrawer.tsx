@@ -561,11 +561,11 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   const renderOfferStatus = (status: ConversationMessage['offerStatus']) => {
     if (!status) return null;
     const base = 'px-2 py-0.5 rounded text-xs font-medium';
-    if (status === 'PENDING') return <span className={`${base} bg-yellow-100 text-yellow-700`}>Pending</span>;
-    if (status === 'ACCEPTED') return <span className={`${base} bg-green-100 text-green-700`}>Accepted</span>;
-    if (status === 'REJECTED') return <span className={`${base} bg-red-100 text-red-700`}>Rejected</span>;
-    if (status === 'COUNTERED') return <span className={`${base} bg-blue-100 text-blue-700`}>Countered</span>;
-    return <span className={`${base} bg-gray-100 text-gray-700`}>{status}</span>;
+    if (status === 'PENDING') return <span className={`${base} bg-pf-warning-bg text-pf-warning`}>Pending</span>;
+    if (status === 'ACCEPTED') return <span className={`${base} bg-pf-accent-bg text-pf-accent`}>Accepted</span>;
+    if (status === 'REJECTED') return <span className={`${base} bg-pf-danger-bg text-pf-danger`}>Rejected</span>;
+    if (status === 'COUNTERED') return <span className={`${base} bg-pf-info-bg text-pf-info`}>Countered</span>;
+    return <span className={`${base} bg-pf-surface text-pf-secondary`}>{status}</span>;
   };
 
   const messageTemplates = useMemo(() => {
@@ -619,24 +619,24 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     if (isOffer) {
       return (
         <div className="space-y-2">
-          <div className={`rounded-lg p-3 ${isMine ? 'bg-green-700/70' : 'border border-green-200 bg-green-50'}`}>
+          <div className={`rounded-lg p-3 ${isMine ? 'border border-pf-accent-line bg-pf-accent-bg' : 'border border-pf-accent-line bg-pf-accent-bg'}`}>
             <div className="flex items-start justify-between gap-2">
-              <p className={`text-sm font-semibold ${isMine ? 'text-white' : 'text-green-800'}`}>
+              <p className={`text-sm font-semibold ${isMine ? 'text-white' : 'text-pf-accent'}`}>
                 Quote {message.product?.name ? `for ${message.product.name}` : ''}
               </p>
               {renderOfferStatus(message.offerStatus)}
             </div>
-            <p className={`mt-1 text-sm ${isMine ? 'text-green-50' : 'text-green-900'}`}>
+            <p className={`mt-1 text-sm ${isMine ? 'text-pf-text' : 'text-pf-accent'}`}>
               {message.offerQuantity ? `${message.offerQuantity} ${message.product?.unit || 'units'} @ ` : ''}
               <span className="font-bold">{message.offerUnitPrice !== null && Number.isFinite(message.offerUnitPrice) ? `$${message.offerUnitPrice.toFixed(2)}` : 'Price unavailable'}</span>
             </p>
             {message.offerNote && (
-              <p className={`mt-1 text-xs ${isMine ? 'text-green-100' : 'text-green-700'}`}>{message.offerNote}</p>
+              <p className={`mt-1 text-xs ${isMine ? 'text-pf-text' : 'text-pf-accent'}`}>{message.offerNote}</p>
             )}
           </div>
 
           {message.offerStatus === 'ACCEPTED' && (
-            <div className="space-y-2"><p className={`text-xs ${isMine ? 'text-green-100' : 'text-green-700'}`}>Quote terms accepted. Create or review an order request to coordinate fulfillment; payment is handled directly.</p>{currentRole === 'DISPENSARY' && message.acceptedQuote && !message.acceptedQuote.consumedByOrderId ? <button type="button" onClick={addAcceptedQuoteToDraft} className="inline-flex h-8 items-center rounded-lg bg-green-700 px-3 text-xs font-semibold text-white hover:bg-green-800 focus-visible:ring-2 focus-visible:ring-green-600">Add to request draft</button> : null}</div>
+            <div className="space-y-2"><p className={`text-xs ${isMine ? 'text-pf-text' : 'text-pf-accent'}`}>Quote terms accepted. Create or review an order request to coordinate fulfillment; payment is handled directly.</p>{currentRole === 'DISPENSARY' && message.acceptedQuote && !message.acceptedQuote.consumedByOrderId ? <button type="button" onClick={addAcceptedQuoteToDraft} className="inline-flex h-8 items-center rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-[#032116] hover:bg-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400">Add to request draft</button> : null}</div>
           )}
 
           {canRespondToOffer && (
@@ -645,7 +645,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                 type="button"
                 onClick={() => handleOfferAction(message.id, 'ACCEPT')}
                 disabled={isOfferActionLoading}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-emerald-600 px-3 text-xs font-semibold text-white hover:bg-emerald-700 disabled:cursor-wait disabled:opacity-70"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-[#032116] hover:bg-emerald-400 disabled:cursor-wait disabled:opacity-70"
               >
                 {isOfferActionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Check className="h-3.5 w-3.5" />}
                 Accept
@@ -659,7 +659,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                   setCounterNote('');
                 }}
                 disabled={isOfferActionLoading}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 text-xs font-semibold text-gray-700 hover:bg-gray-50 disabled:cursor-wait disabled:opacity-60"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-pf-line-strong bg-pf-surface px-3 text-xs font-semibold text-pf-secondary hover:bg-pf-canvas disabled:cursor-wait disabled:opacity-60"
               >
                 {isOfferActionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Repeat2 className="h-3.5 w-3.5" />}
                 Counter
@@ -668,7 +668,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                 type="button"
                 onClick={() => handleOfferAction(message.id, 'REJECT')}
                 disabled={isOfferActionLoading}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-red-600 hover:bg-red-50 hover:text-red-700 disabled:cursor-wait disabled:opacity-60"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-pf-danger hover:bg-pf-danger-bg hover:text-pf-danger disabled:cursor-wait disabled:opacity-60"
               >
                 {isOfferActionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
                 Reject
@@ -677,7 +677,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
           )}
 
           {counterTargetId === message.id && (
-            <div className="mt-2 space-y-2 rounded-lg border border-gray-200 bg-white p-2">
+            <div className="mt-2 space-y-2 rounded-lg border border-pf-line bg-pf-surface p-2">
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="number"
@@ -687,7 +687,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                   onChange={(e) => setCounterPrice(e.target.value)}
                   placeholder="Quote unit price"
                   disabled={isOfferActionLoading}
-                  className="w-full rounded border border-gray-300 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-gray-50"
+                  className="w-full rounded border border-pf-line-strong px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-pf-canvas"
                 />
                 <input
                   type="number"
@@ -696,7 +696,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                   onChange={(e) => setCounterQty(e.target.value)}
                   placeholder="Qty (optional)"
                   disabled={isOfferActionLoading}
-                  className="w-full rounded border border-gray-300 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-gray-50"
+                  className="w-full rounded border border-pf-line-strong px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-pf-canvas"
                 />
               </div>
               <input
@@ -705,14 +705,14 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                 onChange={(e) => setCounterNote(e.target.value)}
                 placeholder="Counter terms note (optional)"
                 disabled={isOfferActionLoading}
-                className="w-full rounded border border-gray-300 px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-gray-50"
+                className="w-full rounded border border-pf-line-strong px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-pf-canvas"
               />
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setCounterTargetId(null)}
                   disabled={isOfferActionLoading}
-                  className="rounded border border-gray-300 px-2 py-1 text-xs text-gray-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded border border-pf-line-strong px-2 py-1 text-xs text-pf-muted disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   Cancel
                 </button>
@@ -720,7 +720,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                   type="button"
                   onClick={() => submitCounterOffer(message.id)}
                   disabled={isOfferActionLoading}
-                  className="inline-flex items-center gap-1.5 rounded bg-blue-600 px-2 py-1 text-xs text-white hover:bg-blue-700 disabled:cursor-wait disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded bg-emerald-500 px-2 py-1 text-xs font-semibold text-[#032116] hover:bg-emerald-400 disabled:cursor-wait disabled:opacity-60"
                   data-testid="send-counter"
                 >
                   {isOfferActionLoading && <Loader2 className="h-3 w-3 animate-spin" />}
@@ -735,18 +735,18 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
 
     if (message.messageType === 'PRICING_REQUEST') {
       return (
-        <div className={`rounded-lg p-3 ${isMine ? 'bg-purple-700/70' : 'border border-purple-200 bg-purple-50'}`}>
+        <div className={`rounded-lg p-3 border border-pf-purple-line bg-pf-purple-bg`}>
           <div className="flex items-center gap-2">
-            <BadgeDollarSign className={`h-4 w-4 ${isMine ? 'text-purple-200' : 'text-purple-700'}`} />
-            <p className={`text-sm font-semibold ${isMine ? 'text-white' : 'text-purple-800'}`}>
+            <BadgeDollarSign className={`h-4 w-4 ${isMine ? 'text-pf-purple' : 'text-pf-purple'}`} />
+            <p className={`text-sm font-semibold ${isMine ? 'text-white' : 'text-pf-purple'}`}>
               Pricing Request
             </p>
           </div>
-          <p className={`mt-1 text-sm ${isMine ? 'text-purple-100' : 'text-purple-900'}`}>
+          <p className={`mt-1 text-sm ${isMine ? 'text-pf-purple' : 'text-pf-purple'}`}>
             {message.body}
           </p>
           {message.product?.name && (
-            <p className={`mt-1 text-xs ${isMine ? 'text-purple-200' : 'text-purple-700'}`}>
+            <p className={`mt-1 text-xs ${isMine ? 'text-pf-purple' : 'text-pf-purple'}`}>
               For: {message.product.name}
             </p>
           )}
@@ -762,7 +762,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
         ref={triggerButtonRef}
         type="button"
         onClick={openDrawer}
-        className="pf-portal-fab-trigger pf-portal-chat-trigger relative z-[70] flex h-11 w-11 items-center justify-center rounded-full bg-green-600 text-white shadow-lg transition-[opacity,background-color] duration-150 hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+        className="pf-portal-fab-trigger pf-portal-chat-trigger relative z-[70] flex h-11 w-11 items-center justify-center rounded-full bg-emerald-500 text-[#032116] shadow-lg transition-[opacity,background-color] duration-150 hover:bg-emerald-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
         aria-label="Open messages"
         title="Open messages"
         data-testid="chat-button"
@@ -787,25 +787,25 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="messages-drawer-title"
-            className={`absolute right-0 top-0 h-full w-full sm:w-[420px] lg:w-[760px] bg-white shadow-2xl border-l border-gray-200 flex transition-shadow ${
-              flashDrawer ? 'ring-4 ring-green-300 ring-inset' : ''
+            className={`absolute right-0 top-0 h-full w-full sm:w-[420px] lg:w-[760px] bg-pf-surface shadow-2xl border-l border-pf-line flex transition-shadow ${
+              flashDrawer ? 'ring-4 ring-pf-accent-line ring-inset' : ''
             }`}
           >
-            <div className={`w-full lg:w-[300px] border-r border-gray-200 flex flex-col ${!mobileListMode && 'hidden lg:flex'}`}>
-              <div className="px-3 py-1 sm:px-4 sm:py-3 border-b border-gray-200 flex items-center justify-between">
-                <h2 id="messages-drawer-title" className="font-semibold text-gray-900">Messages</h2>
-                <button ref={closeButtonRef} className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-gray-500 hover:text-gray-700" onClick={closeDrawer} data-testid="close-chat" aria-label="Close messages">
+            <div className={`w-full lg:w-[300px] border-r border-pf-line flex flex-col ${!mobileListMode && 'hidden lg:flex'}`}>
+              <div className="px-3 py-1 sm:px-4 sm:py-3 border-b border-pf-line flex items-center justify-between">
+                <h2 id="messages-drawer-title" className="font-semibold text-pf-text">Messages</h2>
+                <button ref={closeButtonRef} className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-pf-muted hover:text-pf-secondary" onClick={closeDrawer} data-testid="close-chat" aria-label="Close messages">
                   <X className="w-5 h-5" />
                 </button>
               </div>
               <div className="flex-1 overflow-y-auto">
                 {loadingConversations ? (
-                  <div className="p-4 text-sm text-gray-500 flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Loading...</div>
+                  <div className="p-4 text-sm text-pf-muted flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Loading...</div>
                 ) : conversations.length === 0 ? (
-                  <div className="p-4 text-sm text-gray-500">
-                    <p className="font-medium text-gray-900">No conversations yet</p>
+                  <div className="p-4 text-sm text-pf-muted">
+                    <p className="font-medium text-pf-text">No conversations yet</p>
                     <p className="mt-1">Conversations start from a product&apos;s Message Grower button.</p>
-                    <p className="mt-2 text-xs text-gray-500">
+                    <p className="mt-2 text-xs text-pf-muted">
                       Once a buyer or grower opens a thread, quote terms and order context stay here.
                     </p>
                   </div>
@@ -816,24 +816,24 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                       onClick={() => {
                         selectConversation(conversation.id);
                       }}
-                      className={`w-full text-left px-4 py-3 border-b border-gray-100 hover:bg-gray-50 ${
-                        conversation.id === activeConversationId ? 'bg-green-50' : ''
+                      className={`w-full text-left px-4 py-3 border-b border-pf-line hover:bg-pf-canvas ${
+                        conversation.id === activeConversationId ? 'bg-pf-accent-bg' : ''
                       }`}
                       data-testid="conversation-item"
                     >
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0">
-                          <p className="font-medium text-sm text-gray-900 truncate">{conversation.counterpart.name}</p>
+                          <p className="font-medium text-sm text-pf-text truncate">{conversation.counterpart.name}</p>
                           {conversation.product?.name && (
-                            <p className="text-xs text-gray-500 break-words">{conversation.product.name}</p>
+                            <p className="text-xs text-pf-muted break-words">{conversation.product.name}</p>
                           )}
-                          <span className="mt-1 inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600">
+                          <span className="mt-1 inline-flex rounded-full bg-pf-surface px-2 py-0.5 text-[11px] font-medium text-pf-muted">
                             {getConversationPurpose(conversation, currentRole)}
                           </span>
-                          <p className="text-xs text-gray-500 truncate mt-1">{conversation.lastMessagePreview}</p>
+                          <p className="text-xs text-pf-muted truncate mt-1">{conversation.lastMessagePreview}</p>
                         </div>
                         {conversation.unreadCount > 0 && (
-                          <span data-testid="conversation-unread-badge" className="min-w-[18px] h-[18px] px-1 rounded-full bg-green-600 text-white text-[11px] flex items-center justify-center">
+                          <span data-testid="conversation-unread-badge" className="min-w-[18px] h-[18px] px-1 rounded-full bg-pf-accent-bg text-pf-accent text-[11px] flex items-center justify-center">
                             {conversation.unreadCount}
                           </span>
                         )}
@@ -845,61 +845,61 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
             </div>
 
             <div className={`min-w-0 flex-1 flex-col ${mobileListMode ? 'hidden lg:flex' : 'flex'}`}>
-              <div className="px-3 py-1 sm:px-4 sm:py-3 border-b border-gray-200 flex items-center justify-between gap-2">
+              <div className="px-3 py-1 sm:px-4 sm:py-3 border-b border-pf-line flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <button
                     type="button"
                     aria-label="Back to conversations"
                     onClick={() => { saveMessageDraft(); visibleRef.current = false; setMobileListMode(true); }}
-                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-gray-500 hover:text-gray-700 lg:hidden"
+                    className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-pf-muted hover:text-pf-secondary lg:hidden"
                   >
                     <ArrowLeft className="w-5 h-5" />
                   </button>
                   <div className="min-w-0">
-                    <p className="font-semibold text-sm text-gray-900 break-words">
+                    <p className="font-semibold text-sm text-pf-text break-words">
                       {activeConversation?.counterpart.name || 'Messages'}
                     </p>
                     {activeConversation && (
-                      <p className="text-xs text-gray-500 break-words">
+                      <p className="text-xs text-pf-muted break-words">
                         {getConversationPurpose(activeConversation, currentRole)}
                         {activeConversation.product?.name ? ` - ${activeConversation.product.name}` : ''}
                       </p>
                     )}
                   </div>
                 </div>
-                <button className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-gray-500 hover:text-gray-700 lg:hidden" onClick={closeDrawer} data-testid="close-chat-mobile" aria-label="Close messages">
+                <button className="inline-flex h-10 w-10 shrink-0 items-center justify-center text-pf-muted hover:text-pf-secondary lg:hidden" onClick={closeDrawer} data-testid="close-chat-mobile" aria-label="Close messages">
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
               {contextChips.length > 0 && (
-                <div className="border-b border-gray-200 bg-gray-50/80 px-4 py-2">
+                <div className="border-b border-pf-line bg-pf-canvas/80 px-4 py-2">
                   <div className="flex flex-wrap gap-2">
                     {contextChips.map((chip) => (
                       <span
                         key={`${chip.label}-${chip.value}`}
-                        className="inline-flex max-w-full items-center overflow-hidden rounded-full border border-gray-200 bg-white text-[11px] shadow-sm"
+                        className="inline-flex max-w-full items-center overflow-hidden rounded-full border border-pf-line bg-pf-surface text-[11px] shadow-sm"
                       >
-                        <span className="shrink-0 border-r border-gray-200 bg-gray-50 px-2 py-1 font-semibold uppercase tracking-wide text-gray-500">
+                        <span className="shrink-0 border-r border-pf-line bg-pf-canvas px-2 py-1 font-semibold uppercase tracking-wide text-pf-muted">
                           {chip.label}
                         </span>
-                        <span className="truncate px-2 py-1 font-medium text-gray-700">{chip.value}</span>
+                        <span className="truncate px-2 py-1 font-medium text-pf-secondary">{chip.value}</span>
                       </span>
                     ))}
                   </div>
                 </div>
               )}
 
-              <div ref={scrollContainerRef} onScroll={() => { const node = scrollContainerRef.current; if (node) nearBottomRef.current = node.scrollHeight - node.scrollTop - node.clientHeight < 100; }} className="min-w-0 flex-1 space-y-4 overflow-y-auto bg-gray-50 p-4 pr-5">
+              <div ref={scrollContainerRef} onScroll={() => { const node = scrollContainerRef.current; if (node) nearBottomRef.current = node.scrollHeight - node.scrollTop - node.clientHeight < 100; }} className="min-w-0 flex-1 space-y-4 overflow-y-auto bg-pf-canvas p-4 pr-5">
                 {loadingMessages ? (
-                  <div className="text-sm text-gray-500 flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Loading messages...</div>
+                  <div className="text-sm text-pf-muted flex items-center gap-2"><Loader2 className="w-4 h-4 animate-spin" />Loading messages...</div>
                 ) : !activeConversationId ? (
-                  <div className="rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm text-gray-500">
-                    <p className="font-medium text-gray-900">Choose a conversation</p>
+                  <div className="rounded-lg border border-dashed border-pf-line-strong bg-pf-surface p-4 text-sm text-pf-muted">
+                    <p className="font-medium text-pf-text">Choose a conversation</p>
                   </div>
                 ) : messages.length === 0 ? (
-                  <div className="rounded-lg border border-dashed border-gray-300 bg-white p-4 text-sm text-gray-500">
-                    <p className="font-medium text-gray-900">No messages yet</p>
+                  <div className="rounded-lg border border-dashed border-pf-line-strong bg-pf-surface p-4 text-sm text-pf-muted">
+                    <p className="font-medium text-pf-text">No messages yet</p>
                     <p className="mt-1">Write a message to start this conversation.</p>
 
                   </div>
@@ -908,11 +908,11 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                     if (item.type === 'day') {
                       return (
                         <div key={item.id} className="flex items-center gap-3 py-1">
-                          <div className="h-px flex-1 bg-gray-200" />
-                          <span className="rounded-full bg-white px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-gray-500 shadow-sm ring-1 ring-gray-200">
+                          <div className="h-px flex-1 bg-pf-raised" />
+                          <span className="rounded-full bg-pf-surface px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-pf-muted shadow-sm ring-1 ring-pf-line">
                             {item.label}
                           </span>
-                          <div className="h-px flex-1 bg-gray-200" />
+                          <div className="h-px flex-1 bg-pf-raised" />
                         </div>
                       );
                     }
@@ -920,7 +920,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                     return (
                       <div key={item.id} className={`flex min-w-0 ${item.isMine ? 'justify-end' : 'justify-start'}`}>
                         <div className={`flex min-w-0 max-w-[85%] flex-col gap-1.5 ${item.isMine ? 'items-end' : 'items-start'}`}>
-                          <p className={`px-1 text-[11px] ${item.isMine ? 'text-green-700' : 'text-gray-500'}`}>
+                          <p className={`px-1 text-[11px] ${item.isMine ? 'text-pf-accent' : 'text-pf-muted'}`}>
                             {item.senderLabel} • {formatMessageTime(item.createdAt)}
                             {item.lastCreatedAt !== item.createdAt ? ` - ${formatMessageTime(item.lastCreatedAt)}` : ''}
                           </p>
@@ -938,8 +938,8 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                                 data-testid={testId}
                                 className={`max-w-full break-words rounded-2xl px-3 py-2 ${
                                   item.isMine
-                                    ? 'rounded-br-md bg-green-600 text-white'
-                                    : 'rounded-bl-md border border-gray-200 bg-white text-gray-900'
+                                    ? 'rounded-br-md border border-pf-accent-line bg-pf-accent-bg text-pf-text'
+                                    : 'rounded-bl-md border border-pf-line bg-pf-surface text-pf-text'
                                 }`}
                               >
                                 {renderMessageContent(message, item.isMine)}
@@ -954,50 +954,50 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                 <div ref={messagesEndRef} />
               </div>
 
-              {activeConversationId && <div className="min-w-0 space-y-2 border-t border-gray-200 bg-white p-3">
-                {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
+              {activeConversationId && <div className="min-w-0 space-y-2 border-t border-pf-line bg-pf-surface p-3">
+                {error && <p role="alert" className="text-sm text-pf-danger">{error}</p>}
                 <DraftAutosaveStatus compact savedAt={messageDraft.savedAt} label="Draft" onClear={messageDraft.clearDraft} />
-                {requestingPricing && <p role="status" className="text-sm text-purple-800">Requesting pricing...</p>}
+                {requestingPricing && <p role="status" className="text-sm text-pf-purple">Requesting pricing...</p>}
                 {showOfferComposer ? (
-                  <div className="space-y-3 rounded-lg border border-blue-200 bg-blue-50 p-3">
-                    <div><h3 className="font-semibold text-sm">Quote</h3><p className="text-sm text-gray-600">{activeConversation?.product?.name || 'Open a product listing to quote.'}</p></div>
+                  <div className="space-y-3 rounded-lg border border-pf-info-line bg-pf-info-bg p-3">
+                    <div><h3 className="font-semibold text-sm">Quote</h3><p className="text-sm text-pf-muted">{activeConversation?.product?.name || 'Open a product listing to quote.'}</p></div>
                     {activeConversation?.product ? <>
                       <div className="grid grid-cols-2 gap-2">
-                        <label className="text-xs font-medium text-gray-700">Unit price ($/{activeConversation.product.unit || 'unit'})
-                          <input type="number" min="0.01" step="0.01" value={offerPrice} onChange={e => setOfferPrice(e.target.value)} placeholder="Quote unit price" className="mt-1 w-full rounded border border-gray-300 px-2 py-2 text-base sm:text-sm" />
+                        <label className="text-xs font-medium text-pf-secondary">Unit price ($/{activeConversation.product.unit || 'unit'})
+                          <input type="number" min="0.01" step="0.01" value={offerPrice} onChange={e => setOfferPrice(e.target.value)} placeholder="Quote unit price" className="mt-1 w-full rounded border border-pf-line-strong px-2 py-2 text-base sm:text-sm" />
                         </label>
-                        <label className="text-xs font-medium text-gray-700">Qty (optional)
-                          <input type="number" min="1" value={offerQty} onChange={e => setOfferQty(e.target.value)} placeholder="Qty (optional)" className="mt-1 w-full rounded border border-gray-300 px-2 py-2 text-base sm:text-sm" />
+                        <label className="text-xs font-medium text-pf-secondary">Qty (optional)
+                          <input type="number" min="1" value={offerQty} onChange={e => setOfferQty(e.target.value)} placeholder="Qty (optional)" className="mt-1 w-full rounded border border-pf-line-strong px-2 py-2 text-base sm:text-sm" />
                         </label>
                       </div>
-                      <label className="block text-xs font-medium text-gray-700">Terms (optional)
-                        <textarea rows={2} value={offerNote} onChange={e => setOfferNote(e.target.value)} placeholder="Quote terms note (optional)" className="mt-1 w-full rounded border border-gray-300 px-2 py-2 text-base sm:text-sm" />
+                      <label className="block text-xs font-medium text-pf-secondary">Terms (optional)
+                        <textarea rows={2} value={offerNote} onChange={e => setOfferNote(e.target.value)} placeholder="Quote terms note (optional)" className="mt-1 w-full rounded border border-pf-line-strong px-2 py-2 text-base sm:text-sm" />
                       </label>
-                      <p className="text-xs text-gray-600">Payment arranged directly.</p>
-                    </> : <a href={currentRole === 'GROWER' ? '/grower/products' : '/dispensary/catalog'} className="inline-flex min-h-10 items-center text-sm text-green-700 underline">Choose a product</a>}
+                      <p className="text-xs text-pf-muted">Payment arranged directly.</p>
+                    </> : <a href={currentRole === 'GROWER' ? '/grower/products' : '/dispensary/catalog'} className="inline-flex min-h-10 items-center text-sm text-pf-accent underline">Choose a product</a>}
                     <div className="flex justify-end gap-2">
-                      <button type="button" onClick={() => setShowOfferComposer(false)} className="min-h-10 rounded border border-gray-300 px-3 text-sm">Cancel</button>
-                      {activeConversation?.product && <button type="button" onClick={sendOffer} disabled={sending} className="min-h-10 rounded bg-blue-600 px-3 text-sm text-white disabled:opacity-60" data-testid="send-offer">{sending ? 'Sending...' : 'Send quote'}</button>}
+                      <button type="button" onClick={() => setShowOfferComposer(false)} className="min-h-10 rounded border border-pf-line-strong px-3 text-sm">Cancel</button>
+                      {activeConversation?.product && <button type="button" onClick={sendOffer} disabled={sending} className="min-h-10 rounded bg-emerald-500 px-3 text-sm font-semibold text-[#032116] hover:bg-emerald-400 disabled:opacity-60" data-testid="send-offer">{sending ? 'Sending...' : 'Send quote'}</button>}
                     </div>
                   </div>
                 ) : <>
                   <div className="flex items-end gap-2">
-                    <textarea rows={1} maxLength={5000} aria-label="Message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Type a message..." disabled={sending} className="min-h-[44px] max-h-28 min-w-0 flex-1 resize-y rounded-lg border border-gray-300 px-3 py-2 text-base sm:text-sm" />
-                    <button type="button" onClick={sendMessage} disabled={sending || !messageInput.trim()} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-green-600 text-white hover:bg-green-700 disabled:opacity-50" aria-label="Send message">{sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}</button>
+                    <textarea rows={1} maxLength={5000} aria-label="Message" value={messageInput} onChange={e => setMessageInput(e.target.value)} onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }} placeholder="Type a message..." disabled={sending} className="min-h-[44px] max-h-28 min-w-0 flex-1 resize-y rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm" />
+                    <button type="button" onClick={sendMessage} disabled={sending || !messageInput.trim()} className="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-emerald-500 text-[#032116] hover:bg-emerald-400 disabled:opacity-50" aria-label="Send message">{sending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}</button>
                   </div>
                   <div className="flex flex-wrap items-start gap-2">
                     <select aria-label="Message templates" value="" onChange={event => {
                       const template = messageTemplates[Number(event.target.value)];
                       if (template) setMessageInput(current => current.trim() ? `${current}\n${template.body}` : template.body);
-                    }} className="min-h-10 max-w-[55%] rounded-lg border border-gray-300 bg-white px-2 text-base sm:text-sm">
+                    }} className="min-h-10 max-w-[55%] rounded-lg border border-pf-line-strong bg-pf-surface px-2 text-base sm:text-sm">
                       <option value="" disabled>Templates</option>
                       {messageTemplates.map((template, index) => <option key={template.label} value={index}>{template.label.replace('Quote follow-up', 'Follow up').replace('Delivery timing', 'Delivery').replace('Commercial terms', 'Terms')}</option>)}
                     </select>
-                    <details className="rounded-lg border border-gray-300 text-sm">
+                    <details className="rounded-lg border border-pf-line-strong text-sm">
                       <summary className="min-h-10 cursor-pointer px-3 py-2 font-medium">Quote</summary>
-                      <div className="flex flex-wrap gap-2 border-t p-2">
-                        <button type="button" onClick={() => setShowOfferComposer(true)} className="inline-flex min-h-10 items-center gap-1 rounded px-3 text-blue-700 hover:bg-blue-50" data-testid="toggle-offer-composer"><BadgeDollarSign className="h-4 w-4" />Create quote</button>
-                        <button type="button" onClick={sendPricingRequest} disabled={requestingPricing} className="min-h-10 rounded px-3 text-purple-700 hover:bg-purple-50 disabled:opacity-50" data-testid="request-pricing">Request pricing</button>
+                      <div className="flex flex-wrap gap-2 border-t border-pf-line p-2">
+                        <button type="button" onClick={() => setShowOfferComposer(true)} className="inline-flex min-h-10 items-center gap-1 rounded px-3 text-pf-info hover:bg-pf-info-bg" data-testid="toggle-offer-composer"><BadgeDollarSign className="h-4 w-4" />Create quote</button>
+                        <button type="button" onClick={sendPricingRequest} disabled={requestingPricing} className="min-h-10 rounded px-3 text-pf-purple hover:bg-pf-purple-bg disabled:opacity-50" data-testid="request-pricing">Request pricing</button>
                       </div>
                     </details>
                   </div>

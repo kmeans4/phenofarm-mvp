@@ -129,10 +129,10 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
 
   if (isLoading) {
     return (
-      <div className={`${embedded ? 'min-h-48 rounded-xl border border-gray-200 bg-white' : 'min-h-screen bg-gray-50'} flex items-center justify-center`}>
-        <div className="flex items-center gap-3 text-green-700">
+      <div className={`${embedded ? 'min-h-48 rounded-xl border border-pf-line bg-pf-surface' : 'min-h-48 rounded-xl border border-pf-line bg-pf-surface'} flex items-center justify-center`}>
+        <div className="flex items-center gap-3 text-pf-accent">
           <Loader2 className="animate-spin" size={24} />
-          <span className="text-lg">Loading your price alerts...</span>
+          <span className="text-sm">Loading alerts…</span>
         </div>
       </div>
     );
@@ -142,7 +142,7 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
     <button
       aria-label="Clear alerts"
       onClick={() => setShowClearConfirm(true)}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-red-600 transition-colors hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:w-auto"
+      className="inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-pf-danger transition-colors hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas sm:w-auto"
     >
       <Trash2 size={18} />
       <span>Clear alerts</span>
@@ -155,10 +155,10 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
         <button
           key={tab}
           onClick={() => setActiveTab(tab)}
-          className={`relative px-4 py-3 text-sm font-medium border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
+          className={`relative px-4 py-3 text-sm font-medium border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${
             activeTab === tab
-              ? 'border-green-600 text-green-700'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              ? 'border-emerald-500 text-pf-accent'
+              : 'border-transparent text-pf-muted hover:text-pf-secondary'
           }`}
         >
           {tab === 'history' ? 'All' : tab === 'active' ? `Active (${activeCount})` : `Triggered (${triggeredCount})`}
@@ -168,23 +168,23 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
   );
 
   const alertToolbar = (
-    <div className="rounded-xl border border-gray-200 bg-white p-3">
+    <div className="rounded-xl border border-pf-line bg-pf-surface p-3">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-gray-500">{explainerText}</p>
+        <p className="text-xs text-pf-muted">{explainerText}</p>
         <div className="flex items-center gap-2">
-          <button type="button" aria-label="Refresh prices" onClick={() => void refreshPrices(true)} disabled={refreshing} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-green-700 disabled:opacity-50"><RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />{refreshing ? 'Refreshing…' : 'Refresh'}</button>
-          {alerts.length > 0 && <details className="relative"><summary className="flex min-h-10 cursor-pointer items-center px-2 text-sm text-gray-600">More</summary><div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border bg-white p-1 shadow-lg">{clearAllButton}</div></details>}
+          <button type="button" aria-label="Refresh prices" onClick={() => void refreshPrices(true)} disabled={refreshing} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-pf-accent disabled:opacity-50"><RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />{refreshing ? 'Refreshing…' : 'Refresh'}</button>
+          {alerts.length > 0 && <details className="relative"><summary className="flex min-h-10 cursor-pointer items-center px-2 text-sm text-pf-muted">More</summary><div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-pf-line bg-pf-surface p-1 shadow-lg">{clearAllButton}</div></details>}
         </div>
       </div>
       {tabs}
-      {totalSavings > 0 && <p className="mt-2 text-xs text-green-700">Tracked price decrease: ${totalSavings.toFixed(2)}</p>}
+      {totalSavings > 0 && <p className="mt-2 text-xs text-pf-accent">Tracked price decrease: ${totalSavings.toFixed(2)}</p>}
     </div>
   );
 
   return (
-    <div className={embedded ? "pb-4" : "space-y-4 sm:space-y-6 pb-20 sm:pb-24"}>
-      {(syncError || refreshError) && <p role="alert" className="rounded-lg bg-red-50 p-3 text-red-700">{syncError || refreshError}</p>}
-      {!embedded && <PageHeader title="Price alerts" actions={<Link href="/dispensary/catalog" className="text-sm text-green-700">Browse catalog</Link>} />}
+    <div className={embedded ? "pb-4" : "space-y-4"}>
+      {(syncError || refreshError) && <p role="alert" className="rounded-lg bg-pf-danger-bg p-3 text-pf-danger">{syncError || refreshError}</p>}
+      {!embedded && <PageHeader title="Price alerts" actions={<Link href="/dispensary/catalog" className="text-sm text-pf-accent">Browse catalog</Link>} />}
       {alertToolbar}
 
       {/* Content */}
@@ -211,20 +211,20 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
       {/* Clear Confirmation Modal */}
       {showClearConfirm && (
         <Modal open onClose={() => setShowClearConfirm(false)} title="Clear alerts?">
-            <p className="text-gray-600 mb-6">
+            <p className="text-pf-muted mb-6">
               This will remove all {activeTab === 'active' ? 'active' : activeTab === 'triggered' ? 'triggered' : ''} price alerts.
               This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setShowClearConfirm(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="flex-1 px-4 py-2 border border-pf-line-strong rounded-lg text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 Cancel
               </button>
               <button
                 onClick={clearAllAlerts}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 Clear All
               </button>
@@ -252,44 +252,44 @@ function AlertCard({
   const inventoryQty = alert.inventoryQty ?? 0;
 
   return (
-    <div className={`overflow-hidden rounded-xl border bg-white transition-all hover:shadow-md ${
-      alert.isTriggered ? 'border-emerald-200 ring-1 ring-emerald-100' : 'border-gray-200'
+    <div className={`overflow-hidden rounded-xl border bg-pf-surface transition-colors hover:border-pf-line-strong ${
+      alert.isTriggered ? 'border-pf-accent-line ring-1 ring-pf-accent-line' : 'border-pf-line'
     }`}>
       {alert.isTriggered && (
-        <div className="flex items-center gap-2 border-b border-emerald-100 bg-emerald-50 px-4 py-3 text-emerald-800 sm:px-6">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-pf-accent-line bg-pf-accent-bg px-4 py-2 text-pf-accent">
           <TrendingDown size={18} />
           <span className="text-sm font-semibold">Price dropped</span>
-          <span className="text-sm text-emerald-700">
-            Current price is at or below your ${alert.targetPrice.toFixed(2)} target.
+          <span className="text-sm text-pf-accent">
+            At or below your ${alert.targetPrice.toFixed(2)} target.
           </span>
         </div>
       )}
-      <div className="p-4 sm:p-6">
+      <div className="p-3 sm:p-4">
         <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3 sm:flex sm:gap-4">
           {/* Product Image */}
-          <Link href={`/dispensary/grower/${alert.growerId}`} className="flex-shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
-            <ProductImage src={alert.productImage} alt={alert.productName} productType={alert.productType} className="h-14 w-14 rounded-lg sm:h-24 sm:w-24" />
+          <Link href={`/dispensary/grower/${alert.growerId}`} className="flex-shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
+            <ProductImage src={alert.productImage} alt={alert.productName} productType={alert.productType} className="h-14 w-14 rounded-lg sm:h-16 sm:w-16" />
           </Link>
 
           {/* Product Info */}
           <div className="contents sm:block sm:flex-1 sm:min-w-0">
             <div className="contents sm:flex sm:items-start sm:justify-between sm:gap-2">
               <div>
-                <h3 className="break-words text-sm font-semibold text-gray-900 sm:text-lg">{alert.productName}</h3>
-                <p className="text-sm text-gray-500">
-                  by <Link href={`/dispensary/grower/${alert.growerId}`} className="inline-flex min-h-10 items-center rounded-sm text-green-600 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+                <h3 className="break-words text-sm font-semibold text-pf-text sm:text-base">{alert.productName}</h3>
+                <p className="text-sm text-pf-muted">
+                  by <Link href={`/dispensary/grower/${alert.growerId}`} className="inline-flex min-h-10 items-center rounded-sm text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
                     {alert.growerName}
                   </Link>
                 </p>
 
                 <div className="flex flex-wrap gap-2 mt-2">
                   {alert.thc != null && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pf-accent-bg text-pf-accent">
                       THC {alert.thc}%
                     </span>
                   )}
                   {alert.productType && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-700">
+                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pf-raised text-pf-secondary">
                       {alert.productType}
                     </span>
                   )}
@@ -300,24 +300,24 @@ function AlertCard({
               {/* Price Info */}
               <div className="col-span-2 grid min-w-0 grid-cols-2 gap-2 text-left sm:min-w-[220px] sm:text-right">
                 <div className={`rounded-lg border px-3 py-2 ${
-                  alert.isTriggered ? 'border-emerald-200 bg-emerald-50' : 'border-gray-200 bg-gray-50'
+                  alert.isTriggered ? 'border-pf-accent-line bg-pf-accent-bg' : 'border-pf-line bg-pf-canvas'
                 }`}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Current</p>
-                  <p className={`text-xl font-bold ${alert.isTriggered ? 'text-emerald-700' : 'text-gray-900'}`}>
-                    {alert.currentPrice == null ? 'Request pricing' : <>${alert.currentPrice.toFixed(2)}<span className="text-xs font-normal text-gray-500">/{unitLabel}</span></>}
+                  <p className="text-xs font-medium uppercase tracking-wide text-pf-muted">Current</p>
+                  <p className={`text-lg font-semibold ${alert.isTriggered ? 'text-pf-accent' : 'text-pf-text'}`}>
+                    {alert.currentPrice == null ? 'Request pricing' : <>${alert.currentPrice.toFixed(2)}<span className="text-xs font-normal text-pf-muted">/{unitLabel}</span></>}
                   </p>
                 </div>
-                <div className="rounded-lg border border-gray-200 bg-white px-3 py-2">
-                  <p className="text-xs font-medium uppercase tracking-wide text-gray-500">Target</p>
-                  <p className="text-xl font-bold text-gray-900">${alert.targetPrice.toFixed(2)}<span className="text-xs font-normal text-gray-500">/{unitLabel}</span></p>
+                <div className="rounded-lg border border-pf-line bg-pf-surface px-3 py-2">
+                  <p className="text-xs font-medium uppercase tracking-wide text-pf-muted">Target</p>
+                  <p className="text-lg font-semibold text-pf-text">${alert.targetPrice.toFixed(2)}<span className="text-xs font-normal text-pf-muted">/{unitLabel}</span></p>
                 </div>
               </div>
             </div>
 
             {alert.isTriggered && discountPercent > 0 && (
-              <div className="col-span-2 mt-1 inline-flex items-center gap-1 rounded-full bg-orange-100 px-2.5 py-1 text-orange-700">
+              <div className="col-span-2 mt-1 inline-flex items-center gap-1 rounded-full bg-pf-warning-bg px-2.5 py-1 text-pf-warning">
                 <TrendingDown size={14} />
-                <span className="text-sm font-semibold">{discountPercent}% below original tracked price</span>
+                <span className="text-sm font-semibold">{discountPercent}% below original price</span>
               </div>
             )}
 
@@ -346,7 +346,7 @@ function AlertCard({
                 {alert.isTriggered && (
                   <button
                     onClick={onMarkSeen}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-muted hover:text-pf-accent hover:bg-pf-accent-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                     title="Mark as seen" aria-label="Mark alert as seen"
                   >
                     <Check size={18} />
@@ -355,7 +355,7 @@ function AlertCard({
 
                 <button
                   onClick={onRemove}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-muted hover:text-pf-danger hover:bg-pf-danger-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                   title="Remove alert" aria-label="Remove alert"
                 >
                   <Trash2 size={18} />
@@ -365,7 +365,7 @@ function AlertCard({
 
             {/* Triggered Info */}
             {alert.isTriggered && alert.triggeredAt && (
-              <p className="col-span-2 mt-2 text-xs text-gray-500">
+              <p className="col-span-2 mt-2 text-xs text-pf-muted">
                 Price drop detected on {new Date(alert.triggeredAt).toLocaleDateString('en-US', {
                   month: 'short',
                   day: 'numeric',
@@ -386,21 +386,21 @@ function EmptyState({ type, onBrowse }: { type: AlertTab; onBrowse: () => void }
   const configs = {
     active: {
       icon: BellOff,
-      title: 'No Active Price Alerts',
+      title: 'No active alerts',
       description: 'Track a target price from the catalog.',
-      action: 'Browse Catalog'
+      action: 'Browse catalog'
     },
     triggered: {
       icon: Bell,
       title: 'No price drops yet',
       description: 'Targets are checked when you visit or refresh.',
-      action: 'View Active Alerts'
+      action: 'View active alerts'
     },
     history: {
       icon: TrendingDown,
       title: 'No saved alerts',
       description: 'Track a target price from the catalog.',
-      action: 'Browse Catalog'
+      action: 'Browse catalog'
     }
   };
 
@@ -409,14 +409,14 @@ function EmptyState({ type, onBrowse }: { type: AlertTab; onBrowse: () => void }
 
   return (
     <div className="text-center py-8">
-      <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
-        <Icon className="text-gray-400" size={32} />
+      <div className="w-12 h-12 bg-pf-surface rounded-full flex items-center justify-center mx-auto mb-3">
+        <Icon className="text-pf-muted" size={32} />
       </div>
-      <h3 className="text-xl font-semibold text-gray-900 mb-2">{config.title}</h3>
-      <p className="text-gray-500 max-w-md mx-auto mb-3">{config.description}</p>
+      <h3 className="text-base font-semibold text-pf-text mb-2">{config.title}</h3>
+      <p className="mx-auto mb-3 max-w-sm text-sm text-pf-muted">{config.description}</p>
       <button
         onClick={onBrowse}
-        className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+        className="inline-flex items-center gap-2 min-h-10 px-4 py-2 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
       >
         <Package size={18} />
         {config.action}

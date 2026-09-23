@@ -161,16 +161,16 @@ export default function AddBatchPage() {
   if (fetchingStrains) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pf-accent"></div>
       </div>
     );
   }
 
   if (strains.length === 0) {
     return (
-      <div className="text-center py-16">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">No strains available</h2>
-        <p className="text-gray-600 mb-6">You need to create at least one strain before creating a batch.</p>
+      <div className="text-center py-8 sm:py-12">
+        <h2 className="text-2xl font-bold text-pf-text mb-4">No strains available</h2>
+        <p className="text-pf-muted mb-6">You need to create at least one strain before creating a batch.</p>
         <Button variant="primary" asChild>
           <Link href={`/grower/strains/add?returnUrl=${encodeURIComponent(`/grower/batches/add${returnUrl ? `?returnUrl=${encodeURIComponent(returnUrl)}` : ''}`)}`}>Create your first strain</Link>
         </Button>
@@ -183,8 +183,8 @@ export default function AddBatchPage() {
       <PageHeader title="Add batch" />
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-          <p className="text-red-600">{error}</p>
+        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg">
+          <p className="text-pf-danger">{error}</p>
         </div>
       )}
 
@@ -192,9 +192,9 @@ export default function AddBatchPage() {
         <CardContent className="pt-4">
           <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
-              <div className="space-y-1.5 sm:space-y-2">
+              <div className="min-w-0 space-y-1.5 sm:space-y-2">
                 <div className="flex items-center justify-between gap-3">
-                  <label htmlFor="batchNumber" className="block text-sm font-medium text-gray-700">
+                  <label htmlFor="batchNumber" className="block text-sm font-medium text-pf-secondary">
                     Batch # *
                   </label>
                   <Button type="button" variant="outline" size="sm" onClick={applySuggestedBatchNumber}>
@@ -207,14 +207,14 @@ export default function AddBatchPage() {
                   required
                   value={formData.batchNumber}
                   onChange={(e) => handleChange('batchNumber', e.target.value)}
-                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                   placeholder="Batch number"
                 />
-                <p className="text-xs text-gray-500">Example: BATCH-20260917-01</p>
+                <p className="text-xs text-pf-muted">Example: BATCH-20260917-01</p>
               </div>
 
-              <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="lotNumber" className="block text-sm font-medium text-gray-700">
+              <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                <label htmlFor="lotNumber" className="block text-sm font-medium text-pf-secondary">
                   Lot #
                 </label>
                 <input
@@ -222,15 +222,15 @@ export default function AddBatchPage() {
                   type="text"
                   value={formData.lotNumber}
                   onChange={(e) => handleChange('lotNumber', e.target.value)}
-                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                   placeholder="Internal or lab lot"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
-              <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="harvestDate" className="block text-sm font-medium text-gray-700">
+              <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                <label htmlFor="harvestDate" className="block text-sm font-medium text-pf-secondary">
                   Harvest date *
                 </label>
                 <input
@@ -240,12 +240,12 @@ export default function AddBatchPage() {
                   max={todayDate}
                   value={formData.harvestDate}
                   onChange={(e) => handleChange('harvestDate', e.target.value)}
-                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                 />
               </div>
 
-              <div className="space-y-1.5 sm:space-y-2">
-                <label htmlFor="strainId" className="block text-sm font-medium text-gray-700">
+              <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                <label htmlFor="strainId" className="block text-sm font-medium text-pf-secondary">
                   Strain *
                 </label>
                 <select
@@ -253,7 +253,7 @@ export default function AddBatchPage() {
                   required
                   value={formData.strainId}
                   onChange={(e) => handleChange('strainId', e.target.value)}
-                  className="w-full h-[42px] rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="w-full h-[42px] rounded-lg border border-pf-line-strong px-4 py-2 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                 >
                   <option value="">Select a strain</option>
                   {strains.map(strain => (
@@ -266,11 +266,11 @@ export default function AddBatchPage() {
             </div>
 
             {/* Lab Results */}
-            <div className="border-t border-gray-200 pt-4 sm:pt-6">
-              <h3 className="text-base font-semibold text-gray-900 mb-3 sm:text-lg sm:mb-4">Lab Results</h3>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="thc" className="block text-sm font-medium text-gray-700">
+            <div className="border-t border-pf-line pt-4 sm:pt-6">
+              <h3 className="text-base font-semibold text-pf-text mb-3 sm:text-lg sm:mb-4">Lab results</h3>
+              <div className="grid min-w-0 grid-cols-3 gap-2 sm:gap-3">
+                <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                  <label htmlFor="thc" className="block text-sm font-medium text-pf-secondary">
                     THC (%)
                   </label>
                   <input
@@ -281,13 +281,13 @@ export default function AddBatchPage() {
                     max="100"
                     value={formData.thc}
                     onChange={(e) => handleChange('thc', e.target.value)}
-                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                     placeholder="18.5"
                   />
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="cbd" className="block text-sm font-medium text-gray-700">
+                <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                  <label htmlFor="cbd" className="block text-sm font-medium text-pf-secondary">
                     CBD (%)
                   </label>
                   <input
@@ -298,13 +298,13 @@ export default function AddBatchPage() {
                     max="100"
                     value={formData.cbd}
                     onChange={(e) => handleChange('cbd', e.target.value)}
-                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                     placeholder="0.5"
                   />
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-2">
-                  <label htmlFor="totalCannabinoids" className="block text-sm font-medium text-gray-700">
+                <div className="min-w-0 space-y-1.5 sm:space-y-2">
+                  <label htmlFor="totalCannabinoids" className="block text-sm font-medium text-pf-secondary">
                     Total (%)
                   </label>
                   <input
@@ -315,7 +315,7 @@ export default function AddBatchPage() {
                     max="100"
                     value={formData.totalCannabinoids}
                     onChange={(e) => handleChange('totalCannabinoids', e.target.value)}
-                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                     placeholder="22.0"
                   />
                 </div>
@@ -329,8 +329,8 @@ export default function AddBatchPage() {
               onError={setError}
             />
 
-            <div className="space-y-1.5 sm:space-y-2">
-              <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
+            <div className="min-w-0 space-y-1.5 sm:space-y-2">
+              <label htmlFor="notes" className="block text-sm font-medium text-pf-secondary">
                 Notes
               </label>
               <textarea
@@ -338,12 +338,12 @@ export default function AddBatchPage() {
                 rows={3}
                 value={formData.notes}
                 onChange={(e) => handleChange('notes', e.target.value)}
-                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
                 placeholder="Batch notes"
               />
             </div>
 
-            <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+            <div className="flex flex-wrap gap-3 pt-4 border-t border-pf-line">
               <Button type="submit" variant="primary" className="flex-1 sm:flex-none" disabled={!canSubmit}>
                 {loading ? 'Creating...' : 'Add batch'}
               </Button>

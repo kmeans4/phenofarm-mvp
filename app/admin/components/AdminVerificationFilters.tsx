@@ -48,7 +48,7 @@ export function AdminVerificationFilters({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full flex-col gap-2 rounded-lg border border-gray-200 bg-white p-3 shadow-sm sm:min-w-[22rem] lg:max-w-2xl"
+      className="flex w-full flex-col gap-2 rounded-lg border border-pf-line bg-pf-surface p-2.5 sm:min-w-[22rem] lg:max-w-2xl"
     >
       <div className="flex min-w-0 flex-1 gap-2">
         <label className="sr-only" htmlFor={inputId}>
@@ -61,11 +61,11 @@ export function AdminVerificationFilters({
           value={search}
           onChange={(event) => setSearch(event.target.value)}
           placeholder="Business or license"
-          className="min-h-10 min-w-0 flex-1 rounded-md border border-gray-300 px-3 text-base focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 sm:text-sm"
+          className="min-h-10 min-w-0 flex-1 rounded-md border border-pf-line-strong px-3 text-base focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent/20 sm:text-sm"
         />
         <button
           type="submit"
-          className="min-h-10 shrink-0 rounded-md bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          className="min-h-10 shrink-0 rounded-md bg-emerald-500 px-4 text-sm font-semibold text-pf-canvas hover:bg-emerald-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
         >
           Search
         </button>
@@ -79,24 +79,25 @@ export function AdminVerificationFilters({
           name="status"
           value={selectedStatus}
           onChange={(event) => setSelectedStatus(normalizeStatus(event.target.value))}
-          className="min-h-10 min-w-0 flex-1 rounded-md border border-gray-300 px-3 text-base focus:border-green-500 focus:outline-none focus:ring-2 focus:ring-green-500/20 sm:text-sm"
+          className="min-h-10 min-w-0 flex-1 rounded-md border border-pf-line-strong px-3 text-base focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent/20 sm:text-sm"
         >
           <option value="all">All statuses</option>
-          <option value="pending">Pending only</option>
-          <option value="verified">Verified only</option>
-          <option value="expiring">Expiring within 30 days</option>
+          <option value="pending">Pending</option>
+          <option value="verified">Verified</option>
+          <option value="expiring">Expires in 30 days</option>
           <option value="expired">Expired</option>
         </select>
-        {resultLabel && <span className="shrink-0 text-xs text-gray-600">{resultLabel}</span>}
+        {resultLabel && <span className="hidden shrink-0 text-xs text-pf-muted sm:inline">{resultLabel}</span>}
         {hasFilters ? (
           <Link
             href={basePath}
-            className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md border border-pf-line-strong px-4 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           >
             Clear
           </Link>
         ) : null}
       </div>
+      {resultLabel && <p className="text-xs text-pf-muted sm:hidden">{resultLabel}</p>}
     </form>
   );
 }

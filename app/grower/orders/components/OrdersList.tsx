@@ -74,12 +74,12 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }> = {
-  PENDING: { bg: 'bg-yellow-100', text: 'text-yellow-800', border: 'border-yellow-200' },
-  CONFIRMED: { bg: 'bg-blue-100', text: 'text-blue-800', border: 'border-blue-200' },
-  PROCESSING: { bg: 'bg-purple-100', text: 'text-purple-800', border: 'border-purple-200' },
-  SHIPPED: { bg: 'bg-orange-100', text: 'text-orange-800', border: 'border-orange-200' },
-  DELIVERED: { bg: 'bg-green-100', text: 'text-green-800', border: 'border-green-200' },
-  CANCELLED: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
+  PENDING: { bg: 'bg-pf-warning-bg', text: 'text-pf-warning', border: 'border-pf-warning-line' },
+  CONFIRMED: { bg: 'bg-pf-info-bg', text: 'text-pf-info', border: 'border-pf-info-line' },
+  PROCESSING: { bg: 'bg-pf-purple-bg', text: 'text-pf-purple', border: 'border-pf-purple-line' },
+  SHIPPED: { bg: 'bg-pf-warning-bg', text: 'text-pf-warning', border: 'border-pf-warning-line' },
+  DELIVERED: { bg: 'bg-pf-accent-bg', text: 'text-pf-accent', border: 'border-pf-accent-line' },
+  CANCELLED: { bg: 'bg-pf-danger-bg', text: 'text-pf-danger', border: 'border-pf-danger-line' },
 };
 
 const VIEW_STATUS: Partial<Record<OrderWorkflowView, OrderStatusValue>> = {
@@ -100,12 +100,12 @@ const ACTION_LABELS: Record<OrderStatusValue, string> = {
 };
 
 const ACTION_CLASSES: Record<OrderStatusValue, string> = {
-  PENDING: 'bg-gray-700 hover:bg-gray-600',
-  CONFIRMED: 'bg-blue-600 hover:bg-blue-700',
-  PROCESSING: 'bg-purple-600 hover:bg-purple-700',
-  SHIPPED: 'bg-orange-600 hover:bg-orange-700',
-  DELIVERED: 'bg-green-600 hover:bg-green-700',
-  CANCELLED: 'bg-red-600 hover:bg-red-700',
+  PENDING: 'bg-pf-raised text-pf-text hover:bg-pf-hover',
+  CONFIRMED: 'bg-emerald-500 text-[#032116] hover:bg-emerald-400',
+  PROCESSING: 'bg-pf-purple-bg text-pf-purple ring-1 ring-inset ring-pf-purple-line hover:bg-pf-purple-bg/80',
+  SHIPPED: 'bg-pf-warning-bg text-pf-warning ring-1 ring-inset ring-pf-warning-line hover:bg-pf-warning-bg/80',
+  DELIVERED: 'bg-emerald-500 text-[#032116] hover:bg-emerald-400',
+  CANCELLED: 'bg-pf-danger-bg text-pf-danger ring-1 ring-inset ring-pf-danger-line hover:bg-pf-danger-bg/80',
 };
 
 export default function OrdersList({ initialOrders, customerFilterLabel }: OrdersListProps) {
@@ -292,10 +292,10 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
         <div
           className={`mb-4 rounded-lg border p-4 ${
             message.type === 'success'
-              ? 'border-green-200 bg-green-50 text-green-800'
+              ? 'border-pf-accent-line bg-pf-accent-bg text-pf-accent'
               : message.type === 'warning'
-                ? 'border-amber-200 bg-amber-50 text-amber-900'
-                : 'border-red-200 bg-red-50 text-red-800'
+                ? 'border-pf-warning-line bg-pf-warning-bg text-pf-warning'
+                : 'border-pf-danger-line bg-pf-danger-bg text-pf-danger'
           }`}
         >
           <div className="flex items-start justify-between gap-4">
@@ -317,7 +317,7 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
               type="button"
               onClick={() => setMessage(null)}
               aria-label="Dismiss update message"
-              className="min-h-10 rounded-md px-2 py-1 text-sm opacity-75 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="min-h-10 rounded-md px-2 py-1 text-sm opacity-75 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
             >
               Dismiss
             </button>
@@ -325,9 +325,9 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
         </div>
       )}
 
-      <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+      <div className="mb-4 rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
 
-        <label className="block sm:hidden"><span className="sr-only">Filter requests</span><select value={workflowView} onChange={(event) => { setWorkflowView(event.target.value as OrderWorkflowView); setSelectedOrders(new Set()); }} className="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base">{workflowViews.map((view) => <option key={view.key} value={view.key}>{view.label} ({view.count})</option>)}</select></label>
+        <label className="block sm:hidden"><span className="sr-only">Filter requests</span><select value={workflowView} onChange={(event) => { setWorkflowView(event.target.value as OrderWorkflowView); setSelectedOrders(new Set()); }} className="min-h-10 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 py-2 text-base">{workflowViews.map((view) => <option key={view.key} value={view.key}>{view.label} ({view.count})</option>)}</select></label>
         <div className="hidden flex-wrap gap-2 sm:flex">
           {workflowViews.map((view) => (
             <button
@@ -339,15 +339,15 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
               }}
               aria-pressed={workflowView === view.key}
               aria-label={`${view.label}: ${view.count} requests`}
-              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
+              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 ${
                 workflowView === view.key
-                  ? 'bg-green-600 text-white'
-                  : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                  ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
+                  : 'bg-pf-canvas text-pf-secondary hover:bg-pf-surface'
               }`}
             >
               <span>{view.label}</span>
               <span className={`rounded-full px-2 py-0.5 text-xs ${
-                workflowView === view.key ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
+                workflowView === view.key ? 'bg-pf-accent/15 text-pf-accent' : 'bg-pf-surface text-pf-muted ring-1 ring-pf-line'
               }`}>
                 {view.count}
               </span>
@@ -356,14 +356,14 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
         </div>
       </div>
 
-      <Card className="bg-white shadow-sm border border-gray-200">
+      <Card className="bg-pf-surface shadow-sm border border-pf-line">
         <CardHeader>
           <div className="flex items-center justify-between gap-3">
             <label className="flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" checked={visibleOrders.length > 0 && visibleOrders.every(order => selectedOrders.has(order.id))} onChange={toggleSelectAll} />Select all</label>
             <div className="flex flex-wrap items-center gap-3">
               <div className="hidden sm:block"><TableDensityControl value={tableDensity} onChange={handleDensityChange} /></div>
               {hasSelection && (
-                <span className="text-sm text-gray-600">
+                <span className="text-sm text-pf-muted">
                   {selectedOrders.size} selected
                 </span>
               )}
@@ -372,29 +372,28 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
         </CardHeader>
         <CardContent>
           {visibleOrders.length === 0 ? (
-            <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pf-surface flex items-center justify-center">
+                <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg font-semibold text-pf-text mb-2">
                 {orders.length === 0
                   ? customerFilterLabel
                     ? `No active requests for ${customerFilterLabel}`
                     : 'No active order requests'
                   : 'No requests in this view'}
               </h3>
-              <p className="text-gray-500 mb-2 max-w-md mx-auto">
+              <p className="text-sm text-pf-muted mb-4 max-w-md mx-auto">
                 {orders.length === 0
                   ? customerFilterLabel
-                    ? 'Delivered and cancelled requests stay in history. Active requests for this customer will appear here.'
-                    : 'You do not have any submitted, accepted, preparing, or ready/in-transit requests right now.'
+                    ? 'Active requests for this customer appear here; closed requests stay in history.'
+                    : 'Buyer requests and your direct records will appear here.'
                   : 'Switch workflow views to see other request states.'}
               </p>
               {orders.length === 0 ? (
                 <>
-                  <p className="text-sm text-gray-500 mb-6">Next step: record a direct request or wait for buyer requests.</p>
                   <Button variant="primary" asChild>
                     <Link href="/grower/orders/add">
                       <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -414,16 +413,16 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
             <>
             <div className="space-y-2 sm:hidden">{visibleOrders.map(order => {
               const colors = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
-              return <article key={order.id} className="rounded-xl border border-gray-200 p-3">
-                <div className="flex items-start gap-2"><label className="flex h-10 w-10 shrink-0 items-center justify-center -ml-2"><input type="checkbox" checked={selectedOrders.has(order.id)} onChange={() => toggleSelect(order.id)} aria-label={`Select request #${order.orderId}`} className="h-4 w-4" /></label><div className="min-w-0"><Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-green-700 break-all">#{order.orderId}</Link><p className="text-sm text-gray-600">{order.dispensary.businessName}</p></div></div>
+              return <article key={order.id} className="rounded-xl border border-pf-line p-3">
+                <div className="flex items-start gap-2"><label className="flex h-10 w-10 shrink-0 items-center justify-center -ml-2"><input type="checkbox" checked={selectedOrders.has(order.id)} onChange={() => toggleSelect(order.id)} aria-label={`Select request #${order.orderId}`} className="h-4 w-4" /></label><div className="min-w-0"><Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-pf-accent break-all">#{order.orderId}</Link><p className="text-sm text-pf-muted">{order.dispensary.businessName}</p></div></div>
                 <div className="mt-1 flex flex-wrap items-center justify-between gap-2"><span className={`rounded-full px-2 py-1 text-xs ${colors.bg} ${colors.text}`}>{STATUS_LABELS[order.status] || order.status}</span><strong className="text-sm">{formatProductMoney(order.totalAmount)}</strong></div>
-                <div className="mt-1 flex items-center justify-between gap-2 text-xs text-gray-500"><span>{format(new Date(order.createdAt), 'MMM d, yyyy')}</span><Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-green-700">View →</Link></div>
+                <div className="mt-1 flex items-center justify-between gap-2 text-xs text-pf-muted"><span>{format(new Date(order.createdAt), 'MMM d, yyyy')}</span><Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center rounded-lg border border-pf-line px-3 py-2 text-sm font-semibold text-pf-accent">View →</Link></div>
               </article>;
             })}</div>
             <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-left border-collapse min-w-[640px]">
                 <thead>
-                  <tr className="border-b border-gray-200">
+                  <tr className="border-b border-pf-line">
                     <th className={cellClass}>
                       <input
                         type="checkbox"
@@ -431,25 +430,25 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
                         onChange={toggleSelectAll}
                         onClick={(event) => event.stopPropagation()}
                         aria-label="Select all visible requests"
-                        className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                        className="w-4 h-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
                       />
                     </th>
-                    <th className={`${cellClass} font-medium text-gray-700`}>Request #</th>
-                    <th className={`${cellClass} font-medium text-gray-700`}>Dispensary</th>
-                    <th className={`${cellClass} font-medium text-gray-700`}>Date</th>
-                    <th className={`${cellClass} font-medium text-gray-700`}>Est. value</th>
-                    <th className={`${cellClass} font-medium text-gray-700`}>Status</th>
-                    <th className={`${cellClass} font-medium text-gray-700`}>Actions</th>
+                    <th className={`${cellClass} font-medium text-pf-secondary`}>Request #</th>
+                    <th className={`${cellClass} font-medium text-pf-secondary`}>Dispensary</th>
+                    <th className={`${cellClass} font-medium text-pf-secondary`}>Date</th>
+                    <th className={`${cellClass} font-medium text-pf-secondary`}>Est. value</th>
+                    <th className={`${cellClass} font-medium text-pf-secondary`}>Status</th>
+                    <th className={`${cellClass} font-medium text-pf-secondary`}>Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-pf-line">
                   {visibleOrders.map((order) => {
                     const colors = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
                     return (
                       <tr
                         key={order.id}
                         onClick={() => router.push(`/grower/orders/${order.id}`)}
-                        className={`cursor-pointer transition-colors hover:bg-gray-50 ${selectedOrders.has(order.id) ? 'bg-green-50/50' : ''}`}
+                        className={`cursor-pointer transition-colors hover:bg-pf-canvas ${selectedOrders.has(order.id) ? 'bg-pf-accent-bg/50' : ''}`}
                       >
                         <td className={cellClass}>
                           <input
@@ -458,19 +457,19 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
                             onChange={() => toggleSelect(order.id)}
                             onClick={(event) => event.stopPropagation()}
                             aria-label={`Select request #${order.orderId}`}
-                            className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                            className="w-4 h-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
                           />
                         </td>
                         <td className={cellClass}>
-                          <div className="font-medium text-gray-900">#{order.orderId}</div>
+                          <div className="font-medium text-pf-text">#{order.orderId}</div>
                         </td>
-                        <td className={`${cellClass} text-gray-600`}>
+                        <td className={`${cellClass} text-pf-muted`}>
                           {order.dispensary.businessName}
                         </td>
-                        <td className={`${cellClass} text-gray-600`}>
+                        <td className={`${cellClass} text-pf-muted`}>
                           {format(new Date(order.createdAt), 'MMM d, yyyy')}
                         </td>
-                        <td className={`${cellClass} font-bold text-gray-900`}>
+                        <td className={`${cellClass} font-bold text-pf-text`}>
                           ${Number(order.totalAmount).toFixed(2)}
                         </td>
                         <td className={cellClass}>
@@ -498,19 +497,12 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
 
       {/* Batch Action Toolbar */}
       {hasSelection && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-4xl">
-          <div className="bg-gray-900 text-white rounded-xl shadow-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="fixed inset-x-3 z-50 md:left-60 md:right-0 md:px-6" style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
+          <div className="mx-auto max-w-4xl border border-pf-line-strong bg-pf-raised text-pf-text rounded-xl shadow-xl p-3 sm:p-4 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4">
             <div className="flex items-center gap-3">
               <span className="font-medium">
                 {selectedOrders.size} request{selectedOrders.size !== 1 ? 's' : ''} selected
               </span>
-              <button
-                type="button"
-                onClick={() => setSelectedOrders(new Set())}
-                className="min-h-10 rounded-md px-2 py-1 text-sm text-gray-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
-              >
-                Clear
-              </button>
             </div>
 
             <div className="flex flex-wrap justify-center gap-2">
@@ -521,13 +513,13 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
                     type="button"
                     onClick={() => handleBatchUpdate(targetStatus)}
                     disabled={isUpdating}
-                    className={`min-h-10 rounded-lg px-3 py-1.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${ACTION_CLASSES[targetStatus]}`}
+                    className={`min-h-10 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-raised ${ACTION_CLASSES[targetStatus]}`}
                   >
                     {ACTION_LABELS[targetStatus]}
                   </button>
                 ))
               ) : (
-                <span className="rounded-lg bg-white/10 px-3 py-1.5 text-sm text-gray-300">
+                <span className="rounded-lg bg-pf-hover px-3 py-1.5 text-sm text-pf-secondary">
                   No bulk transitions available
                 </span>
               )}
@@ -535,14 +527,14 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
                 type="button"
                 onClick={() => setSelectedOrders(new Set())}
                 disabled={isUpdating}
-                className="min-h-10 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+                className="min-h-10 rounded-lg px-3 py-1.5 text-sm font-medium text-pf-secondary transition-colors hover:text-pf-text disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-raised"
               >
                 Clear selection
               </button>
             </div>
 
             {isUpdating && (
-              <div className="flex items-center gap-2 text-sm text-gray-400">
+              <div className="flex items-center gap-2 text-sm text-pf-muted">
                 <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />

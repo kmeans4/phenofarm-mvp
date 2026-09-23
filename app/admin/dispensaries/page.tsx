@@ -113,7 +113,7 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
   const pageCount = Math.max(1, Math.ceil(totalDispensaryCount / PAGE_SIZE));
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <div className="space-y-2">
         <PageHeader
           compact
@@ -135,17 +135,17 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
         />
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
+      <div className="bg-pf-surface rounded-lg border border-pf-line overflow-hidden">
         {dispensaries.length === 0 ? (
-          <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50 mx-6 mb-6">
-            <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-              <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="px-4 py-8 text-center sm:py-10">
+            <div className="w-10 h-10 mx-auto mb-3 rounded-lg bg-pf-raised flex items-center justify-center">
+              <svg className="w-5 h-5 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1-1h2 0 011a1 1 0 011 1v5m-4 0h4" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">{hasFilters ? 'No matching dispensaries' : 'No dispensaries yet'}</h3>
-            <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-              {hasFilters ? 'Try a different search or status filter.' : 'Dispensaries will appear here once they register on the platform.'}
+            <h3 className="text-base font-semibold text-pf-text mb-1">{hasFilters ? 'No matching dispensaries' : 'No dispensaries yet'}</h3>
+            <p className="text-sm text-pf-muted mb-4 max-w-sm mx-auto">
+              {hasFilters ? 'Try a different search or status filter.' : 'Registered dispensaries appear here.'}
             </p>
             {hasFilters ? (
               <Button variant="secondary" asChild>
@@ -164,29 +164,29 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
           </div>
         ) : (
           <>
-          <div className="divide-y divide-gray-200 xl:hidden">
+          <div className="divide-y divide-pf-line xl:hidden">
             {dispensaries.map((d) => (
-              <article key={`mobile-${d.id}`} className="space-y-4 p-4">
+              <article key={`mobile-${d.id}`} className="space-y-3 p-3">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <h2 className="truncate font-semibold text-gray-900">{d.businessName}</h2>
+                    <h2 className="break-words text-sm font-semibold text-pf-text">{d.businessName}</h2>
                     {d.user?.email ? (
-                      <a href={`mailto:${d.user.email}`} className="inline-flex min-h-10 items-center break-all text-sm font-medium text-green-700 hover:underline">{d.user.email}</a>
+                      <a href={`mailto:${d.user.email}`} className="inline-flex min-h-10 items-center break-all text-sm font-medium text-pf-accent hover:underline">{d.user.email}</a>
                     ) : null}
                   </div>
-                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${d.isVerified ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                  <span className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${d.isVerified ? 'bg-pf-accent-bg text-pf-accent' : 'bg-pf-warning-bg text-pf-warning'}`}>
                     {d.isVerified ? 'Verified' : 'Pending'}
                   </span>
                 </div>
                 <dl className="grid grid-cols-2 gap-3 text-sm">
-                  <div><dt className="text-xs font-medium uppercase text-gray-500">License</dt><dd className="mt-1 text-gray-800">{d.licenseNumber || 'Not provided'}</dd></div>
-                  <div><dt className="text-xs font-medium uppercase text-gray-500">Expiry</dt><dd className="mt-1"><LicenseExpiryBadge expiresAt={d.licenseExpiry} /></dd></div>
-                  <div className="col-span-2"><dt className="text-xs font-medium uppercase text-gray-500">Ordering</dt><dd className="mt-1 text-gray-800">{d.licenseStatus === 'verified' ? 'Can order' : 'License review'}</dd></div>
+                  <div><dt className="text-xs font-medium uppercase text-pf-muted">License</dt><dd className="mt-1 break-all text-pf-secondary">{d.licenseNumber || 'Not provided'}</dd></div>
+                  <div><dt className="text-xs font-medium uppercase text-pf-muted">Expiry</dt><dd className="mt-1"><LicenseExpiryBadge expiresAt={d.licenseExpiry} /></dd></div>
+                  <div className="col-span-2"><dt className="text-xs font-medium uppercase text-pf-muted">Ordering</dt><dd className="mt-1 text-pf-secondary">{d.licenseStatus === 'verified' ? 'Can order' : 'License review'}</dd></div>
                 </dl>
                 {d.licenseReviewNotes ? (
-                  <details className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                  <details className="rounded-lg bg-pf-warning-bg px-3 py-2 text-sm text-pf-warning">
                     <summary className="min-h-10 cursor-pointer py-2 font-semibold">Review notes</summary>
-                    <p className="pb-2">{d.licenseReviewNotes}</p>
+                    <p className="break-words pb-2 leading-5">{d.licenseReviewNotes}</p>
                   </details>
                 ) : null}
                 <ConfirmActionButton
@@ -195,7 +195,7 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                   confirmMessage={`${d.isVerified ? 'Remove marketplace verification from' : 'Verify marketplace access for'} ${d.businessName}?`}
                   confirmTitle={d.isVerified ? 'Remove verification?' : 'Verify dispensary?'}
                   confirmLabel={d.isVerified ? 'Remove verification' : 'Verify'}
-                  className={`inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${d.isVerified ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' : 'bg-green-600 text-white hover:bg-green-700'}`}
+                  className={`inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${d.isVerified ? 'border border-pf-line bg-pf-raised text-pf-secondary hover:bg-pf-hover' : 'bg-emerald-500 text-pf-canvas hover:bg-emerald-400'}`}
                 >
                   {d.isVerified ? 'Unverify' : 'Verify dispensary'}
                 </ConfirmActionButton>
@@ -204,29 +204,29 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
           </div>
           <div className="hidden overflow-x-auto xl:block">
             <table className="w-full min-w-[900px]">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-pf-canvas border-b border-pf-line">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Business</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">License</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Expiry</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Status</th>
-                  <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">Ordering</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wide">Joined</th>
-                  <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wide">Actions</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Business</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">License</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Expiry</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Status</th>
+                  <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-pf-muted">Ordering</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Joined</th>
+                  <th className="px-4 py-3 text-right text-xs font-medium text-pf-muted uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-pf-line">
                 {dispensaries.map((d) => (
-                  <tr key={d.id} className="hover:bg-gray-50">
+                  <tr key={d.id} className="hover:bg-pf-raised">
                     <td className="px-4 py-3">
-                      <span className="font-medium text-gray-900">{d.businessName}</span>
+                      <span className="font-medium text-pf-text">{d.businessName}</span>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-gray-600">
+                    <td className="whitespace-nowrap px-4 py-3 text-pf-muted">
                       {d.user?.email ? (
                         <a
                           href={`mailto:${d.user.email}`}
-                          className="font-medium text-green-700 hover:text-green-800 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                          className="font-medium text-pf-accent hover:text-pf-accent hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                         >
                           {d.user.email}
                         </a>
@@ -234,14 +234,14 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                         '-'
                       )}
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-gray-600">
+                    <td className="whitespace-nowrap px-4 py-3 text-pf-muted">
                       <div>{d.licenseNumber || '-'}</div>
                       {d.licenseReviewNotes ? (
                         <details className="group mt-1">
-                          <summary className="inline-flex cursor-pointer list-none items-center rounded text-xs font-medium text-amber-700 hover:text-amber-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2">
+                          <summary className="inline-flex min-h-9 cursor-pointer list-none items-center rounded text-xs font-medium text-pf-warning hover:text-pf-warning focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
                             Review notes
                           </summary>
-                          <p className="mt-1 max-w-xs rounded-md bg-amber-50 p-2 text-xs leading-5 text-amber-900 ring-1 ring-inset ring-amber-200">
+                          <p className="mt-1 max-w-xs whitespace-normal break-words rounded-md bg-pf-warning-bg p-2 text-xs leading-5 text-pf-warning ring-1 ring-inset ring-pf-warning-line">
                             {d.licenseReviewNotes}
                           </p>
                         </details>
@@ -252,9 +252,9 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                     </td>
                     <td className="px-4 py-3">
                         <span className={'inline-flex whitespace-nowrap items-center px-2.5 py-1 text-xs font-medium rounded-full ' + (
-                        d.isVerified 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
+                        d.isVerified
+                          ? 'bg-pf-accent-bg text-pf-accent'
+                          : 'bg-pf-warning-bg text-pf-warning'
                       )}>
                         {d.isVerified ? 'Verified' : 'Pending'}
                       </span>
@@ -263,13 +263,13 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                       {/* Ordering ability is gated by licenseStatus, not isVerified */}
                       <span className={'inline-flex whitespace-nowrap items-center px-2.5 py-1 text-xs font-medium rounded-full ' + (
                         d.licenseStatus === 'verified'
-                          ? 'bg-green-50 text-green-800'
-                          : 'bg-amber-50 text-amber-800'
+                          ? 'bg-pf-accent-bg text-pf-accent'
+                          : 'bg-pf-warning-bg text-pf-warning'
                       )}>
                         {d.licenseStatus === 'verified' ? 'Can order' : 'License review'}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-sm text-gray-500">
+                    <td className="whitespace-nowrap px-4 py-3 text-sm text-pf-muted">
                       {new Date(d.createdAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-3 text-right">
@@ -279,10 +279,10 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                         confirmMessage={`${d.isVerified ? 'Remove marketplace verification from' : 'Verify marketplace access for'} ${d.businessName}?`}
                         confirmTitle={d.isVerified ? 'Remove verification?' : 'Verify dispensary?'}
                         confirmLabel={d.isVerified ? 'Remove verification' : 'Verify'}
-                        className={'inline-flex h-10 items-center rounded-md px-3 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 ' + (
+                        className={'inline-flex h-10 items-center rounded-md px-3 text-xs font-medium transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:opacity-60 ' + (
                           d.isVerified
-                            ? 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            : 'bg-green-600 text-white hover:bg-green-700'
+                            ? 'border border-pf-line bg-pf-raised text-pf-secondary hover:bg-pf-hover'
+                            : 'bg-emerald-500 text-pf-canvas hover:bg-emerald-400'
                         )}
                       >
                         {d.isVerified ? 'Unverify' : 'Verify'}
@@ -301,16 +301,16 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
           {page > 1 ? (
             <Link
               href={buildDispensariesHref(query, status, page - 1)}
-              className="inline-flex min-h-10 items-center rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex min-h-10 items-center rounded-md border border-pf-line-strong px-3 text-sm font-medium text-pf-secondary hover:bg-pf-raised"
             >
               Previous
             </Link>
           ) : <span />}
-          <span className="text-sm text-gray-600">Page {page} of {pageCount}</span>
+          <span className="text-sm text-pf-muted">Page {page} of {pageCount}</span>
           {page < pageCount ? (
             <Link
               href={buildDispensariesHref(query, status, page + 1)}
-              className="inline-flex min-h-10 items-center rounded-md border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
+              className="inline-flex min-h-10 items-center rounded-md border border-pf-line-strong px-3 text-sm font-medium text-pf-secondary hover:bg-pf-raised"
             >
               Next
             </Link>

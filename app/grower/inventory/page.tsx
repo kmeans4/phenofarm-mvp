@@ -41,10 +41,10 @@ export default async function GrowerInventoryPage({ searchParams }: { searchPara
         title="Inventory"
         actions={
           <>
-            <Link href="/grower/products/add" className="rounded-lg bg-green-600 px-4 py-2 text-center text-sm font-semibold text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:w-auto">
+            <Link href="/grower/products/add" className="rounded-lg bg-emerald-500 px-4 py-2 text-center text-sm font-semibold text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:w-auto">
               Add product
             </Link>
-            <Link href="/grower/inventory/add" className="rounded-lg border border-gray-300 bg-white px-4 py-2 text-center text-sm font-semibold text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:w-auto">
+            <Link href="/grower/inventory/add" className="rounded-lg border border-pf-line-strong bg-pf-surface px-4 py-2 text-center text-sm font-semibold text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:w-auto">
               Update stock
             </Link>
           </>

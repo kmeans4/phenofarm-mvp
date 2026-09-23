@@ -21,7 +21,7 @@ interface RecentActivityItem {
 }
 
 const labelByPath: Array<[string, string]> = [
-  ['/grower/dashboard', 'Dashboard'],
+  ['/grower/dashboard', 'Overview'],
   ['/grower/products/add', 'Add product'],
   ['/grower/products', 'Products'],
   ['/grower/inventory', 'Inventory'],
@@ -33,7 +33,7 @@ const labelByPath: Array<[string, string]> = [
   ['/grower/pricing', 'Plans'],
   ['/grower/reports', 'Reports'],
   ['/grower/settings', 'Settings'],
-  ['/dispensary/dashboard', 'Dashboard'],
+  ['/dispensary/dashboard', 'Overview'],
   ['/dispensary/catalog', 'Catalog'],
   ['/dispensary/cart', 'Request draft'],
   ['/dispensary/orders', 'Orders'],
@@ -71,7 +71,7 @@ function getPageMeta(pathname: string): PageMeta {
     };
   }
 
-  const segment = normalizedPath.split('/').filter(Boolean).pop() || 'Dashboard';
+  const segment = normalizedPath.split('/').filter(Boolean).pop() || 'Overview';
   const label = segment
     .replace(/-/g, ' ')
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -203,23 +203,23 @@ export function RecentActivityDrawer({ role }: RecentActivityDrawerProps) {
       {open && (
         <div
           id={drawerId}
-          className="absolute bottom-14 right-0 w-80 rounded-xl border border-gray-200 bg-white p-3 shadow-2xl"
+          className="absolute bottom-14 right-0 w-80 rounded-xl border border-pf-line bg-pf-surface p-3 shadow-2xl"
         >
           <div className="flex items-center justify-between">
-            <p className="text-sm font-semibold text-gray-900">Recently used</p>
+            <p className="text-sm font-semibold text-pf-text">Recently used</p>
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 onClick={clearRoleItems}
                 disabled={roleItems.length === 0}
-                className="rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40"
+                className="rounded-md px-2 py-1 text-xs font-medium text-pf-muted hover:bg-pf-surface focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Clear
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="rounded-md p-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="rounded-md p-1.5 text-pf-muted hover:bg-pf-surface hover:text-pf-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
                 aria-label="Close recent activity"
               >
                 <X className="h-4 w-4" />
@@ -237,17 +237,17 @@ export function RecentActivityDrawer({ role }: RecentActivityDrawerProps) {
                     href={item.href}
                     onClick={() => setOpen(false)}
                     aria-label={`${item.label}${relativeTime ? `, ${relativeTime}` : ''}`}
-                    className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    className="flex items-center justify-between gap-3 rounded-lg px-3 py-2 text-sm text-pf-secondary hover:bg-pf-accent-bg hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
                   >
                     <span className="min-w-0 truncate font-medium">{item.label}</span>
-                    <time dateTime={item.visitedAt} className="shrink-0 text-xs text-gray-400">
+                    <time dateTime={item.visitedAt} className="shrink-0 text-xs text-pf-muted">
                       {relativeTime}
                     </time>
                   </Link>
                 );
               })
             ) : (
-              <p className="rounded-lg border border-dashed border-gray-200 px-3 py-3 text-sm text-gray-500">
+              <p className="rounded-lg border border-dashed border-pf-line px-3 py-3 text-sm text-pf-muted">
                 Recent pages will appear here as you move through the portal.
               </p>
             )}
@@ -260,7 +260,7 @@ export function RecentActivityDrawer({ role }: RecentActivityDrawerProps) {
         aria-label="Open recent activity"
         aria-controls={drawerId}
         aria-expanded={open}
-        className="pf-portal-fab-trigger flex h-11 w-11 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-lg transition-[opacity,background-color] duration-150 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+        className="pf-portal-fab-trigger flex h-11 w-11 items-center justify-center rounded-full border border-pf-line bg-pf-surface text-pf-secondary shadow-lg transition-[opacity,background-color] duration-150 hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas"
         title="Recent activity"
       >
         <Clock3 className="h-5 w-5" />

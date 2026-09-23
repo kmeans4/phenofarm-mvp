@@ -108,8 +108,8 @@ export default function AddProductPage() {
     return (
       <div className="mx-auto w-full max-w-5xl space-y-4">
         <PageHeader title="Add product" />
-        <div className="flex min-h-[320px] items-center justify-center rounded-lg border border-gray-200 bg-white">
-          <div className="text-gray-500">Loading...</div>
+        <div className="flex min-h-[320px] items-center justify-center rounded-lg border border-pf-line bg-pf-surface">
+          <div className="text-pf-muted">Loading...</div>
         </div>
       </div>
     );

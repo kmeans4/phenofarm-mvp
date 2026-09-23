@@ -30,10 +30,10 @@ export function SubscriptionStatusBadge({ plan, status, currentPeriodEnd }: Subs
   if (currentPeriodEnd) detailParts.push(`Renews/ends ${formatDate(currentPeriodEnd)}`);
 
   const className: Record<SubscriptionBadgeLabel, string> = {
-    Free: 'bg-gray-100 text-gray-700 ring-gray-200',
-    Pro: 'bg-green-50 text-green-700 ring-green-200',
-    Business: 'bg-blue-50 text-blue-700 ring-blue-200',
-    Inactive: 'bg-red-50 text-red-700 ring-red-200',
+    Free: 'bg-pf-surface text-pf-secondary ring-pf-line',
+    Pro: 'bg-pf-accent-bg text-pf-accent ring-pf-accent-line',
+    Business: 'bg-pf-info-bg text-pf-info ring-pf-info-line',
+    Inactive: 'bg-pf-danger-bg text-pf-danger ring-pf-danger-line',
   };
 
   return (

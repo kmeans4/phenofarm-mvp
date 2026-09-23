@@ -71,7 +71,7 @@ export default async function DispensaryOrdersPage({ searchParams }: { searchPar
   const trackedOrderValue = summaries.filter(row => row.status !== 'CANCELLED').reduce((sum, row) => sum + Number(row._sum.totalAmount ?? 0), 0);
 
   return (
-    <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-24">
+    <div className="space-y-4">
       <PageHeader
         title="Orders"
         mobileInlineActions
@@ -87,33 +87,33 @@ export default async function DispensaryOrdersPage({ searchParams }: { searchPar
       {/* Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard title="Requests" value={totalOrders} />
-        <StatCard title="In progress" value={activeCount} valueClassName="text-blue-600" />
-        <StatCard title="Awaiting response" value={pendingCount} valueClassName="text-yellow-600" />
+        <StatCard title="In progress" value={activeCount} valueClassName="text-pf-info" />
+        <StatCard title="Awaiting response" value={pendingCount} valueClassName="text-pf-warning" />
         <StatCard
           title="Request value"
           value={`$${trackedOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`}
-          valueClassName="text-green-600"
+          valueClassName="text-pf-accent"
         />
       </div>
 
       {/* Orders List */}
-      <Card className="bg-white shadow-sm border border-gray-200">
-        <CardContent className="p-3 sm:p-6">
+      <Card className="bg-pf-surface shadow-sm border border-pf-line">
+        <CardContent className="p-3 sm:p-4">
           <form className="mb-4 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:flex sm:flex-wrap" action="/dispensary/orders">
-            <input name="search" defaultValue={search} aria-label="Search all order requests" placeholder="Search orders" className="col-span-2 min-w-0 flex-1 rounded-lg border p-2 text-base sm:text-sm" />
-            <select name="status" defaultValue={status || ''} aria-label="Request status" className="min-w-0 rounded-lg border p-2 text-base sm:text-sm"><option value="">All statuses</option>{Object.values(OrderStatus).map(value => <option key={value} value={value}>{getOrderStatusLabel(value)}</option>)}</select>
-            <button type="submit" className="rounded-lg bg-green-700 px-4 py-2 text-white">Filter</button>
+            <input name="search" defaultValue={search} aria-label="Search all order requests" placeholder="Search orders" className="col-span-2 min-w-0 flex-1 rounded-lg border border-pf-line-strong p-2 text-base sm:text-sm" />
+            <select name="status" defaultValue={status || ''} aria-label="Request status" className="min-w-0 rounded-lg border border-pf-line-strong p-2 text-base sm:text-sm"><option value="">All statuses</option>{Object.values(OrderStatus).map(value => <option key={value} value={value}>{getOrderStatusLabel(value)}</option>)}</select>
+            <button type="submit" className="rounded-lg bg-emerald-500 px-4 py-2 text-[#032116]">Filter</button>
           </form>
           {orders.length === 0 ? (
-            <div className="text-center py-16 border-2 border-dashed border-gray-300 rounded-xl bg-gray-50">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="rounded-xl border border-dashed border-pf-line-strong bg-pf-canvas px-4 py-8 text-center sm:py-10">
+              <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-pf-surface flex items-center justify-center">
+                <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No requests yet</h3>
-              <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                Browse the catalog to discover products from licensed growers and submit your first request.
+              <h3 className="text-lg font-semibold text-pf-text mb-2">No requests yet</h3>
+              <p className="mx-auto mb-4 max-w-sm text-sm text-pf-muted">
+                Find products in the catalog to start a request.
               </p>
               <Button variant="primary" asChild>
                 <Link href="/dispensary/catalog">
@@ -128,9 +128,9 @@ export default async function DispensaryOrdersPage({ searchParams }: { searchPar
             <OrdersTable orders={serializedOrders} showFilters={false} showWorkflowViews={false} showResultCount={false} />
           )}
           <nav aria-label="Request pages" className="mt-4 flex items-center justify-between gap-3 text-sm">
-            {page > 1 ? <Link href={pageHref(page - 1)} className="rounded-lg border px-3 py-2">Previous</Link> : <span />}
+            {page > 1 ? <Link href={pageHref(page - 1)} className="rounded-lg border border-pf-line-strong px-3 py-2">Previous</Link> : <span />}
             <span>{filteredCount} {filteredCount === 1 ? 'request' : 'requests'}{filteredCount > pageSize ? ` · Page ${page}` : ''}</span>
-            {page * pageSize < filteredCount ? <Link href={pageHref(page + 1)} className="rounded-lg border px-3 py-2">Next</Link> : <span />}
+            {page * pageSize < filteredCount ? <Link href={pageHref(page + 1)} className="rounded-lg border border-pf-line-strong px-3 py-2">Next</Link> : <span />}
           </nav>
         </CardContent>
       </Card>

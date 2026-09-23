@@ -60,14 +60,14 @@ export function LogoUpload({ currentLogo, onUpload, disabled = false }: LogoUplo
   return (
     <div className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
+        <div className="p-3 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger text-sm">
           {error}
         </div>
       )}
 
       <div className="flex items-center gap-3 sm:gap-6">
         {/* Logo Preview */}
-        <div className="h-20 w-20 shrink-0 sm:h-24 sm:w-24 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden">
+        <div className="h-20 w-20 shrink-0 sm:h-24 sm:w-24 rounded-lg border-2 border-dashed border-pf-line-strong flex items-center justify-center bg-pf-canvas overflow-hidden">
           {preview ? (
             // eslint-disable-next-line @next/next/no-img-element -- Small upload previews also support legacy data URLs.
             <img 
@@ -76,7 +76,7 @@ export function LogoUpload({ currentLogo, onUpload, disabled = false }: LogoUplo
               className="w-full h-full object-contain"
             />
           ) : (
-            <div className="text-gray-400 text-center p-2">
+            <div className="text-pf-muted text-center p-2">
               <svg className="w-8 h-8 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -113,14 +113,14 @@ export function LogoUpload({ currentLogo, onUpload, disabled = false }: LogoUplo
                 disabled={uploading || disabled}
                 variant="ghost"
                 size="sm"
-                className="text-red-600 hover:text-red-700"
+                className="text-pf-danger hover:text-pf-danger"
               >
                 Remove
               </Button>
             )}
           </div>
           
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-pf-muted">
             JPG, PNG, or WebP. Max {formatBytes(FILE_UPLOAD_LIMITS.logoMaxBytes)}.
           </p>
         </div>

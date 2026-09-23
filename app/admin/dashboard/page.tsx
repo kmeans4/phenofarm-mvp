@@ -171,11 +171,11 @@ export default async function AdminPage() {
   const completedChecklist = adminChecklist.filter((item) => item.complete);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-5">
       <PageHeader
           compact
-        title="Dashboard"
-        description="Manage subscriptions, verification, and marketplace operations"
+        title="Overview"
+        description="Account access and marketplace operations."
       />
 
       <div className="grid grid-cols-3 gap-2 sm:gap-4">
@@ -194,9 +194,9 @@ export default async function AdminPage() {
           value={stats.growers}
           helperText={`${stats.verifiedGrowers} verified`}
           href="/admin/growers"
-          icon={<Sprout className="h-5 w-5 text-green-600" />}
+          icon={<Sprout className="h-5 w-5 text-pf-accent" />}
           className="sm:p-5"
-          valueClassName="text-2xl text-green-600"
+          valueClassName="text-2xl text-pf-accent"
         />
         <StatCard
           compact
@@ -204,23 +204,23 @@ export default async function AdminPage() {
           value={stats.dispensaries}
           helperText={`${stats.dispensariesToReview} pending`}
           href="/admin/dispensaries"
-          icon={<Building2 className="h-5 w-5 text-blue-600" />}
+          icon={<Building2 className="h-5 w-5 text-pf-info" />}
           className="sm:p-5"
-          valueClassName="text-2xl text-blue-600"
+          valueClassName="text-2xl text-pf-info"
         />
       </div>
 
-      <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+      <section className="rounded-xl border border-pf-line bg-pf-surface p-4 shadow-sm sm:p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
-            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Operations checklist</p>
-            <h2 className="mt-1 text-lg font-semibold text-gray-900">{primaryAction.title}</h2>
-            <p className="mt-1 max-w-2xl text-sm text-gray-600">{primaryAction.description}</p>
+            <p className="text-xs font-semibold uppercase tracking-wide text-pf-muted">Operations checklist</p>
+            <h2 className="mt-1 text-lg font-semibold text-pf-text">{primaryAction.title}</h2>
+            <p className="mt-1 max-w-2xl text-sm text-pf-muted">{primaryAction.description}</p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row lg:flex-shrink-0">
             <Link
               href={primaryAction.href}
-              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-pf-canvas hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
             >
               {primaryAction.cta}
               <ArrowRight className="h-4 w-4" />
@@ -228,7 +228,7 @@ export default async function AdminPage() {
             {primaryAction.secondaryHref && primaryAction.secondaryCta ? (
               <Link
                 href={primaryAction.secondaryHref}
-                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-pf-line-strong px-4 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 {primaryAction.secondaryCta}
               </Link>
@@ -236,37 +236,37 @@ export default async function AdminPage() {
           </div>
         </div>
 
-        <div className="mt-5 divide-y divide-gray-100 rounded-lg border border-gray-200">
+        <div className="mt-5 divide-y divide-pf-line rounded-lg border border-pf-line">
           {pendingChecklist.length ? pendingChecklist.map((item) => (
             <div key={item.label} className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex gap-3">
                 <span className={`mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
-                  item.complete ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                  item.complete ? 'bg-pf-accent-bg text-pf-accent' : 'bg-pf-warning-bg text-pf-warning'
                 }`}>
                   {item.complete ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4 fill-current" />}
                 </span>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900">{item.label}</p>
-                  <p className="mt-0.5 text-sm text-gray-600">{item.description}</p>
+                  <p className="text-sm font-semibold text-pf-text">{item.label}</p>
+                  <p className="mt-0.5 text-sm text-pf-muted">{item.description}</p>
                 </div>
               </div>
               {primaryActionHrefs.has(item.href) ? null : (
                 <Link
                   href={item.href}
-                  className="inline-flex min-h-9 items-center justify-center rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:flex-shrink-0"
+                  className="inline-flex min-h-9 items-center justify-center rounded-lg border border-pf-line-strong px-3 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas sm:flex-shrink-0"
                 >
                   {item.cta}
                 </Link>
               )}
             </div>
-          )) : <p className="p-3 text-sm text-gray-600">All checks complete.</p>}
+          )) : <p className="p-3 text-sm text-pf-muted">All checks complete.</p>}
         </div>
         {completedChecklist.length ? (
           <details className="mt-2 text-sm">
-            <summary className="cursor-pointer py-2 text-green-700">{completedChecklist.length} checks complete</summary>
+            <summary className="min-h-10 cursor-pointer py-2 text-pf-accent">{completedChecklist.length} checks complete</summary>
             <div className="flex flex-wrap gap-2 pt-2">
               {completedChecklist.map((item) => (
-                <Link key={item.label} href={item.href} className="rounded-lg bg-green-50 px-3 py-2 text-green-800">
+                <Link key={item.label} href={item.href} className="rounded-lg bg-pf-accent-bg px-3 py-2 text-pf-accent">
                   {item.label} ✓
                 </Link>
               ))}
@@ -275,23 +275,23 @@ export default async function AdminPage() {
         ) : null}
       </section>
 
-      <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="border-b border-gray-200 px-4 py-3 sm:px-5">
+      <section className="rounded-xl border border-pf-line bg-pf-surface shadow-sm">
+        <div className="border-b border-pf-line px-4 py-3 sm:px-5">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              {pendingVerificationItems.length > 0 && <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Pending verification</p>}
-              <h2 className={pendingVerificationItems.length ? 'mt-1 text-lg font-semibold text-gray-900' : 'text-sm font-medium text-gray-700'}>{pendingVerificationItems.length ? 'Newest accounts awaiting review' : 'No accounts awaiting review'}</h2>
+              {pendingVerificationItems.length > 0 && <p className="text-xs font-semibold uppercase tracking-wide text-pf-muted">Pending verification</p>}
+              <h2 className={pendingVerificationItems.length ? 'mt-1 text-lg font-semibold text-pf-text' : 'text-sm font-medium text-pf-secondary'}>{pendingVerificationItems.length ? 'Newest accounts awaiting review' : 'No accounts awaiting review'}</h2>
             </div>
             <div className="flex gap-2">
               <Link
                 href="/admin/growers?status=pending"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="rounded-lg border border-pf-line-strong px-3 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 Growers
               </Link>
               <Link
                 href="/admin/dispensaries?status=pending"
-                className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                className="rounded-lg border border-pf-line-strong px-3 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
                 Dispensaries
               </Link>
@@ -299,20 +299,20 @@ export default async function AdminPage() {
           </div>
         </div>
         {pendingVerificationItems.length > 0 ? (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-pf-line">
             {pendingVerificationItems.map((item) => (
               <div key={`${item.type}-${item.id}`} className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-medium text-gray-900">{item.businessName}</p>
+                    <p className="font-medium text-pf-text">{item.businessName}</p>
                     <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                      item.type === 'grower' ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'
+                      item.type === 'grower' ? 'bg-pf-accent-bg text-pf-accent' : 'bg-pf-info-bg text-pf-info'
                     }`}>
                       {item.type === 'grower' ? 'Grower' : 'Dispensary'}
                     </span>
-                    {now.getTime() - item.createdAt.getTime() <= 7 * 24 * 60 * 60 * 1000 ? <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">New</span> : null}
+                    {now.getTime() - item.createdAt.getTime() <= 7 * 24 * 60 * 60 * 1000 ? <span className="rounded-full bg-pf-warning-bg px-2 py-0.5 text-xs font-semibold text-pf-warning">New</span> : null}
                   </div>
-                  <p className="mt-1 text-sm text-gray-500">
+                  <p className="mt-1 break-words text-sm text-pf-muted">
                     {item.email || 'No email'} · License {item.licenseNumber || 'not provided'} · Joined {item.createdAt.toLocaleDateString()}
                   </p>
                 </div>
@@ -321,7 +321,7 @@ export default async function AdminPage() {
                     confirmMessage={`Verify marketplace access for ${item.businessName}?`}
                     confirmTitle={`Verify ${item.type}?`}
                     confirmLabel="Verify"
-                    className="inline-flex min-h-9 items-center justify-center rounded-lg bg-green-600 px-3 text-sm font-medium text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    className="inline-flex min-h-9 items-center justify-center rounded-lg bg-emerald-500 px-3 text-sm font-semibold text-pf-canvas hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                   >
                     Verify
                   </ConfirmActionButton>
@@ -332,17 +332,17 @@ export default async function AdminPage() {
         ) : null}
       </section>
 
-      <Link href="/help" className="inline-flex min-h-10 items-center text-sm font-medium text-green-700 underline underline-offset-2 hover:text-green-900">Settlement & billing policy</Link>
+      <Link href="/help" className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent underline underline-offset-2 hover:text-pf-accent">Settlement & billing policy</Link>
 
-      {seedEnabled ? <section id="developer-tools" className="scroll-mt-24 rounded-xl border border-amber-200 bg-amber-50 p-3 shadow-sm sm:p-4">
+      {seedEnabled ? <section id="developer-tools" className="scroll-mt-24 rounded-xl border border-pf-warning-line bg-pf-warning-bg p-3 shadow-sm sm:p-4">
         <details>
-          <summary className="cursor-pointer list-none text-sm font-semibold text-amber-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2">
-            Developer tools <span className="ml-2 font-normal text-amber-800">Demo data seeding</span>
+          <summary className="min-h-10 cursor-pointer py-2 text-sm font-semibold text-pf-warning focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-warning focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
+            Developer tools <span className="ml-2 font-normal text-pf-warning">Demo data seeding</span>
           </summary>
-          <div className="mt-3 border-t border-amber-200 pt-3">
-            <p className="text-sm text-amber-900">Dev/demo environments only. Never seed production data.</p>
+          <div className="mt-3 border-t border-pf-warning-line pt-3">
+            <p className="text-sm text-pf-warning">Dev/demo environments only. Never seed production data.</p>
             {needsSeeding && (
-              <p className="mt-2 text-sm text-amber-900">
+              <p className="mt-2 text-sm text-pf-warning">
                 No growers or dispensaries were found in this environment.
               </p>
             )}

@@ -329,7 +329,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pf-accent"></div>
       </div>
     );
   }
@@ -343,7 +343,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
       />}
 
       {error && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start gap-3">
+        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger flex items-start gap-3">
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
           </svg>
@@ -352,7 +352,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
       )}
       
       {saved && (
-        <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-green-600 flex items-start gap-3">
+        <div className="p-4 bg-pf-accent-bg border border-pf-accent-line rounded-lg text-pf-accent flex items-start gap-3">
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
@@ -361,16 +361,16 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
       )}
 
       <div className="space-y-4">
-        <div id="business-profile" className="scroll-mt-36 lg:scroll-mt-20 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Business profile</h2>
+        <div id="business-profile" className="scroll-mt-36 lg:scroll-mt-20 bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-pf-line bg-pf-canvas">
+            <h2 className="text-base sm:text-lg font-semibold text-pf-text">Business profile</h2>
           </div>
           <div className="grid gap-3 p-4 sm:gap-4 sm:p-6 md:grid-cols-2">
-            <p className="text-xs text-gray-500 md:col-span-2">* Required</p>
+            <p className="text-xs text-pf-muted md:col-span-2">* Required</p>
 
             <div>
-              <label htmlFor="profile-businessName" className="block text-sm font-medium text-gray-700 mb-1">
-                Name <span className="text-red-500">*</span>
+              <label htmlFor="profile-businessName" className="block text-sm font-medium text-pf-secondary mb-1">
+                Name <span className="text-pf-danger">*</span>
               </label>
               <input 
                 type="text" 
@@ -378,15 +378,15 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 value={formData.businessName}
                 onChange={handleChange('businessName')}
                 onBlur={handleBlur('businessName')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
                   touched.businessName && fieldErrors.businessName
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
+                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
                 }`}
                 placeholder="Your business name"
               />
               {touched.businessName && fieldErrors.businessName && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -396,7 +396,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
             </div>
 
             <div>
-              <label htmlFor="profile-contactName" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="profile-contactName" className="block text-sm font-medium text-pf-secondary mb-1">
                 Contact
               </label>
               <input 
@@ -405,13 +405,13 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 value={formData.contactName}
                 onChange={handleChange('contactName')}
                 placeholder="Primary contact person"
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                className="w-full rounded-lg border border-pf-line-strong bg-pf-surface px-4 py-2 text-pf-text placeholder-pf-muted focus:border-pf-accent focus:ring-1 focus:ring-pf-accent focus:outline-none"
               />
             </div>
 
             <div>
-              <label htmlFor="profile-licenseNumber" className="block text-sm font-medium text-gray-700 mb-1">
-                License number <span className="text-red-500">*</span>
+              <label htmlFor="profile-licenseNumber" className="block text-sm font-medium text-pf-secondary mb-1">
+                License number <span className="text-pf-danger">*</span>
               </label>
               <input 
                 type="text" 
@@ -419,15 +419,15 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 value={formData.licenseNumber}
                 onChange={handleChange('licenseNumber')}
                 onBlur={handleBlur('licenseNumber')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
                   touched.licenseNumber && fieldErrors.licenseNumber
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
+                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
                 }`}
                 placeholder="License number"
               />
               {touched.licenseNumber && fieldErrors.licenseNumber && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -437,8 +437,8 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
             </div>
 
             <div>
-              <label htmlFor="profile-licenseExpiry" className="block text-sm font-medium text-gray-700 mb-1">
-                License expiry <span className="text-red-500">*</span>
+              <label htmlFor="profile-licenseExpiry" className="block text-sm font-medium text-pf-secondary mb-1">
+                License expiry <span className="text-pf-danger">*</span>
               </label>
               <input 
                 type="date" 
@@ -446,14 +446,14 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 value={formData.licenseExpiry}
                 onChange={handleChange('licenseExpiry')}
                 onBlur={handleBlur('licenseExpiry')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
                   touched.licenseExpiry && fieldErrors.licenseExpiry
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
+                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
                 }`}
               />
               {touched.licenseExpiry && fieldErrors.licenseExpiry && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -463,8 +463,8 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
             </div>
 
             <div>
-              <label htmlFor="profile-email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email <span className="text-red-500">*</span>
+              <label htmlFor="profile-email" className="block text-sm font-medium text-pf-secondary mb-1">
+                Email <span className="text-pf-danger">*</span>
               </label>
               <input 
                 type="email" 
@@ -472,18 +472,18 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 value={formData.email}
                 readOnly
                 aria-describedby="account-email-help"
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
                   touched.email && fieldErrors.email
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
+                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
                 }`}
                 placeholder="business@example.com"
               />
-              <p id="account-email-help" className="mt-1 text-sm text-gray-600">
-                Login address. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-green-700 underline">Change email</Link>
+              <p id="account-email-help" className="mt-1 text-sm text-pf-muted">
+                Login address. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-pf-accent underline">Change email</Link>
               </p>
               {touched.email && fieldErrors.email && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -493,7 +493,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
             </div>
 
             <div>
-              <label htmlFor="profile-phone" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="profile-phone" className="block text-sm font-medium text-pf-secondary mb-1">
                 Phone
               </label>
               <input 
@@ -502,15 +502,15 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 value={formData.phone}
                 onChange={handleChange('phone')}
                 onBlur={handleBlur('phone')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
                   touched.phone && fieldErrors.phone
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
+                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
                 }`}
                 placeholder="(555) 123-4567"
               />
               {touched.phone && fieldErrors.phone && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -520,7 +520,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
             </div>
 
             <div>
-              <label htmlFor="profile-address" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="profile-address" className="block text-sm font-medium text-pf-secondary mb-1">
                 Address
               </label>
               <AddressAutocomplete
@@ -530,11 +530,11 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 onSelect={handleAddressSelect}
                 placeholder="Type your address..."
               />
-              <p className="text-xs text-gray-500 mt-1">Includes city, state and ZIP.</p>
+              <p className="text-xs text-pf-muted mt-1">Includes city, state and ZIP.</p>
             </div>
 
             <div>
-              <label htmlFor="profile-website" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="profile-website" className="block text-sm font-medium text-pf-secondary mb-1">
                 Website
               </label>
               <input 
@@ -543,15 +543,15 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 value={formData.website}
                 onChange={handleChange('website')}
                 onBlur={handleBlur('website')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:ring-1 focus:outline-none transition-colors ${
+                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text placeholder-pf-muted focus:ring-1 focus:outline-none transition-colors ${
                   touched.website && fieldErrors.website
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
+                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
                 }`}
                 placeholder="https://yourbusiness.com"
               />
               {touched.website && fieldErrors.website && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -561,7 +561,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
             </div>
 
             <div className="md:col-span-2">
-              <label htmlFor="profile-description" className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="profile-description" className="block text-sm font-medium text-pf-secondary mb-1">
                 Description
               </label>
               <textarea 
@@ -569,17 +569,17 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 id="profile-description"
                 value={formData.description}
                 onChange={handleChange('description')}
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+                className="w-full rounded-lg border border-pf-line-strong bg-pf-surface px-4 py-2 text-pf-text focus:border-pf-accent focus:ring-1 focus:ring-pf-accent focus:outline-none"
                 placeholder="Tell customers about your business..."
               />
-              <p className="text-xs text-gray-500 mt-1 text-right">{formData.description.length}/500</p>
+              <p className="text-xs text-pf-muted mt-1 text-right">{formData.description.length}/500</p>
             </div>
           </div>
         </div>
 
-        <div id="branding" className="self-start scroll-mt-36 lg:scroll-mt-20 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Logo</h2>
+        <div id="branding" className="self-start scroll-mt-36 lg:scroll-mt-20 overflow-hidden rounded-lg border border-pf-line bg-pf-surface shadow-sm">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-pf-line bg-pf-canvas">
+            <h2 className="text-base sm:text-lg font-semibold text-pf-text">Logo</h2>
           </div>
           <div className="p-4 sm:p-6">
             <LogoUpload
@@ -591,8 +591,8 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
         </div>
       </div>
 
-      {isDirty && <div className="sticky bottom-4 z-20 hidden items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:flex">
-        <p className="text-sm text-gray-600">Unsaved profile changes</p>
+      {isDirty && <div className="sticky bottom-4 z-20 hidden items-center justify-between gap-4 rounded-lg border border-pf-line bg-pf-raised/95 px-4 py-3 shadow-lg backdrop-blur sm:flex">
+        <p className="text-sm text-pf-muted">Unsaved profile changes</p>
         <Button
           type="button"
           variant="primary"

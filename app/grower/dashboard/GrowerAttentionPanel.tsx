@@ -8,17 +8,17 @@ interface GrowerAttentionPanelProps {
 }
 
 const toneClasses: Record<GrowerAttentionItem['tone'], string> = {
-  yellow: 'border-yellow-200 bg-yellow-50 text-yellow-950',
-  blue: 'border-blue-200 bg-blue-50 text-blue-950',
-  green: 'border-green-200 bg-green-50 text-green-950',
-  red: 'border-red-200 bg-red-50 text-red-950',
+  yellow: 'border-pf-warning-line bg-pf-warning-bg text-pf-warning',
+  blue: 'border-pf-info-line bg-pf-info-bg text-pf-info',
+  green: 'border-pf-accent-line bg-pf-accent-bg text-pf-accent',
+  red: 'border-pf-danger-line bg-pf-danger-bg text-pf-danger',
 };
 
 const badgeClasses: Record<GrowerAttentionItem['tone'], string> = {
-  yellow: 'bg-yellow-100 text-yellow-800 ring-yellow-200',
-  blue: 'bg-blue-100 text-blue-800 ring-blue-200',
-  green: 'bg-green-100 text-green-800 ring-green-200',
-  red: 'bg-red-100 text-red-800 ring-red-200',
+  yellow: 'bg-pf-warning-bg text-pf-warning ring-pf-warning-line',
+  blue: 'bg-pf-info-bg text-pf-info ring-pf-info-line',
+  green: 'bg-pf-accent-bg text-pf-accent ring-pf-accent-line',
+  red: 'bg-pf-danger-bg text-pf-danger ring-pf-danger-line',
 };
 
 function openConversation(conversationId: string) {
@@ -35,7 +35,7 @@ function AttentionAction({ item }: { item: GrowerAttentionItem }) {
       <button
         type="button"
         onClick={() => openConversation(item.conversationId as string)}
-        className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg bg-white px-3 text-sm font-semibold text-blue-700 shadow-sm ring-1 ring-blue-200 transition hover:bg-blue-100 sm:mt-3"
+        className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg bg-pf-surface px-3 text-sm font-semibold text-pf-info shadow-sm ring-1 ring-pf-info-line transition hover:bg-pf-info-bg sm:mt-3"
       >
         Open message
       </button>
@@ -45,7 +45,7 @@ function AttentionAction({ item }: { item: GrowerAttentionItem }) {
   return (
     <Link
       href={item.href}
-      className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg bg-white px-3 text-sm font-semibold text-gray-800 shadow-sm ring-1 ring-gray-200 transition hover:bg-gray-50 sm:mt-3"
+      className="mt-2 inline-flex min-h-10 items-center justify-center rounded-lg bg-pf-surface px-3 text-sm font-semibold text-pf-secondary shadow-sm ring-1 ring-pf-line transition hover:bg-pf-canvas sm:mt-3"
     >
       Review
     </Link>
@@ -73,42 +73,31 @@ export function GrowerAttentionPanel({ summary }: GrowerAttentionPanelProps) {
   ].slice(0, 3);
 
   return (
-    <section data-testid="grower-attention-panel" className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm sm:p-5">
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h2 className="text-base font-semibold text-gray-900">Needs attention</h2>
-        </div>
-        <div
-          data-testid="grower-attention-total"
-          className="inline-flex items-center justify-center rounded-full bg-gray-900 px-3 py-1 text-sm font-semibold text-white"
-        >
-          {counts.totalAttention}
-        </div>
-      </div>
-
+    <details data-testid="grower-attention-panel" className="pf-panel px-4 py-2 sm:px-5">
+      <summary className="min-h-10 cursor-pointer py-2 text-sm font-semibold text-pf-secondary">Messages &amp; updates <span data-testid="grower-attention-total" className="ml-2 rounded-full bg-pf-raised px-2 py-0.5 text-xs text-pf-muted">{counts.totalAttention}</span></summary>
       <div className="mt-3 grid grid-cols-2 gap-2 sm:mt-4 sm:grid-cols-4 [&>div]:flex [&>div]:items-center [&>div]:justify-between [&>div]:gap-1 sm:[&>div]:block">
-        <div className="rounded-lg bg-yellow-50 px-2 py-1.5 sm:px-3 sm:py-2">
-          <p className="text-xs text-yellow-700">New requests</p>
-          <p className="text-lg font-bold text-yellow-950">{counts.pendingRequests}</p>
+        <div className="rounded-lg bg-pf-warning-bg px-2 py-1.5 sm:px-3 sm:py-2">
+          <p className="text-xs text-pf-warning">New requests</p>
+          <p className="text-lg font-bold text-pf-warning">{counts.pendingRequests}</p>
         </div>
-        <div className="rounded-lg bg-blue-50 px-2 py-1.5 sm:px-3 sm:py-2">
-          <p className="text-xs text-blue-700">Unread messages</p>
-          <p className="text-lg font-bold text-blue-950">{counts.unreadBuyerMessages}</p>
+        <div className="rounded-lg bg-pf-info-bg px-2 py-1.5 sm:px-3 sm:py-2">
+          <p className="text-xs text-pf-info">Unread messages</p>
+          <p className="text-lg font-bold text-pf-info">{counts.unreadBuyerMessages}</p>
         </div>
-        <div className="rounded-lg bg-red-50 px-2 py-1.5 sm:px-3 sm:py-2">
-          <p className="text-xs text-red-700">Cancellations</p>
-          <p className="text-lg font-bold text-red-950">{counts.recentCancellations}</p>
+        <div className="rounded-lg bg-pf-danger-bg px-2 py-1.5 sm:px-3 sm:py-2">
+          <p className="text-xs text-pf-danger">Cancellations</p>
+          <p className="text-lg font-bold text-pf-danger">{counts.recentCancellations}</p>
         </div>
-        <div className="rounded-lg bg-green-50 px-2 py-1.5 sm:px-3 sm:py-2">
-          <p className="text-xs text-green-700">Status changes</p>
-          <p className="text-lg font-bold text-green-950">{counts.recentStatusChanges}</p>
+        <div className="rounded-lg bg-pf-accent-bg px-2 py-1.5 sm:px-3 sm:py-2">
+          <p className="text-xs text-pf-accent">Status changes</p>
+          <p className="text-lg font-bold text-pf-accent">{counts.recentStatusChanges}</p>
         </div>
       </div>
 
       {items.length === 0 ? (
-        <div className="mt-4 rounded-lg border border-dashed border-gray-200 bg-gray-50 px-4 py-6 text-center">
-          <h3 className="text-sm font-semibold text-gray-900">Nothing urgent right now</h3>
-          <p className="mt-1 text-sm text-gray-600">Buyer requests and messages will appear here as soon as they need action.</p>
+        <div className="mt-4 rounded-lg border border-dashed border-pf-line bg-pf-canvas px-4 py-6 text-center">
+          <h3 className="text-sm font-semibold text-pf-text">Nothing urgent right now</h3>
+          <p className="mt-1 text-sm text-pf-muted">Buyer requests and messages will appear here as soon as they need action.</p>
         </div>
       ) : (
         <div className="mt-3 grid gap-2 sm:mt-4 sm:gap-3 lg:grid-cols-2">
@@ -133,11 +122,11 @@ export function GrowerAttentionPanel({ summary }: GrowerAttentionPanelProps) {
       {items.length > visibleItems.length || counts.pendingRequests > requestItems.length ? (
         <Link
           href="/grower/orders?view=needs-review"
-          className="mt-4 flex min-h-10 items-center justify-center rounded-lg border border-gray-200 px-3 text-sm font-semibold text-green-700 transition-colors hover:bg-green-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          className="mt-4 flex min-h-10 items-center justify-center rounded-lg border border-pf-line px-3 text-sm font-semibold text-pf-accent transition-colors hover:bg-pf-accent-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
         >
           Review {counts.pendingRequests} requests →
         </Link>
       ) : null}
-    </section>
+    </details>
   );
 }

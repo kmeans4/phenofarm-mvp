@@ -2,22 +2,22 @@
 export function getThcBadgeColor(thc: number, variant: 'card' | 'compact' = 'card') {
   const bucket = thc < 15 ? 0 : thc < 20 ? 1 : thc < 25 ? 2 : 3;
   return (variant === 'compact'
-    ? ['bg-emerald-50 text-emerald-700', 'bg-yellow-50 text-yellow-700', 'bg-orange-50 text-orange-700', 'bg-red-50 text-red-700']
-    : ['bg-emerald-100 text-emerald-800 border-emerald-200', 'bg-yellow-100 text-yellow-800 border-yellow-200', 'bg-orange-100 text-orange-800 border-orange-200', 'bg-red-100 text-red-800 border-red-200'])[bucket];
+    ? ['bg-pf-accent-bg text-pf-accent', 'bg-pf-warning-bg text-pf-warning', 'bg-pf-warning-bg text-pf-warning', 'bg-pf-danger-bg text-pf-danger']
+    : ['bg-pf-accent-bg text-pf-accent border-pf-accent-line', 'bg-pf-warning-bg text-pf-warning border-pf-warning-line', 'bg-pf-warning-bg text-pf-warning border-pf-warning-line', 'bg-pf-danger-bg text-pf-danger border-pf-danger-line'])[bucket];
 }
 
 export function getCbdBadgeColor(cbd: number) {
-  if (cbd < 1) return 'bg-gray-100 text-gray-600 border-gray-200';
-  if (cbd < 5) return 'bg-blue-100 text-blue-800 border-blue-200';
-  return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+  if (cbd < 1) return 'bg-pf-raised text-pf-muted border-pf-line';
+  if (cbd < 5) return 'bg-pf-info-bg text-pf-info border-pf-info-line';
+  return 'bg-pf-purple-bg text-pf-purple border-pf-purple-line';
 }
 
 export function getStrainTypeColor(strainType: string | null, variant: 'card' | 'compact' | 'row' = 'compact', fallback?: string | null) {
   const source = strainType || fallback;
-  if (!source) return variant === 'row' ? 'bg-gray-100 text-gray-600' : 'bg-gray-100 text-gray-700';
+  if (!source) return variant === 'row' ? 'bg-pf-raised text-pf-muted' : 'bg-pf-raised text-pf-muted';
   const lower = source.toLowerCase();
   const bucket = lower.includes('indica') ? 0 : lower.includes('sativa') ? 1 : 2;
   return (variant === 'card'
-    ? ['bg-purple-100 text-purple-800 border-purple-200', 'bg-amber-100 text-amber-800 border-amber-200', 'bg-blue-100 text-blue-800 border-blue-200']
-    : ['bg-purple-100 text-purple-700', 'bg-amber-100 text-amber-700', 'bg-blue-100 text-blue-700'])[bucket];
+    ? ['bg-pf-purple-bg text-pf-purple border-pf-purple-line', 'bg-pf-warning-bg text-pf-warning border-pf-warning-line', 'bg-pf-info-bg text-pf-info border-pf-info-line']
+    : ['bg-pf-purple-bg text-pf-purple', 'bg-pf-warning-bg text-pf-warning', 'bg-pf-info-bg text-pf-info'])[bucket];
 }
