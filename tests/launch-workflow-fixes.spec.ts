@@ -192,6 +192,8 @@ async function recordedOrder(grower: Awaited<ReturnType<typeof account>>, buyer:
 
 for (const width of [1440, 390]) test(`saved settlement notes remain visible for both businesses at ${width}px`, async ({ page, browser }) => {
   const grower = await account(), buyer = await account('DISPENSARY'), order = await recordedOrder(grower, buyer);
+  const longGrowerName = 'QA Grower with a long business name ' + 'LongName'.repeat(12);
+  await db.grower.update({ where: { id: grower.grower!.id }, data: { businessName: longGrowerName } });
   const appended = '\nSecond buyer note\n\nSettlement recorded directly: check #1042, reference "QA"\nPayment terms: buyer requested a follow-up receipt';
   await page.setViewportSize({ width, height: 1000 }); await login(page, grower);
   await page.goto(`/grower/orders/${order.id}/edit`);
@@ -210,6 +212,13 @@ for (const width of [1440, 390]) test(`saved settlement notes remain visible for
     await expect(buyerPage.getByText('Keep the original agreement', { exact: false })).toContainText('Second buyer note');
     await expect(buyerPage.getByText('Keep the original agreement', { exact: false })).toContainText('check #1042');
     await expect(buyerPage.getByText('Net 30', { exact: true })).toBeVisible();
+    const growerLabel = buyerPage.getByText(longGrowerName, { exact: true }).first();
+    await expect(growerLabel).toBeVisible();
+    const bounds = await growerLabel.boundingBox();
+    expect(bounds!.x).toBeGreaterThanOrEqual(0); expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(width);
+    expect(await growerLabel.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
+    const dateRow = buyerPage.getByText('Request date', { exact: true }).locator('..');
+    expect(await dateRow.evaluate(el => el.scrollWidth <= el.clientWidth)).toBe(true);
     await capture(buyerPage, `buyer-notes-${width}`);
   } finally { await context.close(); }
   const persisted = await db.order.findUniqueOrThrow({ where: { id: order.id } });

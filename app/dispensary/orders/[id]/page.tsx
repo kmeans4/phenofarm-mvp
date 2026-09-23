@@ -174,14 +174,14 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
         className="mb-4 sm:mb-6"
       />
 
-      <div className="mb-4 grid gap-px overflow-hidden rounded-lg border border-pf-line bg-pf-raised shadow-sm sm:grid-cols-2">
+      <div className="mb-4 grid grid-cols-1 gap-px overflow-hidden rounded-lg border border-pf-line bg-pf-raised shadow-sm sm:grid-cols-2">
         {[
           { label: 'Request date', value: format(order.createdAt, 'MMM dd, yyyy') },
           { label: 'Grower', value: order.grower?.businessName || 'Grower' },
         ].map((item) => (
-          <div key={item.label} className="flex items-center justify-between gap-4 bg-pf-surface px-4 py-3 sm:block sm:py-4">
-            <p className="text-xs font-semibold uppercase text-pf-muted">{item.label}</p>
-            <p className={`min-w-0 truncate text-sm font-semibold text-pf-text sm:mt-1 sm:text-base`}>{item.value}</p>
+          <div key={item.label} className="flex min-w-0 items-start justify-between gap-4 bg-pf-surface px-4 py-3 sm:block sm:py-4">
+            <p className="shrink-0 text-xs font-semibold uppercase text-pf-muted">{item.label}</p>
+            <p className="min-w-0 flex-1 break-words text-right text-sm font-semibold text-pf-text sm:mt-1 sm:text-left sm:text-base">{item.value}</p>
           </div>
         ))}
       </div>
