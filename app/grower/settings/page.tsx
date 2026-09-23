@@ -3,7 +3,6 @@ import { redirect, notFound } from "next/navigation";
 import { SettingsForm } from "./components/SettingsForm";
 import { SubscriptionBilling } from "@/app/components/settings/SubscriptionBilling";
 import { CommercialTermsPanel } from "@/app/components/settings/CommercialTermsPanel";
-import { Card, CardContent, CardHeader, CardTitle } from "@/app/components/ui/Card";
 import { PageHeader } from "@/app/components/ui/PageHeader";
 import { db } from '@/lib/db';
 import { getSubscriptionSummary } from '@/lib/subscription';
@@ -15,7 +14,6 @@ const settingsSections = [
   { id: "branding", label: "Logo" },
   { id: "commercial-terms", label: "Terms" },
   { id: "subscription", label: "Subscription" },
-  { id: "integrations", label: "Integrations" },
 ];
 
 export default async function GrowerSettingsPage() {
@@ -63,16 +61,6 @@ export default async function GrowerSettingsPage() {
           </section>
           <section id="subscription" className="scroll-mt-36 lg:scroll-mt-20">
             <SubscriptionBilling initialData={subscription} />
-          </section>
-
-          <section id="integrations" className="scroll-mt-6">
-            <Card>
-              <CardHeader><CardTitle>Integrations</CardTitle></CardHeader>
-              <CardContent className="text-sm text-pf-secondary">
-                <p className="font-semibold text-pf-text">Metrc state-tracking sync</p>
-                <p className="mt-1">In development. Your batch and COA records are structured for future synchronization; no automatic Metrc sync runs today.</p>
-              </CardContent>
-            </Card>
           </section>
         </div>
       </div>

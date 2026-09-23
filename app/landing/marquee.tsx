@@ -1,4 +1,4 @@
-import { BadgeCheck, FileCheck2, Handshake, Leaf, MessagesSquare, ShieldCheck, Timer, Wallet } from 'lucide-react';
+import { BadgeCheck, FileCheck2, Handshake, MessagesSquare, ShieldCheck, Timer, Wallet } from 'lucide-react';
 
 const ITEMS = [
   { icon: ShieldCheck, label: 'License-gated ordering' },
@@ -7,7 +7,6 @@ const ITEMS = [
   { icon: Handshake, label: 'Direct settlement' },
   { icon: FileCheck2, label: 'COA & lab docs on file' },
   { icon: Timer, label: 'Live fulfillment status' },
-  { icon: Leaf, label: 'Metrc-ready compliance' },
   { icon: BadgeCheck, label: 'Verified growers & buyers' },
 ];
 

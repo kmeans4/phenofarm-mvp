@@ -525,8 +525,8 @@ const problemSolutionTimeline = {
 │  │ Savings   │ │ First     │ │    📋 Integrated Tools    │ │
 │  │           │ │           │ │                           │ │
 │  │ $249 vs   │ │ Full      │ │  CSV upload, inventory    │ │
-│  │ $600+     │ │ platform  │ │ management, Metrc         │ │
-│  │           │ │ on any    │ │ integration, and more     │ │
+│  │ $600+     │ │ platform  │ │ management, batch         │ │
+│  │           │ │ on any    │ │ records, and more         │ │
 │  │           │ │ device    │ │                           │ │
 │  └───────────┘ └───────────┘ └───────────────────────────┘ │
 │                                                              │
@@ -776,7 +776,7 @@ const testimonialsAnimation = {
 │  │    ✓ Basic features │ │    ✓ Analytics      │            │
 │  │    ✓ Support        │ │    ✓ Priority       │            │
 │  │                     │ │    ✓ CSV Import     │            │
-│  │  [Get Started]      │ │    ✓ Metrc Ready    │            │
+│  │  [Get Started]      │ │                     │            │
 │  │                     │ │                     │            │
 │  │                     │ │  [Start Free Trial] │            │
 │  └─────────────────────┘ └─────────────────────┘            │

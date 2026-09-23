@@ -30,7 +30,6 @@ const plans = [
       'Unlimited product listings',
       'Priority support & higher limits',
       'CSV bulk upload',
-      'Metrc integration ready',
       'Priority support',
     ],
     cta: 'Create Account',

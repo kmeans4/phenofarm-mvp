@@ -71,7 +71,6 @@
 49. **Verified grower badge** - Checkmark for verified partners
 50. **Lab results preview** - THC/CBD on product cards link to full COA
 51. **License numbers** - Visible on vendor shop pages
-52. **Metrc integration indicator** - Shows state tracking compliance
 
 ### PERSONALIZATION
 53. **Saved filters** - Remember preferred filter combinations
