@@ -1,8 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { useState, useEffect, useMemo, useRef } from 'react';
+import { useSession } from 'next-auth/react';
+import { prepareImageUpload, uploadFile } from '@/app/components/uploads/uploadFile';
+import Link from 'next/link';
+import { canonicalizeProductType } from '@/lib/product-types';
+import { normalizeUnit } from '@/lib/product-payload';
+import { formatProductUnit, productUnitOptions } from '@/lib/product-display';
 import { Button } from '@/app/components/ui/Button';
 import { ProductTypeSelector } from '../../components/ProductTypeSelector';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
@@ -18,6 +22,7 @@ import {
   PRODUCT_DEFAULTS_STORAGE_KEY,
   ProductDefaults,
 } from '@/lib/ux-workflow';
+import { FILE_UPLOAD_LIMITS, IMAGE_MIME_TYPES, formatBytes, validateProductImageFile } from '@/lib/upload-validation';
 
 interface ProductFormData {
   id?: string;
@@ -48,6 +53,8 @@ type DirtyBaseline = Omit<ProductFormData, 'id'> & { id: string | undefined };
 
 interface FieldErrors {
   name?: string;
+  strainId?: string;
+  batchId?: string;
   price?: string;
   inventoryQty?: string;
   productType?: string;
@@ -59,10 +66,46 @@ interface FieldErrors {
   cbdMin?: string;
   cbdMax?: string;
   harvestDate?: string;
+  images?: string;
 }
 
-const UNITS = ['Gram', 'Half Ounce', 'Ounce', 'Eighth', 'Quarter', 'Unit', 'Pack', 'Each', 'Lb'];
-const FORM_STEPS = ['Basics', 'Pricing', 'Inventory', 'Profile', 'Images'];
+const FORM_SECTIONS = ['Basics', 'Pricing', 'Stock', 'Details'];
+const FIELD_FOCUS_ORDER: (keyof FieldErrors)[] = [
+  'name',
+  'productType',
+  'strainId',
+  'batchId',
+  'price',
+  'unit',
+  'inventoryQty',
+  'sku',
+  'thcMin',
+  'thcMax',
+  'cbdMin',
+  'cbdMax',
+  'harvestDate',
+  'description',
+  'images',
+];
+const SUBMIT_ERROR_ID = 'product-form-submit-error';
+
+const ERROR_FIELD_MATCHERS: Array<[keyof FieldErrors, RegExp]> = [
+  ['name', /name/i],
+  ['productType', /product\s*type|productType/i],
+  ['strainId', /strain/i],
+  ['batchId', /batch/i],
+  ['price', /price/i],
+  ['unit', /unit/i],
+  ['inventoryQty', /inventory|quantity|inventoryQty/i],
+  ['sku', /sku/i],
+  ['thcMin', /thcMin|thc min/i],
+  ['thcMax', /thcMax|thc max/i],
+  ['cbdMin', /cbdMin|cbd min/i],
+  ['cbdMax', /cbdMax|cbd max/i],
+  ['harvestDate', /harvest/i],
+  ['images', /image/i],
+  ['description', /description/i],
+];
 
 // Validation functions
 const validateName = (name: string): string | undefined => {
@@ -83,8 +126,8 @@ const validatePrice = (price: string): string | undefined => {
 
 const validateInventoryQty = (qty: string): string | undefined => {
   if (!qty) return 'Inventory quantity is required';
-  const numQty = parseInt(qty, 10);
-  if (isNaN(numQty)) return 'Please enter a valid whole number';
+  const numQty = Number(qty);
+  if (!Number.isInteger(numQty)) return 'Please enter a valid whole number';
   if (numQty < 0) return 'Quantity cannot be negative';
   if (numQty > 999999) return 'Quantity exceeds maximum allowed';
   return undefined;
@@ -156,8 +199,15 @@ const validateHarvestDate = (date: string): string | undefined => {
   return undefined;
 };
 
-const INPUT_CLASSES = "w-full h-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
-const INPUT_ERROR_CLASSES = "w-full h-10 px-4 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
+const validateImages = (images: string[]): string | undefined => {
+  if (images.length > FILE_UPLOAD_LIMITS.productImagesMaxCount) {
+    return `Use at most ${FILE_UPLOAD_LIMITS.productImagesMaxCount} product images. Remove ${images.length - FILE_UPLOAD_LIMITS.productImagesMaxCount} before saving.`;
+  }
+  return undefined;
+};
+
+const INPUT_CLASSES = "w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const INPUT_ERROR_CLASSES = "w-full h-10 px-3 py-2 text-base sm:px-4 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50";
 
 interface ProductFormProps {
   growerBrand?: string;
@@ -179,13 +229,13 @@ export function ProductForm({
   const [formData, setFormData] = useState<ProductFormData>({
     id: initialData.id,
     name: initialData.name || '',
-    productType: initialData.productType || '',
+    productType: canonicalizeProductType(initialData.productType) || '',
     subType: initialData.subType || '',
     strainId: initialData.strainId || '',
     batchId: initialData.batchId || '',
     price: initialData.price || '',
     inventoryQty: initialData.inventoryQty || '0',
-    unit: initialData.unit || 'Gram',
+    unit: normalizeUnit(initialData.unit) || 'Gram',
     description: initialData.description || '',
     isAvailable: initialData.isAvailable !== undefined ? initialData.isAvailable : true,
     isPriceVisible: initialData.isPriceVisible !== undefined ? initialData.isPriceVisible : true,
@@ -204,20 +254,25 @@ export function ProductForm({
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [imagePreviews, setImagePreviews] = useState<string[]>(initialData.images || []);
-  const [showExitPrompt, setShowExitPrompt] = useState(false);
+  const [imageUploadProgress, setImageUploadProgress] = useState<number | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const submitRef = useRef(false);
+  const uploadRef = useRef(false);
+  const { data: session } = useSession();
+  const defaultsKey = session?.user?.id ? `${PRODUCT_DEFAULTS_STORAGE_KEY}:${session.user.id}` : null;
   const [savedDefaults, setSavedDefaults] = useState<ProductDefaults | null>(null);
   const { showToast } = useToast();
 
   const initialDataState = useMemo<DirtyBaseline>(() => ({
     id: initialData?.id ?? undefined,
     name: initialData?.name || '',
-    productType: initialData?.productType || '',
+    productType: canonicalizeProductType(initialData?.productType) || '',
     subType: initialData?.subType || '',
     strainId: initialData?.strainId || '',
     batchId: initialData?.batchId || '',
     price: initialData?.price || '',
     inventoryQty: initialData?.inventoryQty || '0',
-    unit: initialData?.unit || 'Gram',
+    unit: normalizeUnit(initialData?.unit) || 'Gram',
     description: initialData?.description || '',
     isAvailable: initialData?.isAvailable !== undefined ? initialData.isAvailable : true,
     isPriceVisible: initialData?.isPriceVisible !== undefined ? initialData.isPriceVisible : true,
@@ -236,68 +291,41 @@ export function ProductForm({
   const [dirtyBaseline, setDirtyBaseline] = useState<DirtyBaseline>(initialDataState);
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (!defaultsKey || typeof window === 'undefined') return;
     const timer = window.setTimeout(() => {
       try {
-        const parsed = JSON.parse(window.localStorage.getItem(PRODUCT_DEFAULTS_STORAGE_KEY) || 'null') as ProductDefaults | null;
+        const parsed = JSON.parse(window.localStorage.getItem(defaultsKey) || 'null') as ProductDefaults | null;
         setSavedDefaults(parsed);
       } catch {
         setSavedDefaults(null);
       }
     }, 0);
     return () => window.clearTimeout(timer);
-  }, []);
+  }, [defaultsKey]);
 
-  const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
-    enabled: !!initialData.id,
+  const { isDirty, setIsDirty, resetDirtyState, confirmNavigation } = useUnsavedChanges({
+    enabled: true,
     message: 'You have unsaved changes in this product. Are you sure you want to leave?',
   });
 
+  const draftValue = useMemo(() => ({ ...formData, images: [] }), [formData]);
   const browserDraft = useLocalDraft<ProductFormData>({
     key: initialData.id ? `phenofarm:draft:product:${initialData.id}` : 'phenofarm:draft:product:new',
-    value: { ...formData, images: imagePreviews },
+    value: draftValue,
+    autoRestore: false,
     onRestore: (value) => {
-      setFormData((prev) => ({
-        ...prev,
-        ...value,
-        id: prev.id ?? value.id,
-        images: value.images || [],
-      }));
-      setImagePreviews(value.images || []);
+      if (!value || typeof value !== 'object') return;
+      setFormData((prev) => ({ ...prev, ...value, unit: normalizeUnit(value.unit) || prev.unit, id: prev.id, images: prev.images }));
     },
-    shouldSave: (value) => JSON.stringify(value) !== JSON.stringify(dirtyBaseline),
+    shouldSave: () => isDirty,
   });
 
   useEffect(() => {
-    const hasChanges = JSON.stringify(formData) !== JSON.stringify(dirtyBaseline);
+    const hasChanges = JSON.stringify({ ...formData, images: imagePreviews }) !== JSON.stringify(dirtyBaseline);
     setIsDirty(hasChanges);
-  }, [formData, dirtyBaseline, setIsDirty]);
+  }, [formData, imagePreviews, dirtyBaseline, setIsDirty]);
 
-  useEffect(() => {
-    if (!initialData.id && typeof window !== 'undefined') {
-      const hasDraft = JSON.stringify(formData) !== JSON.stringify(initialDataState);
-      if (hasDraft) {
-        window.sessionStorage.setItem('addProductDraft', JSON.stringify({ ...formData, images: imagePreviews }));
-      } else {
-        window.sessionStorage.removeItem('addProductDraft');
-      }
-    }
-  }, [formData, imagePreviews, initialData.id, initialDataState]);
-
-  useEffect(() => {
-    if (initialData.id || !isDirty) return;
-
-    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = '';
-      return '';
-    };
-
-    window.addEventListener('beforeunload', handleBeforeUnload);
-    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
-  }, [initialData.id, isDirty]);
-
-  const validateForm = (): boolean => {
+  const collectFormErrors = (): FieldErrors => {
     const thcErrors = validateThcRange(formData.thcMin, formData.thcMax);
     const cbdErrors = validateCbdRange(formData.cbdMin, formData.cbdMax);
     
@@ -314,6 +342,7 @@ export function ProductForm({
       cbdMin: cbdErrors.minError,
       cbdMax: cbdErrors.maxError,
       harvestDate: validateHarvestDate(formData.harvestDate),
+      images: validateImages(imagePreviews),
     };
     
     Object.keys(newErrors).forEach(key => {
@@ -321,9 +350,36 @@ export function ProductForm({
         delete newErrors[key as keyof FieldErrors];
       }
     });
-    
+
+    return newErrors;
+  };
+
+  const validateForm = (): FieldErrors => {
+    const newErrors = collectFormErrors();
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return newErrors;
+  };
+
+  const focusElementById = (id: string) => {
+    if (typeof window === 'undefined') return;
+
+    window.setTimeout(() => {
+      const element = document.getElementById(id) as HTMLElement | null;
+      if (!element) return;
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      window.setTimeout(() => element.focus({ preventScroll: true }), 220);
+    }, 0);
+  };
+
+  const focusFirstInvalidField = (fieldErrors: FieldErrors) => {
+    const firstInvalid = FIELD_FOCUS_ORDER.find((field) => Boolean(fieldErrors[field]));
+    if (!firstInvalid) return;
+    focusElementById(firstInvalid === 'images' ? 'productImages' : firstInvalid);
+  };
+
+  const getSubmitErrorField = (message: string): keyof FieldErrors | null => {
+    const match = ERROR_FIELD_MATCHERS.find(([, pattern]) => pattern.test(message));
+    return match?.[0] || null;
   };
 
   const validateField = (field: keyof FieldErrors, value: string): string | undefined => {
@@ -345,6 +401,8 @@ export function ProductForm({
   };
 
   const handleChange = (field: keyof ProductFormData, value: string | boolean) => {
+    setSubmitError(null);
+
     if (field === 'strainId') {
       setFormData(prev => ({ ...prev, strainId: String(value), batchId: '' }));
     } else if (typeof value === 'boolean') {
@@ -362,22 +420,20 @@ export function ProductForm({
   const persistProductDefaults = (source: ProductFormData) => {
     const nextDefaults: ProductDefaults = {
       productType: source.productType || DEFAULT_PRODUCT_DEFAULTS.productType,
-      unit: source.unit || DEFAULT_PRODUCT_DEFAULTS.unit,
+      unit: normalizeUnit(source.unit) || DEFAULT_PRODUCT_DEFAULTS.unit,
       price: source.price || '',
       isPriceVisible: source.isPriceVisible,
     };
 
     setSavedDefaults(nextDefaults);
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(PRODUCT_DEFAULTS_STORAGE_KEY, JSON.stringify(nextDefaults));
-    }
+    try { if (defaultsKey) window.localStorage.setItem(defaultsKey, JSON.stringify(nextDefaults)); } catch { /* Saving the product still succeeds if browser storage is full. */ }
   };
 
   const applyProductDefaults = (defaults: ProductDefaults) => {
     setFormData((prev) => ({
       ...prev,
       productType: defaults.productType || prev.productType,
-      unit: defaults.unit || prev.unit,
+      unit: normalizeUnit(defaults.unit) || prev.unit,
       price: defaults.price || prev.price,
       isPriceVisible: defaults.isPriceVisible,
     }));
@@ -391,103 +447,101 @@ export function ProductForm({
     setErrors(prev => ({ ...prev, [field]: error }));
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const files = Array.from(e.target.files);
-      const newPreviews: string[] = [];
-      
-      const oversizedFiles = files.filter(f => f.size > 5 * 1024 * 1024);
-      if (oversizedFiles.length > 0) {
-        showToast('error', 'Some images exceed 5MB limit and were skipped');
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.currentTarget;
+    const files = Array.from(input.files || []);
+    input.value = '';
+    if (!files.length || uploadRef.current) return;
+    if (files.length + imagePreviews.length > FILE_UPLOAD_LIMITS.productImagesMaxCount) {
+      showToast('error', `Use at most ${FILE_UPLOAD_LIMITS.productImagesMaxCount} images.`);
+      return;
+    }
+    uploadRef.current = true;
+    setImageUploadProgress(0);
+    setSubmitError(null);
+    try {
+      const urls: string[] = [];
+      // Upload separately so each request stays below the platform body limit.
+      for (const file of files) {
+        const prepared = await prepareImageUpload(file, FILE_UPLOAD_LIMITS.productImageMaxBytes);
+        const validation = validateProductImageFile(prepared);
+        if (!validation.ok) throw new Error(validation.error);
+        urls.push(await uploadFile(prepared, 'image'));
+        setImageUploadProgress(Math.round(urls.length / files.length * 100));
       }
-      
-      const validFiles = files.filter(f => f.size <= 5 * 1024 * 1024);
-      
-      validFiles.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const result = event.target?.result as string;
-          newPreviews.push(result);
-          if (newPreviews.length === validFiles.length) {
-            setImagePreviews(prev => [...prev, ...newPreviews]);
-            showToast('success', `Added ${validFiles.length} image(s)`);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+      setImagePreviews((prev) => [...prev, ...urls]);
+      setErrors((prev) => ({ ...prev, images: undefined }));
+    } catch (err) {
+      showToast('error', err instanceof Error ? err.message : 'Could not upload the images.');
+    } finally {
+      uploadRef.current = false;
+      setImageUploadProgress(null);
     }
   };
 
   const removeImage = (index: number) => {
+    setSubmitError(null);
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
+    setErrors((prev) => ({ ...prev, images: undefined }));
     showToast('info', 'Image has been removed from the product');
-  };
-
-  const getBase64Images = () => {
-    return imagePreviews.map(preview => {
-      if (preview.startsWith('data:image/')) {
-        return preview;
-      }
-      return preview;
-    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isSubmitting) return;
+    if (isSubmitting || submitRef.current || uploadRef.current) return;
+    setSubmitError(null);
     
     const allTouched: Record<string, boolean> = {};
     Object.keys(formData).forEach(key => {
       allTouched[key] = true;
     });
+    allTouched.images = true;
     setTouched(allTouched);
     
-    if (!validateForm()) {
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
       showToast('error', 'Please fix the errors below before saving');
+      focusFirstInvalidField(validationErrors);
       return;
     }
     
+    submitRef.current = true;
     const wasDirty = isDirty;
-    setIsDirty(false);
 
     try {
       await onSubmit({
         ...formData,
-        images: getBase64Images(),
+        images: imagePreviews,
       });
       persistProductDefaults(formData);
       browserDraft.clearDraft();
-      if (!initialData.id && typeof window !== 'undefined') {
-        window.sessionStorage.removeItem('addProductDraft');
-      }
       setDirtyBaseline({ ...formData, id: formData.id ?? undefined });
       resetDirtyState();
-    } catch {
+    } catch (err) {
       if (wasDirty) setIsDirty(true);
-      // Parent handles user-facing submit errors.
-    }
-  };
+      const message = err instanceof Error ? err.message : 'Unable to save product';
+      const submitErrorField = getSubmitErrorField(message);
+      const localErrors = collectFormErrors();
 
-  const handleLeavePage = () => {
-    setShowExitPrompt(false);
-    onCancel();
-  };
-
-  const handleSaveDraftAndExit = () => {
-    if (typeof window !== 'undefined') {
-      window.sessionStorage.setItem('addProductDraft', JSON.stringify({ ...formData, images: imagePreviews }));
-    }
-    setShowExitPrompt(false);
-    onCancel();
+      if (submitErrorField) {
+        const nextErrors = { ...localErrors, [submitErrorField]: message };
+        setErrors(nextErrors);
+        setTouched((prev) => ({ ...prev, [submitErrorField]: true }));
+        focusFirstInvalidField(nextErrors);
+      } else if (Object.keys(localErrors).length > 0) {
+        setErrors(localErrors);
+        focusFirstInvalidField(localErrors);
+      } else {
+        setSubmitError(message);
+        focusElementById(SUBMIT_ERROR_ID);
+      }
+      showToast('error', message);
+    } finally { submitRef.current = false; }
   };
 
   const handleCancelRequest = () => {
-    if (!initialData.id && isDirty) {
-      setShowExitPrompt(true);
-      return;
-    }
-    onCancel();
+    if (confirmNavigation()) { browserDraft.saveDraft(); onCancel(); }
   };
 
   // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
@@ -516,89 +570,121 @@ export function ProductForm({
   );
 
   const handleSaveDraft = async () => {
-    if (!onSaveDraft || isSubmitting) return;
+    if (!onSaveDraft || isSubmitting || submitRef.current || uploadRef.current) return;
+    const validationErrors = collectFormErrors();
+    // Drafts may omit required fields, but supplied values must still be valid.
+    for (const field of Object.keys(validationErrors) as (keyof FieldErrors)[]) {
+      if (field !== 'name' && field !== 'images' && !formData[field as keyof ProductFormData]) delete validationErrors[field];
+    }
+    if (Object.keys(validationErrors).length) {
+      setErrors(validationErrors);
+      setTouched(Object.fromEntries(Object.keys(validationErrors).map((field) => [field, true])));
+      focusFirstInvalidField(validationErrors);
+      return;
+    }
+    submitRef.current = true;
+    setSubmitError(null);
     const wasDirty = isDirty;
-    setIsDirty(false);
 
     try {
       await onSaveDraft({
         ...formData,
-        images: getBase64Images(),
+        images: imagePreviews,
       });
       persistProductDefaults(formData);
       browserDraft.clearDraft();
       showToast('success', 'Draft saved');
       setDirtyBaseline({ ...formData, id: formData.id ?? undefined });
       resetDirtyState();
-    } catch {
+    } catch (err) {
       if (wasDirty) setIsDirty(true);
-      // Parent handles errors
-    }
+      const message = err instanceof Error ? err.message : 'Unable to save draft';
+      const submitErrorField = getSubmitErrorField(message);
+      const localErrors = collectFormErrors();
+
+      if (submitErrorField) {
+        const nextErrors = { ...localErrors, [submitErrorField]: message };
+        setErrors(nextErrors);
+        setTouched((prev) => ({ ...prev, [submitErrorField]: true }));
+        focusFirstInvalidField(nextErrors);
+      } else {
+        setSubmitError(message);
+        focusElementById(SUBMIT_ERROR_ID);
+      }
+      showToast('error', message);
+    } finally { submitRef.current = false; }
   };
 
   const saveSummary = [
     { label: 'Listing', value: formData.name.trim() || 'Unnamed product' },
     { label: 'Type', value: formData.productType || 'Not selected' },
-    { label: 'Price', value: formData.price ? `$${formData.price}/${formData.unit || 'unit'}` : 'Not priced' },
-    { label: 'Inventory', value: `${formData.inventoryQty || '0'} ${formData.unit || 'units'}` },
-    { label: 'Visibility', value: formData.isAvailable ? 'Available to buyers' : 'Hidden from buyers' },
-    { label: 'Pricing display', value: formData.isPriceVisible ? 'Price visible' : 'Pricing by request' },
+    { label: 'Price', value: formData.price ? `$${formData.price}/${formatProductUnit(formData.unit)}` : 'Not priced' },
+    { label: 'Stock', value: `${formData.inventoryQty || '0'} ${formatProductUnit(formData.unit)}` },
+    {
+      label: 'Visibility',
+      value: `${formData.isAvailable ? 'Available' : 'Hidden'} · ${formData.isPriceVisible ? 'price visible' : 'quote only'}`,
+    },
   ];
 
   return (
-    <div className="max-w-3xl mx-auto">
-      <Card>
-        <CardHeader>
-          <CardTitle>Product Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form id="product-form" onSubmit={handleSubmit} className="space-y-6">
-          <div className="rounded-xl border border-green-100 bg-green-50 p-3 sm:p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-green-800">Guided listing setup</p>
-            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-5">
-              {FORM_STEPS.map((step, index) => (
-                <div key={step} className="rounded-lg bg-white px-3 py-2 text-sm shadow-sm ring-1 ring-green-100">
-                  <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-green-600 text-xs font-semibold text-white">
-                    {index + 1}
-                  </span>
-                  <span className="font-medium text-gray-800">{step}</span>
-                </div>
-              ))}
-            </div>
-            <p className="mt-3 text-xs text-green-800">
-              Fill the core listing first. Optional profile, lab, and image details stay grouped so mobile setup stays easier to scan.
-            </p>
+    <div className="mx-auto w-full max-w-5xl">
+      {browserDraft.availableDraft && (
+        <div className="mb-4 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <p className="text-sm text-amber-900">Unsaved product draft found. Images are not stored in browser drafts.</p>
+          <div className="mt-3 flex gap-3">
+            <Button type="button" onClick={browserDraft.restoreDraft}>Restore draft</Button>
+            <Button type="button" variant="outline" onClick={browserDraft.clearDraft}>Discard draft</Button>
           </div>
+        </div>
+      )}
+      {browserDraft.storageError && <p role="status" className="mb-4 text-sm text-amber-800">{browserDraft.storageError}</p>}
+      <form
+        id="product-form"
+        onSubmit={handleSubmit}
+        className="space-y-3 sm:space-y-6 lg:grid lg:grid-cols-[minmax(0,1.6fr)_minmax(270px,1fr)] lg:items-start lg:gap-6 lg:space-y-0"
+      >
+        <div className="space-y-3 sm:space-y-6">
+          <nav aria-label="Product sections" className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-green-700">
+            {FORM_SECTIONS.map((section) => <a key={section} href={`#product-${section.toLowerCase()}`} onClick={() => { if (section === 'Details') { const details = document.getElementById('product-details'); if (details instanceof HTMLDetailsElement) details.open = true; } }} className="inline-flex min-h-10 items-center py-2 hover:underline">{section}</a>)}
+          </nav>
 
           <DraftAutosaveStatus
             savedAt={browserDraft.savedAt}
-            label="Product browser draft"
+            label="Draft on this device"
             onClear={browserDraft.clearDraft}
           />
 
+          {submitError && (
+            <div
+              id={SUBMIT_ERROR_ID}
+              role="alert"
+              tabIndex={-1}
+              className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              {submitError}{/free plan|upgrade/i.test(submitError) ? <> <Link href="/grower/pricing" className="font-semibold underline">Compare plans</Link></> : null}
+            </div>
+          )}
+
           {!initialData.id && (
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-semibold text-gray-900">Smart defaults</p>
-                  <p className="text-xs text-gray-600">Reuse your last product type, unit, price, and pricing visibility.</p>
-                </div>
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+              <div className="flex w-full flex-wrap items-center justify-between gap-2">
+                <p className="text-xs text-gray-500">Defaults</p>
                 <div className="flex flex-wrap gap-2">
                   {savedDefaults && (
                     <button
                       type="button"
                       onClick={() => applyProductDefaults(savedDefaults)}
-                      className="rounded-lg border border-gray-300 bg-white px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                      className="rounded-lg border border-gray-300 bg-white min-h-10 px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
                     >
-                      Use previous listing
+                      Use last listing
                     </button>
                   )}
                   <button
                     type="button"
                     onClick={() => applyProductDefaults(DEFAULT_PRODUCT_DEFAULTS)}
-                    className="rounded-lg border border-green-200 bg-white px-3 py-2 text-xs font-semibold text-green-800 hover:bg-green-50"
+                    className="rounded-lg border border-green-200 bg-white min-h-10 px-3 py-2 text-sm font-semibold text-green-800 hover:bg-green-50"
                   >
-                    Use starter defaults
+                    Reset defaults
                   </button>
                 </div>
               </div>
@@ -610,20 +696,16 @@ export function ProductForm({
               <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
-              <span>You have unsaved changes. Don&apos;t forget to save before leaving.</span>
+              <span>Unsaved changes</span>
             </div>
           )}
 
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-5">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Step 1</p>
-                <h3 className="text-base font-semibold text-gray-900">Basics</h3>
-                <p className="text-sm text-gray-500">Name the product and connect it to strain and batch context when available.</p>
-              </div>
+            <section id="product-basics" className="scroll-mt-20 rounded-xl border border-gray-200 bg-white p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
+              <h3 className="text-base font-semibold text-gray-900">Basics</h3>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Product Name *
+                Name *
               </label>
               <input
                 id="name"
@@ -632,14 +714,14 @@ export function ProductForm({
                 onChange={(e) => handleChange('name', e.target.value)}
                 onBlur={() => handleBlur('name')}
                 className={errors.name && touched.name ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                placeholder="e.g., Blueberries NF - 3.5g Jar"
+                placeholder="Blueberries NF, 3.5g"
               />
               {errors.name && touched.name && (
                 <p className="text-sm text-red-600 mt-1">{errors.name}</p>
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <ProductTypeSelector
                 productType={formData.productType}
                 subType={formData.subType}
@@ -657,20 +739,19 @@ export function ProductForm({
               )}
             </div>
 
-            <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+            <div className="space-y-1.5 sm:space-y-2">
+              <label htmlFor="strainId" className="block text-sm font-medium text-gray-700">
                 Strain
               </label>
               <StrainSelector
                 strainId={formData.strainId}
                 onStrainChange={(id) => handleChange('strainId', id || '')}
               />
-              <p className="text-xs text-gray-500">Link to a strain for better inventory tracking</p>
             </div>
 
-            {formData.strainId && (
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
+            {formData.strainId ? (
+              <div className="space-y-1.5 sm:space-y-2">
+                <label htmlFor="batchId" className="block text-sm font-medium text-gray-700">
                   Batch
                 </label>
                 <BatchSelector
@@ -678,20 +759,28 @@ export function ProductForm({
                   batchId={formData.batchId}
                   onBatchChange={(id) => handleChange('batchId', id || '')}
                 />
-                <p className="text-xs text-gray-500">Link to a harvest batch for lab results</p>
+              </div>
+            ) : (
+              <div className="hidden space-y-2 sm:block">
+                <label htmlFor="batchId" className="block text-sm font-medium text-gray-700">
+                  Batch
+                </label>
+                <div
+                  id="batchId"
+                  tabIndex={-1}
+                  className="flex h-10 items-center rounded-lg border border-dashed border-gray-300 bg-gray-50 px-4 text-sm text-gray-500 focus:outline-none focus:ring-2 focus:ring-green-600"
+                >
+                  Pick a strain to attach a batch
+                </div>
               </div>
             )}
-            </div>
+            </section>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-5">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Step 2</p>
-                <h3 className="text-base font-semibold text-gray-900">Pricing</h3>
-                <p className="text-sm text-gray-500">Set the buyer-facing unit price or require a pricing request.</p>
-              </div>
+            <section id="product-pricing" className="scroll-mt-20 rounded-xl border border-gray-200 bg-white p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
+              <h3 className="text-base font-semibold text-gray-900">Pricing</h3>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label htmlFor="price" className="block text-sm font-medium text-gray-700">
                   Price ($) *
                 </label>
@@ -704,14 +793,14 @@ export function ProductForm({
                   onChange={(e) => handleChange('price', e.target.value)}
                   onBlur={() => handleBlur('price')}
                   className={errors.price && touched.price ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                  placeholder="e.g., 45.00"
+                  placeholder="45.00"
                 />
                 {errors.price && touched.price && (
                   <p className="text-sm text-red-600 mt-1">{errors.price}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label htmlFor="unit" className="block text-sm font-medium text-gray-700">
                   Unit *
                 </label>
@@ -729,7 +818,7 @@ export function ProductForm({
                   className={errors.unit && touched.unit ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                 >
                   <option value="">Select a unit</option>
-                  {UNITS.map(unit => (
+                  {productUnitOptions(formData.unit).map(unit => (
                     <option key={unit} value={unit}>{unit}</option>
                   ))}
                 </select>
@@ -739,50 +828,44 @@ export function ProductForm({
               </div>
             </div>
 
-            <div className="p-4 border border-gray-200 rounded-lg bg-gray-50 space-y-3">
+            <div className="p-3 border border-gray-200 rounded-lg bg-gray-50 space-y-2 sm:p-4 sm:space-y-3">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Pricing Display</label>
-                <p className="text-xs text-gray-500 mt-1">Choose whether dispensaries see your price or must request pricing via message.</p>
+                <label className="block text-sm font-medium text-gray-700">Price visibility</label>
+                <p className="text-xs text-gray-500 mt-1">Quote only hides the price.</p>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => handleChange('isPriceVisible', true)}
-                  className={`text-left px-3 py-2 rounded-lg border transition-colors ${
+                  className={`min-h-10 text-left px-3 py-2 rounded-lg border transition-colors ${
                     formData.isPriceVisible
                       ? 'border-green-600 bg-green-50 text-green-700'
                       : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span className="block text-sm font-medium">Show Price</span>
-                  <span className="block text-xs text-gray-500">Display public product price</span>
+                  <span className="block text-sm font-medium">Show price</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleChange('isPriceVisible', false)}
-                  className={`text-left px-3 py-2 rounded-lg border transition-colors ${
+                  className={`min-h-10 text-left px-3 py-2 rounded-lg border transition-colors ${
                     !formData.isPriceVisible
                       ? 'border-green-600 bg-green-50 text-green-700'
                       : 'border-gray-300 bg-white text-gray-700 hover:bg-gray-100'
                   }`}
                 >
-                  <span className="block text-sm font-medium">Request Pricing</span>
-                  <span className="block text-xs text-gray-500">Hide price and require inquiry</span>
+                  <span className="block text-sm font-medium">Quote only</span>
                 </button>
               </div>
             </div>
-            </div>
+            </section>
 
-            <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm space-y-5">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Step 3</p>
-                <h3 className="text-base font-semibold text-gray-900">Inventory and status</h3>
-                <p className="text-sm text-gray-500">Add the starting quantity and decide whether this listing is available now.</p>
-              </div>
+            <section id="product-stock" className="scroll-mt-20 rounded-xl border border-gray-200 bg-white p-3 shadow-sm space-y-3 sm:p-4 sm:space-y-4">
+              <h3 className="text-base font-semibold text-gray-900">Stock</h3>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="inventoryQty" className="block text-sm font-medium text-gray-700">
-                Initial Inventory Quantity *
+                Stock *
               </label>
               <input
                 id="inventoryQty"
@@ -792,15 +875,15 @@ export function ProductForm({
                 onChange={(e) => handleChange('inventoryQty', e.target.value)}
                 onBlur={() => handleBlur('inventoryQty')}
                 className={errors.inventoryQty && touched.inventoryQty ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                placeholder="e.g., 100"
+                placeholder="100"
               />
               {errors.inventoryQty && touched.inventoryQty && (
                 <p className="text-sm text-red-600 mt-1">{errors.inventoryQty}</p>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
+            <div className="grid grid-cols-2 gap-3 sm:gap-4">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label htmlFor="sku" className="block text-sm font-medium text-gray-700">
                   SKU
                 </label>
@@ -811,14 +894,14 @@ export function ProductForm({
                   onChange={(e) => handleChange('sku', e.target.value)}
                   onBlur={() => handleBlur('sku')}
                   className={errors.sku && touched.sku ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                  placeholder="e.g., BERRY-3.5G"
+                  placeholder="BERRY-3.5G"
                 />
                 {errors.sku && touched.sku && (
                   <p className="text-sm text-red-600 mt-1">{errors.sku}</p>
                 )}
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label htmlFor="brand" className="block text-sm font-medium text-gray-700">
                   Brand
                 </label>
@@ -828,50 +911,49 @@ export function ProductForm({
                   value={formData.brand}
                   onChange={(e) => handleChange('brand', e.target.value)}
                   className={INPUT_CLASSES}
-                  placeholder="e.g., Your Business Name"
+                  placeholder="Business name"
                 />
               </div>
             </div>
 
-            <div className="flex items-center justify-between p-4 border border-gray-200 rounded-lg bg-gray-50">
+            <div className="flex items-center justify-between gap-3 p-3 sm:p-4 border border-gray-200 rounded-lg bg-gray-50">
               <div>
-                <label className="text-sm font-medium text-gray-700">Availability Status</label>
-                <p className="text-sm text-gray-600">Make product available for buyer requests</p>
+                <label className="text-sm font-medium text-gray-700">Available</label>
+                <p className="text-xs text-gray-600 sm:text-sm">Buyers can request this product</p>
               </div>
               <button
                 type="button"
                 onClick={() => handleChange('isAvailable', !formData.isAvailable)}
                 aria-label={formData.isAvailable ? 'Mark product unavailable' : 'Mark product available'}
                 aria-pressed={formData.isAvailable}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                className={`relative inline-flex h-10 w-14 shrink-0 items-center rounded-full transition-colors ${
                   formData.isAvailable ? 'bg-green-600' : 'bg-gray-300'
                 }`}
               >
                 <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    formData.isAvailable ? 'translate-x-6' : 'translate-x-1'
+                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                    formData.isAvailable ? 'translate-x-7' : 'translate-x-1'
                   }`}
                 />
               </button>
             </div>
-            </div>
+            </section>
 
-            <details open={shouldOpenAdvanced} className="rounded-xl border border-gray-200 bg-gray-50 p-4 shadow-sm">
-              <summary className="cursor-pointer list-none">
+            <details id="product-details" open={shouldOpenAdvanced} className="rounded-xl border border-gray-200 bg-gray-50 p-3 shadow-sm sm:p-4">
+              <summary className="min-h-10 cursor-pointer list-none py-2 sm:py-0">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Steps 4 and 5</p>
-                    <h3 className="text-base font-semibold text-gray-900">Optional profile, compliance, and images</h3>
-                    <p className="text-sm text-gray-500">Add cannabinoids, harvest details, descriptions, and product imagery when needed.</p>
+                    <h3 className="text-base font-semibold text-gray-900">Details &amp; photos</h3>
+                    <p className="hidden text-sm text-gray-500 sm:block">Cannabinoids, harvest date, description and photos.</p>
                   </div>
                   <span className="rounded-full bg-white px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">Optional</span>
                 </div>
               </summary>
-              <div className="mt-5 space-y-6">
-            <div className="p-4 border border-gray-200 rounded-lg bg-white">
-              <h3 className="text-sm font-medium text-gray-700 mb-3">Cannabinoid Profile (Optional)</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+              <div className="mt-3 space-y-4 sm:mt-5 sm:space-y-6">
+            <div className="p-3 border border-gray-200 rounded-lg bg-white sm:p-4">
+              <h3 className="text-sm font-medium text-gray-700 mb-3">Cannabinoids</h3>
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="thcMin" className="block text-xs font-medium text-gray-600">
                     THC Min (%)
                   </label>
@@ -891,7 +973,7 @@ export function ProductForm({
                     <p className="text-xs text-red-600 mt-1">{liveThcErrors.minError}</p>
                   )}
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="thcMax" className="block text-xs font-medium text-gray-600">
                     THC Max (%)
                   </label>
@@ -911,7 +993,7 @@ export function ProductForm({
                     <p className="text-xs text-red-600 mt-1">{liveThcErrors.maxError}</p>
                   )}
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="cbdMin" className="block text-xs font-medium text-gray-600">
                     CBD Min (%)
                   </label>
@@ -931,7 +1013,7 @@ export function ProductForm({
                     <p className="text-xs text-red-600 mt-1">{liveCbdErrors.minError}</p>
                   )}
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="cbdMax" className="block text-xs font-medium text-gray-600">
                     CBD Max (%)
                   </label>
@@ -954,7 +1036,7 @@ export function ProductForm({
               </div>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="harvestDate" className="block text-sm font-medium text-gray-700">
                 Harvest Date
               </label>
@@ -972,7 +1054,7 @@ export function ProductForm({
               )}
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                 Description
               </label>
@@ -995,157 +1077,150 @@ export function ProductForm({
               </p>
             </div>
 
-            <div className="space-y-2">
+            <div id="productImages" tabIndex={-1} className="space-y-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2">
               <label className="block text-sm font-medium text-gray-700">
                 Product Images
               </label>
+              <p className="text-xs text-gray-500">
+                Up to {FILE_UPLOAD_LIMITS.productImagesMaxCount} photos · JPG, PNG, WebP · {formatBytes(FILE_UPLOAD_LIMITS.productImageMaxBytes)} each
+              </p>
               <div className="flex items-center gap-4">
                 <input
+                  id="productImagesInput"
                   type="file"
-                  accept="image/*"
+                  accept={IMAGE_MIME_TYPES.join(',')}
                   multiple
                   onChange={handleImageChange}
-                  className="block w-full text-sm text-gray-600
-                    file:mr-4 file:py-2 file:px-4
+                  disabled={imagePreviews.length >= FILE_UPLOAD_LIMITS.productImagesMaxCount || imageUploadProgress !== null}
+                  className="block w-full text-base text-gray-600 sm:text-sm
+                    file:mr-4 file:min-h-10 file:py-2 file:px-4
                     file:rounded-lg file:border-0
                     file:text-sm file:font-medium
                     file:bg-green-50 file:text-green-700
                     hover:file:bg-green-100
-                    cursor-pointer"
+                    cursor-pointer
+                    disabled:cursor-not-allowed disabled:opacity-60"
                 />
               </div>
+
+              {imageUploadProgress !== null && (
+                <div className="rounded-lg border border-green-100 bg-green-50 p-3">
+                  <div className="flex items-center justify-between text-xs font-medium text-green-800">
+                    <span>Preparing images</span>
+                    <span>{imageUploadProgress}%</span>
+                  </div>
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-green-100">
+                    <div
+                      className="h-full rounded-full bg-green-600 transition-all"
+                      style={{ width: `${imageUploadProgress}%` }}
+                    />
+                  </div>
+                </div>
+              )}
               
               {imagePreviews.length > 0 && (
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
                   {imagePreviews.map((preview, index) => (
-                    <div key={index} className="relative group">
-                      <Image
+                    <div key={`${preview}-${index}`} className="group rounded-xl border border-gray-200 bg-white p-2 shadow-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element -- Upload previews also support legacy data URLs. */}
+                      <img
                         src={preview}
-                        alt={`Preview ${index}`}
-                        width={80}
-                        height={80}
-                        className="w-20 h-20 object-cover rounded-lg border border-gray-200"
+                        alt={`Product image preview ${index + 1}`}
+                        width={160}
+                        height={120}
+                        className="h-28 w-full rounded-lg border border-gray-200 object-cover"
                       />
                       <button
                         type="button"
                         onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs hover:bg-red-600"
+                        className="mt-2 min-h-10 w-full rounded-lg border border-red-200 px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                       >
-                        ×
+                        Remove
                       </button>
                     </div>
                   ))}
                 </div>
               )}
+              {errors.images && (
+                <p className="text-sm text-red-600 mt-1">{errors.images}</p>
+              )}
+              <p className="text-xs text-gray-500">
+                {imagePreviews.length}/{FILE_UPLOAD_LIMITS.productImagesMaxCount} image slots used.
+              </p>
             </div>
               </div>
             </details>
+        </div>
 
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-              <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+        <aside className="space-y-4 lg:sticky lg:top-6">
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 sm:p-4">
+              <div className="flex items-center justify-between gap-2">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Save summary</p>
-                  <h3 className="text-base font-semibold text-gray-900">Review before saving</h3>
+                  <h3 className="text-sm font-semibold text-gray-900">Summary</h3>
                 </div>
                 <span className="rounded-full bg-white px-2 py-1 text-xs font-medium text-gray-600 ring-1 ring-gray-200">
-                  {formData.isAvailable ? 'Buyer visible' : 'Hidden'}
+                  {formData.isAvailable ? 'Available' : 'Hidden'}
                 </span>
               </div>
-              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              <dl className="mt-2 space-y-1.5 sm:mt-3 sm:space-y-2">
                 {saveSummary.map((item) => (
-                  <div key={item.label} className="rounded-lg bg-white px-3 py-2 ring-1 ring-gray-200">
-                    <p className="text-xs font-medium text-gray-500">{item.label}</p>
-                    <p className="mt-0.5 text-sm font-semibold text-gray-900">{item.value}</p>
+                  <div key={item.label} className="flex justify-between gap-3 text-sm">
+                    <dt className="shrink-0 text-gray-500">{item.label}</dt>
+                    <dd className="text-right font-medium text-gray-900 break-words">{item.value}</dd>
                   </div>
                 ))}
-              </div>
+              </dl>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-              <Button
+            <div className="flex flex-wrap gap-2">
+              <div className="hidden sm:block"><Button
                 type="submit"
                 variant="primary"
-                className="w-full sm:w-auto"
-                disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
+                className="hidden sm:inline-flex"
+                disabled={imageUploadProgress !== null || isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
               >
-                {isSubmitting ? 'Saving...' : (initialData.id ? 'Update Product' : 'Create Product')}
-              </Button>
-              {onSaveDraft && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  className="w-full sm:w-auto"
-                  onClick={handleSaveDraft}
-                  disabled={isSubmitting}
-                >
-                  {isSubmitting ? 'Saving...' : 'Save Draft'}
-                </Button>
+                {isSubmitting ? 'Saving...' : (initialData.id ? 'Save changes' : 'Publish product')}
+              </Button></div>
+              {!initialData.id && onSaveDraft && (
+                <div className="w-full sm:w-auto">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="w-full sm:w-auto"
+                    onClick={handleSaveDraft}
+                    disabled={imageUploadProgress !== null || isSubmitting}
+                  >
+                    {isSubmitting ? 'Saving...' : 'Save draft'}
+                  </Button>
+                  <p className="mt-1 max-w-52 text-xs text-gray-500">
+                    Hidden from buyers until published.
+                  </p>
+                </div>
               )}
-              <Button
+              <div className="hidden sm:block"><Button
                 type="button"
                 variant="outline"
-                className="w-full sm:w-auto"
+                className="hidden sm:inline-flex"
                 onClick={handleCancelRequest}
-                disabled={isSubmitting}
+                disabled={imageUploadProgress !== null || isSubmitting}
               >
                 Cancel
-              </Button>
+              </Button></div>
             </div>
-          </form>
-        </CardContent>
-      </Card>
-
-      {showExitPrompt && (
-        <div className="fixed inset-0 z-[100000] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="leave-product-dialog-title"
-            className="w-full max-w-md rounded-xl bg-white shadow-2xl"
-          >
-            <div className="border-b border-gray-200 px-6 py-4">
-              <h3 id="leave-product-dialog-title" className="text-lg font-semibold text-gray-900">Leave product creation?</h3>
-              <p className="text-sm text-gray-600 mt-1">You have unsaved changes on this new product.</p>
-            </div>
-            <div className="p-6 space-y-3 text-sm text-gray-700">
-              <p>Choose what you want to do:</p>
-              <ul className="list-disc pl-5 space-y-1 text-gray-600">
-                <li><strong>Save draft & exit</strong> keeps your progress for this session.</li>
-                <li><strong>Exit without saving</strong> clears this draft.</li>
-                <li><strong>Continue editing</strong> stays on this page.</li>
-              </ul>
-            </div>
-            <div className="flex flex-col sm:flex-row gap-3 px-6 py-4 border-t border-gray-200">
-              <Button type="button" variant="primary" onClick={handleSaveDraftAndExit}>
-                Save draft & exit
-              </Button>
-              <Button type="button" variant="destructive" onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.sessionStorage.removeItem('addProductDraft');
-                }
-                handleLeavePage();
-              }}>
-                Exit without saving
-              </Button>
-              <Button type="button" variant="outline" onClick={() => setShowExitPrompt(false)}>
-                Continue editing
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
+        </aside>
+      </form>
 
       <StickyMobileActionBar
-        primaryLabel={isSubmitting ? 'Saving...' : initialData.id ? 'Save product' : 'Publish product'}
+        primaryLabel={isSubmitting ? 'Saving...' : initialData.id ? 'Save changes' : 'Publish product'}
         primaryType="submit"
         form="product-form"
-        disabled={isSubmitting || hasErrors}
-        helperText={hasErrors ? 'Fix highlighted fields before saving.' : 'Product drafts save in this browser.'}
+        disabled={imageUploadProgress !== null || isSubmitting || hasErrors}
+        helperText={hasErrors ? 'Fix highlighted fields before saving.' : undefined}
         secondary={
           <button
             type="button"
             onClick={handleCancelRequest}
-            className="rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700"
+            className="rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
           >
             Cancel
           </button>

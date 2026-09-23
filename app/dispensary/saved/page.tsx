@@ -1,16 +1,44 @@
-import { getServerSession } from 'next-auth';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
-import { authOptions } from '@/lib/auth';
 import { db } from '@/lib/db';
 import SavedContent from './SavedContent';
+
+type SavedTab = 'favorites' | 'alerts' | 'recent';
 
 export const metadata = {
   title: 'Saved | PhenoFarm',
   description: 'Buyer saved products, price alerts, and recent order requests',
 };
 
-export default async function SavedPage() {
-  const session = await getServerSession(authOptions);
+function parseSavedTab(tab: unknown): SavedTab {
+  const value = Array.isArray(tab) ? tab[0] : tab;
+  return value === 'alerts' || value === 'recent' || value === 'favorites' ? value : 'favorites';
+}
+
+async function countSavedFavorites(dispensaryId: string) {
+  try {
+    return await db.dispensaryFavoriteProduct.count({ where: { dispensaryId } });
+  } catch (error) {
+    console.warn('Unable to count saved favorite products:', error);
+    return 0;
+  }
+}
+
+async function countPriceAlerts(dispensaryId: string) {
+  try {
+    return await db.dispensaryPriceAlert.count({ where: { dispensaryId } });
+  } catch (error) {
+    console.warn('Unable to count saved price alerts:', error);
+    return 0;
+  }
+}
+
+interface SavedPageProps {
+  searchParams?: Promise<{ tab?: string | string[] }>;
+}
+
+export default async function SavedPage({ searchParams }: SavedPageProps) {
+  const session = await getAuthSession();
 
   if (!session) {
     redirect('/auth/sign_in');
@@ -22,26 +50,32 @@ export default async function SavedPage() {
     redirect('/dashboard');
   }
 
-  const orders = await db.order.findMany({
-    where: { dispensaryId: user.dispensaryId },
-    include: {
-      grower: { select: { id: true, businessName: true } },
-      items: {
-        include: {
-          product: {
-            select: {
-              id: true,
-              name: true,
-              unit: true,
-              price: true,
+  const params = searchParams ? await searchParams : {};
+  const initialTab = parseSavedTab(params.tab);
+
+  const [orders, favoriteCount, priceAlertCount] = await Promise.all([
+    db.order.findMany({
+      where: { dispensaryId: user.dispensaryId },
+      include: {
+        grower: { select: { id: true, businessName: true } },
+        items: {
+          include: {
+            product: {
+              select: {
+                id: true,
+                name: true,
+                unit: true,
+              },
             },
           },
         },
       },
-    },
-    orderBy: { createdAt: 'desc' },
-    take: 50,
-  });
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    }),
+    countSavedFavorites(user.dispensaryId),
+    countPriceAlerts(user.dispensaryId),
+  ]);
 
   const recentMap = new Map<string, {
     productId: string;
@@ -55,7 +89,10 @@ export default async function SavedPage() {
   }>();
 
   for (const order of orders) {
+    const seenProducts = new Set<string>();
     for (const item of order.items) {
+      if (seenProducts.has(item.productId)) continue;
+      seenProducts.add(item.productId);
       const productId = item.product?.id || item.productId;
       const existing = recentMap.get(productId);
 
@@ -70,12 +107,24 @@ export default async function SavedPage() {
         growerName: order.grower?.businessName || 'Unknown grower',
         growerId: order.grower?.id || order.growerId,
         unit: item.product?.unit || null,
-        price: Number(item.unitPrice || item.product?.price || 0),
+        price: Number(item.unitPrice),
         lastOrderedAt: order.createdAt.toISOString(),
         orderCount: 1,
       });
     }
   }
 
-  return <SavedContent recentProducts={Array.from(recentMap.values()).slice(0, 10)} />;
+  const recentProducts = Array.from(recentMap.values()).slice(0, 10);
+
+  return (
+    <SavedContent
+      initialTab={initialTab}
+      counts={{
+        favorites: favoriteCount,
+        alerts: priceAlertCount,
+        recent: recentProducts.length,
+      }}
+      recentProducts={recentProducts}
+    />
+  );
 }

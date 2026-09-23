@@ -1,0 +1,68 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e73]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e74]
+- main
+  - sectionheader
+    - heading "Settings" [level=1, ref=e75]
+    - paragraph
+      - StaticText "View billing, support, and policies."
+  - paragraph
+    - StaticText "Settlement policy"
+  - paragraph
+    - StaticText "PhenoFarm bills only grower subscriptions. Wholesale payment stays between licensed businesses."
+  - generic
+    - heading "Grower billing" [level=2, ref=e76]
+    - paragraph
+      - StaticText "Stripe subscription readiness."
+    - StaticText "Configure in Vercel Project Settings > Environment Variables, then redeploy."
+    - paragraph
+      - StaticText "Stripe webhook secret"
+    - StaticText "Needs setup"
+    - paragraph
+      - StaticText "Required to keep subscription status synced after checkout and portal updates."
+    - paragraph
+      - StaticText "Pro price ID"
+    - StaticText "Needs setup"
+    - paragraph
+      - StaticText "Enables the Pro plan in grower settings."
+    - paragraph
+      - StaticText "Business price ID"
+    - StaticText "Needs setup"
+    - paragraph
+      - StaticText "Enables the Business plan in grower settings."
+    - group
+      - DisclosureTriangle "1 configured" [expanded=false]
+        - StaticText "1 configured"
+  - generic
+    - heading "Support" [level=2, ref=e77]
+    - DescriptionList
+      - term "Support email"
+      - definition
+        - link "support@phenofarm.com" [ref=e79]
+        - button "Copy support email" [ref=e80]
+          - StaticText "Copy"
+  - generic
+    - heading "Policies" [level=2, ref=e78]
+    - DescriptionList
+      - term "License review"
+      - definition
+        - StaticText "Admin-controlled"
+      - group
+        - DisclosureTriangle "Details" [expanded=false]
+          - StaticText "Details"
+      - term "Notification templates"
+      - definition
+        - StaticText "Code-managed"
+      - group
+        - DisclosureTriangle "Details" [expanded=false]
+          - StaticText "Details"
+      - term "Demo accounts"
+      - definition
+        - StaticText "Enabled by request"
+      - group
+        - DisclosureTriangle "Details" [expanded=false]
+          - StaticText "Details"
+- region "Notifications alt+T" [ref=e72]
+- alert

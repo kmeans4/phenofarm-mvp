@@ -1,0 +1,237 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e73]
+- button "Notifications" [expanded=false, ref=e74]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e75]
+- main
+  - sectionheader
+    - heading "Orders" [level=1, ref=e97]
+    - paragraph
+      - StaticText "Track requests and grower responses."
+    - link "Browse Catalog" [ref=e98]
+  - paragraph
+    - StaticText "Requests"
+  - paragraph
+    - StaticText "19"
+  - paragraph
+    - StaticText "In progress"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Awaiting response"
+  - paragraph
+    - StaticText "17"
+  - paragraph
+    - StaticText "Request value"
+  - paragraph
+    - StaticText "$460.50"
+  - form
+    - textbox "Search all order requests" [ref=e99]
+    - combobox "Request status" [expanded=false, ref=e100]: All statuses
+      - MenuListPopup
+        - option "All statuses" [selected, ref=e102]
+        - option "Submitted" [ref=e103]
+        - option "Accepted" [ref=e104]
+        - option "Preparing" [ref=e105]
+        - option "Ready / In transit" [ref=e106]
+        - option "Delivered" [ref=e107]
+        - option "Cancelled" [ref=e108]
+    - button "Filter" [ref=e101]
+  - link "View request ORD-20260710-XPJO3I" [ref=e76]
+    - generic
+      - StaticText "#XPJO3I"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jul 9, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-20260710-03UYXZ" [ref=e77]
+    - generic
+      - StaticText "#03UYXZ"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jul 9, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-20260710-O78T5N" [ref=e78]
+    - generic
+      - StaticText "#O78T5N"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jul 9, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-20260710-ZYGM3S" [ref=e79]
+    - generic
+      - StaticText "#ZYGM3S"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jul 9, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-20260710-FMBIOT" [ref=e80]
+    - generic
+      - StaticText "#FMBIOT"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jul 9, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-1783641718088-1" [ref=e81]
+    - generic
+      - StaticText "#718088-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jul 9, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-1783641503047-1" [ref=e82]
+    - generic
+      - StaticText "#503047-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jul 9, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-1781196282824-1" [ref=e83]
+    - generic
+      - StaticText "#282824-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jun 11, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-1781145140815-1" [ref=e84]
+    - generic
+      - StaticText "#140815-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jun 10, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-1781144783465-1" [ref=e85]
+    - generic
+      - StaticText "#783465-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jun 10, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-1781144724494-1" [ref=e86]
+    - generic
+      - StaticText "#724494-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jun 10, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-1781123929454-1" [ref=e87]
+    - generic
+      - StaticText "#929454-1"
+    - StaticText "Cancelled"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Jun 10, 2026"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-1777395857103-1" [ref=e88]
+    - generic
+      - StaticText "#857103-1"
+    - StaticText "Accepted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Apr 28, 2026"
+    - StaticText "$"
+    - StaticText "26.50"
+  - link "View request ORD-1777395448158-1" [ref=e89]
+    - generic
+      - StaticText "#448158-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Apr 28, 2026"
+    - StaticText "$"
+    - StaticText "26.50"
+  - link "View request ORD-1777395128040-1" [ref=e90]
+    - generic
+      - StaticText "#128040-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Apr 28, 2026"
+    - StaticText "$"
+    - StaticText "26.50"
+  - link "View request ORD-1776721375263-1" [ref=e91]
+    - generic
+      - StaticText "#375263-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Apr 20, 2026"
+    - StaticText "$"
+    - StaticText "26.50"
+  - link "View request ORD-1776721208544-1" [ref=e92]
+    - generic
+      - StaticText "#208544-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Apr 20, 2026"
+    - StaticText "$"
+    - StaticText "26.50"
+  - link "View request ORD-1776352194185-1" [ref=e93]
+    - generic
+      - StaticText "#194185-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Apr 16, 2026"
+    - StaticText "$"
+    - StaticText "26.50"
+  - link "View request ORD-1776352143510-1" [ref=e94]
+    - generic
+      - StaticText "#143510-1"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - paragraph
+      - StaticText "Apr 16, 2026"
+    - StaticText "$"
+    - StaticText "26.50"
+  - navigation "Request pages" [ref=e95]
+    - StaticText "19"
+    - StaticText "requests"
+- button "Open messages" [ref=e96]
+- region "Notifications alt+T" [ref=e72]
+- alert

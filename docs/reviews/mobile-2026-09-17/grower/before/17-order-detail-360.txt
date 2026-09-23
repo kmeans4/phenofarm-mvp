@@ -1,0 +1,84 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e551]
+- button "Notifications" [expanded=false, ref=e552]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e553]
+- main
+  - link "← Requests" [ref=e554]
+  - sectionheader
+    - heading "Request #ORD-20260710-XPJO3I" [level=1, ref=e564]
+      - StaticText "Request"
+      - StaticText "#"
+      - StaticText "ORD-20260710-XPJO3I"
+    - paragraph
+      - StaticText "Submitted on July 9, 2026 at 8:39 PM"
+    - StaticText "Submitted"
+    - group
+      - DisclosureTriangle "Actions" [expanded=false]
+        - StaticText "Actions"
+  - heading "Next action" [level=2, ref=e555]
+  - button "Accept request" [ref=e556]
+  - button "Cancel request" [ref=e557]
+  - heading "Items (1item)" [level=3, ref=e558]
+    - image
+    - StaticText "Items"
+    - StaticText "("
+    - StaticText "1"
+    - StaticText "item"
+    - StaticText ")"
+  - paragraph
+    - StaticText "Purple Haze Flowers"
+  - paragraph
+    - StaticText "Purple Haze"
+  - paragraph
+    - StaticText "$25.00"
+  - StaticText "$25.00"
+  - StaticText "/"
+  - StaticText "gram"
+  - StaticText "Qty: "
+  - StaticText "1"
+  - StaticText "Subtotal"
+  - StaticText "$25.00"
+  - StaticText "Est. total"
+  - StaticText "$25.00"
+  - paragraph
+    - StaticText "Payment is arranged directly with the buyer."
+  - heading "Request Details" [level=3, ref=e559]
+    - image
+    - StaticText "Request Details"
+  - paragraph
+    - StaticText "FULFILLMENT"
+  - paragraph
+    - StaticText "Flexible"
+  - paragraph
+    - StaticText "REQUESTED WINDOW"
+  - paragraph
+    - StaticText "Coordinate with grower"
+  - paragraph
+    - StaticText "DIRECT PAYMENT TERMS"
+  - paragraph
+    - StaticText "Handled directly"
+  - group
+    - DisclosureTriangle "Progress" [expanded=false]
+      - StaticText "Progress"
+  - group
+    - DisclosureTriangle "Request history" [expanded=false]
+      - StaticText "Request history"
+  - heading "Customer" [level=3, ref=e560]
+    - image
+    - StaticText "Customer"
+  - link "Green Vermont Dispensary" [ref=e561]
+  - image
+  - StaticText "(802) 555-0145"
+  - image
+  - StaticText "456 Market Street"
+  - LineBreak "\n"
+  - StaticText "Burlington"
+  - StaticText ", VT"
+  - StaticText " 05401"
+  - button "Message buyer" [ref=e562]
+- button "Open messages" [ref=e563]
+- region "Notifications alt+T" [ref=e550]
+- alert

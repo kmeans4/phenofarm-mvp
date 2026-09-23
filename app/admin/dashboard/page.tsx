@@ -1,51 +1,110 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
-import { redirect } from "next/navigation";
+import { requireAdmin } from "@/lib/auth-helpers";
 import { db } from "@/lib/db";
 import Link from 'next/link';
 import { SeedDataButton } from "../components/SeedDataButton";
-import { SetupChecklist } from "@/app/components/ux/SetupChecklist";
-import { GuidedFixPanel } from "@/app/components/ux/GuidedFixPanel";
-import { RolePrimaryAction } from "@/app/components/ux/RolePrimaryAction";
+import { ConfirmActionButton } from "@/app/admin/components/ConfirmActionButton";
+import { PageHeader } from "@/app/components/ui/PageHeader";
+import { StatCard } from "@/app/components/ui/StatCard";
+import { ArrowRight, Building2, CheckCircle2, Circle, Sprout, Users } from "lucide-react";
+
+type PendingVerificationItem = {
+  id: string;
+  type: 'grower' | 'dispensary';
+  businessName: string;
+  email: string | null;
+  licenseNumber: string | null;
+  createdAt: Date;
+};
+
+type AdminPrimaryAction = {
+  title: string;
+  description: string;
+  href: string;
+  cta: string;
+  secondaryHref?: string;
+  secondaryCta?: string;
+};
 
 export default async function AdminPage() {
-  let session;
-  
-  try {
-    session = await getServerSession(authOptions);
-  } catch {
-    redirect('/auth/sign_in');
-  }
-  
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  if (!session || !session?.user) {
-    redirect('/auth/sign_in');
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userRole = session.user.role as string;
-  
-  if (userRole !== 'ADMIN') {
-    redirect('/dashboard');
-  }
-
+  await requireAdmin();
+  const now = new Date();
   // Fetch stats
   let stats = { users: 0, growers: 0, dispensaries: 0, growersToReview: 0, dispensariesToReview: 0, verifiedGrowers: 0 };
+  let pendingVerificationItems: PendingVerificationItem[] = [];
   try {
-    const [users, growers, dispensaries, growersToReview, dispensariesToReview, verifiedGrowers] = await Promise.all([
+    const [
+      users,
+      growers,
+      dispensaries,
+      dispensariesToReview,
+      verifiedGrowers,
+      pendingGrowers,
+      pendingDispensaries,
+    ] = await Promise.all([
       db.user.count(),
       db.grower.count(),
-      db.dispensary.count(),
-      db.grower.count({ where: { isVerified: false } }),
-      db.dispensary.count({ where: { isVerified: false } }),
+      db.dispensary.count({ where: { isOffPlatform: false } }),
+      db.dispensary.count({ where: { isVerified: false, isOffPlatform: false } }),
       db.grower.count({ where: { isVerified: true } }),
+      db.grower.findMany({
+        where: { isVerified: false },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: {
+          id: true,
+          businessName: true,
+          licenseNumber: true,
+          createdAt: true,
+          user: { select: { email: true } },
+        },
+      }),
+      db.dispensary.findMany({
+        where: { isVerified: false },
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        select: {
+          id: true,
+          businessName: true,
+          licenseNumber: true,
+          createdAt: true,
+          user: { select: { email: true } },
+        },
+      }),
     ]);
-    stats = { users, growers, dispensaries, growersToReview, dispensariesToReview, verifiedGrowers };
+    stats = {
+      users,
+      growers,
+      dispensaries,
+      growersToReview: Math.max(0, growers - verifiedGrowers),
+      dispensariesToReview,
+      verifiedGrowers,
+    };
+    pendingVerificationItems = [
+      ...pendingGrowers.map((grower) => ({
+        id: grower.id,
+        type: 'grower' as const,
+        businessName: grower.businessName,
+        email: grower.user?.email || null,
+        licenseNumber: grower.licenseNumber,
+        createdAt: grower.createdAt,
+      })),
+      ...pendingDispensaries.map((dispensary) => ({
+        id: dispensary.id,
+        type: 'dispensary' as const,
+        businessName: dispensary.businessName,
+        email: dispensary.user?.email || null,
+        licenseNumber: dispensary.licenseNumber,
+        createdAt: dispensary.createdAt,
+      })),
+    ]
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .slice(0, 5);
   } catch {
     // Keep default stats on error
   }
 
   const needsSeeding = stats.growers === 0 && stats.dispensaries === 0;
+  const seedEnabled = process.env.NODE_ENV !== 'production' && process.env.VERCEL_ENV !== 'production';
   const subscriptionConfigured = Boolean(
     process.env.STRIPE_SECRET_KEY &&
     process.env.STRIPE_WEBHOOK_SECRET &&
@@ -53,18 +112,18 @@ export default async function AdminPage() {
   );
   const adminChecklist = [
     {
-      label: 'Cultivator review',
-      description: stats.growersToReview === 0 ? 'All cultivators are reviewed.' : `${stats.growersToReview} cultivator accounts need review.`,
+      label: 'Grower review',
+      description: stats.growersToReview === 0 ? 'All growers are reviewed.' : `${stats.growersToReview} grower accounts need review.`,
       href: '/admin/growers',
       complete: stats.growersToReview === 0,
-      cta: 'Review cultivators',
+      cta: 'Review growers',
     },
     {
       label: 'Dispensary review',
       description: stats.dispensariesToReview === 0 ? 'All dispensaries are reviewed.' : `${stats.dispensariesToReview} dispensary accounts need review.`,
       href: '/admin/dispensaries',
       complete: stats.dispensariesToReview === 0,
-      cta: 'Review buyers',
+      cta: 'Review dispensaries',
     },
     {
       label: 'Subscription configuration',
@@ -77,161 +136,222 @@ export default async function AdminPage() {
     },
     {
       label: 'Marketplace activity',
-      description: stats.growers > 0 && stats.dispensaries > 0 ? 'Marketplace has both seller and buyer accounts.' : 'Seed or invite both sides of the marketplace.',
-      href: needsSeeding ? '/admin/dashboard' : '/admin/users',
+      description: stats.growers > 0 && stats.dispensaries > 0 ? 'Marketplace has growers and dispensaries.' : 'Seed or invite both sides of the marketplace.',
+      href: needsSeeding ? '#developer-tools' : '/admin/users',
       complete: stats.growers > 0 && stats.dispensaries > 0,
-      cta: 'Review users',
+      cta: needsSeeding ? 'Open developer tools' : 'Review users',
     },
   ];
-  const exceptionItems = [
-    stats.growersToReview > 0
-      ? {
-          title: `${stats.growersToReview} cultivator verification exception${stats.growersToReview === 1 ? '' : 's'}`,
-          description: 'Review license, subscription readiness, and marketplace access.',
-          href: '/admin/growers',
-          cta: 'Review cultivators',
-          severity: 'critical' as const,
-        }
-      : null,
-    stats.dispensariesToReview > 0
-      ? {
-          title: `${stats.dispensariesToReview} dispensary verification exception${stats.dispensariesToReview === 1 ? '' : 's'}`,
-          description: 'Confirm retail license details before enabling buyer workflows.',
-          href: '/admin/dispensaries',
-          cta: 'Review dispensaries',
-          severity: 'warning' as const,
-        }
-      : null,
-    {
-      title: 'Subscription configuration check',
-      description: 'Confirm cultivator subscription settings and support copy before wider rollout.',
-      href: '/admin/settings',
-      cta: 'Open settings',
-      severity: 'info' as const,
-    },
-  ].filter((item): item is { title: string; description: string; href: string; cta: string; severity: 'critical' | 'warning' | 'info' } => item !== null);
-  const primaryAction = stats.growersToReview > 0
+  const primaryAction: AdminPrimaryAction = stats.growersToReview > 0
     ? {
-        title: 'Review cultivator verification queue',
-        description: 'Cultivator access and subscription readiness are the highest-impact admin checks.',
+        title: 'Review grower verification queue',
+        description: 'Grower access and subscription readiness are the highest-impact admin checks.',
         href: '/admin/growers',
-        cta: 'Review cultivators',
+        cta: 'Review growers',
         secondaryHref: '/admin/settings',
         secondaryCta: 'Subscription settings',
       }
     : stats.dispensariesToReview > 0
       ? {
           title: 'Review dispensary verification queue',
-          description: 'Clear buyer verification issues before they submit requests.',
+          description: 'Clear dispensary verification issues before they submit requests.',
           href: '/admin/dispensaries',
           cta: 'Review dispensaries',
           secondaryHref: '/admin/growers',
-          secondaryCta: 'Cultivators',
+          secondaryCta: 'Growers',
         }
       : {
           title: 'Review subscription settings',
-          description: 'Keep PhenoFarm subscription configuration current for cultivator billing.',
+          description: 'Keep PhenoFarm subscription configuration current for grower billing.',
           href: '/admin/settings',
           cta: 'Open settings',
-        };
+      };
+  const primaryActionHrefs = new Set([primaryAction.href, primaryAction.secondaryHref].filter(Boolean));
+  const pendingChecklist = adminChecklist.filter((item) => !item.complete);
+  const completedChecklist = adminChecklist.filter((item) => item.complete);
 
   return (
-    <div className="p-6 space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        <p className="text-gray-500 mt-1">Manage subscriptions, verification, and marketplace operations</p>
-      </div>
-
-      <RolePrimaryAction {...primaryAction} />
-
-      {needsSeeding && (
-        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-          <p className="text-yellow-800 mb-2">No growers or dispensaries found in the database.</p>
-          <SeedDataButton />
-        </div>
-      )}
-
-      <SetupChecklist title="Keep operations ready" items={adminChecklist} />
-
-      <GuidedFixPanel
-        title="Admin exception queue"
-        description="Work through verification and subscription setup exceptions before they become support tickets."
-        fixes={exceptionItems}
+    <div className="space-y-6">
+      <PageHeader
+          compact
+        title="Dashboard"
+        description="Manage subscriptions, verification, and marketplace operations"
       />
 
-      <div className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-        <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Priority work</p>
-        <h2 className="mt-1 text-lg font-semibold text-gray-900">Subscription and compliance queue</h2>
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          <Link href="/admin/growers" className="rounded-lg border border-green-200 bg-green-50 p-3 text-green-950 hover:bg-green-100">
-            <p className="text-sm font-semibold">{stats.growersToReview} cultivators to review</p>
-            <p className="mt-1 text-sm text-green-800">Verify license, subscription readiness, and marketplace access.</p>
-          </Link>
-          <Link href="/admin/dispensaries" className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-blue-950 hover:bg-blue-100">
-            <p className="text-sm font-semibold">{stats.dispensariesToReview} dispensaries to review</p>
-            <p className="mt-1 text-sm text-blue-800">Review buyer license and retail account status.</p>
-          </Link>
-          <Link href="/admin/settings" className="rounded-lg border border-gray-200 bg-gray-50 p-3 text-gray-950 hover:bg-gray-100">
-            <p className="text-sm font-semibold">Subscription settings</p>
-            <p className="mt-1 text-sm text-gray-700">Confirm Stripe Billing price IDs, notifications, and support details.</p>
-          </Link>
-        </div>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <StatCard
+          compact
+          title="Users"
+          value={stats.users}
+          href="/admin/users"
+          icon={<Users className="h-5 w-5" />}
+          className="sm:p-5"
+          valueClassName="text-2xl"
+        />
+        <StatCard
+          compact
+          title="Growers"
+          value={stats.growers}
+          helperText={`${stats.verifiedGrowers} verified`}
+          href="/admin/growers"
+          icon={<Sprout className="h-5 w-5 text-green-600" />}
+          className="sm:p-5"
+          valueClassName="text-2xl text-green-600"
+        />
+        <StatCard
+          compact
+          title="Dispensaries"
+          value={stats.dispensaries}
+          helperText={`${stats.dispensariesToReview} pending`}
+          href="/admin/dispensaries"
+          icon={<Building2 className="h-5 w-5 text-blue-600" />}
+          className="sm:p-5"
+          valueClassName="text-2xl text-blue-600"
+        />
       </div>
 
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
-        <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Business model</p>
-        <h2 className="mt-1 text-lg font-semibold text-blue-950">PhenoFarm subscription revenue only</h2>
-        <p className="mt-1 text-sm text-blue-900">
-          Cultivators pay PhenoFarm subscription fees. Wholesale order value is tracked for marketplace operations,
-          but buyer-seller settlement happens directly outside the app.
-        </p>
-      </div>
+      <section className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:p-5">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Operations checklist</p>
+            <h2 className="mt-1 text-lg font-semibold text-gray-900">{primaryAction.title}</h2>
+            <p className="mt-1 max-w-2xl text-sm text-gray-600">{primaryAction.description}</p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row lg:flex-shrink-0">
+            <Link
+              href={primaryAction.href}
+              className="inline-flex min-h-10 items-center justify-center gap-2 rounded-lg bg-green-600 px-4 text-sm font-medium text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            >
+              {primaryAction.cta}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            {primaryAction.secondaryHref && primaryAction.secondaryCta ? (
+              <Link
+                href={primaryAction.secondaryHref}
+                className="inline-flex min-h-10 items-center justify-center rounded-lg border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              >
+                {primaryAction.secondaryCta}
+              </Link>
+            ) : null}
+          </div>
+        </div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Total Users</p>
-              <p className="text-3xl font-bold text-gray-900 mt-1">{stats.users}</p>
+        <div className="mt-5 divide-y divide-gray-100 rounded-lg border border-gray-200">
+          {pendingChecklist.length ? pendingChecklist.map((item) => (
+            <div key={item.label} className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex gap-3">
+                <span className={`mt-0.5 inline-flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full ${
+                  item.complete ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
+                }`}>
+                  {item.complete ? <CheckCircle2 className="h-4 w-4" /> : <Circle className="h-4 w-4 fill-current" />}
+                </span>
+                <div>
+                  <p className="text-sm font-semibold text-gray-900">{item.label}</p>
+                  <p className="mt-0.5 text-sm text-gray-600">{item.description}</p>
+                </div>
+              </div>
+              {primaryActionHrefs.has(item.href) ? null : (
+                <Link
+                  href={item.href}
+                  className="inline-flex min-h-9 items-center justify-center rounded-lg border border-gray-300 px-3 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 sm:flex-shrink-0"
+                >
+                  {item.cta}
+                </Link>
+              )}
             </div>
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-              </svg>
+          )) : <p className="p-3 text-sm text-gray-600">All checks complete.</p>}
+        </div>
+        {completedChecklist.length ? (
+          <details className="mt-2 text-sm">
+            <summary className="cursor-pointer py-2 text-green-700">{completedChecklist.length} checks complete</summary>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {completedChecklist.map((item) => (
+                <Link key={item.label} href={item.href} className="rounded-lg bg-green-50 px-3 py-2 text-green-800">
+                  {item.label} ✓
+                </Link>
+              ))}
+            </div>
+          </details>
+        ) : null}
+      </section>
+
+      <section className="rounded-xl border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-200 px-4 py-3 sm:px-5">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              {pendingVerificationItems.length > 0 && <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Pending verification</p>}
+              <h2 className={pendingVerificationItems.length ? 'mt-1 text-lg font-semibold text-gray-900' : 'text-sm font-medium text-gray-700'}>{pendingVerificationItems.length ? 'Newest accounts awaiting review' : 'No accounts awaiting review'}</h2>
+            </div>
+            <div className="flex gap-2">
+              <Link
+                href="/admin/growers?status=pending"
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              >
+                Growers
+              </Link>
+              <Link
+                href="/admin/dispensaries?status=pending"
+                className="rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+              >
+                Dispensaries
+              </Link>
             </div>
           </div>
         </div>
-        
-        <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Cultivators</p>
-              <p className="text-3xl font-bold text-green-600 mt-1">{stats.growers}</p>
-              <p className="mt-1 text-xs text-gray-500">{stats.verifiedGrowers} verified for marketplace access</p>
-            </div>
-            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-              </svg>
+        {pendingVerificationItems.length > 0 ? (
+          <div className="divide-y divide-gray-100">
+            {pendingVerificationItems.map((item) => (
+              <div key={`${item.type}-${item.id}`} className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-medium text-gray-900">{item.businessName}</p>
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                      item.type === 'grower' ? 'bg-green-50 text-green-700' : 'bg-blue-50 text-blue-700'
+                    }`}>
+                      {item.type === 'grower' ? 'Grower' : 'Dispensary'}
+                    </span>
+                    {now.getTime() - item.createdAt.getTime() <= 7 * 24 * 60 * 60 * 1000 ? <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-900">New</span> : null}
+                  </div>
+                  <p className="mt-1 text-sm text-gray-500">
+                    {item.email || 'No email'} · License {item.licenseNumber || 'not provided'} · Joined {item.createdAt.toLocaleDateString()}
+                  </p>
+                </div>
+                <form action={`/admin/${item.type === 'grower' ? 'growers' : 'dispensaries'}/${item.id}/verify`} method="POST">
+                  <ConfirmActionButton
+                    confirmMessage={`Verify marketplace access for ${item.businessName}?`}
+                    confirmTitle={`Verify ${item.type}?`}
+                    confirmLabel="Verify"
+                    className="inline-flex min-h-9 items-center justify-center rounded-lg bg-green-600 px-3 text-sm font-medium text-white hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                  >
+                    Verify
+                  </ConfirmActionButton>
+                </form>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </section>
+
+      <Link href="/help" className="inline-flex min-h-10 items-center text-sm font-medium text-green-700 underline underline-offset-2 hover:text-green-900">Settlement & billing policy</Link>
+
+      {seedEnabled ? <section id="developer-tools" className="scroll-mt-24 rounded-xl border border-amber-200 bg-amber-50 p-3 shadow-sm sm:p-4">
+        <details>
+          <summary className="cursor-pointer list-none text-sm font-semibold text-amber-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 focus-visible:ring-offset-2">
+            Developer tools <span className="ml-2 font-normal text-amber-800">Demo data seeding</span>
+          </summary>
+          <div className="mt-3 border-t border-amber-200 pt-3">
+            <p className="text-sm text-amber-900">Dev/demo environments only. Never seed production data.</p>
+            {needsSeeding && (
+              <p className="mt-2 text-sm text-amber-900">
+                No growers or dispensaries were found in this environment.
+              </p>
+            )}
+            <div className="mt-3">
+              <SeedDataButton />
             </div>
           </div>
-        </div>
-        
-        <div className="bg-white p-6 rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-500">Dispensaries</p>
-              <p className="text-3xl font-bold text-blue-600 mt-1">{stats.dispensaries}</p>
-            </div>
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-          </div>
-        </div>
-      </div>
+        </details>
+      </section> : null}
     </div>
   );
 }

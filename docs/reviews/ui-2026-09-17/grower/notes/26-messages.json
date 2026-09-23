@@ -1,0 +1,37 @@
+{
+  "slug": "26-messages",
+  "route": "/grower/dashboard",
+  "state": "Messages drawer, conversation list",
+  "pass1": {
+    "inspected": [
+      "pass-1/26-messages-desktop.png",
+      "pass-1/26-messages-mobile.png"
+    ],
+    "strengths": [
+      "Mobile shows a simple conversation list with preview; desktop separates list and conversation area."
+    ],
+    "issues": [
+      {
+        "key": "messages-empty-copy",
+        "priority": "low",
+        "viewport": "desktop",
+        "observation": "Before a thread is selected, \u2018Select a conversation\u2019 appears in the header, an empty-state card and composer placeholder. Quote/pricing controls and settlement note still occupy the bottom.",
+        "recommendation": "Use one centered \u2018Choose a conversation\u2019 prompt and hide composer/quote actions until selection. The explanatory sentence about context, pricing actions and templates is unnecessary."
+      }
+    ],
+    "limits": [
+      "Read-only conversation list; large empty list space reflects a single fixture conversation and is not treated as a defect."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/26-messages-desktop.png",
+      "pass-2/26-messages-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile message drawer opens to the conversation list. Desktop repeats Select a conversation in the header, placeholder panel, and disabled composer while showing pricing actions before selection. The single conversation and blank mobile list space are fixture density, not a separate layout defect.",
+    "confirmedIssueKeys": [
+      "messages-empty-copy"
+    ],
+    "newIssues": []
+  }
+}

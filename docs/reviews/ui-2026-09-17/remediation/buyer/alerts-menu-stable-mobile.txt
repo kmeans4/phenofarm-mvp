@@ -1,0 +1,63 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e1872]
+  - button "Notifications" [expanded=false, ref=e1873]
+    - StaticText "22"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1874]
+  - main
+    - sectionheader
+      - heading "Saved" [level=1, ref=e1876]
+      - link "Browse Catalog" [ref=e1877]
+    - tablist "Saved workspace"
+      - tab "Favorites (1)" [ref=e1878]
+        - StaticText "Favorites"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Alerts (1)" [selected, ref=e1879]
+        - StaticText "Alerts"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Recent (1)" [ref=e1880]
+        - StaticText "Recent"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+    - tabpanel "Alerts (1)"
+      - paragraph
+        - StaticText "Checks when you visit or refresh."
+      - button "Refresh prices" [ref=e1913]
+        - StaticText "Refresh"
+      - group
+        - DisclosureTriangle "More" [expanded=true]
+        - button "Clear alerts" [ref=e1927]
+          - StaticText "Clear alerts"
+      - button "Active (1)" [ref=e1914]
+      - button "Triggered (0)" [ref=e1915]
+      - button "All" [ref=e1916]
+      - link "Purple Haze Flowers" [ref=e1923]
+        - image "Purple Haze Flowers"
+      - heading "Purple Haze Flowers" [level=3, ref=e1924]
+      - paragraph
+        - StaticText "by "
+        - link "Vermont Nurseries" [ref=e1926]
+      - StaticText "THC "
+      - StaticText "24.8"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "CURRENT"
+      - paragraph
+        - StaticText "$25.00/g"
+      - paragraph
+        - StaticText "TARGET"
+      - paragraph
+        - StaticText "$20.00/g"
+      - button "Remove alert" [ref=e1925]
+  - button "Open messages" [ref=e1875]
+  - region "Notifications alt+T" [ref=e1871]
+  - alert
+    - StaticText "Saved"

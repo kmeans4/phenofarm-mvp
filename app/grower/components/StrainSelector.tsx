@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/app/components/ui/Button';
 import { toast } from '@/app/hooks/useToast';
 import { STRAIN_TYPES, STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
@@ -18,8 +18,8 @@ interface StrainSelectorProps {
 }
 
 // Consistent input styles - h-10 matches text inputs
-const INPUT_CLASSES = "w-full h-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
-const SMALL_INPUT_CLASSES = "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const INPUT_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const SMALL_INPUT_CLASSES = "min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent";
 
 export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps) {
   const [strains, setStrains] = useState<Strain[]>([]);
@@ -36,7 +36,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
 
     const fetchStrains = async () => {
       try {
-        const response = await fetch('/api/strains', { signal: controller.signal });
+        const response = await fetch('/api/strains?summary=true', { signal: controller.signal });
         if (!isActive) return;
 
         if (response.ok) {
@@ -62,8 +62,10 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
     };
   }, []);
 
+  const pendingRef = useRef(false);
   const handleCreateStrain = async () => {
-    if (!newStrainName.trim() || !newStrainType) return;
+    if (!newStrainName.trim() || !newStrainType || pendingRef.current) return;
+    pendingRef.current = true;
     
     try {
       setCreating(true);
@@ -79,20 +81,21 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
 
       if (response.ok) {
         const newStrain = await response.json();
-        setStrains([...strains, newStrain]);
+        setStrains((current) => [...current, newStrain]);
         onStrainChange(newStrain.id, newStrain.name);
         setShowCreateForm(false);
         setNewStrainName('');
         setNewStrainType('');
         setNewStrainGenetics('');
       } else {
-        const err = await response.json();
+        const err = await response.json().catch(() => ({}));
         toast.error(err.error || 'Failed to create strain');
       }
     } catch (err) {
       console.error('Error creating strain:', err);
       toast.error('Network error creating strain');
     } finally {
+      pendingRef.current = false;
       setCreating(false);
     }
   };
@@ -107,6 +110,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
     <div className="space-y-2">
       <div className="flex items-center gap-2">
         <select
+          id="strainId"
           value={strainId}
           onChange={(e) => {
             const selectedValue = e.target.value || null;
@@ -117,7 +121,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
           }}
           className={INPUT_CLASSES}
         >
-          <option value="">Select a strain (optional)</option>
+          <option value="">Choose strain</option>
           {strains.map(strain => (
             <option key={strain.id} value={strain.id}>
               {strain.name}
@@ -137,13 +141,14 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
       </div>
 
       {showCreateForm && (
-        <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3">
+        <div className="p-3 sm:p-4 bg-gray-50 rounded-lg border border-gray-200 space-y-3" onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); event.stopPropagation(); void handleCreateStrain(); } }}>
           <div className="flex items-center justify-between">
-            <span className="font-medium text-gray-700">Create New Strain</span>
+            <span className="font-medium text-gray-700">New strain</span>
             <button 
               type="button"
               onClick={() => setShowCreateForm(false)}
-              className="text-gray-400 hover:text-gray-600"
+              aria-label="Close strain form"
+              className="flex h-10 w-10 items-center justify-center text-xl text-gray-500 hover:text-gray-700"
             >
               ×
             </button>
@@ -179,7 +184,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
             onClick={handleCreateStrain}
             disabled={!newStrainName.trim() || !newStrainType || creating}
           >
-            {creating ? 'Creating...' : 'Create Strain'}
+            {creating ? 'Creating...' : 'Add strain'}
           </Button>
         </div>
       )}

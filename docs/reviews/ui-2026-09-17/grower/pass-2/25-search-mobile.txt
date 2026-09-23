@@ -1,0 +1,203 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e3707]
+  - button "Notifications" [expanded=false, ref=e3708]
+    - StaticText "16"
+  - button "Open Grower Portal navigation menu" [expanded=false, ref=e3709]
+  - main
+    - sectionheader
+      - paragraph
+        - StaticText "GOOD MORNING"
+      - heading "Vermont Nurseries" [level=1, ref=e3720]
+      - paragraph
+        - StaticText "Track buyer requests, estimated value, and catalog health from one place."
+    - link "Total Requests 20 17 pending review" [ref=e3710]
+      - paragraph
+        - StaticText "Total Requests"
+      - paragraph
+        - StaticText "20"
+      - paragraph
+        - StaticText "17 pending review"
+    - link "Delivered Request Value $450.00 Value tracked only; settlement is direct" [ref=e3711]
+      - paragraph
+        - StaticText "Delivered Request Value"
+      - paragraph
+        - StaticText "$450.00"
+      - paragraph
+        - StaticText "Value tracked only; settlement is direct"
+    - link "Active Customers 2 Manage dispensary relationships" [ref=e3712]
+      - paragraph
+        - StaticText "Active Customers"
+      - paragraph
+        - StaticText "2"
+      - paragraph
+        - StaticText "Manage dispensary relationships"
+    - link "Active Products 3 Manage your catalog" [ref=e3713]
+      - paragraph
+        - StaticText "Active Products"
+      - paragraph
+        - StaticText "3"
+      - paragraph
+        - StaticText "Manage your catalog"
+    - generic
+      - paragraph
+        - StaticText "SETUP & NEXT STEPS"
+      - heading "Review pending buyer requests" [level=2, ref=e3721]
+      - paragraph
+        - StaticText "Pending requests are the fastest path to keeping buyers moving."
+      - link "Check catalog" [ref=e3722]
+      - link "Review requests" [ref=e3723]
+      - heading "Marketplace readiness" [level=3, ref=e3724]
+      - paragraph
+        - StaticText "3 of 6 complete"
+      - paragraph
+        - StaticText "50% ready"
+      - paragraph
+        - StaticText "Profile"
+      - paragraph
+        - StaticText "Business profile has the basics buyers need."
+      - StaticText "Complete"
+      - paragraph
+        - StaticText "License"
+      - paragraph
+        - StaticText "Add a current license number and expiry date."
+      - link "Update license" [ref=e3725]
+      - paragraph
+        - StaticText "Subscription"
+      - paragraph
+        - StaticText "Connect the cultivator subscription when Stripe Billing is ready."
+      - link "Review subscription" [ref=e3726]
+      - paragraph
+        - StaticText "Catalog"
+      - paragraph
+        - StaticText "Products are available for buyer discovery."
+      - StaticText "Complete"
+      - paragraph
+        - StaticText "Commercial terms"
+      - paragraph
+        - StaticText "Set MOQ, fulfillment, region, response, and direct-payment defaults."
+      - link "Set terms" [ref=e3727]
+      - paragraph
+        - StaticText "Request readiness"
+      - paragraph
+        - StaticText "Buyer requests are waiting for review."
+      - StaticText "Complete"
+    - generic
+      - paragraph
+        - StaticText "ATTENTION CENTER"
+      - heading "What needs your attention" [level=2, ref=e3728]
+      - paragraph
+        - StaticText "New requests, unread buyer messages, cancellations, and recent fulfillment changes stay grouped here."
+      - StaticText "18"
+      - paragraph
+        - StaticText "New requests"
+      - paragraph
+        - StaticText "17"
+      - paragraph
+        - StaticText "Unread messages"
+      - paragraph
+        - StaticText "0"
+      - paragraph
+        - StaticText "Cancellations"
+      - paragraph
+        - StaticText "0"
+      - paragraph
+        - StaticText "Status changes"
+      - paragraph
+        - StaticText "1"
+      - article
+        - heading "6 new buyer requests" [level=3, ref=e3731]
+        - StaticText "Review all"
+        - paragraph
+          - StaticText "Green Vermont Dispensary has 6 requests waiting for review."
+        - link "Review" [ref=e3732]
+      - article
+        - heading "Recently delivered" [level=3, ref=e3733]
+        - StaticText "Delivered"
+        - paragraph
+          - StaticText "ORD-20260917-REVIEW for Maple Street Market moved to Delivered."
+        - link "Review" [ref=e3734]
+      - link "View all 17 in Requests →" [ref=e3729]
+        - StaticText "View all 17 in Requests →"
+    - heading "Delivered Request Value (Last 30 Days)" [level=2, ref=e3714]
+    - image "Delivered request value bar chart for the last 30 days. Maximum daily value is $450."
+      - generic
+        - generic
+          - StaticText "Scroll chart horizontally"
+          - StaticText "Swipe"
+        - StaticText "Tue"
+        - StaticText "Wed"
+        - StaticText "Thu"
+        - StaticText "Fri"
+        - StaticText "Sat"
+        - StaticText "Sun"
+        - StaticText "Mon"
+        - StaticText "Tue"
+        - StaticText "Wed"
+        - StaticText "Thu"
+        - StaticText "Fri"
+        - StaticText "Sat"
+        - StaticText "Sun"
+        - StaticText "Mon"
+        - StaticText "Tue"
+        - StaticText "Wed"
+        - StaticText "Thu"
+        - StaticText "Fri"
+        - StaticText "Sat"
+        - StaticText "Sun"
+        - StaticText "Mon"
+        - StaticText "Tue"
+        - StaticText "Wed"
+        - StaticText "Thu"
+        - StaticText "Fri"
+        - StaticText "Sat"
+        - StaticText "Sun"
+        - StaticText "Mon"
+        - StaticText "$450"
+        - StaticText "Tue"
+        - StaticText "Wed"
+    - heading "Activity Feed" [level=2, ref=e3715]
+    - paragraph
+      - StaticText "Track new requests by timeframe without leaving the dashboard."
+    - link "View All Requests" [ref=e3716]
+    - heading "Recent Activity" [level=2, ref=e3717]
+    - combobox "Date range" [expanded=false, ref=e3730]: Last 30 Days
+      - MenuListPopup
+        - option "Today" [ref=e3735]
+        - option "Last 7 Days" [ref=e3736]
+        - option "Last 30 Days" [selected, ref=e3737]
+        - option "This Month" [ref=e3738]
+        - option "Last Month" [ref=e3739]
+        - option "All Time" [ref=e3740]
+    - link "Request #ORD-20260917-REVIEW From Maple Street Market Sep 13, 8:00 PM" [ref=e3718]
+      - paragraph
+        - StaticText "Request #ORD-20260917-REVIEW"
+      - paragraph
+        - StaticText "From Maple Street Market"
+      - paragraph
+        - StaticText "Sep 13, 8:00 PM"
+  - button "Open messages" [ref=e3719]
+  - region "Notifications alt+T" [ref=e3706]
+  - button "Open Next.js Dev Tools" [expanded=false, ref=e3741]
+    - image
+  - alert
+  - generic
+    - button "Close search" [ref=e3742]
+    - dialog "Search PhenoFarm"
+      - heading "Search PhenoFarm" [level=2, ref=e3743]
+      - textbox "Search products, orders, customers, and strains" [ref=e3744]
+      - button "Close search" [ref=e3745]
+      - paragraph
+        - StaticText "Start typing to search..."
+      - paragraph
+        - StaticText "RECENT SEARCHES"
+      - button "Purple" [ref=e3746]
+      - StaticText "Products"
+      - StaticText "Orders"
+      - StaticText "Customers"
+      - StaticText "Strains"
+      - StaticText "0"
+      - StaticText " results"
+      - StaticText "↑↓ navigate · ↵ open · esc close"

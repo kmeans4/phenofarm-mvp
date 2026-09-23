@@ -1,0 +1,98 @@
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- generic [ref=e1878] clickable [onclick]
+  - button "Open messages" [ref=e1883]
+- button "Search" [ref=e1879]
+- button "Notifications" [expanded=false, ref=e1880]
+  - StaticText "26"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1881]
+- main
+  - sectionheader
+    - heading "Vermont Nurseries" [level=1, ref=e1884]
+    - paragraph
+      - StaticText "Premium cannabis products grown with care in Vermont"
+    - link "Catalog" [ref=e1885]
+    - link "Browse products" [ref=e1886]
+  - StaticText "VN"
+  - StaticText "Verified"
+  - StaticText "Bristol"
+  - StaticText ", "
+  - StaticText "VT"
+  - StaticText "(802) 555-0123"
+  - link "Website" [ref=e1882]
+  - StaticText "License: "
+  - StaticText "VT-GWL-2024-001"
+  - paragraph
+    - StaticText "Pickup or delivery · No minimum set"
+  - generic
+    - heading "Products (2)" [level=2, ref=e1887]
+      - StaticText "Products (2)"
+    - textbox "Search products" [ref=e1898]
+    - combobox "Sort products" [expanded=false, ref=e1899]: Price: high
+      - MenuListPopup
+        - option "Newest" [ref=e1909]
+        - option "Price: low" [ref=e1910]
+        - option "Price: high" [selected, ref=e1911]
+        - option "THC: high" [ref=e1912]
+        - option "THC: low" [ref=e1913]
+        - option "Name: A-Z" [ref=e1914]
+        - option "Name: Z-A" [ref=e1915]
+    - button "Product filters" [expanded=true, ref=e1888]
+      - StaticText "1"
+    - button "Grid view" [ref=e1889]
+    - button "List view" [ref=e1890]
+    - StaticText "Active filters:"
+    - StaticText "Price: high"
+    - button [ref=e1891]
+    - StaticText "Type: "
+    - StaticText "Flower"
+    - button [ref=e1892]
+    - button "Clear all" [ref=e1893]
+    - heading "Product type" [level=3, ref=e1894]
+    - button "All Types" [ref=e1895]
+    - button "Bulk Extract" [ref=e1896]
+    - button "Flower" [ref=e1897]
+    - article
+      - image "Purple Haze Flowers"
+      - heading "Purple Haze Flowers" [level=3, ref=e1900]
+      - StaticText "THC "
+      - StaticText "24.8"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Purple Haze"
+      - paragraph
+        - StaticText "Indoor"
+      - paragraph
+        - StaticText "$25.00/g"
+      - button "Decrease quantity for Purple Haze Flowers" [ref=e1901]
+        - StaticText "−"
+      - spinbutton "Quantity for Purple Haze Flowers" [ref=e1902]: 1
+        - StaticText "1"
+      - button "Increase quantity for Purple Haze Flowers" [ref=e1903]
+        - StaticText "+"
+      - button "Add to draft" [ref=e1904]
+        - StaticText "Add"
+      - StaticText "240 available"
+      - button "Message grower" [ref=e1905]
+    - article
+      - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e1906]
+      - StaticText "THC "
+      - StaticText "19"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Assorted"
+      - paragraph
+        - StaticText "Greenhouse"
+      - paragraph
+        - StaticText "25 available"
+      - generic
+        - button "Request pricing" [ref=e1907]
+        - button "Message grower" [ref=e1908]
+  - group
+    - DisclosureTriangle "Shop details" [expanded=false]
+      - StaticText "Shop details"
+- region "Notifications alt+T" [ref=e1877]
+- alert

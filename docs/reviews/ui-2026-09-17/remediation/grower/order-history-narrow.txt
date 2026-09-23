@@ -1,0 +1,62 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e2607]
+- button "Notifications" [expanded=false, ref=e2608]
+  - StaticText "17"
+- button "Open Grower navigation menu" [expanded=false, ref=e2609]
+- main
+  - sectionheader
+    - heading "Request history" [level=1, ref=e2611]
+    - link "Active requests" [ref=e2612]
+      - button "Active requests" [ref=e2620]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Requests"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "Delivered"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "Cancelled"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "Delivered value"
+    - paragraph
+      - StaticText "$450"
+  - generic "Request history status filter"
+    - link "All 2" [ref=e2613]
+      - StaticText "All"
+      - StaticText "2"
+    - link "Delivered 1" [ref=e2614]
+      - StaticText "Delivered"
+      - StaticText "1"
+    - link "Cancelled 1" [ref=e2615]
+      - StaticText "Cancelled"
+      - StaticText "1"
+  - article
+    - link "#ORD-20260917-REVIEW" [ref=e2616]
+      - StaticText "#ORD-20260917-REVIEW"
+    - paragraph
+      - StaticText "Maple Street Market"
+    - StaticText "Delivered"
+    - strong
+      - StaticText "$450"
+    - StaticText "Sep 17, 2026"
+    - link "View request →" [ref=e2617]
+  - article
+    - link "#ORD-1781123929454-1" [ref=e2618]
+      - StaticText "#ORD-1781123929454-1"
+    - paragraph
+      - StaticText "Green Vermont Dispensary"
+    - StaticText "Cancelled"
+    - strong
+      - StaticText "$25"
+    - StaticText "Jun 10, 2026"
+    - link "View request →" [ref=e2619]
+- button "Open messages" [ref=e2610]
+- region "Notifications alt+T" [ref=e2606]
+- alert

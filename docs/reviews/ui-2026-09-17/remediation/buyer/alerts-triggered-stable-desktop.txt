@@ -1,0 +1,70 @@
+- generic
+  - complementary
+    - StaticText "P"
+    - StaticText "PhenoFarm"
+    - StaticText "DISPENSARY"
+    - button "Search" [ref=e1901]
+      - StaticText "Search..."
+      - StaticText "⌘K"
+    - button "Notifications" [expanded=false, ref=e1902]
+      - StaticText "Notifications"
+      - StaticText "20"
+    - navigation "Portal navigation" [ref=e1903]
+      - link "Dashboard" [ref=e1905]
+        - StaticText "Dashboard"
+      - link "Catalog" [ref=e1906]
+        - StaticText "Catalog"
+      - link "Request Draft 2" [ref=e1907]
+        - StaticText "Request Draft"
+        - StaticText "2"
+      - link "Orders 17" [ref=e1908]
+        - StaticText "Orders"
+        - StaticText "17"
+      - link "Saved" [ref=e1909]
+        - StaticText "Saved"
+      - link "Settings" [ref=e1910]
+        - StaticText "Settings"
+    - StaticText "GV"
+    - StaticText "Green Vermont Dispensary"
+    - StaticText "Verified buyer"
+    - button "Sign out" [ref=e1904]
+  - main
+    - sectionheader
+      - heading "Saved" [level=1, ref=e1876]
+      - link "Browse Catalog" [ref=e1877]
+    - tablist "Saved workspace"
+      - tab "Favorites (1)" [ref=e1878]
+        - StaticText "Favorites"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Alerts (1)" [selected, ref=e1879]
+        - StaticText "Alerts"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Recent (1)" [ref=e1880]
+        - StaticText "Recent"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+    - tabpanel "Alerts (1)"
+      - paragraph
+        - StaticText "Checks when you visit or refresh."
+      - button "Refresh prices" [ref=e1913]
+        - StaticText "Refresh"
+      - group
+        - DisclosureTriangle "More" [expanded=false]
+      - button "Active (1)" [ref=e1914]
+      - button "Triggered (0)" [ref=e1915]
+      - button "All" [ref=e1916]
+      - heading "No price drops yet" [level=3, ref=e1921]
+      - paragraph
+        - StaticText "Targets are checked when you visit or refresh."
+      - button "View Active Alerts" [ref=e1922]
+  - generic
+    - button "Open recent activity" [expanded=false, ref=e1911]
+    - button "Open messages" [ref=e1875]
+  - region "Notifications alt+T" [ref=e1871]
+  - alert
+    - StaticText "Saved"

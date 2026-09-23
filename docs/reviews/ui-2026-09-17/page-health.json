@@ -1,0 +1,696 @@
+[
+  {
+    "route": "/admin/dashboard",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "A02",
+      "A08",
+      "A09",
+      "A10",
+      "A11",
+      "A12",
+      "A13"
+    ]
+  },
+  {
+    "route": "/admin/dispensaries",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "A07",
+      "A16",
+      "A17",
+      "A18"
+    ]
+  },
+  {
+    "route": "/admin/growers",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "A04",
+      "A15"
+    ]
+  },
+  {
+    "route": "/admin",
+    "kind": "Redirect",
+    "destination": "/admin/dashboard",
+    "area": "admin",
+    "status": "Redirect checked",
+    "findings": []
+  },
+  {
+    "route": "/admin/settings",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "A06",
+      "A19",
+      "A20",
+      "A21",
+      "A22",
+      "A23"
+    ]
+  },
+  {
+    "route": "/admin/users",
+    "kind": "Page",
+    "destination": "",
+    "area": "admin",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "A01",
+      "A03",
+      "A05",
+      "A14"
+    ]
+  },
+  {
+    "route": "/auth/error",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-014",
+      "PUB-015"
+    ]
+  },
+  {
+    "route": "/auth/sign_in",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-011"
+    ]
+  },
+  {
+    "route": "/auth/sign_up",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-012",
+      "PUB-013"
+    ]
+  },
+  {
+    "route": "/contact",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-005",
+      "PUB-006"
+    ]
+  },
+  {
+    "route": "/dashboard",
+    "kind": "Redirect",
+    "destination": "role dashboard",
+    "area": "public",
+    "status": "Redirect checked",
+    "findings": []
+  },
+  {
+    "route": "/dispensary/cart",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary",
+    "status": "Action or data-display issue",
+    "findings": [
+      "BUY-014",
+      "BUY-015",
+      "BUY-016",
+      "BUY-017",
+      "BUY-018",
+      "BUY-019",
+      "BUY-020",
+      "BUY-021",
+      "BUY-022",
+      "BUY-023",
+      "BUY-078",
+      "BUY-079",
+      "BUY-080",
+      "BUY-081"
+    ]
+  },
+  {
+    "route": "/dispensary/catalog",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary",
+    "status": "Action or data-display issue",
+    "findings": [
+      "BUY-007",
+      "BUY-008",
+      "BUY-009",
+      "BUY-010",
+      "BUY-011",
+      "BUY-012",
+      "BUY-013",
+      "BUY-065",
+      "BUY-066",
+      "BUY-067",
+      "BUY-068",
+      "BUY-069",
+      "BUY-070",
+      "BUY-071",
+      "BUY-072",
+      "BUY-073",
+      "BUY-074",
+      "BUY-075",
+      "BUY-076",
+      "BUY-077",
+      "BUY-092"
+    ]
+  },
+  {
+    "route": "/dispensary/dashboard",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "BUY-001",
+      "BUY-002",
+      "BUY-003",
+      "BUY-004",
+      "BUY-005",
+      "BUY-006"
+    ]
+  },
+  {
+    "route": "/dispensary/favorites",
+    "kind": "Redirect",
+    "destination": "/dispensary/saved?tab=favorites",
+    "area": "dispensary",
+    "status": "Redirect checked",
+    "findings": [
+      "BUY-050",
+      "BUY-051",
+      "BUY-052",
+      "BUY-053",
+      "BUY-084",
+      "BUY-088"
+    ]
+  },
+  {
+    "route": "/dispensary/grower/[id]",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "BUY-037",
+      "BUY-038",
+      "BUY-039",
+      "BUY-040",
+      "BUY-041",
+      "BUY-042",
+      "BUY-043",
+      "BUY-082",
+      "BUY-083"
+    ]
+  },
+  {
+    "route": "/dispensary/orders/[id]",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "BUY-030",
+      "BUY-031",
+      "BUY-032",
+      "BUY-033",
+      "BUY-034",
+      "BUY-035",
+      "BUY-036"
+    ]
+  },
+  {
+    "route": "/dispensary/orders",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "BUY-024",
+      "BUY-025",
+      "BUY-026",
+      "BUY-027",
+      "BUY-028",
+      "BUY-029"
+    ]
+  },
+  {
+    "route": "/dispensary/price-alerts",
+    "kind": "Redirect",
+    "destination": "/dispensary/saved?tab=alerts",
+    "area": "dispensary",
+    "status": "Redirect checked",
+    "findings": [
+      "BUY-054",
+      "BUY-055",
+      "BUY-056",
+      "BUY-057",
+      "BUY-085",
+      "BUY-086",
+      "BUY-087"
+    ]
+  },
+  {
+    "route": "/dispensary/saved",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary",
+    "status": "Action or data-display issue",
+    "findings": [
+      "BUY-050",
+      "BUY-051",
+      "BUY-052",
+      "BUY-053",
+      "BUY-084",
+      "BUY-088",
+      "BUY-054",
+      "BUY-055",
+      "BUY-056",
+      "BUY-057",
+      "BUY-085",
+      "BUY-086",
+      "BUY-087",
+      "BUY-058"
+    ]
+  },
+  {
+    "route": "/dispensary/settings",
+    "kind": "Page",
+    "destination": "",
+    "area": "dispensary",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "BUY-044",
+      "BUY-045",
+      "BUY-046",
+      "BUY-047",
+      "BUY-048",
+      "BUY-049"
+    ]
+  },
+  {
+    "route": "/grower/batches/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Action or data-display issue",
+    "findings": [
+      "G29",
+      "G33",
+      "G34",
+      "G35"
+    ]
+  },
+  {
+    "route": "/grower/batches/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G31",
+      "G32"
+    ]
+  },
+  {
+    "route": "/grower/batches",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Action or data-display issue",
+    "findings": [
+      "G28",
+      "G29",
+      "G30"
+    ]
+  },
+  {
+    "route": "/grower/catalog",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G05",
+      "G06",
+      "G07"
+    ]
+  },
+  {
+    "route": "/grower/customers/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G54",
+      "G55"
+    ]
+  },
+  {
+    "route": "/grower/customers/[id]/statement",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G56",
+      "G57"
+    ]
+  },
+  {
+    "route": "/grower/customers/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G53"
+    ]
+  },
+  {
+    "route": "/grower/customers",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G51",
+      "G52"
+    ]
+  },
+  {
+    "route": "/grower/dashboard",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G01",
+      "G02",
+      "G03",
+      "G04",
+      "G58",
+      "G59",
+      "G60",
+      "G61",
+      "G62",
+      "G63"
+    ]
+  },
+  {
+    "route": "/grower/inventory/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G22"
+    ]
+  },
+  {
+    "route": "/grower/inventory",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G19",
+      "G20",
+      "G21"
+    ]
+  },
+  {
+    "route": "/grower/marketplace",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "E19",
+      "E20",
+      "E21",
+      "E22"
+    ]
+  },
+  {
+    "route": "/grower/orders/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G49",
+      "G50"
+    ]
+  },
+  {
+    "route": "/grower/orders/[id]",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G45",
+      "G46",
+      "G47",
+      "G48"
+    ]
+  },
+  {
+    "route": "/grower/orders/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G41",
+      "G42",
+      "G43",
+      "G44"
+    ]
+  },
+  {
+    "route": "/grower/orders/history",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G39",
+      "G40"
+    ]
+  },
+  {
+    "route": "/grower/orders",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G36",
+      "G37",
+      "G38"
+    ]
+  },
+  {
+    "route": "/grower",
+    "kind": "Redirect",
+    "destination": "/grower/dashboard",
+    "area": "grower",
+    "status": "Redirect checked",
+    "findings": []
+  },
+  {
+    "route": "/grower/pricing",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "E08",
+      "E09",
+      "E10",
+      "E11"
+    ]
+  },
+  {
+    "route": "/grower/products/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Action or data-display issue",
+    "findings": [
+      "G16",
+      "G17",
+      "G18"
+    ]
+  },
+  {
+    "route": "/grower/products/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G12",
+      "G13",
+      "G14",
+      "G15"
+    ]
+  },
+  {
+    "route": "/grower/products",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G08",
+      "G09",
+      "G10",
+      "G11"
+    ]
+  },
+  {
+    "route": "/grower/reports",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Action or data-display issue",
+    "findings": [
+      "E01",
+      "E02",
+      "E03",
+      "E04",
+      "E05",
+      "E06",
+      "E07"
+    ]
+  },
+  {
+    "route": "/grower/settings",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "E12",
+      "E13",
+      "E14",
+      "E15",
+      "E16",
+      "E17",
+      "E18"
+    ]
+  },
+  {
+    "route": "/grower/strains/[id]/edit",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G27"
+    ]
+  },
+  {
+    "route": "/grower/strains/add",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G25",
+      "G26"
+    ]
+  },
+  {
+    "route": "/grower/strains",
+    "kind": "Page",
+    "destination": "",
+    "area": "grower",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "G23",
+      "G24"
+    ]
+  },
+  {
+    "route": "/help",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-004"
+    ]
+  },
+  {
+    "route": "/legal/cookies",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-009",
+      "PUB-010"
+    ]
+  },
+  {
+    "route": "/legal/privacy",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-007"
+    ]
+  },
+  {
+    "route": "/legal/terms",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-008"
+    ]
+  },
+  {
+    "route": "/",
+    "kind": "Page",
+    "destination": "",
+    "area": "public",
+    "status": "Density or clarity improvements",
+    "findings": [
+      "PUB-003",
+      "PUB-016",
+      "PUB-017"
+    ]
+  }
+]

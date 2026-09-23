@@ -23,7 +23,7 @@
 ## 1. Design Philosophy
 
 ### Vision
-Create a **premium, state-of-the-art B2B cannabis marketplace landing page** that rivals Linear, Vercel, and Stripe in design quality. The design should feel custom-built, not templated, with purposeful animations and micro-interactions that delight users while maintaining professional credibility.
+Create a **premium, state-of-the-art B2B cannabis marketplace landing page** that rivals high-end SaaS products in design quality. The design should feel custom-built, not templated, with purposeful animations and micro-interactions that delight users while maintaining professional credibility.
 
 ### Core Principles
 
@@ -37,7 +37,7 @@ Create a **premium, state-of-the-art B2B cannabis marketplace landing page** tha
 
 ### Design Inspiration Analysis
 
-**Linear.app:**
+**High-end SaaS dashboards:**
 - Dark/light theme with sophisticated gradients
 - Animated UI mockups in hero
 - Smooth scroll-triggered reveals
@@ -553,7 +553,7 @@ const problemSolutionTimeline = {
 
 **Featured Card:**
 - Larger footprint for key feature
-- Subtle animation preview (like Linear)
+- Subtle animation preview
 - Background video or Lottie option
 
 #### Animation Specifications

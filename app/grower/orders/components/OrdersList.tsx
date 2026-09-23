@@ -3,15 +3,23 @@
 import { useEffect, useMemo, useState } from 'react';
 import { format } from 'date-fns';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/app/components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { Card, CardContent, CardHeader } from '@/app/components/ui/Card';
 import {
   readDensityPreference,
   saveDensityPreference,
   TableDensity,
   TableDensityControl,
 } from '@/app/components/ux/TableDensityControl';
-import { getOrderStatusLabel } from '@/lib/order-workflow';
+import {
+  getAllowedOrderStatusTransitions,
+  getOrderStatusLabel,
+  isOrderStatus,
+  type OrderStatusValue,
+} from '@/lib/order-workflow';
+import { formatProductMoney } from '@/lib/product-display';
+import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
 
 interface Order {
   id: string;
@@ -26,9 +34,35 @@ interface Order {
 
 interface OrdersListProps {
   initialOrders: Order[];
+  customerFilterLabel?: string;
 }
 
 type OrderWorkflowView = 'all' | 'needs-review' | 'accepted' | 'preparing' | 'ready' | 'delivered';
+
+interface SkippedOrderDetail {
+  id: string;
+  orderLabel: string;
+  reason: string;
+}
+
+interface BatchStatusResponse {
+  error?: string;
+  updatedCount?: number;
+  updatedOrderIds?: unknown[];
+  skippedCount?: number;
+  noOpCount?: number;
+  skippedOrders?: Array<{
+    id?: unknown;
+    reason?: unknown;
+  }>;
+}
+
+interface BatchStatusMessage {
+  type: 'success' | 'warning' | 'error';
+  title: string;
+  text: string;
+  skippedOrders?: SkippedOrderDetail[];
+}
 
 const STATUS_LABELS: Record<string, string> = {
   PENDING: getOrderStatusLabel('PENDING'),
@@ -48,11 +82,39 @@ const STATUS_COLORS: Record<string, { bg: string; text: string; border: string }
   CANCELLED: { bg: 'bg-red-100', text: 'text-red-800', border: 'border-red-200' },
 };
 
-export default function OrdersList({ initialOrders }: OrdersListProps) {
+const VIEW_STATUS: Partial<Record<OrderWorkflowView, OrderStatusValue>> = {
+  'needs-review': 'PENDING',
+  accepted: 'CONFIRMED',
+  preparing: 'PROCESSING',
+  ready: 'SHIPPED',
+  delivered: 'DELIVERED',
+};
+
+const ACTION_LABELS: Record<OrderStatusValue, string> = {
+  PENDING: 'Submitted',
+  CONFIRMED: 'Accept',
+  PROCESSING: 'Start preparing',
+  SHIPPED: 'Mark ready',
+  DELIVERED: 'Mark delivered',
+  CANCELLED: 'Cancel',
+};
+
+const ACTION_CLASSES: Record<OrderStatusValue, string> = {
+  PENDING: 'bg-gray-700 hover:bg-gray-600',
+  CONFIRMED: 'bg-blue-600 hover:bg-blue-700',
+  PROCESSING: 'bg-purple-600 hover:bg-purple-700',
+  SHIPPED: 'bg-orange-600 hover:bg-orange-700',
+  DELIVERED: 'bg-green-600 hover:bg-green-700',
+  CANCELLED: 'bg-red-600 hover:bg-red-700',
+};
+
+export default function OrdersList({ initialOrders, customerFilterLabel }: OrdersListProps) {
+  const router = useRouter();
   const [orders, setOrders] = useState<Order[]>(initialOrders);
   const [selectedOrders, setSelectedOrders] = useState<Set<string>>(new Set());
+  useBodyOverlay(selectedOrders.size > 0);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<BatchStatusMessage | null>(null);
   const [workflowView, setWorkflowView] = useState<OrderWorkflowView>('all');
   const [tableDensity, setTableDensity] = useState<TableDensity>('comfortable');
 
@@ -62,6 +124,12 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    setOrders(initialOrders);
+    setSelectedOrders(new Set());
+    setWorkflowView('all');
+  }, [initialOrders, customerFilterLabel]);
 
   const handleDensityChange = (mode: TableDensity) => {
     setTableDensity(mode);
@@ -84,10 +152,35 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
       { key: 'accepted' as const, label: 'Accepted', count: orders.filter((order) => order.status === 'CONFIRMED').length },
       { key: 'preparing' as const, label: 'Preparing', count: orders.filter((order) => order.status === 'PROCESSING').length },
       { key: 'ready' as const, label: 'Ready', count: orders.filter((order) => order.status === 'SHIPPED').length },
-      { key: 'delivered' as const, label: 'Delivered', count: orders.filter((order) => order.status === 'DELIVERED').length },
+
     ],
     [orders],
   );
+
+  const selectedOrderList = useMemo(
+    () => orders.filter((order) => selectedOrders.has(order.id)),
+    [orders, selectedOrders],
+  );
+
+  const allowedBulkTransitions = useMemo(() => {
+    if (selectedOrderList.length === 0) return [];
+
+    const viewStatus = VIEW_STATUS[workflowView];
+    const sourceStatuses = viewStatus
+      ? [viewStatus]
+      : Array.from(new Set(selectedOrderList.map((order) => order.status))).filter(isOrderStatus);
+
+    const transitionSet = new Set<OrderStatusValue>();
+    sourceStatuses.forEach((status) => {
+      getAllowedOrderStatusTransitions(status).forEach((transition) => {
+        if (selectedOrderList.some((order) => getAllowedOrderStatusTransitions(order.status).includes(transition))) {
+          transitionSet.add(transition);
+        }
+      });
+    });
+
+    return Array.from(transitionSet);
+  }, [selectedOrderList, workflowView]);
 
   const toggleSelectAll = () => {
     const visibleIds = visibleOrders.map((order) => order.id);
@@ -114,7 +207,7 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
     setSelectedOrders(newSelected);
   };
 
-  const handleBatchUpdate = async (newStatus: string) => {
+  const handleBatchUpdate = async (newStatus: OrderStatusValue) => {
     if (selectedOrders.size === 0) return;
 
     setIsUpdating(true);
@@ -130,49 +223,63 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
         }),
       });
 
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error || 'Failed to update requests');
-      }
-
-      const result = await response.json();
-      
+      const result = (await response.json()) as BatchStatusResponse;
       const updatedOrderIds = new Set<string>(
         Array.isArray(result.updatedOrderIds)
           ? result.updatedOrderIds.filter((id: unknown): id is string => typeof id === 'string')
-          : Array.from(selectedOrders)
+          : [],
       );
+      const updatedCount = Number(result.updatedCount ?? updatedOrderIds.size);
+      const skippedCount = Number(result.skippedCount ?? 0);
+      const noOpCount = Number(result.noOpCount ?? 0);
+      const skippedOrders = Array.isArray(result.skippedOrders)
+        ? result.skippedOrders.map((skipped) => {
+            const id = typeof skipped.id === 'string' ? skipped.id : '';
+            const order = orders.find((item) => item.id === id);
+            return {
+              id,
+              orderLabel: order ? `#${order.orderId}` : 'Request',
+              reason: typeof skipped.reason === 'string' ? skipped.reason : 'This request cannot move to that status.',
+            };
+          })
+        : [];
+
+      if (!response.ok && updatedCount === 0) {
+        setMessage({
+          type: 'error',
+          title: skippedCount > 0 ? `0 updated, ${skippedCount} skipped` : 'Batch update failed',
+          text: result.error || 'Failed to update selected requests.',
+          skippedOrders,
+        });
+        return;
+      }
 
       setOrders(prev => prev.map(order =>
         updatedOrderIds.has(order.id) ? { ...order, status: newStatus } : order
       ));
-      
-      const skippedCount = Number(result.skippedCount || 0);
-      const noOpCount = Number(result.noOpCount || 0);
-      const extraContext = [
-        skippedCount > 0 ? `${skippedCount} skipped because that move is not allowed` : '',
+
+      const context = [
         noOpCount > 0 ? `${noOpCount} already ${STATUS_LABELS[newStatus]}` : '',
-      ].filter(Boolean).join('; ');
+        skippedCount > 0 ? 'Review the skipped reasons below.' : '',
+      ].filter(Boolean).join(' ');
 
       setMessage({
-        type: 'success',
-        text: `Updated ${result.updatedCount} request${result.updatedCount !== 1 ? 's' : ''} to ${STATUS_LABELS[newStatus]}${extraContext ? `. ${extraContext}.` : ''}`,
+        type: skippedCount > 0 ? 'warning' : 'success',
+        title: skippedCount > 0 ? `${updatedCount} updated, ${skippedCount} skipped` : `${updatedCount} updated`,
+        text: `Moved ${updatedCount} request${updatedCount !== 1 ? 's' : ''} to ${STATUS_LABELS[newStatus]}.${context ? ` ${context}` : ''}`,
+        skippedOrders,
       });
       setSelectedOrders(new Set());
     } catch (err) {
-      setMessage({ 
-        type: 'error', 
-        text: err instanceof Error ? err.message : 'Update failed' 
+      setMessage({
+        type: 'error',
+        title: 'Batch update failed',
+        text: err instanceof Error ? err.message : 'Update failed'
       });
     } finally {
       setIsUpdating(false);
     }
   };
-
-  const canCancel = Array.from(selectedOrders).some(id => {
-    const order = orders.find(o => o.id === id);
-    return order && order.status !== 'DELIVERED' && order.status !== 'CANCELLED';
-  });
 
   const hasSelection = selectedOrders.size > 0;
   const compactMode = tableDensity === 'compact';
@@ -182,40 +289,64 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
     <div className="relative">
       {/* Message Toast */}
       {message && (
-        <div className={`mb-4 p-4 rounded-lg ${message.type === 'success' ? 'bg-green-50 border border-green-200 text-green-800' : 'bg-red-50 border border-red-200 text-red-800'}`}>
-          <div className="flex items-center justify-between">
-            <span className="font-medium">{message.text}</span>
-            <button 
+        <div
+          className={`mb-4 rounded-lg border p-4 ${
+            message.type === 'success'
+              ? 'border-green-200 bg-green-50 text-green-800'
+              : message.type === 'warning'
+                ? 'border-amber-200 bg-amber-50 text-amber-900'
+                : 'border-red-200 bg-red-50 text-red-800'
+          }`}
+        >
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="font-semibold">{message.title}</p>
+              <p className="mt-1 text-sm">{message.text}</p>
+              {message.skippedOrders && message.skippedOrders.length > 0 && (
+                <ul className="mt-3 space-y-1 text-sm">
+                  {message.skippedOrders.map((skipped) => (
+                    <li key={`${skipped.id}-${skipped.reason}`} className="flex gap-2">
+                      <span className="font-medium">{skipped.orderLabel}:</span>
+                      <span>{skipped.reason}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+            <button
+              type="button"
               onClick={() => setMessage(null)}
-              className="text-sm opacity-75 hover:opacity-100"
+              aria-label="Dismiss update message"
+              className="min-h-10 rounded-md px-2 py-1 text-sm opacity-75 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
             >
-              ✕
+              Dismiss
             </button>
           </div>
         </div>
       )}
 
       <div className="mb-4 rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-        <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm font-semibold text-gray-900">Saved workflow views</p>
-          <p className="text-xs text-gray-500">Start with the next request state before selecting batch actions.</p>
-        </div>
-        <div className="flex flex-wrap gap-2">
+
+        <label className="block sm:hidden"><span className="sr-only">Filter requests</span><select value={workflowView} onChange={(event) => { setWorkflowView(event.target.value as OrderWorkflowView); setSelectedOrders(new Set()); }} className="min-h-10 w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-base">{workflowViews.map((view) => <option key={view.key} value={view.key}>{view.label} ({view.count})</option>)}</select></label>
+        <div className="hidden flex-wrap gap-2 sm:flex">
           {workflowViews.map((view) => (
             <button
               key={view.key}
               type="button"
-              onClick={() => setWorkflowView(view.key)}
+              onClick={() => {
+                setWorkflowView(view.key);
+                setSelectedOrders(new Set());
+              }}
               aria-pressed={workflowView === view.key}
               aria-label={`${view.label}: ${view.count} requests`}
-              className={`rounded-lg px-3 py-2 text-sm font-medium ${
+              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2 ${
                 workflowView === view.key
                   ? 'bg-green-600 text-white'
                   : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
               }`}
             >
-              {view.label}
-              <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
+              <span>{view.label}</span>
+              <span className={`rounded-full px-2 py-0.5 text-xs ${
                 workflowView === view.key ? 'bg-white/20 text-white' : 'bg-white text-gray-600 ring-1 ring-gray-200'
               }`}>
                 {view.count}
@@ -227,12 +358,10 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
 
       <Card className="bg-white shadow-sm border border-gray-200">
         <CardHeader>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle className="text-lg font-semibold text-gray-900">
-              Active Requests ({visibleOrders.length})
-            </CardTitle>
+          <div className="flex items-center justify-between gap-3">
+            <label className="flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" checked={visibleOrders.length > 0 && visibleOrders.every(order => selectedOrders.has(order.id))} onChange={toggleSelectAll} />Select all</label>
             <div className="flex flex-wrap items-center gap-3">
-              <TableDensityControl value={tableDensity} onChange={handleDensityChange} />
+              <div className="hidden sm:block"><TableDensityControl value={tableDensity} onChange={handleDensityChange} /></div>
               {hasSelection && (
                 <span className="text-sm text-gray-600">
                   {selectedOrders.size} selected
@@ -250,11 +379,17 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                 </svg>
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {orders.length === 0 ? 'No active order requests' : 'No requests in this view'}
+                {orders.length === 0
+                  ? customerFilterLabel
+                    ? `No active requests for ${customerFilterLabel}`
+                    : 'No active order requests'
+                  : 'No requests in this view'}
               </h3>
               <p className="text-gray-500 mb-2 max-w-md mx-auto">
                 {orders.length === 0
-                  ? 'You do not have any submitted, accepted, preparing, or ready/in-transit requests right now.'
+                  ? customerFilterLabel
+                    ? 'Delivered and cancelled requests stay in history. Active requests for this customer will appear here.'
+                    : 'You do not have any submitted, accepted, preparing, or ready/in-transit requests right now.'
                   : 'Switch workflow views to see other request states.'}
               </p>
               {orders.length === 0 ? (
@@ -276,7 +411,16 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
               )}
             </div>
           ) : (
-            <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
+            <>
+            <div className="space-y-2 sm:hidden">{visibleOrders.map(order => {
+              const colors = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
+              return <article key={order.id} className="rounded-xl border border-gray-200 p-3">
+                <div className="flex items-start gap-2"><label className="flex h-10 w-10 shrink-0 items-center justify-center -ml-2"><input type="checkbox" checked={selectedOrders.has(order.id)} onChange={() => toggleSelect(order.id)} aria-label={`Select request #${order.orderId}`} className="h-4 w-4" /></label><div className="min-w-0"><Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center text-sm font-semibold text-green-700 break-all">#{order.orderId}</Link><p className="text-sm text-gray-600">{order.dispensary.businessName}</p></div></div>
+                <div className="mt-1 flex flex-wrap items-center justify-between gap-2"><span className={`rounded-full px-2 py-1 text-xs ${colors.bg} ${colors.text}`}>{STATUS_LABELS[order.status] || order.status}</span><strong className="text-sm">{formatProductMoney(order.totalAmount)}</strong></div>
+                <div className="mt-1 flex items-center justify-between gap-2 text-xs text-gray-500"><span>{format(new Date(order.createdAt), 'MMM d, yyyy')}</span><Link href={`/grower/orders/${order.id}`} className="inline-flex min-h-10 items-center rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold text-green-700">View →</Link></div>
+              </article>;
+            })}</div>
+            <div className="hidden overflow-x-auto sm:block">
               <table className="w-full text-left border-collapse min-w-[640px]">
                 <thead>
                   <tr className="border-b border-gray-200">
@@ -285,6 +429,8 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                         type="checkbox"
                         checked={visibleOrders.length > 0 && visibleOrders.every((order) => selectedOrders.has(order.id))}
                         onChange={toggleSelectAll}
+                        onClick={(event) => event.stopPropagation()}
+                        aria-label="Select all visible requests"
                         className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                       />
                     </th>
@@ -300,15 +446,18 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                   {visibleOrders.map((order) => {
                     const colors = STATUS_COLORS[order.status] || STATUS_COLORS.PENDING;
                     return (
-                      <tr 
-                        key={order.id} 
-                        className={`hover:bg-gray-50 transition-colors ${selectedOrders.has(order.id) ? 'bg-green-50/50' : ''}`}
+                      <tr
+                        key={order.id}
+                        onClick={() => router.push(`/grower/orders/${order.id}`)}
+                        className={`cursor-pointer transition-colors hover:bg-gray-50 ${selectedOrders.has(order.id) ? 'bg-green-50/50' : ''}`}
                       >
                         <td className={cellClass}>
                           <input
                             type="checkbox"
                             checked={selectedOrders.has(order.id)}
                             onChange={() => toggleSelect(order.id)}
+                            onClick={(event) => event.stopPropagation()}
+                            aria-label={`Select request #${order.orderId}`}
                             className="w-4 h-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
                           />
                         </td>
@@ -331,7 +480,7 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                         </td>
                         <td className={cellClass}>
                           <Button variant="ghost" size="sm" asChild>
-                            <Link href={`/grower/orders/${order.id}`}>
+                            <Link href={`/grower/orders/${order.id}`} onClick={(event) => event.stopPropagation()}>
                               View
                             </Link>
                           </Button>
@@ -342,6 +491,7 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                 </tbody>
               </table>
             </div>
+            </>
           )}
         </CardContent>
       </Card>
@@ -355,51 +505,40 @@ export default function OrdersList({ initialOrders }: OrdersListProps) {
                 {selectedOrders.size} request{selectedOrders.size !== 1 ? 's' : ''} selected
               </span>
               <button
+                type="button"
                 onClick={() => setSelectedOrders(new Set())}
-                className="text-sm text-gray-400 hover:text-white transition-colors"
+                className="min-h-10 rounded-md px-2 py-1 text-sm text-gray-400 transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
               >
                 Clear
               </button>
             </div>
 
             <div className="flex flex-wrap justify-center gap-2">
-              <button
-                onClick={() => handleBatchUpdate('CONFIRMED')}
-                disabled={isUpdating}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
-              >
-                Accept
-              </button>
-              <button
-                onClick={() => handleBatchUpdate('PROCESSING')}
-                disabled={isUpdating}
-                className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
-              >
-                Prepare
-              </button>
-              <button
-                onClick={() => handleBatchUpdate('SHIPPED')}
-                disabled={isUpdating}
-                className="px-3 py-1.5 bg-orange-600 hover:bg-orange-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
-              >
-                Ready / In transit
-              </button>
-              <button
-                onClick={() => handleBatchUpdate('DELIVERED')}
-                disabled={isUpdating}
-                className="px-3 py-1.5 bg-green-600 hover:bg-green-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
-              >
-                Deliver
-              </button>
-              {canCancel && (
-                <button
-                  onClick={() => handleBatchUpdate('CANCELLED')}
-                  disabled={isUpdating}
-                  className="px-3 py-1.5 bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-lg text-sm font-medium transition-colors"
-                >
-                  Cancel
-                </button>
+              {allowedBulkTransitions.length > 0 ? (
+                allowedBulkTransitions.map((targetStatus) => (
+                  <button
+                    key={targetStatus}
+                    type="button"
+                    onClick={() => handleBatchUpdate(targetStatus)}
+                    disabled={isUpdating}
+                    className={`min-h-10 rounded-lg px-3 py-1.5 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900 ${ACTION_CLASSES[targetStatus]}`}
+                  >
+                    {ACTION_LABELS[targetStatus]}
+                  </button>
+                ))
+              ) : (
+                <span className="rounded-lg bg-white/10 px-3 py-1.5 text-sm text-gray-300">
+                  No bulk transitions available
+                </span>
               )}
+              <button
+                type="button"
+                onClick={() => setSelectedOrders(new Set())}
+                disabled={isUpdating}
+                className="min-h-10 rounded-lg px-3 py-1.5 text-sm font-medium text-gray-300 transition-colors hover:text-white disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-900"
+              >
+                Clear selection
+              </button>
             </div>
 
             {isUpdating && (

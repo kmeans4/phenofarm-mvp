@@ -42,3 +42,9 @@ playwright-report/
 .claude/
 tsconfig.tsbuildinfo
 .codex/tmp/
+
+# Private environment files and local uploaded media
+.env
+.env.*
+!.env.example
+public/uploads/

@@ -1,0 +1,64 @@
+{
+  "slug": "17-order-detail",
+  "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+  "routePattern": "/grower/orders/[id]",
+  "pass1": {
+    "inspected": [
+      "pass-1/17-order-detail-desktop.png",
+      "pass-1/17-order-detail-mobile.png"
+    ],
+    "strengths": [
+      "Requested item and value are clear; direct settlement is distinguished from the recorded estimate; customer contact details are available."
+    ],
+    "issues": [
+      {
+        "key": "request-detail-mobile-actions",
+        "priority": "high",
+        "viewport": "mobile",
+        "observation": "Long32px request heading plus four stacked navigation/edit/print/export actions precede the item. The primary fulfillment decision Accept/Cancel is far lower on the page, while sticky footer repeats All orders and Edit request rather than the next action.",
+        "recommendation": "Use ‘Request’ with a smaller reference line; put back navigation once, keep the next status action near the summary, and move Edit/Print/Export into an overflow menu. Use ‘Requests’ consistently instead of ‘All orders’."
+      },
+      {
+        "key": "request-status-repetition",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Submitted appears in the title area, Update Status badge, timeline, ‘Currently: Submitted’ callout and History. Timeline lists four future stages with Pending; mobile stretches it into a tall block, followed by a near-duplicate History card.",
+        "recommendation": "Use one current-status chip and one compact progress/history area. Collapse future stages; remove ‘5 stages’, ‘Quick actions to move fulfillment forward’ and the duplicate current-status callout."
+      },
+      {
+        "key": "request-value-copy",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "‘Requested Items’, ‘Estimated item value’, ‘Estimated request value’ and repeated direct-payment wording lengthen a one-item request.",
+        "recommendation": "Use ‘Items’, ‘Subtotal’, ‘Est. total’ and one payment note ‘Payment arranged directly’."
+      }
+    ],
+    "limits": [
+      "No status, edit, print, export or Message buyer action activated; only existing request read."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/17-order-detail-desktop.png",
+      "pass-2/17-order-detail-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+    "confirmedIssueKeys": [
+      "request-detail-mobile-actions",
+      "request-status-repetition",
+      "request-value-copy"
+    ],
+    "newIssues": [
+      {
+        "key": "request-address-separator",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "The customer address joins street and city as “456 Market StreetBurlington, VT 05401” with no separator. It was visible in both passes and independently confirmed in the second.",
+        "recommendation": "Preserve a line break or insert a comma between street and city in compact address layouts."
+      }
+    ],
+    "source": "root-pass2-notes.md"
+  }
+}

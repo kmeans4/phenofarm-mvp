@@ -1,0 +1,44 @@
+{
+  "slug": "12-batch-add",
+  "route": "/grower/batches/add",
+  "pass1": {
+    "inspected": [
+      "pass-1/12-batch-add-desktop.png",
+      "pass-1/12-batch-add-mobile.png"
+    ],
+    "strengths": [
+      "Clear required batch identity/harvest fields; lab uploads are separated by test type and size limit is explicit."
+    ],
+    "issues": [
+      {
+        "key": "batch-upload-density",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Three upload cards each repeat the test name in a sentence, display a Missing badge and a separate Upload PDF button. On mobile these occupy roughly560px; the introductory upload paragraph adds another80px.",
+        "recommendation": "Use \u2018Lab PDFs \u00b7 up to2MB each\u2019 once, then compact rows \u2018Potency\u2019, \u2018Pesticides\u2019, \u2018Microbials\u2019 with status and Upload. Reserve explanation for help or an error. Avoid \u2018Missing\u2019 warning styling on a brand-new untouched form unless required."
+      },
+      {
+        "key": "batch-form-density",
+        "priority": "low",
+        "viewport": "mobile",
+        "observation": "THC, CBD and total cannabinoids each occupy a full-width row despite short numeric values; Add New Batch/subtitle/Batch Details repeat the task, and the batch-number example is shown twice.",
+        "recommendation": "Use \u2018Add batch\u2019, one \u2018Batch ID\u2019 example and a \u2018Generate\u2019 control. Pair THC/CBD in a grid with total below or use a compact three-column lab row if labels remain readable; use \u2018Total (%)\u2019 inside Lab results."
+      }
+    ],
+    "limits": [
+      "No generated batch number, files, or form values submitted."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/12-batch-add-desktop.png",
+      "pass-2/12-batch-add-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile captures confirm the three upload cards repeat the same instruction and Missing status, while the three compact numeric lab fields become full-width rows on mobile. The sample format hint repeats the placeholder. Upload limits remain useful and should be preserved in a concise shared line. No files or values were entered.",
+    "confirmedIssueKeys": [
+      "batch-upload-density",
+      "batch-form-density"
+    ],
+    "newIssues": []
+  }
+}

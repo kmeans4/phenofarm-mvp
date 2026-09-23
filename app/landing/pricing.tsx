@@ -1,6 +1,6 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { m as motion } from 'framer-motion';
 import { useState } from 'react';
 import { Check } from 'lucide-react';
 import Link from 'next/link';
@@ -28,7 +28,7 @@ const plans = [
     features: [
       'Everything in Free',
       'Unlimited product listings',
-      'Advanced analytics',
+      'Priority support & higher limits',
       'CSV bulk upload',
       'Metrc integration ready',
       'Priority support',
@@ -55,7 +55,7 @@ export function Pricing() {
   const [isAnnual, setIsAnnual] = useState(true);
 
   return (
-    <section id="pricing" className="relative border-t border-white/[0.06] py-28 md:py-36">
+    <section id="pricing" className="relative border-t border-white/[0.06] pb-28 pt-20 md:pb-36 md:pt-24">
       <div className="mx-auto max-w-6xl px-6">
         <motion.div
           initial={{ opacity: 0, y: 24 }}

@@ -1,0 +1,28 @@
+{
+  "results": [
+    {
+      "case": "Customer records appear once at phone/tablet/desktop transition",
+      "passed": true,
+      "widths": [
+        360,
+        700,
+        768
+      ]
+    },
+    {
+      "case": "Collapsed optional new-customer fields remain in submitted payload",
+      "passed": true,
+      "mutation": "POST intercepted; no record created"
+    },
+    {
+      "case": "Collapsed customer website/description remain in submitted payload",
+      "passed": true,
+      "mutation": "PUT intercepted; no record updated"
+    },
+    {
+      "case": "Invalid optional website keeps a visible correction prompt",
+      "passed": true
+    }
+  ],
+  "errors": []
+}

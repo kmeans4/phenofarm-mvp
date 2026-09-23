@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import type { BuyerCatalogPage } from '@/lib/buyer-catalog';
 import { 
   LayoutGrid, 
   List as ListIcon, 
@@ -9,49 +10,59 @@ import {
   Search,
   Filter
 } from "lucide-react";
+import { Modal } from '@/app/components/ui/Modal';
+import { ProductImage } from '@/app/components/ui/ProductImage';
+import { getThcBadgeColor } from '@/lib/product-badges';
+import { useSearchParams } from 'next/navigation';
 import AddToCartButton from "../../catalog/components/AddToCartButton";
 
 interface Product {
   id: string;
   name: string;
-  price: number;
+  price: number | null;
   isPriceVisible: boolean;
   strain: { name: string } | null;
   productType: string | null;
   subType: string | null;
   unit: string | null;
   batch: { thc: number | null } | null;
-  thcLegacy: number | null;
+  thc: number | null;
   inventoryQty: number;
   images: string[];
-  description: string | null;
+
 }
 
 type ViewMode = 'grid' | 'list';
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'thc-asc' | 'thc-desc' | 'name-asc' | 'name-desc';
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'default', label: 'Featured' },
-  { value: 'price-asc', label: 'Price: Low to High' },
-  { value: 'price-desc', label: 'Price: High to Low' },
-  { value: 'thc-desc', label: 'THC: High to Low' },
-  { value: 'thc-asc', label: 'THC: Low to High' },
+  { value: 'default', label: 'Newest' },
+  { value: 'price-asc', label: 'Price: low' },
+  { value: 'price-desc', label: 'Price: high' },
+  { value: 'thc-desc', label: 'THC: high' },
+  { value: 'thc-asc', label: 'THC: low' },
   { value: 'name-asc', label: 'Name: A-Z' },
   { value: 'name-desc', label: 'Name: Z-A' },
 ];
 
+function shopProducts(data: BuyerCatalogPage): Product[] {
+  return data.products.map(product => ({ ...product, strain: product.strain ? { name: product.strain } : null, batch: { thc: product.thc } }));
+}
+
 export default function GrowerShopContent({ 
-  products,
+  initialData,
   growerName,
   growerId 
 }: { 
-  products: Product[];
+  initialData: BuyerCatalogPage;
   growerName: string;
   growerId: string;
 }) {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('default');
-  const [searchQuery, setSearchQuery] = useState('');
+  const searchParams = useSearchParams();
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  useEffect(() => { setSearchQuery(searchParams.get('search') || ''); }, [searchParams]);
   const [selectedType, setSelectedType] = useState<string | null>(null);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -62,60 +73,47 @@ export default function GrowerShopContent({
   const [messageSuccess, setMessageSuccess] = useState('');
   const [messageError, setMessageError] = useState('');
 
-  // Get unique product types for filter
-  const productTypes = useMemo(() => {
-    const types = [...new Set(products.map(p => p.productType).filter(Boolean))];
-    return types.sort();
-  }, [products]);
+  const [products, setProducts] = useState(() => shopProducts(initialData));
+  const [total, setTotal] = useState(initialData.total);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(initialData.hasMore);
+  const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState('');
+  const [productTypes, setProductTypes] = useState(() => Object.keys(initialData.productTypeCounts).sort());
+  const [debouncedSearch, setDebouncedSearch] = useState(searchQuery);
+  useEffect(() => {
+    const timer = setTimeout(() => { setDebouncedSearch(searchQuery); setPage(1); }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+  const key = JSON.stringify([growerId, debouncedSearch, selectedType, sortBy, page]);
+  const hydratedKey = useRef<string | null>(key);
+  useEffect(() => {
+    if (hydratedKey.current === key) return;
+    hydratedKey.current = null;
+    const controller = new AbortController();
+    setLoading(true); setLoadError('');
+    const params = new URLSearchParams({ growerId, search: debouncedSearch, sortBy, page: String(page), limit: '24' });
+    if (selectedType) params.set('productTypes', selectedType);
+    fetch(`/api/dispensary/catalog?${params}`, { signal: controller.signal }).then(async response => {
+      if (!response.ok) throw new Error('Could not load products. Try again.');
+      const data: BuyerCatalogPage = await response.json();
+      if (controller.signal.aborted) return;
+      const next = shopProducts(data);
+      setProducts(previous => page === 1 ? next : [...new Map([...previous, ...next].map(product => [product.id, product])).values()]);
+      setTotal(data.total); setHasMore(data.hasMore); setProductTypes(Object.keys(data.productTypeCounts).sort());
+    }).catch(error => { if (!controller.signal.aborted) setLoadError(error.message); })
+      .finally(() => { if (!controller.signal.aborted) setLoading(false); });
+    return () => controller.abort();
+  }, [key, growerId, debouncedSearch, selectedType, sortBy, page]);
+  const filteredProducts = products;
 
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
-
-    // Apply search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(p => 
-        p.name.toLowerCase().includes(query) ||
-        (p.strain?.name && p.strain.name.toLowerCase().includes(query)) ||
-        (p.productType && p.productType.toLowerCase().includes(query))
-      );
-    }
-
-    // Apply type filter
-    if (selectedType) {
-      result = result.filter(p => p.productType === selectedType);
-    }
-
-    // Apply sorting
-    switch (sortBy) {
-      case 'price-asc':
-        result.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        result.sort((a, b) => b.price - a.price);
-        break;
-      case 'thc-asc':
-        result.sort((a, b) => ((a.batch?.thc || a.thcLegacy || 0) - (b.batch?.thc || b.thcLegacy || 0)));
-        break;
-      case 'thc-desc':
-        result.sort((a, b) => ((b.batch?.thc || b.thcLegacy || 0) - (a.batch?.thc || a.thcLegacy || 0)));
-        break;
-      case 'name-asc':
-        result.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-      case 'name-desc':
-        result.sort((a, b) => b.name.localeCompare(a.name));
-        break;
-    }
-
-    return result;
-  }, [products, searchQuery, selectedType, sortBy]);
+  const changeType = (value: string | null) => { setPage(1); setSelectedType(value); };
+  const changeSort = (value: SortOption) => { setPage(1); setSortBy(value); };
 
   const clearFilters = () => {
     setSearchQuery('');
-    setSelectedType(null);
-    setSortBy('default');
+    changeType(null);
+    changeSort('default');
   };
 
   const openMessageModal = (product: Product, mode: 'REQUEST_PRICING' | 'QUESTION') => {
@@ -187,22 +185,21 @@ export default function GrowerShopContent({
   const hasActiveFilters = searchQuery || selectedType || sortBy !== 'default';
 
   return (
-    <div className="space-y-6">
+    <div id="shop-products" className="scroll-mt-24 space-y-4 sm:scroll-mt-4">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">All Products</h2>
-          <p className="text-gray-600">Browse {growerName}&apos;s full catalog</p>
+          <h2 className="text-xl font-semibold text-gray-900">Products ({total})</h2>
         </div>
         
         {/* Controls */}
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-2 sm:flex sm:flex-wrap">
           {/* Search */}
-          <div className="relative flex-1 min-w-[200px] max-w-xs">
+          <div className="relative col-span-3 min-w-0 flex-1 sm:min-w-[180px]">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search products..."
+              placeholder="Search products" aria-label="Search products"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
@@ -213,8 +210,8 @@ export default function GrowerShopContent({
           <div className="relative">
             <select
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value as SortOption)}
-              className="appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer text-sm"
+              onChange={(e) => changeSort(e.target.value as SortOption)}
+              aria-label="Sort products" className="w-full appearance-none bg-white border border-gray-300 rounded-lg px-4 py-2 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent cursor-pointer text-base sm:text-sm"
             >
               {SORT_OPTIONS.map(option => (
                 <option key={option.value} value={option.value}>
@@ -227,6 +224,7 @@ export default function GrowerShopContent({
 
           {/* Filter Button (Mobile) */}
           <button
+            aria-label="Product filters" aria-expanded={showFilters}
             onClick={() => setShowFilters(!showFilters)}
             className={`lg:hidden flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
               showFilters 
@@ -235,7 +233,7 @@ export default function GrowerShopContent({
             }`}
           >
             <Filter size={18} />
-            Filters
+            <span className="hidden sm:inline">Filters</span>
             {selectedType && (
               <span className="ml-1 bg-white text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">
                 1
@@ -246,6 +244,9 @@ export default function GrowerShopContent({
           {/* View Mode Toggle */}
           <div className="flex rounded-lg border border-gray-300 overflow-hidden">
             <button
+              type="button"
+              aria-label="Grid view"
+              aria-pressed={viewMode === 'grid'}
               onClick={() => setViewMode('grid')}
               className={`px-3 py-2 flex items-center gap-2 transition-colors ${
                 viewMode === 'grid' 
@@ -256,6 +257,9 @@ export default function GrowerShopContent({
               <LayoutGrid size={18} />
             </button>
             <button
+              type="button"
+              aria-label="List view"
+              aria-pressed={viewMode === 'list'}
               onClick={() => setViewMode('list')}
               className={`px-3 py-2 flex items-center gap-2 transition-colors ${
                 viewMode === 'list' 
@@ -276,7 +280,7 @@ export default function GrowerShopContent({
           {sortBy !== 'default' && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-50 text-purple-700 text-sm rounded-full">
               {SORT_OPTIONS.find(o => o.value === sortBy)?.label}
-              <button onClick={() => setSortBy('default')} className="hover:text-purple-900">
+              <button onClick={() => changeSort('default')} className="hover:text-purple-900">
                 <X size={14} />
               </button>
             </span>
@@ -284,7 +288,7 @@ export default function GrowerShopContent({
           {selectedType && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-700 text-sm rounded-full">
               Type: {selectedType}
-              <button onClick={() => setSelectedType(null)} className="hover:text-green-900">
+              <button onClick={() => changeType(null)} className="hover:text-green-900">
                 <X size={14} />
               </button>
             </span>
@@ -306,16 +310,11 @@ export default function GrowerShopContent({
         </div>
       )}
 
-      {/* Results Count */}
-      <div className="text-sm text-gray-600">
-        Showing {filteredProducts.length} of {products.length} products
-      </div>
-
       {/* Product Type Filters (Desktop) */}
       <div className="hidden lg:flex flex-wrap gap-2">
         <button
-          onClick={() => setSelectedType(null)}
-          className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+          onClick={() => changeType(null)}
+          className={`min-h-10 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
             !selectedType 
               ? 'bg-green-600 text-white' 
               : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -326,8 +325,8 @@ export default function GrowerShopContent({
         {productTypes.map(type => (
           <button
             key={type}
-            onClick={() => setSelectedType(type === selectedType ? null : type)}
-            className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+            onClick={() => changeType(type === selectedType ? null : type)}
+            className={`min-h-10 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
               selectedType === type 
                 ? 'bg-green-600 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -340,12 +339,12 @@ export default function GrowerShopContent({
 
       {/* Mobile Filters Panel */}
       {showFilters && (
-        <div className="lg:hidden bg-white rounded-lg border border-gray-200 p-4 space-y-4">
-          <h3 className="font-semibold text-gray-900">Filter by Type</h3>
+        <div className="lg:hidden bg-white rounded-lg border border-gray-200 p-3 space-y-2">
+          <h3 className="font-semibold text-gray-900">Product type</h3>
           <div className="flex flex-wrap gap-2">
             <button
-              onClick={() => setSelectedType(null)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              onClick={() => changeType(null)}
+              className={`min-h-10 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 !selectedType 
                   ? 'bg-green-600 text-white' 
                   : 'bg-gray-100 text-gray-700'
@@ -356,8 +355,8 @@ export default function GrowerShopContent({
             {productTypes.map(type => (
               <button
                 key={type}
-                onClick={() => setSelectedType(type === selectedType ? null : type)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                onClick={() => changeType(type === selectedType ? null : type)}
+                className={`min-h-10 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   selectedType === type 
                     ? 'bg-green-600 text-white' 
                     : 'bg-gray-100 text-gray-700'
@@ -371,10 +370,13 @@ export default function GrowerShopContent({
       )}
 
       {/* Products Grid/List */}
+      {loadError && <p role="alert" className="text-sm text-red-600">{loadError}</p>}
+      {loading && <p role="status" className="text-sm text-gray-500">Loading products…</p>}
+      {hasMore && <button type="button" disabled={loading} onClick={() => setPage(value => value + 1)} className="min-h-10 rounded-lg border px-4 py-2 text-sm">More products</button>}
       {filteredProducts.length > 0 ? (
         <>
           {viewMode === 'grid' ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-4">
               {filteredProducts.map(product => (
                 <ProductCard 
                   key={product.id} 
@@ -421,294 +423,55 @@ export default function GrowerShopContent({
         </div>
       )}
 
-      {messageProduct && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden">
-            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">
-                  {messageMode === 'REQUEST_PRICING' ? 'Request Pricing' : 'Message Grower'}
-                </h2>
-                <p className="text-sm text-gray-500 mt-0.5">{messageProduct.name} • {growerName}</p>
-              </div>
-              <button
-                onClick={() => {
-                  setMessageProduct(null);
-                  setMessageSuccess('');
-                  setMessageError('');
-                }}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="p-6 space-y-4">
-              <label className="block text-sm font-medium text-gray-700">Message to grower</label>
-              <textarea
-                value={messageText}
-                onChange={(e) => setMessageText(e.target.value)}
-                rows={5}
-                className="w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Write your message..."
-              />
-              {messageSuccess && <p className="text-sm text-green-700">{messageSuccess}</p>}
-              {messageError && <p className="text-sm text-red-600">{messageError}</p>}
-            </div>
-
-            <div className="px-6 py-4 border-t border-gray-200 flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setMessageProduct(null);
-                  setMessageSuccess('');
-                  setMessageError('');
-                }}
-                className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={sendMessage}
-                disabled={messageSending || !messageText.trim()}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                {messageSending ? 'Sending…' : 'Send Message'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Modal open={Boolean(messageProduct)} onClose={() => { if (!messageSending) { setMessageProduct(null); setMessageSuccess(''); setMessageError(''); } }} title={messageMode === 'REQUEST_PRICING' ? 'Request pricing' : 'Message grower'} className="max-w-lg">
+        {messageProduct && <div className="space-y-4">
+          <div className="min-w-0"><p className="break-words font-medium text-gray-900">{messageProduct.name}</p><p className="break-words text-sm text-gray-500">To: {growerName}</p></div>
+          <label htmlFor="shop-message" className="block text-sm font-medium text-gray-700">Message</label>
+          <textarea id="shop-message" value={messageText} onChange={(e) => setMessageText(e.target.value)} rows={4} className="w-full rounded-lg border border-gray-300 px-4 py-3 text-base focus:ring-2 focus:ring-green-500 sm:text-sm" placeholder="Write your message…" />
+          {messageSuccess && <p className="text-sm text-green-700">{messageSuccess}</p>}
+          {messageError && <p className="text-sm text-red-600">{messageError}</p>}
+          <div className="flex justify-end gap-3"><button type="button" disabled={messageSending} onClick={() => setMessageProduct(null)} className="min-h-10 rounded-lg px-4 py-2 text-gray-700 hover:bg-gray-100">Cancel</button><button type="button" onClick={sendMessage} disabled={messageSending || !messageText.trim()} className="min-h-10 rounded-lg bg-green-600 px-4 py-2 text-white hover:bg-green-700 disabled:opacity-60">{messageSending ? 'Sending…' : 'Send message'}</button></div>
+        </div>}
+      </Modal>
     </div>
   );
 }
 
-// Product Card Component (Grid View)
-function ProductCard({ 
-  product, 
-  growerName, 
-  growerId,
-  onRequestPricing,
-  onMessageGrower,
-}: { 
-  product: Product; 
-  growerName: string; 
+interface ProductDisplayProps {
+  product: Product;
+  growerName: string;
   growerId: string;
   onRequestPricing: () => void;
   onMessageGrower: () => void;
-}) {
-  const thcValue = product.batch?.thc || product.thcLegacy;
-  const stockStatus = product.inventoryQty === 0 
-    ? { text: 'Out of Stock', color: 'text-red-600' }
-    : product.inventoryQty <= 10 
-      ? { text: `Only ${product.inventoryQty} left!`, color: 'text-orange-600' }
-      : { text: 'In Stock', color: 'text-green-600' };
-
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
-      {/* Product Image */}
-      <div className="aspect-square bg-gray-100 relative overflow-hidden">
-        {product.images && product.images.length > 0 ? (
-          <img 
-            src={product.images[0]} 
-            alt={product.name}
-            className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-            <span className="text-6xl font-bold text-green-200">
-              {product.name.charAt(0).toUpperCase()}
-            </span>
-          </div>
-        )}
-        
-        {/* THC Badge */}
-        {thcValue && (
-          <div className="absolute top-3 left-3 bg-purple-600 text-white px-3 py-1 rounded-full text-sm font-bold">
-            {thcValue}% THC
-          </div>
-        )}
-        
-        {/* Product Type Badge */}
-        {product.productType && (
-          <div className="absolute top-3 right-3 bg-black/50 backdrop-blur text-white px-3 py-1 rounded-full text-xs font-medium">
-            {product.productType}
-          </div>
-        )}
-      </div>
-
-      {/* Product Info */}
-      <div className="p-4">
-        <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1">{product.name}</h3>
-        
-        {product.strain?.name && (
-          <p className="text-sm text-gray-600 mb-2">
-            <span className="font-medium">Strain:</span> {product.strain.name}
-          </p>
-        )}
-        
-        {product.subType && (
-          <p className="text-sm text-gray-500 mb-3">{product.subType}</p>
-        )}
-
-        <div className="mt-4 pt-3 border-t border-gray-100 space-y-2">
-          {product.isPriceVisible ? (
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xl font-bold text-green-700">${product.price.toFixed(2)}</span>
-                <span className="text-sm text-gray-500">/{product.unit || 'unit'}</span>
-              </div>
-              <AddToCartButton 
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  price: product.price,
-                  strain: product.strain?.name || null,
-                  unit: product.unit,
-                  thc: thcValue || null,
-                  inventoryQty: product.inventoryQty,
-                }}
-                growerName={growerName}
-                growerId={growerId}
-              />
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={onRequestPricing}
-              className="w-full rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
-            >
-              Request Pricing
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={onMessageGrower}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-          >
-            Message Grower
-          </button>
-        </div>
-        
-        <p className={`text-xs mt-2 ${stockStatus.color}`}>{stockStatus.text}</p>
-      </div>
-    </div>
-  );
 }
 
-// Product List Item Component (List View)
-function ProductListItem({ 
-  product, 
-  growerName, 
-  growerId,
-  onRequestPricing,
-  onMessageGrower,
-}: { 
-  product: Product; 
-  growerName: string; 
-  growerId: string;
-  onRequestPricing: () => void;
-  onMessageGrower: () => void;
-}) {
-  const thcValue = product.batch?.thc || product.thcLegacy;
-  const stockStatus = product.inventoryQty === 0 
-    ? { text: 'Out of Stock', color: 'text-red-600', bg: 'bg-red-50' }
-    : product.inventoryQty <= 10 
-      ? { text: 'Low Stock', color: 'text-orange-600', bg: 'bg-orange-50' }
-      : { text: 'In Stock', color: 'text-green-600', bg: 'bg-green-50' };
+function ProductCard(props: ProductDisplayProps) { return <ProductDisplay {...props} />; }
+function ProductListItem(props: ProductDisplayProps) { return <ProductDisplay {...props} list />; }
 
+function ProductDisplay({ product, growerName, growerId, onRequestPricing, onMessageGrower, list = false }: ProductDisplayProps & { list?: boolean }) {
+  const thc = product.batch?.thc ?? product.thc;
+  const unit = product.unit?.toLowerCase() === 'gram' ? 'g' : product.unit || 'unit';
+  const priced = product.isPriceVisible && product.price != null;
   return (
-    <div className="flex items-center gap-4 p-4 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-      {/* Product Image */}
-      <div className="w-20 h-20 rounded-lg bg-gray-100 flex-shrink-0 overflow-hidden">
-        {product.images && product.images.length > 0 ? (
-          <img 
-            src={product.images[0]} 
-            alt={product.name}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-green-50 to-green-100">
-            <span className="text-2xl font-bold text-green-200">
-              {product.name.charAt(0).toUpperCase()}
-            </span>
-          </div>
-        )}
-      </div>
-
-      {/* Product Info */}
-      <div className="flex-1 min-w-0">
-        <h3 className="font-semibold text-gray-900">{product.name}</h3>
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1 text-sm text-gray-600">
-          {product.strain?.name && (
-            <span><span className="font-medium">Strain:</span> {product.strain.name}</span>
-          )}
-          {product.productType && (
-            <span><span className="font-medium">Type:</span> {product.productType}</span>
-          )}
-          {product.subType && (
-            <span className="text-gray-500">{product.subType}</span>
-          )}
+    <article className={list ? 'grid grid-cols-[4rem_minmax(0,1fr)] gap-3 rounded-xl border border-gray-200 bg-white p-4 sm:flex sm:items-start' : 'grid grid-cols-[4rem_minmax(0,1fr)] gap-3 p-3 min-w-0 overflow-hidden rounded-xl border border-gray-200 bg-white sm:block sm:p-0'}>
+      <ProductImage src={product.images?.[0]} alt={product.name} productType={product.productType} showPlaceholderLabel={false} imageStyle={{ objectFit: 'contain' }} className={list ? 'h-16 w-16 shrink-0 rounded-lg' : 'h-16 w-16 rounded-lg sm:h-40 sm:w-full sm:rounded-none'} />
+      <div className={list ? 'min-w-0 flex-1' : 'min-w-0 space-y-1 sm:space-y-2 sm:px-4 sm:pt-4'}>
+        <h3 className="break-words text-sm font-semibold text-gray-900 sm:text-base">{product.name}</h3>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {thc != null && <span className={`rounded-full border px-2 py-0.5 text-xs font-medium ${getThcBadgeColor(thc)}`}>THC {thc}%</span>}
+          {product.productType && <span className="rounded-full border border-gray-200 bg-gray-100 px-2 py-0.5 text-xs text-gray-600">{product.productType}</span>}
         </div>
+        {product.strain?.name && <p className="mt-1 text-sm text-gray-600">{product.strain.name}</p>}
+        {product.subType && <p className="text-sm text-gray-500">{product.subType}</p>}
+        {!priced && <p className="mt-2 text-xs text-gray-500">{product.inventoryQty} available</p>}
       </div>
-
-      {/* THC Badge */}
-      {thcValue && (
-        <div className="hidden sm:flex flex-col items-center px-3 py-1 bg-purple-50 rounded">
-          <span className="text-xs text-purple-600 font-medium">THC</span>
-          <span className="text-sm font-bold text-purple-700">{thcValue}%</span>
-        </div>
-      )}
-
-      {/* Stock Status */}
-      <div className={`hidden md:flex items-center px-3 py-1 rounded ${stockStatus.bg}`}>
-        <span className={`text-sm font-medium ${stockStatus.color}`}>{stockStatus.text}</span>
+      <div className={list ? 'col-span-2 min-w-0 space-y-2 border-t border-gray-100 pt-3 sm:w-64 sm:shrink-0 sm:border-0 sm:pt-0' : 'col-span-2 space-y-2 border-t border-gray-100 pt-2 sm:m-4 sm:space-y-3 sm:pt-3'}>
+        {priced ? <>
+          <p className="text-xl font-bold text-green-700">${product.price!.toFixed(2)}<span className="text-sm font-normal text-gray-500">/{unit}</span></p>
+          <AddToCartButton product={{ id: product.id, name: product.name, price: product.price, strain: product.strain?.name || null, unit: product.unit, thc, inventoryQty: product.inventoryQty }} growerName={growerName} growerId={growerId} />
+        </> : <button type="button" onClick={onRequestPricing} className="min-h-10 w-full rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100">Request pricing</button>}
+        <button type="button" onClick={onMessageGrower} className="min-h-10 w-full rounded-lg px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-50">Message grower</button>
       </div>
-
-      {/* Price / Request + Actions */}
-      <div className="flex-shrink-0 min-w-[180px] space-y-2">
-        {product.isPriceVisible ? (
-          <>
-            <div className="text-right">
-              <div className="text-lg font-bold text-green-700">${product.price.toFixed(2)}</div>
-              <div className="text-xs text-gray-500">/{product.unit || 'unit'}</div>
-            </div>
-
-            <div className="flex justify-end">
-              <AddToCartButton 
-                product={{
-                  id: product.id,
-                  name: product.name,
-                  price: product.price,
-                  strain: product.strain?.name || null,
-                  unit: product.unit,
-                  thc: thcValue || null,
-                  inventoryQty: product.inventoryQty,
-                }}
-                growerName={growerName}
-                growerId={growerId}
-                compact
-              />
-            </div>
-          </>
-        ) : (
-          <button
-            type="button"
-            onClick={onRequestPricing}
-            className="w-full rounded-lg border border-green-300 bg-green-50 px-3 py-2 text-sm font-medium text-green-700 hover:bg-green-100"
-          >
-            Request Pricing
-          </button>
-        )}
-
-        <button
-          type="button"
-          onClick={onMessageGrower}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100"
-        >
-          Message Grower
-        </button>
-      </div>
-    </div>
+    </article>
   );
 }

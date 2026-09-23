@@ -1,0 +1,37 @@
+{
+  "slug": "04a-product-details",
+  "route": "/grower/products/add",
+  "state": "Optional details expanded",
+  "pass1": {
+    "inspected": [
+      "pass-1/04a-product-details-desktop.png",
+      "pass-1/04a-product-details-mobile.png"
+    ],
+    "strengths": [
+      "THC/CBD min/max fields remain a readable two-column grid on mobile; optional fields stay grouped."
+    ],
+    "issues": [
+      {
+        "key": "product-optional-copy",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "Optional appears in the section title, badge and \u2018Cannabinoid Profile (Optional)\u2019. Image helper includes the implementation detail \u2018Images upload separately before you save the product.\u2019",
+        "recommendation": "Use \u2018Cannabinoids\u2019 inside the already optional section. Keep the upload helper to \u2018Up to 2 photos \u00b7 JPG, PNG, WebP \u00b7 1MB each\u2019 and show actual upload status only when needed."
+      }
+    ],
+    "limits": [
+      "Expanded by clicking heading; no fields changed. Fullpage fixed-header position reflects the scroll position at capture, not an asserted sticky-header defect."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/04a-product-details-desktop.png",
+      "pass-2/04a-product-details-mobile.png"
+    ],
+    "notes": "Fresh desktop and mobile expanded-details captures confirm repetitive optional labels and technical image-upload helper text. The mobile sticky action uses Publish product while the footer uses Create Product. Both captures reset scroll before capture; the fixed action bar position in a full-page screenshot is not a separate defect.",
+    "confirmedIssueKeys": [
+      "product-optional-copy"
+    ],
+    "newIssues": []
+  }
+}

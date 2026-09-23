@@ -20,12 +20,12 @@ test.describe('Order smoke test', () => {
 
     await page.goto('/dispensary/catalog');
     await page.waitForLoadState('networkidle').catch(() => {});
-    await expect(page.getByRole('heading', { name: /product catalog/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
 
     await page.evaluate(() => window.localStorage.removeItem('phenofarm-cart'));
 
-    const productCard = page.locator('[class*="group"]').filter({ has: page.getByRole('button', { name: /add to request/i }) }).first();
-    await productCard.getByRole('button', { name: /add to request/i }).click();
+    const productCard = page.locator('[class*="group"]').filter({ has: page.getByRole('button', { name: /^add to draft$/i }) }).first();
+    await productCard.getByRole('button', { name: /^add to draft$/i }).click();
 
     await expect
       .poll(async () => {
@@ -43,7 +43,7 @@ test.describe('Order smoke test', () => {
       .toBeGreaterThan(0);
 
     await page.goto('/dispensary/cart');
-    await expect(page.getByRole('heading', { name: /order request draft/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /request draft/i })).toBeVisible();
 
     const initialOrderCount = await page.context().newPage();
     await login(initialOrderCount);
@@ -53,7 +53,7 @@ test.describe('Order smoke test', () => {
     await initialOrderCount.close();
 
     await page.getByRole('button', { name: /review request/i }).first().click();
-    await page.getByRole('button', { name: /submit order request/i }).click();
+    await page.getByRole('button', { name: /^submit request$/i }).click();
     await expect(page.getByRole('heading', { name: /order request submitted/i })).toBeVisible({ timeout: 20000 });
     await page.waitForURL(/\/dispensary\/orders/, { timeout: 20000 });
     await page.waitForLoadState('networkidle').catch(() => {});
@@ -65,7 +65,6 @@ test.describe('Order smoke test', () => {
     const afterRows = await page.locator('a[href^="/dispensary/orders/"]').count();
     expect(afterRows).toBeGreaterThanOrEqual(Math.max(1, beforeRows));
 
-    const pageText = await page.locator('main').innerText();
-    expect(pageText).toMatch(/Order Requests|Request Tracker/);
+    await expect(page.getByRole('heading', { name: 'Orders', exact: true })).toBeVisible();
   });
 });

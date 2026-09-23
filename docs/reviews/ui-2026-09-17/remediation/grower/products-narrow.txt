@@ -1,0 +1,106 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e2504]
+- button "Notifications" [expanded=false, ref=e2505]
+  - StaticText "17"
+- button "Open Grower navigation menu" [expanded=false, ref=e2506]
+- main
+  - sectionheader
+    - heading "Products" [level=1, ref=e2519]
+    - button "Quick add" [ref=e2520]
+    - button "Import CSV" [ref=e2521]
+    - link "Add product" [ref=e2522]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Products"
+    - paragraph
+      - StaticText "3"
+    - paragraph
+      - StaticText "Stock value"
+    - paragraph
+      - StaticText "$10,000"
+    - paragraph
+      - StaticText "Available"
+    - paragraph
+      - StaticText "3"
+  - paragraph
+    - StaticText "Filter"
+  - button "All: 3 products" [ref=e2507]
+    - StaticText "All"
+    - StaticText "3"
+  - button "Active: 3 products" [ref=e2508]
+    - StaticText "Active"
+    - StaticText "3"
+  - button "Low inventory: 0 products" [ref=e2509]
+    - StaticText "Low inventory"
+    - StaticText "0"
+  - button "Quote only: 1 products" [ref=e2510]
+    - StaticText "Quote only"
+    - StaticText "1"
+  - button "Missing images: 0 products" [ref=e2511]
+    - StaticText "Missing images"
+    - StaticText "0"
+  - button "Missing type: 0 products" [ref=e2512]
+    - StaticText "Missing type"
+    - StaticText "0"
+  - button "Hidden/out: 0 products" [ref=e2513]
+    - StaticText "Hidden/out"
+    - StaticText "0"
+  - button "Show all products" [ref=e2514]
+    - image
+    - StaticText "All"
+  - button "Group products by Product type" [ref=e2515]
+    - image
+    - StaticText "Type"
+  - button "Group products by Strain" [ref=e2516]
+    - image
+    - StaticText "Strain"
+  - button "Group products by Batch" [ref=e2517]
+    - image
+    - StaticText "Batch"
+  - article
+    - checkbox "Select Mystery Pricing Batch" [checked=false, ref=e2523]
+    - heading "Mystery Pricing Batch" [level=3, ref=e2524]
+    - paragraph
+      - StaticText "Flower · Assorted"
+    - StaticText "Live"
+    - paragraph
+      - StaticText "$40/eighthQuote only"
+    - paragraph
+      - StaticText "25 eighth in stock"
+    - link "Edit" [ref=e2525]
+    - button "Hide" [ref=e2526]
+    - button "More actions for Mystery Pricing Batch" [ref=e2527]
+      - StaticText "More"
+  - article
+    - checkbox "Select Silver Haze Concentrate" [checked=false, ref=e2528]
+    - heading "Silver Haze Concentrate" [level=3, ref=e2529]
+    - paragraph
+      - StaticText "Bulk Extract · Silver Haze"
+    - StaticText "Live"
+    - paragraph
+      - StaticText "$60/g"
+    - paragraph
+      - StaticText "50 g in stock"
+    - link "Edit" [ref=e2530]
+    - button "Hide" [ref=e2531]
+    - button "More actions for Silver Haze Concentrate" [ref=e2532]
+      - StaticText "More"
+  - article
+    - checkbox "Select Purple Haze Flowers" [checked=false, ref=e2533]
+    - heading "Purple Haze Flowers" [level=3, ref=e2534]
+    - paragraph
+      - StaticText "Flower · Purple Haze"
+    - StaticText "Live"
+    - paragraph
+      - StaticText "$25/g"
+    - paragraph
+      - StaticText "240 g in stock"
+    - link "Edit" [ref=e2535]
+    - button "Hide" [ref=e2536]
+    - button "More actions for Purple Haze Flowers" [ref=e2537]
+      - StaticText "More"
+- button "Open messages" [ref=e2518]
+- region "Notifications alt+T" [ref=e2503]
+- alert

@@ -1,0 +1,44 @@
+PF
+PhenoFarm
+Sign in
+
+HELP CENTER
+
+Practical answers for licensed marketplace teams.
+
+Find the operating rules behind verification, requests, quote terms, direct settlement, and cultivator subscriptions in the PhenoFarm MVP.
+
+Need support?
+
+support@phenofarm.com
+
+Include your business name, role, and the page or request you need help with.
+
+For growers
+
+Catalog, quote, request, and subscription basics for cultivator teams.
+
+How do I publish products for buyers?
+What happens when a dispensary submits a request?
+Can growers send quote terms before accepting a request?
+What payments does PhenoFarm process for growers?
+For dispensaries
+
+How verified buyers browse, draft requests, and coordinate fulfillment.
+
+Why can I browse but not submit an order request?
+How do I request products from growers?
+How do quote requests work?
+Does PhenoFarm collect wholesale payment from dispensaries?
+Account & billing
+
+Access, verification, billing, and support expectations for the MVP.
+
+How do password resets work?
+Where do I update business or license details?
+How does the cultivator subscription work?
+How do I reach PhenoFarm support?
+
+Payment model reminder
+
+PhenoFarm never processes wholesale payments. Buyers and growers settle directly; the only in-app payment flow is the cultivator subscription.

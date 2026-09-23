@@ -1,0 +1,109 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e332]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e333]
+    - StaticText "Notifications"
+    - StaticText "19"
+  - navigation "Portal navigation" [ref=e334]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e339]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e340]
+      - StaticText "Catalog"
+    - link "Products" [ref=e341]
+      - StaticText "Products"
+    - link "Inventory" [ref=e342]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e343]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e344]
+      - StaticText "Strains"
+    - link "Batches" [ref=e345]
+      - StaticText "Batches"
+    - link "Customers" [ref=e346]
+      - StaticText "Customers"
+    - link "Reports" [ref=e347]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e348]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e335]
+- main
+  - sectionheader
+    - heading "Marketplace preview" [level=1, ref=e349]
+      - StaticText "Marketplace preview"
+    - paragraph
+      - StaticText "How buyers see your listings."
+    - link "Add product" [ref=e350]
+  - strong
+    - StaticText "3"
+  - StaticText " active"
+  - strong
+    - StaticText "1"
+  - StaticText " quote required"
+  - link "Terms" [ref=e336]
+  - heading "Vermont Nurseries" [level=2, ref=e337]
+  - generic
+    - heading "Mystery Pricing Batch" [level=3, ref=e351]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "19"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.3"
+    - StaticText "%"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "Strain:Assorted"
+    - paragraph
+      - StaticText "25eighth available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e355]
+  - generic
+    - heading "Silver Haze Concentrate" [level=3, ref=e352]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "85"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.2"
+    - StaticText "%"
+    - StaticText "Concentrate"
+    - paragraph
+      - StaticText "Strain:Silver Haze"
+    - paragraph
+      - StaticText "50g available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e356]
+  - generic
+    - heading "Purple Haze Flowers" [level=3, ref=e353]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "24.8"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.6"
+    - StaticText "%"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "Strain:Purple Haze"
+    - paragraph
+      - StaticText "240g available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e357]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e354]
+  - button "Open messages" [ref=e338]
+- region "Notifications alt+T" [ref=e331]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e358]
+  - image
+- alert

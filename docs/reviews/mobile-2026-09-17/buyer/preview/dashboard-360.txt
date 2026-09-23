@@ -1,0 +1,83 @@
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e696]
+- button "Notifications" [expanded=false, ref=e697]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e698]
+- main
+  - sectionheader
+    - heading "Green Vermont Dispensary" [level=1, ref=e709]
+    - link "Browse Catalog" [ref=e710]
+  - paragraph
+    - StaticText "Request value"
+  - paragraph
+    - StaticText "$460.50"
+  - paragraph
+    - StaticText "Awaiting response"
+  - paragraph
+    - StaticText "17"
+  - paragraph
+    - StaticText "Growers"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "In progress"
+  - paragraph
+    - StaticText "1"
+  - link "Verified buyer" [ref=e699]
+  - group
+    - DisclosureTriangle "About these totals" [expanded=false]
+      - StaticText "About these totals"
+  - link "Saved Favorites 1 · Alerts 1" [ref=e700]
+    - StaticText "Saved"
+    - StaticText "Favorites "
+    - StaticText "1"
+    - StaticText " · Alerts "
+    - StaticText "1"
+  - heading "Recent requests" [level=3, ref=e701]
+  - link "View all" [ref=e702]
+  - link "View request ORD-20260710-XPJO3I" [ref=e703]
+    - generic
+      - StaticText "#XPJO3I"
+      - time
+        - StaticText "Jul 9"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-20260710-03UYXZ" [ref=e704]
+    - generic
+      - StaticText "#03UYXZ"
+      - time
+        - StaticText "Jul 9"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - StaticText "$"
+    - StaticText "25.00"
+  - link "View request ORD-20260710-O78T5N" [ref=e705]
+    - generic
+      - StaticText "#O78T5N"
+      - time
+        - StaticText "Jul 9"
+    - StaticText "Submitted"
+    - paragraph
+      - StaticText "Vermont Nurseries"
+    - StaticText "$"
+    - StaticText "25.00"
+  - heading "Recently Requested" [level=3, ref=e706]
+  - paragraph
+    - StaticText "Purple Haze Flowers"
+  - paragraph
+    - StaticText "Flower • from Vermont Nurseries"
+  - StaticText "$"
+  - StaticText "25.00"
+  - heading "7-Day Request Value" [level=3, ref=e707]
+  - paragraph
+    - StaticText "No requests this week."
+- button "Open messages" [ref=e708]
+- region "Notifications alt+T" [ref=e695]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e711]
+  - image
+- alert

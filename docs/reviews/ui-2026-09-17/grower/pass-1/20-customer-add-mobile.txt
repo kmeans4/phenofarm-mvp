@@ -1,0 +1,49 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e1961]
+- button "Notifications" [expanded=false, ref=e1962]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e1963]
+- main
+  - sectionheader
+    - heading "Add New Customer" [level=1, ref=e1965]
+    - paragraph
+      - StaticText "Add a new dispensary customer"
+  - form
+    - heading "Customer Information" [level=2, ref=e1966]
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox [required, ref=e1967]
+    - LabelText
+      - StaticText "Contact Name *"
+    - textbox [required, ref=e1968]
+    - LabelText
+      - StaticText "Email *"
+    - textbox [required, ref=e1969]
+    - LabelText
+      - StaticText "Phone *"
+    - textbox [required, ref=e1970]
+    - LabelText
+      - StaticText "Address"
+    - textbox [ref=e1971]
+    - LabelText
+      - StaticText "City"
+    - textbox [ref=e1972]
+    - LabelText
+      - StaticText "State"
+    - textbox [ref=e1973]: VT
+      - StaticText "VT"
+    - LabelText
+      - StaticText "ZIP"
+    - textbox [ref=e1974]
+    - LabelText
+      - StaticText "License Number"
+    - textbox "VT-DISP-XXXXX" [ref=e1975]
+    - link "Cancel" [ref=e1976]
+    - button "Add Customer" [disabled, ref=e1977]
+- button "Open messages" [ref=e1964]
+- region "Notifications alt+T" [ref=e1960]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1978]
+  - image
+- alert

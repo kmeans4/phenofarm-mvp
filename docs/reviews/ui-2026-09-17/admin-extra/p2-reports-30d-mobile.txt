@@ -1,0 +1,121 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e470]
+- button "Notifications" [expanded=false, ref=e471]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e472]
+- main
+  - sectionheader
+    - heading "Analytics & Reports" [level=1, ref=e484]
+    - paragraph
+      - StaticText "Track delivered request value and fulfillment metrics. Settlement happens directly with buyers."
+    - button "Export PDF" [ref=e485]
+    - button "Export CSV" [ref=e486]
+    - paragraph
+      - StaticText "Exports reflect the selected date range."
+  - paragraph
+    - StaticText "Date range"
+  - generic "Report date range"
+    - link "Last 30 days" [ref=e487]
+    - link "Last 90 days" [ref=e488]
+    - link "Last 12 months" [ref=e489]
+    - link "All" [ref=e490]
+  - paragraph
+    - StaticText "Delivered Request Value"
+  - paragraph
+    - StaticText "$450.00"
+  - paragraph
+    - StaticText "From 1 delivered requests in last 30 days"
+  - paragraph
+    - StaticText "Total Requests"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "0 active in last 30 days"
+  - paragraph
+    - StaticText "Active Customers"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "With requests in last 30 days"
+  - paragraph
+    - StaticText "Avg Delivered Value"
+  - paragraph
+    - StaticText "$450.00"
+  - paragraph
+    - StaticText "Delivered requests in last 30 days"
+  - heading "Delivered Request Value Trend" [level=2, ref=e473]
+  - StaticText "Aug 26"
+  - StaticText "$450"
+  - heading "Requests by Status" [level=2, ref=e474]
+  - link "View Submitted requests" [ref=e475]
+    - StaticText "Submitted"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - link "View Accepted requests" [ref=e476]
+    - StaticText "Accepted"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - link "View Preparing requests" [ref=e477]
+    - StaticText "Preparing"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - link "View Ready / In transit requests" [ref=e478]
+    - StaticText "Ready / In transit"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - link "View Delivered requests" [ref=e479]
+    - StaticText "Delivered"
+    - StaticText "1"
+    - StaticText "("
+    - StaticText "100"
+    - StaticText "%)"
+  - link "View Cancelled requests" [ref=e480]
+    - StaticText "Cancelled"
+    - StaticText "0"
+    - StaticText "("
+    - StaticText "0"
+    - StaticText "%)"
+  - heading "Top Products" [level=2, ref=e481]
+  - StaticText "1"
+  - StaticText "Purple Haze Flowers"
+  - paragraph
+    - StaticText "$450"
+  - paragraph
+    - StaticText "30 units"
+  - heading "Top Customers" [level=2, ref=e482]
+  - StaticText "1"
+  - StaticText "Maple Street Market"
+  - paragraph
+    - StaticText "$450"
+  - paragraph
+    - StaticText "1 orders"
+  - generic
+    - heading "Recent Requests" [level=2, ref=e491]
+    - link "View All Requests" [ref=e492]
+    - table
+      - rowgroup
+        - row
+          - columnheader "REQUEST ID" [ref=e518]
+          - columnheader "STATUS" [ref=e519]
+          - columnheader "EST. VALUE" [ref=e520]
+      - row
+        - cell "#7-REVIEW" [ref=e493]
+          - StaticText "#7-REVIEW"
+        - cell "Delivered" [ref=e494]
+        - cell "$450.00" [ref=e495]
+          - StaticText "$450.00"
+- button "Open messages" [ref=e483]
+- region "Notifications alt+T" [ref=e469]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e517]
+  - image
+- alert

@@ -1,0 +1,130 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e1054]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1055]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e1056]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e1060]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e1061]
+      - StaticText "Overview"
+    - link "Products" [ref=e1062]
+      - StaticText "Products"
+    - link "Inventory" [ref=e1063]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e1064]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e1065]
+      - StaticText "Strains"
+    - link "Batches" [ref=e1066]
+      - StaticText "Batches"
+    - link "Customers" [ref=e1067]
+      - StaticText "Customers"
+    - link "Reports" [ref=e1068]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e1069]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e1057]
+- main
+  - sectionheader
+    - heading "Edit Batch" [level=1, ref=e1070]
+    - paragraph
+      - StaticText "Update batch details and lab results"
+  - heading "Batch Details" [level=3, ref=e1058]
+  - form
+    - LabelText
+      - StaticText "Batch Number *"
+    - button "Suggest" [ref=e1071]
+    - textbox "Batch Number *" [required, ref=e1072]: VN-2026-0912
+      - StaticText "VN-2026-0912"
+    - paragraph
+      - StaticText "Expected format: BATCH-YYYYMMDD-XX, such as BATCH-20260706-01."
+    - LabelText
+      - StaticText "Lot Number"
+    - textbox "Lot Number" [ref=e1073]: VT-A104
+      - StaticText "VT-A104"
+    - LabelText
+      - StaticText "Harvest Date *"
+    - Date "Harvest Date *": 2026-09-12
+      - generic
+        - spinbutton "Month Month" [ref=e1092]: 9
+          - StaticText "09"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e1093]: 12
+          - StaticText "12"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e1094]: 2026
+          - StaticText "2026"
+      - button "Show date picker" [ref=e1091]
+    - LabelText
+      - StaticText "Strain *"
+    - combobox "Strain *" [expanded=false, ref=e1074]: Audit Test Kush
+      - MenuListPopup
+        - option "Select a strain" [ref=e1095]
+        - option "Assorted " [ref=e1096]
+        - option "Audit Test Kush " [selected, ref=e1097]
+        - option "Purple Haze " [ref=e1098]
+        - option "Silver Haze " [ref=e1099]
+    - heading "Lab Results" [level=3, ref=e1075]
+    - LabelText
+      - StaticText "THC (%)"
+    - spinbutton "THC (%)" [ref=e1076]
+    - LabelText
+      - StaticText "CBD (%)"
+    - spinbutton "CBD (%)" [ref=e1077]
+    - LabelText
+      - StaticText "Total Cannabinoids (%)"
+    - spinbutton "Total Cannabinoids (%)" [ref=e1078]: 27.200000762939453
+      - StaticText "27.2"
+    - LabelText
+      - StaticText "Terpenes (JSON)"
+    - textbox "Terpenes (JSON)" [ref=e1079]
+    - heading "Lab Result Documents" [level=4, ref=e1080]
+    - paragraph
+      - StaticText "Upload the three lab PDFs growers typically receive before selling flower. Each PDF must be 2MB or smaller."
+    - LabelText
+      - StaticText "Potency Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the PDF showing THC, CBD, and total cannabinoids."
+    - button "Potency Test" [ref=e1081]: No file chosen
+    - button "Upload PDF" [ref=e1082]
+    - LabelText
+      - StaticText "Pesticide Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the pesticide test PDF for this batch."
+    - button "Pesticide Test" [ref=e1083]: No file chosen
+    - button "Upload PDF" [ref=e1084]
+    - LabelText
+      - StaticText "Microbial Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the microbial test PDF for this batch."
+    - button "Microbial Test" [ref=e1085]: No file chosen
+    - button "Upload PDF" [ref=e1086]
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Notes" [ref=e1087]: Fall greenhouse harvest. Cured and ready for wholesale orders.
+      - StaticText "Fall greenhouse harvest. Cured and ready for wholesale orders."
+    - button "Save Changes" [ref=e1088]
+    - button "Cancel" [ref=e1089]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1090]
+  - button "Open messages" [ref=e1059]
+- region "Notifications alt+T" [ref=e1053]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1100]
+  - image
+- alert

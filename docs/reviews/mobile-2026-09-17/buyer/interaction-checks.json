@@ -1,0 +1,65 @@
+{
+  "environment": "Local isolated phenofarm_ui_fixes_20260917 clone; dedicated mobile-buyer browser",
+  "savedFilters": {
+    "viewport": [
+      360,
+      640
+    ],
+    "initialSaveDisabled": true,
+    "draftFlowerEnabledSave": true,
+    "saveDialogPreview": [
+      "Flower"
+    ],
+    "savedPresetResponseMocked": true,
+    "applyClosedSheet": true,
+    "applyUrl": "/dispensary/catalog?productTypes=Flower",
+    "triggerExpandedAfterApply": false,
+    "resizeDesktopToPhoneExpanded": false,
+    "resizePhoneToDesktopSheetCount": 0,
+    "bodyOverflowAfterBothResizes": "visible",
+    "serverWrites": 0,
+    "automatedPayloadCheck": "Parent reports all56 selected tests passed including new intercepted sixth buyer layout test"
+  },
+  "cart": {
+    "catalogQuantityIncreasedThenTyped": 4,
+    "localCartQuantityAfterAdd": 7,
+    "cartQuantityIncreasedDecreasedThenTyped": 3,
+    "reviewTotal": 75,
+    "shortViewport": [
+      360,
+      640
+    ],
+    "submitAndBackVisible": true,
+    "submitted": false,
+    "noteTemplateApplied": true,
+    "originalCartRestored": true,
+    "taskOnlyDraftAndComparisonStorageRemoved": true
+  },
+  "settings": {
+    "lowerFieldsReachable": true,
+    "descriptionFocusedWithoutEdit": true,
+    "logoControlsAndSaveVisible": true,
+    "submitted": false
+  },
+  "orders": {
+    "statusFilter": "CANCELLED",
+    "visibleMatchingCount": 1,
+    "detailLowerItemsTermsAndActionsVisible": true,
+    "withdrawDialogReviewedAndCancelled": true
+  },
+  "compare": {
+    "products": 3,
+    "attributesVisible": true,
+    "belowFoldActionsVisible": true,
+    "keyboardDismissed": true
+  },
+  "shop": {
+    "typeFilter": "Flower",
+    "matchingProducts": 2,
+    "listView": true,
+    "pricingDialogOpenedAndCancelled": true,
+    "messageSubmitted": false,
+    "finalShortSortLabelImagePending": false,
+    "finalShortSortLabelFullyVisible": true
+  }
+}

@@ -1,36 +1,33 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { unstable_cache } from 'next/cache';
+import type { Session } from 'next-auth';
 import { redirect } from "next/navigation";
-import { MobileNav } from "@/app/dispensary/_components/MobileNav";
+import { getAuthSession } from '@/lib/auth-helpers';
+import { Providers } from '@/app/providers';
+import { MobileNav } from "@/app/components/ui/MobileNav";
 import { ClientNav } from "@/app/grower/components/ClientNav";
-import { SearchDialog } from "@/app/components/SearchDialog";
+import { SearchDialog, SearchTrigger } from "@/app/components/SearchDialog";
 import { db } from "@/lib/db";
 import CartBadge from "./catalog/components/CartBadge";
-import { ChatDrawer } from "@/app/components/messaging/ChatDrawer";
-import { RecentActivityDrawer } from "@/app/components/ux/RecentActivityDrawer";
+import { PortalFloatingActions } from '@/app/components/ui/PortalFloatingActions';
+import { PortalAccount, PortalBrand } from '@/app/components/ui/PortalBrand';
+import { NotificationBell } from '@/app/components/notifications/NotificationBell';
+import { PriceAlertSessionRefresh } from './PriceAlertSessionRefresh';
 
 interface SessionUser {
   id: string;
   role?: string;
+  email?: string | null;
+  name?: string | null;
   dispensaryId?: string;
 }
 
-// Fetch pending orders count for notification badge
-async function getPendingOrdersCount(dispensaryId: string): Promise<number> {
-  try {
-    return await db.order.count({
-      where: {
-        dispensaryId,
-        status: 'PENDING',
-      },
-    });
-  } catch {
-    return 0;
-  }
-}
+// The account id participates in the cache key; only the navigation badge may be up to 30s old.
+const getPendingOrdersCount = unstable_cache(async (dispensaryId: string) => {
+  return db.order.count({ where: { dispensaryId, status: 'PENDING' } });
+}, ['dispensary-pending-orders'], { revalidate: 30 });
 
 export default async function DispensaryLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
   
   if (!session) {
     redirect('/auth/sign_in');
@@ -38,12 +35,21 @@ export default async function DispensaryLayout({ children }: { children: React.R
 
   const user = session.user as SessionUser;
   
+  if (user.role === 'DISPENSARY' && !user.dispensaryId) redirect('/auth/error?error=Configuration');
   if (user.role !== 'DISPENSARY') {
     redirect('/dashboard');
   }
 
-  // Get pending orders count for badge
-  const pendingOrdersCount = user.dispensaryId ? await getPendingOrdersCount(user.dispensaryId) : 0;
+  const [pendingOrdersCount, dispensaryProfile] = user.dispensaryId
+    ? await Promise.all([
+        getPendingOrdersCount(user.dispensaryId),
+        db.dispensary.findUnique({
+          where: { id: user.dispensaryId },
+          select: { businessName: true },
+        }),
+      ])
+    : [0, null];
+  const accountName = dispensaryProfile?.businessName || user.email || 'Dispensary account';
 
   const navLinks = [
     { name: 'Dashboard', href: '/dispensary/dashboard', group: 'Home', badge: null },
@@ -55,49 +61,58 @@ export default async function DispensaryLayout({ children }: { children: React.R
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <Providers session={session as Session}>
+      <div className="pf-portal min-h-screen w-full bg-gray-50">
+      <PriceAlertSessionRefresh userId={session.user.id} />
       {/* Mobile Header with Hamburger Menu */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.07] bg-[#16251c] md:hidden">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
-            <div className="text-lg font-bold text-green-600" aria-label="PhenoFarm dispensary portal">PhenoFarm</div>
-            <div className="flex items-center gap-2">
-              <SearchDialog variant="icon" />
-              <MobileNav links={navLinks} />
+            <PortalBrand portalLabel="Dispensary" compactOnMobile />
+            <div className="flex items-center gap-1.5">
+              <span id="portal-mobile-messages" className="pf-portal-message-slot h-10 w-10 shrink-0" />
+              <SearchTrigger variant="icon" className="!border-white/10 !bg-white/5 !text-[#c4d1c6] hover:!bg-white/10 hover:!text-white" />
+              <NotificationBell compact />
+              <MobileNav
+                links={navLinks}
+                portalLabel="Dispensary Portal"
+                accountName={accountName}
+                roleLabel="Dispensary"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <div className="min-h-screen md:pl-56 lg:pl-64">
+      <div className="min-h-screen md:pl-60">
         {/* Tablet/Desktop Sidebar */}
-        <aside className="hidden md:fixed md:inset-y-0 md:left-0 md:z-30 md:flex md:w-56 lg:w-64 md:flex-col md:bg-white md:border-r md:border-gray-200">
-          <div className="px-4 pt-4 pb-3 border-b border-gray-200 flex-shrink-0">
-            <div className="text-xl font-bold text-green-600" aria-label="PhenoFarm dispensary portal">PhenoFarm</div>
-            <p className="text-sm text-gray-500">Dispensary Portal</p>
+        <aside className="fixed inset-y-0 left-0 z-30 hidden w-60 flex-col bg-[#16251c] px-4 py-5 md:flex">
+          <div className="flex-shrink-0 px-1 pb-3">
+            <PortalBrand portalLabel="Dispensary" />
             <div className="mt-3">
-              <SearchDialog />
+              <SearchDialog className="!border-white/10 !bg-white/5 !text-[#a9bcad] hover:!bg-white/10 hover:!text-white [&_kbd]:!border-white/10 [&_kbd]:!bg-white/5" />
+            </div>
+            <div className="mt-2">
+              <NotificationBell />
             </div>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto py-2">
+          <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto py-2">
             <ClientNav links={navLinks} />
           </div>
+          <PortalAccount accountName={accountName} roleLabel="Verified buyer" />
         </aside>
 
         {/* Main Content */}
-        <main className="flex min-h-screen flex-col pt-20 md:pt-0 w-full min-w-0 bg-gray-50">
-          <div className="flex flex-1 flex-col p-4 md:p-5 lg:p-6 max-w-7xl mx-auto w-full">
+        <main className="flex min-h-screen w-full min-w-0 flex-col bg-gray-50 pt-16 md:pt-0">
+          <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col p-4 pb-24 md:p-7 md:pb-24 lg:p-8 lg:pb-24">
             {children}
           </div>
         </main>
       </div>
 
-      <ChatDrawer
-        currentUserId={user.id}
-        currentRole="DISPENSARY"
-      />
-      <RecentActivityDrawer role="DISPENSARY" />
-    </div>
+      <PortalFloatingActions currentUserId={user.id} role="DISPENSARY" />
+      </div>
+    </Providers>
   );
 }

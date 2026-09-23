@@ -1,59 +1,60 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { prepareImageUpload, uploadFile } from '@/app/components/uploads/uploadFile';
 import { Button } from '@/app/components/ui/Button';
+import { FILE_UPLOAD_LIMITS, IMAGE_MIME_TYPES, formatBytes, validateLogoFile } from '@/lib/upload-validation';
 
 interface LogoUploadProps {
   currentLogo?: string | null;
-  onUpload: (logoBase64: string) => Promise<void>;
+  onUpload: (logoUrl: string) => Promise<void>;
+  disabled?: boolean;
 }
 
-export function LogoUpload({ currentLogo, onUpload }: LogoUploadProps) {
+export function LogoUpload({ currentLogo, onUpload, disabled = false }: LogoUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(currentLogo || null);
   const [error, setError] = useState<string | null>(null);
+  const currentLogoRef = useRef(currentLogo || null);
+  currentLogoRef.current = currentLogo || null;
+  useEffect(() => { setPreview(currentLogo || null); }, [currentLogo]);
+  const pendingRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-    if (!validTypes.includes(file.type)) {
-      setError('Invalid file type. Only JPG, PNG, GIF, and WebP are allowed.');
-      return;
-    }
-
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      setError('File too large. Maximum size is 2MB.');
-      return;
-    }
-
+    const input = e.currentTarget;
+    const file = input.files?.[0];
+    input.value = '';
+    if (!file || pendingRef.current || disabled) return;
+    pendingRef.current = true;
+    const startedLogo = currentLogoRef.current;
     setError(null);
     setUploading(true);
-
     try {
-      // Convert to base64
-      const bytes = await file.arrayBuffer();
-      const base64 = Buffer.from(bytes).toString('base64');
-      const mimeType = file.type;
-      const dataUrl = `data:${mimeType};base64,${base64}`;
-      
-      setPreview(dataUrl);
-      await onUpload(dataUrl);
+      const prepared = await prepareImageUpload(file, FILE_UPLOAD_LIMITS.logoMaxBytes);
+      const validation = validateLogoFile(prepared);
+      if (!validation.ok) throw new Error(validation.error);
+      const url = await uploadFile(prepared, 'logo');
+      await onUpload(url);
+      if (currentLogoRef.current === startedLogo) setPreview(url);
     } catch (err) {
-      setError('Failed to upload logo. Please try again.');
-      console.error('Upload error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to upload logo. Please try again.');
+      if (currentLogoRef.current === startedLogo) setPreview(currentLogoRef.current);
     } finally {
+      pendingRef.current = false;
       setUploading(false);
     }
   };
 
-  const handleRemove = () => {
-    setPreview(null);
-    onUpload('');
+  const handleRemove = async () => {
+    if (pendingRef.current || disabled) return;
+    pendingRef.current = true;
+    const startedLogo = currentLogoRef.current;
+    setUploading(true);
+    setError(null);
+    try { await onUpload(''); if (currentLogoRef.current === startedLogo) setPreview(null); }
+    catch { setError('Could not remove the logo. Please try again.'); }
+    finally { pendingRef.current = false; setUploading(false); }
   };
 
   return (
@@ -64,10 +65,11 @@ export function LogoUpload({ currentLogo, onUpload }: LogoUploadProps) {
         </div>
       )}
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-3 sm:gap-6">
         {/* Logo Preview */}
-        <div className="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden">
+        <div className="h-20 w-20 shrink-0 sm:h-24 sm:w-24 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center bg-gray-50 overflow-hidden">
           {preview ? (
+            // eslint-disable-next-line @next/next/no-img-element -- Small upload previews also support legacy data URLs.
             <img 
               src={preview} 
               alt="Company logo" 
@@ -84,20 +86,20 @@ export function LogoUpload({ currentLogo, onUpload }: LogoUploadProps) {
         </div>
 
         {/* Upload Controls */}
-        <div className="space-y-2">
+        <div className="min-w-0 space-y-2">
           <input
             ref={fileInputRef}
             type="file"
-            accept="image/jpeg,image/png,image/gif,image/webp"
+            accept={IMAGE_MIME_TYPES.join(',')}
             onChange={handleFileChange}
             className="hidden"
           />
           
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              disabled={uploading}
+              disabled={uploading || disabled}
               variant="outline"
               size="sm"
             >
@@ -108,6 +110,7 @@ export function LogoUpload({ currentLogo, onUpload }: LogoUploadProps) {
               <Button
                 type="button"
                 onClick={handleRemove}
+                disabled={uploading || disabled}
                 variant="ghost"
                 size="sm"
                 className="text-red-600 hover:text-red-700"
@@ -118,7 +121,7 @@ export function LogoUpload({ currentLogo, onUpload }: LogoUploadProps) {
           </div>
           
           <p className="text-xs text-gray-500">
-            JPG, PNG, GIF, or WebP. Max 2MB.
+            JPG, PNG, or WebP. Max {formatBytes(FILE_UPLOAD_LIMITS.logoMaxBytes)}.
           </p>
         </div>
       </div>

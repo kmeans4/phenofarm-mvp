@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
-import { STRIPE_CONFIG, stripe } from '@/lib/stripe';
+import { STRIPE_CONFIG, getStripe } from '@/lib/stripe';
 
 export async function POST() {
   const session = await getAuthSession();
@@ -31,7 +31,8 @@ export async function POST() {
     return NextResponse.json({ error: 'No active cultivator subscription is connected yet' }, { status: 400 });
   }
 
-  const portalSession = await stripe.billingPortal.sessions.create({
+  try {
+  const portalSession = await getStripe().billingPortal.sessions.create({
     customer: grower.stripeCustomerId,
     return_url: STRIPE_CONFIG.getPortalReturnUrl(),
   }) as { url?: string | null };
@@ -41,4 +42,7 @@ export async function POST() {
   }
 
   return NextResponse.json({ url: portalSession.url });
+  } catch {
+    return NextResponse.json({ error: 'Billing is temporarily unavailable. Please try again.' }, { status: 503 });
+  }
 }

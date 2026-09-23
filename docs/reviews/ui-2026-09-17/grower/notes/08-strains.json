@@ -1,0 +1,44 @@
+{
+  "slug": "08-strains",
+  "route": "/grower/strains",
+  "pass1": {
+    "inspected": [
+      "pass-1/08-strains-desktop.png",
+      "pass-1/08-strains-mobile.png"
+    ],
+    "strengths": [
+      "Strain names, batch/product counts and primary actions are easy to recognize; empty metadata does not introduce placeholder prose."
+    ],
+    "issues": [
+      {
+        "key": "strain-list-density",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Four sparse strain cards have a large gap between counts and buttons. On mobile the three metric cards alone consume300px and the first strain starts at y626; four strains extend the page to1537px.",
+        "recommendation": "Use \u2018Strains\u2019 as the title and remove the generic subtitle. Put counts in a compact summary row. Use shorter strain rows/cards with counts beside the name and Edit/Add product in a small action row; reserve card height for actual genetics details."
+      },
+      {
+        "key": "strain-action-wording",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "The green \u2018+ Product\u2019 action is shorter than other create labels but does not clearly say it creates a product from this strain; delete icons receive strong red emphasis on every card.",
+        "recommendation": "Use \u2018Add product\u2019 consistently and move destructive actions into an overflow menu, keeping Edit most prominent for library maintenance."
+      }
+    ],
+    "limits": [
+      "No view preference changed and no create/delete action used."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/08-strains-desktop.png",
+      "pass-2/08-strains-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile captures confirm three stacked metric cards and the verbose Strain Management title. The sparse card bodies reserve substantial vertical space, while Add Product is abbreviated to + Product inconsistently. No view preference or record action was changed.",
+    "confirmedIssueKeys": [
+      "strain-list-density",
+      "strain-action-wording"
+    ],
+    "newIssues": []
+  }
+}

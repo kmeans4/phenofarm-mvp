@@ -1,0 +1,60 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e2622]
+- button "Notifications" [expanded=false, ref=e2623]
+  - StaticText "17"
+- button "Open Grower navigation menu" [expanded=false, ref=e2624]
+- main
+  - link "← Customer" [ref=e2625]
+  - sectionheader
+    - heading "Statement" [level=1, ref=e2627]
+    - paragraph
+      - StaticText "Maple Street Market"
+    - button "Export CSV" [ref=e2628]
+  - form
+    - LabelText
+      - StaticText "From"
+      - Date "From"
+        - generic
+          - spinbutton "Month Month" [ref=e2633]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e2634]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e2635]: 0
+            - StaticText "yyyy"
+        - button "Show date picker" [ref=e2631]
+    - LabelText
+      - StaticText "To"
+      - Date "To"
+        - generic
+          - spinbutton "Month Month" [ref=e2636]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e2637]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e2638]: 0
+            - StaticText "yyyy"
+        - button "Show date picker" [ref=e2632]
+    - button "Apply" [ref=e2629]
+  - generic
+    - StaticText "1"
+    - StaticText " delivered request"
+    - StaticText "$450"
+    - article
+      - link "#ORD-20260917-REVIEW" [ref=e2630]
+        - StaticText "#ORD-20260917-REVIEW"
+      - paragraph
+        - StaticText "Sep 15, 2026"
+      - paragraph
+        - StaticText "Purple Haze Flowers × 30"
+      - strong
+        - StaticText "$450"
+  - paragraph
+    - StaticText "Payments are arranged directly; PhenoFarm does not collect funds."
+- button "Open messages" [ref=e2626]
+- region "Notifications alt+T" [ref=e2621]
+- alert

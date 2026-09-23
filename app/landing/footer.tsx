@@ -1,5 +1,3 @@
-'use client';
-
 import Link from 'next/link';
 
 const footerLinks = {
@@ -16,16 +14,14 @@ const footerLinks = {
   Company: [
     { label: 'Contact', href: 'mailto:support@phenofarm.com' },
     { label: 'Help center', href: '/help' },
-    { label: 'Privacy policy', href: '/legal/privacy' },
-    { label: 'Terms of service', href: '/legal/terms' },
   ],
 };
 
 export function Footer() {
   return (
     <footer className="relative border-t border-white/[0.06]">
-      <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="grid gap-12 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))]">
+      <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
+        <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_repeat(3,minmax(0,1fr))] md:gap-12">
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5">
@@ -40,7 +36,7 @@ export function Footer() {
             </p>
             <a
               href="mailto:support@phenofarm.com"
-              className="mt-5 inline-block text-sm text-gray-400 transition-colors hover:text-emerald-400"
+              className="mt-5 inline-flex min-h-10 items-center text-sm text-gray-400 transition-colors hover:text-emerald-400"
             >
               support@phenofarm.com
             </a>
@@ -53,7 +49,7 @@ export function Footer() {
               <ul className="space-y-2.5">
                 {links.map((link) => (
                   <li key={link.label}>
-                    <Link href={link.href} className="text-sm text-gray-400 transition-colors hover:text-white">
+                    <Link href={link.href} className="inline-flex min-h-10 items-center text-sm text-gray-400 transition-colors hover:text-white">
                       {link.label}
                     </Link>
                   </li>
@@ -63,19 +59,19 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-14 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center">
+        <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center md:mt-14">
           <p className="text-xs text-gray-600">
             © {new Date().getFullYear()} PhenoFarm. For licensed operators only. Wholesale settlement stays
             direct between businesses.
           </p>
           <div className="flex gap-6">
-            <Link href="/legal/privacy" className="text-xs text-gray-600 transition-colors hover:text-gray-300">
+            <Link href="/legal/privacy" className="inline-flex min-h-10 items-center text-xs text-gray-600 transition-colors hover:text-gray-300">
               Privacy
             </Link>
-            <Link href="/legal/terms" className="text-xs text-gray-600 transition-colors hover:text-gray-300">
+            <Link href="/legal/terms" className="inline-flex min-h-10 items-center text-xs text-gray-600 transition-colors hover:text-gray-300">
               Terms
             </Link>
-            <Link href="/legal/cookies" className="text-xs text-gray-600 transition-colors hover:text-gray-300">
+            <Link href="/legal/cookies" className="inline-flex min-h-10 items-center text-xs text-gray-600 transition-colors hover:text-gray-300">
               Cookies
             </Link>
           </div>

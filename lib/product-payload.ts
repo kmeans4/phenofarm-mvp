@@ -1,4 +1,5 @@
 import { canonicalizeProductType, getSubTypesForProductType } from '@/lib/product-types';
+import { validateDocumentReference, validateProductImageList } from '@/lib/upload-validation';
 
 export const PRODUCT_STATUS = {
   DRAFT: 'DRAFT',
@@ -180,6 +181,16 @@ export function parseProductPayload(body: Record<string, unknown>, options: Prod
     }
   }
 
+  if (!partial || body.images !== undefined) {
+    const imageValidation = validateProductImageList(body.images);
+    if (!imageValidation.ok) errors.push(imageValidation.error);
+  }
+
+  if (!partial || body.ingredientsDocumentUrl !== undefined) {
+    const documentValidation = validateDocumentReference(body.ingredientsDocumentUrl);
+    if (!documentValidation.ok) errors.push(documentValidation.error);
+  }
+
   if (errors.length) {
     return { ok: false as const, errors };
   }
@@ -217,11 +228,6 @@ export function parseProductPayload(body: Record<string, unknown>, options: Prod
       ingredients: normalizeOptionalString(body.ingredients),
       ingredientsDocumentUrl: normalizeOptionalString(body.ingredientsDocumentUrl),
       isFeatured: typeof body.isFeatured === 'boolean' ? body.isFeatured : false,
-      strainLegacy: normalizeOptionalString(body.strainLegacy),
-      categoryLegacy: normalizeOptionalString(body.categoryLegacy),
-      subcategoryLegacy: normalizeOptionalString(body.subcategoryLegacy),
-      thcLegacy: body.thcLegacy === undefined || body.thcLegacy === null || body.thcLegacy === '' ? null : Number.parseFloat(String(body.thcLegacy)),
-      cbdLegacy: body.cbdLegacy === undefined || body.cbdLegacy === null || body.cbdLegacy === '' ? null : Number.parseFloat(String(body.cbdLegacy)),
       thcMin: thcRange.min,
       thcMax: thcRange.max,
       cbdMin: cbdRange.min,

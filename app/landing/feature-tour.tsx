@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
+import { AnimatePresence, m as motion, useReducedMotion } from 'framer-motion';
 import { BadgeCheck, BarChart3, FileCheck2, MessagesSquare, ShieldCheck, Timer } from 'lucide-react';
 import { SectionHeading } from './motion';
 
@@ -288,10 +288,11 @@ export function FeatureTour() {
                     </div>
                   </div>
                   {/* Auto-advance progress */}
-                  {isActive && !reduced && (
+                  {isActive && (
                     <motion.span
                       key={`progress-${index}-${paused}`}
-                      className="absolute bottom-0 left-0 h-[2px] bg-emerald-400/70"
+                      aria-hidden
+                      className="absolute bottom-0 left-0 h-[2px] bg-emerald-400/70 motion-reduce:hidden"
                       initial={{ width: '0%' }}
                       animate={{ width: paused ? '0%' : '100%' }}
                       transition={{ duration: paused ? 0 : ADVANCE_MS / 1000, ease: 'linear' }}

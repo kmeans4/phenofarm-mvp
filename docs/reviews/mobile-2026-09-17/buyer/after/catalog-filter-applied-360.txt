@@ -1,0 +1,106 @@
+- generic
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - generic [ref=e1228] clickable [onclick]
+    - button "Open messages" [ref=e1233]
+  - button "Search" [ref=e1229]
+  - button "Notifications" [expanded=false, ref=e1230]
+    - StaticText "24"
+  - button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1231]
+  - main
+    - generic
+      - sectionheader
+        - heading "Catalog" [level=1, ref=e1238]
+        - link "View draft 3" [ref=e1239]
+          - StaticText "View draft"
+          - StaticText "3"
+      - generic
+        - generic
+          - LabelText
+            - StaticText "Search catalog"
+          - combobox "Search catalog" [expanded=false, ref=e1283]
+        - combobox "Sort catalog results" [expanded=false, ref=e1282]: By grower
+          - MenuListPopup
+            - option "By grower" [selected, ref=e1284]
+            - option "Price: low" [ref=e1285]
+            - option "Price: high" [ref=e1286]
+            - option "THC: high" [ref=e1287]
+            - option "THC: low" [ref=e1288]
+            - option "Name: A-Z" [ref=e1289]
+            - option "Name: Z-A" [ref=e1290]
+        - button "Toggle filters" [expanded=false, ref=e1240]
+          - StaticText "1"
+        - button "Grid view" [ref=e1241]
+        - button "List view" [ref=e1242]
+      - StaticText "Active:"
+      - StaticText "Flower"
+      - button "Remove Flower filter" [ref=e1291]
+      - button "Clear all filters" [ref=e1292]
+      - StaticText "2 of 2 products"
+      - heading "Vermont Nurseries" [level=2, ref=e1234]
+      - link "Shop →" [ref=e1235]
+      - generic
+        - generic
+          - image "Mystery Pricing Batch"
+        - heading "Mystery Pricing Batch" [level=3, ref=e1243]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "19"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "0.3"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Assorted"
+        - paragraph
+          - StaticText "25 available"
+        - button "Request pricing" [ref=e1244]
+        - button "Remove Mystery Pricing Batch from favorites" [ref=e1245]
+        - button "Message grower" [ref=e1246]
+          - StaticText "Message"
+        - button "Compare Mystery Pricing Batch" [ref=e1247]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - generic
+        - generic
+          - image "Purple Haze Flowers"
+        - heading "Purple Haze Flowers" [level=3, ref=e1248]
+        - image
+        - StaticText "Hybrid"
+        - image
+        - StaticText "THC "
+        - StaticText "24.8"
+        - StaticText "%"
+        - image
+        - StaticText "CBD "
+        - StaticText "0.6"
+        - StaticText "%"
+        - StaticText "Flower"
+        - paragraph
+          - StaticText "Strain: Purple Haze"
+        - generic
+          - StaticText "$25.00/ g"
+        - button "Decrease quantity for Purple Haze Flowers" [ref=e1249]
+          - StaticText "−"
+        - spinbutton "Quantity for Purple Haze Flowers" [ref=e1250]: 1
+          - StaticText "1"
+        - button "Increase quantity for Purple Haze Flowers" [ref=e1251]
+          - StaticText "+"
+        - button "Add to draft" [ref=e1252]
+          - StaticText "Add"
+        - StaticText "240 available"
+        - button "Favorite Purple Haze Flowers" [ref=e1253]
+        - button "Price alert for Purple Haze Flowers" [ref=e1254]
+        - button "Message grower" [ref=e1255]
+          - StaticText "Message"
+        - button "Compare Purple Haze Flowers" [ref=e1256]
+          - StaticText "Compare"
+        - StaticText "Labs on request"
+      - paragraph
+        - StaticText "End of results"
+  - region "Notifications alt+T" [ref=e1227]
+  - alert

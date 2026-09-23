@@ -1,0 +1,55 @@
+{
+  "slug": "14-orders",
+  "route": "/grower/orders",
+  "pass1": {
+    "inspected": [
+      "pass-1/14-orders-desktop.png",
+      "pass-1/14-orders-mobile.png"
+    ],
+    "strengths": [
+      "Desktop request rows and colored statuses are scannable; saved status filters show counts."
+    ],
+    "issues": [
+      {
+        "key": "requests-mobile-table",
+        "priority": "high",
+        "viewport": "mobile",
+        "observation": "At390px the table shows only selection, long request ID and dispensary; date, value, status and View action are outside the visible area with no clear scroll cue. The identifier wraps over multiple lines while the decision-making fields are hidden.",
+        "recommendation": "Use compact mobile request cards/rows with buyer, short request reference, value, status and a visible View action. Keep full ID available in details or copy action. If retaining table scrolling, pin identifier/action and add a clear scroll hint."
+      },
+      {
+        "key": "requests-top-density",
+        "priority": "high",
+        "viewport": "mobile",
+        "observation": "Four full-width metric cards and the saved-view explanation push Active Requests below y1000; the first actual request is beyond the first screen. Active and Needs Review counts are repeated in cards, filters and section heading.",
+        "recommendation": "Combine metrics into a compact two-by-two or single summary strip, use a short status filter row, and put Record request/History in one compact header row. Show ‘18 active ·17 need review’ once near the list."
+      },
+      {
+        "key": "requests-jargon",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "‘Saved workflow views’, ‘Start with the next request state before selecting batch actions’, and the heading subtitle's ‘without in-app payment settlement’ add administrative wording before the core list.",
+        "recommendation": "Use title ‘Requests’, filters labeled by status, and no instructional sentence. Keep the payment model as a concise contextual note ‘Payment is arranged directly’ where order value/payment decisions are shown."
+      }
+    ],
+    "limits": [
+      "No status, density preference, selection, batch action, or request data changed. Long historical IDs are local fixture data, but clipping is measured in this viewport."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/14-orders-desktop.png",
+      "pass-2/14-orders-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed the mobile table hides value, status and View; tall summaries delay the request list. Status tabs and counts repeat context. Desktop rows remain readable. No actions were submitted.",
+    "confirmedIssueKeys": [
+      "requests-mobile-table",
+      "requests-top-density",
+      "requests-jargon"
+    ],
+    "newIssues": [],
+    "source": "root-pass2-notes.md"
+  }
+}

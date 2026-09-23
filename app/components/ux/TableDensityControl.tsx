@@ -27,7 +27,7 @@ export function TableDensityControl({
               value === mode
                 ? 'bg-white text-green-700 shadow-sm ring-1 ring-green-200'
                 : 'text-gray-600 hover:bg-white'
-            }`}
+            } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2`}
           >
             {mode === 'comfortable' ? 'Comfort' : 'Compact'}
           </button>

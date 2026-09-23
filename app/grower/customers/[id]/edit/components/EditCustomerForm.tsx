@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { RecordActions } from '../../../../components/RecordActions';
 
 interface Customer {
   id: string;
@@ -140,7 +142,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
 
-  const initialData = {
+  const initialData = useMemo(() => ({
     businessName: customer.businessName || '',
     contactName: customer.contactName || '',
     email: customer.email || '',
@@ -152,9 +154,11 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
     zipCode: customer.zip || '',
     website: customer.website || '',
     description: customer.description || '',
-  };
+  }), [customer]);
 
-  const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
+  const pendingRef = useRef(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { isDirty, setIsDirty, resetDirtyState, confirmNavigation } = useUnsavedChanges({
     enabled: true,
     message: 'You have unsaved changes in this customer. Are you sure you want to leave?',
   });
@@ -162,7 +166,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
   useEffect(() => {
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
-  }, [formData, setIsDirty]);
+  }, [formData, initialData, setIsDirty]);
 
   const validateForm = (): boolean => {
     const newErrors: FieldErrors = {
@@ -225,6 +229,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (pendingRef.current || customer.isPlatformManaged) return;
     
     const allTouched: Record<string, boolean> = {};
     Object.keys(formData).forEach(key => {
@@ -237,29 +242,28 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
       return;
     }
     
+    pendingRef.current = true;
     setIsSubmitting(true);
 
     try {
       const response = await fetch(`/api/customers/${customer.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, zip: formData.zipCode, zipCode: undefined }),
       });
 
       if (response.ok) {
         showToast('success', 'Customer updated successfully!');
         resetDirtyState();
-        setTimeout(() => {
-          router.push('/grower/customers');
-          router.refresh();
-        }, 1500);
+        router.push('/grower/customers');
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         showToast('error', data.error || 'Failed to update customer');
       }
     } catch {
       showToast('error', 'An error occurred while updating');
     } finally {
+      pendingRef.current = false;
       setIsSubmitting(false);
     }
   };
@@ -269,12 +273,15 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
     onSave: async () => {
       await handleSubmit({ preventDefault: () => {} } as React.FormEvent);
     },
-    onCancel: () => router.push("/grower/customers"),
+    onCancel: () => { if (confirmNavigation()) router.push("/grower/customers"); },
     isDirty,
     enabled: true
   });
 
   const handleDelete = async () => {
+    if (pendingRef.current || customer.isPlatformManaged) return;
+    pendingRef.current = true;
+    setIsDeleting(true);
     try {
       const response = await fetch(`/api/customers/${customer.id}`, {
         method: 'DELETE',
@@ -282,32 +289,25 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
 
       if (response.ok) {
         showToast('success', 'Customer has been deleted');
+        resetDirtyState();
         router.push('/grower/customers');
-        router.refresh();
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         showToast('error', data.error || 'Failed to delete customer');
       }
     } catch {
       showToast('error', 'An error occurred while deleting');
-    }
+    } finally { pendingRef.current = false; setIsDeleting(false); setDeleteConfirmOpen(false); }
   };
 
-  const hasErrors = Object.keys(errors).length > 0;
+  const hasErrors = Object.values(errors).some(Boolean);
   const isPlatformManaged = customer.isPlatformManaged;
   const displayValue = (value?: string | null) => value?.trim() ? value : '—';
 
   return (
-    <div className="space-y-5 sm:space-y-6 p-4 max-w-3xl mx-auto">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <Link href="/grower/customers" className="text-sm text-gray-500 hover:text-gray-700">
-            &larr; Back to Customers
-          </Link>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mt-2">Edit Customer</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Update customer information</p>
-        </div>
-      </div>
+    <div className="w-full space-y-5 sm:space-y-6 max-w-3xl mx-auto">
+      <div className="flex items-center justify-between gap-3 text-sm font-medium text-green-700"><Link href="/grower/customers" className="py-2 hover:underline">← Customers</Link><Link href={`/grower/customers/${customer.id}/statement`} className="rounded-lg border border-gray-200 bg-white px-3 py-2 hover:bg-green-50">Statement</Link></div>
+      <PageHeader title={isPlatformManaged ? 'Customer details' : 'Edit customer'} />
 
       {isDirty && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-center gap-2">
@@ -318,18 +318,18 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Information</h2>
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h2 className="text-base font-semibold text-gray-900 mb-3 sm:mb-4 sm:text-lg">Business</h2>
           
           {isPlatformManaged ? (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
                 <label className={READONLY_LABEL_CLASSES}>Business Name</label>
                 <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.businessName)}</div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className={READONLY_LABEL_CLASSES}>License Number</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.licenseNumber)}</div>
@@ -346,7 +346,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Business Name *
@@ -364,7 +364,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     License Number
@@ -381,55 +381,60 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                     <p className="text-sm text-red-600 mt-1">{errors.licenseNumber}</p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Website
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.website}
-                    onChange={(e) => handleChange('website', e.target.value)}
-                    onBlur={() => handleBlur('website')}
-                    className={errors.website && touched.website ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
-                    placeholder="https://..."
-                  />
-                  {errors.website && touched.website && (
-                    <p className="text-sm text-red-600 mt-1">{errors.website}</p>
-                  )}
-                </div>
               </div>
+              <details className="rounded-lg border border-gray-200 px-3" open={Boolean(formData.website || formData.description || (errors.website && touched.website) || (errors.description && touched.description))}>
+                <summary className="min-h-10 cursor-pointer py-2 text-sm font-medium text-gray-700">Website & description{((errors.website && touched.website) || (errors.description && touched.description)) && <span className="ml-2 text-xs text-red-600">Check fields</span>}</summary>
+                <div className="space-y-3 pb-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Website
+                    </label>
+                    <input
+                      type="url"
+                      value={formData.website}
+                      onChange={(e) => handleChange('website', e.target.value)}
+                      onBlur={() => handleBlur('website')}
+                      className={errors.website && touched.website ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
+                      placeholder="https://..."
+                    />
+                    {errors.website && touched.website && (
+                      <p className="text-sm text-red-600 mt-1">{errors.website}</p>
+                    )}
+                  </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Description
-                </label>
-                <textarea
-                  rows={3}
-                  value={formData.description}
-                  onChange={(e) => handleChange('description', e.target.value)}
-                  onBlur={() => handleBlur('description')}
-                  className={errors.description && touched.description 
-                    ? "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50" 
-                    : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"}
-                  placeholder="Brief description..."
-                />
-                {errors.description && touched.description && (
-                  <p className="text-sm text-red-600 mt-1">{errors.description}</p>
-                )}
-                <p className="text-xs text-gray-500 text-right mt-1">
-                  {formData.description.length}/500 characters
-                </p>
-              </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Description
+                    </label>
+                    <textarea
+                      rows={2}
+                      value={formData.description}
+                      onChange={(e) => handleChange('description', e.target.value)}
+                      onBlur={() => handleBlur('description')}
+                      className={errors.description && touched.description
+                        ? "w-full px-3 py-2 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50"
+                        : "w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"}
+                      placeholder="Brief description..."
+                    />
+                    {errors.description && touched.description && (
+                      <p className="text-sm text-red-600 mt-1">{errors.description}</p>
+                    )}
+                    <p className="text-xs text-gray-500 text-right mt-1">
+                      {formData.description.length}/500
+                    </p>
+                  </div>
+                </div>
+              </details>
             </div>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact Information</h2>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h2 className="text-base font-semibold text-gray-900 mb-3 sm:mb-4 sm:text-lg">Contact</h2>
           
           {isPlatformManaged ? (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className={READONLY_LABEL_CLASSES}>Contact Person</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.contactName)}</div>
@@ -446,8 +451,8 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Contact Person
@@ -498,18 +503,18 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Address</h2>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+          <h2 className="text-base font-semibold text-gray-900 mb-3 sm:mb-4 sm:text-lg">Address</h2>
           
           {isPlatformManaged ? (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
                 <label className={READONLY_LABEL_CLASSES}>Street Address</label>
                 <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.address)}</div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div className="col-span-2 sm:col-span-1">
                   <label className={READONLY_LABEL_CLASSES}>City</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.city)}</div>
                 </div>
@@ -518,13 +523,13 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.state)}</div>
                 </div>
                 <div>
-                  <label className={READONLY_LABEL_CLASSES}>ZIP Code</label>
+                  <label className={READONLY_LABEL_CLASSES}>ZIP</label>
                   <div className={READONLY_VALUE_CLASSES}>{displayValue(formData.zipCode)}</div>
                 </div>
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3 sm:space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Street Address
@@ -538,8 +543,8 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
+                <div className="col-span-2 sm:col-span-1">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     City
                   </label>
@@ -569,7 +574,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    ZIP Code
+                    ZIP
                   </label>
                   <input
                     type="text"
@@ -588,21 +593,13 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
           )}
         </div>
 
-        <div className="flex flex-col gap-3 pt-4 border-t border-gray-200">
-          {!isPlatformManaged && (
-            <button
-              type="button"
-              onClick={() => setDeleteConfirmOpen(true)}
-              className="w-full sm:w-auto sm:self-start px-6 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-            >
-              Delete Customer
-            </button>
-          )}
+        <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-gray-200 sm:pt-4">
+          {!isPlatformManaged && <div className="self-start"><RecordActions name={customer.businessName} actions={[{label: 'Delete contact', destructive: true, onSelect: () => setDeleteConfirmOpen(true)}]} /></div>}
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:self-end w-full sm:w-auto">
+          <div className="ml-auto flex gap-2 sm:gap-3">
             <Link
               href="/grower/customers"
-              className="w-full sm:w-auto text-center px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 sm:flex-none whitespace-nowrap text-center px-3 py-2 text-sm sm:px-4 sm:text-base border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Cancel
             </Link>
@@ -610,15 +607,16 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
               <button
                 type="submit"
                 disabled={isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
-                className="w-full sm:w-auto px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 sm:flex-none whitespace-nowrap px-3 py-2 text-sm sm:px-4 sm:text-base bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? 'Saving...' : 'Save changes'}
               </button>
             )}
           </div>
         </div>
       </form>
       <ConfirmDialog
+        loading={isDeleting}
         open={deleteConfirmOpen}
         title="Delete customer?"
         description="This removes the customer relationship from your grower workspace. This action cannot be undone from this screen."

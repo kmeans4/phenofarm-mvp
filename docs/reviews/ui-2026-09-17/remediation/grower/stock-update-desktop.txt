@@ -1,0 +1,74 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e2848]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2849]
+    - StaticText "Notifications"
+    - StaticText "17"
+  - navigation "Portal navigation" [ref=e2850]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2854]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2855]
+      - StaticText "Catalog"
+    - link "Products" [ref=e2856]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2857]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2858]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2859]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2860]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2861]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2862]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2863]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2851]
+- main
+  - sectionheader
+    - heading "Update stock" [level=1, ref=e2864]
+  - form
+    - LabelText
+      - StaticText "Product *"
+    - searchbox "Product *" [ref=e2865]
+    - button "Mystery Pricing Batch Flower · Greenhouse · Assorted 25 eighth" [ref=e2866]
+      - StaticText "Mystery Pricing Batch"
+      - StaticText "Flower · Greenhouse · Assorted"
+      - StaticText "25"
+      - StaticText "eighth"
+    - button "Silver Haze Concentrate Bulk Extract · Live Resin · Silver Haze 50 g" [ref=e2867]
+      - StaticText "Silver Haze Concentrate"
+      - StaticText "Bulk Extract · Live Resin · Silver Haze"
+      - StaticText "50"
+      - StaticText "g"
+    - button "Purple Haze Flowers Flower · Indoor · Purple Haze 240 g" [ref=e2868]
+      - StaticText "Purple Haze Flowers"
+      - StaticText "Flower · Indoor · Purple Haze"
+      - StaticText "240"
+      - StaticText "g"
+    - LabelText
+      - StaticText "Stock on hand *"
+    - spinbutton "Stock on hand *" [required, ref=e2869]
+    - paragraph
+      - StaticText "This replaces the current stock level; it is not added to it."
+    - link "Cancel" [ref=e2870]
+    - button "Save stock" [disabled, ref=e2871]
+  - link "Add a new product →" [ref=e2852]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2872]
+  - button "Open messages" [ref=e2853]
+- region "Notifications alt+T" [ref=e2847]
+- alert

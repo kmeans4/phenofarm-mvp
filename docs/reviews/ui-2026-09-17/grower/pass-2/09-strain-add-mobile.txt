@@ -1,0 +1,58 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e3266]
+- button "Notifications" [expanded=false, ref=e3267]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e3268]
+- main
+  - sectionheader
+    - heading "Add New Strain" [level=1, ref=e3271]
+    - paragraph
+      - StaticText "Create a new cannabis genetics entry"
+  - heading "Strain Details" [level=3, ref=e3269]
+  - form
+    - LabelText
+      - StaticText "Strain Name *"
+    - combobox "Strain Name *" [required, ref=e3272]
+    - LabelText
+      - StaticText "Strain Type *"
+    - combobox "Strain Type *" [expanded=false, ref=e3273]: Select strain type
+      - MenuListPopup
+        - option "Select strain type" [selected, ref=e3279]
+        - option "Indica" [ref=e3280]
+        - option "Sativa" [ref=e3281]
+        - option "Hybrid" [ref=e3282]
+        - option "Sativa Dom. Hybrid" [ref=e3283]
+        - option "Indica Dom. Hybrid" [ref=e3284]
+    - paragraph
+      - StaticText "Indica"
+      - StaticText " — Generally selected for indica-leaning genetics and buyer expectations."
+    - paragraph
+      - StaticText "Sativa"
+      - StaticText " — Generally selected for sativa-leaning genetics and buyer expectations."
+    - paragraph
+      - StaticText "Hybrid"
+      - StaticText " — Balanced hybrid genetics without a strong indica or sativa lean."
+    - paragraph
+      - StaticText "Sativa Dom. Hybrid"
+      - StaticText " — Hybrid genetics that lean sativa in growth traits or buyer positioning."
+    - paragraph
+      - StaticText "Indica Dom. Hybrid"
+      - StaticText " — Hybrid genetics that lean indica in growth traits or buyer positioning."
+    - LabelText
+      - StaticText "Genetics / Lineage"
+    - textbox "Genetics / Lineage" [ref=e3274]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e3275]
+    - LabelText
+      - StaticText "Grower Notes"
+    - textbox "Grower Notes" [ref=e3276]
+    - button "Create Strain" [disabled, ref=e3277]
+    - button "Cancel" [ref=e3278]
+- button "Open messages" [ref=e3270]
+- region "Notifications alt+T" [ref=e3265]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3285]
+  - image
+- alert

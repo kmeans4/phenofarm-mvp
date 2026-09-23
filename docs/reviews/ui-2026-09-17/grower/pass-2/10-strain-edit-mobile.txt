@@ -1,0 +1,59 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e3320]
+- button "Notifications" [expanded=false, ref=e3321]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e3322]
+- main
+  - sectionheader
+    - heading "Edit Strain" [level=1, ref=e3325]
+    - paragraph
+      - StaticText "Update strain details"
+  - heading "Strain Details" [level=3, ref=e3323]
+  - form
+    - LabelText
+      - StaticText "Strain Name *"
+    - combobox "Strain Name *" [required, ref=e3326]: Audit Test Kush
+      - StaticText "Audit Test Kush"
+    - LabelText
+      - StaticText "Strain Type *"
+    - combobox "Strain Type *" [expanded=false, ref=e3327]: Hybrid
+      - MenuListPopup
+        - option "Select strain type" [ref=e3333]
+        - option "Indica" [ref=e3334]
+        - option "Sativa" [ref=e3335]
+        - option "Hybrid" [selected, ref=e3336]
+        - option "Sativa Dom. Hybrid" [ref=e3337]
+        - option "Indica Dom. Hybrid" [ref=e3338]
+    - paragraph
+      - StaticText "Indica"
+      - StaticText " — Generally selected for indica-leaning genetics and buyer expectations."
+    - paragraph
+      - StaticText "Sativa"
+      - StaticText " — Generally selected for sativa-leaning genetics and buyer expectations."
+    - paragraph
+      - StaticText "Hybrid"
+      - StaticText " — Balanced hybrid genetics without a strong indica or sativa lean."
+    - paragraph
+      - StaticText "Sativa Dom. Hybrid"
+      - StaticText " — Hybrid genetics that lean sativa in growth traits or buyer positioning."
+    - paragraph
+      - StaticText "Indica Dom. Hybrid"
+      - StaticText " — Hybrid genetics that lean indica in growth traits or buyer positioning."
+    - LabelText
+      - StaticText "Genetics / Lineage"
+    - textbox "Genetics / Lineage" [ref=e3328]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e3329]
+    - LabelText
+      - StaticText "Grower Notes"
+    - textbox "Grower Notes" [ref=e3330]
+    - button "Save Changes" [ref=e3331]
+    - button "Cancel" [ref=e3332]
+- button "Open messages" [ref=e3324]
+- region "Notifications alt+T" [ref=e3319]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3339]
+  - image
+- alert

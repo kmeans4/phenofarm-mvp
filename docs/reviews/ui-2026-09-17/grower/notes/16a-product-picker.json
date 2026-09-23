@@ -1,0 +1,37 @@
+{
+  "slug": "16a-product-picker",
+  "route": "/grower/orders/add",
+  "state": "One unsaved item row",
+  "pass1": {
+    "inspected": [
+      "pass-1/16a-product-picker-desktop.png",
+      "pass-1/16a-product-picker-mobile.png"
+    ],
+    "strengths": [
+      "Quantity and agreed unit price are editable together; the estimate updates immediately and includes a payment-model note."
+    ],
+    "issues": [
+      {
+        "key": "request-item-repetition",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "One item repeats its price in the product option, next to \u2018Agreed price\u2019, and in the input. Stock appears both in the option and an \u2018Available now\u2019 badge. Mobile row is about350px; its long select text truncates. Desktop price column is narrow enough to wrap its help over three lines while product select is very wide.",
+        "recommendation": "Select by product name, show \u201825 available \u00b7 List $40/eighth\u2019 once below, pair Qty and Unit price, and place Remove in the row corner. Use \u2018Subtotal\u2019, \u2018Shipping\u2019, \u2018Est. total\u2019 and one concise \u2018Payment arranged directly\u2019 note."
+      }
+    ],
+    "limits": [
+      "Clicked Add to reveal a local unsaved row only; no request submitted, quantity or price changed, or data saved."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/16a-product-picker-desktop.png",
+      "pass-2/16a-product-picker-mobile.png"
+    ],
+    "notes": "Fresh unsaved item-row captures confirm repeated price and availability values, narrow desktop price-help wrapping, and a tall mobile item card. The floating message launcher partly overlaps Add on mobile, matching the independent base-form second-pass observation. Only the local + Add row action was used; no request was submitted.",
+    "confirmedIssueKeys": [
+      "request-item-repetition"
+    ],
+    "newIssues": []
+  }
+}

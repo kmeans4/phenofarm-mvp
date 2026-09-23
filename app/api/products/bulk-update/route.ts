@@ -54,7 +54,7 @@ export async function PATCH(request: NextRequest) {
         growerId: user.growerId,
         isDeleted: false,
       },
-      select: { id: true, inventoryQty: true },
+      select: { id: true, inventoryQty: true, status: true },
     });
 
     if (products.length === 0) {
@@ -65,7 +65,7 @@ export async function PATCH(request: NextRequest) {
       const data: Prisma.ProductUncheckedUpdateInput = {};
 
       if (updates.isAvailable !== undefined) {
-        data.isAvailable = product.inventoryQty > 0 ? toSafeBoolean(updates.isAvailable, false) : false;
+        data.isAvailable = product.inventoryQty > 0 && product.status === 'PUBLISHED' ? toSafeBoolean(updates.isAvailable, false) : false;
       }
 
       if (updates.isPriceVisible !== undefined) {
@@ -91,6 +91,8 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({
       success: true,
       updatedCount: products.length,
+      updatedIds: products.map(product => product.id),
+      skippedIds: productIds.filter(id => !products.some(product => product.id === id)),
       skippedCount: productIds.length - products.length,
     });
   } catch (error) {

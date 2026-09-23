@@ -1,0 +1,23 @@
+- main
+  - link "PF PhenoFarm" [ref=e477]
+    - StaticText "PF"
+    - StaticText "PhenoFarm"
+  - heading "Sign in to your account" [level=2, ref=e476]
+  - paragraph
+    - StaticText "Or"
+    - link "create a new account" [ref=e478]
+  - form
+    - LabelText
+      - StaticText "Email address"
+    - textbox "Email address" [required, ref=e479]
+    - LabelText
+      - StaticText "Password"
+    - generic
+      - textbox "Password" [required, ref=e481]
+      - button "Show password" [ref=e482]
+    - group
+      - DisclosureTriangle "Need password help?" [expanded=false]
+    - button "Sign in" [ref=e480]
+  - group
+    - DisclosureTriangle "Demo access" [expanded=false]
+- alert

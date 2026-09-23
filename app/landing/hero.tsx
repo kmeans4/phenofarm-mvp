@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
   AnimatePresence,
-  motion,
+  m as motion,
   useMotionValue,
   useReducedMotion,
   useSpring,
@@ -244,9 +244,8 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.55 }}
             className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-gray-400"
           >
-            Verified partners, recorded quotes, and live request tracking from submission to
-            delivery — while settlement moves directly between businesses. PhenoFarm never
-            takes a cut.
+            Verified partners, recorded quotes, and live request tracking — while settlement
+            stays direct. PhenoFarm takes no cut.
           </motion.p>
 
           <motion.div

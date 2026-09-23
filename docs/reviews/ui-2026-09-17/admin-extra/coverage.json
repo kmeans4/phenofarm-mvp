@@ -1,0 +1,126 @@
+[
+  {
+    "route": "/grower/reports",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin-extra/p1-reports-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin-extra/p1-reports-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin-extra/p2-reports-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin-extra/p2-reports-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  },
+  {
+    "route": "/grower/pricing",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin-extra/p1-pricing-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin-extra/p1-pricing-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin-extra/p2-pricing-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin-extra/p2-pricing-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  },
+  {
+    "route": "/grower/settings",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin-extra/p1-settings-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin-extra/p1-settings-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin-extra/p2-settings-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin-extra/p2-settings-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  },
+  {
+    "route": "/grower/marketplace",
+    "passes": {
+      "1": {
+        "desktop": {
+          "screenshot": "admin-extra/p1-marketplace-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin-extra/p1-marketplace-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      },
+      "2": {
+        "desktop": {
+          "screenshot": "admin-extra/p2-marketplace-desktop.png",
+          "inspected": true,
+          "width": 1440
+        },
+        "mobile": {
+          "screenshot": "admin-extra/p2-marketplace-mobile.png",
+          "inspected": true,
+          "width": 390
+        }
+      }
+    },
+    "health": "Usable with documented density/copy issues",
+    "notes": "Read-only review; no submissions"
+  }
+]

@@ -10,3 +10,4 @@ export { Pricing } from './pricing';
 export { Faq } from './faq';
 export { Cta } from './cta';
 export { Footer } from './footer';
+export { MarketingMotion } from './motion';

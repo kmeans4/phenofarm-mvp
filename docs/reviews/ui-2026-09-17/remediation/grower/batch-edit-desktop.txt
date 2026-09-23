@@ -1,0 +1,120 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e3066]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3067]
+    - StaticText "Notifications"
+    - StaticText "17"
+  - navigation "Portal navigation" [ref=e3068]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3071]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e3072]
+      - StaticText "Catalog"
+    - link "Products" [ref=e3073]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3074]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3075]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3076]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3077]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3078]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3079]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3080]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3069]
+- main
+  - sectionheader
+    - heading "Edit batch" [level=1, ref=e3081]
+  - form
+    - LabelText
+      - StaticText "Batch Number *"
+    - button "Generate" [ref=e3082]
+    - textbox "Batch Number *" [required, ref=e3083]: VN-2026-0912
+      - StaticText "VN-2026-0912"
+    - LabelText
+      - StaticText "Lot Number"
+    - textbox "Lot Number" [ref=e3084]: VT-A104
+      - StaticText "VT-A104"
+    - LabelText
+      - StaticText "Harvest Date *"
+    - Date "Harvest Date *": 2026-09-12
+      - generic
+        - spinbutton "Month Month" [ref=e3103]: 9
+          - StaticText "09"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e3104]: 12
+          - StaticText "12"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e3105]: 2026
+          - StaticText "2026"
+      - button "Show date picker" [ref=e3101]
+    - LabelText
+      - StaticText "Strain *"
+    - combobox "Strain *" [expanded=false, ref=e3085]: Audit Test Kush
+      - MenuListPopup
+        - option "Select a strain" [ref=e3106]
+        - option "Assorted " [ref=e3107]
+        - option "Audit Test Kush " [selected, ref=e3108]
+        - option "Purple Haze " [ref=e3109]
+        - option "Silver Haze " [ref=e3110]
+    - heading "Lab Results" [level=3, ref=e3086]
+    - LabelText
+      - StaticText "THC (%)"
+    - spinbutton "THC (%)" [ref=e3087]: 24.799999237060547
+      - StaticText "24.8"
+    - LabelText
+      - StaticText "CBD (%)"
+    - spinbutton "CBD (%)" [ref=e3088]: 0.6000000238418579
+      - StaticText "0.6"
+    - LabelText
+      - StaticText "Total (%)"
+    - spinbutton "Total (%)" [ref=e3089]: 27.200000762939453
+      - StaticText "27.2"
+    - group "Terpenes"
+      - Legend
+        - StaticText "Terpenes"
+      - button "Add terpene" [ref=e3102]
+    - heading "Lab PDFs" [level=4, ref=e3090]
+    - paragraph
+      - StaticText "PDF · 2MB max each"
+    - LabelText
+      - StaticText "Potency"
+    - button "Potency" [ref=e3091]: No file chosen
+    - button "Upload Potency PDF" [ref=e3092]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Pesticides"
+    - button "Pesticides" [ref=e3093]: No file chosen
+    - button "Upload Pesticides PDF" [ref=e3094]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Microbials"
+    - button "Microbials" [ref=e3095]: No file chosen
+    - button "Upload Microbials PDF" [ref=e3096]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Notes" [ref=e3097]: Fall greenhouse harvest. Cured and ready for wholesale orders.
+      - StaticText "Fall greenhouse harvest. Cured and ready for wholesale orders."
+    - button "Save Changes" [ref=e3098]
+    - button "Cancel" [ref=e3099]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3100]
+  - button "Open messages" [ref=e3070]
+- region "Notifications alt+T" [ref=e3065]
+- alert

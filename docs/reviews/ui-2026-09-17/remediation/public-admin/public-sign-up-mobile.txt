@@ -1,0 +1,61 @@
+- main
+  - link "PF PhenoFarm" [ref=e598]
+    - StaticText "PF"
+    - StaticText "PhenoFarm"
+  - heading "Create your account" [level=2, ref=e597]
+  - paragraph
+    - StaticText "Already have an account?"
+    - link "Sign in" [ref=e599]
+  - form
+    - group "Personal contact"
+      - Legend
+        - StaticText "Personal contact"
+      - LabelText
+        - StaticText "First Name *"
+      - textbox "First Name *" [required, ref=e603]
+      - LabelText
+        - StaticText "Last Name *"
+      - textbox "Last Name *" [required, ref=e604]
+    - group "Business profile"
+      - Legend
+        - StaticText "Business profile"
+      - LabelText
+        - StaticText "Business Name"
+      - textbox "Business Name" [ref=e605]
+      - paragraph
+        - StaticText "Shown to marketplace partners — defaults to your name if left blank."
+      - LabelText
+        - StaticText "Business Type *"
+      - combobox "Business Type *" [expanded=false, ref=e606]: Cannabis Grower
+        - MenuListPopup
+          - option "Cannabis Grower" [selected, ref=e613]
+          - option "Dispensary/Retailer" [ref=e614]
+    - group "Account security"
+      - Legend
+        - StaticText "Account security"
+      - LabelText
+        - StaticText "Email address *"
+      - textbox "Email address *" [required, ref=e607]
+      - LabelText
+        - StaticText "Password *"
+      - generic
+        - textbox "Password *" [required, ref=e609]
+        - button "Show password" [ref=e610]
+      - paragraph
+        - StaticText "Use at least 12 characters."
+      - LabelText
+        - StaticText "Confirm Password *"
+      - generic
+        - textbox "Confirm Password *" [required, ref=e611]
+        - button "Show password" [ref=e612]
+      - paragraph
+        - StaticText "Confirm your password."
+    - button "Create account" [ref=e600]
+  - generic
+    - StaticText "By signing up, you agree to the"
+    - link "Terms" [ref=e601]
+    - StaticText "and"
+    - link "Privacy Policy" [ref=e602]
+    - StaticText "."
+- button "Open Next.js Dev Tools" [expanded=false, ref=e608]
+  - image

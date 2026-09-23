@@ -1,0 +1,1540 @@
+[
+  {
+    "pattern": "/",
+    "route": "/",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 7918,
+    "headings": [
+      "Licensed wholesale, engineered like software"
+    ],
+    "text": "PF\nPhenoFarm\nProduct\nWhy PhenoFarm\nWorkflow\nPricing\nFAQ\nSign in\nCreate account\nNew\nLive quote negotiation and license-gated ordering\nLicensed wholesale, engineered like software\n\nVerified partners, recorded quotes, and live request tracking — while settlement stays direct. PhenoFarm takes no cut.\n\nCreate your account\nWatch it work\n\nFree to evaluate · No wholesale payment processing · Cultivator subscriptions only\n\nphenofarm.app/grower/orders\nLIVE\nPF\nGrower Portal\nDashboard\nCatalog\nOrders\nCustomers\nReports\nOrder Requests\n3 in flight · settlement stays direct\nRecord Request\nREQUEST\nBUYER\nEST. VALUE\nSTATUS\nORD-2481\nGreen Mountain Dispensary\n$4,250.00\nSubmitted\nORD-2479\nElevate Wellness\n$1,860.00\nAccepted\nORD-2475\nHerb House Collective\n$7,400.00\nPreparing\nORD-2468\nPure Grow Retail\n$2,130.00\nDelivered\nSubmitted\nAccepted\nPreparing\nReady\nDelivered\n\nLive simulation — every request advances through the same shared lifecycle both sides see.\n\n0%\nTake rate on wholesale value\n0%\nBuyers license-verified before ordering\n0\nFulfillment stages tracked live\n0\nWorkspace for the whole deal\nLicense-gated ordering\n0% take rate\nRecorded quote terms\nDirect settlement\nCOA & lab docs on file\nLive fulfillment"
+  },
+  {
+    "pattern": "/",
+    "route": "/",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 10877,
+    "headings": [
+      "Licensed wholesale, engineered like software"
+    ],
+    "text": "PF\nPhenoFarm\nCreate account\nNew\nLive quote negotiation and license-gated ordering\nLicensed wholesale, engineered like software\n\nVerified partners, recorded quotes, and live request tracking — while settlement stays direct. PhenoFarm takes no cut.\n\nCreate your account\nWatch it work\n\nFree to evaluate · No wholesale payment processing · Cultivator subscriptions only\n\nphenofarm.app/grower/orders\nOrder Requests\n3 in flight · settlement stays direct\nRecord Request\nBUYER\nEST. VALUE\nSTATUS\nGreen Mountain Dispensary\n$4,250.00\nSubmitted\nElevate Wellness\n$1,860.00\nAccepted\nHerb House Collective\n$7,400.00\nPreparing\nPure Grow Retail\n$2,130.00\nDelivered\n\nLive simulation — every request advances through the same shared lifecycle both sides see.\n\n0%\nTake rate on wholesale value\n0%\nBuyers license-verified before ordering\n0\nFulfillment stages tracked live\n0\nWorkspace for the whole deal\nLicense-gated ordering\n0% take rate\nRecorded quote terms\nDirect settlement\nCOA & lab docs on file\nLive fulfillment status\nMetrc-ready compliance\nVerified growers & buyers\nLicense-gated ordering\n0% take rate\nRecorded quote terms\nDirect settlement\nCOA & lab docs on file\nLive fulfillment status\nMetrc-ready compliance\nVer"
+  },
+  {
+    "pattern": "/admin/dashboard",
+    "route": "/admin/dashboard",
+    "role": "admin",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Dashboard"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nNotifications\nDashboard\nUsers\nGrowers\nDispensaries\nSettings\nA\nadmin@phenofarm.com\nFull system access\nSign out\nDashboard\n\nManage subscriptions, verification, and marketplace operations\n\nUsers\n\n3\n\nGrowers\n\n1\n\n1 verified\n\nDispensaries\n\n1\n\n0 pending\n\nOPERATIONS CHECKLIST\n\nReview subscription settings\n\nKeep PhenoFarm subscription configuration current for grower billing.\n\nOpen settings\n\nSubscription configuration\n\nConfirm Stripe Billing price IDs and support details before enabling paid plans.\n\n3 checks complete\nNo accounts awaiting review\nGrowers\nDispensaries\nSettlement & billing policy"
+  },
+  {
+    "pattern": "/admin/dashboard",
+    "route": "/admin/dashboard",
+    "role": "admin",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 881,
+    "headings": [
+      "Dashboard"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nDashboard\n\nManage subscriptions, verification, and marketplace operations\n\nUsers\n\n3\n\nGrowers\n\n1\n\n1 verified\n\nDispensaries\n\n1\n\n0 pending\n\nOPERATIONS CHECKLIST\n\nReview subscription settings\n\nKeep PhenoFarm subscription configuration current for grower billing.\n\nOpen settings\n\nSubscription configuration\n\nConfirm Stripe Billing price IDs and support details before enabling paid plans.\n\n3 checks complete\nNo accounts awaiting review\nGrowers\nDispensaries\nSettlement & billing policy"
+  },
+  {
+    "pattern": "/admin/dispensaries",
+    "route": "/admin/dispensaries",
+    "role": "admin",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Dispensaries"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nNotifications\nDashboard\nUsers\nGrowers\nDispensaries\nSettings\nA\nadmin@phenofarm.com\nFull system access\nSign out\nDispensaries\n\nView dispensary licenses and access.\n\nSearch dispensaries\nSearch\nVerification status\nAll statuses\nPending only\nVerified only\nExpiring within 30 days\nExpired\n1 dispensary\nBUSINESS\tEMAIL\tLICENSE\tEXPIRY\tSTATUS\tORDERING\tJOINED\tACTIONS\nGreen Vermont Dispensary\tdispensary@greenvermont.com\t\nVT-RTL-2024-001\n\tDec 30, 2027\tVerified\tCan order\t4/9/2026\tUnverify"
+  },
+  {
+    "pattern": "/admin/dispensaries",
+    "route": "/admin/dispensaries",
+    "role": "admin",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Dispensaries"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nDispensaries\n\nView dispensary licenses and access.\n\nSearch dispensaries\nSearch\nVerification status\nAll statuses\nPending only\nVerified only\nExpiring within 30 days\nExpired\n1 dispensary\nGreen Vermont Dispensary\ndispensary@greenvermont.com\nVerified\nLICENSE\nVT-RTL-2024-001\nEXPIRY\nDec 30, 2027\nORDERING\nCan order\nUnverify"
+  },
+  {
+    "pattern": "/admin/growers",
+    "route": "/admin/growers",
+    "role": "admin",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Growers"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nNotifications\nDashboard\nUsers\nGrowers\nDispensaries\nSettings\nA\nadmin@phenofarm.com\nFull system access\nSign out\nGrowers\n\nView grower licenses, access, and plans.\n\nSearch growers\nSearch\nVerification status\nAll statuses\nPending only\nVerified only\nExpiring within 30 days\nExpired\n1 grower\nBUSINESS\tEMAIL\tLICENSE\tEXPIRY\tSTATUS\tSUBSCRIPTION\tJOINED\tACTIONS\nVermont Nurseries\tgrower@vtnurseries.com\tVT-GWL-2024-001\tNot on file\tVerified\tFree\t4/9/2026\tUnverify"
+  },
+  {
+    "pattern": "/admin/growers",
+    "route": "/admin/growers",
+    "role": "admin",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Growers"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nGrowers\n\nView grower licenses, access, and plans.\n\nSearch growers\nSearch\nVerification status\nAll statuses\nPending only\nVerified only\nExpiring within 30 days\nExpired\n1 grower\nVermont Nurseries\ngrower@vtnurseries.com\nVerified\nFree\nLICENSE\nVT-GWL-2024-001\nEXPIRY\nNot on file\nUnverify"
+  },
+  {
+    "pattern": "/admin/settings",
+    "route": "/admin/settings",
+    "role": "admin",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Settings"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nNotifications\nDashboard\nUsers\nGrowers\nDispensaries\nSettings\nA\nadmin@phenofarm.com\nFull system access\nSign out\nSettings\n\nView billing, support, and policies.\n\nSettlement policy\n\nPhenoFarm bills only grower subscriptions. Wholesale payment stays between licensed businesses.\n\nGrower billing\n\nStripe subscription readiness.\n\nConfigure in Vercel Project Settings > Environment Variables, then redeploy.\n\nStripe webhook secret\n\nNeeds setup\n\nRequired to keep subscription status synced after checkout and portal updates.\n\nPro price ID\n\nNeeds setup\n\nEnables the Pro plan in grower settings.\n\nBusiness price ID\n\nNeeds setup\n\nEnables the Business plan in grower settings.\n\n1 configured\nSupport\nSupport email\nsupport@phenofarm.com\nCopy\nPolicies\nLicense review\nAdmin-controlled\nDetails\nNotification templates\nCode-managed\nDetails\nDemo accounts\nEnabled by request\nDetails"
+  },
+  {
+    "pattern": "/admin/settings",
+    "route": "/admin/settings",
+    "role": "admin",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1204,
+    "headings": [
+      "Settings"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nSettings\n\nView billing, support, and policies.\n\nSettlement policy\n\nPhenoFarm bills only grower subscriptions. Wholesale payment stays between licensed businesses.\n\nGrower billing\n\nStripe subscription readiness.\n\nConfigure in Vercel Project Settings > Environment Variables, then redeploy.\n\nStripe webhook secret\n\nNeeds setup\n\nRequired to keep subscription status synced after checkout and portal updates.\n\nPro price ID\n\nNeeds setup\n\nEnables the Pro plan in grower settings.\n\nBusiness price ID\n\nNeeds setup\n\nEnables the Business plan in grower settings.\n\n1 configured\nSupport\nSupport email\nsupport@phenofarm.com\nCopy\nPolicies\nLicense review\nAdmin-controlled\nDetails\nNotification templates\nCode-managed\nDetails\nDemo accounts\nEnabled by request\nDetails"
+  },
+  {
+    "pattern": "/admin/users",
+    "route": "/admin/users",
+    "role": "admin",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Users"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nNotifications\nDashboard\nUsers\nGrowers\nDispensaries\nSettings\nA\nadmin@phenofarm.com\nFull system access\nSign out\nUsers\n\nView accounts and verification.\n\nSearch users\nSearch\nAll\nAdmin\nGrower\nDispensary\n\n3 users\n\nEMAIL\tROLE\tBUSINESS\tVERIFIED\tJOINED\ndispensary@greenvermont.com\tDispensary\tGreen Vermont Dispensary\tVerified\t4/9/2026\ngrower@vtnurseries.com\tGrower\tVermont Nurseries\tVerified\t4/9/2026\nadmin@phenofarm.com\tAdmin\t-\t\t4/9/2026"
+  },
+  {
+    "pattern": "/admin/users",
+    "route": "/admin/users",
+    "role": "admin",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Users"
+    ],
+    "text": "P\nPhenoFarm\nADMIN\nUsers\n\nView accounts and verification.\n\nSearch users\nSearch\nAll\nAdmin\nGrower\nDispensary\n\n3 users\n\ndispensary@greenvermont.com\nDispensary\nGreen Vermont Dispensary\nVerified\n\nJoined 4/9/2026\n\ngrower@vtnurseries.com\nGrower\nVermont Nurseries\nVerified\n\nJoined 4/9/2026\n\nadmin@phenofarm.com\nAdmin\n\nJoined 4/9/2026"
+  },
+  {
+    "pattern": "/auth/error",
+    "route": "/auth/error",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Need access? We can help."
+    ],
+    "text": "PF\nPhenoFarm\n\nACCOUNT ACCESS\n\nNeed access? We can help.\n\nPhenoFarm support can help account owners recover access.\n\nRole-based grower and dispensary access\nLicense-aware buyer ordering gates\nSupport-assisted password recovery\n\nNeed help? support@phenofarm.com\n\nAuthentication error\nSomething went wrong while signing in. Try again, or contact support if the problem continues.\n\nIf this keeps happening, email support from the account owner address and include your business name.\n\nBack to sign in\nContact support"
+  },
+  {
+    "pattern": "/auth/error",
+    "route": "/auth/error",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Need access? We can help."
+    ],
+    "text": "PF\nPhenoFarm\nAuthentication error\nSomething went wrong while signing in. Try again, or contact support if the problem continues.\n\nIf this keeps happening, email support from the account owner address and include your business name.\n\nBack to sign in\nContact support"
+  },
+  {
+    "pattern": "/auth/sign_in",
+    "route": "/auth/sign_in",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Wholesale workflows, without payment confusion."
+    ],
+    "text": "PF\nPhenoFarm\n\nLICENSED MARKETPLACE OPERATIONS\n\nWholesale workflows, without payment confusion.\n\nManage catalog listings, buyer requests, order status, and subscription access. Settlement stays direct.\n\nDirect grower to dispensary requests\nFriendly order status tracking\nCultivator subscription billing only\n\nNeed access help? support@phenofarm.com\n\nSign in to your account\n\nOr create a new account\n\nEmail address\nPassword\nNeed password help?\nSign in\nDemo access"
+  },
+  {
+    "pattern": "/auth/sign_in",
+    "route": "/auth/sign_in",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Wholesale workflows, without payment confusion."
+    ],
+    "text": "PF\nPhenoFarm\nSign in to your account\n\nOr create a new account\n\nEmail address\nPassword\nNeed password help?\nSign in\nDemo access"
+  },
+  {
+    "pattern": "/auth/sign_up",
+    "route": "/auth/sign_up",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1146,
+    "headings": [
+      "Build your verified profile."
+    ],
+    "text": "PF\nPhenoFarm\n\nJOIN THE LICENSED NETWORK\n\nBuild your verified profile.\n\nOne account covers grower catalog or dispensary buying workflows.\n\nMarketplace identity from your business profile\nLicense-aware dispensary ordering gates\nCultivator subscription billing only\n\nAlready registered? Sign in\n\nCreate your account\n\nAlready have an account? Sign in\n\nPersonal contact\nFirst Name *\nLast Name *\nBusiness profile\nBusiness Name\n\nShown to marketplace partners — defaults to your name if left blank.\n\nBusiness Type *\nCannabis Grower\nDispensary/Retailer\nAccount security\nEmail address *\nPassword *\n\nUse at least 12 characters.\n\nConfirm Password *\n\nConfirm your password.\n\nCreate account\nBy signing up, you agree to the Terms and Privacy Policy."
+  },
+  {
+    "pattern": "/auth/sign_up",
+    "route": "/auth/sign_up",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1454,
+    "headings": [
+      "Build your verified profile."
+    ],
+    "text": "PF\nPhenoFarm\nCreate your account\n\nAlready have an account? Sign in\n\nPersonal contact\nFirst Name *\nLast Name *\nBusiness profile\nBusiness Name\n\nShown to marketplace partners — defaults to your name if left blank.\n\nBusiness Type *\nCannabis Grower\nDispensary/Retailer\nAccount security\nEmail address *\nPassword *\n\nUse at least 12 characters.\n\nConfirm Password *\n\nConfirm your password.\n\nCreate account\nBy signing up, you agree to the Terms and Privacy Policy."
+  },
+  {
+    "pattern": "/contact",
+    "route": "/contact",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Talk about wholesale workflows."
+    ],
+    "text": "Back to home\n\nCONTACT PHENOFARM\n\nTalk about wholesale workflows.\n\nTell us whether you are a grower, dispensary, or partner and include the details the PhenoFarm support team should know.\n\nEmail\n\nsupport@phenofarm.com\n\nLocation\n\nVermont, USA\n\nPhenoFarm coordinates marketplace workflows and cultivator subscriptions. Wholesale payment settlement stays directly between licensed businesses.\n\nEmail us\n\nThese details help support route your request.\n\nFull name\nEmail\nBusiness type\nSelect one\nGrower\nDispensary\nOther\nMessage\nOpen email draft"
+  },
+  {
+    "pattern": "/contact",
+    "route": "/contact",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1598,
+    "headings": [
+      "Talk about wholesale workflows."
+    ],
+    "text": "Back to home\n\nCONTACT PHENOFARM\n\nTalk about wholesale workflows.\n\nTell us whether you are a grower, dispensary, or partner and include the details the PhenoFarm support team should know.\n\nEmail\n\nsupport@phenofarm.com\n\nLocation\n\nVermont, USA\n\nPhenoFarm coordinates marketplace workflows and cultivator subscriptions. Wholesale payment settlement stays directly between licensed businesses.\n\nEmail us\n\nThese details help support route your request.\n\nFull name\nEmail\nBusiness type\nSelect one\nGrower\nDispensary\nOther\nMessage\nOpen email draft"
+  },
+  {
+    "pattern": "/dispensary/cart",
+    "route": "/dispensary/cart",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Request draft"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\nSearch...\n⌘K\nNotifications\n24\nDashboard\nCatalog\nRequest Draft\nOrders\n17\nSaved\nSettings\nGV\nGreen Vermont Dispensary\nVerified buyer\nSign out\nRequest draft\n\nSend requests here; arrange payment with the grower.\n\nYour draft is empty\n\nAdd products to get started.\n\nSaved and recent products\n\nMystery Pricing Batch\n\nFavorite\n\nVermont Nurseries\n\nQuote only · 25 available\n\nRequest pricing\n\nPurple Haze Flowers\n\nRecent\n\nVermont Nurseries\n\n$25.00/gram · 240 available\n\nAdd\nBrowse products\nSaved items"
+  },
+  {
+    "pattern": "/dispensary/cart",
+    "route": "/dispensary/cart",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Request draft"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\n24\nRequest draft\n\nSend requests here; arrange payment with the grower.\n\nYour draft is empty\n\nAdd products to get started.\n\nSaved and recent products\n\nMystery Pricing Batch\n\nFavorite\n\nVermont Nurseries\n\nQuote only · 25 available\n\nRequest pricing\n\nPurple Haze Flowers\n\nRecent\n\nVermont Nurseries\n\n$25.00/gram · 240 available\n\nAdd\nBrowse products\nSaved items"
+  },
+  {
+    "pattern": "/dispensary/catalog",
+    "route": "/dispensary/catalog",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1142,
+    "headings": [
+      "Catalog"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\nSearch...\n⌘K\nNotifications\n24\nDashboard\nCatalog\nRequest Draft\nOrders\n17\nSaved\nSettings\nGV\nGreen Vermont Dispensary\nVerified buyer\nSign out\nCatalog\n\nBrowse verified growers.\n\nSearch catalog\nGrouped by grower\nPrice: Low to High\nPrice: High to Low\nTHC: High to Low\nTHC: Low to High\nName: A-Z\nName: Z-A\nFilters\nGrid\nList\n3 of 3 products\nVermont Nurseries\nView Shop →\nMystery Pricing Batch\nHybrid\nTHC 19%\nCBD 0.3%\nFlower\n\nStrain: Assorted\n\n25 available\n\nRequest pricing\nMessage grower\n•\nCompare\n\nLab results on request\n\nPurple Haze Flowers\nHybrid\nTHC 24.8%\nCBD 0.6%\nFlower\n\nStrain: Purple Haze\n\n$25.00/ g\nQty:\n−\n+\nAdd to draft\n240 Available\nMessage grower\n•\nCompare\n\nLab results on request\n\nSilver Haze Concentrate\nHybrid\nTHC 85%\nCBD 0.2%\nBulk Extract\n\nStrain: Silver Haze\n\n$60.00/ g\nQty:\n−\n+\nAdd to draft\n50 Available\nMessage grower\n•\nCompare\n\nLab results on request\n\nEnd of results"
+  },
+  {
+    "pattern": "/dispensary/catalog",
+    "route": "/dispensary/catalog",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2308,
+    "headings": [
+      "Catalog"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\n24\nCatalog\n\nBrowse verified growers.\n\nSearch catalog\nGrouped by grower\nPrice: Low to High\nPrice: High to Low\nTHC: High to Low\nTHC: Low to High\nName: A-Z\nName: Z-A\n3 of 3 products\nVermont Nurseries\nView Shop →\nMystery Pricing Batch\nHybrid\nTHC 19%\nCBD 0.3%\nFlower\n\nStrain: Assorted\n\n25 available\n\nRequest pricing\nMessage grower\n•\nCompare\n\nLab results on request\n\nPurple Haze Flowers\nHybrid\nTHC 24.8%\nCBD 0.6%\nFlower\n\nStrain: Purple Haze\n\n$25.00/ g\nQty:\n−\n+\nAdd to draft\n240 Available\nMessage grower\n•\nCompare\n\nLab results on request\n\nSilver Haze Concentrate\nHybrid\nTHC 85%\nCBD 0.2%\nBulk Extract\n\nStrain: Silver Haze\n\n$60.00/ g\nQty:\n−\n+\nAdd to draft\n50 Available\nMessage grower\n•\nCompare\n\nLab results on request\n\nEnd of results"
+  },
+  {
+    "pattern": "/dispensary/dashboard",
+    "route": "/dispensary/dashboard",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1085,
+    "headings": [
+      "Green Vermont Dispensary"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\nSearch...\n⌘K\nNotifications\n24\nDashboard\nCatalog\nRequest Draft\nOrders\n17\nSaved\nSettings\nGV\nGreen Vermont Dispensary\nVerified buyer\nSign out\n\nBUYER WORKSPACE\n\nGreen Vermont Dispensary\n\nTrack requests and revisit saved products.\n\nBrowse Catalog\n\nRequest value\n\n$460.50\n\nAwaiting response\n\n17\n\nGrowers\n\n1\n\nIn progress\n\n1\n\nVerified buyer\nAbout these totals\nSaved\nFavorites 1 · Alerts 1\nRecent Requests\nView all\nRequest #\n\tGROWER\t\nDate\n\t\nEst. value\n\t\nStatus\n\tACTIONS\n\n#ORD-20260710-XPJO3I\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-20260710-03UYXZ\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-20260710-O78T5N\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-20260710-ZYGM3S\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-20260710-FMBIOT\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\nRecently Requested\n\nPurple Haze Flowers\n\nFlower • from Vermont Nurseries\n\n$25.00\n7-Day Request Value\n\nNo requests this week."
+  },
+  {
+    "pattern": "/dispensary/dashboard",
+    "route": "/dispensary/dashboard",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1573,
+    "headings": [
+      "Green Vermont Dispensary"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\n24\n\nBUYER WORKSPACE\n\nGreen Vermont Dispensary\n\nTrack requests and revisit saved products.\n\nBrowse Catalog\n\nRequest value\n\n$460.50\n\nAwaiting response\n\n17\n\nGrowers\n\n1\n\nIn progress\n\n1\n\nVerified buyer\nAbout these totals\nSaved\nFavorites 1 · Alerts 1\nRecent Requests\nView all\n#XPJO3I\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#03UYXZ\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#O78T5N\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\nRecently Requested\n\nPurple Haze Flowers\n\nFlower • from Vermont Nurseries\n\n$25.00\n7-Day Request Value\n\nNo requests this week."
+  },
+  {
+    "pattern": "/dispensary/orders",
+    "route": "/dispensary/orders",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1508,
+    "headings": [
+      "Orders"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\nSearch...\n⌘K\nNotifications\n24\nDashboard\nCatalog\nRequest Draft\nOrders\n17\nSaved\nSettings\nGV\nGreen Vermont Dispensary\nVerified buyer\nSign out\nOrders\n\nTrack requests and grower responses.\n\nBrowse Catalog\n\nRequests\n\n19\n\nIn progress\n\n1\n\nAwaiting response\n\n17\n\nRequest value\n\n$460.50\n\nAll statuses\nSubmitted\nAccepted\nPreparing\nReady / In transit\nDelivered\nCancelled\nFilter\nRequest #\n\tGROWER\t\nDate\n\t\nEst. value\n\t\nStatus\n\tACTIONS\n\n#ORD-20260710-XPJO3I\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-20260710-03UYXZ\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-20260710-O78T5N\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-20260710-ZYGM3S\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-20260710-FMBIOT\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-1783641718088-1\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-1783641503047-1\n\tVermont Nurseries\tJul 9, 2026\t$25.00\tSubmitted\tView\n\n#ORD-1781196282824-1\n\tVermont Nurseries\tJun 11, 2026\t$25.00\tSubmitted\tView\n\n#ORD-1781145140815-1\n\tVermont Nurseries\tJun 10, 2026\t$25.00\tSubmitted\tView\n\n#ORD-1781144783465-1\n\tVermont Nurseries\tJun 10, 2026\t$25.00\tSubmitted\tView\n\n#O"
+  },
+  {
+    "pattern": "/dispensary/orders",
+    "route": "/dispensary/orders",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2966,
+    "headings": [
+      "Orders"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\n24\nOrders\n\nTrack requests and grower responses.\n\nBrowse Catalog\n\nRequests\n\n19\n\nIn progress\n\n1\n\nAwaiting response\n\n17\n\nRequest value\n\n$460.50\n\nAll statuses\nSubmitted\nAccepted\nPreparing\nReady / In transit\nDelivered\nCancelled\nFilter\n#XPJO3I\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#03UYXZ\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#O78T5N\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#ZYGM3S\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#FMBIOT\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#718088-1\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#503047-1\nSubmitted\n\nVermont Nurseries\n\nJul 9, 2026\n\n$25.00\n#282824-1\nSubmitted\n\nVermont Nurseries\n\nJun 11, 2026\n\n$25.00\n#140815-1\nSubmitted\n\nVermont Nurseries\n\nJun 10, 2026\n\n$25.00\n#783465-1\nSubmitted\n\nVermont Nurseries\n\nJun 10, 2026\n\n$25.00\n#724494-1\nSubmitted\n\nVermont Nurseries\n\nJun 10, 2026\n\n$25.00\n#929454-1\nCancelled\n\nVermont Nurseries\n\nJun 10, 2026\n\n$25.00\n#857103-1\nAccepted\n\nVermont Nurseries\n\nApr 28, 2026\n\n$26.50\n#448158-1\nSubmitted\n\nVermont Nurseries\n\nApr 28, 2026\n\n$26.50\n#128040-1\nSubmitted\n\nVermont Nurseries\n\nApr 28, 2026\n\n$26.50\n#375263-1\nSubmitted\n\nVermont Nurseries\n\nApr 20, 20"
+  },
+  {
+    "pattern": "/dispensary/saved",
+    "route": "/dispensary/saved",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Saved"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\nSearch...\n⌘K\nNotifications\n24\nDashboard\nCatalog\nRequest Draft\nOrders\n17\nSaved\nSettings\nGV\nGreen Vermont Dispensary\nVerified buyer\nSign out\nSaved\nBrowse Catalog\nFavorites (1)\nAlerts (1)\nRecent (1)\nRecently Added\nPrice: Low to High\nPrice: High to Low\nTHC: High to Low\nName: A-Z\nName: Z-A\nTHC: Low to High\nGrid\nList\nMore\nMystery Pricing Batch\nVermont Nurseries\nFlower\nTHC 19%\n25 available\nRequest pricing\nMessage"
+  },
+  {
+    "pattern": "/dispensary/saved",
+    "route": "/dispensary/saved",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Saved"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\n24\nSaved\nBrowse Catalog\nFavorites (1)\nAlerts (1)\nRecent (1)\nRecently Added\nPrice: Low to High\nPrice: High to Low\nTHC: High to Low\nName: A-Z\nName: Z-A\nTHC: Low to High\nMore\nMystery Pricing Batch\nVermont Nurseries\nFlower\nTHC 19%\n25 available\nRequest pricing\nMessage"
+  },
+  {
+    "pattern": "/dispensary/settings",
+    "route": "/dispensary/settings",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1445,
+    "headings": [
+      "Settings"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\nSearch...\n⌘K\nNotifications\n24\nDashboard\nCatalog\nRequest Draft\nOrders\n17\nSaved\nSettings\nGV\nGreen Vermont Dispensary\nVerified buyer\nSign out\nSettings\n\nManage your account and preferences\n\nSECTIONS\nLicense & verification\nBusiness profile\nBranding\nLicense & verification\n\nVerified through 12/31/2027\n\nLicense number *\nState *\nVermont (VT)\nExpiry date (recommended)\nBusiness profile\nBusiness Name *\nContact Name (optional)\nEmail *\nPhone (optional)\nAddress\n\nType 3+ characters to see suggestions (includes city, state, ZIP)\n\nWebsite (optional)\nDescription (optional)\n\n45/500\n\nBranding\nNo logo\nUpload Logo\n\nJPG, PNG, or WebP. Max 500KB.\n\nAccount\nSign out\n\nSave settings"
+  },
+  {
+    "pattern": "/dispensary/settings",
+    "route": "/dispensary/settings",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1811,
+    "headings": [
+      "Settings"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\n24\nSettings\n\nManage your account and preferences\n\nLicense & verification\n\nVerified through 12/31/2027\n\nLicense number *\nState *\nVermont (VT)\nExpiry date (recommended)\nBusiness profile\nBusiness Name *\nContact Name (optional)\nEmail *\nPhone (optional)\nAddress\n\nType 3+ characters to see suggestions (includes city, state, ZIP)\n\nWebsite (optional)\nDescription (optional)\n\n45/500\n\nBranding\nNo logo\nUpload Logo\n\nJPG, PNG, or WebP. Max 500KB.\n\nAccount\nSign out\nSave settings"
+  },
+  {
+    "pattern": "/grower/batches",
+    "route": "/grower/batches",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Batches"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nBatches\nAdd batch\n\nBatches\n\n1\n\nProducts\n\n1\n\nAvg. THC\n\n24.8%\n\nBATCH #\tSTRAIN\tHARVEST DATE\tTHC\tCBD\tPRODUCTS\tACTIONS\nVN-2026-0912\tAudit Test Kush\tSep 12, 2026\t24.8%\t0.6%\t1 product0/3 lab docs\t\nEdit\nAdd product\nMore"
+  },
+  {
+    "pattern": "/grower/batches",
+    "route": "/grower/batches",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Batches"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nBatches\nAdd batch\n\nBatches\n\n1\n\nProducts\n\n1\n\nAvg. THC\n\n24.8%\n\nBatch #\n\nVN-2026-0912\n\nLot VT-A104\n\nSep 12, 2026\n\nStrain\n\nAudit Test Kush\n\nProducts\n\n1 product\n\nTHC\n\n24.8%\n\nCBD\n\n0.6%\n\n0/3 lab docs\n\nEdit\nAdd product\nMore"
+  },
+  {
+    "pattern": "/grower/batches/add",
+    "route": "/grower/batches/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1057,
+    "headings": [
+      "Add batch"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nAdd batch\nBatch Number *\nGenerate\n\nExample: BATCH-20260917-01\n\nLot Number\nHarvest Date *\nStrain *\nSelect a strain\nAssorted\nAudit Test Kush\nPurple Haze\nSilver Haze\nLab Results\nTHC (%)\nCBD (%)\nTotal (%)\nLab PDFs\n\nPDF · 2MB max each\n\nPotency\nUpload\nPesticides\nUpload\nMicrobials\nUpload\nNotes\nCreate Batch\nCancel"
+  },
+  {
+    "pattern": "/grower/batches/add",
+    "route": "/grower/batches/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1311,
+    "headings": [
+      "Add batch"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nAdd batch\nBatch Number *\nGenerate\n\nExample: BATCH-20260917-01\n\nLot Number\nHarvest Date *\nStrain *\nSelect a strain\nAssorted\nAudit Test Kush\nPurple Haze\nSilver Haze\nLab Results\nTHC (%)\nCBD (%)\nTotal (%)\nLab PDFs\n\nPDF · 2MB max each\n\nPotency\nUpload\nPesticides\nUpload\nMicrobials\nUpload\nNotes\nCreate Batch\nCancel"
+  },
+  {
+    "pattern": "/grower/catalog",
+    "route": "/grower/catalog",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Catalog"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nCatalog\nAdd product\n\nKeep your catalog current.\n\nReview listings →\n\nProducts\n\n3\n\nAvailable\n\n3\n\nStock value\n\n$10,000.00\n\nQuote only\n\n1\n\nListings\n3 total\n\nEdit and publish products.\n\nInventory\n0 stock alerts\n\nUpdate stock quantities.\n\nBuyer preview\n3 live\n\nSee your public listings.\n\nPricing\n1 quote only\n\nShow prices or invite quotes.\n\nCatalog health\nQuote only\n1 →\nAll checks\nStrains, batches & customers"
+  },
+  {
+    "pattern": "/grower/catalog",
+    "route": "/grower/catalog",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1242,
+    "headings": [
+      "Catalog"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nCatalog\nAdd product\n\nKeep your catalog current.\n\nReview listings →\n\nProducts\n\n3\n\nAvailable\n\n3\n\nStock value\n\n$10,000.00\n\nQuote only\n\n1\n\nListings\n3 total\n\nEdit and publish products.\n\nInventory\n0 stock alerts\n\nUpdate stock quantities.\n\nBuyer preview\n3 live\n\nSee your public listings.\n\nPricing\n1 quote only\n\nShow prices or invite quotes.\n\nCatalog health\nQuote only\n1 →\nAll checks\nStrains, batches & customers"
+  },
+  {
+    "pattern": "/grower/customers",
+    "route": "/grower/customers",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Customers"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nCustomers\n\nSaved contacts and buyers\n\nAdd customer\n\nCustomers\n\n2\n\nActive · 90 days\n\n2\n\nRequests\n\n20\n\nBUSINESS\tCONTACT\tLAST REQUEST\tDELIVERED VALUE\tLOCATION\tACTIONS\n\nGreen Vermont Dispensary\nLicense: VT-RTL-2024-001\nPhenoFarm member\t\ndispensary@greenvermont.com\n(802) 555-0145\n\tJul 9, 2026\t$0.00\tBurlington, VT\t\nDetails\nStatement\nRequests\nMessage\n\n\nMaple Street Market\nLicense: VT-UI-2026-104\n\t\nAlex Morgan\norders@example.test\n802-555-0142\n\tSep 13, 2026\t$450.00\tBurlington, VT\t\nEdit contact\nStatement\nRequests\nMessage"
+  },
+  {
+    "pattern": "/grower/customers",
+    "route": "/grower/customers",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1116,
+    "headings": [
+      "Customers"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nCustomers\n\nSaved contacts and buyers\n\nAdd customer\n\nCustomers\n\n2\n\nActive · 90 days\n\n2\n\nRequests\n\n20\n\nGreen Vermont Dispensary\n\nLicense: VT-RTL-2024-001\n\nEmail: dispensary@greenvermont.com\n\nPhone: (802) 555-0145\n\nLocation: Burlington, VT\n\nLast request: Jul 9, 2026\n\nDelivered value: $0.00\n\nPhenoFarm member\n19 requests\nDetails\nStatement\nRequests\nMessage\n\nMaple Street Market\n\nLicense: VT-UI-2026-104\n\nAlex Morgan\n\nEmail: orders@example.test\n\nPhone: 802-555-0142\n\nLocation: Burlington, VT\n\nLast request: Sep 13, 2026\n\nDelivered value: $450.00\n\n1 request\nEdit contact\nStatement\nRequests\nMessage"
+  },
+  {
+    "pattern": "/grower/customers/add",
+    "route": "/grower/customers/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Add customer"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nAdd customer\nBusiness Name *\nContact Name *\nEmail *\nPhone *\nAddress\nCity\nState\nZIP\nLicense Number\nCancel\nAdd customer"
+  },
+  {
+    "pattern": "/grower/customers/add",
+    "route": "/grower/customers/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 984,
+    "headings": [
+      "Add customer"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nAdd customer\nBusiness Name *\nContact Name *\nEmail *\nPhone *\nAddress\nCity\nState\nZIP\nLicense Number\nCancel\nAdd customer"
+  },
+  {
+    "pattern": "/grower/dashboard",
+    "route": "/grower/dashboard",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1391,
+    "headings": [
+      "Vermont Nurseries"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\n\nGOOD MORNING\n\nVermont Nurseries\n\nRequests\n\n20\n\nDelivered value\n\n$450\n\nCustomers\n\n2\n\nProducts\n\n3\n\nNeeds attention\n18\n\nNew requests\n\n17\n\nUnread messages\n\n0\n\nCancellations\n\n0\n\nStatus changes\n\n1\n\n6 new buyer requests\nReview all\n\nGreen Vermont Dispensary has 6 requests waiting for review.\n\nReview\nRecently delivered\nDelivered\n\nORD-20260917-REVIEW for Maple Street Market moved to Delivered.\n\nReview\nReview 17 requests →\nSetup · 3 left\nDelivered value · 30 days\n\nAug 19–Sep 17 · Payment is arranged directly with buyers.\n\n$450\n$225\n$0\n$0\n8/19\n$0\n8/20\n$0\n8/21\n$0\n8/22\n$0\n8/23\n$0\n8/24\n$0\n8/25\n$0\n8/26\n$0\n8/27\n$0\n8/28\n$0\n8/29\n$0\n8/30\n$0\n8/31\n$0\n9/1\n$0\n9/2\n$0\n9/3\n$0\n9/4\n$0\n9/5\n$0\n9/6\n$0\n9/7\n$0\n9/8\n$0\n9/9\n$0\n9/10\n$0\n9/11\n$0\n9/12\n$0\n9/13\n$0\n9/14\n$450\n9/15\n$450\n$0\n9/16\n$0\n9/17\nRecent activity\nToday\nLast 7 Days\nLast 30 Days\nThis Month\nLast Month\nAll Time\nAll requests\n\nRequest #ORD-20260917-REVIEW\n\nFrom Maple Street Market\n\nSep 13, 8:00 PM"
+  },
+  {
+    "pattern": "/grower/dashboard",
+    "route": "/grower/dashboard",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1701,
+    "headings": [
+      "Vermont Nurseries"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\n\nGOOD MORNING\n\nVermont Nurseries\n\nRequests\n\n20\n\nDelivered value\n\n$450\n\nCustomers\n\n2\n\nProducts\n\n3\n\nNeeds attention\n18\n\nNew requests\n\n17\n\nUnread messages\n\n0\n\nCancellations\n\n0\n\nStatus changes\n\n1\n\n6 new buyer requests\nReview all\n\nGreen Vermont Dispensary has 6 requests waiting for review.\n\nReview\nRecently delivered\nDelivered\n\nORD-20260917-REVIEW for Maple Street Market moved to Delivered.\n\nReview\nReview 17 requests →\nSetup · 3 left\nDelivered value · 30 days\n\nAug 19–Sep 17 · Payment is arranged directly with buyers.\n\n$450\n$225\n$0\nScroll chart horizontally\n← Earlier\n8/19\n8/20\n8/21\n8/22\n8/23\n8/24\n8/25\n8/26\n8/27\n8/28\n8/29\n8/30\n8/31\n9/1\n9/2\n9/3\n9/4\n9/5\n9/6\n9/7\n9/8\n9/9\n9/10\n9/11\n9/12\n9/13\n9/14\n9/15\n$450\n9/16\n9/17\nRecent activity\nToday\nLast 7 Days\nLast 30 Days\nThis Month\nLast Month\nAll Time\nAll requests\n\nRequest #ORD-20260917-REVIEW\n\nFrom Maple Street Market\n\nSep 13, 8:00 PM"
+  },
+  {
+    "pattern": "/grower/inventory",
+    "route": "/grower/inventory",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Inventory"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nInventory\nAdd product\nUpdate stock\n\nProducts\n\n3\n\nStock value\n\n$10,000\n\nLow stock\n\n0\n\nStock value = list price × quantity on hand.\n\nEnter the total stock on hand. Changes save automatically.\n\nAll\n3\nLow stock\n0\nOut of stock\n0\nUnavailable\n0\nPRODUCT\tTYPE\tPRICE\tINVENTORY\tSTATUS\tACTIONS\n\nMystery Pricing Batch\nAssorted\n\tFlower - Greenhouse\t$40/eighth\t\n25 eighth\n\tAvailable\tEdit\n\nSilver Haze Concentrate\nSilver Haze\n\tConcentrate - Live Resin\t$60/g\t\n50 g\n\tAvailable\tEdit\n\nPurple Haze Flowers\nPurple Haze\n\tFlower - Indoor\t$25/g\t\n240 g\n\tAvailable\tEdit"
+  },
+  {
+    "pattern": "/grower/inventory",
+    "route": "/grower/inventory",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1399,
+    "headings": [
+      "Inventory"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nInventory\nAdd product\nUpdate stock\n\nProducts\n\n3\n\nStock value\n\n$10,000\n\nLow stock\n\n0\n\nStock value = list price × quantity on hand.\n\nEnter the total stock on hand. Changes save automatically.\n\nAll\n3\nLow stock\n0\nOut of stock\n0\nUnavailable\n0\nMystery Pricing Batch\nAssorted\nAvailable\n\nType\n\nFlower - Greenhouse\n\nPrice\n\n$40/eighth\n\nInventory\n\n25 eighth\n\nEdit product\nSilver Haze Concentrate\nSilver Haze\nAvailable\n\nType\n\nConcentrate - Live Resin\n\nPrice\n\n$60/g\n\nInventory\n\n50 g\n\nEdit product\nPurple Haze Flowers\nPurple Haze\nAvailable\n\nType\n\nFlower - Indoor\n\nPrice\n\n$25/g\n\nInventory\n\n240 g\n\nEdit product"
+  },
+  {
+    "pattern": "/grower/inventory/add",
+    "route": "/grower/inventory/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Update stock"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nUpdate stock\nProduct *\nMystery Pricing Batch\nFlower · Greenhouse · Assorted\n25 eighth\nSilver Haze Concentrate\nBulk Extract · Live Resin · Silver Haze\n50 g\nPurple Haze Flowers\nFlower · Indoor · Purple Haze\n240 g\nStock on hand *\n\nThis replaces the current stock level; it is not added to it.\n\nCancel\nSave stock\nAdd a new product →"
+  },
+  {
+    "pattern": "/grower/inventory/add",
+    "route": "/grower/inventory/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Update stock"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nUpdate stock\nProduct *\nMystery Pricing Batch\nFlower · Greenhouse · Assorted\n25 eighth\nSilver Haze Concentrate\nBulk Extract · Live Resin · Silver Haze\n50 g\nPurple Haze Flowers\nFlower · Indoor · Purple Haze\n240 g\nStock on hand *\n\nThis replaces the current stock level; it is not added to it.\n\nCancel\nSave stock\nAdd a new product →"
+  },
+  {
+    "pattern": "/grower/marketplace",
+    "route": "/grower/marketplace",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Marketplace preview"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nMarketplace preview\n\nHow buyers see your listings.\n\nAdd product\n3 active\n1 quote required\nTerms\nVermont Nurseries\nMystery Pricing Batch\nHybrid\nTHC 19%\nCBD 0.3%\nFlower\n\nStrain: Assorted\n\n25 eighth available\n\nRequest pricingMessage grower\n\nLab results on request\n\nEdit listing\nSilver Haze Concentrate\nHybrid\nTHC 85%\nCBD 0.2%\nConcentrate\n\nStrain: Silver Haze\n\n50 g available\n\n$60.00/ g\nAdd to draft\nMessage grower\n\nLab results on request\n\nEdit listing\nPurple Haze Flowers\nHybrid\nTHC 24.8%\nCBD 0.6%\nFlower\n\nStrain: Purple Haze\n\n240 g available\n\n$25.00/ g\nAdd to draft\nMessage grower\n\nLab results on request\n\nEdit listing"
+  },
+  {
+    "pattern": "/grower/marketplace",
+    "route": "/grower/marketplace",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2004,
+    "headings": [
+      "Marketplace preview"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nMarketplace preview\n\nHow buyers see your listings.\n\nAdd product\n3 active\n1 quote required\nTerms\nVermont Nurseries\nMystery Pricing Batch\nHybrid\nTHC 19%\nCBD 0.3%\nFlower\n\nStrain: Assorted\n\n25 eighth available\n\nRequest pricingMessage grower\n\nLab results on request\n\nEdit listing\nSilver Haze Concentrate\nHybrid\nTHC 85%\nCBD 0.2%\nConcentrate\n\nStrain: Silver Haze\n\n50 g available\n\n$60.00/ g\nAdd to draft\nMessage grower\n\nLab results on request\n\nEdit listing\nPurple Haze Flowers\nHybrid\nTHC 24.8%\nCBD 0.6%\nFlower\n\nStrain: Purple Haze\n\n240 g available\n\n$25.00/ g\nAdd to draft\nMessage grower\n\nLab results on request\n\nEdit listing"
+  },
+  {
+    "pattern": "/grower/orders",
+    "route": "/grower/orders",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1758,
+    "headings": [
+      "Requests"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nRequests\nHistory\nRecord request\n\nRequests\n\n20\n\nActive\n\n18\n\nNeeds review\n\n17\n\nEst. value\n\n$910.50\n\nValue excludes cancelled requests. Payment is arranged directly with buyers.\n\nAll\n18\nNeeds review\n17\nAccepted\n1\nPreparing\n0\nReady\n0\nSelect all\nDensity\nComfort\nCompact\n\tREQUEST #\tDISPENSARY\tDATE\tEST. VALUE\tSTATUS\tACTIONS\n\t\n#ORD-20260710-XPJO3I\n\tGreen Vermont Dispensary\tJul 9, 2026\t$25.00\tSubmitted\tView\n\t\n#ORD-20260710-03UYXZ\n\tGreen Vermont Dispensary\tJul 9, 2026\t$25.00\tSubmitted\tView\n\t\n#ORD-20260710-O78T5N\n\tGreen Vermont Dispensary\tJul 9, 2026\t$25.00\tSubmitted\tView\n\t\n#ORD-20260710-ZYGM3S\n\tGreen Vermont Dispensary\tJul 9, 2026\t$25.00\tSubmitted\tView\n\t\n#ORD-20260710-FMBIOT\n\tGreen Vermont Dispensary\tJul 9, 2026\t$25.00\tSubmitted\tView\n\t\n#ORD-1783641718088-1\n\tGreen Vermont Dispensary\tJul 9, 2026\t$25.00\tSubmitted\tView\n\t\n#ORD-1783641503047-1\n\tGreen Vermont Dispensary\tJul 9, 2026\t$25.00\tSubmitted\tView\n\t\n#ORD-1781196282824-1\n\tGreen Vermont Dispensary\tJun 11, 2026\t$25.00\tSubmitted\tView\n\t\n#ORD-178114"
+  },
+  {
+    "pattern": "/grower/orders",
+    "route": "/grower/orders",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 4012,
+    "headings": [
+      "Requests"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nRequests\nHistory\nRecord request\n\nRequests\n\n20\n\nActive\n\n18\n\nNeeds review\n\n17\n\nEst. value\n\n$910.50\n\nValue excludes cancelled requests. Payment is arranged directly with buyers.\n\nAll\n18\nNeeds review\n17\nAccepted\n1\nPreparing\n0\nReady\n0\nSelect all\n#ORD-20260710-XPJO3I\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJul 9, 2026\nView request →\n#ORD-20260710-03UYXZ\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJul 9, 2026\nView request →\n#ORD-20260710-O78T5N\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJul 9, 2026\nView request →\n#ORD-20260710-ZYGM3S\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJul 9, 2026\nView request →\n#ORD-20260710-FMBIOT\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJul 9, 2026\nView request →\n#ORD-1783641718088-1\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJul 9, 2026\nView request →\n#ORD-1783641503047-1\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJul 9, 2026\nView request →\n#ORD-1781196282824-1\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJun 11, 2026\nView request →\n#ORD-1781145140815-1\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJun 10, 2026\nView request →\n#ORD-1781144783465-1\n\nGreen Vermont Dispensary\n\nSubmitted\n$25\nJun 10, 2026\nView request →\n#ORD-1781144724494-1\n\nGreen Vermont Dispensa"
+  },
+  {
+    "pattern": "/grower/orders/add",
+    "route": "/grower/orders/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Record request"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nRecord request\n\nRecord an agreement made directly with a buyer.\n\nBuyer *\nItems\nAdd item\n\nAdd products to this request\n\nUse Add item to begin.\n\nShipping & notes\nRecord request\nCancel\n\nSelect a dispensary before recording the request."
+  },
+  {
+    "pattern": "/grower/orders/add",
+    "route": "/grower/orders/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Record request"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nRecord request\n\nRecord an agreement made directly with a buyer.\n\nBuyer *\nItems\nAdd item\n\nAdd products to this request\n\nUse Add item to begin.\n\nShipping & notes\nRecord request\nCancel\n\nSelect a dispensary before recording the request."
+  },
+  {
+    "pattern": "/grower/orders/history",
+    "route": "/grower/orders/history",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Request history"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nRequest history\nActive requests\n\nRequests\n\n2\n\nDelivered\n\n1\n\nCancelled\n\n1\n\nDelivered value\n\n$450\n\nAll\n2\nDelivered\n1\nCancelled\n1\nREQUEST #\tCUSTOMER\tCLOSED\tEST. VALUE\tSTATUS\tACTIONS\n\n#ORD-20260917-REVIEW\n\tMaple Street Market\tSep 17, 2026\t$450.00\tDelivered\tView\n\n#ORD-1781123929454-1\n\tGreen Vermont Dispensary\tJun 10, 2026\t$25.00\tCancelled\tView"
+  },
+  {
+    "pattern": "/grower/orders/history",
+    "route": "/grower/orders/history",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 970,
+    "headings": [
+      "Request history"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nRequest history\nActive requests\n\nRequests\n\n2\n\nDelivered\n\n1\n\nCancelled\n\n1\n\nDelivered value\n\n$450\n\nAll\n2\nDelivered\n1\nCancelled\n1\n#ORD-20260917-REVIEW\n\nMaple Street Market\n\nDelivered\n$450\nSep 17, 2026\nView request →\n#ORD-1781123929454-1\n\nGreen Vermont Dispensary\n\nCancelled\n$25\nJun 10, 2026\nView request →"
+  },
+  {
+    "pattern": "/grower/pricing",
+    "route": "/grower/pricing",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Plans"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nPlans\n\nSoftware subscriptions only. Wholesale settlement stays directly between businesses.\n\nCurrent plan: Free\n\nPaid upgrades are unavailable. Contact support.\n\nFree\nCurrent plan\n\nEvaluate the marketplace workflow before enabling paid plans.\n\n$0\n\n/mo\n\nPlan features\nSelected subscription plan\nMost popular\nPro\n\nCultivator subscription for active wholesale teams.\n\n$249\n\n/mo ($199/mo billed annually)\n\nPlan features\n\nCheckout unavailable\n\nBusiness\n\nFor multi-license operations that need deeper integrations.\n\nCustom\n\nPlan features\nContact sales"
+  },
+  {
+    "pattern": "/grower/pricing",
+    "route": "/grower/pricing",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1192,
+    "headings": [
+      "Plans"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nPlans\n\nSoftware subscriptions only. Wholesale settlement stays directly between businesses.\n\nCurrent plan: Free\n\nPaid upgrades are unavailable. Contact support.\n\nFree\nCurrent plan\n\nEvaluate the marketplace workflow before enabling paid plans.\n\n$0\n\n/mo\n\nPlan features\nSelected subscription plan\nMost popular\nPro\n\nCultivator subscription for active wholesale teams.\n\n$249\n\n/mo ($199/mo billed annually)\n\nPlan features\n\nCheckout unavailable\n\nBusiness\n\nFor multi-license operations that need deeper integrations.\n\nCustom\n\nPlan features\nContact sales"
+  },
+  {
+    "pattern": "/grower/products",
+    "route": "/grower/products",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Products"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nProducts\nQuick add\nImport CSV\nAdd product\n\nProducts\n\n3\n\nStock value\n\n$10,000\n\nAvailable\n\n3\n\nFilter\n\nAll\n3\nActive\n3\nLow inventory\n0\nQuote only\n1\nMissing images\n0\nMissing type\n0\nHidden/out\n0\nAll\nProduct type\nStrain\nBatch\nDisplay\nList · Comfort\n\tPRODUCT\tTYPE\tSTATUS\tPRICE\tINVENTORY\tACTIONS\n\t\nMystery Pricing Batch\nAssorted\n\tFlower\tAvailable\t\n$40.00\nQuote only — price hidden from buyers\n\t25 Eighths\t\nEdit\n\n\t\nSilver Haze Concentrate\nSilver Haze\n\tBulk Extract\tAvailable\t\n$60.00\n\t50 Grams\t\nEdit\n\n\t\nPurple Haze Flowers\nPurple Haze\n\tFlower\tAvailable\t\n$25.00\n\t240 Grams\t\nEdit"
+  },
+  {
+    "pattern": "/grower/products",
+    "route": "/grower/products",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1331,
+    "headings": [
+      "Products"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nProducts\nQuick add\nImport CSV\nAdd product\n\nProducts\n\n3\n\nStock value\n\n$10,000\n\nAvailable\n\n3\n\nFilter\n\nAll\n3\nActive\n3\nLow inventory\n0\nQuote only\n1\nMissing images\n0\nMissing type\n0\nHidden/out\n0\nAll\nType\nStrain\nBatch\nMystery Pricing Batch\n\nFlower · Assorted\n\nLive\n\n$40/eighthQuote only\n\n25 eighth in stock\n\nEdit\nHide\nMore\nSilver Haze Concentrate\n\nBulk Extract · Silver Haze\n\nLive\n\n$60/g\n\n50 g in stock\n\nEdit\nHide\nMore\nPurple Haze Flowers\n\nFlower · Purple Haze\n\nLive\n\n$25/g\n\n240 g in stock\n\nEdit\nHide\nMore"
+  },
+  {
+    "pattern": "/grower/products/add",
+    "route": "/grower/products/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1444,
+    "headings": [
+      "Add product"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nAdd product\nBasics\nPricing\nStock\nDetails\n\nPrefill type, unit & price\n\nReset defaults\nBasics\nName *\nProduct Type *\nSelect a product type\nBulk Extract\nCartridge\nEdibles\nBeverages\nFlower\nLive Plant\nPlant Material\nPrepack\nPreroll\nTincture\nTopicals & Wellness\nSub Type\nStrain\nSelect a strain (optional)\nAssorted\nAudit Test Kush • Hybrid\nPurple Haze\nSilver Haze\n+ New\nBatch\nPick a strain to attach a batch\nPricing\nPrice ($) *\nUnit *\nSelect a unit\nGram\nHalf Ounce\nOunce\nEighth\nQuarter\nUnit\nPack\nEach\nLb\nPrice visibility\n\nQuote-only listings hide the price.\n\nShow price\nQuote only\nStock\nStarting stock *\nSKU\nBrand\nAvailable\n\nBuyers can request this product\n\nMore details & photos\n\nCannabinoids, harvest date, description and photos.\n\nOptional\nSummary\nAvailable\nListing\nUnnamed product\nType\nNot selected\nPrice\nNot priced\nStock\n0 g\nVisibility\nAvailable · price visible\nPublish product\nSave draft\n\nHidden from buyers until published.\n\nCancel"
+  },
+  {
+    "pattern": "/grower/products/add",
+    "route": "/grower/products/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1962,
+    "headings": [
+      "Add product"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nAdd product\nBasics\nPricing\nStock\nDetails\n\nPrefill type, unit & price\n\nReset defaults\nBasics\nName *\nProduct Type *\nSelect a product type\nBulk Extract\nCartridge\nEdibles\nBeverages\nFlower\nLive Plant\nPlant Material\nPrepack\nPreroll\nTincture\nTopicals & Wellness\nSub Type\nStrain\nSelect a strain (optional)\nAssorted\nAudit Test Kush • Hybrid\nPurple Haze\nSilver Haze\n+ New\nBatch\nPick a strain to attach a batch\nPricing\nPrice ($) *\nUnit *\nSelect a unit\nGram\nHalf Ounce\nOunce\nEighth\nQuarter\nUnit\nPack\nEach\nLb\nPrice visibility\n\nQuote-only listings hide the price.\n\nShow price\nQuote only\nStock\nStarting stock *\nSKU\nBrand\nAvailable\n\nBuyers can request this product\n\nMore details & photos\n\nCannabinoids, harvest date, description and photos.\n\nOptional\nSummary\nAvailable\nListing\nUnnamed product\nType\nNot selected\nPrice\nNot priced\nStock\n0 g\nVisibility\nAvailable · price visible\nSave draft\n\nHidden from buyers until published.\n\nCancel\nPublish product"
+  },
+  {
+    "pattern": "/grower/reports",
+    "route": "/grower/reports",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1421,
+    "headings": [
+      "Reports"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nReports\n\nDelivered value and request activity.\n\nPDF\nCSV\n\nDate range\n\n30d\n90d\n12mo\nAll\n\nDelivered value\n\n$450.00\n\n1 delivered request\n\nRequests\n\n8\n\n7 active\n\nCustomers\n\n2\n\nAvg. delivered value\n\n$450.00\n\nDelivered value by month\n$450\nSep 26\n$450\nRequests by Status\nSubmitted\n7\n(88%)\nDelivered\n1\n(13%)\nStatuses with no requests\nTop Products\n1\nPurple Haze Flowers\n\n$450\n\n30 units\n\nTop Customers\n1\nMaple Street Market\n\n$450\n\n1 request\n\nRecent Requests\nView all\nREQUEST\tCUSTOMER\tSTATUS\tDATE\tEST. VALUE\n#7-REVIEW\tMaple Street Market\tDelivered\tSep 13, 2026\t$450.00\n#0-XPJO3I\tGreen Vermont Dispensary\tSubmitted\tJul 9, 2026\t$25.00\n#0-03UYXZ\tGreen Vermont Dispensary\tSubmitted\tJul 9, 2026\t$25.00\n#0-O78T5N\tGreen Vermont Dispensary\tSubmitted\tJul 9, 2026\t$25.00\n#0-ZYGM3S\tGreen Vermont Dispensary\tSubmitted\tJul 9, 2026\t$25.00\n#0-FMBIOT\tGreen Vermont Dispensary\tSubmitted\tJul 9, 2026\t$25.00\n#718088-1\tGreen Vermont Dispensary\tSubmitted\tJul 9, 2026\t$25.00\n#503047-1\tGreen Vermont Dispensary\tSubmitted\tJul 9, 202"
+  },
+  {
+    "pattern": "/grower/reports",
+    "route": "/grower/reports",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2043,
+    "headings": [
+      "Reports"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nReports\n\nDelivered value and request activity.\n\nPDF\nCSV\n\nDate range\n\n30d\n90d\n12mo\nAll\n\nDelivered value\n\n$450.00\n\n1 delivered request\n\nRequests\n\n8\n\n7 active\n\nCustomers\n\n2\n\nAvg. delivered value\n\n$450.00\n\nDelivered value by month\nSep 26\n$450\nRequests by Status\nSubmitted\n7\n(88%)\nDelivered\n1\n(13%)\nStatuses with no requests\nTop Products\n1\nPurple Haze Flowers\n\n$450\n\n30 units\n\nTop Customers\n1\nMaple Street Market\n\n$450\n\n1 request\n\nRecent Requests\nView all\nREQUEST\tSTATUS\tEST. VALUE\n\nMaple Street Market\nSep 13 · #REVIEW\n\tDelivered\t$450.00\n\nGreen Vermont Dispensary\nJul 9 · #XPJO3I\n\tSubmitted\t$25.00\n\nGreen Vermont Dispensary\nJul 9 · #03UYXZ\n\tSubmitted\t$25.00\n\nGreen Vermont Dispensary\nJul 9 · #O78T5N\n\tSubmitted\t$25.00\n\nGreen Vermont Dispensary\nJul 9 · #ZYGM3S\n\tSubmitted\t$25.00\n\nGreen Vermont Dispensary\nJul 9 · #FMBIOT\n\tSubmitted\t$25.00\n\nGreen Vermont Dispensary\nJul 9 · #8088-1\n\tSubmitted\t$25.00\n\nGreen Vermont Dispensary\nJul 9 · #3047-1\n\tSubmitted\t$25.00"
+  },
+  {
+    "pattern": "/grower/settings",
+    "route": "/grower/settings",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 2112,
+    "headings": [
+      "Settings"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nSettings\nProfile\nLogo\nTerms\nSubscription\nIntegrations\nBusiness profile\n\n* Required\n\nName *\nContact (optional)\nLicense number *\nLicense expiry *\nEmail *\nPhone (optional)\nAddress\n\nIncludes city, state and ZIP.\n\nWebsite (optional)\nDescription (optional)\n\n52/500\n\nLogo\nNo logo\nUpload Logo\n\nJPG, PNG, or WebP. Max 500KB.\n\nCommercial terms\n\nShown to buyers on your shop.\n\nReset defaults\nSave terms\nDefault MOQ\nFulfillment methods\nFulfillment region\nDirect payment terms\nResponse window\nContact note\n\nDefaults only; confirm final terms with each buyer.\n\nSubscription\nFREE\n\nSoftware subscription only. Wholesale payment stays directly between businesses.\n\nFree Plan\n\nStarter access\n\n$0/mo\n\nPlan features\nUpgrade to Pro\n\nOnline subscription checkout is currently unavailable.\n\nIntegrations\n\nMetrc state-tracking sync\n\nIn development. Your batch and COA records are structured for future synchronization; no automatic Metrc sync runs today."
+  },
+  {
+    "pattern": "/grower/settings",
+    "route": "/grower/settings",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2826,
+    "headings": [
+      "Settings"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nSettings\nProfile\nLogo\nTerms\nSubscription\nIntegrations\nBusiness profile\n\n* Required\n\nName *\nContact (optional)\nLicense number *\nLicense expiry *\nEmail *\nPhone (optional)\nAddress\n\nIncludes city, state and ZIP.\n\nWebsite (optional)\nDescription (optional)\n\n52/500\n\nLogo\nNo logo\nUpload Logo\n\nJPG, PNG, or WebP. Max 500KB.\n\nCommercial terms\n\nShown to buyers on your shop.\n\nReset defaults\nSave terms\nDefault MOQ\nFulfillment methods\nFulfillment region\nDirect payment terms\nResponse window\nContact note\n\nDefaults only; confirm final terms with each buyer.\n\nSubscription\nFREE\n\nSoftware subscription only. Wholesale payment stays directly between businesses.\n\nFree Plan\n\nStarter access\n\n$0/mo\n\nPlan features\nUpgrade to Pro\n\nOnline subscription checkout is currently unavailable.\n\nIntegrations\n\nMetrc state-tracking sync\n\nIn development. Your batch and COA records are structured for future synchronization; no automatic Metrc sync runs today."
+  },
+  {
+    "pattern": "/grower/strains",
+    "route": "/grower/strains",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Strains"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nStrains\nAdd strain\n\nStrains\n\n4\n\nBatches\n\n1\n\nProducts\n\n3\n\nCards\nList\nAssorted\n0 batches\n1 product\nEdit\nAdd product\nMore\nAudit Test Kush\n\nHybrid\n\n1 batch\n0 products\nEdit\nAdd product\nMore\nPurple Haze\n0 batches\n1 product\nEdit\nAdd product\nMore\nSilver Haze\n0 batches\n1 product\nEdit\nAdd product\nMore"
+  },
+  {
+    "pattern": "/grower/strains",
+    "route": "/grower/strains",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1246,
+    "headings": [
+      "Strains"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nStrains\nAdd strain\n\nStrains\n\n4\n\nBatches\n\n1\n\nProducts\n\n3\n\nAssorted\n0 batches\n1 product\nEdit\nAdd product\nMore\nAudit Test Kush\n\nHybrid\n\n1 batch\n0 products\nEdit\nAdd product\nMore\nPurple Haze\n0 batches\n1 product\nEdit\nAdd product\nMore\nSilver Haze\n0 batches\n1 product\nEdit\nAdd product\nMore"
+  },
+  {
+    "pattern": "/grower/strains/add",
+    "route": "/grower/strains/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Add strain"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nAdd strain\nName *\nType *\nSelect strain type\nIndica\nSativa\nHybrid\nSativa Dom. Hybrid\nIndica Dom. Hybrid\nAbout strain types\nGenetics\nDescription\nGrowing notes\nCreate Strain\nCancel"
+  },
+  {
+    "pattern": "/grower/strains/add",
+    "route": "/grower/strains/add",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 946,
+    "headings": [
+      "Add strain"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nAdd strain\nName *\nType *\nSelect strain type\nIndica\nSativa\nHybrid\nSativa Dom. Hybrid\nIndica Dom. Hybrid\nAbout strain types\nGenetics\nDescription\nGrowing notes\nCreate Strain\nCancel"
+  },
+  {
+    "pattern": "/help",
+    "route": "/help",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1010,
+    "headings": [
+      "Marketplace help"
+    ],
+    "text": "PF\nPhenoFarm\nSign in\nMarketplace help\n\nVerification, requests, quotes, settlement, and subscriptions.\n\nNeed support?\n\nsupport@phenofarm.com\n\nInclude your business name, role, and the page or request you need help with.\n\nFor growers\n\nCatalog, quote, request, and subscription basics for cultivator teams.\n\nHow do I publish products for buyers?\nWhat happens when a dispensary submits a request?\nCan growers send quote terms before accepting a request?\nWhat payments does PhenoFarm process for growers?\nFor dispensaries\n\nHow verified buyers browse, draft requests, and coordinate fulfillment.\n\nWhy can I browse but not submit an order request?\nHow do I request products from growers?\nHow do quote requests work?\nDoes PhenoFarm collect wholesale payment from dispensaries?\nAccount & billing\n\nAccess, verification, billing, and support expectations for the MVP.\n\nHow do password resets work?\nWhere do I update business or license details?\nHow does the cultivator subscription work?\nHow do I reach PhenoFarm support?\n\nPayment model reminder\n\nPhenoFarm never processes wholesale payments. Buyers and growers settle directly; the only in-app payment flow is the cultivator subscription."
+  },
+  {
+    "pattern": "/help",
+    "route": "/help",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2162,
+    "headings": [
+      "Marketplace help"
+    ],
+    "text": "PF\nPhenoFarm\nSign in\nMarketplace help\n\nVerification, requests, quotes, settlement, and subscriptions.\n\nNeed support?\n\nsupport@phenofarm.com\n\nInclude your business name, role, and the page or request you need help with.\n\nFor growers\n\nCatalog, quote, request, and subscription basics for cultivator teams.\n\nHow do I publish products for buyers?\nWhat happens when a dispensary submits a request?\nCan growers send quote terms before accepting a request?\nWhat payments does PhenoFarm process for growers?\nFor dispensaries\n\nHow verified buyers browse, draft requests, and coordinate fulfillment.\n\nWhy can I browse but not submit an order request?\nHow do I request products from growers?\nHow do quote requests work?\nDoes PhenoFarm collect wholesale payment from dispensaries?\nAccount & billing\n\nAccess, verification, billing, and support expectations for the MVP.\n\nHow do password resets work?\nWhere do I update business or license details?\nHow does the cultivator subscription work?\nHow do I reach PhenoFarm support?\n\nPayment model reminder\n\nPhenoFarm never processes wholesale payments. Buyers and growers settle directly; the only in-app payment flow is the cultivator subscription."
+  },
+  {
+    "pattern": "/legal/cookies",
+    "route": "/legal/cookies",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1864,
+    "headings": [
+      "Cookie Notice"
+    ],
+    "text": "PF\nPhenoFarm\nHelp\n\nLEGAL\n\nCookie Notice\n\nLast updated: July 6, 2026\n\nHow PhenoFarm uses essential cookies and browser storage for authentication, session security, request workflows, and cultivator subscription support.\n\nPre-launch draft pending counsel review.\n\nThis MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app.\n\nContents\n\nCookies and storage\nEssential use\nBilling and third-party services\nAnalytics and advertising\nYour choices\nCookies and storage\n\nCookies and browser storage help web applications remember session, security, and workflow information. Similar technologies may include local storage, session storage, and framework-managed session tokens.\n\nEssential use\n\nPhenoFarm uses essential cookies and storage for authentication, account routing, session security, marketplace workflow continuity, and request-draft usability.\n\nSign-in and session cookies used by authentication workflows.\nSecurity and framework cookies needed to keep the app operating correctly.\nBrowser storage for request dra"
+  },
+  {
+    "pattern": "/legal/cookies",
+    "route": "/legal/cookies",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2914,
+    "headings": [
+      "Cookie Notice"
+    ],
+    "text": "PF\nPhenoFarm\nHelp\n\nLEGAL\n\nCookie Notice\n\nLast updated: July 6, 2026\n\nHow PhenoFarm uses essential cookies and browser storage for authentication, session security, request workflows, and cultivator subscription support.\n\nPre-launch draft pending counsel review.\n\nThis MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app.\n\nContents\n\nCookies and storage\nEssential use\nBilling and third-party services\nAnalytics and advertising\nYour choices\nCookies and storage\n\nCookies and browser storage help web applications remember session, security, and workflow information. Similar technologies may include local storage, session storage, and framework-managed session tokens.\n\nEssential use\n\nPhenoFarm uses essential cookies and storage for authentication, account routing, session security, marketplace workflow continuity, and request-draft usability.\n\nSign-in and session cookies used by authentication workflows.\nSecurity and framework cookies needed to keep the app operating correctly.\nBrowser storage for request dra"
+  },
+  {
+    "pattern": "/legal/privacy",
+    "route": "/legal/privacy",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 2558,
+    "headings": [
+      "Privacy Policy"
+    ],
+    "text": "PF\nPhenoFarm\nHelp\n\nLEGAL\n\nPrivacy Policy\n\nLast updated: July 6, 2026\n\nHow PhenoFarm handles account, business, license, marketplace, request, quote, and cultivator subscription data during the MVP.\n\nPre-launch draft pending counsel review.\n\nThis MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app.\n\nContents\n\nInformation we collect\nWholesale payment data\nHow we use information\nHow information is shared\nRetention and security\nChoices and contact\nInformation we collect\n\nPhenoFarm collects information needed to create accounts, verify marketplace participants, operate catalog and request workflows, and support cultivator subscriptions.\n\nAccount details such as name, email address, role, and authentication records.\nBusiness profile details such as business name, contact information, addresses, and grower or dispensary settings.\nLicense and verification information for dispensaries, including license numbers, license status, and admin review records.\nMarketplace records such as products, strains, batches"
+  },
+  {
+    "pattern": "/legal/privacy",
+    "route": "/legal/privacy",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 4072,
+    "headings": [
+      "Privacy Policy"
+    ],
+    "text": "PF\nPhenoFarm\nHelp\n\nLEGAL\n\nPrivacy Policy\n\nLast updated: July 6, 2026\n\nHow PhenoFarm handles account, business, license, marketplace, request, quote, and cultivator subscription data during the MVP.\n\nPre-launch draft pending counsel review.\n\nThis MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app.\n\nContents\n\nInformation we collect\nWholesale payment data\nHow we use information\nHow information is shared\nRetention and security\nChoices and contact\nInformation we collect\n\nPhenoFarm collects information needed to create accounts, verify marketplace participants, operate catalog and request workflows, and support cultivator subscriptions.\n\nAccount details such as name, email address, role, and authentication records.\nBusiness profile details such as business name, contact information, addresses, and grower or dispensary settings.\nLicense and verification information for dispensaries, including license numbers, license status, and admin review records.\nMarketplace records such as products, strains, batches"
+  },
+  {
+    "pattern": "/legal/terms",
+    "route": "/legal/terms",
+    "role": "public",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 2480,
+    "headings": [
+      "Terms of Service"
+    ],
+    "text": "PF\nPhenoFarm\nHelp\n\nLEGAL\n\nTerms of Service\n\nLast updated: July 6, 2026\n\nDraft operating terms for licensed marketplace accounts, verification-gated ordering, quote workflows, direct wholesale settlement, and cultivator subscription billing.\n\nPre-launch draft pending counsel review.\n\nThis MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app.\n\nContents\n\nEligible users\nAccounts and verification\nMarketplace workflows\nDirect settlement\nCultivator subscriptions\nUser responsibilities\nSupport and changes\nEligible users\n\nPhenoFarm is intended for licensed cannabis cultivators, dispensaries, retailers, and authorized staff using the product for B2B marketplace workflows. Users are responsible for providing accurate account, business, contact, and license information.\n\nAccounts and verification\n\nAccount access is role-based. Admins manage marketplace oversight, growers manage catalog and request workflows, and dispensaries browse, draft requests, and manage buyer settings.\n\nDispensary ordering is gated by lice"
+  },
+  {
+    "pattern": "/legal/terms",
+    "route": "/legal/terms",
+    "role": "public",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 3898,
+    "headings": [
+      "Terms of Service"
+    ],
+    "text": "PF\nPhenoFarm\nHelp\n\nLEGAL\n\nTerms of Service\n\nLast updated: July 6, 2026\n\nDraft operating terms for licensed marketplace accounts, verification-gated ordering, quote workflows, direct wholesale settlement, and cultivator subscription billing.\n\nPre-launch draft pending counsel review.\n\nThis MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app.\n\nContents\n\nEligible users\nAccounts and verification\nMarketplace workflows\nDirect settlement\nCultivator subscriptions\nUser responsibilities\nSupport and changes\nEligible users\n\nPhenoFarm is intended for licensed cannabis cultivators, dispensaries, retailers, and authorized staff using the product for B2B marketplace workflows. Users are responsible for providing accurate account, business, contact, and license information.\n\nAccounts and verification\n\nAccount access is role-based. Admins manage marketplace oversight, growers manage catalog and request workflows, and dispensaries browse, draft requests, and manage buyer settings.\n\nDispensary ordering is gated by lice"
+  },
+  {
+    "pattern": "/dispensary/grower/[id]",
+    "route": "/dispensary/grower/grower-001",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1242,
+    "headings": [
+      "Vermont Nurseries"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\nSearch...\n⌘K\nNotifications\n24\nDashboard\nCatalog\nRequest Draft\nOrders\n17\nSaved\nSettings\nGV\nGreen Vermont Dispensary\nVerified buyer\nSign out\nVermont Nurseries\n\nPremium cannabis products grown with care in Vermont\n\nCatalog\nBrowse products\nVN\nVerified\nBristol, VT\n(802) 555-0123\nWebsite\nLicense: VT-GWL-2024-001\n\nPickup or delivery · No minimum set\n\nProducts (3)\nNewest first\nPrice: Low to High\nPrice: High to Low\nTHC: High to Low\nTHC: Low to High\nName: A-Z\nName: Z-A\nAll Types\nBulk Extract\nFlower\nMystery Pricing Batch\nTHC 19%\nFlower\n\nStrain: Assorted\n\nGreenhouse\n\n25 available\n\nRequest pricingMessage grower\nSilver Haze Concentrate\nTHC 85%\nBulk Extract\n\nStrain: Silver Haze\n\nLive Resin\n\n$60.00/g\n\nQty:\n−\n+\nAdd to draft\n50 Available\nMessage grower\nPurple Haze Flowers\nTHC 24.8%\nFlower\n\nStrain: Purple Haze\n\nIndoor\n\n$25.00/g\n\nQty:\n−\n+\nAdd to draft\n240 Available\nMessage grower\nShop details"
+  },
+  {
+    "pattern": "/dispensary/grower/[id]",
+    "route": "/dispensary/grower/grower-001",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2226,
+    "headings": [
+      "Vermont Nurseries"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\n24\nVermont Nurseries\n\nPremium cannabis products grown with care in Vermont\n\nCatalog\nBrowse products\nVN\nVerified\nBristol, VT\n(802) 555-0123\nWebsite\nLicense: VT-GWL-2024-001\n\nPickup or delivery · No minimum set\n\nProducts (3)\nNewest first\nPrice: Low to High\nPrice: High to Low\nTHC: High to Low\nTHC: Low to High\nName: A-Z\nName: Z-A\nMystery Pricing Batch\nTHC 19%\nFlower\n\nStrain: Assorted\n\nGreenhouse\n\n25 available\n\nRequest pricingMessage grower\nSilver Haze Concentrate\nTHC 85%\nBulk Extract\n\nStrain: Silver Haze\n\nLive Resin\n\n$60.00/g\n\nQty:\n−\n+\nAdd to draft\n50 Available\nMessage grower\nPurple Haze Flowers\nTHC 24.8%\nFlower\n\nStrain: Purple Haze\n\nIndoor\n\n$25.00/g\n\nQty:\n−\n+\nAdd to draft\n240 Available\nMessage grower\nShop details"
+  },
+  {
+    "pattern": "/dispensary/orders/[id]",
+    "route": "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1085,
+    "headings": [
+      "Request#ORD-20260710-XPJO3I"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\nSearch...\n⌘K\nNotifications\n24\nDashboard\nCatalog\nRequest Draft\nOrders\n17\nSaved\nSettings\nGV\nGreen Vermont Dispensary\nVerified buyer\nSign out\n← Orders\nRequest\n#ORD-20260710-XPJO3I\n\nWaiting for grower review\n\nSubmitted\nExport CSV\n\nREQUEST DATE\n\nJul 09, 2026\n\nGROWER\n\nVermont Nurseries\n\nView timeline\nView history\nBuyer actions\nMessage grower\nWithdraw request\nRequested Items\nPRODUCT\tQTY\tPRICE\tLINE VALUE\nPurple Haze Flowers (Purple Haze)\t1\t$25.00\t$25.00\nTotal\n$25.00\nRequest details\n\nFULFILLMENT\n\nFlexible\n\nREQUESTED WINDOW\n\nCoordinate with grower\n\nPAYMENT TERMS\n\nHandled directly"
+  },
+  {
+    "pattern": "/dispensary/orders/[id]",
+    "route": "/dispensary/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "role": "dispensary",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1289,
+    "headings": [
+      "Request#ORD-20260710-XPJO3I"
+    ],
+    "text": "P\nPhenoFarm\nDISPENSARY\n24\n← Orders\nRequest\n#ORD-20260710-XPJO3I\n\nWaiting for grower review\n\nSubmitted\nExport CSV\n\nREQUEST DATE\n\nJul 09, 2026\n\nGROWER\n\nVermont Nurseries\n\nView timeline\nView history\nBuyer actions\nMessage grower\nWithdraw request\nRequested Items\n\nPurple Haze Flowers (Purple Haze)\n\n1 x $25.00\n$25.00\nTotal\n$25.00\nRequest details\n\nFULFILLMENT\n\nFlexible\n\nREQUESTED WINDOW\n\nCoordinate with grower\n\nPAYMENT TERMS\n\nHandled directly\n\nOrders\nBuyer actions"
+  },
+  {
+    "pattern": "/grower/batches/[id]/edit",
+    "route": "/grower/batches/ui-review-batch/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1113,
+    "headings": [
+      "Edit batch"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nEdit batch\nBatch Number *\nGenerate\nLot Number\nHarvest Date *\nStrain *\nSelect a strain\nAssorted\nAudit Test Kush\nPurple Haze\nSilver Haze\nLab Results\nTHC (%)\nCBD (%)\nTotal (%)\nTerpenes\nAdd terpene\nLab PDFs\n\nPDF · 2MB max each\n\nPotency\nUpload\nPesticides\nUpload\nMicrobials\nUpload\nNotes\nSave Changes\nCancel"
+  },
+  {
+    "pattern": "/grower/batches/[id]/edit",
+    "route": "/grower/batches/ui-review-batch/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1370,
+    "headings": [
+      "Edit batch"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nEdit batch\nBatch Number *\nGenerate\nLot Number\nHarvest Date *\nStrain *\nSelect a strain\nAssorted\nAudit Test Kush\nPurple Haze\nSilver Haze\nLab Results\nTHC (%)\nCBD (%)\nTotal (%)\nTerpenes\nAdd terpene\nLab PDFs\n\nPDF · 2MB max each\n\nPotency\nUpload\nPesticides\nUpload\nMicrobials\nUpload\nNotes\nSave Changes\nCancel"
+  },
+  {
+    "pattern": "/grower/customers/[id]/edit",
+    "route": "/grower/customers/ui-review-customer/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1264,
+    "headings": [
+      "Edit customer"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\n← Customers\nStatement\nEdit customer\nBusiness\nBusiness Name *\nLicense Number\nWebsite\nDescription\n\n0/500 characters\n\nContact\nContact Person\nEmail\nPhone\nAddress\nStreet Address\nCity\nState\nVermont\nMaine\nMassachusetts\nConnecticut\nRhode Island\nNew Hampshire\nNew York\nNew Jersey\nPennsylvania\nDelaware\nMaryland\nDistrict of Columbia\nVirginia\nZIP\nMore\nCancel\nSave changes"
+  },
+  {
+    "pattern": "/grower/customers/[id]/edit",
+    "route": "/grower/customers/ui-review-customer/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1568,
+    "headings": [
+      "Edit customer"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\n← Customers\nStatement\nEdit customer\nBusiness\nBusiness Name *\nLicense Number\nWebsite\nDescription\n\n0/500 characters\n\nContact\nContact Person\nEmail\nPhone\nAddress\nStreet Address\nCity\nState\nVermont\nMaine\nMassachusetts\nConnecticut\nRhode Island\nNew Hampshire\nNew York\nNew Jersey\nPennsylvania\nDelaware\nMaryland\nDistrict of Columbia\nVirginia\nZIP\nMore\nCancel\nSave changes"
+  },
+  {
+    "pattern": "/grower/customers/[id]/statement",
+    "route": "/grower/customers/ui-review-customer/statement",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Statement"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\n← Customer\nStatement\n\nMaple Street Market\n\nExport CSV\nFrom\nTo\nApply\n1 delivered request\n$450\nREQUEST\tDELIVERED\tITEMS\tVALUE\n#ORD-20260917-REVIEW\tSep 15, 2026\tPurple Haze Flowers × 30\t$450\n\nPayments are arranged directly; PhenoFarm does not collect funds."
+  },
+  {
+    "pattern": "/grower/customers/[id]/statement",
+    "route": "/grower/customers/ui-review-customer/statement",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 844,
+    "headings": [
+      "Statement"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\n← Customer\nStatement\n\nMaple Street Market\n\nExport CSV\nFrom\nTo\nApply\n1 delivered request\n$450\n#ORD-20260917-REVIEW\n\nSep 15, 2026\n\nPurple Haze Flowers × 30\n\n$450\n\nPayments are arranged directly; PhenoFarm does not collect funds."
+  },
+  {
+    "pattern": "/grower/orders/[id]",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1043,
+    "headings": [
+      "Order Request #ORD-20260710-XPJO3I",
+      "Request#ORD-20260710-XPJO3I"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\n← Requests\nRequest\n#ORD-20260710-XPJO3I\n\nSubmitted on July 9, 2026 at 8:39 PM\n\nSubmitted\nActions\nNext action\nAccept request\nCancel request\nItems\n(1 item)\nPRODUCT\tPRICE\tQTY\tLINE VALUE\n\n\nPurple Haze Flowers\n\nPurple Haze\n\nFlower - Indoor\n\n\t$25.00/gram\t1\t$25.00\nSubtotal\n$25.00\nEst. total\n$25.00\n\nPayment is arranged directly with the buyer.\n\nRequest Details\n\nFULFILLMENT\n\nFlexible\n\nREQUESTED WINDOW\n\nCoordinate with grower\n\nDIRECT PAYMENT TERMS\n\nHandled directly\n\nProgress\nRequest history\nCustomer\nGreen Vermont Dispensary\n\n(802) 555-0145\n\n456 Market Street\nBurlington, VT 05401\n\nMessage buyer"
+  },
+  {
+    "pattern": "/grower/orders/[id]",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1668,
+    "headings": [
+      "Order Request #ORD-20260710-XPJO3I",
+      "Request#ORD-20260710-XPJO3I"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\n← Requests\nRequest\n#ORD-20260710-XPJO3I\n\nSubmitted on July 9, 2026 at 8:39 PM\n\nSubmitted\nActions\nNext action\nAccept request\nCancel request\nItems\n(1 item)\n\nPurple Haze Flowers\n\nPurple Haze\n\n$25.00\n\n$25.00/gram\nQty: 1\nSubtotal\n$25.00\nEst. total\n$25.00\n\nPayment is arranged directly with the buyer.\n\nRequest Details\n\nFULFILLMENT\n\nFlexible\n\nREQUESTED WINDOW\n\nCoordinate with grower\n\nDIRECT PAYMENT TERMS\n\nHandled directly\n\nProgress\nRequest history\nCustomer\nGreen Vermont Dispensary\n\n(802) 555-0145\n\n456 Market Street\nBurlington, VT 05401\n\nMessage buyer"
+  },
+  {
+    "pattern": "/grower/orders/[id]/edit",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1433,
+    "headings": [
+      "Edit request#ORD-20260710-XPJO3I"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nDashboard\nRequests\nORD-20260710-XPJO3I\nEdit\nEdit request\n#ORD-20260710-XPJO3I\n\nCustomer: Green Vermont Dispensary\n\nRequest status\n\nCurrent: Submitted\n\nChange to\n\nAccepted\nCancelled\nItems\n(1)\n1\n\nPurple Haze Flowers\n\nPurple Haze\n\n$25.00 / gram\n\n-\n1\n+\n\nMax 241\n\n$25.00\n\nPricing\nShipping ($)\nTax ($)\n\nOptional tax: enter only the amount on your invoice. PhenoFarm does not calculate tax.\n\nNotes\n\n101/1000 characters\n\nSUMMARY\nSubtotal (1 item)\n$25.00\nShipping\n$0.00\nTax\n$0.00\nTotal\n$25.00\nCancel\nSave Changes"
+  },
+  {
+    "pattern": "/grower/orders/[id]/edit",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 1686,
+    "headings": [
+      "Edit request#ORD-20260710-XPJO3I"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nBack to request\nEdit request\n#ORD-20260710-XPJO3I\n\nCustomer: Green Vermont Dispensary\n\nRequest status\n\nCurrent: Submitted\n\nChange to\n\nAccepted\nCancelled\nItems\n(1)\n1\n\nPurple Haze Flowers\n\nPurple Haze\n\n$25.00/gram\n\n-\n1\n+\n\nMax 241\n\n$25.00\n\nPricing\nShipping ($)\nTax ($)\n\nOptional tax: enter only the amount on your invoice. PhenoFarm does not calculate tax.\n\nNotes\n\n101/1000 characters\n\nSUMMARY\nSubtotal (1 item)\n$25.00\nShipping\n$0.00\nTax\n$0.00\nTotal\n$25.00\nCancel\nSave Changes"
+  },
+  {
+    "pattern": "/grower/products/[id]/edit",
+    "route": "/grower/products/product-001/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 2289,
+    "headings": [
+      "Edit product"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nProducts\nEdit product\nBasics\nPricing\nStock\nDetails\nBasics\nName *\nProduct Type *\nSelect a product type\nBulk Extract\nCartridge\nEdibles\nBeverages\nFlower\nLive Plant\nPlant Material\nPrepack\nPreroll\nTincture\nTopicals & Wellness\nSub Type\nSelect a sub type\nIndoor\nA Bud\nB Bud\nC Bud\nInfused Flower\nPopcorn\nOther (custom)\nStrain\nSelect a strain (optional)\nAssorted\nAudit Test Kush • Hybrid\nPurple Haze\nSilver Haze\n+ New\nBatch\nSelect a batch (optional)\n+ New\nNo batches for this strain.\nPricing\nPrice ($) *\nUnit *\nSelect a unit\nGram\nHalf Ounce\nOunce\nEighth\nQuarter\nUnit\nPack\nEach\nLb\nPrice visibility\n\nQuote-only listings hide the price.\n\nShow price\nQuote only\nStock\nStock *\nSKU\nBrand\nAvailable\n\nBuyers can request this product\n\nMore details & photos\n\nCannabinoids, harvest date, description and photos.\n\nOptional\nCannabinoids\nTHC Min (%)\nTHC Max (%)\nCBD Min (%)\nCBD Max (%)\nHarvest Date\nDescription\n\n52/2000 characters\n\nProduct Images\n\nUp to 2 photos · JPG, PNG, WebP · 1MB each\n\nRemove\n\n1/2 image slots used"
+  },
+  {
+    "pattern": "/grower/products/[id]/edit",
+    "route": "/grower/products/product-001/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 2731,
+    "headings": [
+      "Edit product"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nProducts\nEdit product\nBasics\nPricing\nStock\nDetails\nBasics\nName *\nProduct Type *\nSelect a product type\nBulk Extract\nCartridge\nEdibles\nBeverages\nFlower\nLive Plant\nPlant Material\nPrepack\nPreroll\nTincture\nTopicals & Wellness\nSub Type\nSelect a sub type\nIndoor\nA Bud\nB Bud\nC Bud\nInfused Flower\nPopcorn\nOther (custom)\nStrain\nSelect a strain (optional)\nAssorted\nAudit Test Kush • Hybrid\nPurple Haze\nSilver Haze\n+ New\nBatch\nSelect a batch (optional)\n+ New\nNo batches for this strain.\nPricing\nPrice ($) *\nUnit *\nSelect a unit\nGram\nHalf Ounce\nOunce\nEighth\nQuarter\nUnit\nPack\nEach\nLb\nPrice visibility\n\nQuote-only listings hide the price.\n\nShow price\nQuote only\nStock\nStock *\nSKU\nBrand\nAvailable\n\nBuyers can request this product\n\nMore details & photos\n\nCannabinoids, harvest date, description and photos.\n\nOptional\nCannabinoids\nTHC Min (%)\nTHC Max (%)\nCBD Min (%)\nCBD Max (%)\nHarvest Date\nDescription\n\n52/2000 characters\n\nProduct Images\n\nUp to 2 photos · JPG, PNG, WebP · 1MB each\n\nRemove\n\n1/2 image slots used.\n\nSummary\nAvailable\nListing\nPurple Haze Flowers\nType\nFlower\nPrice\n$25/g\nStock\n240 g\nVisibility\nAvailable · price visible\nCancel\nSave changes"
+  },
+  {
+    "pattern": "/grower/strains/[id]/edit",
+    "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 1440,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 1440,
+    "width": 1440,
+    "height": 1000,
+    "headings": [
+      "Edit strain"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\nSearch...\n⌘K\nNotifications\n19\nSELL\nDashboard\nCatalog\nProducts\nInventory\nRequests\n17\nGROW\nStrains\nBatches\nCustomers\nReports\nACCOUNT\nSettings\nVN\nVermont Nurseries\nGrower account\nSign out\nEdit strain\nName *\nType *\nSelect strain type\nIndica\nSativa\nHybrid\nSativa Dom. Hybrid\nIndica Dom. Hybrid\nAbout strain types\nGenetics\nDescription\nGrowing notes\nSave Changes\nCancel"
+  },
+  {
+    "pattern": "/grower/strains/[id]/edit",
+    "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+    "role": "grower",
+    "status": 200,
+    "viewport": 390,
+    "overflow": false,
+    "errors": [],
+    "pageWidth": 390,
+    "width": 390,
+    "height": 946,
+    "headings": [
+      "Edit strain"
+    ],
+    "text": "P\nPhenoFarm\nGROWER\n19\nEdit strain\nName *\nType *\nSelect strain type\nIndica\nSativa\nHybrid\nSativa Dom. Hybrid\nIndica Dom. Hybrid\nAbout strain types\nGenetics\nDescription\nGrowing notes\nSave Changes\nCancel"
+  }
+]

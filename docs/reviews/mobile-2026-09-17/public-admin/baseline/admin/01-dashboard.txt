@@ -1,0 +1,49 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e15]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e16]
+- main
+  - sectionheader
+    - heading "Dashboard" [level=1, ref=e21]
+    - paragraph
+      - StaticText "Manage subscriptions, verification, and marketplace operations"
+  - link "Users 3" [ref=e17]
+    - paragraph
+      - StaticText "Users"
+    - paragraph
+      - StaticText "3"
+  - link "Growers 1 1 verified" [ref=e18]
+    - paragraph
+      - StaticText "Growers"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "1 verified"
+  - link "Dispensaries 1 0 pending" [ref=e19]
+    - paragraph
+      - StaticText "Dispensaries"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "0 pending"
+  - generic
+    - paragraph
+      - StaticText "OPERATIONS CHECKLIST"
+    - heading "Review subscription settings" [level=2, ref=e22]
+    - paragraph
+      - StaticText "Keep PhenoFarm subscription configuration current for grower billing."
+    - link "Open settings" [ref=e23]
+    - paragraph
+      - StaticText "Subscription configuration"
+    - paragraph
+      - StaticText "Confirm Stripe Billing price IDs and support details before enabling paid plans."
+    - group
+      - DisclosureTriangle "3 checks complete" [expanded=false]
+        - StaticText "3 checks complete"
+  - heading "No accounts awaiting review" [level=2, ref=e24]
+  - link "Growers" [ref=e25]
+  - link "Dispensaries" [ref=e26]
+  - link "Settlement & billing policy" [ref=e20]
+- region "Notifications alt+T" [ref=e14]
+- alert

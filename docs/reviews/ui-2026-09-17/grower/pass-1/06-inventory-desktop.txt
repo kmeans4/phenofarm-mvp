@@ -1,0 +1,144 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e639]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e640]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e641]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e645]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e646]
+      - StaticText "Overview"
+    - link "Products" [ref=e647]
+      - StaticText "Products"
+    - link "Inventory" [ref=e648]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e649]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e650]
+      - StaticText "Strains"
+    - link "Batches" [ref=e651]
+      - StaticText "Batches"
+    - link "Customers" [ref=e652]
+      - StaticText "Customers"
+    - link "Reports" [ref=e653]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e654]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e642]
+- main
+  - sectionheader
+    - heading "Inventory" [level=1, ref=e655]
+    - paragraph
+      - StaticText "Adjust product stock inline, review low inventory, and jump into full product edits."
+    - link "+ Add Product" [ref=e656]
+    - link "Update Stock" [ref=e657]
+  - paragraph
+    - StaticText "Total Products"
+  - paragraph
+    - StaticText "3"
+  - paragraph
+    - StaticText "Total Value"
+  - paragraph
+    - StaticText "$10000.00"
+  - paragraph
+    - StaticText "Estimated stock value"
+  - image "List price times on-hand stock, including quote-only products"
+  - paragraph
+    - StaticText "Low Stock"
+  - paragraph
+    - StaticText "0"
+  - heading "Product Inventory" [level=2, ref=e643]
+  - paragraph
+    - StaticText "Adjust on-hand stock inline. Changes save as absolute quantities."
+  - generic "Inventory filters"
+    - button "All 3" [ref=e658]
+      - StaticText "All"
+      - StaticText "3"
+    - button "Low stock 0" [ref=e659]
+      - StaticText "Low stock"
+      - StaticText "0"
+    - button "Out of stock 0" [ref=e660]
+      - StaticText "Out of stock"
+      - StaticText "0"
+    - button "Unavailable 0" [ref=e661]
+      - StaticText "Unavailable"
+      - StaticText "0"
+  - table
+    - rowgroup
+      - row
+        - columnheader "PRODUCT" [ref=e681]
+        - columnheader "TYPE" [ref=e682]
+        - columnheader "PRICE" [ref=e683]
+        - columnheader "INVENTORY" [ref=e684]
+        - columnheader "STATUS" [ref=e685]
+        - columnheader "ACTIONS" [ref=e686]
+    - row
+      - cell "Mystery Pricing Batch Assorted" [ref=e663]
+        - StaticText "Mystery Pricing Batch"
+        - StaticText "Assorted"
+      - cell "Flower - Greenhouse" [ref=e664]
+      - cell "$40.00/eighth" [ref=e665]
+        - StaticText "$40.00/eighth"
+      - cell "Decrease stock for Mystery Pricing Batch 25 Increase stock for Mystery Pricing Batch 25eighths" [ref=e666]
+        - button "Decrease stock for Mystery Pricing Batch" [ref=e687]
+        - spinbutton "Stock quantity for Mystery Pricing Batch" [ref=e688]: 25
+          - StaticText "25"
+        - button "Increase stock for Mystery Pricing Batch" [ref=e689]
+        - StaticText "25"
+        - StaticText "eighths"
+      - cell "Available" [ref=e667]
+      - cell "Edit" [ref=e668]
+        - link "Edit" [ref=e690]
+    - row
+      - cell "Silver Haze Concentrate Silver Haze" [ref=e669]
+        - StaticText "Silver Haze Concentrate"
+        - StaticText "Silver Haze"
+      - cell "Concentrate - Live Resin" [ref=e670]
+      - cell "$60.00/gram" [ref=e671]
+        - StaticText "$60.00/gram"
+      - cell "Decrease stock for Silver Haze Concentrate 50 Increase stock for Silver Haze Concentrate 50grams" [ref=e672]
+        - button "Decrease stock for Silver Haze Concentrate" [ref=e691]
+        - spinbutton "Stock quantity for Silver Haze Concentrate" [ref=e692]: 50
+          - StaticText "50"
+        - button "Increase stock for Silver Haze Concentrate" [ref=e693]
+        - StaticText "50"
+        - StaticText "grams"
+      - cell "Available" [ref=e673]
+      - cell "Edit" [ref=e674]
+        - link "Edit" [ref=e694]
+    - row
+      - cell "Purple Haze Flowers Purple Haze" [ref=e675]
+        - StaticText "Purple Haze Flowers"
+        - StaticText "Purple Haze"
+      - cell "Flower - Indoor" [ref=e676]
+      - cell "$25.00/gram" [ref=e677]
+        - StaticText "$25.00/gram"
+      - cell "Decrease stock for Purple Haze Flowers 240 Increase stock for Purple Haze Flowers 240grams" [ref=e678]
+        - button "Decrease stock for Purple Haze Flowers" [ref=e695]
+        - spinbutton "Stock quantity for Purple Haze Flowers" [ref=e696]: 240
+          - StaticText "240"
+        - button "Increase stock for Purple Haze Flowers" [ref=e697]
+        - StaticText "240"
+        - StaticText "grams"
+      - cell "Available" [ref=e679]
+      - cell "Edit" [ref=e680]
+        - link "Edit" [ref=e698]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e662]
+  - button "Open messages" [ref=e644]
+- region "Notifications alt+T" [ref=e638]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e699]
+  - image
+- alert

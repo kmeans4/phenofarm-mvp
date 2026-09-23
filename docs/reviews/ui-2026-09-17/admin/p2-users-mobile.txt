@@ -1,0 +1,47 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e377]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e378]
+- main
+  - sectionheader
+    - heading "User Management" [level=1, ref=e379]
+    - paragraph
+      - StaticText "Read-only account directory for role, business profile, and verification standing."
+    - form
+      - LabelText
+        - StaticText "Search users"
+      - searchbox "Search users" [ref=e387]
+      - button "Search" [ref=e388]
+  - generic "Filter users by role"
+    - link "All" [ref=e380]
+    - link "Admin" [ref=e381]
+    - link "Grower" [ref=e382]
+    - link "Dispensary" [ref=e383]
+  - paragraph
+    - StaticText "Showing 3 of 3 users"
+  - article
+    - link "dispensary@greenvermont.com" [ref=e384]
+    - StaticText "Dispensary"
+    - link "Green Vermont Dispensary" [ref=e389]
+    - StaticText "Verified"
+    - paragraph
+      - StaticText "Joined 4/9/2026"
+  - article
+    - link "grower@vtnurseries.com" [ref=e385]
+    - StaticText "Grower"
+    - link "Vermont Nurseries" [ref=e390]
+    - StaticText "Verified"
+    - paragraph
+      - StaticText "Joined 4/9/2026"
+  - article
+    - link "admin@phenofarm.com" [ref=e386]
+    - StaticText "Admin"
+    - StaticText "-"
+    - StaticText "Admin"
+    - paragraph
+      - StaticText "Joined 4/9/2026"
+- region "Notifications alt+T" [ref=e376]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e391]
+  - image
+- alert

@@ -1,8 +1,7 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 import bcrypt from 'bcryptjs';
+import { getAuthSession } from '@/lib/auth-helpers';
 
 interface SeedResults {
   checked: { users: number; growers: number; dispensaries: number };
@@ -11,14 +10,40 @@ interface SeedResults {
   final?: { users: number; growers: number; dispensaries: number };
 }
 
-// GET /api/admin/seed - Check and create demo data
+function isProductionEnvironment() {
+  return process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+}
+
+// Demo seeding is deliberately unavailable in production. Keep the endpoint
+// development-only because it creates credentials and sample records.
 export async function GET() {
+  return NextResponse.json(
+    { error: 'Demo seeding requires an explicit POST in a non-production environment.' },
+    { status: 405, headers: { Allow: 'POST' } },
+  );
+}
+
+export async function POST() {
   try {
+    if (isProductionEnvironment()) {
+      return NextResponse.json({ error: 'Demo seeding is disabled in production.' }, { status: 404 });
+    }
+
     // Verify admin
-    const session = await getServerSession(authOptions);
-    // Session role check
-    if (!session || session.user?.role !== 'ADMIN') {
+    const session = await getAuthSession();
+    if (!session) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (session.user?.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    const demoPassword = process.env.DEMO_SEED_PASSWORD;
+    if (!demoPassword) {
+      return NextResponse.json(
+        { error: 'Demo seeding is not configured for this environment.' },
+        { status: 503 },
+      );
     }
 
     const results: SeedResults = { checked: { users: 0, growers: 0, dispensaries: 0 }, created: [], errors: [] };
@@ -33,7 +58,7 @@ export async function GET() {
     // Create demo grower if needed
     if (growerCount === 0) {
       try {
-        const hashedPassword = await bcrypt.hash('password123', 10);
+        const hashedPassword = await bcrypt.hash(demoPassword, 10);
         
         const growerUser = await db.user.create({
           data: {
@@ -60,15 +85,15 @@ export async function GET() {
 
         results.created.push('grower@vtnurseries.com');
       } catch (e) {
-        const err = e as Error;
-        results.errors.push(`Grower creation failed: ${err.message}`);
+        console.error('Grower demo seed failed:', e instanceof Error ? e.message : 'unknown error');
+        results.errors.push('Grower account could not be created.');
       }
     }
 
     // Create demo dispensary if needed
     if (dispensaryCount === 0) {
       try {
-        const hashedPassword = await bcrypt.hash('password123', 10);
+        const hashedPassword = await bcrypt.hash(demoPassword, 10);
         
         const dispensaryUser = await db.user.create({
           data: {
@@ -97,8 +122,8 @@ export async function GET() {
 
         results.created.push('dispensary@greenvermont.com');
       } catch (e) {
-        const err = e as Error;
-        results.errors.push(`Dispensary creation failed: ${err.message}`);
+        console.error('Dispensary demo seed failed:', e instanceof Error ? e.message : 'unknown error');
+        results.errors.push('Dispensary account could not be created.');
       }
     }
 
@@ -115,8 +140,7 @@ export async function GET() {
 
     return NextResponse.json(results);
   } catch (error) {
-    const err = error as Error;
-    console.error('Seed API error:', err);
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error('Seed API error:', error instanceof Error ? error.message : 'unknown error');
+    return NextResponse.json({ error: 'Unable to seed demo data.' }, { status: 500 });
   }
 }

@@ -1,0 +1,78 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e3033]
+- button "Notifications" [expanded=false, ref=e3034]
+  - StaticText "17"
+- button "Open Grower navigation menu" [expanded=false, ref=e3035]
+- main
+  - sectionheader
+    - heading "Add batch" [level=1, ref=e3037]
+  - form
+    - LabelText
+      - StaticText "Batch Number *"
+    - button "Generate" [ref=e3038]
+    - textbox "Batch Number *" [required, ref=e3039]
+    - paragraph
+      - StaticText "Example: BATCH-20260917-01"
+    - LabelText
+      - StaticText "Lot Number"
+    - textbox "Lot Number" [ref=e3040]
+    - LabelText
+      - StaticText "Harvest Date *"
+    - Date "Harvest Date *": 2026-09-17
+      - generic
+        - spinbutton "Month Month" [ref=e3057]: 9
+          - StaticText "09"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e3058]: 17
+          - StaticText "17"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e3059]: 2026
+          - StaticText "2026"
+      - button "Show date picker" [ref=e3056]
+    - LabelText
+      - StaticText "Strain *"
+    - combobox "Strain *" [expanded=false, ref=e3041]: Select a strain
+      - MenuListPopup
+        - option "Select a strain" [selected, ref=e3060]
+        - option "Assorted " [ref=e3061]
+        - option "Audit Test Kush " [ref=e3062]
+        - option "Purple Haze " [ref=e3063]
+        - option "Silver Haze " [ref=e3064]
+    - heading "Lab Results" [level=3, ref=e3042]
+    - LabelText
+      - StaticText "THC (%)"
+    - spinbutton "THC (%)" [ref=e3043]
+    - LabelText
+      - StaticText "CBD (%)"
+    - spinbutton "CBD (%)" [ref=e3044]
+    - LabelText
+      - StaticText "Total (%)"
+    - spinbutton "Total (%)" [ref=e3045]
+    - heading "Lab PDFs" [level=4, ref=e3046]
+    - paragraph
+      - StaticText "PDF · 2MB max each"
+    - LabelText
+      - StaticText "Potency"
+    - button "Potency" [ref=e3047]: No file chosen
+    - button "Upload Potency PDF" [ref=e3048]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Pesticides"
+    - button "Pesticides" [ref=e3049]: No file chosen
+    - button "Upload Pesticides PDF" [ref=e3050]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Microbials"
+    - button "Microbials" [ref=e3051]: No file chosen
+    - button "Upload Microbials PDF" [ref=e3052]
+      - StaticText "Upload"
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Notes" [ref=e3053]
+    - button "Create Batch" [disabled, ref=e3054]
+    - button "Cancel" [ref=e3055]
+- button "Open messages" [ref=e3036]
+- region "Notifications alt+T" [ref=e3032]
+- alert

@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 
 // GET current grower's profile
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getAuthSession();
 
@@ -33,6 +33,9 @@ export async function GET(request: NextRequest) {
         logo: true,
         contactName: true,
         isVerified: true,
+        licenseExpiry: true,
+        subscriptionPlan: true,
+        subscriptionStatus: true,
       },
     });
 

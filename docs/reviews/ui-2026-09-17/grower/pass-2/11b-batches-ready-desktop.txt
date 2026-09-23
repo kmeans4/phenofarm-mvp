@@ -1,0 +1,87 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e3341]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3342]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e3343]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3346]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e3347]
+      - StaticText "Overview"
+    - link "Products" [ref=e3348]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3349]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3350]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3351]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3352]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3353]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3354]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3355]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3344]
+- main
+  - sectionheader
+    - heading "Batch Management" [level=1, ref=e3356]
+    - paragraph
+      - StaticText "Manage your harvest batches and lab results"
+    - link "+ Add Batch" [ref=e3357]
+  - paragraph
+    - StaticText "Total Batches"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Total Products"
+  - paragraph
+    - StaticText "1"
+  - paragraph
+    - StaticText "Avg. THC"
+  - paragraph
+    - StaticText "—"
+  - table
+    - rowgroup
+      - row
+        - columnheader "BATCH #" [ref=e3366]
+        - columnheader "STRAIN" [ref=e3367]
+        - columnheader "HARVEST DATE" [ref=e3368]
+        - columnheader "THC" [ref=e3369]
+        - columnheader "CBD" [ref=e3370]
+        - columnheader "PRODUCTS" [ref=e3371]
+        - columnheader "ACTIONS" [ref=e3372]
+    - row
+      - cell "VN-2026-0912" [ref=e3359]
+      - cell "Audit Test Kush" [ref=e3360]
+      - cell "Sep 11, 2026" [ref=e3361]
+      - cell "-" [ref=e3362]
+      - cell "-" [ref=e3363]
+      - cell "1 product 0/3 lab docs" [ref=e3364]
+        - link "1 product" [ref=e3373]
+        - StaticText "0/3 lab docs"
+      - cell "Edit + Product from batch Delete" [ref=e3365]
+        - link "Edit" [ref=e3374]
+        - link "+ Product from batch" [ref=e3375]
+        - button "Delete" [ref=e3376]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3358]
+  - button "Open messages" [ref=e3345]
+- region "Notifications alt+T" [ref=e3340]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3377]
+  - image
+- alert

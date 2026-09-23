@@ -1,48 +1,34 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { createPortal } from 'react-dom';
+import { useFocusTrap } from '@/app/hooks/useFocusTrap';
+import { readCart, writeCart, calculateTotals, getLineTotal, removeOrderedItems, type Cart, type CartItem } from '@/lib/cart';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { formatProductUnit } from '@/lib/product-display';
 import { PAYMENT_TERMS_OPTIONS, buildOrderRequestNotes } from '@/lib/order-workflow';
 import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
 import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
+import { ProductImage } from '@/app/components/ui/ProductImage';
 import { useLocalDraft } from '@/app/hooks/useLocalDraft';
+import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
 import {
+  DEFAULT_COMMERCIAL_TERMS,
   DEFAULT_REQUEST_DEFAULTS,
   REQUEST_DEFAULTS_STORAGE_KEY,
   REQUEST_NOTE_TEMPLATES,
   RequestDefaults,
 } from '@/lib/ux-workflow';
-
-interface CartItem {
-  id: string;
-  name: string;
-  grower: string;
-  growerId: string;
-  price: number;
-  quantity: number;
-  maxQty: number;
-  strain?: string;
-  unit?: string;
-}
-
-interface Cart {
-  items: CartItem[];
-  subtotal: number;
-  tax: number;
-  total: number;
-}
+import { CheckCircle2, Loader2, Plus, Trash2 } from 'lucide-react';
 
 interface CheckoutIssue {
   productId: string;
   productName: string;
   requested: number;
   available: number;
-}
-
-interface DispensaryProductGroup {
-  products?: Array<{ id: string; inventoryQty: number | null }>;
 }
 
 interface RequestDraftDetails {
@@ -52,16 +38,58 @@ interface RequestDraftDetails {
   paymentTerms: string;
 }
 
+interface SuggestedProduct {
+  id: string;
+  name: string;
+  price: number | null;
+  isPriceVisible: boolean;
+  strain: string | null;
+  unit: string | null;
+  thc: number | null;
+  inventoryQty: number;
+  grower: {
+    id: string;
+    businessName: string;
+  };
+  source: 'favorite' | 'recent';
+  orderCount?: number;
+}
+
+interface GrowerTerms {
+  fulfillmentRegion: string;
+  paymentTerms: string;
+}
+
+interface GrowerTermsResponse {
+  growerId?: string;
+  fulfillmentRegion?: string;
+  paymentTerms?: string;
+}
+
 type BuilderStep = 'items' | 'logistics' | 'terms' | 'review';
 
-const calculateTotals = (items: CartItem[]) => {
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = 0;
-  return { subtotal, tax, total: subtotal + tax };
-};
+const FAVORITES_KEY = 'phenofarm_favorites';
+const SUGGESTION_LIMIT = 6;
 
-function notifyCartUpdated() {
-  window.dispatchEvent(new Event('cart-updated'));
+function normalizeSuggestion(product: Omit<SuggestedProduct, 'source'>, source: SuggestedProduct['source']): SuggestedProduct | null {
+  if (!product?.id || !product?.grower?.id || product.inventoryQty < 1) return null;
+
+  return {
+    id: product.id,
+    name: product.name,
+    price: product.isPriceVisible && product.price != null ? Number(product.price) : null,
+    isPriceVisible: product.isPriceVisible,
+    strain: product.strain || null,
+    unit: product.unit || null,
+    thc: product.thc ?? null,
+    inventoryQty: product.inventoryQty,
+    grower: {
+      id: product.grower.id,
+      businessName: product.grower.businessName,
+    },
+    source,
+    orderCount: product.orderCount,
+  };
 }
 
 export default function DispensaryCartPage() {
@@ -69,17 +97,26 @@ export default function DispensaryCartPage() {
   const [cart, setCart] = useState<Cart>({ items: [], subtotal: 0, tax: 0, total: 0 });
   const [mounted, setMounted] = useState(false);
   const [submittingRequest, setSubmittingRequest] = useState(false);
+  const submittingRef = useRef(false);
+  const [inventorySyncing, setInventorySyncing] = useState(false);
   const [requestError, setRequestError] = useState('');
   const [checkoutIssues, setCheckoutIssues] = useState<CheckoutIssue[]>([]);
   const [inventoryAdjustmentNotice, setInventoryAdjustmentNotice] = useState('');
   const [requestSuccess, setRequestSuccess] = useState(false);
   const [showRequestReview, setShowRequestReview] = useState(false);
+  useBodyOverlay(showRequestReview);
+  const reviewRef = useRef<HTMLDivElement>(null);
+  useFocusTrap({ active: showRequestReview, containerRef: reviewRef, onEscape: () => setShowRequestReview(false) });
   const [orderNotes, setOrderNotes] = useState('');
   const [fulfillmentMethod, setFulfillmentMethod] = useState('Flexible');
   const [requestedWindow, setRequestedWindow] = useState('');
   const [paymentTerms, setPaymentTerms] = useState('Handled directly');
   const [builderStep, setBuilderStep] = useState<BuilderStep>('items');
   const [savedRequestDefaults, setSavedRequestDefaults] = useState<RequestDefaults | null>(null);
+  const [suggestedProducts, setSuggestedProducts] = useState<SuggestedProduct[]>([]);
+  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [growerTerms, setGrowerTerms] = useState<Record<string, GrowerTerms>>({});
+  const [successRedirectPaused, setSuccessRedirectPaused] = useState(false);
 
   const requestDraft = useLocalDraft<RequestDraftDetails>({
     key: 'phenofarm:draft:order-request',
@@ -100,95 +137,191 @@ export default function DispensaryCartPage() {
       ),
   });
 
-  const syncCartWithLiveInventory = useCallback(async (savedCart: Cart) => {
-    if (!savedCart.items.length) {
-      setCart(savedCart);
-      return;
-    }
-
+  const syncCartWithLiveInventory = useCallback(async (savedCart: Cart, signal: AbortSignal) => {
+    if (!savedCart.items.length) return;
+    setInventorySyncing(true);
     try {
-      const response = await fetch('/api/dispensary/products?limit=200');
-      if (!response.ok) {
-        setCart(savedCart);
-        return;
-      }
-
+      const [response, quoteResponse] = await Promise.all([
+        fetch('/api/dispensary/cart/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productIds: savedCart.items.map(item => item.id) }), signal }),
+        fetch('/api/dispensary/accepted-quotes', { signal }),
+      ]);
+      if (!response.ok || !quoteResponse.ok) throw new Error('Unable to refresh inventory.');
       const data = await response.json();
-      const groups: DispensaryProductGroup[] = Array.isArray(data?.groups) ? data.groups : [];
-      const liveProducts = groups.flatMap((group) =>
-        Array.isArray(group.products) ? group.products : []
-      );
-      const inventoryByProductId = new Map(
-        liveProducts.map((product) => [product.id, product.inventoryQty ?? 0])
-      );
-
-      let changedCount = 0;
-      const syncedItems = savedCart.items.flatMap((item) => {
-        const liveInventory = inventoryByProductId.get(item.id);
-
-        if (liveInventory === undefined) {
-          changedCount += 1;
-          return [];
-        }
-
-        const nextMaxQty = Math.max(0, liveInventory);
-        const nextQuantity = Math.min(item.quantity, nextMaxQty);
-
-        if (nextQuantity !== item.quantity || nextMaxQty !== item.maxQty) {
-          changedCount += 1;
-        }
-
-        if (nextQuantity < 1) {
-          return [];
-        }
-
-        return [{ ...item, quantity: nextQuantity, maxQty: nextMaxQty }];
+      const quoteData = await quoteResponse.json();
+      if (!Array.isArray(data.products) || !Array.isArray(quoteData.quotes)) throw new Error('Invalid inventory response.');
+      const live = new Map<string, { id: string; inventoryQty: number; price: number | null; isPriceVisible: boolean; isAvailable: boolean }>(data.products.map((product: { id: string }) => [product.id, product]));
+      const quotes = new Map<string, { id: string; quantity: number | null; unitPrice: number }>(quoteData.quotes.map((quote: { productId: string }) => [quote.productId, quote]));
+      if (signal.aborted) return;
+      // Reconcile against the current draft, so edits made during the request survive.
+      setCart(current => {
+        const items = current.items.map(item => {
+          const product = live.get(item.id);
+          if (!product) return item;
+          const quote = quotes.get(item.id);
+          const base = { ...item };
+          delete base.acceptedQuoteId; delete base.quotedQuantity; delete base.quotedUnitPrice;
+          return { ...base, price: quote?.unitPrice ?? product.price ?? 0, listPrice: product.price ?? undefined,
+            maxQty: product.inventoryQty, quantity: product.isAvailable ? Math.min(item.quantity, product.inventoryQty) : item.quantity,
+            unavailable: !product.isAvailable, requiresQuote: !product.isPriceVisible && (!quote || (quote.quantity != null && quote.quantity < item.quantity)),
+            ...(quote ? { acceptedQuoteId: quote.id, quotedQuantity: quote.quantity ?? product.inventoryQty, quotedUnitPrice: quote.unitPrice } : {}),
+          };
+        });
+        return { items, ...calculateTotals(items) };
       });
-
-      const nextCart = { items: syncedItems, ...calculateTotals(syncedItems) };
-      setCart(nextCart);
-
-      if (changedCount > 0) {
-        setInventoryAdjustmentNotice(
-          changedCount === 1
-            ? '1 cart item was refreshed to match current inventory.'
-            : `${changedCount} cart items were refreshed to match current inventory.`
-        );
-      }
+      const changed = savedCart.items.some(item => {
+        const product = live.get(item.id);
+        const quote = quotes.get(item.id);
+        return !product || !product.isAvailable || item.quantity > product.inventoryQty || item.price !== (quote?.unitPrice ?? product.price ?? 0);
+      });
+      setInventoryAdjustmentNotice(changed ? 'Prices or availability changed. Review the updated draft.' : '');
     } catch {
-      setCart(savedCart);
-    }
+      if (!signal.aborted) setInventoryAdjustmentNotice('Inventory could not be refreshed. Your saved draft has been kept.');
+    } finally { if (!signal.aborted) setInventorySyncing(false); }
   }, []);
 
   useEffect(() => {
+    const saved = readCart();
+    setCart(saved);
     setMounted(true);
-    const saved = localStorage.getItem('phenofarm-cart');
-    if (saved) {
-      try {
-        const parsedCart = JSON.parse(saved);
-        void syncCartWithLiveInventory(parsedCart);
-      } catch {
-        setCart({ items: [], subtotal: 0, tax: 0, total: 0 });
-      }
-    }
-    const defaultsTimer = window.setTimeout(() => {
-      try {
-        const parsedDefaults = JSON.parse(localStorage.getItem(REQUEST_DEFAULTS_STORAGE_KEY) || 'null') as RequestDefaults | null;
-        setSavedRequestDefaults(parsedDefaults);
-      } catch {
-        setSavedRequestDefaults(null);
-      }
-    }, 0);
-    return () => window.clearTimeout(defaultsTimer);
+    const controller = new AbortController();
+    void syncCartWithLiveInventory(saved, controller.signal);
+    try {
+      setSavedRequestDefaults(JSON.parse(localStorage.getItem(REQUEST_DEFAULTS_STORAGE_KEY) || 'null'));
+    } catch { setSavedRequestDefaults(null); }
+    return () => controller.abort();
   }, [syncCartWithLiveInventory]);
 
   useEffect(() => {
-    if (mounted) {
-      localStorage.setItem('phenofarm-cart', JSON.stringify(cart));
-      notifyCartUpdated();
-    }
+    if (mounted && !writeCart(cart)) setInventoryAdjustmentNotice('This browser could not save the latest draft. Please free up storage before leaving.');
   }, [cart, mounted]);
 
+  useEffect(() => {
+    if (!mounted) return;
+
+    let cancelled = false;
+
+    const loadSuggestedProducts = async () => {
+      setSuggestionsLoading(true);
+
+      try {
+        const storedFavoriteIds = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]') as string[];
+        const favoritesResponse = await fetch('/api/dispensary/favorites');
+        const favoritesData = favoritesResponse.ok ? await favoritesResponse.json() : { productIds: [] };
+        const favoriteIds = Array.from(
+          new Set([
+            ...(Array.isArray(favoritesData.productIds) ? favoritesData.productIds : []),
+            ...(Array.isArray(storedFavoriteIds) ? storedFavoriteIds : []),
+          ].map((id) => String(id || '').trim()).filter(Boolean))
+        ).slice(0, 20);
+
+        const [favoriteDetailsResponse, recentResponse] = await Promise.all([
+          favoriteIds.length > 0
+            ? fetch('/api/dispensary/favorites', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ productIds: favoriteIds }),
+              })
+            : Promise.resolve(null),
+          fetch('/api/dispensary/recent-products'),
+        ]);
+
+        const favoriteDetails = favoriteDetailsResponse?.ok ? await favoriteDetailsResponse.json() : { products: [] };
+        const recentDetails = recentResponse.ok ? await recentResponse.json() : { products: [] };
+        const favoriteProducts = Array.isArray(favoriteDetails.products)
+          ? favoriteIds
+              .map((id) => favoriteDetails.products.find((product: SuggestedProduct) => product.id === id))
+              .filter(Boolean)
+          : [];
+        const recentProducts = Array.isArray(recentDetails.products) ? recentDetails.products : [];
+        const merged = new Map<string, SuggestedProduct>();
+
+        for (const product of favoriteProducts) {
+          const suggestion = normalizeSuggestion(product, 'favorite');
+          if (suggestion) merged.set(suggestion.id, suggestion);
+        }
+
+        for (const product of recentProducts) {
+          const suggestion = normalizeSuggestion(product, 'recent');
+          if (suggestion && !merged.has(suggestion.id)) {
+            merged.set(suggestion.id, suggestion);
+          }
+        }
+
+        if (!cancelled) {
+          setSuggestedProducts(Array.from(merged.values()).slice(0, SUGGESTION_LIMIT));
+        }
+      } catch {
+        if (!cancelled) {
+          setSuggestedProducts([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setSuggestionsLoading(false);
+        }
+      }
+    };
+
+    void loadSuggestedProducts();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [mounted]);
+
+  const growerIdsKey = Array.from(new Set(cart.items.map((item) => item.growerId).filter(Boolean))).sort().join(',');
+
+  useEffect(() => {
+    if (!mounted || !growerIdsKey) {
+      setGrowerTerms({});
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadGrowerTerms = async () => {
+      try {
+        const response = await fetch(`/api/dispensary/grower-terms?ids=${encodeURIComponent(growerIdsKey)}`);
+        if (!response.ok) return;
+
+        const data = await response.json();
+        const terms: GrowerTermsResponse[] = Array.isArray(data.terms) ? data.terms : [];
+        const nextTerms: Record<string, GrowerTerms> = {};
+
+        for (const term of terms) {
+          if (term.growerId) {
+            nextTerms[term.growerId] = {
+              fulfillmentRegion: term.fulfillmentRegion || DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion,
+              paymentTerms: term.paymentTerms || DEFAULT_COMMERCIAL_TERMS.paymentTerms,
+            };
+          }
+        }
+
+        if (!cancelled) {
+          setGrowerTerms(nextTerms);
+        }
+      } catch {
+        if (!cancelled) {
+          setGrowerTerms({});
+        }
+      }
+    };
+
+    void loadGrowerTerms();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [growerIdsKey, mounted]);
+
+  useEffect(() => {
+    if (!requestSuccess || successRedirectPaused) return;
+
+    const redirectTimer = window.setTimeout(() => {
+      router.push('/dispensary/orders');
+    }, 5000);
+
+    return () => window.clearTimeout(redirectTimer);
+  }, [requestSuccess, router, successRedirectPaused]);
 
   const updateQuantity = (id: string, delta: number) => {
     setCart(prev => {
@@ -225,46 +358,64 @@ export default function DispensaryCartPage() {
     });
   };
 
-  const applyInventoryAdjustments = (issues: CheckoutIssue[]) => {
-    if (issues.length === 0) return;
+  const addSuggestedProduct = (product: SuggestedProduct) => {
+    if (product.inventoryQty < 1 || product.price == null) return;
 
     setCart((prev) => {
-      let changedCount = 0;
-      const nextItems = prev.items.flatMap((item) => {
-        const issue = issues.find((entry) => entry.productId === item.id);
-        if (!issue) return [item];
+      const existingIndex = prev.items.findIndex((item) => item.id === product.id);
+      let items: CartItem[];
 
-        const adjustedQuantity = Math.max(0, Math.min(item.quantity, issue.available));
-        if (adjustedQuantity === item.quantity) return [item];
-
-        changedCount += 1;
-
-        if (adjustedQuantity < 1) {
-          return [];
-        }
-
-        return [{
-          ...item,
-          quantity: adjustedQuantity,
-          maxQty: issue.available,
-        }];
-      });
-
-      if (changedCount > 0) {
-        setInventoryAdjustmentNotice(
-          changedCount === 1
-            ? '1 item quantity was adjusted to match currently available inventory.'
-            : `${changedCount} item quantities were adjusted to match currently available inventory.`
-        );
+      if (existingIndex >= 0) {
+        items = prev.items.map((item, index) => {
+          if (index !== existingIndex) return item;
+          return {
+            ...item,
+            quantity: Math.min(item.quantity + 1, product.inventoryQty),
+            maxQty: product.inventoryQty,
+          };
+        });
+      } else {
+        items = [
+          ...prev.items,
+          {
+            id: product.id,
+            name: product.name,
+            grower: product.grower.businessName,
+            growerId: product.grower.id,
+            price: product.price ?? 0,
+            quantity: 1,
+            maxQty: product.inventoryQty,
+            strain: product.strain || undefined,
+            unit: product.unit || undefined,
+          },
+        ];
       }
 
-      return { items: nextItems, ...calculateTotals(nextItems) };
+      return { items, ...calculateTotals(items) };
     });
+  };
+
+  const applyInventoryAdjustments = (issues: CheckoutIssue[]) => {
+    if (!issues.length) return;
+    const items = cart.items.map(item => {
+      const issue = issues.find(entry => entry.productId === item.id);
+      if (!issue) return item;
+      return { ...item, quantity: issue.available > 0 ? Math.min(item.quantity, issue.available) : item.quantity,
+        maxQty: Math.max(0, issue.available), unavailable: issue.available < 1 };
+    });
+    setCart({ items, ...calculateTotals(items) });
+    setInventoryAdjustmentNotice('Inventory quantities updated. Unavailable items remain in your draft until you remove them.');
+  };
+
+  const applySingleInventoryAdjustment = (issue: CheckoutIssue) => {
+    applyInventoryAdjustments([issue]);
+    setCheckoutIssues((prev) => prev.filter((entry) => entry.productId !== issue.productId));
+    setRequestError('');
   };
 
   const persistRequestDefaults = (defaults: RequestDefaults) => {
     setSavedRequestDefaults(defaults);
-    localStorage.setItem(REQUEST_DEFAULTS_STORAGE_KEY, JSON.stringify(defaults));
+    try { localStorage.setItem(REQUEST_DEFAULTS_STORAGE_KEY, JSON.stringify(defaults)); } catch { /* Request submission does not depend on saving defaults. */ }
   };
 
   const applyRequestDefaults = (defaults: RequestDefaults) => {
@@ -276,6 +427,11 @@ export default function DispensaryCartPage() {
   };
 
   const handleSubmitRequest = async () => {
+    if (submittingRef.current || inventorySyncing) return;
+    if (!cart.items.length || cart.items.some(item => item.unavailable || item.requiresQuote)) {
+      setRequestError('Remove unavailable items or obtain pricing for items that require a quote before submitting.'); return;
+    }
+    submittingRef.current = true;
     setSubmittingRequest(true);
     setRequestError('');
     setCheckoutIssues([]);
@@ -295,55 +451,82 @@ export default function DispensaryCartPage() {
         body: JSON.stringify({ items: cart.items, notes }),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       const issues = Array.isArray(data.issues) ? data.issues : [];
 
       if (!response.ok) {
         setCheckoutIssues(issues);
-        applyInventoryAdjustments(issues);
+        if (issues.length > 0) {
+          setInventoryAdjustmentNotice('Review each inventory conflict and adjust the draft before submitting again.');
+        }
         throw new Error(data.error || 'Request submission failed');
       }
 
+      if (!Array.isArray(data.orders) || !data.orders.length || data.orders.some((order: { orderedProductIds?: unknown }) => !Array.isArray(order.orderedProductIds))) {
+        throw new Error('Request confirmation was incomplete. Your draft has been kept; check your orders before trying again.');
+      }
+      const remaining = removeOrderedItems(cart, data.orders);
       setCheckoutIssues(issues);
-      applyInventoryAdjustments(issues);
-
       persistRequestDefaults({ orderNotes, fulfillmentMethod, requestedWindow, paymentTerms });
-      localStorage.removeItem('phenofarm-cart');
+      setCart(remaining);
+      writeCart(remaining);
+      if (remaining.items.length) {
+        setRequestError('Some requests were submitted. Items that were not ordered remain in your draft; review the issues before retrying.');
+        setShowRequestReview(false);
+        return;
+      }
       requestDraft.clearDraft();
-      setCart({ items: [], subtotal: 0, tax: 0, total: 0 });
       setOrderNotes('');
       setRequestedWindow('');
       setFulfillmentMethod('Flexible');
       setPaymentTerms('Handled directly');
       setBuilderStep('items');
       setShowRequestReview(false);
+      setSuccessRedirectPaused(false);
       setRequestSuccess(true);
-      setTimeout(() => router.push('/dispensary/orders'), 2000);
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Request submission failed';
       setRequestError(message);
     } finally {
+      submittingRef.current = false;
       setSubmittingRequest(false);
     }
   };
 
   if (!mounted) {
     return (
-      <div className="p-4 max-w-5xl mx-auto">
-        <div className="mb-6 space-y-1">
-          <h1 className="text-3xl font-bold">Order Request Draft</h1>
-          <p className="text-sm text-gray-600">Loading your request draft...</p>
-        </div>
+      <div className="max-w-5xl mx-auto">
+        <PageHeader title="Order Request Draft" description="Loading your request draft..." className="mb-4 sm:mb-6" />
       </div>
     );
   }
 
   if (requestSuccess) {
     return (
-      <div className="p-6 max-w-2xl mx-auto text-center">
-        <div className="mb-4 text-5xl text-green-600">✓</div>
-        <h1 className="text-2xl font-bold">Order Request Submitted</h1>
-        <p className="text-gray-600">The grower will review the request. Redirecting to orders...</p>
+      <div className="mx-auto max-w-2xl">
+        <div
+          className="rounded-2xl border border-green-200 bg-white p-8 text-center shadow-sm"
+          onMouseEnter={() => setSuccessRedirectPaused(true)}
+          onFocusCapture={() => setSuccessRedirectPaused(true)}
+          onTouchStart={() => setSuccessRedirectPaused(true)}
+        >
+          <CheckCircle2 className="mx-auto mb-4 h-12 w-12 text-green-600" />
+          <h1 className="text-2xl font-bold text-gray-900">Order Request Submitted</h1>
+          <p className="mt-2 text-gray-600">
+            The grower will review the request. Wholesale settlement stays direct between buyer and grower.
+          </p>
+          <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
+            <Link
+              href="/dispensary/orders"
+              className="inline-flex h-10 items-center justify-center rounded-lg bg-green-600 px-4 text-sm font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            >
+              View requests now
+            </Link>
+            <span className="inline-flex h-10 items-center justify-center text-sm text-gray-500">
+              {successRedirectPaused ? 'Redirect paused' : 'Redirecting in 5 seconds'}
+            </span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -354,7 +537,7 @@ export default function DispensaryCartPage() {
       groups[item.growerId] = { grower: item.grower, items: [], subtotal: 0 };
     }
     groups[item.growerId].items.push(item);
-    groups[item.growerId].subtotal += item.price * item.quantity;
+    groups[item.growerId].subtotal += getLineTotal(item);
     return groups;
   }, {});
 
@@ -365,23 +548,6 @@ export default function DispensaryCartPage() {
     { key: 'review', label: 'Review', complete: false },
   ];
   const requestDetailsReady = cart.items.length > 0 && Boolean(fulfillmentMethod.trim()) && Boolean(paymentTerms.trim());
-  const requestSuggestions = [
-    !requestedWindow.trim()
-      ? {
-          title: 'Add a timing window',
-          description: 'A pickup, delivery, or flexible receiving window reduces follow-up messages.',
-          step: 'logistics' as BuilderStep,
-        }
-      : null,
-    !orderNotes.trim()
-      ? {
-          title: 'Add a short note',
-          description: 'Receiving instructions, substitutions, or PO context help growers respond faster.',
-          step: 'terms' as BuilderStep,
-        }
-      : null,
-  ].filter((item): item is { title: string; description: string; step: BuilderStep } => item !== null);
-
   const applyNoteTemplate = (body: string) => {
     setOrderNotes((prev) => {
       if (!prev.trim()) return body;
@@ -391,39 +557,26 @@ export default function DispensaryCartPage() {
   };
 
   return (
-    <div className="p-4 max-w-5xl mx-auto">
-      <div className="mb-6 space-y-1">
-        <h1 className="text-3xl font-bold">Order Request Draft</h1>
-        <p className="text-sm text-gray-600">
-          Build a wholesale request for growers to review. PhenoFarm does not collect wholesale payment.
-        </p>
-      </div>
+    <div className="max-w-5xl mx-auto">
+      <PageHeader
+        title="Request draft"
+        description={isEmpty ? "Build a request for your grower." : undefined}
+        className="mb-4 sm:mb-6"
+      />
 
       {!isEmpty && (
-        <div className="mb-4 space-y-3">
-          <div className="rounded-xl border border-green-100 bg-green-50 p-3">
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-              {builderSteps.map((step, index) => (
-                <button
-                  key={step.key}
-                  type="button"
-                  onClick={() => setBuilderStep(step.key)}
-                  aria-pressed={builderStep === step.key}
-                  className={`rounded-lg px-3 py-2 text-left text-sm font-medium transition ${
-                    builderStep === step.key
-                      ? 'bg-green-600 text-white shadow-sm'
-                      : step.complete
-                        ? 'bg-white text-green-800 ring-1 ring-green-200'
-                        : 'bg-white/70 text-gray-700 ring-1 ring-green-100'
-                  }`}
-                >
-                  <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-white/80 text-xs font-semibold text-green-800">
-                    {step.complete ? 'OK' : index + 1}
-                  </span>
-                  {step.label}
-                </button>
-              ))}
+        <div className="mb-4 space-y-2">
+          <div className="flex flex-wrap items-center justify-between gap-1">
+          <nav aria-label="Draft sections" className="flex gap-2 text-sm">
+            {builderSteps.filter(step => step.key !== 'review').map(step => <button key={step.key} type="button" onClick={() => { setBuilderStep(step.key); document.getElementById(`draft-${step.key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} aria-pressed={builderStep === step.key} className={`min-h-10 rounded-lg px-3 ${builderStep === step.key ? 'bg-green-100 font-semibold text-green-900' : 'text-gray-600 hover:bg-gray-100'}`}>{step.label}</button>)}
+          </nav>
+          <details className="relative">
+            <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-green-800">Templates</summary>
+            <div className="absolute right-0 z-10 mt-1 w-48 rounded-lg border border-gray-200 bg-white p-1 shadow-lg">
+              {savedRequestDefaults && <button type="button" onClick={() => applyRequestDefaults(savedRequestDefaults)} className="min-h-10 w-full rounded px-3 text-left text-sm text-gray-700 hover:bg-gray-50">Reuse last request</button>}
+              <button type="button" onClick={() => applyRequestDefaults(DEFAULT_REQUEST_DEFAULTS)} className="min-h-10 w-full rounded px-3 text-left text-sm text-green-800 hover:bg-green-50">Use standard terms</button>
             </div>
+          </details>
           </div>
 
           <DraftAutosaveStatus
@@ -431,33 +584,6 @@ export default function DispensaryCartPage() {
             label="Request browser draft"
             onClear={requestDraft.clearDraft}
           />
-
-          <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="text-sm font-semibold text-gray-900">Smart request defaults</p>
-                <p className="text-xs text-gray-600">Reuse the logistics, terms, and notes that worked last time.</p>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {savedRequestDefaults && (
-                  <button
-                    type="button"
-                    onClick={() => applyRequestDefaults(savedRequestDefaults)}
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
-                  >
-                    Use previous request
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => applyRequestDefaults(DEFAULT_REQUEST_DEFAULTS)}
-                  className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-xs font-semibold text-green-800 hover:bg-green-100"
-                >
-                  Use standard terms
-                </button>
-              </div>
-            </div>
-          </div>
         </div>
       )}
 
@@ -473,14 +599,34 @@ export default function DispensaryCartPage() {
           )}
           {checkoutIssues.length > 0 && (
             <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-              <p className="text-sm font-semibold text-amber-900 mb-2">Inventory changes applied</p>
+              <p className="text-sm font-semibold text-amber-900 mb-2">Inventory conflicts</p>
               <ul className="space-y-2 text-sm text-amber-900">
-                {checkoutIssues.map((issue) => (
-                  <li key={`${issue.productId}-${issue.requested}`} className="rounded-md bg-white/70 border border-amber-100 px-3 py-2">
-                    <span className="font-medium">{issue.productName}</span>
-                    <span className="text-amber-800"> was adjusted from {issue.requested} to {issue.available} due to current inventory availability.</span>
-                  </li>
-                ))}
+                {checkoutIssues.map((issue) => {
+                  const currentItem = cart.items.find((item) => item.id === issue.productId);
+                  const alreadyAdjusted = !currentItem || currentItem.quantity <= issue.available;
+
+                  return (
+                    <li
+                      key={`${issue.productId}-${issue.requested}`}
+                      className="flex flex-col gap-3 rounded-lg border border-amber-200 bg-white px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
+                    >
+                      <div>
+                        <p className="font-semibold text-amber-950">{issue.productName}</p>
+                        <p className="mt-1 text-xs text-amber-800">
+                          Requested {issue.requested} · Available {issue.available}
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => applySingleInventoryAdjustment(issue)}
+                        disabled={alreadyAdjusted}
+                        className="inline-flex h-9 items-center justify-center rounded-lg border border-amber-300 px-3 text-xs font-semibold text-amber-900 transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
+                      >
+                        {alreadyAdjusted ? 'Adjusted' : issue.available > 0 ? `Adjust to ${issue.available}` : 'Remove item'}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           )}
@@ -488,67 +634,112 @@ export default function DispensaryCartPage() {
       )}
 
       {isEmpty ? (
-        <Card className="p-8 sm:p-12 text-center">
-          <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-50 text-green-700">
-            <span className="text-2xl font-bold">+</span>
-          </div>
-          <h2 className="text-xl font-semibold text-gray-900">Start a request from the catalog</h2>
+        <Card className="p-5 sm:p-8 text-center">
+          <h2 className="text-xl font-semibold text-gray-900">Your draft is empty</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
-            Add products first, then confirm logistics and direct payment terms in one review step. No wholesale payment is collected in PhenoFarm.
+            Add products to get started.
           </p>
-          <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
+          {(suggestionsLoading || suggestedProducts.length > 0) && (
+            <div className="mx-auto mt-6 max-w-2xl text-left">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-gray-900">Suggested products</h3>
+                </div>
+                {suggestionsLoading && <Loader2 className="h-4 w-4 animate-spin text-green-600" />}
+              </div>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {suggestionsLoading
+                  ? Array.from({ length: 2 }).map((_, index) => (
+                      <div key={index} className="h-20 animate-pulse rounded-lg border border-gray-200 bg-gray-50" />
+                    ))
+                  : suggestedProducts.map((product) => (
+                      <div key={product.id} className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <p className="truncate text-sm font-semibold text-gray-900">{product.name}</p>
+                            </div>
+                            <p className="mt-1 text-xs text-gray-500">{product.grower.businessName}</p>
+                            <p className="mt-1 text-xs text-gray-600">
+                              {product.isPriceVisible ? `$${(product.price ?? 0).toFixed(2)}${product.unit ? `/${formatProductUnit(product.unit)}` : ''}` : ''}
+                              {product.isPriceVisible ? ' · ' : ''}
+                              {product.inventoryQty} available
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => product.isPriceVisible ? addSuggestedProduct(product) : router.push(`/dispensary/catalog?product=${encodeURIComponent(product.id)}&search=${encodeURIComponent(product.name)}`)}
+                            className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-green-600 px-3 text-xs font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                          >
+                            {product.isPriceVisible && <Plus className="h-3.5 w-3.5" />}
+                            {product.isPriceVisible ? 'Add' : 'Request pricing'}
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+              </div>
+            </div>
+          )}
+          <div className="mt-4 flex flex-wrap justify-center gap-2 sm:mt-6">
             <Link href="/dispensary/catalog" className="inline-flex h-10 items-center justify-center rounded-lg bg-green-600 px-4 text-sm font-semibold text-white hover:bg-green-700">
-              Browse products
+              Browse catalog
             </Link>
             <Link href="/dispensary/saved" className="inline-flex h-10 items-center justify-center rounded-lg border border-gray-300 px-4 text-sm font-semibold text-gray-700 hover:bg-gray-50">
-              Open saved workspace
+              Saved
             </Link>
           </div>
         </Card>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div id="draft-items" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           <div className="lg:col-span-2 space-y-4">
             {cart.items.map(item => {
               const atMax = item.quantity >= item.maxQty;
               return (
                 <Card key={item.id}>
-                  <CardContent className="p-4 flex gap-4">
-                    <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center text-2xl">🌿</div>
-                    <div className="flex-1">
-                      <p className="font-semibold">{item.name}</p>
-                      <p className="text-sm text-gray-500">{item.grower} • ${item.price}/{item.unit}</p>
+                  <CardContent className="flex flex-wrap gap-3 p-3 sm:p-4 sm:flex-nowrap">
+                    <ProductImage src={item.image} alt={item.name} productType={item.productType} className="h-14 w-14 shrink-0 rounded-lg sm:h-20 sm:w-20" />
+                    <div className="min-w-0 flex-1">
+                      <p className="break-words text-sm font-semibold sm:text-base">{item.name}</p>
+                      <p className="text-xs text-gray-500 sm:text-sm">{item.grower} · ${item.price}/{formatProductUnit(item.unit)}</p>
+                      {item.acceptedQuoteId ? <p className="mt-1 inline-flex rounded-full bg-green-50 px-2 py-1 text-xs font-semibold text-green-800 ring-1 ring-green-200">Quoted: ${item.quotedUnitPrice?.toFixed(2)}/{formatProductUnit(item.unit)} × up to {item.quotedQuantity}</p> : null}
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="flex items-center border rounded">
-                        <button onClick={() => updateQuantity(item.id, -1)} className="px-3 py-1">-</button>
+                    <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
+                      <div className="flex items-center rounded border border-gray-300">
+                        <button aria-label={`Decrease quantity for ${item.name}`}
+                        onClick={() => updateQuantity(item.id, -1)} className="h-10 w-10">-</button>
                         <input
                           type="number"
-                          value={item.quantity}
+                          aria-label={`Quantity for ${item.name}`}
+                        value={item.quantity}
                           onChange={(e) => setExactQuantity(item.id, parseInt(e.target.value) || 1)}
-                          className="w-12 text-center py-1 border-x"
+                          className="h-10 w-12 text-center text-base border-x border-gray-300"
                         />
-                        <button 
-                          onClick={() => updateQuantity(item.id, 1)} 
+                        <button
+                          aria-label={`Increase quantity for ${item.name}`}
+                        onClick={() => updateQuantity(item.id, 1)}
                           disabled={atMax}
-                          className="px-3 py-1 disabled:opacity-30"
+                          className="h-10 w-10 disabled:opacity-30"
                         >+</button>
                       </div>
-                      <p className="font-bold">${(item.price * item.quantity).toFixed(2)}</p>
-                      <button onClick={() => removeItem(item.id)} className="text-red-600">🗑️</button>
+                      <p className="font-bold">${getLineTotal(item).toFixed(2)}</p>
+                      <button aria-label={`Remove ${item.name} from draft`}
+                      onClick={() => removeItem(item.id)} className="flex h-10 w-10 items-center justify-center rounded-lg text-red-600 hover:bg-red-50">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </CardContent>
                 </Card>
               );
             })}
 
-            <Card className={builderStep === 'logistics' ? 'ring-2 ring-green-500' : ''}>
-              <CardHeader>
+            <section id="draft-logistics" className="scroll-mt-24"><Card className={builderStep === 'logistics' ? 'ring-2 ring-green-500' : ''}>
+              <CardHeader className="pb-2">
                 <CardTitle>Logistics</CardTitle>
               </CardHeader>
-              <CardContent className="grid gap-4 sm:grid-cols-2">
+              <CardContent className="grid gap-4 pt-0 sm:grid-cols-2">
                 <div>
                   <label htmlFor="fulfillment-method-page" className="block text-sm font-medium text-gray-700">
-                    Fulfillment method
+                    Fulfillment
                   </label>
                   <select
                     id="fulfillment-method-page"
@@ -557,7 +748,7 @@ export default function DispensaryCartPage() {
                       setFulfillmentMethod(event.target.value);
                       setBuilderStep('logistics');
                     }}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                   >
                     <option>Flexible</option>
                     <option>Pickup</option>
@@ -578,22 +769,23 @@ export default function DispensaryCartPage() {
                       setBuilderStep('logistics');
                     }}
                     maxLength={120}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-                    placeholder="Example: Tuesday morning or next week"
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    placeholder="e.g. Tuesday morning"
                   />
                   <p className="mt-1 text-right text-xs text-gray-500">{requestedWindow.length}/120</p>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className={builderStep === 'terms' ? 'ring-2 ring-green-500' : ''}>
-              <CardHeader>
-                <CardTitle>Terms and Notes</CardTitle>
+            </section>
+            <section id="draft-terms" className="scroll-mt-24"><Card className={builderStep === 'terms' ? 'ring-2 ring-green-500' : ''}>
+              <CardHeader className="pb-2">
+                <CardTitle>Terms</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-4 pt-0">
                 <div>
                   <label htmlFor="payment-terms-page" className="block text-sm font-medium text-gray-700">
-                    Direct payment terms
+                    Payment terms
                   </label>
                   <select
                     id="payment-terms-page"
@@ -602,32 +794,24 @@ export default function DispensaryCartPage() {
                       setPaymentTerms(event.target.value);
                       setBuilderStep('terms');
                     }}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
                   >
                     {PAYMENT_TERMS_OPTIONS.map((option) => (
                       <option key={option}>{option}</option>
                     ))}
                   </select>
-                  <p className="mt-1 text-xs text-gray-500">Informational only. PhenoFarm does not process wholesale settlement.</p>
+                  <p className="mt-1 text-xs text-gray-500">Arrange payment directly with the grower.</p>
                 </div>
 
                 <div>
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <label htmlFor="request-notes-page" className="block text-sm font-medium text-gray-700">
-                      Notes or special instructions
+                      Notes <span className="font-normal text-gray-500">(optional)</span>
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {REQUEST_NOTE_TEMPLATES.map((template) => (
-                        <button
-                          key={template.label}
-                          type="button"
-                          onClick={() => applyNoteTemplate(template.body)}
-                          className="rounded-full border border-gray-300 px-3 py-1 text-xs font-medium text-gray-700 hover:bg-gray-50"
-                        >
-                          {template.label}
-                        </button>
-                      ))}
-                    </div>
+                    <select aria-label="Add a note template" value="" onChange={event => { if (event.target.value) applyNoteTemplate(event.target.value); }} className="min-h-10 rounded-lg border border-gray-300 bg-white px-3 text-base sm:text-sm">
+                      <option value="">Add note template…</option>
+                      {REQUEST_NOTE_TEMPLATES.map(template => <option key={template.label} value={template.body}>{template.label}</option>)}
+                    </select>
                   </div>
                   <textarea
                     id="request-notes-page"
@@ -636,70 +820,29 @@ export default function DispensaryCartPage() {
                       setOrderNotes(event.target.value);
                       setBuilderStep('terms');
                     }}
-                    rows={4}
+                    rows={3}
                     maxLength={500}
-                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-                    placeholder="Delivery window, receiving instructions, buyer PO number, or other context for the grower."
+                    className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
+                    placeholder="Delivery details, PO number, or other notes."
                   />
                   <p className="mt-1 text-right text-xs text-gray-500">{orderNotes.length}/500</p>
                 </div>
               </CardContent>
-            </Card>
+            </Card></section>
           </div>
 
           <Card className="h-fit">
-            <CardHeader><CardTitle>Request Summary</CardTitle></CardHeader>
+            <CardHeader className="pb-2"><CardTitle>Summary</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-              <div className="flex justify-between"><span>Estimated item value</span><span>${cart.subtotal.toFixed(2)}</span></div>
-              <div className="rounded-lg bg-gray-50 p-3 text-sm text-gray-700">
-                Payment terms are coordinated directly between buyer and grower.
-              </div>
-              <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-900">
-                {Object.keys(growerGroups).length > 1
-                  ? `This draft will create ${Object.keys(growerGroups).length} separate grower requests.`
-                  : 'This draft will create one grower request.'}
-              </div>
-              <div className="rounded-lg border border-gray-200 p-3 text-sm text-gray-700">
-                <div className="flex justify-between gap-3">
-                  <span>Fulfillment</span>
-                  <span className="font-medium text-gray-900">{fulfillmentMethod}</span>
-                </div>
-                <div className="mt-2 flex justify-between gap-3">
-                  <span>Payment terms</span>
-                  <span className="font-medium text-gray-900">{paymentTerms}</span>
-                </div>
-                {requestedWindow && (
-                  <div className="mt-2 flex justify-between gap-3">
-                    <span>Window</span>
-                    <span className="font-medium text-gray-900">{requestedWindow}</span>
-                  </div>
-                )}
-              </div>
-              {requestSuggestions.length > 0 && (
-                <div className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
-                  <p className="font-semibold">Optional fixes before review</p>
-                  <div className="mt-2 space-y-2">
-                    {requestSuggestions.map((suggestion) => (
-                      <button
-                        key={suggestion.title}
-                        type="button"
-                        onClick={() => setBuilderStep(suggestion.step)}
-                        className="block w-full rounded-md bg-white/70 px-3 py-2 text-left hover:bg-white"
-                      >
-                        <span className="block font-medium">{suggestion.title}</span>
-                        <span className="text-xs text-amber-800">{suggestion.description}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              )}
-              <button 
+              <div className="flex justify-between"><span>Total</span><span>${cart.subtotal.toFixed(2)}</span></div>
+              <p className="text-sm text-gray-500">{cart.items.length} item{cart.items.length === 1 ? '' : 's'} · {Object.keys(growerGroups).length} grower{Object.keys(growerGroups).length === 1 ? '' : 's'}</p>
+              <button
                 onClick={() => {
                   setBuilderStep('review');
                   setShowRequestReview(true);
                 }}
                 disabled={submittingRequest || !requestDetailsReady}
-                className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 disabled:opacity-50"
+                className="hidden w-full bg-green-600 text-white py-3 rounded-lg sm:block hover:bg-green-700 disabled:opacity-50"
               >
                 Review Request
               </button>
@@ -713,14 +856,13 @@ export default function DispensaryCartPage() {
         </div>
       )}
 
-      {showRequestReview && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-hidden rounded-xl bg-white shadow-2xl">
-            <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+      {showRequestReview && createPortal(
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
+          <div ref={reviewRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="request-review-title" className="flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl">
+            <div className="shrink-0 border-b border-gray-200 bg-gray-50 px-4 py-3">
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900">Review Order Request</h2>
-                  <p className="mt-1 text-sm text-gray-600">Confirm grower splits, value, logistics, and direct payment terms before submitting.</p>
+                  <h2 id="request-review-title" className="text-xl font-bold text-gray-900">Review request</h2>
                 </div>
                 <button
                   type="button"
@@ -733,18 +875,16 @@ export default function DispensaryCartPage() {
               </div>
             </div>
 
-            <div className="max-h-[65vh] overflow-y-auto px-6 py-5 space-y-5">
-              <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
-                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Review mode</p>
-                <h3 className="mt-1 text-base font-semibold text-gray-900">Confirm before submitting</h3>
-                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 space-y-4">
+              <div className="rounded-xl border border-gray-200 bg-gray-50 p-2 sm:p-4">
+                <div className="grid grid-cols-2 gap-2">
                   {[
                     { label: 'Items', value: `${cart.items.length} item${cart.items.length === 1 ? '' : 's'}`, step: 'items' as BuilderStep },
-                    { label: 'Grower requests', value: `${Object.keys(growerGroups).length}`, step: 'items' as BuilderStep },
+                    { label: 'Growers', value: `${Object.keys(growerGroups).length}`, step: 'items' as BuilderStep },
                     { label: 'Fulfillment', value: fulfillmentMethod || 'Not set', step: 'logistics' as BuilderStep },
-                    { label: 'Direct terms', value: paymentTerms || 'Not set', step: 'terms' as BuilderStep },
+                    { label: 'Terms', value: paymentTerms || 'Not set', step: 'terms' as BuilderStep },
                   ].map((item) => (
-                    <div key={item.label} className="rounded-lg bg-white px-3 py-2 ring-1 ring-gray-200">
+                    <div key={item.label} className="rounded-lg bg-white px-2 py-2 ring-1 ring-gray-200 sm:px-3">
                       <div className="flex items-start justify-between gap-2">
                         <div>
                           <p className="text-xs font-medium text-gray-500">{item.label}</p>
@@ -756,7 +896,7 @@ export default function DispensaryCartPage() {
                             setShowRequestReview(false);
                             setBuilderStep(item.step);
                           }}
-                          className="text-xs font-semibold text-green-700 hover:text-green-800"
+                          className="inline-flex min-h-10 min-w-10 items-center justify-center text-xs font-semibold text-green-700 hover:text-green-800"
                         >
                           Edit
                         </button>
@@ -764,143 +904,71 @@ export default function DispensaryCartPage() {
                     </div>
                   ))}
                 </div>
-                {requestSuggestions.length > 0 && (
-                  <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                    <p className="text-sm font-semibold text-amber-950">Optional details that can reduce follow-up</p>
-                    <div className="mt-2 flex flex-wrap gap-2">
-                      {requestSuggestions.map((suggestion) => (
-                        <button
-                          key={suggestion.title}
-                          type="button"
-                          onClick={() => {
-                            setShowRequestReview(false);
-                            setBuilderStep(suggestion.step);
-                          }}
-                          className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-900 ring-1 ring-amber-200 hover:bg-amber-100"
-                        >
-                          {suggestion.title}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               <div className="space-y-3">
-                {Object.entries(growerGroups).map(([growerId, group]) => (
-                  <div key={growerId} className="rounded-lg border border-gray-200 p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <h3 className="font-semibold text-gray-900">{group.grower}</h3>
-                      <span className="text-sm font-semibold text-gray-700">${group.subtotal.toFixed(2)}</span>
+                {Object.entries(growerGroups).map(([growerId, group]) => {
+                  const terms = growerTerms[growerId] || {
+                    fulfillmentRegion: DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion,
+                    paymentTerms: DEFAULT_COMMERCIAL_TERMS.paymentTerms,
+                  };
+
+                  return (
+                    <div key={growerId} className="rounded-lg border border-gray-200 p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <h3 className="font-semibold text-gray-900">{group.grower}</h3>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {terms.fulfillmentRegion} · {terms.paymentTerms}
+                          </p>
+                        </div>
+                        <span className="text-sm font-semibold text-gray-700">${group.subtotal.toFixed(2)}</span>
+                      </div>
+                      <ul className="mt-3 space-y-2 text-sm text-gray-700">
+                        {group.items.map((item) => (
+                          <li key={item.id} className="flex justify-between gap-3">
+                            <span>{item.quantity} × {item.name}</span>
+                            <span className="font-medium">${getLineTotal(item).toFixed(2)}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <ul className="mt-3 space-y-2 text-sm text-gray-700">
-                      {group.items.map((item) => (
-                        <li key={item.id} className="flex justify-between gap-3">
-                          <span>{item.quantity} × {item.name}</span>
-                          <span className="font-medium">${(item.quantity * item.price).toFixed(2)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
-              <div>
-                <label htmlFor="fulfillment-method" className="block text-sm font-medium text-gray-700">
-                  Fulfillment method
-                </label>
-                <select
-                  id="fulfillment-method"
-                  value={fulfillmentMethod}
-                  onChange={(event) => setFulfillmentMethod(event.target.value)}
-                  className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-                >
-                  <option>Flexible</option>
-                  <option>Pickup</option>
-                  <option>Delivery requested</option>
-                  <option>Coordinate with grower</option>
-                </select>
-              </div>
-
-              <div>
-                <label htmlFor="requested-window" className="block text-sm font-medium text-gray-700">
-                  Requested window
-                </label>
-                <input
-                  id="requested-window"
-                  value={requestedWindow}
-                  onChange={(event) => setRequestedWindow(event.target.value)}
-                  maxLength={120}
-                  className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-                  placeholder="Example: Tuesday morning, next week, or coordinate after acceptance"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="payment-terms" className="block text-sm font-medium text-gray-700">
-                  Direct payment terms
-                </label>
-                <select
-                  id="payment-terms"
-                  value={paymentTerms}
-                  onChange={(event) => setPaymentTerms(event.target.value)}
-                  className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-                >
-                  {PAYMENT_TERMS_OPTIONS.map((option) => (
-                    <option key={option}>{option}</option>
-                  ))}
-                </select>
-                <p className="mt-1 text-xs text-gray-500">Informational only. PhenoFarm does not process wholesale settlement.</p>
-              </div>
-
-              <div>
-                <label htmlFor="request-notes" className="block text-sm font-medium text-gray-700">
-                  Notes or special instructions
-                </label>
-                <textarea
-                  id="request-notes"
-                  value={orderNotes}
-                  onChange={(event) => setOrderNotes(event.target.value)}
-                  rows={4}
-                  maxLength={500}
-                  className="mt-2 w-full rounded-lg border border-gray-300 px-4 py-3 text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-green-500"
-                  placeholder="Delivery window, receiving instructions, buyer PO number, or other context for the grower."
-                />
-                <p className="mt-1 text-right text-xs text-gray-500">{orderNotes.length}/500</p>
-              </div>
-
-              <div className="rounded-lg bg-amber-50 p-4 text-sm text-amber-900">
-                Inventory is checked again when you submit. If quantities changed, the draft will be adjusted before any request is created.
+              <div className="rounded-lg bg-amber-50 p-3 text-xs text-amber-900 sm:p-4 sm:text-sm">
+                Stock is checked before submission. Any changes return to your draft.
               </div>
             </div>
 
-            <div className="border-t border-gray-200 bg-white px-6 py-4">
-              <div className="mb-4 space-y-2 text-sm">
-                <div className="flex justify-between text-base font-bold"><span>Estimated item value</span><span>${cart.subtotal.toFixed(2)}</span></div>
-                <p className="text-xs text-gray-500">No wholesale payment is collected in PhenoFarm.</p>
+            <div className="shrink-0 border-t border-gray-200 bg-white px-4 py-3">
+              <div className="mb-3 space-y-1 text-sm">
+                <div className="flex justify-between text-base font-bold"><span>Total</span><span>${cart.subtotal.toFixed(2)}</span></div>
+                <p className="text-xs text-gray-500">Payment arranged with the grower.</p>
               </div>
-              <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+              <div className="flex items-stretch justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setShowRequestReview(false)}
-                  disabled={submittingRequest}
+                  disabled={submittingRequest || inventorySyncing}
                   className="rounded-lg border border-gray-300 px-4 py-2 text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                 >
-                  Back to Draft
+                  Back
                 </button>
                 <button
                   type="button"
                   onClick={handleSubmitRequest}
-                  disabled={submittingRequest}
+                  disabled={submittingRequest || inventorySyncing}
                   className="rounded-lg bg-green-600 px-4 py-2 font-medium text-white hover:bg-green-700 disabled:opacity-50"
                 >
-                  {submittingRequest ? 'Submitting Request...' : 'Submit Order Request'}
+                  {submittingRequest ? 'Submitting Request...' : 'Submit request'}
                 </button>
               </div>
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
 
       {!isEmpty && (
         <StickyMobileActionBar
@@ -912,7 +980,7 @@ export default function DispensaryCartPage() {
           disabled={submittingRequest || !requestDetailsReady}
           helperText={
             requestDetailsReady
-              ? 'Review grower splits before submitting.'
+              ? undefined
               : 'Confirm fulfillment and direct payment terms first.'
           }
           secondary={
@@ -920,7 +988,7 @@ export default function DispensaryCartPage() {
               href="/dispensary/catalog"
               className="rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700"
             >
-              Add
+              Add items
             </Link>
           }
         />

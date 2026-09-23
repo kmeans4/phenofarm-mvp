@@ -1,0 +1,75 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e589]
+- button "Notifications" [expanded=false, ref=e590]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e591]
+- main
+  - sectionheader
+    - heading "Customers" [level=1, ref=e595]
+    - paragraph
+      - StaticText "Saved contacts and buyers"
+    - link "Add customer" [ref=e596]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Customers"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "Active · 90 days"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "Requests"
+    - paragraph
+      - StaticText "20"
+  - link "View Green Vermont Dispensary" [ref=e592]
+    - paragraph
+      - StaticText "Green Vermont Dispensary"
+    - paragraph
+      - StaticText "License: VT-RTL-2024-001"
+    - paragraph
+      - StaticText "Email:dispensary@greenvermont.com"
+    - paragraph
+      - StaticText "Phone:(802) 555-0145"
+    - paragraph
+      - StaticText "Location:Burlington, VT"
+    - paragraph
+      - StaticText "Last request:Jul 9, 2026"
+    - paragraph
+      - StaticText "Delivered value:$0.00"
+    - StaticText "PhenoFarm member"
+    - StaticText "19"
+    - StaticText " request"
+    - StaticText "s"
+    - link "Details" [ref=e597]
+    - link "Statement" [ref=e598]
+    - link "Requests" [ref=e599]
+    - button "Message" [ref=e600]
+  - link "View Maple Street Market" [ref=e593]
+    - paragraph
+      - StaticText "Maple Street Market"
+    - paragraph
+      - StaticText "License: VT-UI-2026-104"
+    - paragraph
+      - StaticText "Alex Morgan"
+    - paragraph
+      - StaticText "Email:orders@example.test"
+    - paragraph
+      - StaticText "Phone:802-555-0142"
+    - paragraph
+      - StaticText "Location:Burlington, VT"
+    - paragraph
+      - StaticText "Last request:Sep 13, 2026"
+    - paragraph
+      - StaticText "Delivered value:$450.00"
+    - StaticText "1"
+    - StaticText " request"
+    - link "Edit contact" [ref=e601]
+    - link "Statement" [ref=e602]
+    - link "Requests" [ref=e603]
+    - button "Message" [ref=e604]
+- button "Open messages" [ref=e594]
+- region "Notifications alt+T" [ref=e588]
+- alert

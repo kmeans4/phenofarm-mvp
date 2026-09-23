@@ -1,0 +1,72 @@
+- main
+  - generic
+    - generic
+    - generic
+      - navigation
+        - link "PF PhenoFarm" [ref=e519]
+          - StaticText "PF"
+          - StaticText "PhenoFarm"
+        - link "Sign in" [ref=e520]
+      - heading "Marketplace help" [level=1, ref=e517]
+      - paragraph
+        - StaticText "Verification, requests, quotes, settlement, and subscriptions."
+      - paragraph
+        - StaticText "Need support?"
+      - link "support@phenofarm.com" [ref=e518]
+      - paragraph
+        - StaticText "Include your business name, role, and the page or request you need help with."
+      - generic
+        - heading "For growers" [level=2, ref=e521]
+        - paragraph
+          - StaticText "Catalog, quote, request, and subscription basics for cultivator teams."
+        - group
+          - DisclosureTriangle "How do I publish products for buyers?" [expanded=false]
+            - StaticText "How do I publish products for buyers?"
+        - group
+          - DisclosureTriangle "What happens when a dispensary submits a request?" [expanded=false]
+            - StaticText "What happens when a dispensary submits a request?"
+        - group
+          - DisclosureTriangle "Can growers send quote terms before accepting a request?" [expanded=false]
+            - StaticText "Can growers send quote terms before accepting a request?"
+        - group
+          - DisclosureTriangle "What payments does PhenoFarm process for growers?" [expanded=false]
+            - StaticText "What payments does PhenoFarm process for growers?"
+      - generic
+        - heading "For dispensaries" [level=2, ref=e522]
+        - paragraph
+          - StaticText "How verified buyers browse, draft requests, and coordinate fulfillment."
+        - group
+          - DisclosureTriangle "Why can I browse but not submit an order request?" [expanded=false]
+            - StaticText "Why can I browse but not submit an order request?"
+        - group
+          - DisclosureTriangle "How do I request products from growers?" [expanded=false]
+            - StaticText "How do I request products from growers?"
+        - group
+          - DisclosureTriangle "How do quote requests work?" [expanded=false]
+            - StaticText "How do quote requests work?"
+        - group
+          - DisclosureTriangle "Does PhenoFarm collect wholesale payment from dispensaries?" [expanded=false]
+            - StaticText "Does PhenoFarm collect wholesale payment from dispensaries?"
+      - generic
+        - heading "Account & billing" [level=2, ref=e523]
+        - paragraph
+          - StaticText "Access, verification, billing, and support expectations for the MVP."
+        - group
+          - DisclosureTriangle "How do password resets work?" [expanded=false]
+            - StaticText "How do password resets work?"
+        - group
+          - DisclosureTriangle "Where do I update business or license details?" [expanded=false]
+            - StaticText "Where do I update business or license details?"
+        - group
+          - DisclosureTriangle "How does the cultivator subscription work?" [expanded=false]
+            - StaticText "How does the cultivator subscription work?"
+        - group
+          - DisclosureTriangle "How do I reach PhenoFarm support?" [expanded=false]
+            - StaticText "How do I reach PhenoFarm support?"
+      - paragraph
+        - StaticText "Payment model reminder"
+      - paragraph
+        - StaticText "PhenoFarm never processes wholesale payments. Buyers and growers settle directly; the only in-app payment flow is the cultivator subscription."
+- button "Open Next.js Dev Tools" [expanded=false, ref=e524]
+  - image
+- alert

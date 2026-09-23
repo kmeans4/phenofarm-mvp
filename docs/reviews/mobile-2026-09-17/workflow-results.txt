@@ -1,0 +1,76 @@
+
+> phenofarm-mvp@0.1.0 test
+> playwright test tests/buyer-ui-layout-regressions.spec.ts tests/dispensary-remediation.spec.ts tests/grower-review-regressions.spec.ts tests/profile-hardening.spec.ts tests/ui-grower-data-regressions.spec.ts tests/messaging-workflow.spec.ts tests/ui-shared-density-regressions.spec.ts --workers=1 --reporter=line
+
+(node:63530) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+
+Running 56 tests using 1 worker
+
+(node:63532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+(node:63532) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+
+(node:63532) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+
+[1/56] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:37:5 › desktop filter sidebar preserves quantity and add controls inside product cards
+[2/56] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:49:5 › mobile catalog list keeps price, identity and Add in separate visible areas
+[3/56] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:67:5 › comparison dialog stays above navigation and remains keyboard dismissible at three widths
+[4/56] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:83:5 › mobile saved list keeps quote action below readable product identity
+[5/56] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:99:5 › request review keeps both footer actions visible above navigation
+[6/56] [chromium] › tests/buyer-ui-layout-regressions.spec.ts:121:5 › mobile draft filters can be saved and existing presets remain reachable on a short phone
+[7/56] [chromium] › tests/dispensary-remediation.spec.ts:68:5 › cart normalization preserves valid items, zero tax, merges and removes only ordered products
+[8/56] [chromium] › tests/dispensary-remediation.spec.ts:77:5 › grower storefront loads authenticated thumbnails and legacy logos in grid and list at desktop and mobile widths
+[9/56] [chromium] › tests/dispensary-remediation.spec.ts:103:5 › buyer catalog safely paginates, combines filters and suppresses hidden/deleted/unverified products
+[10/56] [chromium] › tests/dispensary-remediation.spec.ts:118:5 › cart validation targets exact IDs and retains unavailable products without hidden prices
+[11/56] [chromium] › tests/dispensary-remediation.spec.ts:129:5 › collection diffs preserve existing IDs, out-of-stock favorites, and stored alerts on bad payloads
+[12/56] [chromium] › tests/dispensary-remediation.spec.ts:152:5 › catalog latest search wins; mounting does not write collections
+[13/56] [chromium] › tests/dispensary-remediation.spec.ts:173:5 › slow inventory response cannot erase saved draft on navigation
+[14/56] [chromium] › tests/dispensary-remediation.spec.ts:188:5 › partial checkout keeps rejected items and submits once
+[15/56] [chromium] › tests/dispensary-remediation.spec.ts:209:5 › saved alert refresh rejects malformed data without deleting alerts; tab switches retain collection state
+[16/56] [chromium] › tests/dispensary-remediation.spec.ts:226:5 › history counts distinct requests and paginates without capping summary totals
+[17/56] [chromium] › tests/dispensary-remediation.spec.ts:248:5 › settings restores editable text only, saves compact drafts, and accepts expiry today
+[18/56] [chromium] › tests/dispensary-remediation.spec.ts:273:5 › mobile catalog filters stage changes and dialog Escape restores scrolling
+[19/56] [chromium] › tests/dispensary-remediation.spec.ts:300:5 › trending sums eligible order quantities and suggestions exclude strains without listings
+[20/56] [chromium] › tests/dispensary-remediation.spec.ts:320:5 › deleting a cached saved filter while canonical IDs load does not restore it
+[21/56] [chromium] › tests/grower-review-regressions.spec.ts:48:5 › paged catalog keeps focus, avoids session refetch and applies bulk changes locally
+[22/56] [chromium] › tests/grower-review-regressions.spec.ts:77:5 › product drafts restore explicitly, exclude images, stay account scoped and survive unavailable storage
+[23/56] [chromium] › tests/grower-review-regressions.spec.ts:98:5 › nested creation and search Escape keep a dirty product on its current page
+[24/56] [chromium] › tests/grower-review-regressions.spec.ts:116:5 › mobile search Escape returns focus to the visible trigger
+[25/56] [chromium] › tests/grower-review-regressions.spec.ts:127:5 › server pages serialize safely, use whole-history aggregates and preload settings
+[26/56] [chromium] › tests/grower-review-regressions.spec.ts:153:5 › chat loads only visible threads, ignores late responses and keeps drafts separated
+[27/56] [chromium] › tests/grower-review-regressions.spec.ts:198:5 › image uploads are separate requests and a rapid draft save posts only once
+[28/56] [chromium] › tests/grower-review-regressions.spec.ts:224:5 › logo-only saves do not submit unrelated invalid fields and Escape preserves settings
+[29/56] [chromium] › tests/grower-review-regressions.spec.ts:240:5 › logo preview follows a newer saved prop after a delayed upload
+[30/56] [chromium] › tests/grower-review-regressions.spec.ts:258:5 › subscription readiness rejects canceled and unpaid plans and permits trialing
+[31/56] [chromium] › tests/grower-review-regressions.spec.ts:271:5 › quantity input permits editing before blur and inventory submits validated numbers
+[32/56] [chromium] › tests/grower-review-regressions.spec.ts:288:5 › report CSV neutralizes customer formulas and dates use calendar day boundaries
+[33/56] [chromium] › tests/grower-review-regressions.spec.ts:305:5 › batch PDFs upload separately and editing preserves existing batch metadata
+[34/56] [chromium] › tests/grower-review-regressions.spec.ts:328:7 › chat retries non-ok read acknowledgement on reopen with the same visible message bound
+[35/56] [chromium] › tests/grower-review-regressions.spec.ts:328:7 › chat retries aborted read acknowledgement on reopen with the same visible message bound
+[36/56] [chromium] › tests/grower-review-regressions.spec.ts:362:5 › chat clears a sent origin draft after switching chats while keeping the other draft and sent response
+[37/56] [chromium] › tests/grower-review-regressions.spec.ts:396:5 › chat preserves newer origin quote edits when an earlier send completes
+[38/56] [chromium] › tests/grower-review-regressions.spec.ts:435:5 › chat keeps a delayed send failure scoped to its originating conversation
+[39/56] [chromium] › tests/messaging-workflow.spec.ts:89:7 › Messaging Workflow › pricing request UI: send and display
+[40/56] [chromium] › tests/messaging-workflow.spec.ts:107:7 › Messaging Workflow › offer workflow: send → counter → accept
+[41/56] [chromium] › tests/messaging-workflow.spec.ts:153:7 › Messaging Workflow › read status tracking
+[42/56] [chromium] › tests/profile-hardening.spec.ts:26:7 › Profile hardening + license verification › Grower creates valid product with cannabinoid profile
+[43/56] [chromium] › tests/profile-hardening.spec.ts:97:7 › Profile hardening + license verification › Grower product form validates THC/CBD ranges
+[44/56] [chromium] › tests/profile-hardening.spec.ts:141:7 › Profile hardening + license verification › Unverified dispensary cannot place orders
+[45/56] [chromium] › tests/profile-hardening.spec.ts:211:7 › Profile hardening + license verification › Dispensary settings form shows license status badge
+[46/56] [chromium] › tests/profile-hardening.spec.ts:250:7 › Profile hardening + license verification › Grower settings form validates license expiry
+[47/56] [chromium] › tests/ui-grower-data-regressions.spec.ts:40:5 › decimal lab strings, zeroes, absent values and harvest calendar days remain distinct
+[48/56] [chromium] › tests/ui-grower-data-regressions.spec.ts:53:5 › real decimal API values render on desktop and narrow mobile without changing the harvest day
+[49/56] [chromium] › tests/ui-grower-data-regressions.spec.ts:78:5 › editing a legacy lowercase unit preserves stock, price, labs and the calendar day
+[50/56] [chromium] › tests/ui-grower-data-regressions.spec.ts:94:5 › valid customer edits can save optional values after field errors clear
+[51/56] [chromium] › tests/ui-shared-density-regressions.spec.ts:10:5 › report month buckets stay stable across timezones and reject malformed input
+[52/56] [chromium] › tests/ui-shared-density-regressions.spec.ts:27:7 › shared controls on a populated portal › mobile settings save appears for profile edits and clears after saving
+[53/56] [chromium] › tests/ui-shared-density-regressions.spec.ts:48:7 › shared controls on a populated portal › search has touch-sized actions, correct singular result and keyboard-only desktop hints
+[54/56] [chromium] › tests/ui-shared-density-regressions.spec.ts:65:7 › shared controls on a populated portal › messaging replaces the composer with a labeled quote and restores the unsent text
+[55/56] [chromium] › tests/ui-shared-density-regressions.spec.ts:97:7 › shared controls on a populated portal › notifications anchor beside the trigger and group repeated history
+[56/56] [chromium] › tests/ui-shared-density-regressions.spec.ts:112:5 › recent shops use the business name and missing pages offer recovery
+  56 passed (51.2s)

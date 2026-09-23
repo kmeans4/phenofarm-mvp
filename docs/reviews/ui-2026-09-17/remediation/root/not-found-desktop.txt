@@ -1,0 +1,14 @@
+- main
+  - link "PhenoFarm" [ref=e545]
+  - heading "Page not found" [level=1, ref=e546]
+  - paragraph
+    - StaticText "This page may have moved or is no longer available."
+  - link "Dashboard" [ref=e547]
+  - link "Home" [ref=e548]
+- button "Open Next.js Dev Tools" [ref=e549]
+  - generic
+    - StaticText "Compiling"
+    - StaticText "."
+    - StaticText "."
+    - StaticText "."
+- alert

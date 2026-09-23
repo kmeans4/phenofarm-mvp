@@ -11,10 +11,11 @@ Complete guide to all environment variables required for PhenoFarm MVP.
 | `DATABASE_URL` | ✅ Yes | Neon Dashboard or local PostgreSQL | Database connection |
 | `AUTH_SECRET` | ✅ Yes | `openssl rand -base64 32` | NextAuth session encryption |
 | `NEXTAUTH_URL` | ✅ Yes | Your app URL | NextAuth callbacks |
-| `STRIPE_SECRET_KEY` | ⚠️ For payments | Stripe Dashboard → Developers → API Keys | Server-side Stripe operations |
-| `STRIPE_PUBLISHABLE_KEY` | ⚠️ For payments | Stripe Dashboard → Developers → API Keys | Client-side Stripe (public) |
+| `STRIPE_SECRET_KEY` | ⚠️ For subscriptions | Stripe Dashboard → Developers → API Keys | Server-side Stripe Billing operations |
+| `STRIPE_PUBLISHABLE_KEY` | ⚠️ For subscriptions | Stripe Dashboard → Developers → API Keys | Client-side subscription checkout |
 | `STRIPE_WEBHOOK_SECRET` | ⚠️ For webhooks | Stripe CLI or Dashboard | Webhook signature verification |
 | `NEXT_PUBLIC_API_URL` | ✅ Yes | Your app URL | Client-side API calls |
+| `BLOB_READ_WRITE_TOKEN` | ⚠️ For production uploads | Vercel Blob store | Product images, logos, and product/lab documents |
 
 ---
 
@@ -114,7 +115,14 @@ NEXT_PUBLIC_API_URL="https://phenofarm-mvp.vercel.app"
 
 ---
 
-## Optional Variables (Payments Enabled)
+## Optional Variables (Cultivator Subscription Billing)
+
+### BLOB_READ_WRITE_TOKEN
+**Purpose:** Stores product images, logos, and product/lab documents in Vercel Blob instead of Postgres data URLs.
+
+Create or connect a Blob store in the Vercel project, then expose its read-write token to the application. When this variable is absent, local development intentionally falls back to validated data URLs. Run `npm run db:migrate-blobs` after configuring the token to move existing data URLs; the script skips existing HTTP(S) URLs.
+
+Never expose this token to browser code or commit it to an env file.
 
 ### STRIPE_SECRET_KEY
 **Purpose:** Server-side Stripe API authentication
@@ -140,7 +148,7 @@ STRIPE_SECRET_KEY="sk_test_51ABCdefGhIjKlMnOpQrStUvWxYz1234567890abcdef"
 ---
 
 ### STRIPE_PUBLISHABLE_KEY
-**Purpose:** Client-side Stripe.js initialization (safe to expose)
+**Purpose:** Client-side Stripe.js initialization for subscription checkout (safe to expose)
 
 **Format:** `pk_test_...` (test) or `pk_live_...` (production)
 
@@ -154,7 +162,7 @@ STRIPE_PUBLISHABLE_KEY="pk_test_51ABCdefGhIjKlMnOpQrStUvWxYz1234567890abcdef"
 **Important Notes:**
 - Safe to expose in browser (hence "publishable")
 - Must match the mode (test/live) of your secret key
-- Used for Stripe Elements (card input) and checkout
+- Used for Stripe-hosted subscription checkout
 
 ---
 
@@ -181,7 +189,7 @@ STRIPE_WEBHOOK_SECRET="test"
 **How to Get (Production):**
 1. Stripe Dashboard → Developers → Webhooks
 2. Add endpoint URL: `https://yourdomain.com/api/webhooks/stripe`
-3. Select events: `payment_intent.succeeded`, `payment_intent.payment_failed`
+3. Select events: `checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`
 4. Copy signing secret from webhook details
 
 **Example:**
@@ -193,7 +201,7 @@ STRIPE_WEBHOOK_SECRET="whsec_1234567890abcdefghijklmnopqrstuvwxyz"
 - Webhooks must use `https://` in production
 - The `test` value skips verification - **never use in production**
 - Each webhook endpoint has a unique secret
-- Required for async payment confirmation (cards, bank transfers)
+- Required to keep cultivator subscription status synced after checkout and portal changes
 
 ---
 
@@ -207,7 +215,7 @@ DATABASE_URL="postgresql://postgres:password@localhost:5432/phenofarm?schema=pub
 
 # Auth
 NEXTAUTH_URL="http://localhost:3000"
-AUTH_SECRET="dev-secret-change-in-production"
+AUTH_SECRET="replace-with-a-unique-generated-local-secret"
 
 # Stripe (test mode only)
 STRIPE_SECRET_KEY="sk_test_..."
@@ -244,10 +252,12 @@ DATABASE_URL="postgresql://neondb_owner:...@ep-xxx.us-east-1.aws.neon.tech/neond
 NEXTAUTH_URL="https://phenofarm-mvp.vercel.app"  # Auto-set
 AUTH_SECRET="very-secure-random-secret"
 
-# Stripe (LIVE mode for real payments)
+# Stripe (LIVE mode for PhenoFarm software subscriptions)
 STRIPE_SECRET_KEY="sk_live_..."
 STRIPE_PUBLISHABLE_KEY="pk_live_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
+STRIPE_PRO_PRICE_ID="price_..."
+STRIPE_BUSINESS_PRICE_ID="price_..."
 
 NEXT_PUBLIC_API_URL="https://phenofarm-mvp.vercel.app"
 ```
@@ -281,11 +291,14 @@ NEXT_PUBLIC_API_URL="https://phenofarm-mvp.vercel.app"
 - Generate new secret: `openssl rand -base64 32`
 - Restart dev server after changing env vars
 
-### Stripe payment not working
+### Stripe subscription checkout not working
 - Verify both STRIPE_SECRET_KEY and STRIPE_PUBLISHABLE_KEY are set
+- Verify STRIPE_PRO_PRICE_ID and/or STRIPE_BUSINESS_PRICE_ID are set
 - Check keys match (both test or both live)
 - Ensure NEXT_PUBLIC_API_URL is correct for client-side requests
 - Check Stripe Dashboard for failed request logs
+
+PhenoFarm does not process wholesale payments between buyers and growers. Wholesale order values are operational records only; settlement is handled directly outside the app.
 
 ### Webhook errors (400 Bad Request)
 - STRIPE_WEBHOOK_SECRET must match the endpoint's secret

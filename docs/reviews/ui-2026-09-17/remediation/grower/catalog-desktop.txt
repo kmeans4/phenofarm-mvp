@@ -1,0 +1,103 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e785]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e786]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e787]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e795]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e796]
+      - StaticText "Catalog"
+    - link "Products" [ref=e797]
+      - StaticText "Products"
+    - link "Inventory" [ref=e798]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e799]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e800]
+      - StaticText "Strains"
+    - link "Batches" [ref=e801]
+      - StaticText "Batches"
+    - link "Customers" [ref=e802]
+      - StaticText "Customers"
+    - link "Reports" [ref=e803]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e804]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e788]
+- main
+  - sectionheader
+    - heading "Catalog" [level=1, ref=e805]
+    - link "Add product" [ref=e806]
+  - paragraph
+    - StaticText "Keep your catalog current."
+  - link "Review listings →" [ref=e789]
+    - StaticText "Review listings →"
+  - generic "Summary"
+    - paragraph
+      - StaticText "Products"
+    - paragraph
+      - StaticText "3"
+    - paragraph
+      - StaticText "Available"
+    - paragraph
+      - StaticText "3"
+    - paragraph
+      - StaticText "Stock value"
+    - paragraph
+      - StaticText "$10,000.00"
+    - paragraph
+      - StaticText "Quote only"
+    - paragraph
+      - StaticText "1"
+  - link "Listings 3 total Edit and publish products." [ref=e790]
+    - heading "Listings" [level=2, ref=e807]
+    - StaticText "3 total"
+    - paragraph
+      - StaticText "Edit and publish products."
+  - link "Inventory 0 stock alerts Update stock quantities." [ref=e791]
+    - heading "Inventory" [level=2, ref=e808]
+    - StaticText "0 stock alerts"
+    - paragraph
+      - StaticText "Update stock quantities."
+  - link "Buyer preview 3 live See your public listings." [ref=e792]
+    - heading "Buyer preview" [level=2, ref=e809]
+    - StaticText "3 live"
+    - paragraph
+      - StaticText "See your public listings."
+  - link "Pricing 1 quote only Show prices or invite quotes." [ref=e793]
+    - heading "Pricing" [level=2, ref=e810]
+    - StaticText "1 quote only"
+    - paragraph
+      - StaticText "Show prices or invite quotes."
+  - generic
+    - heading "Catalog health" [level=2, ref=e811]
+    - link "Quote only 1 →" [ref=e812]
+      - StaticText "Quote only"
+      - StaticText "1"
+      - StaticText " →"
+    - group
+      - DisclosureTriangle "All checks" [expanded=false]
+        - StaticText "All checks"
+  - group
+    - DisclosureTriangle "Strains, batches & customers" [expanded=false]
+      - StaticText "Strains, batches & customers"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e813]
+  - button "Open messages" [ref=e794]
+- region "Notifications alt+T" [ref=e784]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e814]
+  - image
+- alert

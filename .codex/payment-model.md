@@ -15,8 +15,8 @@ PhenoFarm does not process wholesale payments between buyers and sellers.
 - Order value is tracked for marketplace operations and reporting.
 - Buyer-seller settlement is handled directly outside PhenoFarm.
 
-## Legacy Compatibility
+## Removed Legacy Payment Schema
 
-The Prisma schema still contains legacy Stripe Connect and `payments` fields from earlier marketplace-payment assumptions. Keep those fields dormant until a dedicated migration removes them with production data reviewed.
+The dormant wholesale `Payment` model, payment enums, and Grower Stripe Connect columns were removed in the database-hardening migration. Stripe fields that remain on Grower are exclusively for PhenoFarm subscription billing.
 
 Do not add new UI, API behavior, reporting, or copy that implies PhenoFarm collects, remits, or pays out wholesale order funds.

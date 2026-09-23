@@ -1,0 +1,45 @@
+{
+  "slug": "11b-batches-ready",
+  "route": "/grower/batches",
+  "state": "Synthetic batch THC/CBD empty so list renders",
+  "pass1": {
+    "inspected": [
+      "pass-1/11b-batches-ready-desktop.png",
+      "pass-1/11b-batches-ready-mobile.png"
+    ],
+    "strengths": [
+      "Mobile batch card exposes lab-document status, strain and actions without horizontal scrolling; desktop table is compact."
+    ],
+    "issues": [
+      {
+        "key": "batch-date-consistency",
+        "priority": "high",
+        "viewport": "desktop and mobile",
+        "observation": "The same batch lists \u2018Sep11,2026\u2019 here but edit form shows harvest date09/12/2026. A date-only field appears to shift by one day between views.",
+        "recommendation": "Use the same date-only formatting in list and edit views so harvest dates agree; verify across time zones without altering the stored harvest day."
+      },
+      {
+        "key": "batch-list-density",
+        "priority": "medium",
+        "viewport": "mobile",
+        "observation": "Three stacked metrics push the first batch to y558; the batch's three actions each consume a full row, and Delete is the largest bright-red emphasis.",
+        "recommendation": "Use \u2018Batches\u2019, compact metrics, and a single action row with \u2018Edit\u2019, \u2018Add product\u2019 and an overflow menu for Delete. Shorten \u2018+ Product from batch\u2019 to \u2018Add product\u2019; the batch context already supplies the relationship."
+      }
+    ],
+    "limits": [
+      "Parent changed only synthetic batch THC/CBD to null in disposable audit clone to unlock visual coverage. No app fix performed; numeric-value failure remains an independent finding. Empty averages are fixture-limited."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/11b-batches-ready-desktop.png",
+      "pass-2/11b-batches-ready-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile successful-list captures use the disposable fixture with THC/CBD null, separate from the original numeric-lab render failure. Three stacked metrics and three full-width mobile actions remain prominent. The list shows Sep 11, 2026; the edit form is cross-checked separately. No action was clicked.",
+    "confirmedIssueKeys": [
+      "batch-date-consistency",
+      "batch-list-density"
+    ],
+    "newIssues": []
+  }
+}

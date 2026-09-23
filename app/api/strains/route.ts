@@ -2,35 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { normalizeStrainType } from '@/lib/strain-types';
+import { STRAIN_TYPES, normalizeStrainType } from '@/lib/strain-types';
 
-function isMissingStrainTypeColumnError(error: unknown): boolean {
-  if (error instanceof Prisma.PrismaClientKnownRequestError) {
-    if (error.code === 'P2022' && String(error.meta?.column ?? '').includes('strainType')) {
-      return true;
-    }
+const MAX_NAME_LENGTH = 120;
+const MAX_GENETICS_LENGTH = 500;
+const MAX_DESCRIPTION_LENGTH = 2_000;
+const MAX_NOTES_LENGTH = 2_000;
 
-    if (error.code === 'P2010') {
-      const message = String(error.message ?? '').toLowerCase();
-      if (message.includes('straintype') && message.includes('does not exist')) {
-        return true;
-      }
-    }
+type TextResult = { value: string | null | undefined; error?: string };
+
+function readText(value: unknown, label: string, maxLength: number, required = false): TextResult {
+  if (value === undefined) {
+    return required ? { value: undefined, error: `${label} is required.` } : { value: undefined };
   }
+  if (value === null) {
+    return required ? { value: null, error: `${label} is required.` } : { value: null };
+  }
+  if (typeof value !== 'string') return { value: undefined, error: `${label} must be text.` };
 
-  const message = (error instanceof Error ? error.message : String(error)).toLowerCase();
-  return message.includes('straintype') && (message.includes('does not exist') || message.includes('unknown column'));
+  const normalized = value.trim();
+  if (required && !normalized) return { value: undefined, error: `${label} is required.` };
+  if (normalized.length > maxLength) {
+    return { value: undefined, error: `${label} must be ${maxLength} characters or fewer.` };
+  }
+  return { value: normalized || null };
 }
 
-function withNullStrainType<T extends object>(strain: T): T & { strainType: null } {
-  return {
-    ...strain,
-    strainType: null
-  };
+function isUniqueConstraintError(error: unknown) {
+  return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002';
 }
 
 // GET all strains for the authenticated grower
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getAuthSession();
 
@@ -45,50 +48,31 @@ export async function GET() {
     }
 
     const growerId = user.growerId;
+    const summary = new URL(request.url).searchParams.get('summary') === 'true';
 
-    try {
+    if (summary) {
       const strains = await db.strain.findMany({
         where: { growerId },
-        include: {
-          batches: {
-            select: { id: true, batchNumber: true, harvestDate: true }
-          },
-          _count: {
-            select: { products: true, batches: true }
-          }
-        },
-        orderBy: { name: 'asc' }
+        select: { id: true, name: true, genetics: true, strainType: true },
+        orderBy: { name: 'asc' },
       });
-
       return NextResponse.json(strains, { status: 200 });
-    } catch (error) {
-      if (!isMissingStrainTypeColumnError(error)) {
-        throw error;
-      }
-
-      const strains = await db.strain.findMany({
-        where: { growerId },
-        select: {
-          id: true,
-          name: true,
-          genetics: true,
-          description: true,
-          growerNotes: true,
-          growerId: true,
-          createdAt: true,
-          updatedAt: true,
-          batches: {
-            select: { id: true, batchNumber: true, harvestDate: true }
-          },
-          _count: {
-            select: { products: true, batches: true }
-          }
-        },
-        orderBy: { name: 'asc' }
-      });
-
-      return NextResponse.json(strains.map(withNullStrainType), { status: 200 });
     }
+
+    const strains = await db.strain.findMany({
+      where: { growerId },
+      include: {
+        batches: {
+          select: { id: true, batchNumber: true, harvestDate: true }
+        },
+        _count: {
+          select: { products: true, batches: true }
+        }
+      },
+      orderBy: { name: 'asc' }
+    });
+
+    return NextResponse.json(strains, { status: 200 });
   } catch (error) {
     console.error('Error fetching strains:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -112,20 +96,25 @@ export async function POST(request: NextRequest) {
 
     const growerId = user.growerId;
     const body = await request.json();
-    const { name, genetics, description, growerNotes } = body;
-    const strainType = normalizeStrainType(body?.strainType);
-
-    if (!name) {
-      return NextResponse.json({ error: 'Name is required' }, { status: 400 });
+    if (!body || typeof body !== 'object' || Array.isArray(body)) {
+      return NextResponse.json({ error: 'Request body must be an object.' }, { status: 400 });
     }
 
-    if (body?.strainType !== undefined && body?.strainType !== null && !strainType) {
-      return NextResponse.json({ error: 'strainType must be one of: INDICA, SATIVA, HYBRID' }, { status: 400 });
+    const nameResult = readText(body.name, 'Name', MAX_NAME_LENGTH, true);
+    const geneticsResult = readText(body.genetics, 'Genetics', MAX_GENETICS_LENGTH);
+    const descriptionResult = readText(body.description, 'Description', MAX_DESCRIPTION_LENGTH);
+    const notesResult = readText(body.growerNotes, 'Grower notes', MAX_NOTES_LENGTH);
+    const textError = [nameResult, geneticsResult, descriptionResult, notesResult].find((result) => result.error);
+    if (textError?.error) return NextResponse.json({ error: textError.error }, { status: 400 });
+
+    const strainType = normalizeStrainType(body.strainType);
+    if (body.strainType !== undefined && body.strainType !== null && !strainType) {
+      return NextResponse.json({ error: `strainType must be one of: ${STRAIN_TYPES.join(', ')}` }, { status: 400 });
     }
 
     // Check for duplicate name
     const existing = await db.strain.findFirst({
-      where: { growerId, name },
+      where: { growerId, name: nameResult.value as string },
       select: { id: true }
     });
 
@@ -137,41 +126,20 @@ export async function POST(request: NextRequest) {
       const strain = await db.strain.create({
         data: {
           growerId,
-          name,
+          name: nameResult.value as string,
           strainType,
-          genetics: genetics || null,
-          description: description || null,
-          growerNotes: growerNotes || null
+          genetics: geneticsResult.value ?? null,
+          description: descriptionResult.value ?? null,
+          growerNotes: notesResult.value ?? null
         }
       });
 
       return NextResponse.json(strain, { status: 201 });
     } catch (error) {
-      if (!isMissingStrainTypeColumnError(error)) {
-        throw error;
+      if (isUniqueConstraintError(error)) {
+        return NextResponse.json({ error: 'A strain with this name already exists' }, { status: 409 });
       }
-
-      const strain = await db.strain.create({
-        data: {
-          growerId,
-          name,
-          genetics: genetics || null,
-          description: description || null,
-          growerNotes: growerNotes || null
-        },
-        select: {
-          id: true,
-          name: true,
-          genetics: true,
-          description: true,
-          growerNotes: true,
-          growerId: true,
-          createdAt: true,
-          updatedAt: true
-        }
-      });
-
-      return NextResponse.json(withNullStrainType(strain), { status: 201 });
+      throw error;
     }
   } catch (error) {
     console.error('Error creating strain:', error);

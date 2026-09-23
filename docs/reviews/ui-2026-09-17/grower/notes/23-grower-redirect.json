@@ -1,0 +1,29 @@
+{
+  "slug": "23-grower-redirect",
+  "route": "/grower",
+  "kind": "redirect",
+  "destination": "/grower/dashboard",
+  "pass1": {
+    "inspected": [
+      "pass-1/23-grower-redirect-desktop.png",
+      "pass-1/23-grower-redirect-mobile.png"
+    ],
+    "strengths": [
+      "Both widths redirect to the expected dashboard."
+    ],
+    "issues": [],
+    "noNewIssue": "Redirect works; destination dashboard findings recorded under01-dashboard.",
+    "limits": [
+      "Counted as a redirect, not an additional actual page."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/23-grower-redirect-desktop.png",
+      "pass-2/23-grower-redirect-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile navigation to /grower redirects to /grower/dashboard. Both destination captures were inspected; no new redirect-specific issue. Dashboard observations are covered once under its own route.",
+    "confirmedIssueKeys": [],
+    "newIssues": []
+  }
+}

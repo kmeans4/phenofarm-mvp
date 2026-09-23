@@ -1,0 +1,154 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e172]
+- button "Notifications" [expanded=false, ref=e173]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e174]
+- main
+  - sectionheader
+    - heading "Grower Settings" [level=1, ref=e131]
+    - paragraph
+      - StaticText "Manage your account, subscription, and wholesale terms"
+  - generic
+    - heading "Cultivator Subscription FREE" [level=3, ref=e133]
+      - StaticText "Cultivator Subscription"
+      - StaticText "FREE"
+    - paragraph
+      - StaticText "This is the only payment flow in PhenoFarm."
+    - paragraph
+      - StaticText "Growers pay PhenoFarm a software subscription. Wholesale order payments are handled directly between buyers and sellers outside the app."
+    - heading "Free Plan" [level=4, ref=e134]
+    - paragraph
+      - StaticText "Starter access"
+    - paragraph
+      - StaticText "$0/mo"
+    - heading "Plan Features" [level=4, ref=e135]
+    - StaticText "Expanded catalog listings"
+    - StaticText "Priority grower support"
+    - StaticText "Estimated request value reports"
+    - StaticText "Advanced integrations"
+    - button "Upgrade to Pro" [disabled, ref=e136]
+    - paragraph
+      - StaticText "Online subscription checkout is currently unavailable."
+    - heading "Wholesale Settlement" [level=3, ref=e137]
+    - paragraph
+      - StaticText "PhenoFarm does not process payments from dispensaries to growers. Use this app to coordinate quotes, order requests, fulfillment, and records; settle wholesale invoices directly with each buyer."
+    - paragraph
+      - StaticText "The only in-app payment flow for growers is the cultivator subscription paid to PhenoFarm."
+  - generic
+    - paragraph
+      - StaticText "REUSABLE DEFAULTS"
+    - heading "Commercial terms" [level=2, ref=e157]
+    - paragraph
+      - StaticText "Saved to your account and shown to buyers on your shop page."
+    - button "Reset defaults" [ref=e158]
+    - button "Save terms" [ref=e159]
+    - LabelText
+      - StaticText "Default MOQ"
+      - textbox "Default MOQ" [ref=e161]: No minimum set
+        - StaticText "No minimum set"
+    - LabelText
+      - StaticText "Fulfillment methods"
+      - textbox "Fulfillment methods" [ref=e162]: Pickup or coordinated delivery
+        - StaticText "Pickup or coordinated delivery"
+    - LabelText
+      - StaticText "Fulfillment region"
+      - textbox "Fulfillment region" [ref=e163]: Vermont buyers
+        - StaticText "Vermont buyers"
+    - LabelText
+      - StaticText "Direct payment terms"
+      - textbox "Direct payment terms" [ref=e164]: Handled directly
+        - StaticText "Handled directly"
+    - LabelText
+      - StaticText "Response window"
+      - textbox "Response window" [ref=e165]: Respond within 1 business day
+        - StaticText "Respond within 1 business day"
+    - LabelText
+      - StaticText "Contact note"
+      - textbox "Contact note" [ref=e166]: Message through PhenoFarm before confirming fulfillment.
+        - StaticText "Message through PhenoFarm before confirming fulfillment."
+    - paragraph
+      - StaticText "These terms are informational defaults only. PhenoFarm does not collect or remit wholesale payments between businesses."
+  - generic
+    - heading "Business Information" [level=2, ref=e138]
+    - paragraph
+      - StaticText "REQUIRED FIRST"
+    - paragraph
+      - StaticText "Finish business name, license, expiry date, and email first. Logo, address, website, and description can be completed later."
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox "Your business name" [ref=e139]: Vermont Nurseries
+      - StaticText "Vermont Nurseries"
+    - LabelText
+      - StaticText "Contact Name (optional)"
+    - textbox "Primary contact person" [ref=e140]: John Green
+      - StaticText "John Green"
+    - LabelText
+      - StaticText "Business License Number *"
+    - textbox "License number" [ref=e141]: VT-GWL-2024-001
+      - StaticText "VT-GWL-2024-001"
+    - LabelText
+      - StaticText "License Expiry Date *"
+    - Date
+      - generic
+        - spinbutton "Month" [ref=e167]: 0
+          - StaticText "mm"
+        - StaticText "/"
+        - spinbutton "Day" [ref=e168]: 0
+          - StaticText "dd"
+        - StaticText "/"
+        - spinbutton "Year" [ref=e169]: 0
+          - StaticText "yyyy"
+      - button "Show date picker" [ref=e160]
+    - LabelText
+      - StaticText "Business Email *"
+    - textbox "business@example.com" [ref=e142]: grower@vtnurseries.com
+      - StaticText "grower@vtnurseries.com"
+    - LabelText
+      - StaticText "Business Phone (optional)"
+    - textbox "(555) 123-4567" [ref=e143]: (802) 555-0123
+      - StaticText "(802) 555-0123"
+    - LabelText
+      - StaticText "Business Address (Autocomplete)"
+    - generic
+      - textbox "Type your address..." [ref=e170]: 123 Green Valley Rd
+        - StaticText "123 Green Valley Rd"
+      - image
+    - paragraph
+      - StaticText "Type 3+ characters to see suggestions (includes city, state, ZIP)"
+    - LabelText
+      - StaticText "Website (optional)"
+    - textbox "https://yourbusiness.com" [ref=e144]: https://vermontnurseries.com
+      - StaticText "https://vermontnurseries.com"
+    - LabelText
+      - StaticText "Description (optional)"
+    - textbox "Tell customers about your business..." [ref=e145]: Premium cannabis products grown with care in Vermont
+      - StaticText "Premium cannabis products grown with care in Vermont"
+    - paragraph
+      - StaticText "52/500"
+  - generic
+    - heading "Company Logo" [level=2, ref=e146]
+    - image
+    - StaticText "No logo"
+    - button "Upload Logo" [ref=e147]
+    - paragraph
+      - StaticText "JPG, PNG, or WebP. Max 500KB."
+  - heading "Account" [level=2, ref=e119]
+  - paragraph
+    - StaticText "Sign out of your grower account from this device."
+  - button "Sign Out" [ref=e148]
+  - generic
+    - paragraph
+      - StaticText "Settings drafts save in this browser."
+    - button "Save settings" [ref=e175]
+  - heading "Integrations" [level=3, ref=e150]
+  - paragraph
+    - StaticText "Metrc state-tracking sync"
+  - paragraph
+    - StaticText "In development. Your batch and COA records are structured for future synchronization; no automatic Metrc sync runs today."
+- button "Open messages" [ref=e120]
+- region "Notifications alt+T" [ref=e114]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e171]
+  - image
+- alert

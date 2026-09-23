@@ -1,0 +1,2934 @@
+{
+  "reviewDate": "2026-09-17",
+  "mode": "read-only UI review",
+  "scope": "22 grower pages, one redirect, and 11 supplemental states",
+  "actualPageCount": 22,
+  "redirectCount": 1,
+  "supplementalStateCount": 11,
+  "passes": 2,
+  "standardViewports": [
+    {
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "width": 390,
+      "height": 844
+    }
+  ],
+  "additionalViewports": [
+    {
+      "width": 360,
+      "height": 844,
+      "route": "/grower/products"
+    }
+  ],
+  "screenshots": {
+    "pass1": 68,
+    "pass2": 69,
+    "total": 137,
+    "allInspected": true,
+    "independentRootPass2Screenshots": 18
+  },
+  "findings": {
+    "total": 63,
+    "byPriority": {
+      "medium": 41,
+      "low": 19,
+      "high": 3
+    }
+  },
+  "limitations": [
+    "Local Chrome audit at http://localhost:3144 against the disposable phenofarm_ui_review_20260917 database clone; this is not a production verification.",
+    "No app source edits, submitted business actions, messages, quotes, uploads, or original-database changes. Existing message read receipts were mocked. Only unsaved local UI state and read-only searches were exercised.",
+    "The parent adjusted only the synthetic batch THC/CBD values in the clone to inspect the working list and independently reproduce the numeric-value failure. These are separate evidence states.",
+    "Full-page captures are used for actual pages; viewport captures are used for dialogs/drawers. Fixed elements may appear mid-image in a full-page capture, and that capture artifact is not treated as a defect.",
+    "Existing/synthetic record density limits empty-state and scale conclusions. Mobile dimensions describe a 390×844 viewport, with an additional 360×844 product-list check.",
+    "METRC-specific findings are excluded. Reports, pricing, settings, and marketplace grower routes are reviewed separately by the parent under admin-extra and are not counted here."
+  ],
+  "records": [
+    {
+      "slug": "01-dashboard",
+      "title": "Dashboard",
+      "route": "/grower/dashboard",
+      "routePattern": "/grower/dashboard",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G01",
+        "G02",
+        "G03",
+        "G04"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/01-dashboard-desktop.png",
+            "domSnapshot": "pass-1/01-dashboard-desktop.txt",
+            "metrics": "pass-1/01-dashboard-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/01-dashboard-mobile.png",
+            "domSnapshot": "pass-1/01-dashboard-mobile.txt",
+            "metrics": "pass-1/01-dashboard-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Clear account identity and actionable request count; mobile cards reflow without page overflow."
+        ],
+        "limits": [
+          "No setup, billing, or request action submitted. Development toolbar excluded from recommendations."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/01-dashboard-desktop.png",
+            "domSnapshot": "pass-2/01-dashboard-desktop.txt",
+            "metrics": "pass-2/01-dashboard-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/01-dashboard-mobile.png",
+            "domSnapshot": "pass-2/01-dashboard-mobile.txt",
+            "metrics": "pass-2/01-dashboard-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "02-catalog",
+      "title": "Catalog overview",
+      "route": "/grower/catalog",
+      "routePattern": "/grower/catalog",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G05",
+        "G06",
+        "G07"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/02-catalog-desktop.png",
+            "domSnapshot": "pass-1/02-catalog-desktop.txt",
+            "metrics": "pass-1/02-catalog-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1010,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/02-catalog-mobile.png",
+            "domSnapshot": "pass-1/02-catalog-mobile.txt",
+            "metrics": "pass-1/02-catalog-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1977,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Four overview metrics and a clear Add Product action; all content fits width."
+        ],
+        "limits": [
+          "No advanced-setup panel or destination writes used."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/02-catalog-desktop.png",
+            "domSnapshot": "pass-2/02-catalog-desktop.txt",
+            "metrics": "pass-2/02-catalog-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1010,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/02-catalog-mobile.png",
+            "domSnapshot": "pass-2/02-catalog-mobile.txt",
+            "metrics": "pass-2/02-catalog-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1977,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Revisited both widths. Catalog health remains below1211px mobile and status pills still wrap over several lines. Refined priority: compact navigation cards and zero-count checks first; keep the useful two-by-two metric layout. No new issue."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "03-products",
+      "title": "Products",
+      "route": "/grower/products",
+      "routePattern": "/grower/products",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G08",
+        "G09",
+        "G10"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/03-products-desktop.png",
+            "domSnapshot": "pass-1/03-products-desktop.txt",
+            "metrics": "pass-1/03-products-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1063,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/03-products-mobile.png",
+            "domSnapshot": "pass-1/03-products-mobile.txt",
+            "metrics": "pass-1/03-products-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1719,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Useful saved issue counts; columns align on desktop and no page-level horizontal overflow."
+        ],
+        "limits": [
+          "No selection, edit, or bulk mutation performed."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/03-products-desktop.png",
+            "domSnapshot": "pass-2/03-products-desktop.txt",
+            "metrics": "pass-2/03-products-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1063,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/03-products-mobile.png",
+            "domSnapshot": "pass-2/03-products-mobile.txt",
+            "metrics": "pass-2/03-products-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1719,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/03-products-narrow.png",
+            "domSnapshot": "pass-2/03-products-narrow.txt",
+            "metrics": "pass-2/03-products-narrow.json",
+            "viewport": {
+              "width": 360,
+              "height": 844
+            },
+            "pageHeight": 1795,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Second desktop/mobile pass confirms the first product is below the fold and stock/actions are hidden inside horizontal table scrolling. Additional360px capture worsens clipping: Price is nearly entirely offscreen and filter chips gain another row. Keep high priority for mobile list composition; no distinct new issue."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "03a-quick-add",
+      "title": "Quick add product",
+      "route": "/grower/products",
+      "routePattern": "/grower/products",
+      "kind": "supplemental state",
+      "state": "Quick add expanded",
+      "destination": null,
+      "findingIds": [
+        "G11"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/03a-quick-add-desktop.png",
+            "domSnapshot": "pass-1/03a-quick-add-desktop.txt",
+            "metrics": "pass-1/03a-quick-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1389,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/03a-quick-add-mobile.png",
+            "domSnapshot": "pass-1/03a-quick-add-mobile.txt",
+            "metrics": "pass-1/03a-quick-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2483,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Only essential product fields are required; an existing draft is visibly indicated."
+        ],
+        "limits": [
+          "Existing draft only viewed; no field typed, draft cleared, defaults changed, or listing created."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/03a-quick-add-desktop.png",
+            "domSnapshot": "pass-2/03a-quick-add-desktop.txt",
+            "metrics": "pass-2/03a-quick-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1389,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/03a-quick-add-mobile.png",
+            "domSnapshot": "pass-2/03a-quick-add-mobile.txt",
+            "metrics": "pass-2/03a-quick-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2483,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Reopened Quick add after a fresh Products navigation at both widths. Same expanded form and existing draft indication; repeated header/defaults copy remains the main space opportunity. No added issue; no input changed."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "04-product-add",
+      "title": "Add product",
+      "route": "/grower/products/add",
+      "routePattern": "/grower/products/add",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G12",
+        "G13",
+        "G14"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/04-product-add-desktop.png",
+            "domSnapshot": "pass-1/04-product-add-desktop.txt",
+            "metrics": "pass-1/04-product-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1906,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/04-product-add-mobile.png",
+            "domSnapshot": "pass-1/04-product-add-mobile.txt",
+            "metrics": "pass-1/04-product-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3223,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Required basics are separated from optional profile details; desktop review panel keeps summary near save controls."
+        ],
+        "limits": [
+          "No values changed and no save/publish/draft action used."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/04-product-add-desktop.png",
+            "domSnapshot": "pass-2/04-product-add-desktop.txt",
+            "metrics": "pass-2/04-product-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1906,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/04-product-add-mobile.png",
+            "domSnapshot": "pass-2/04-product-add-mobile.txt",
+            "metrics": "pass-2/04-product-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3223,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh second pass confirms the same3223px mobile form, duplicated summaries/actions and Publish/Create naming mismatch. Keep optional details collapsed by default but remove the guide paragraphs; no extra issue found."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "04a-product-details",
+      "title": "Expanded product details",
+      "route": "/grower/products/add",
+      "routePattern": "/grower/products/add",
+      "kind": "supplemental state",
+      "state": "Optional details expanded",
+      "destination": null,
+      "findingIds": [
+        "G15"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/04a-product-details-desktop.png",
+            "domSnapshot": "pass-1/04a-product-details-desktop.txt",
+            "metrics": "pass-1/04a-product-details-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2577,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/04a-product-details-mobile.png",
+            "domSnapshot": "pass-1/04a-product-details-mobile.txt",
+            "metrics": "pass-1/04a-product-details-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3894,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "THC/CBD min/max fields remain a readable two-column grid on mobile; optional fields stay grouped."
+        ],
+        "limits": [
+          "Expanded by clicking heading; no fields changed. Fullpage fixed-header position reflects the scroll position at capture, not an asserted sticky-header defect."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/04a-product-details-desktop.png",
+            "domSnapshot": "pass-2/04a-product-details-desktop.txt",
+            "metrics": "pass-2/04a-product-details-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2577,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/04a-product-details-mobile.png",
+            "domSnapshot": "pass-2/04a-product-details-mobile.txt",
+            "metrics": "pass-2/04a-product-details-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3894,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop and mobile expanded-details captures confirm repetitive optional labels and technical image-upload helper text. The mobile sticky action uses Publish product while the footer uses Create Product. Both captures reset scroll before capture; the fixed action bar position in a full-page screenshot is not a separate defect."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "05-product-edit",
+      "title": "Edit product",
+      "route": "/grower/products/product-001/edit",
+      "routePattern": "/grower/products/[id]/edit",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G16",
+        "G17",
+        "G18"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/05-product-edit-desktop.png",
+            "domSnapshot": "pass-1/05-product-edit-desktop.txt",
+            "metrics": "pass-1/05-product-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2859,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/05-product-edit-mobile.png",
+            "domSnapshot": "pass-1/05-product-edit-mobile.txt",
+            "metrics": "pass-1/05-product-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3982,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Existing values and optional profile details are visible together; desktop summary provides a cross-check."
+        ],
+        "limits": [
+          "Viewed existing record only; no field or data changed. Gray thumbnail may be synthetic fixture imagery and is not treated as a production defect."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/05-product-edit-desktop.png",
+            "domSnapshot": "pass-2/05-product-edit-desktop.txt",
+            "metrics": "pass-2/05-product-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2859,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/05-product-edit-mobile.png",
+            "domSnapshot": "pass-2/05-product-edit-mobile.txt",
+            "metrics": "pass-2/05-product-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3982,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile revisits confirm the required Unit select displays Select a unit while the summary shows $25/gram and 240 gram. The unlinked batch still presents View batch details. New-listing guidance and repeated save labels remain in edit mode; no fields were changed and no save attempted. Sample-data limitations apply to the unit/batch mismatch."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "06-inventory",
+      "title": "Inventory",
+      "route": "/grower/inventory",
+      "routePattern": "/grower/inventory",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G19",
+        "G20",
+        "G21"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/06-inventory-desktop.png",
+            "domSnapshot": "pass-1/06-inventory-desktop.txt",
+            "metrics": "pass-1/06-inventory-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/06-inventory-mobile.png",
+            "domSnapshot": "pass-1/06-inventory-mobile.txt",
+            "metrics": "pass-1/06-inventory-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1761,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Mobile switches to usable product cards with visible stock controls and Edit link; no sideways table scrolling."
+        ],
+        "limits": [
+          "Stock controls and Update Stock not activated; no inventory changes."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/06-inventory-desktop.png",
+            "domSnapshot": "pass-2/06-inventory-desktop.txt",
+            "metrics": "pass-2/06-inventory-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/06-inventory-mobile.png",
+            "domSnapshot": "pass-2/06-inventory-mobile.txt",
+            "metrics": "pass-2/06-inventory-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1761,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile captures confirm the three stacked mobile metrics and repeated inventory introduction place the first product below the 844px fold. Inventory cards themselves remain readable with visible quantity controls. Total Value still renders $10000.00 without grouping. No stock controls were used."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "07-inventory-add",
+      "title": "Update stock",
+      "route": "/grower/inventory/add",
+      "routePattern": "/grower/inventory/add",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G22"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/07-inventory-add-desktop.png",
+            "domSnapshot": "pass-1/07-inventory-add-desktop.txt",
+            "metrics": "pass-1/07-inventory-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/07-inventory-add-mobile.png",
+            "domSnapshot": "pass-1/07-inventory-add-mobile.txt",
+            "metrics": "pass-1/07-inventory-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 935,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Single-purpose form is short; the replacement-stock warning is useful and should remain; current stock is visible beside each product."
+        ],
+        "limits": [
+          "No product selected and no stock submitted."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/07-inventory-add-desktop.png",
+            "domSnapshot": "pass-2/07-inventory-add-desktop.txt",
+            "metrics": "pass-2/07-inventory-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/07-inventory-add-mobile.png",
+            "domSnapshot": "pass-2/07-inventory-add-mobile.txt",
+            "metrics": "pass-2/07-inventory-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 935,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile revisits confirm the form is short and readable; only the secondary Add Product action, repeated search instruction, and wide desktop fields add avoidable space. Keep the stock-replacement warning because it prevents a meaningful mistake. No product was selected and no stock update was submitted."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "08-strains",
+      "title": "Strains",
+      "route": "/grower/strains",
+      "routePattern": "/grower/strains",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G23",
+        "G24"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/08-strains-desktop.png",
+            "domSnapshot": "pass-1/08-strains-desktop.txt",
+            "metrics": "pass-1/08-strains-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/08-strains-mobile.png",
+            "domSnapshot": "pass-1/08-strains-mobile.txt",
+            "metrics": "pass-1/08-strains-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1537,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Strain names, batch/product counts and primary actions are easy to recognize; empty metadata does not introduce placeholder prose."
+        ],
+        "limits": [
+          "No view preference changed and no create/delete action used."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/08-strains-desktop.png",
+            "domSnapshot": "pass-2/08-strains-desktop.txt",
+            "metrics": "pass-2/08-strains-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/08-strains-mobile.png",
+            "domSnapshot": "pass-2/08-strains-mobile.txt",
+            "metrics": "pass-2/08-strains-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1537,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile captures confirm three stacked metric cards and the verbose Strain Management title. The sparse card bodies reserve substantial vertical space, while Add Product is abbreviated to + Product inconsistently. No view preference or record action was changed."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "09-strain-add",
+      "title": "Add strain",
+      "route": "/grower/strains/add",
+      "routePattern": "/grower/strains/add",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G25",
+        "G26"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/09-strain-add-desktop.png",
+            "domSnapshot": "pass-1/09-strain-add-desktop.txt",
+            "metrics": "pass-1/09-strain-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1121,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/09-strain-add-mobile.png",
+            "domSnapshot": "pass-1/09-strain-add-mobile.txt",
+            "metrics": "pass-1/09-strain-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1309,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Centered desktop form stays readable; required name/type and optional text fields are clearly separated."
+        ],
+        "limits": [
+          "No form inputs modified or submitted."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/09-strain-add-desktop.png",
+            "domSnapshot": "pass-2/09-strain-add-desktop.txt",
+            "metrics": "pass-2/09-strain-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1121,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/09-strain-add-mobile.png",
+            "domSnapshot": "pass-2/09-strain-add-mobile.txt",
+            "metrics": "pass-2/09-strain-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1309,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile captures confirm all five strain definitions remain visible below the selector and occupy about 216px on mobile. The header repeats Add New Strain, Create a new cannabis genetics entry, and Strain Details. Long example placeholders clip while the form labels remain readable. No form values were entered."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "10-strain-edit",
+      "title": "Edit strain",
+      "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+      "routePattern": "/grower/strains/[id]/edit",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G27"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/10-strain-edit-desktop.png",
+            "domSnapshot": "pass-1/10-strain-edit-desktop.txt",
+            "metrics": "pass-1/10-strain-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1121,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/10-strain-edit-mobile.png",
+            "domSnapshot": "pass-1/10-strain-edit-mobile.txt",
+            "metrics": "pass-1/10-strain-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1309,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Name/type are prefilled and Save Changes is concise; desktop width is appropriate for reading/editing."
+        ],
+        "limits": [
+          "No values edited or save submitted; sparse optional fields reflect the synthetic fixture."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/10-strain-edit-desktop.png",
+            "domSnapshot": "pass-2/10-strain-edit-desktop.txt",
+            "metrics": "pass-2/10-strain-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1121,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/10-strain-edit-mobile.png",
+            "domSnapshot": "pass-2/10-strain-edit-mobile.txt",
+            "metrics": "pass-2/10-strain-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1309,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile revisits confirm the same five-definition helper block is displayed even with Hybrid selected, adding about 216px on mobile. The selected value and form labels remain readable. No edit or save occurred."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "11-batches",
+      "title": "Batches: numeric-lab error",
+      "route": "/grower/batches",
+      "routePattern": "/grower/batches",
+      "kind": "supplemental state",
+      "state": "Numeric THC/CBD render failure",
+      "destination": null,
+      "findingIds": [
+        "G28"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/11-batches-desktop.png",
+            "domSnapshot": "pass-1/11-batches-desktop.txt",
+            "metrics": "pass-1/11-batches-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/11-batches-mobile.png",
+            "domSnapshot": "pass-1/11-batches-mobile.txt",
+            "metrics": "pass-1/11-batches-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 844,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [],
+        "limits": [
+          "Observed locally in the disposable clone using one synthetic batch with numeric THC/CBD values; not a production claim. The error screen does not support layout conclusions. The same route was also reviewed successfully in both passes with null lab fields; see 11b-batches-ready. No app source fix was made."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/11-batches-desktop.png",
+            "domSnapshot": "pass-2/11-batches-desktop.txt",
+            "metrics": "pass-2/11-batches-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/11-batches-mobile.png",
+            "domSnapshot": "pass-2/11-batches-mobile.txt",
+            "metrics": "pass-2/11-batches-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 844,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Independent second reproduction after root temporarily restored the synthetic clone batch to THC 24.8 and CBD 0.6: both desktop and mobile again fail with batch.thc.toFixed is not a function at app/grower/batches/page.tsx:187. Both fresh error screenshots were inspected. Root was asked to restore only the clone fixture labs to null afterward; normal UI has separate completed two-pass evidence under 11b-batches-ready."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "11b-batches-ready",
+      "title": "Batches: rendered list",
+      "route": "/grower/batches",
+      "routePattern": "/grower/batches",
+      "kind": "page",
+      "state": "Synthetic batch THC/CBD empty so list renders",
+      "destination": null,
+      "findingIds": [
+        "G29",
+        "G30"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/11b-batches-ready-desktop.png",
+            "domSnapshot": "pass-1/11b-batches-ready-desktop.txt",
+            "metrics": "pass-1/11b-batches-ready-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/11b-batches-ready-mobile.png",
+            "domSnapshot": "pass-1/11b-batches-ready-mobile.txt",
+            "metrics": "pass-1/11b-batches-ready-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1040,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/13-batch-edit-desktop.png",
+            "domSnapshot": "pass-1/13-batch-edit-desktop.txt",
+            "metrics": "pass-1/13-batch-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1585,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/13-batch-edit-mobile.png",
+            "domSnapshot": "pass-1/13-batch-edit-mobile.txt",
+            "metrics": "pass-1/13-batch-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2218,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Mobile batch card exposes lab-document status, strain and actions without horizontal scrolling; desktop table is compact."
+        ],
+        "limits": [
+          "Parent changed only synthetic batch THC/CBD to null in disposable audit clone to unlock visual coverage. No app fix performed; numeric-value failure remains an independent finding. Empty averages are fixture-limited."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/11b-batches-ready-desktop.png",
+            "domSnapshot": "pass-2/11b-batches-ready-desktop.txt",
+            "metrics": "pass-2/11b-batches-ready-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/11b-batches-ready-mobile.png",
+            "domSnapshot": "pass-2/11b-batches-ready-mobile.txt",
+            "metrics": "pass-2/11b-batches-ready-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1040,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/13-batch-edit-desktop.png",
+            "domSnapshot": "pass-2/13-batch-edit-desktop.txt",
+            "metrics": "pass-2/13-batch-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1585,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/13-batch-edit-mobile.png",
+            "domSnapshot": "pass-2/13-batch-edit-mobile.txt",
+            "metrics": "pass-2/13-batch-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2218,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile successful-list captures use the disposable fixture with THC/CBD null, separate from the original numeric-lab render failure. Three stacked metrics and three full-width mobile actions remain prominent. The list shows Sep 11, 2026; the edit form is cross-checked separately. No action was clicked."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "12-batch-add",
+      "title": "Add batch",
+      "route": "/grower/batches/add",
+      "routePattern": "/grower/batches/add",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G31",
+        "G32"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/12-batch-add-desktop.png",
+            "domSnapshot": "pass-1/12-batch-add-desktop.txt",
+            "metrics": "pass-1/12-batch-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1448,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/12-batch-add-mobile.png",
+            "domSnapshot": "pass-1/12-batch-add-mobile.txt",
+            "metrics": "pass-1/12-batch-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2082,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Clear required batch identity/harvest fields; lab uploads are separated by test type and size limit is explicit."
+        ],
+        "limits": [
+          "No generated batch number, files, or form values submitted."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/12-batch-add-desktop.png",
+            "domSnapshot": "pass-2/12-batch-add-desktop.txt",
+            "metrics": "pass-2/12-batch-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1448,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/12-batch-add-mobile.png",
+            "domSnapshot": "pass-2/12-batch-add-mobile.txt",
+            "metrics": "pass-2/12-batch-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2082,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile captures confirm the three upload cards repeat the same instruction and Missing status, while the three compact numeric lab fields become full-width rows on mobile. The sample format hint repeats the placeholder. Upload limits remain useful and should be preserved in a concise shared line. No files or values were entered."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "13-batch-edit",
+      "title": "Edit batch",
+      "route": "/grower/batches/ui-review-batch/edit",
+      "routePattern": "/grower/batches/[id]/edit",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G33",
+        "G34",
+        "G35"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/13-batch-edit-desktop.png",
+            "domSnapshot": "pass-1/13-batch-edit-desktop.txt",
+            "metrics": "pass-1/13-batch-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1585,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/13-batch-edit-mobile.png",
+            "domSnapshot": "pass-1/13-batch-edit-mobile.txt",
+            "metrics": "pass-1/13-batch-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2218,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Batch, lot, harvest date, strain and notes are prefilled; lab upload status is explicit."
+        ],
+        "limits": [
+          "No edits or uploads submitted. Parent nulled only synthetic fixture THC/CBD in disposable clone before this capture to allow list coverage; total cannabinoids remains27.2. Original failure evidence retained."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/13-batch-edit-desktop.png",
+            "domSnapshot": "pass-2/13-batch-edit-desktop.txt",
+            "metrics": "pass-2/13-batch-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1585,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/13-batch-edit-mobile.png",
+            "domSnapshot": "pass-2/13-batch-edit-mobile.txt",
+            "metrics": "pass-2/13-batch-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2218,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile captures confirm the raw Terpenes (JSON) editor and repeated upload-card copy. Harvest Date displays 09/12/2026 while the same batch list displays Sep 11, 2026, reproducing the date inconsistency in both passes. The suggested batch format also differs from this synthetic existing record. No values or files were changed. Priority refined to medium for the JSON input: editing difficulty is visible, but no failed save or data loss was tested."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "14-orders",
+      "title": "Requests",
+      "route": "/grower/orders",
+      "routePattern": "/grower/orders",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G36",
+        "G37",
+        "G38"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/14-orders-desktop.png",
+            "domSnapshot": "pass-1/14-orders-desktop.txt",
+            "metrics": "pass-1/14-orders-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1813,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/14-orders-mobile.png",
+            "domSnapshot": "pass-1/14-orders-mobile.txt",
+            "metrics": "pass-1/14-orders-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2385,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Desktop request rows and colored statuses are scannable; saved status filters show counts."
+        ],
+        "limits": [
+          "No status, density preference, selection, batch action, or request data changed. Long historical IDs are local fixture data, but clipping is measured in this viewport."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/14-orders-desktop.png",
+            "domSnapshot": "pass-2/14-orders-desktop.txt",
+            "metrics": "pass-2/14-orders-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1813,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/14-orders-mobile.png",
+            "domSnapshot": "pass-2/14-orders-mobile.txt",
+            "metrics": "pass-2/14-orders-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2385,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed the mobile table hides value, status and View; tall summaries delay the request list. Status tabs and counts repeat context. Desktop rows remain readable. No actions were submitted."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "15-order-history",
+      "title": "Request history",
+      "route": "/grower/orders/history",
+      "routePattern": "/grower/orders/history",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G39",
+        "G40"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/15-order-history-desktop.png",
+            "domSnapshot": "pass-1/15-order-history-desktop.txt",
+            "metrics": "pass-1/15-order-history-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/15-order-history-mobile.png",
+            "domSnapshot": "pass-1/15-order-history-mobile.txt",
+            "metrics": "pass-1/15-order-history-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1253,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Delivered/cancelled separation is explicit and the desktop history table is concise."
+        ],
+        "limits": [
+          "No request opened from table or status changed; current records are local fixture history."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/15-order-history-desktop.png",
+            "domSnapshot": "pass-2/15-order-history-desktop.txt",
+            "metrics": "pass-2/15-order-history-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/15-order-history-mobile.png",
+            "domSnapshot": "pass-2/15-order-history-mobile.txt",
+            "metrics": "pass-2/15-order-history-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1253,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed nearly 500px of stacked mobile metrics and long wrapped IDs; value, status and actions remain offscreen. Sparse desktop space is record density, not a defect."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "16-order-add",
+      "title": "Record request",
+      "route": "/grower/orders/add",
+      "routePattern": "/grower/orders/add",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G41",
+        "G42",
+        "G43"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/16-order-add-desktop.png",
+            "domSnapshot": "pass-1/16-order-add-desktop.txt",
+            "metrics": "pass-1/16-order-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/16-order-add-mobile.png",
+            "domSnapshot": "pass-1/16-order-add-mobile.txt",
+            "metrics": "pass-1/16-order-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1091,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Buyer selection is required before recording; empty Items area makes the next step understandable."
+        ],
+        "limits": [
+          "No buyer, products, fields, or request submitted."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/16-order-add-desktop.png",
+            "domSnapshot": "pass-2/16-order-add-desktop.txt",
+            "metrics": "pass-2/16-order-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/16-order-add-mobile.png",
+            "domSnapshot": "pass-2/16-order-add-mobile.txt",
+            "metrics": "pass-2/16-order-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1091,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed verbose request/payment copy and optional fields placed before Items. It also identified the floating message launcher partly overlapping Add item on mobile. No row was added by the independent reviewer; the separate 16a state covers the unsaved row."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "16a-product-picker",
+      "title": "Unsaved request item row",
+      "route": "/grower/orders/add",
+      "routePattern": "/grower/orders/add",
+      "kind": "supplemental state",
+      "state": "One unsaved item row",
+      "destination": null,
+      "findingIds": [
+        "G44"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/16a-product-picker-desktop.png",
+            "domSnapshot": "pass-1/16a-product-picker-desktop.txt",
+            "metrics": "pass-1/16a-product-picker-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1103,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/16a-product-picker-mobile.png",
+            "domSnapshot": "pass-1/16a-product-picker-mobile.txt",
+            "metrics": "pass-1/16a-product-picker-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1501,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Quantity and agreed unit price are editable together; the estimate updates immediately and includes a payment-model note."
+        ],
+        "limits": [
+          "Clicked Add to reveal a local unsaved row only; no request submitted, quantity or price changed, or data saved."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/16a-product-picker-desktop.png",
+            "domSnapshot": "pass-2/16a-product-picker-desktop.txt",
+            "metrics": "pass-2/16a-product-picker-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1103,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/16a-product-picker-mobile.png",
+            "domSnapshot": "pass-2/16a-product-picker-mobile.txt",
+            "metrics": "pass-2/16a-product-picker-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1501,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh unsaved item-row captures confirm repeated price and availability values, narrow desktop price-help wrapping, and a tall mobile item card. The floating message launcher partly overlaps Add on mobile, matching the independent base-form second-pass observation. Only the local + Add row action was used; no request was submitted."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "17-order-detail",
+      "title": "Request detail",
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "routePattern": "/grower/orders/[id]",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G45",
+        "G46",
+        "G47",
+        "G48"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/17-order-detail-desktop.png",
+            "domSnapshot": "pass-1/17-order-detail-desktop.txt",
+            "metrics": "pass-1/17-order-detail-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1365,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/17-order-detail-mobile.png",
+            "domSnapshot": "pass-1/17-order-detail-mobile.txt",
+            "metrics": "pass-1/17-order-detail-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2438,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Requested item and value are clear; direct settlement is distinguished from the recorded estimate; customer contact details are available."
+        ],
+        "limits": [
+          "No status, edit, print, export or Message buyer action activated; only existing request read."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/17-order-detail-desktop.png",
+            "domSnapshot": "pass-2/17-order-detail-desktop.txt",
+            "metrics": "pass-2/17-order-detail-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1365,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/17-order-detail-mobile.png",
+            "domSnapshot": "pass-2/17-order-detail-mobile.txt",
+            "metrics": "pass-2/17-order-detail-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 2438,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "18-order-edit",
+      "title": "Edit request",
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+      "routePattern": "/grower/orders/[id]/edit",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G49",
+        "G50"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/18-order-edit-desktop.png",
+            "domSnapshot": "pass-1/18-order-edit-desktop.txt",
+            "metrics": "pass-1/18-order-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1505,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/18-order-edit-mobile.png",
+            "domSnapshot": "pass-1/18-order-edit-mobile.txt",
+            "metrics": "pass-1/18-order-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1920,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Request reference is already smaller than the heading; item quantity controls remain visible on mobile; tax guidance clearly separates recorded tax from automatic calculation."
+        ],
+        "limits": [
+          "No status selected, items changed, fields edited or save submitted."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/18-order-edit-desktop.png",
+            "domSnapshot": "pass-2/18-order-edit-desktop.txt",
+            "metrics": "pass-2/18-order-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1505,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/18-order-edit-mobile.png",
+            "domSnapshot": "pass-2/18-order-edit-mobile.txt",
+            "metrics": "pass-2/18-order-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1920,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed duplicated status presentation and short numeric fields using separate mobile rows. The compact heading/reference and quantity control fit well. The maximum quantity of 241 is expected: one reserved unit plus 240 available. No save occurred."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "19-customers",
+      "title": "Customers",
+      "route": "/grower/customers",
+      "routePattern": "/grower/customers",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G51",
+        "G52"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/19-customers-desktop.png",
+            "domSnapshot": "pass-1/19-customers-desktop.txt",
+            "metrics": "pass-1/19-customers-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/19-customers-mobile.png",
+            "domSnapshot": "pass-1/19-customers-mobile.txt",
+            "metrics": "pass-1/19-customers-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1280,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Mobile uses readable customer cards, visible contact details and two clear relationship actions."
+        ],
+        "limits": [
+          "No Message or record actions used. Availability of add/edit/statement routes verified separately; this is a discoverability finding for the visible directory."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/19-customers-desktop.png",
+            "domSnapshot": "pass-2/19-customers-desktop.txt",
+            "metrics": "pass-2/19-customers-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/19-customers-mobile.png",
+            "domSnapshot": "pass-2/19-customers-mobile.txt",
+            "metrics": "pass-2/19-customers-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1280,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed stacked mobile metrics, repeated contact/business names, and missing visible Add/Edit/Statement entry points for supported contact-management screens. Existing desktop contact text is already small and should not be reduced."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "20-customer-add",
+      "title": "Add customer",
+      "route": "/grower/customers/add",
+      "routePattern": "/grower/customers/add",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G53"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/20-customer-add-desktop.png",
+            "domSnapshot": "pass-1/20-customer-add-desktop.txt",
+            "metrics": "pass-1/20-customer-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/20-customer-add-mobile.png",
+            "domSnapshot": "pass-1/20-customer-add-mobile.txt",
+            "metrics": "pass-1/20-customer-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1206,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Plain labels, no excessive field instructions, clear required fields, readable desktop grid."
+        ],
+        "limits": [
+          "No values entered or customer created; otherwise no new major issue observed."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/20-customer-add-desktop.png",
+            "domSnapshot": "pass-2/20-customer-add-desktop.txt",
+            "metrics": "pass-2/20-customer-add-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/20-customer-add-mobile.png",
+            "domSnapshot": "pass-2/20-customer-add-mobile.txt",
+            "metrics": "pass-2/20-customer-add-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1206,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed only minor copy and spacing improvements: three repeated task labels and separate State/ZIP rows. Input text and targets remain readable; desktop grid works well."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "21-customer-edit",
+      "title": "Edit customer",
+      "route": "/grower/customers/ui-review-customer/edit",
+      "routePattern": "/grower/customers/[id]/edit",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G54",
+        "G55"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/21-customer-edit-desktop.png",
+            "domSnapshot": "pass-1/21-customer-edit-desktop.txt",
+            "metrics": "pass-1/21-customer-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1403,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/21-customer-edit-mobile.png",
+            "domSnapshot": "pass-1/21-customer-edit-mobile.txt",
+            "metrics": "pass-1/21-customer-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1862,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Business, contact and address groups are clearly separated; the statement link is available here; fields have readable values."
+        ],
+        "limits": [
+          "No fields changed or customer saved/deleted. The contact is synthetic and has one delivered request."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/21-customer-edit-desktop.png",
+            "domSnapshot": "pass-2/21-customer-edit-desktop.txt",
+            "metrics": "pass-2/21-customer-edit-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1403,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/21-customer-edit-mobile.png",
+            "domSnapshot": "pass-2/21-customer-edit-mobile.txt",
+            "metrics": "pass-2/21-customer-edit-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 1862,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed the isolated Statement row delays the mobile heading to y=214. Repeated section names and State/ZIP stacking add height. Keep Delete separate from Save; no changes were submitted."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "22-customer-statement",
+      "title": "Customer statement",
+      "route": "/grower/customers/ui-review-customer/statement",
+      "routePattern": "/grower/customers/[id]/statement",
+      "kind": "page",
+      "state": "default",
+      "destination": null,
+      "findingIds": [
+        "G56",
+        "G57"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/22-customer-statement-desktop.png",
+            "domSnapshot": "pass-1/22-customer-statement-desktop.txt",
+            "metrics": "pass-1/22-customer-statement-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/22-customer-statement-mobile.png",
+            "domSnapshot": "pass-1/22-customer-statement-mobile.txt",
+            "metrics": "pass-1/22-customer-statement-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 890,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Short statement with clear date controls and overall delivered value; payment boundary is explicit."
+        ],
+        "limits": [
+          "No date filter submitted or CSV exported; read-only view of one synthetic delivered request."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/22-customer-statement-desktop.png",
+            "domSnapshot": "pass-2/22-customer-statement-desktop.txt",
+            "metrics": "pass-2/22-customer-statement-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 1000,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          },
+          {
+            "screenshot": "pass-2/22-customer-statement-mobile.png",
+            "domSnapshot": "pass-2/22-customer-statement-mobile.txt",
+            "metrics": "pass-2/22-customer-statement-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 890,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "root"
+          }
+        ],
+        "notes": "Independent fresh desktop/mobile inspection confirmed long title/copy, singular-count grammar, and hidden per-request values on mobile. From/To already fit a two-column row. The September 15 delivered date is the expected local conversion of a September 16 midnight-UTC instant and is not reported as a bug."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "23-grower-redirect",
+      "title": "Grower redirect",
+      "route": "/grower",
+      "routePattern": "/grower",
+      "kind": "redirect",
+      "state": "default",
+      "destination": "/grower/dashboard",
+      "findingIds": [],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/23-grower-redirect-desktop.png",
+            "domSnapshot": "pass-1/23-grower-redirect-desktop.txt",
+            "metrics": "pass-1/23-grower-redirect-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/23-grower-redirect-mobile.png",
+            "domSnapshot": "pass-1/23-grower-redirect-mobile.txt",
+            "metrics": "pass-1/23-grower-redirect-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Both widths redirect to the expected dashboard."
+        ],
+        "limits": [
+          "Counted as a redirect, not an additional actual page."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/23-grower-redirect-desktop.png",
+            "domSnapshot": "pass-2/23-grower-redirect-desktop.txt",
+            "metrics": "pass-2/23-grower-redirect-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/23-grower-redirect-mobile.png",
+            "domSnapshot": "pass-2/23-grower-redirect-mobile.txt",
+            "metrics": "pass-2/23-grower-redirect-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile navigation to /grower redirects to /grower/dashboard. Both destination captures were inspected; no new redirect-specific issue. Dashboard observations are covered once under its own route."
+      },
+      "noNewIssue": true,
+      "noIssueNote": "Redirect works; destination dashboard findings recorded under01-dashboard."
+    },
+    {
+      "slug": "24-navigation",
+      "title": "Navigation",
+      "route": "/grower/dashboard",
+      "routePattern": "/grower/dashboard",
+      "kind": "supplemental state",
+      "state": "Shared desktop sidebar and mobile navigation drawer",
+      "destination": null,
+      "findingIds": [
+        "G58"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/24-navigation-desktop.png",
+            "domSnapshot": "pass-1/24-navigation-desktop.txt",
+            "metrics": "pass-1/24-navigation-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/24-navigation-mobile.png",
+            "domSnapshot": "pass-1/24-navigation-mobile.txt",
+            "metrics": "pass-1/24-navigation-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Mobile navigation fits390x844, has clear touch rows and visible close/sign-out controls; desktop sections are tidy."
+        ],
+        "limits": [
+          "Menu only opened/closed; no navigation preference or sign-out used. No desktop drawer exists; persistent sidebar is the desktop equivalent."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/24-navigation-desktop.png",
+            "domSnapshot": "pass-2/24-navigation-desktop.txt",
+            "metrics": "pass-2/24-navigation-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/24-navigation-mobile.png",
+            "domSnapshot": "pass-2/24-navigation-mobile.txt",
+            "metrics": "pass-2/24-navigation-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop sidebar and reopened mobile menu were inspected. Mobile rows fit the viewport and remain comfortably spaced; only the Overview versus Dashboard distinction and Cultivator versus Grower naming need simplification. No navigation preference was changed."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "25-search",
+      "title": "Search: empty state",
+      "route": "/grower/dashboard",
+      "routePattern": "/grower/dashboard",
+      "kind": "supplemental state",
+      "state": "Search dialog empty",
+      "destination": null,
+      "findingIds": [
+        "G59"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/25-search-desktop.png",
+            "domSnapshot": "pass-1/25-search-desktop.txt",
+            "metrics": "pass-1/25-search-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/25-search-mobile.png",
+            "domSnapshot": "pass-1/25-search-mobile.txt",
+            "metrics": "pass-1/25-search-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Focused search field, clear close control and supported categories; restrained desktop dialog."
+        ],
+        "limits": [
+          "Dialog only; no result navigation or data changes."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/25-search-desktop.png",
+            "domSnapshot": "pass-2/25-search-desktop.txt",
+            "metrics": "pass-2/25-search-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/25-search-mobile.png",
+            "domSnapshot": "pass-2/25-search-mobile.txt",
+            "metrics": "pass-2/25-search-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Freshly reopened desktop/mobile search confirms the long placeholder clips on mobile and keyboard navigation hints remain at the bottom on touch layout. Search still calls requests Orders. The harmless recent-search chip reflects the prior read-only Purple query; no result was opened."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "25a-search-results",
+      "title": "Search: results",
+      "route": "/grower/dashboard",
+      "routePattern": "/grower/dashboard",
+      "kind": "supplemental state",
+      "state": "Search query Purple",
+      "destination": null,
+      "findingIds": [],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/25a-search-results-desktop.png",
+            "domSnapshot": "pass-1/25a-search-results-desktop.txt",
+            "metrics": "pass-1/25a-search-results-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/25a-search-results-mobile.png",
+            "domSnapshot": "pass-1/25a-search-results-mobile.txt",
+            "metrics": "pass-1/25a-search-results-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Results are compact, readable and distinguish product from strain; price/stock context is restrained."
+        ],
+        "limits": [
+          "Read-only search query typed; no result action activated. Sparse result count reflects the fixture, so unused result area is not a defect."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/25a-search-results-desktop.png",
+            "domSnapshot": "pass-2/25a-search-results-desktop.txt",
+            "metrics": "pass-2/25a-search-results-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/25a-search-results-mobile.png",
+            "domSnapshot": "pass-2/25a-search-results-mobile.txt",
+            "metrics": "pass-2/25a-search-results-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh Purple query at both widths again returns two compact, readable results. No new issue in the result rows; the shared mobile keyboard footer concern remains covered under the empty search state. No result was opened."
+      },
+      "noNewIssue": true,
+      "noIssueNote": "No additional copy/density issue in the populated results beyond shared mobile search footer wording."
+    },
+    {
+      "slug": "26-messages",
+      "title": "Messages: conversation list",
+      "route": "/grower/dashboard",
+      "routePattern": "/grower/dashboard",
+      "kind": "supplemental state",
+      "state": "Messages drawer, conversation list",
+      "destination": null,
+      "findingIds": [
+        "G60"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/26-messages-desktop.png",
+            "domSnapshot": "pass-1/26-messages-desktop.txt",
+            "metrics": "pass-1/26-messages-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/26-messages-mobile.png",
+            "domSnapshot": "pass-1/26-messages-mobile.txt",
+            "metrics": "pass-1/26-messages-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Mobile shows a simple conversation list with preview; desktop separates list and conversation area."
+        ],
+        "limits": [
+          "Read-only conversation list; large empty list space reflects a single fixture conversation and is not treated as a defect."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/26-messages-desktop.png",
+            "domSnapshot": "pass-2/26-messages-desktop.txt",
+            "metrics": "pass-2/26-messages-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/26-messages-mobile.png",
+            "domSnapshot": "pass-2/26-messages-mobile.txt",
+            "metrics": "pass-2/26-messages-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile message drawer opens to the conversation list. Desktop repeats Select a conversation in the header, placeholder panel, and disabled composer while showing pricing actions before selection. The single conversation and blank mobile list space are fixture density, not a separate layout defect."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "26a-message-thread",
+      "title": "Messages: existing conversation",
+      "route": "/grower/dashboard",
+      "routePattern": "/grower/dashboard",
+      "kind": "supplemental state",
+      "state": "Existing conversation open",
+      "destination": null,
+      "findingIds": [
+        "G61"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/26a-message-thread-desktop.png",
+            "domSnapshot": "pass-1/26a-message-thread-desktop.txt",
+            "metrics": "pass-1/26a-message-thread-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/26a-message-thread-mobile.png",
+            "domSnapshot": "pass-1/26a-message-thread-mobile.txt",
+            "metrics": "pass-1/26a-message-thread-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Conversation title, timestamps and message body are readable; composer stays anchored at bottom and mobile back/close actions are visible."
+        ],
+        "limits": [
+          "Existing conversation viewed only; read receipt endpoint mocked to avoid database writes. No message typed/sent or template inserted; sparse message content is fixture-limited."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/26a-message-thread-desktop.png",
+            "domSnapshot": "pass-2/26a-message-thread-desktop.txt",
+            "metrics": "pass-2/26a-message-thread-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/26a-message-thread-mobile.png",
+            "domSnapshot": "pass-2/26a-message-thread-mobile.txt",
+            "metrics": "pass-2/26a-message-thread-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Reopened existing conversation at both widths confirms the horizontally clipped template strip, two pricing actions, and repeated settlement/role text around the composer. Message bubbles remain readable. Read receipts were mocked; no template, message, quote, or pricing request was submitted."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "26b-quote-form",
+      "title": "Messages: quote form",
+      "route": "/grower/dashboard",
+      "routePattern": "/grower/dashboard",
+      "kind": "supplemental state",
+      "state": "Quote form expanded in existing conversation",
+      "destination": null,
+      "findingIds": [
+        "G62"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/26b-quote-form-desktop.png",
+            "domSnapshot": "pass-1/26b-quote-form-desktop.txt",
+            "metrics": "pass-1/26b-quote-form-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/26b-quote-form-mobile.png",
+            "domSnapshot": "pass-1/26b-quote-form-mobile.txt",
+            "metrics": "pass-1/26b-quote-form-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Quote inputs are compact and stay next to the conversation; cancellation is explicit."
+        ],
+        "limits": [
+          "Expanded form only; no quote fields entered, pricing request made, or quote sent. This fixture conversation has no visible product context; recommendation is based on that state."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/26b-quote-form-desktop.png",
+            "domSnapshot": "pass-2/26b-quote-form-desktop.txt",
+            "metrics": "pass-2/26b-quote-form-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/26b-quote-form-mobile.png",
+            "domSnapshot": "pass-2/26b-quote-form-mobile.txt",
+            "metrics": "pass-2/26b-quote-form-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Reopened quote form at both widths again shows placeholder-only unit-price and quantity fields, no visible currency/unit or product context for this general conversation, and two competing send surfaces. Persistent field labels and an explicit product/unit context would be clearer. No quote values or message were entered or submitted."
+      },
+      "noNewIssue": false
+    },
+    {
+      "slug": "27-notifications",
+      "title": "Notifications",
+      "route": "/grower/dashboard",
+      "routePattern": "/grower/dashboard",
+      "kind": "supplemental state",
+      "state": "Notifications panel",
+      "destination": null,
+      "findingIds": [
+        "G63"
+      ],
+      "pass1": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-1/27-notifications-desktop.png",
+            "domSnapshot": "pass-1/27-notifications-desktop.txt",
+            "metrics": "pass-1/27-notifications-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-1/27-notifications-mobile.png",
+            "domSnapshot": "pass-1/27-notifications-mobile.txt",
+            "metrics": "pass-1/27-notifications-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": [
+          "Unread total and relative time are compact; list stays within the mobile viewport with clear close control."
+        ],
+        "limits": [
+          "Panel opened only; no notification or Mark all read clicked. Desktop panel was reopened after viewport change and screenshot replaced because first resized capture had closed it; accepted screenshot shows correct panel."
+        ]
+      },
+      "pass2": {
+        "status": "complete",
+        "evidence": [
+          {
+            "screenshot": "pass-2/27-notifications-desktop.png",
+            "domSnapshot": "pass-2/27-notifications-desktop.txt",
+            "metrics": "pass-2/27-notifications-desktop.json",
+            "viewport": {
+              "width": 1440,
+              "height": 1000
+            },
+            "pageHeight": 2186,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          },
+          {
+            "screenshot": "pass-2/27-notifications-mobile.png",
+            "domSnapshot": "pass-2/27-notifications-mobile.txt",
+            "metrics": "pass-2/27-notifications-mobile.json",
+            "viewport": {
+              "width": 390,
+              "height": 844
+            },
+            "pageHeight": 3168,
+            "documentOverflow": false,
+            "inspected": true,
+            "inspectedBy": "grower reviewer"
+          }
+        ],
+        "notes": "Fresh desktop/mobile notification panels were reopened and inspected independently after resizing. Repeated generic New order request and New counter quote sentences still omit useful request/product context. The panel fits both widths. No notification or Mark all read action was clicked."
+      },
+      "noNewIssue": false
+    }
+  ],
+  "artifactRoot": "grower",
+  "findingsEvidenceRelativeTo": "docs/reviews/ui-2026-09-17",
+  "coverageEvidenceRelativeTo": "docs/reviews/ui-2026-09-17/grower"
+}

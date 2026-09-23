@@ -1,0 +1,83 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e1813]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1814]
+    - StaticText "Notifications"
+    - StaticText "20"
+  - navigation "Portal navigation" [ref=e1815]
+    - link "Dashboard" [ref=e1818]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e1819]
+      - StaticText "Catalog"
+    - link "Request Draft 2" [ref=e1820]
+      - StaticText "Request Draft"
+      - StaticText "2"
+    - link "Orders 17" [ref=e1821]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e1822]
+      - StaticText "Saved"
+    - link "Settings" [ref=e1823]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e1816]
+- main
+  - sectionheader
+    - heading "Saved" [level=1, ref=e1824]
+    - link "Browse Catalog" [ref=e1825]
+  - tablist "Saved workspace"
+    - tab "Favorites (1)" [selected, ref=e1826]
+      - StaticText "Favorites"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Alerts (1)" [ref=e1827]
+      - StaticText "Alerts"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Recent (1)" [ref=e1828]
+      - StaticText "Recent"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+  - tabpanel "Favorites (1)"
+    - combobox "Sort favorites" [expanded=false, ref=e1832]: Recently Added
+      - MenuListPopup
+        - option "Recently Added" [selected, ref=e1838]
+        - option "Price: Low to High" [ref=e1839]
+        - option "Price: High to Low" [ref=e1840]
+        - option "THC: High to Low" [ref=e1841]
+        - option "Name: A-Z" [ref=e1842]
+        - option "Name: Z-A" [ref=e1843]
+        - option "THC: Low to High" [ref=e1844]
+    - button "Grid view" [ref=e1829]
+      - StaticText "Grid"
+    - button "List view" [ref=e1830]
+      - StaticText "List"
+    - group
+      - DisclosureTriangle "More" [expanded=false]
+    - article
+      - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e1833]
+      - link "Vermont Nurseries" [ref=e1834]
+      - StaticText "Flower"
+      - StaticText "THC "
+      - StaticText "19"
+      - StaticText "%"
+      - StaticText "25"
+      - StaticText " available"
+      - button "Request pricing" [ref=e1835]
+      - button "Message" [ref=e1836]
+      - button "Remove Mystery Pricing Batch from favorites" [ref=e1837]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1831]
+  - button "Open messages" [ref=e1817]
+- region "Notifications alt+T" [ref=e1812]
+- alert

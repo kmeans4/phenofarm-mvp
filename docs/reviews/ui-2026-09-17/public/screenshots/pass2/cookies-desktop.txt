@@ -1,0 +1,87 @@
+- main
+  - generic
+  - generic
+    - navigation
+      - link "PF PhenoFarm" [ref=e1425]
+        - StaticText "PF"
+        - StaticText "PhenoFarm"
+      - link "Help" [ref=e1426]
+    - sectionheader
+      - paragraph
+        - StaticText "LEGAL"
+      - heading "Cookie Notice" [level=1, ref=e1427]
+      - paragraph
+        - StaticText "Last updated: July 6, 2026"
+      - paragraph
+        - StaticText "How PhenoFarm uses essential cookies and browser storage for authentication, session security, request workflows, and cultivator subscription support."
+      - paragraph
+        - StaticText "Pre-launch draft pending counsel review."
+      - paragraph
+        - StaticText "This MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app."
+    - complementary
+      - paragraph
+        - StaticText "Contents"
+      - list
+        - listitem [level=1]
+          - link "Draft status" [ref=e1436]
+        - listitem [level=1]
+          - link "What cookies and storage are" [ref=e1437]
+        - listitem [level=1]
+          - link "Essential use" [ref=e1438]
+        - listitem [level=1]
+          - link "Billing and third-party services" [ref=e1439]
+        - listitem [level=1]
+          - link "Analytics and advertising" [ref=e1440]
+        - listitem [level=1]
+          - link "Your choices" [ref=e1441]
+    - article
+      - generic
+        - heading "Draft status" [level=2, ref=e1428]
+        - paragraph
+          - StaticText "This cookie notice is a pre-launch MVP draft pending counsel review. It describes the browser storage expected for the current PhenoFarm application."
+      - generic
+        - heading "What cookies and storage are" [level=2, ref=e1429]
+        - paragraph
+          - StaticText "Cookies and browser storage help web applications remember session, security, and workflow information. Similar technologies may include local storage, session storage, and framework-managed session tokens."
+      - generic
+        - heading "Essential use" [level=2, ref=e1430]
+        - paragraph
+          - StaticText "PhenoFarm uses essential cookies and storage for authentication, account routing, session security, marketplace workflow continuity, and request-draft usability."
+        - list
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Sign-in and session cookies used by authentication workflows."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Security and framework cookies needed to keep the app operating correctly."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Browser storage for request draft details, workflow defaults, and similar MVP usability features."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Support or operational data needed to diagnose account, verification, or request issues."
+      - generic
+        - heading "Billing and third-party services" [level=2, ref=e1431]
+        - paragraph
+          - StaticText "Cultivator subscription checkout and subscription management are handled through Stripe Billing. Stripe may use its own cookies or browser storage when a grower opens checkout or the billing portal."
+        - paragraph
+          - StaticText "PhenoFarm does not use cookies to process wholesale buyer-seller payments because wholesale settlement is handled directly outside the app."
+      - generic
+        - heading "Analytics and advertising" [level=2, ref=e1432]
+        - paragraph
+          - StaticText "The MVP copy does not assume advertising cookies or cross-site ad tracking. If PhenoFarm adds analytics, performance monitoring, or marketing tools before launch, this notice should be updated to describe those tools clearly."
+      - generic
+        - heading "Your choices" [level=2, ref=e1433]
+        - paragraph
+          - StaticText "Most browsers let you block or delete cookies and storage. Blocking essential cookies may prevent sign-in, role routing, request drafts, or subscription management from working correctly."
+        - paragraph
+          - StaticText "Questions about cookies or browser storage should be sent to support@phenofarm.com."
+      - paragraph
+        - StaticText "Questions or requests?"
+      - paragraph
+        - StaticText "Contact"
+        - link "support@phenofarm.com" [ref=e1434]
+        - StaticText "."
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1435]
+  - image
+- alert

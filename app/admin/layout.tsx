@@ -1,72 +1,78 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
+import type { Session } from 'next-auth';
 import { redirect } from "next/navigation";
-import { MobileNav } from "@/app/grower/components/MobileNav";
-import { ClientNav } from "./components/ClientNav";
-import { SignOutButton } from "@/app/components/SignOutButton";
+import { getAuthSession } from '@/lib/auth-helpers';
+import { Providers } from '@/app/providers';
+import { MobileNav } from "@/app/components/ui/MobileNav";
+import { ClientNav } from "@/app/grower/components/ClientNav";
+import { PortalAccount, PortalBrand } from '@/app/components/ui/PortalBrand';
+import { NotificationBell } from '@/app/components/notifications/NotificationBell';
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
   
   if (!session) {
     redirect('/auth/sign_in');
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const user = session?.user as { role: string } | undefined;
+  const user = session?.user as { id: string; role: string; email?: string | null; name?: string | null } | undefined;
   if (!user || user.role !== 'ADMIN') {
     redirect('/dashboard');
   }
+  const accountName = user.name || user.email || 'PhenoFarm admin';
 
   const navLinks = [
-    { name: 'Dashboard', href: '/admin/dashboard' },
-    { name: 'Users', href: '/admin/users' },
-    { name: 'Growers', href: '/admin/growers' },
-    { name: 'Dispensaries', href: '/admin/dispensaries' },
-    { name: 'Settings', href: '/admin/settings' },
+    { name: 'Dashboard', href: '/admin/dashboard', group: 'Operations' },
+    { name: 'Users', href: '/admin/users', group: 'Accounts' },
+    { name: 'Growers', href: '/admin/growers', group: 'Accounts' },
+    { name: 'Dispensaries', href: '/admin/dispensaries', group: 'Accounts' },
+    { name: 'Settings', href: '/admin/settings', group: 'System' },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 w-full">
+    <Providers session={session as Session}>
+      <div className="pf-portal min-h-screen w-full bg-gray-50">
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-gray-200 z-40">
+      <div className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.07] bg-[#16251c] lg:hidden">
         <div className="px-4 py-3">
           <div className="flex justify-between items-center">
-            <div className="text-lg font-bold text-green-600" aria-label="PhenoFarm admin panel">PhenoFarm</div>
-            <SignOutButton />
+            <PortalBrand portalLabel="Admin" />
+            <div className="flex items-center gap-2">
+              <NotificationBell compact />
+              <MobileNav
+                links={navLinks}
+                portalLabel="Admin Panel"
+                accountName={accountName}
+                roleLabel="Admin"
+              />
+            </div>
           </div>
-          <MobileNav links={navLinks} />
         </div>
       </div>
 
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 hidden lg:flex lg:flex-col flex-shrink-0 h-screen sticky top-0">
-          <div className="p-4 border-b border-gray-200 flex-shrink-0">
-            <div className="text-xl font-bold text-green-600" aria-label="PhenoFarm admin panel">PhenoFarm</div>
-            <p className="text-sm text-gray-500">Admin Panel</p>
+        <aside className="sticky top-0 hidden h-screen w-60 flex-shrink-0 flex-col bg-[#16251c] px-4 py-5 lg:flex">
+          <div className="flex-shrink-0 px-1 pb-4">
+            <PortalBrand portalLabel="Admin" />
+            <div className="mt-3">
+              <NotificationBell />
+            </div>
           </div>
 
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto py-2">
             <ClientNav links={navLinks} />
           </div>
-
-          <div className="flex-shrink-0 p-4 border-t border-gray-200 bg-white">
-            <div className="bg-green-50 rounded-lg p-4 mb-3">
-              <p className="text-sm font-medium text-green-900 mb-1">Admin Access</p>
-              <p className="text-xs text-green-700">Full system access</p>
-            </div>
-            <SignOutButton variant="sidebar" />
-          </div>
+          <PortalAccount accountName={accountName} roleLabel="Full system access" />
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 pt-20 lg:pt-0 w-full min-w-0">
-          <div className="p-4 lg:p-6 max-w-7xl mx-auto">
+        <main className="w-full min-w-0 flex-1 pt-16 lg:pt-0">
+          <div className="mx-auto max-w-7xl p-4 md:p-7 lg:p-8">
             {children}
           </div>
         </main>
       </div>
-    </div>
+      </div>
+    </Providers>
   );
 }

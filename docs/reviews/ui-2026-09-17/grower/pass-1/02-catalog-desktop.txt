@@ -1,0 +1,126 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e86]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e87]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e88]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e103]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e104]
+      - StaticText "Overview"
+    - link "Products" [ref=e105]
+      - StaticText "Products"
+    - link "Inventory" [ref=e106]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e107]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e108]
+      - StaticText "Strains"
+    - link "Batches" [ref=e109]
+      - StaticText "Batches"
+    - link "Customers" [ref=e110]
+      - StaticText "Customers"
+    - link "Reports" [ref=e111]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e112]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e89]
+- main
+  - sectionheader
+    - heading "Catalog Workspace" [level=1, ref=e113]
+    - paragraph
+      - StaticText "Manage listings, stock, marketplace visibility, and pricing rules from one place."
+    - link "Add Product" [ref=e114]
+  - paragraph
+    - StaticText "NEXT BEST ACTION"
+  - heading "Review listing health" [level=2, ref=e90]
+  - paragraph
+    - StaticText "Check product details, pricing visibility, images, and buyer readiness."
+  - link "Review listings" [ref=e91]
+  - paragraph
+    - StaticText "Products"
+  - paragraph
+    - StaticText "3"
+  - paragraph
+    - StaticText "Available"
+  - paragraph
+    - StaticText "3"
+  - paragraph
+    - StaticText "Inventory Value"
+  - paragraph
+    - StaticText "$10,000.00"
+  - paragraph
+    - StaticText "Pricing by Request"
+  - paragraph
+    - StaticText "1"
+  - link "Listings Create, edit, publish, disable, or remove product listings. 3 listings total" [ref=e92]
+    - heading "Listings" [level=2, ref=e115]
+    - paragraph
+      - StaticText "Create, edit, publish, disable, or remove product listings."
+    - StaticText "3 listings total"
+  - link "Inventory Track stock levels, inventory value, and low-stock products. 0 stock alerts" [ref=e93]
+    - heading "Inventory" [level=2, ref=e116]
+    - paragraph
+      - StaticText "Track stock levels, inventory value, and low-stock products."
+    - StaticText "0 stock alerts"
+  - link "Marketplace Preview See what buyers see and manage marketplace listing presentation. 3 buyer-visible listings" [ref=e94]
+    - heading "Marketplace Preview" [level=2, ref=e117]
+    - paragraph
+      - StaticText "See what buyers see and manage marketplace listing presentation."
+    - StaticText "3 buyer-visible listings"
+  - link "Pricing Visibility Choose whether buyers see prices or request pricing by message. 1 quote-only listing" [ref=e95]
+    - heading "Pricing Visibility" [level=2, ref=e118]
+    - paragraph
+      - StaticText "Choose whether buyers see prices or request pricing by message."
+    - StaticText "1 quote-only listing"
+  - group
+    - DisclosureTriangle "Advanced setup Strains, batches, customers" [expanded=false]
+      - StaticText "Advanced setup"
+      - StaticText "Strains, batches, customers"
+  - heading "Catalog health" [level=2, ref=e96]
+  - paragraph
+    - StaticText "Use this overview to jump into the cleanup queue that needs attention."
+  - link "View all listings" [ref=e97]
+  - link "Missing images Add photos so verified buyers can inspect listings faster. 0" [ref=e98]
+    - paragraph
+      - StaticText "Missing images"
+    - paragraph
+      - StaticText "Add photos so verified buyers can inspect listings faster."
+    - StaticText "0"
+  - link "Missing type Assign product types so filters and buyer preview stay clean. 0" [ref=e99]
+    - paragraph
+      - StaticText "Missing type"
+    - paragraph
+      - StaticText "Assign product types so filters and buyer preview stay clean."
+    - StaticText "0"
+  - link "Quote only Review listings where buyers request pricing by message. 1" [ref=e100]
+    - paragraph
+      - StaticText "Quote only"
+    - paragraph
+      - StaticText "Review listings where buyers request pricing by message."
+    - StaticText "1"
+  - link "Low stock Restock or hide listings with 10 or fewer units on hand. 0" [ref=e101]
+    - paragraph
+      - StaticText "Low stock"
+    - paragraph
+      - StaticText "Restock or hide listings with 10 or fewer units on hand."
+    - StaticText "0"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e119]
+  - button "Open messages" [ref=e102]
+- region "Notifications alt+T" [ref=e85]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e120]
+  - image
+- alert

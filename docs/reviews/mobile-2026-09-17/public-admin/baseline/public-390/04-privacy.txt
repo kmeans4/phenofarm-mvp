@@ -1,0 +1,110 @@
+- main
+  - generic
+  - generic
+    - navigation
+      - link "PF PhenoFarm" [ref=e267]
+        - StaticText "PF"
+        - StaticText "PhenoFarm"
+      - link "Help" [ref=e268]
+    - sectionheader
+      - paragraph
+        - StaticText "LEGAL"
+      - heading "Privacy Policy" [level=1, ref=e269]
+      - paragraph
+        - StaticText "Last updated: July 6, 2026"
+      - paragraph
+        - StaticText "How PhenoFarm handles account, business, license, marketplace, request, quote, and cultivator subscription data during the MVP."
+      - paragraph
+        - StaticText "Pre-launch draft pending counsel review."
+      - paragraph
+        - StaticText "This MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app."
+    - complementary
+      - paragraph
+        - StaticText "Contents"
+      - list
+        - listitem [level=1]
+          - link "Information we collect" [ref=e277]
+        - listitem [level=1]
+          - link "Wholesale payment data" [ref=e278]
+        - listitem [level=1]
+          - link "How we use information" [ref=e279]
+        - listitem [level=1]
+          - link "How information is shared" [ref=e280]
+        - listitem [level=1]
+          - link "Retention and security" [ref=e281]
+        - listitem [level=1]
+          - link "Choices and contact" [ref=e282]
+    - article
+      - generic
+        - heading "Information we collect" [level=2, ref=e270]
+        - paragraph
+          - StaticText "PhenoFarm collects information needed to create accounts, verify marketplace participants, operate catalog and request workflows, and support cultivator subscriptions."
+        - list
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Account details such as name, email address, role, and authentication records."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Business profile details such as business name, contact information, addresses, and grower or dispensary settings."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "License and verification information for dispensaries, including license numbers, license status, and admin review records."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Marketplace records such as products, strains, batches, inventory, documents, favorites, messages, quote terms, order request lines, request value, fulfillment status, and direct payment terms."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Cultivator subscription records such as plan, status, Stripe customer identifiers, renewal dates, and billing portal availability."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Support communications and basic technical data such as session, security, and device/browser information."
+      - generic
+        - heading "Wholesale payment data" [level=2, ref=e271]
+        - paragraph
+          - StaticText "PhenoFarm does not process wholesale payments between buyers and growers. The app may store request value, direct payment terms, and fulfillment records, but settlement happens directly between the licensed businesses outside PhenoFarm."
+        - paragraph
+          - StaticText "Because wholesale payment is not processed in PhenoFarm, the MVP is not designed to collect wholesale card, bank, remittance, payout, escrow, or transfer details for buyer-seller settlement."
+      - generic
+        - heading "How we use information" [level=2, ref=e272]
+        - list
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Authenticate users and route them to the correct admin, grower, or dispensary workspace."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Operate verification gates so unverified dispensaries cannot submit order requests."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Publish grower catalog information and help buyers create request drafts."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Record quote terms, messages, request status, fulfillment notes, and direct settlement terms for marketplace coordination."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Provide support, investigate issues, maintain security, and improve MVP workflows."
+          - listitem [level=1]
+            - ListMarker "• "
+            - StaticText "Operate grower subscription billing through Stripe Billing."
+      - generic
+        - heading "How information is shared" [level=2, ref=e273]
+        - paragraph
+          - StaticText "Marketplace information may be visible to the counterparties involved in a workflow. For example, growers may see buyer business details, request lines, quote responses, and fulfillment notes; dispensaries may see grower catalog details, quote terms, and request status."
+        - paragraph
+          - StaticText "PhenoFarm may use service providers for hosting, database storage, authentication, support operations, and cultivator subscription billing. Stripe handles subscription checkout and billing portal workflows for growers."
+      - generic
+        - heading "Retention and security" [level=2, ref=e274]
+        - paragraph
+          - StaticText "The MVP keeps account, business, license, catalog, message, quote, and order request records as needed to operate the marketplace, provide support, maintain auditability, and satisfy legal or compliance needs."
+        - paragraph
+          - StaticText "PhenoFarm uses administrative access controls and application security practices appropriate for the MVP stage, but final production retention and security commitments should be reviewed by counsel before launch."
+      - generic
+        - heading "Choices and contact" [level=2, ref=e275]
+        - paragraph
+          - StaticText "Users can update many account, business, and license details in their workspace settings. For privacy questions, correction requests, or account support, contact support@phenofarm.com."
+      - paragraph
+        - StaticText "Questions or requests?"
+      - paragraph
+        - StaticText "Contact"
+        - link "support@phenofarm.com" [ref=e276]
+        - StaticText "."
+- alert

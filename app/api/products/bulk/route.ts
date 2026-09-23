@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
+import { productImportTemplateCsv, validateProductImport } from '@/lib/product-import';
+import { validateCsvImportFile } from '@/lib/upload-validation';
+import { canCreateListings, FREE_LISTING_LIMIT_MESSAGE, getGrowerPlanLimits } from '@/lib/plans';
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,91 +20,109 @@ export async function POST(request: NextRequest) {
     }
 
     const formData = await request.formData();
-    const csvFile = formData.get('file') as File;
+    const csvFile = formData.get('file');
+    const dryRun = formData.get('dryRun') === 'true';
 
-    if (!csvFile) {
+    if (!(csvFile instanceof File)) {
       return NextResponse.json({ error: 'No CSV file provided' }, { status: 400 });
     }
 
+    const fileValidation = validateCsvImportFile(csvFile);
+    if (!fileValidation.ok) {
+      return NextResponse.json({ error: fileValidation.error }, { status: 400 });
+    }
+
     const csvContent = await csvFile.text();
-    const lines = csvContent.split('\n').filter(line => line.trim());
+    const validation = validateProductImport(csvContent);
 
-    if (lines.length <= 1) {
-      return NextResponse.json({ error: 'CSV file is empty or has no data rows' }, { status: 400 });
+    const [growerPlan, listingCount] = await Promise.all([
+      db.grower.findUnique({
+        where: { id: user.growerId },
+        select: { subscriptionPlan: true, subscriptionStatus: true },
+      }),
+      db.product.count({ where: { growerId: user.growerId, isDeleted: false } }),
+    ]);
+    const limits = getGrowerPlanLimits(growerPlan);
+    if (!limits.csvImport) {
+      return NextResponse.json(
+        { error: 'CSV import is available on Pro and Business plans', code: 'PLAN_UPGRADE_REQUIRED', upgradeHref: '/grower/pricing' },
+        { status: 402 }
+      );
     }
 
-    const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
-    
-    const requiredHeaders = ['name', 'price', 'inventoryqty', 'unit'];
-    const missingHeaders = requiredHeaders.filter(h => !headers.includes(h));
-    
-    if (missingHeaders.length > 0) {
-      return NextResponse.json({ 
-        error: `Missing required columns: ${missingHeaders.join(', ')}` 
-      }, { status: 400 });
+    if (!canCreateListings(growerPlan, listingCount, validation.records.length)) {
+      return NextResponse.json(
+        { error: FREE_LISTING_LIMIT_MESSAGE, code: 'PLAN_LIMIT_REACHED', upgradeHref: '/grower/pricing' },
+        { status: 402 }
+      );
     }
 
-    let successCount = 0;
-    let errorCount = 0;
-    const errors: string[] = [];
+    if (dryRun) {
+      return NextResponse.json({
+        success: validation.errors.length === 0,
+        dryRun: true,
+        totalRows: validation.totalRows,
+        validRows: validation.records.length,
+        errorRows: new Set(validation.errors.map((item) => item.row)).size,
+        records: validation.records.map((record, index) => ({ row: index + 2, action: 'create', name: record.name, productType: record.productType, price: record.price })),
+        errors: validation.errors,
+      }, { status: validation.errors.length ? 422 : 200 });
+    }
 
-    for (let i = 1; i < lines.length; i++) {
-      const values = lines[i].split(',').map(v => v.trim());
-      
-      if (values.length < headers.length) {
-        errors.push(`Row ${i + 1}: Missing values`);
-        errorCount++;
-        continue;
+    if (validation.errors.length > 0) {
+      return NextResponse.json({
+        success: false,
+        error: 'Product import has row errors. Fix the CSV and upload again.',
+        totalRows: validation.totalRows,
+        validRows: validation.records.length,
+        errorRows: new Set(validation.errors.map((item) => item.row)).size,
+        errors: validation.errors,
+      }, { status: 422 });
+    }
+
+    const createdProducts = await db.$transaction(async (tx) => {
+      const strainIds = new Map<string, string>();
+      for (const strainName of new Set(validation.records.map((record) => record.strainName).filter(Boolean) as string[])) {
+        const strain = await tx.strain.upsert({
+          where: { growerId_name: { growerId: user.growerId!, name: strainName } },
+          update: {},
+          create: { growerId: user.growerId!, name: strainName },
+          select: { id: true },
+        });
+        strainIds.set(strainName, strain.id);
       }
 
-      try {
-        const productData: Record<string, string | null> = {};
-        headers.forEach((header, index) => {
-          productData[header] = values[index] || null;
-        });
-
-        const growerId = user.growerId!;
-
-        // Map legacy column names to new schema fields
-        await db.product.create({
-          data: {
-            growerId,
-            name: productData.name || '',
-            // New flexible type/subtype system
-            productType: productData.producttype || productData.category || null,
-            subType: productData.subtype || productData.subcategory || null,
-            // Legacy fields for backwards compatibility
-            strainLegacy: productData.strain || null,
-            categoryLegacy: productData.category || null,
-            subcategoryLegacy: productData.subcategory || null,
-            thcLegacy: productData.thc ? parseFloat(productData.thc) : null,
-            cbdLegacy: productData.cbd ? parseFloat(productData.cbd) : null,
-            price: parseFloat(productData.price || '0'),
-            inventoryQty: parseInt(productData.inventoryqty || '0'),
-            unit: productData.unit || 'Gram',
-            description: productData.description || null,
-            images: productData.images ? productData.images.split(';') : [],
-            isAvailable: productData.isavailable !== 'false',
-            sku: productData.sku || null,
-            brand: productData.brand || null,
-            isFeatured: productData.isfeatured === 'true',
-          },
-        });
-        
-        successCount++;
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error';
-        errors.push(`Row ${i + 1}: ${errorMessage}`);
-        errorCount++;
-      }
-    }
+      return tx.product.createMany({
+        data: validation.records.map((record) => ({
+          growerId: user.growerId!,
+          name: record.name,
+          productType: record.productType,
+          subType: record.subType,
+          strainId: record.strainName ? strainIds.get(record.strainName) : null,
+          thcMin: record.thcMin,
+          thcMax: record.thcMax,
+          cbdMin: record.cbdMin,
+          cbdMax: record.cbdMax,
+          price: record.price,
+          inventoryQty: record.inventoryQty,
+          unit: record.unit,
+          description: record.description,
+          images: record.images,
+          isAvailable: record.inventoryQty > 0 ? record.isAvailable : false,
+          isPriceVisible: record.isPriceVisible,
+          sku: record.sku,
+          brand: record.brand,
+          isDeleted: false,
+        })),
+      });
+    });
 
     return NextResponse.json({
       success: true,
-      totalRows: lines.length - 1,
-      successCount,
-      errorCount,
-      errors: errors.length > 0 ? errors : undefined,
+      totalRows: validation.totalRows,
+      successCount: createdProducts.count,
+      errorCount: 0,
+      errors: [],
     }, { status: 200 });
   } catch (error) {
     console.error('Error uploading CSV:', error);
@@ -120,21 +141,7 @@ export async function GET(request: NextRequest) {
     }
 
     if (template === 'true') {
-      // Updated template with new field names
-      const templateHeaders = ['name', 'productType', 'subType', 'strain', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'images', 'sku', 'brand'];
-      const sampleRow = [
-        'Blue Dream - 3.5g Jar', 'Flower', '3.5g Jar', 'Blue Dream',
-        '45.00', '100', 'Gram',
-        'Premium sativa flower with berry aroma', 'true',
-        'https://example.com/image1.jpg', 'BD-001', 'PhenoFarm'
-      ];
-      
-      const csvContent = [
-        templateHeaders.join(','),
-        sampleRow.join(',')
-      ].join('\n');
-
-      return new NextResponse(csvContent, {
+      return new NextResponse(productImportTemplateCsv(), {
         headers: {
           'Content-Type': 'text/csv',
           'Content-Disposition': 'attachment; filename=product-template.csv',

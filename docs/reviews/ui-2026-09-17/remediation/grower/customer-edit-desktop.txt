@@ -1,0 +1,114 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e3256]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3257]
+    - StaticText "Notifications"
+    - StaticText "17"
+  - navigation "Portal navigation" [ref=e3258]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3263]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e3264]
+      - StaticText "Catalog"
+    - link "Products" [ref=e3265]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3266]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3267]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3268]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3269]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3270]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3271]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3272]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3259]
+- main
+  - link "← Customers" [ref=e3260]
+  - link "Statement" [ref=e3261]
+  - sectionheader
+    - heading "Edit customer" [level=1, ref=e3273]
+  - form
+    - heading "Business" [level=2, ref=e3274]
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox "Enter business name" [ref=e3275]: Maple Street Market
+      - StaticText "Maple Street Market"
+    - LabelText
+      - StaticText "License Number"
+    - textbox "License #" [ref=e3276]: VT-UI-2026-104
+      - StaticText "VT-UI-2026-104"
+    - LabelText
+      - StaticText "Website"
+    - textbox "https://..." [ref=e3277]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Brief description..." [ref=e3278]
+    - paragraph
+      - StaticText "0/500 characters"
+    - heading "Contact" [level=2, ref=e3279]
+    - LabelText
+      - StaticText "Contact Person"
+    - textbox "Full name" [ref=e3280]: Alex Morgan
+      - StaticText "Alex Morgan"
+    - LabelText
+      - StaticText "Email"
+    - textbox "email@example.com" [ref=e3281]: orders@example.test
+      - StaticText "orders@example.test"
+    - LabelText
+      - StaticText "Phone"
+    - textbox "(555) 123-4567" [ref=e3282]: 802-555-0142
+      - StaticText "802-555-0142"
+    - heading "Address" [level=2, ref=e3283]
+    - LabelText
+      - StaticText "Street Address"
+    - textbox "123 Main St" [ref=e3284]: 25 Maple Street
+      - StaticText "25 Maple Street"
+    - LabelText
+      - StaticText "City"
+    - textbox "City" [ref=e3285]: Burlington
+      - StaticText "Burlington"
+    - LabelText
+      - StaticText "State"
+    - combobox [expanded=false, ref=e3286]: Vermont
+      - MenuListPopup
+        - option "Vermont" [selected, ref=e3292]
+        - option "Maine" [ref=e3293]
+        - option "Massachusetts" [ref=e3294]
+        - option "Connecticut" [ref=e3295]
+        - option "Rhode Island" [ref=e3296]
+        - option "New Hampshire" [ref=e3297]
+        - option "New York" [ref=e3298]
+        - option "New Jersey" [ref=e3299]
+        - option "Pennsylvania" [ref=e3300]
+        - option "Delaware" [ref=e3301]
+        - option "Maryland" [ref=e3302]
+        - option "District of Columbia" [ref=e3303]
+        - option "Virginia" [ref=e3304]
+    - LabelText
+      - StaticText "ZIP"
+    - textbox "12345" [ref=e3287]: 05401
+      - StaticText "05401"
+    - button "More actions for Maple Street Market" [ref=e3291]
+      - StaticText "More"
+    - link "Cancel" [ref=e3288]
+    - button "Save changes" [ref=e3289]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3290]
+  - button "Open messages" [ref=e3262]
+- region "Notifications alt+T" [ref=e3255]
+- alert

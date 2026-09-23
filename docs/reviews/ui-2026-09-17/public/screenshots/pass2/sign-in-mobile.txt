@@ -1,0 +1,25 @@
+- main
+  - link "PF PhenoFarm" [ref=e1534]
+    - StaticText "PF"
+    - StaticText "PhenoFarm"
+  - heading "Sign in to your account" [level=2, ref=e1533]
+  - paragraph
+    - StaticText "Or"
+    - link "create a new account" [ref=e1535]
+  - form
+    - LabelText
+      - StaticText "Email address"
+    - textbox "Email address" [required, ref=e1536]
+    - LabelText
+      - StaticText "Password"
+    - generic
+      - textbox "Password" [required, ref=e1538]
+      - button "Show password" [ref=e1539]
+    - group
+      - DisclosureTriangle "Need password help?" [expanded=false]
+    - button "Sign in" [ref=e1537]
+  - group
+    - DisclosureTriangle "Demo access" [expanded=false]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1540]
+  - image
+- alert

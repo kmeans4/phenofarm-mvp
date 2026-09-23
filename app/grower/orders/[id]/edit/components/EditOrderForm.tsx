@@ -1,12 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { canTransitionOrderStatus, getOrderStatusLabel, type OrderStatusValue } from '@/lib/order-workflow';
+import { pluralize } from '@/lib/utils';
+import { formatProductUnit } from '@/lib/product-display';
+import { CheckCircle2, ClipboardList, Flag, Package, Truck, XCircle, type LucideIcon } from 'lucide-react';
 
 interface OrderItem {
   id: string;
@@ -14,6 +19,7 @@ interface OrderItem {
   quantity: number;
   unitPrice: number;
   totalPrice: number;
+  maxQuantity?: number;
   product?: {
     id: string;
     name: string;
@@ -31,9 +37,6 @@ interface Order {
   tax: number;
   shippingFee: number;
   notes: string | null;
-  shippedAt: Date | null;
-  deliveredAt: Date | null;
-  createdAt: Date;
   dispensary: {
     businessName: string;
     phone: string | null;
@@ -51,13 +54,18 @@ interface FieldErrors {
 }
 
 const STATUS_OPTIONS = [
-  { value: 'PENDING', label: 'Pending', color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: '📋' },
-  { value: 'CONFIRMED', label: 'Confirmed', color: 'bg-blue-100 text-blue-800 border-blue-300', icon: '✅' },
-  { value: 'PROCESSING', label: 'Processing', color: 'bg-purple-100 text-purple-800 border-purple-300', icon: '📦' },
-  { value: 'SHIPPED', label: 'Shipped', color: 'bg-orange-100 text-orange-800 border-orange-300', icon: '🚚' },
-  { value: 'DELIVERED', label: 'Delivered', color: 'bg-green-100 text-green-800 border-green-300', icon: '🎉' },
-  { value: 'CANCELLED', label: 'Cancelled', color: 'bg-red-100 text-red-800 border-red-300', icon: '❌' },
-];
+  { value: 'PENDING', label: getOrderStatusLabel('PENDING'), color: 'bg-yellow-100 text-yellow-800 border-yellow-300', icon: ClipboardList },
+  { value: 'CONFIRMED', label: getOrderStatusLabel('CONFIRMED'), color: 'bg-blue-100 text-blue-800 border-blue-300', icon: CheckCircle2 },
+  { value: 'PROCESSING', label: getOrderStatusLabel('PROCESSING'), color: 'bg-purple-100 text-purple-800 border-purple-300', icon: Package },
+  { value: 'SHIPPED', label: getOrderStatusLabel('SHIPPED'), color: 'bg-orange-100 text-orange-800 border-orange-300', icon: Truck },
+  { value: 'DELIVERED', label: getOrderStatusLabel('DELIVERED'), color: 'bg-green-100 text-green-800 border-green-300', icon: Flag },
+  { value: 'CANCELLED', label: getOrderStatusLabel('CANCELLED'), color: 'bg-red-100 text-red-800 border-red-300', icon: XCircle },
+] satisfies Array<{
+  value: OrderStatusValue;
+  label: string;
+  color: string;
+  icon: LucideIcon;
+}>;
 
 const validateShippingFee = (fee: number): string | undefined => {
   if (fee < 0) return 'Shipping fee cannot be negative';
@@ -77,9 +85,10 @@ const validateNotes = (notes: string): string | undefined => {
   return undefined;
 };
 
-const validateQuantity = (qty: number): string | undefined => {
+const validateQuantity = (qty: number, maxQuantity?: number): string | undefined => {
   if (qty < 1) return 'Quantity must be at least 1';
   if (qty > 9999) return 'Quantity cannot exceed 9999';
+  if (maxQuantity !== undefined && qty > maxQuantity) return `Quantity cannot exceed available stock (${maxQuantity})`;
   return undefined;
 };
 
@@ -93,6 +102,8 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
+const getItemMaxQuantity = (item: OrderItem) => Math.max(1, item.maxQuantity ?? item.quantity);
+
 export default function EditOrderForm({ order }: { order: Order }) {
   const router = useRouter();
   const { showToast } = useToast();
@@ -105,26 +116,24 @@ export default function EditOrderForm({ order }: { order: Order }) {
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [removeCandidate, setRemoveCandidate] = useState<OrderItem | null>(null);
+  const [showCancellationConfirm, setShowCancellationConfirm] = useState(false);
 
-  const initialData = {
-    status: order.status,
-    notes: order.notes || '',
-    shippingFee: order.shippingFee,
-    tax: order.tax,
-    items: order.items,
-  };
+  const submitRef = useRef(false);
 
-  const currentData = { status, notes, shippingFee, tax, items };
-
-  const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
+  const { isDirty, setIsDirty, resetDirtyState, confirmNavigation } = useUnsavedChanges({
     enabled: true,
     message: 'You have unsaved changes in this request. Are you sure you want to leave?',
   });
 
   useEffect(() => {
-    const hasChanges = JSON.stringify(currentData) !== JSON.stringify(initialData);
+    const hasChanges = status !== order.status || notes !== (order.notes || '')
+      || shippingFee !== order.shippingFee || tax !== order.tax
+      || items.length !== order.items.length || items.some((item, index) => {
+        const original = order.items[index];
+        return item.id !== original?.id || item.quantity !== original?.quantity;
+      });
     setIsDirty(hasChanges);
-  }, [currentData, setIsDirty]);
+  }, [status, notes, shippingFee, tax, items, order, setIsDirty]);
 
   const calculateTotals = () => {
     const subtotal = items.reduce((sum, item) => sum + (item.quantity * item.unitPrice), 0);
@@ -147,7 +156,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
       }
     });
     
-    const invalidItems = items.filter(item => validateQuantity(item.quantity));
+    const invalidItems = items.filter(item => validateQuantity(item.quantity, getItemMaxQuantity(item)));
     if (invalidItems.length > 0) {
       showToast('error', 'One or more items have invalid quantities');
     }
@@ -165,12 +174,24 @@ export default function EditOrderForm({ order }: { order: Order }) {
     }
   };
 
+  const setFieldError = (field: keyof FieldErrors, error: string | undefined) => {
+    setErrors((prev) => {
+      const next = { ...prev };
+      if (error) {
+        next[field] = error;
+      } else {
+        delete next[field];
+      }
+      return next;
+    });
+  };
+
   const handleShippingFeeChange = (value: string) => {
     const numValue = parseFloat(value) || 0;
     setShippingFee(numValue);
     if (touched.shippingFee) {
       const error = validateShippingFee(numValue);
-      setErrors(prev => ({ ...prev, shippingFee: error }));
+      setFieldError('shippingFee', error);
     }
   };
 
@@ -179,7 +200,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
     setTax(numValue);
     if (touched.tax) {
       const error = validateTax(numValue);
-      setErrors(prev => ({ ...prev, tax: error }));
+      setFieldError('tax', error);
     }
   };
 
@@ -187,7 +208,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
     setNotes(value);
     if (touched.notes) {
       const error = validateNotes(value);
-      setErrors(prev => ({ ...prev, notes: error }));
+      setFieldError('notes', error);
     }
   };
 
@@ -201,17 +222,18 @@ export default function EditOrderForm({ order }: { order: Order }) {
       default: value = '';
     }
     const error = validateField(field, value);
-    setErrors(prev => ({ ...prev, [field]: error }));
+    setFieldError(field, error);
   };
 
   const updateItemQuantity = (itemId: string, newQuantity: number) => {
-    const error = validateQuantity(newQuantity);
+    const item = items.find((candidate) => candidate.id === itemId);
+    const error = validateQuantity(newQuantity, item ? getItemMaxQuantity(item) : undefined);
     if (error) {
       showToast('error', error);
       return;
     }
     
-    setItems(items.map(item => {
+    setItems((current) => current.map(item => {
       if (item.id === itemId) {
         return {
           ...item,
@@ -224,13 +246,11 @@ export default function EditOrderForm({ order }: { order: Order }) {
   };
 
   const removeItem = (itemId: string) => {
-    setItems(items.filter(item => item.id !== itemId));
+    setItems((current) => current.filter(item => item.id !== itemId));
     showToast('info', 'Item has been removed from the request');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const validateBeforeSubmit = () => {
     const allTouched: Record<string, boolean> = {
       shippingFee: true,
       tax: true,
@@ -240,13 +260,20 @@ export default function EditOrderForm({ order }: { order: Order }) {
     
     if (!validateForm()) {
       showToast('error', 'Please fix the errors below before saving');
-      return;
+      return false;
     }
     
     if (items.length === 0) {
-      showToast('error', 'Order must have at least one item');
-      return;
+      showToast('error', 'Request must have at least one item');
+      return false;
     }
+
+    return true;
+  };
+
+  const submitChanges = async () => {
+    if (isSubmitting || submitRef.current) return;
+    submitRef.current = true;
     
     setIsSubmitting(true);
 
@@ -262,28 +289,37 @@ export default function EditOrderForm({ order }: { order: Order }) {
           items: items.map(item => ({
             id: item.id,
             quantity: item.quantity,
-            unitPrice: item.unitPrice,
-            totalPrice: item.totalPrice,
           })),
         }),
       });
 
       if (response.ok) {
-        showToast('success', 'Order updated successfully!');
+        showToast('success', 'Request updated');
         resetDirtyState();
-        setTimeout(() => {
-          router.push(`/grower/orders/${order.id}`);
-          router.refresh();
-        }, 1500);
+        router.push(`/grower/orders/${order.id}`);
       } else {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         showToast('error', data.error || 'Failed to update request');
       }
     } catch {
       showToast('error', 'An error occurred while updating');
     } finally {
+      submitRef.current = false;
       setIsSubmitting(false);
     }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!validateBeforeSubmit()) return;
+
+    if (status === 'CANCELLED' && order.status !== 'CANCELLED') {
+      setShowCancellationConfirm(true);
+      return;
+    }
+
+    await submitChanges();
   };
 
   // Keyboard shortcuts: Ctrl+S to save, Esc to cancel
@@ -291,28 +327,32 @@ export default function EditOrderForm({ order }: { order: Order }) {
     onSave: async () => {
       await handleSubmit({ preventDefault: () => {} } as React.FormEvent);
     },
-    onCancel: () => router.push("/grower/orders"),
+    onCancel: () => { if (confirmNavigation()) router.push(`/grower/orders/${order.id}`); },
     isDirty,
     enabled: true
   });
 
   const hasErrors = Object.keys(errors).length > 0;
+  const currentStatusOption = STATUS_OPTIONS.find(s => s.value === order.status);
+  const validNextStatusOptions = STATUS_OPTIONS.filter((option) =>
+    option.value !== order.status && canTransitionOrderStatus(order.status, option.value)
+  );
+  const CurrentStatusIcon = currentStatusOption?.icon || ClipboardList;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-4xl mx-auto p-4 sm:p-6 space-y-6">
+    <div className="mx-auto w-full min-w-0 max-w-4xl space-y-3 sm:space-y-6 overflow-x-clip">
         <Link
           href={`/grower/orders/${order.id}`}
-          className="sm:hidden inline-flex items-center gap-2 text-sm font-medium text-green-700 hover:text-green-800"
+          className="inline-flex min-h-10 items-center gap-2 text-sm font-medium text-green-700 hover:text-green-800 sm:hidden"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
-          Back to request
+          Request
         </Link>
 
         {/* Breadcrumb */}
-        <nav className="hidden sm:flex items-center gap-2 text-sm text-gray-500 overflow-x-auto whitespace-nowrap pb-2">
+        <nav className="hidden min-w-0 items-center gap-2 overflow-hidden pb-2 text-sm text-gray-500 sm:flex">
           <Link href="/grower/dashboard" className="hover:text-gray-700 transition-colors flex-shrink-0">
             Dashboard
           </Link>
@@ -325,7 +365,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
           <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
-          <Link href={`/grower/orders/${order.id}`} className="hover:text-gray-700 transition-colors flex-shrink-0">
+          <Link href={`/grower/orders/${order.id}`} title={order.orderId} className="min-w-0 truncate transition-colors hover:text-gray-700">
             {order.orderId}
           </Link>
           <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -334,27 +374,10 @@ export default function EditOrderForm({ order }: { order: Order }) {
           <span className="text-gray-900 font-medium flex-shrink-0">Edit</span>
         </nav>
 
-        {/* Header */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-          <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-            <div className="min-w-0 flex-1">
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Edit Request #{order.orderId}
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Customer: {order.dispensary.businessName}
-              </p>
-            </div>
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <span className="text-sm text-gray-500 hidden sm:inline">Status:</span>
-              <span className={`px-3 py-1.5 rounded-full text-sm font-medium border ${
-                STATUS_OPTIONS.find(s => s.value === order.status)?.color || 'bg-gray-100 text-gray-800 border-gray-200'
-              }`}>
-                {STATUS_OPTIONS.find(s => s.value === order.status)?.label || order.status}
-              </span>
-            </div>
-          </div>
-        </div>
+        <PageHeader
+          title={<span className="flex min-w-0 flex-col gap-1"><span>Edit request</span><span title={order.orderId} className="max-w-full break-all font-sans text-base font-semibold leading-tight text-gray-600 sm:text-lg">#{order.orderId}</span></span>}
+          description={order.dispensary.businessName}
+        />
 
         {/* Unsaved Changes Warning */}
         {isDirty && (
@@ -369,162 +392,208 @@ export default function EditOrderForm({ order }: { order: Order }) {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Order Status */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-6">
+          {/* Request status */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-3 sm:text-lg sm:mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Order Status
+              Request status
             </h2>
-            
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
-              {STATUS_OPTIONS.map((option) => (
-                <label
-                  key={option.value}
-                  className={`
-                    cursor-pointer rounded-lg border-2 p-3 sm:p-4 transition-all
-                    flex items-center gap-2 sm:flex-col sm:items-start sm:gap-1
-                    ${status === option.value
-                      ? 'border-green-500 bg-green-50 ring-1 ring-green-500'
-                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                    }
-                  `}
+
+            <p className="flex items-center gap-2 text-sm text-gray-600"><CurrentStatusIcon className="h-4 w-4" aria-hidden="true" />Current: {currentStatusOption?.label || getOrderStatusLabel(order.status)}</p>
+
+            <div className="mt-3 sm:mt-4">
+              <p className="mb-2 text-sm font-medium text-gray-700">Change to</p>
+              {validNextStatusOptions.length > 0 ? (
+                <div className="grid grid-cols-2 gap-2">
+                  {validNextStatusOptions.map((option) => {
+                    const StatusIcon = option.icon;
+                    const isSelected = status === option.value;
+                    const isDestructive = option.value === 'CANCELLED';
+                    const selectedClasses = isDestructive
+                      ? 'border-red-500 bg-red-50 ring-1 ring-red-500'
+                      : 'border-green-500 bg-green-50 ring-1 ring-green-500';
+                    const idleClasses = isDestructive
+                      ? 'border-red-200 hover:border-red-300 hover:bg-red-50'
+                      : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50';
+                    const textClasses = isDestructive
+                      ? isSelected ? 'text-red-700' : 'text-red-600'
+                      : isSelected ? 'text-green-700' : 'text-gray-700';
+
+                    return (
+                      <label
+                        key={option.value}
+                        className={`
+                          min-h-10 cursor-pointer rounded-lg border-2 px-2 py-2 sm:p-3 transition-all
+                          flex items-center gap-2 focus-within:ring-2 focus-within:ring-green-600 focus-within:ring-offset-2
+                          ${isSelected ? selectedClasses : idleClasses}
+                        `}
+                      >
+                        <input
+                          type="radio"
+                          name="status"
+                          value={option.value}
+                          checked={isSelected}
+                          onChange={() => setStatus(option.value)}
+                          className="sr-only"
+                        />
+                        <StatusIcon className={`h-5 w-5 ${textClasses}`} aria-hidden="true" />
+                        <span className={`text-sm font-medium ${textClasses}`}>
+                          {option.label}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              ) : (
+                <p className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-600">
+                  This request is closed.
+                </p>
+              )}
+              {status !== order.status && (
+                <button
+                  type="button"
+                  onClick={() => setStatus(order.status)}
+                  className="mt-2 min-h-10 rounded-md px-2 text-sm font-medium text-gray-500 hover:text-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
                 >
-                  <input
-                    type="radio"
-                    name="status"
-                    value={option.value}
-                    checked={status === option.value}
-                    onChange={() => setStatus(option.value)}
-                    className="sr-only"
-                  />
-                  <span className="text-lg">{option.icon}</span>
-                  <span className={`text-sm font-medium ${status === option.value ? 'text-green-700' : 'text-gray-700'}`}>
-                    {option.label}
-                  </span>
-                </label>
-              ))}
+                  Keep current status
+                </button>
+              )}
             </div>
           </div>
 
           {/* Request items */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-3 sm:text-lg sm:mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
-              Request Items
+              Items
               <span className="text-sm font-normal text-gray-500">({items.length})</span>
             </h2>
 
             {/* Desktop View */}
             <div className="hidden sm:block space-y-3">
-              {items.map((item, index) => (
-                <div key={item.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
-                  <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600 flex-shrink-0">
-                    {index + 1}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{item.product?.name || 'Unknown Product'}</p>
-                    {item.product?.strain && <p className="text-sm text-gray-500 truncate">{item.product.strain}</p>}
-                    <p className="text-sm text-gray-600">{formatCurrency(item.unitPrice)} / {item.product?.unit || 'unit'}</p>
-                  </div>
+              {items.map((item, index) => {
+                const maxQuantity = getItemMaxQuantity(item);
 
-                  <div className="flex items-center gap-3 flex-shrink-0">
-                    {/* Quantity Controls */}
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
-                      <button
-                        type="button"
-                        onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                        className="px-3 py-2 hover:bg-gray-100 border-r border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
-                        disabled={item.quantity <= 1}
-                      >
-                        −
-                      </button>
-                      <span className="px-4 py-2 font-medium min-w-[3rem] text-center">{item.quantity}</span>
-                      <button
-                        type="button"
-                        onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                        className="px-3 py-2 hover:bg-gray-100 border-l border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
-                        disabled={item.quantity >= 9999}
-                      >
-                        +
-                      </button>
+                return (
+                  <div key={item.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                    <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium text-gray-600 flex-shrink-0">
+                      {index + 1}
                     </div>
 
-                    <div className="text-right min-w-[100px]">
-                      <p className="font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{item.product?.name || 'Unknown Product'}</p>
+                      {item.product?.strain && <p className="text-sm text-gray-500 truncate">{item.product.strain}</p>}
+                      <p className="text-sm text-gray-600">{formatCurrency(item.unitPrice)} / {formatProductUnit(item.product?.unit)}</p>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => setRemoveCandidate(item)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      title="Remove item"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      {/* Quantity Controls */}
+                      <div>
+                        <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                            className="px-3 py-2 hover:bg-gray-100 border-r border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
+                            disabled={item.quantity <= 1}
+                          >
+                            -
+                          </button>
+                          <span className="px-4 py-2 font-medium min-w-[3rem] text-center">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                            className="px-3 py-2 hover:bg-gray-100 border-l border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium transition-colors"
+                            disabled={item.quantity >= maxQuantity}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="mt-1 text-right text-xs text-gray-500">Max {maxQuantity}</p>
+                      </div>
+
+                      <div className="text-right min-w-[100px]">
+                        <p className="font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => setRemoveCandidate(item)}
+                        className="min-h-10 min-w-10 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Remove item"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Mobile View */}
             <div className="sm:hidden space-y-3">
-              {items.map((item, index) => (
-                <div key={item.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-3">
-                    <div className="flex items-start gap-3 min-w-0 flex-1">
-                      <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600 flex-shrink-0">
-                        {index + 1}
+              {items.map((item, index) => {
+                const maxQuantity = getItemMaxQuantity(item);
+
+                return (
+                  <div key={item.id} className="border border-gray-200 rounded-lg p-3">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex items-start gap-3 min-w-0 flex-1">
+                        <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center text-xs font-medium text-gray-600 flex-shrink-0">
+                          {index + 1}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900">{item.product?.name || 'Unknown Product'}</p>
+                          {item.product?.strain && <p className="text-sm text-gray-500">{item.product.strain}</p>}
+                          <p className="text-sm text-gray-600 mt-0.5">{formatCurrency(item.unitPrice)}/{formatProductUnit(item.product?.unit)}</p>
+                        </div>
                       </div>
-                      <div className="min-w-0">
-                        <p className="font-medium text-gray-900">{item.product?.name || 'Unknown Product'}</p>
-                        {item.product?.strain && <p className="text-sm text-gray-500">{item.product.strain}</p>}
-                        <p className="text-sm text-gray-600 mt-0.5">{formatCurrency(item.unitPrice)}/{item.product?.unit || 'unit'}</p>
-                      </div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setRemoveCandidate(item)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors -mr-2 -mt-2"
-                      title="Remove item"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
-                  </div>
-                  
-                  <div className="flex items-center justify-between pt-3 border-t border-gray-100">
-                    <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
                       <button
                         type="button"
-                        onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
-                        className="px-4 py-2.5 hover:bg-gray-100 border-r border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium min-w-[44px] touch-manipulation"
-                        disabled={item.quantity <= 1}
+                        onClick={() => setRemoveCandidate(item)}
+                        className="min-h-10 min-w-10 p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors -mr-2 -mt-2"
+                        title="Remove item"
                       >
-                        −
-                      </button>
-                      <span className="px-4 py-2.5 font-medium min-w-[50px] text-center">{item.quantity}</span>
-                      <button
-                        type="button"
-                        onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
-                        className="px-4 py-2.5 hover:bg-gray-100 border-l border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium min-w-[44px] touch-manipulation"
-                        disabled={item.quantity >= 9999}
-                      >
-                        +
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                       </button>
                     </div>
-                    <p className="text-lg font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</p>
+
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                      <div>
+                        <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => updateItemQuantity(item.id, item.quantity - 1)}
+                            className="min-h-10 px-3 py-1.5 hover:bg-gray-100 border-r border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium min-w-[44px] touch-manipulation"
+                            disabled={item.quantity <= 1}
+                          >
+                            -
+                          </button>
+                          <span className="px-3 py-1.5 font-medium min-w-[50px] text-center">{item.quantity}</span>
+                          <button
+                            type="button"
+                            onClick={() => updateItemQuantity(item.id, item.quantity + 1)}
+                            className="min-h-10 px-3 py-1.5 hover:bg-gray-100 border-l border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-lg font-medium min-w-[44px] touch-manipulation"
+                            disabled={item.quantity >= maxQuantity}
+                          >
+                            +
+                          </button>
+                        </div>
+                        <p className="mt-1 text-xs text-gray-500">Max {maxQuantity}</p>
+                      </div>
+                      <p className="text-base font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {items.length === 0 && (
@@ -539,18 +608,18 @@ export default function EditOrderForm({ order }: { order: Order }) {
           </div>
 
           {/* Pricing */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-6">
+            <h2 className="text-base font-semibold text-gray-900 mb-3 sm:text-lg sm:mb-4 flex items-center gap-2">
               <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Pricing
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Shipping Fee ($)
+                  Shipping ($)
                 </label>
                 <input
                   type="number"
@@ -594,16 +663,17 @@ export default function EditOrderForm({ order }: { order: Order }) {
               </div>
             </div>
 
-            <div className="mt-6">
+            <p className="mt-2 text-xs text-gray-500">Optional tax: enter only the amount on your invoice. PhenoFarm does not calculate tax.</p>
+            <div className="mt-3 sm:mt-4">
               <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                Request Notes
+                Notes
               </label>
               <textarea
                 rows={3}
                 value={notes}
                 onChange={(e) => handleNotesChange(e.target.value)}
                 onBlur={() => handleBlur('notes')}
-                placeholder="Add any special instructions or notes..."
+                placeholder="Instructions or notes"
                 className={errors.notes && touched.notes 
                   ? "w-full px-3 py-2.5 border border-red-500 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent bg-red-50 text-base sm:text-sm" 
                   : "w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-base sm:text-sm"
@@ -624,16 +694,16 @@ export default function EditOrderForm({ order }: { order: Order }) {
           </div>
 
           {/* Request summary */}
-          <div className="bg-gray-50 rounded-xl border border-gray-200 p-4 sm:p-6">
-            <h3 className="text-sm font-semibold text-gray-900 uppercase tracking-wide mb-4 flex items-center gap-2">
+          <div className="bg-gray-50 rounded-xl border border-gray-200 p-3 sm:p-6">
+            <h3 className="text-sm font-semibold text-gray-900 mb-2 sm:mb-4 flex items-center gap-2">
               <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
               </svg>
-              Request Summary
+              Summary
             </h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-600">Subtotal ({items.length} items)</span>
+                <span className="text-gray-600">Subtotal ({pluralize(items.length, 'item')})</span>
                 <span className="font-medium text-gray-900">{formatCurrency(subtotal)}</span>
               </div>
               <div className="flex justify-between">
@@ -646,16 +716,16 @@ export default function EditOrderForm({ order }: { order: Order }) {
               </div>
               <div className="flex justify-between pt-3 mt-3 border-t border-gray-200">
                 <span className="font-semibold text-gray-900 text-base">Total</span>
-                <span className="font-bold text-green-600 text-xl">{formatCurrency(total)}</span>
+                <span className="font-bold text-green-600 text-lg sm:text-xl">{formatCurrency(total)}</span>
               </div>
             </div>
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col-reverse sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-4 pb-6">
+          <div className="grid grid-cols-2 gap-3 pt-1 pb-3 sm:flex sm:items-center sm:justify-between sm:pt-4 sm:pb-6">
             <Link
               href={`/grower/orders/${order.id}`}
-              className="px-6 py-3 border border-gray-300 rounded-lg text-center text-gray-700 hover:bg-gray-50 font-medium transition-colors"
+              className="min-h-10 px-3 py-2 text-sm sm:px-6 sm:py-3 border border-gray-300 rounded-lg text-center text-gray-700 hover:bg-gray-50 font-medium transition-colors"
             >
               Cancel
             </Link>
@@ -663,7 +733,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
             <button
               type="submit"
               disabled={isSubmitting || items.length === 0 || (hasErrors && Object.keys(touched).length > 0)}
-              className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center justify-center gap-2 min-w-[140px]"
+              className="min-h-10 px-3 py-2 text-sm sm:px-6 sm:py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors flex items-center justify-center gap-2 min-w-0 sm:min-w-[140px]"
             >
               {isSubmitting ? (
                 <>
@@ -684,7 +754,6 @@ export default function EditOrderForm({ order }: { order: Order }) {
             </button>
           </div>
         </form>
-      </div>
       <ConfirmDialog
         open={Boolean(removeCandidate)}
         title="Remove item?"
@@ -697,6 +766,19 @@ export default function EditOrderForm({ order }: { order: Order }) {
             removeItem(removeCandidate.id);
           }
           setRemoveCandidate(null);
+        }}
+      />
+      <ConfirmDialog
+        loading={isSubmitting}
+        open={showCancellationConfirm}
+        title="Cancel request?"
+        description="Saving this status will cancel the request and return reserved stock to inventory. This should only be used when the buyer and grower agree the request will not be fulfilled."
+        confirmLabel="Cancel request"
+        intent="danger"
+        onCancel={() => setShowCancellationConfirm(false)}
+        onConfirm={() => {
+          setShowCancellationConfirm(false);
+          void submitChanges();
         }}
       />
     </div>

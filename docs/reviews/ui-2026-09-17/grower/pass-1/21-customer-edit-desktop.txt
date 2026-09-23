@@ -1,0 +1,117 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e1980]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1981]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e1982]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e1987]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e1988]
+      - StaticText "Overview"
+    - link "Products" [ref=e1989]
+      - StaticText "Products"
+    - link "Inventory" [ref=e1990]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e1991]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e1992]
+      - StaticText "Strains"
+    - link "Batches" [ref=e1993]
+      - StaticText "Batches"
+    - link "Customers" [ref=e1994]
+      - StaticText "Customers"
+    - link "Reports" [ref=e1995]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e1996]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e1983]
+- main
+  - link "View statement" [ref=e1984]
+  - link "← Back to Customers" [ref=e1985]
+  - sectionheader
+    - heading "Edit Customer" [level=1, ref=e1997]
+    - paragraph
+      - StaticText "Update customer information"
+  - form
+    - heading "Business Information" [level=2, ref=e1998]
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox "Enter business name" [ref=e1999]: Maple Street Market
+      - StaticText "Maple Street Market"
+    - LabelText
+      - StaticText "License Number"
+    - textbox "License #" [ref=e2000]: VT-UI-2026-104
+      - StaticText "VT-UI-2026-104"
+    - LabelText
+      - StaticText "Website"
+    - textbox "https://..." [ref=e2001]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Brief description..." [ref=e2002]
+    - paragraph
+      - StaticText "0/500 characters"
+    - heading "Contact Information" [level=2, ref=e2003]
+    - LabelText
+      - StaticText "Contact Person"
+    - textbox "Full name" [ref=e2004]: Alex Morgan
+      - StaticText "Alex Morgan"
+    - LabelText
+      - StaticText "Email"
+    - textbox "email@example.com" [ref=e2005]: orders@example.test
+      - StaticText "orders@example.test"
+    - LabelText
+      - StaticText "Phone"
+    - textbox "(555) 123-4567" [ref=e2006]: 802-555-0142
+      - StaticText "802-555-0142"
+    - heading "Address" [level=2, ref=e2007]
+    - LabelText
+      - StaticText "Street Address"
+    - textbox "123 Main St" [ref=e2008]: 25 Maple Street
+      - StaticText "25 Maple Street"
+    - LabelText
+      - StaticText "City"
+    - textbox "City" [ref=e2009]: Burlington
+      - StaticText "Burlington"
+    - LabelText
+      - StaticText "State"
+    - combobox [expanded=false, ref=e2010]: Vermont
+      - MenuListPopup
+        - option "Vermont" [selected, ref=e2016]
+        - option "Maine" [ref=e2017]
+        - option "Massachusetts" [ref=e2018]
+        - option "Connecticut" [ref=e2019]
+        - option "Rhode Island" [ref=e2020]
+        - option "New Hampshire" [ref=e2021]
+        - option "New York" [ref=e2022]
+        - option "New Jersey" [ref=e2023]
+        - option "Pennsylvania" [ref=e2024]
+        - option "Delaware" [ref=e2025]
+        - option "Maryland" [ref=e2026]
+        - option "District of Columbia" [ref=e2027]
+        - option "Virginia" [ref=e2028]
+    - LabelText
+      - StaticText "ZIP Code"
+    - textbox "12345" [ref=e2011]: 05401
+      - StaticText "05401"
+    - button "Delete Customer" [ref=e2012]
+    - link "Cancel" [ref=e2013]
+    - button "Save Changes" [ref=e2014]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2015]
+  - button "Open messages" [ref=e1986]
+- region "Notifications alt+T" [ref=e1979]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e2029]
+  - image
+- alert

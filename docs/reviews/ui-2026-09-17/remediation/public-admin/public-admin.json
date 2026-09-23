@@ -1,0 +1,671 @@
+{
+  "owner": "public-admin",
+  "count": 38,
+  "items": [
+    {
+      "id": "PUB-003",
+      "title": "Mobile hero repeats settlement promise",
+      "status": "completed",
+      "summary": "Shortened the hero support paragraph while retaining verification, tracking, and direct-settlement meaning.",
+      "files": [
+        "app/landing/hero.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-home-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-004",
+      "title": "Help intro repeats page purpose",
+      "status": "completed",
+      "summary": "Removed the duplicate help eyebrow and kept one Marketplace help heading with a concise topic summary.",
+      "files": [
+        "app/help/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-help-desktop.png",
+        "remediation/public-admin/public-help-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-005",
+      "title": "Mobile contact form starts below long preamble",
+      "status": "completed",
+      "summary": "Shortened the contact heading and tightened the lead information card spacing so the form begins sooner.",
+      "files": [
+        "app/contact/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-contact-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-006",
+      "title": "Contact helper copy is longer than needed",
+      "status": "completed",
+      "summary": "Shortened the form helper copy without changing fields or the email-draft action.",
+      "files": [
+        "app/contact/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-contact-desktop.png",
+        "remediation/public-admin/public-contact-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-007",
+      "title": "Privacy draft status is duplicated",
+      "status": "completed",
+      "summary": "Removed the duplicate body draft-status card; the concise hero warning remains.",
+      "files": [
+        "app/legal/privacy/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-privacy-desktop.png",
+        "remediation/public-admin/public-privacy-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-008",
+      "title": "Terms draft status is duplicated",
+      "status": "completed",
+      "summary": "Removed the duplicate body draft-status card; substantive terms begin after Contents.",
+      "files": [
+        "app/legal/terms/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-terms-desktop.png",
+        "remediation/public-admin/public-terms-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-009",
+      "title": "Cookie draft status is duplicated",
+      "status": "completed",
+      "summary": "Removed the duplicate body draft-status card and preserved the hero counsel-review warning.",
+      "files": [
+        "app/legal/cookies/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-cookies-desktop.png",
+        "remediation/public-admin/public-cookies-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-010",
+      "title": "Cookie section heading is wordy",
+      "status": "completed",
+      "summary": "Renamed the section to Cookies and storage.",
+      "files": [
+        "app/legal/cookies/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-cookies-desktop.png",
+        "remediation/public-admin/public-cookies-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-011",
+      "title": "Sign-in marketing panel is overlong",
+      "status": "completed",
+      "summary": "Shortened the desktop marketing headline and support paragraph while keeping the mobile form layout.",
+      "files": [
+        "app/auth/sign_in/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-sign-in-desktop.png",
+        "remediation/public-admin/public-sign-in-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-012",
+      "title": "Sign-up marketing panel repeats form promise",
+      "status": "completed",
+      "summary": "Shortened the desktop marketing headline and focused the supporting sentence on grower and dispensary workflows.",
+      "files": [
+        "app/auth/sign_up/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-sign-up-desktop.png",
+        "remediation/public-admin/public-sign-up-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-013",
+      "title": "Mobile sign-up disclosure wraps awkwardly",
+      "status": "completed",
+      "summary": "Shortened the legal disclosure and retained both Terms and Privacy Policy links inline.",
+      "files": [
+        "app/auth/sign_up/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-sign-up-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-014",
+      "title": "Configuration error repeats marketing copy",
+      "status": "completed",
+      "summary": "Replaced the shared desktop error marketing panel with concise access-recovery copy.",
+      "files": [
+        "app/auth/error/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-error-configuration-desktop.png",
+        "remediation/public-admin/public-error-configuration-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-015",
+      "title": "Credentials error repeats marketing copy",
+      "status": "completed",
+      "summary": "Applied the same concise shared access-recovery panel while preserving the credential-specific error card.",
+      "files": [
+        "app/auth/error/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-error-credentials-desktop.png",
+        "remediation/public-admin/public-error-credentials-mobile.png"
+      ],
+      "checks": [
+        "Fresh desktop/mobile render captured and inspected after network-idle settle.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-016",
+      "title": "Testimonial-to-pricing transition has excess vertical space",
+      "status": "completed",
+      "summary": "Reduced pricing section top padding to shorten the settled testimonial-to-pricing transition.",
+      "files": [
+        "app/landing/pricing.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-home-settled-desktop-y04200.png",
+        "remediation/public-admin/public-home-settled-mobile-y05664.png"
+      ],
+      "checks": [
+        "Fresh settled scroll captures at 1440x1000 and 390x844 inspected; all reveal-on-scroll content rendered.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "PUB-017",
+      "title": "Mobile footer repeats Privacy and Terms links",
+      "status": "completed",
+      "summary": "Removed duplicate policy links from the Company group and kept one compact bottom legal row.",
+      "files": [
+        "app/landing/footer.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/public-home-settled-mobile-footer.png",
+        "remediation/public-admin/public-home-settled-desktop-y06720.png"
+      ],
+      "checks": [
+        "Fresh settled footer capture inspected at 390x844; footer text has one Privacy/Terms/Cookies row.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A01",
+      "title": "Shorten admin headings and introductions",
+      "status": "follow-up",
+      "summary": "Page titles and descriptions are concise; mobile heading size remains the unresolved visual follow-up.",
+      "files": [
+        "app/admin/users/page.tsx",
+        "app/admin/growers/page.tsx",
+        "app/admin/dispensaries/page.tsx",
+        "app/admin/settings/page.tsx",
+        "app/admin/dashboard/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-users-desktop.png",
+        "remediation/public-admin/admin-users-mobile.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed.",
+        "Follow-up: reduce the admin mobile heading to the requested 26\u201328px range and recapture."
+      ]
+    },
+    {
+      "id": "A02",
+      "title": "Standardize business-role names",
+      "status": "completed",
+      "summary": "Admin navigation, headings, actions, and seed results consistently use Growers and Dispensaries.",
+      "files": [
+        "app/admin/layout.tsx",
+        "app/admin/dashboard/page.tsx",
+        "app/admin/components/SeedDataButton.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dashboard-desktop.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A03",
+      "title": "Search placeholders clip on desktop",
+      "status": "completed",
+      "summary": "Directory placeholders now use concise Email or business / Business or license copy.",
+      "files": [
+        "app/admin/users/page.tsx",
+        "app/admin/components/AdminVerificationFilters.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-users-desktop.png",
+        "remediation/public-admin/admin-growers-desktop.png",
+        "remediation/public-admin/admin-dispensaries-desktop.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A04",
+      "title": "Mobile directory controls consume too many rows",
+      "status": "completed",
+      "summary": "Directory search and Search stay together, with status and Clear grouped on the compact second row.",
+      "files": [
+        "app/admin/components/AdminVerificationFilters.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-growers-mobile.png",
+        "remediation/public-admin/admin-dispensaries-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A05",
+      "title": "Simplify directory result counts",
+      "status": "follow-up",
+      "summary": "Unfiltered counts are concise, but singular grammar needs correction for one record (1 growers / equivalent).",
+      "files": [
+        "app/admin/users/page.tsx",
+        "app/admin/growers/page.tsx",
+        "app/admin/dispensaries/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-growers-desktop.png",
+        "remediation/public-admin/admin-dispensaries-desktop.png",
+        "remediation/public-admin/admin-users-desktop.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed.",
+        "Follow-up: pluralize result labels conditionally for one record."
+      ]
+    },
+    {
+      "id": "A06",
+      "title": "Reduce navigation grouping and empty notification controls",
+      "status": "completed-with-dependency",
+      "summary": "Admin nav call site is preserved for root\u2019s simplified five-item navigation and empty notification-control treatment.",
+      "files": [
+        "app/admin/layout.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dashboard-desktop.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed.",
+        "Root shared ClientNav and NotificationBell changes are the dependency."
+      ]
+    },
+    {
+      "id": "A07",
+      "title": "Make confirmation wording specific",
+      "status": "follow-up",
+      "summary": "Unverify dialog title and button are specific; the alert icon alignment still needs correction when text wraps.",
+      "files": [
+        "app/admin/components/ConfirmActionButton.tsx",
+        "app/admin/dispensaries/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-unverify-dialog-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed.",
+        "Follow-up: keep alert icon square/top-aligned in ConfirmDialog and recapture."
+      ]
+    },
+    {
+      "id": "A08",
+      "title": "Compact mobile metric cards",
+      "status": "completed",
+      "summary": "Dashboard metric cards use compact padding, counts, and short verified/pending helpers.",
+      "files": [
+        "app/admin/dashboard/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dashboard-desktop.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A09",
+      "title": "Collapse completed checklist items",
+      "status": "completed-with-dependency",
+      "summary": "Dashboard shows pending checklist work and collapses completed checks behind a single summary disclosure.",
+      "files": [
+        "app/admin/dashboard/page.tsx",
+        "app/components/ux/SetupChecklist.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dashboard-desktop.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed.",
+        "Shared SetupChecklist treatment remains root-owned."
+      ]
+    },
+    {
+      "id": "A10",
+      "title": "Shrink the clear verification queue",
+      "status": "completed",
+      "summary": "An empty queue is rendered as one concise status row with destination links; work expands only when pending records exist.",
+      "files": [
+        "app/admin/dashboard/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dashboard-desktop.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A11",
+      "title": "Move standing business-model explanation",
+      "status": "completed",
+      "summary": "Dashboard keeps a compact settlement policy sentence and help link.",
+      "files": [
+        "app/admin/dashboard/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dashboard-desktop.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A12",
+      "title": "Simplify development-only seeding panel",
+      "status": "completed",
+      "summary": "Dev-only seed tools are behind one collapsed Developer tools row with one action; production guard remains.",
+      "files": [
+        "app/admin/dashboard/page.tsx",
+        "app/admin/components/SeedDataButton.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dashboard-desktop.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A13",
+      "title": "Make dashboard counts match destinations",
+      "status": "completed",
+      "summary": "Dashboard dispensary counts and pending counts use the same platform-account scope as the directory; grower query remains schema-valid.",
+      "files": [
+        "app/admin/dashboard/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dashboard-desktop.png",
+        "remediation/public-admin/admin-dashboard-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A14",
+      "title": "Tighten sparse mobile account rows",
+      "status": "completed",
+      "summary": "Mobile user rows are compact and omit inapplicable business and verification fields for administrators.",
+      "files": [
+        "app/admin/users/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-users-mobile.png",
+        "remediation/public-admin/admin-users-desktop.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A15",
+      "title": "Use compact verification metadata",
+      "status": "completed",
+      "summary": "Grower mobile cards place plan beside verification and tighten metadata while retaining license exceptions.",
+      "files": [
+        "app/admin/growers/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-growers-mobile.png",
+        "remediation/public-admin/admin-growers-desktop.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A16",
+      "title": "Remove repeated ordering-policy copy",
+      "status": "completed",
+      "summary": "Dispensary rows use compact Can order / License review states and keep settlement guidance outside each row.",
+      "files": [
+        "app/admin/dispensaries/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dispensaries-mobile.png",
+        "remediation/public-admin/admin-dispensaries-desktop.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A17",
+      "title": "Give business and license identifiers enough room",
+      "status": "completed",
+      "summary": "Normal expiry dates are plain dates, identifier cells are nowrap, and exception dates retain badges.",
+      "files": [
+        "app/admin/components/LicenseExpiryBadge.tsx",
+        "app/admin/dispensaries/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dispensaries-desktop.png",
+        "remediation/public-admin/admin-dispensaries-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A18",
+      "title": "Delay wide table/header layout at tablet widths",
+      "status": "completed",
+      "summary": "Admin directory header stacks from tablet widths and the horizontally scrollable table has a visible action hint.",
+      "files": [
+        "app/admin/growers/page.tsx",
+        "app/admin/dispensaries/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-dispensaries-tablet.png"
+      ],
+      "checks": [
+        "Fresh authenticated 1024x1000 render inspected; header is stacked and scroll hint is visible.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A19",
+      "title": "Remove implementation commentary and obvious labels",
+      "status": "completed",
+      "summary": "Settings copy now focuses on billing, support, and policy state without implementation history or platform identity.",
+      "files": [
+        "app/admin/settings/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-settings-desktop.png",
+        "remediation/public-admin/admin-settings-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A20",
+      "title": "Stop stretching the short support card",
+      "status": "completed",
+      "summary": "Settings grid aligns cards to content height so Support does not stretch to billing height.",
+      "files": [
+        "app/admin/settings/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-settings-desktop.png",
+        "remediation/public-admin/admin-settings-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A21",
+      "title": "Use one compact status per billing item",
+      "status": "follow-up",
+      "summary": "Billing rows use one status badge and no duplicate value, but mobile badge width still needs visual confirmation/fix.",
+      "files": [
+        "app/admin/settings/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-settings-mobile.png",
+        "remediation/public-admin/admin-settings-desktop.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed.",
+        "Follow-up: make badges fit content on mobile and recapture after the pending correction."
+      ]
+    },
+    {
+      "id": "A22",
+      "title": "Consolidate setup and settlement guidance",
+      "status": "completed",
+      "summary": "Settings retains one setup instruction and one settlement policy; repeated bottom guidance was removed.",
+      "files": [
+        "app/admin/settings/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-settings-desktop.png",
+        "remediation/public-admin/admin-settings-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed."
+      ]
+    },
+    {
+      "id": "A23",
+      "title": "Prioritize setup issues and flatten policy cards",
+      "status": "follow-up",
+      "summary": "Billing is first and policy cards are flattened into rows, but missing configuration is not yet visually prioritized/collapsed as requested.",
+      "files": [
+        "app/admin/settings/page.tsx"
+      ],
+      "evidence": [
+        "remediation/public-admin/admin-settings-desktop.png",
+        "remediation/public-admin/admin-settings-mobile.png"
+      ],
+      "checks": [
+        "Fresh authenticated desktop/mobile render captured and inspected on localhost:3144.",
+        "npx eslint app/admin app/landing app/auth app/contact app/help app/legal passed.",
+        "Follow-up: move missing setup state to the top and collapse reference policies."
+      ]
+    }
+  ]
+}

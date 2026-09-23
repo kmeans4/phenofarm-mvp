@@ -1,0 +1,23 @@
+{
+  "h1": {
+    "font": "28px",
+    "height": 28,
+    "line": "28px",
+    "lines": 1,
+    "text": "Users",
+    "width": 358,
+    "x": 16,
+    "y": 80
+  },
+  "height": 844,
+  "pageHeight": 844,
+  "pageWidth": 390,
+  "search": {
+    "height": 40,
+    "placeholder": "Email or name",
+    "scrollWidth": 390,
+    "width": 171.875
+  },
+  "url": "http://localhost:3146/admin/users?role=dispensary",
+  "width": 390
+}

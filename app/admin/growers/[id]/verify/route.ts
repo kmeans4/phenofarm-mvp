@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { createNotification } from '@/lib/notifications';
 
 export async function POST(
   request: Request,
@@ -9,7 +10,6 @@ export async function POST(
 ) {
   const session = await getServerSession(authOptions);
   
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   if (!session || session?.user?.role !== 'ADMIN') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -20,20 +20,30 @@ export async function POST(
     // Get current verification status
     const grower = await db.grower.findUnique({
       where: { id },
-      select: { isVerified: true }
+      select: { businessName: true, isVerified: true, userId: true }
     });
 
     if (!grower) {
       return NextResponse.json({ error: 'Grower not found' }, { status: 404 });
     }
 
+    const verifying = !grower.isVerified;
+
     // Toggle verification status
-    await db.grower.update({
-      where: { id },
-      data: { isVerified: !grower.isVerified }
+    await db.$transaction(async (tx) => {
+      await tx.grower.update({ where: { id }, data: { isVerified: verifying } });
+      await createNotification(tx, { userId: grower.userId, type: 'VERIFICATION_DECISION', title: verifying ? 'Account verified' : 'Verification removed', body: verifying ? 'Your listings are now visible to verified dispensaries.' : 'Your listings are hidden until PhenoFarm verifies your account again.', href: '/grower/dashboard' });
     });
 
-    return NextResponse.redirect(new URL('/admin/growers', request.url));
+    if (request.headers.get('accept')?.includes('application/json')) {
+      return NextResponse.json({
+        success: true,
+        verified: verifying,
+        message: `${grower.businessName} ${verifying ? 'verified' : 'unverified'}.`,
+      });
+    }
+
+    return NextResponse.redirect(new URL('/admin/growers', request.url), 303);
   } catch (error) {
     console.error('Error toggling grower verification:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

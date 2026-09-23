@@ -1,0 +1,59 @@
+PF
+PhenoFarm
+Help
+
+LEGAL
+
+Cookie Notice
+
+Last updated: July 6, 2026
+
+How PhenoFarm uses essential cookies and browser storage for authentication, session security, request workflows, and cultivator subscription support.
+
+Pre-launch draft pending counsel review.
+
+This MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms. No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app.
+
+Contents
+
+Draft status
+What cookies and storage are
+Essential use
+Billing and third-party services
+Analytics and advertising
+Your choices
+Draft status
+
+This cookie notice is a pre-launch MVP draft pending counsel review. It describes the browser storage expected for the current PhenoFarm application.
+
+What cookies and storage are
+
+Cookies and browser storage help web applications remember session, security, and workflow information. Similar technologies may include local storage, session storage, and framework-managed session tokens.
+
+Essential use
+
+PhenoFarm uses essential cookies and storage for authentication, account routing, session security, marketplace workflow continuity, and request-draft usability.
+
+Sign-in and session cookies used by authentication workflows.
+Security and framework cookies needed to keep the app operating correctly.
+Browser storage for request draft details, workflow defaults, and similar MVP usability features.
+Support or operational data needed to diagnose account, verification, or request issues.
+Billing and third-party services
+
+Cultivator subscription checkout and subscription management are handled through Stripe Billing. Stripe may use its own cookies or browser storage when a grower opens checkout or the billing portal.
+
+PhenoFarm does not use cookies to process wholesale buyer-seller payments because wholesale settlement is handled directly outside the app.
+
+Analytics and advertising
+
+The MVP copy does not assume advertising cookies or cross-site ad tracking. If PhenoFarm adds analytics, performance monitoring, or marketing tools before launch, this notice should be updated to describe those tools clearly.
+
+Your choices
+
+Most browsers let you block or delete cookies and storage. Blocking essential cookies may prevent sign-in, role routing, request drafts, or subscription management from working correctly.
+
+Questions about cookies or browser storage should be sent to support@phenofarm.com.
+
+Questions or requests?
+
+Contact support@phenofarm.com.

@@ -1,17 +1,20 @@
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
+import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
 import { format } from 'date-fns';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { OrderTimeline } from '@/app/components/ui/OrderTimeline';
+import { MobileOrderNavBar } from '@/app/components/ui/MobileOrderNavBar';
 import Link from 'next/link';
 import { OrderDetailActions } from './OrderDetailActions';
 import {
-  ORDER_STATUS_STEPS,
   getOrderStatusHelp,
   getOrderStatusLabel,
   parseOrderRequestNotes,
 } from '@/lib/order-workflow';
+import { OrderHistory, type OrderHistoryEvent } from '@/app/components/ui/OrderHistory';
+import { OrderRecordExport } from '@/app/components/ui/OrderRecordExport';
 
 interface OrderDetail {
   id: string;
@@ -25,6 +28,10 @@ interface OrderDetail {
   shippedAt: Date | null;
   deliveredAt: Date | null;
   createdAt: Date;
+  createdBy: string;
+  buyerAcknowledgedAt: Date | null;
+  dispensary: { businessName: string; isOffPlatform: boolean };
+  statusEvents: OrderHistoryEvent[];
   grower: {
     id: string;
     businessName: string;
@@ -34,12 +41,13 @@ interface OrderDetail {
     quantity: number;
     unitPrice: number;
     totalPrice: number;
+    quoted: boolean;
     product?: {
       id: string;
       name: string;
       strain: string | null;
       unit: string | null;
-      price: number;
+      price: number | null;
       inventoryQty: number;
       isAvailable: boolean;
     };
@@ -49,9 +57,15 @@ interface OrderDetail {
 async function fetchOrder(id: string, dispensaryId: string): Promise<OrderDetail | null> {
   const order = await db.order.findUnique({
     where: { id, dispensaryId },
-    include: {
-      grower: true,
-      items: { include: { product: true } },
+    select: {
+      id: true, orderId: true, status: true, totalAmount: true, subtotal: true, tax: true, shippingFee: true,
+      notes: true, shippedAt: true, deliveredAt: true, createdAt: true, createdBy: true, buyerAcknowledgedAt: true,
+      grower: { select: { id: true, businessName: true } },
+      dispensary: { select: { businessName: true, isOffPlatform: true } },
+      items: { select: { id: true, quantity: true, unitPrice: true, totalPrice: true, acceptedQuoteId: true,
+        product: { select: { id: true, name: true, unit: true, price: true, isPriceVisible: true, isAvailable: true, isDeleted: true, status: true, inventoryQty: true, strain: { select: { name: true } } } },
+      } },
+      statusEvents: { orderBy: { createdAt: 'asc' }, select: { id: true, fromStatus: true, toStatus: true, actorRole: true, createdAt: true } },
     },
   });
   
@@ -69,32 +83,23 @@ async function fetchOrder(id: string, dispensaryId: string): Promise<OrderDetail
     shippedAt: order.shippedAt,
     deliveredAt: order.deliveredAt,
     createdAt: order.createdAt,
+    createdBy: order.createdBy,
+    buyerAcknowledgedAt: order.buyerAcknowledgedAt,
+    dispensary: order.dispensary,
+    statusEvents: order.statusEvents,
     grower: {
       id: order.grower.id,
       businessName: order.grower.businessName,
     },
-    items: order.items.map((item: Record<string, unknown>) => ({
-      id: String(item.id),
-      quantity: Number(item.quantity),
-      unitPrice: Number(item.unitPrice),
-      totalPrice: Number(item.totalPrice),
-      product: item.product && typeof item.product === 'object'
-        ? {
-            id: String((item.product as Record<string, unknown>).id),
-            name: String((item.product as Record<string, unknown>).name || 'Unknown Product'),
-            strain: typeof (item.product as Record<string, unknown>).strainLegacy === 'string'
-              ? ((item.product as Record<string, unknown>).strainLegacy as string)
-              : null,
-            unit: typeof (item.product as Record<string, unknown>).unit === 'string'
-              ? ((item.product as Record<string, unknown>).unit as string)
-              : null,
-            price: Number((item.product as Record<string, unknown>).price || 0),
-            inventoryQty: Number((item.product as Record<string, unknown>).inventoryQty || 0),
-            isAvailable: Boolean((item.product as Record<string, unknown>).isAvailable),
-          }
-        : undefined,
+    items: order.items.map(item => ({
+      id: item.id, quantity: item.quantity, unitPrice: Number(item.unitPrice), totalPrice: Number(item.totalPrice), quoted: Boolean(item.acceptedQuoteId),
+      product: { id: item.product.id, name: item.product.name, strain: item.product.strain?.name ?? null, unit: item.product.unit,
+        price: item.product.isPriceVisible ? Number(item.product.price) : null, inventoryQty: item.product.inventoryQty,
+        isAvailable: item.product.status === 'PUBLISHED' && !item.product.isDeleted && item.product.isAvailable && item.product.inventoryQty > 0 && item.product.isPriceVisible,
+      },
     })),
-  } as unknown as OrderDetail;
+  };
+
 }
 
 function formatCurrency(amount: number) {
@@ -102,83 +107,6 @@ function formatCurrency(amount: number) {
     style: 'currency',
     currency: 'USD',
   }).format(amount);
-}
-
-function statusStepState(orderStatus: string, step: string) {
-  const order = ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
-  const currentIndex = order.indexOf(orderStatus);
-  const stepIndex = order.indexOf(step);
-
-  if (orderStatus === 'CANCELLED') return step === 'PENDING' ? 'complete' : 'cancelled';
-  if (currentIndex === -1 || stepIndex === -1) return 'upcoming';
-  if (stepIndex < currentIndex) return 'complete';
-  if (stepIndex === currentIndex) return 'current';
-  return 'upcoming';
-}
-
-function StatusTimeline({ order }: { order: OrderDetail }) {
-  const steps = ORDER_STATUS_STEPS.map((step) => ({
-    ...step,
-    date:
-      step.status === 'PENDING'
-        ? order.createdAt
-        : step.status === 'SHIPPED'
-          ? order.shippedAt
-          : step.status === 'DELIVERED'
-            ? order.deliveredAt
-            : null,
-  }));
-
-  if (order.status === 'CANCELLED') {
-    return (
-      <Card className="mb-6 border-red-200 bg-red-50">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-lg text-red-900">Fulfillment Timeline</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-red-800">This request was cancelled. Message the grower if you need more detail.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card className="mb-6 bg-white shadow-sm border border-gray-200">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Fulfillment Timeline</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <ol className="grid gap-3 sm:grid-cols-5">
-          {steps.map((step) => {
-            const state = statusStepState(order.status, step.status);
-            return (
-              <li key={step.status} className="flex items-start gap-3 sm:block">
-                <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-bold sm:mb-2 ${
-                  state === 'complete'
-                    ? 'bg-green-600 text-white'
-                    : state === 'current'
-                      ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-400'
-                }`}>
-                  {state === 'complete' ? '✓' : steps.findIndex((entry) => entry.status === step.status) + 1}
-                </div>
-                <div>
-                  <p className={`text-sm font-semibold ${
-                    state === 'upcoming' ? 'text-gray-400' : 'text-gray-900'
-                  }`}>
-                    {step.label}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {step.date ? format(step.date, 'MMM d, yyyy h:mm a') : state === 'current' ? 'Current step' : 'Pending'}
-                  </p>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      </CardContent>
-    </Card>
-  );
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -199,7 +127,7 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 export default async function DispensaryOrderDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const session = await getServerSession(authOptions);
+  const session = await getAuthSession();
 
   if (!session) {
     redirect('/auth/sign_in');
@@ -207,7 +135,7 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
 
   const user = session.user as { role: string; growerId?: string; dispensaryId?: string };
 
-  if (user.role !== 'DISPENSARY') {
+  if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
     redirect('/dashboard');
   }
 
@@ -220,7 +148,7 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
         <h1 className="text-2xl font-bold">Order Not Found</h1>
         <p className="mt-2 text-gray-600">The requested order could not be found.</p>
         <Link href="/dispensary/orders" className="mt-4 inline-block text-green-600 hover:underline">
-          ← Back to Requests
+          ← Orders
         </Link>
       </div>
     );
@@ -235,53 +163,48 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
     requestNotes.legacyNotes;
 
   return (
-    <div className="p-4 pb-24 max-w-4xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-        <div>
-          <Link href="/dispensary/orders" className="text-green-600 hover:underline text-sm mb-1 inline-block">
-            ← Back to Requests
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900">Order Request #{order.orderId}</h1>
-          <p className="mt-1 text-sm text-gray-600">{getOrderStatusHelp(order.status)}</p>
-        </div>
-        <StatusBadge status={order.status} />
+    <div className="mx-auto w-full min-w-0 max-w-4xl overflow-x-clip pb-24">
+      <Link href="/dispensary/orders" className="mb-2 inline-flex min-h-10 items-center text-sm text-green-600 hover:underline">
+        ← Orders
+      </Link>
+      <PageHeader
+        title={<span className="flex min-w-0 flex-col gap-1"><span>Request</span><span title={order.orderId} className="max-w-full break-all font-sans text-base font-semibold leading-tight text-gray-600 sm:text-lg">#{order.orderId}</span></span>}
+        description={getOrderStatusHelp(order.status)}
+        actions={<><StatusBadge status={order.status} /><OrderRecordExport order={{ orderId: order.orderId, createdAt: order.createdAt.toISOString(), status: getOrderStatusLabel(order.status), grower: order.grower.businessName, buyer: order.dispensary.businessName, subtotal: order.subtotal, tax: order.tax, shippingFee: order.shippingFee, total: order.totalAmount, items: order.items.map((item) => ({ name: item.product?.name || 'Unknown product', quantity: item.quantity, unit: item.product?.unit || 'unit', unitPrice: item.unitPrice, totalPrice: item.totalPrice, quoted: item.quoted })) }} /></>}
+        className="mb-4 sm:mb-6"
+      />
+
+      <div className="mb-4 grid gap-px overflow-hidden rounded-lg border border-gray-200 bg-gray-200 shadow-sm sm:grid-cols-2">
+        {[
+          { label: 'Request date', value: format(order.createdAt, 'MMM dd, yyyy') },
+          { label: 'Grower', value: order.grower?.businessName || 'Grower' },
+        ].map((item) => (
+          <div key={item.label} className="flex items-center justify-between gap-4 bg-white px-4 py-3 sm:block sm:py-4">
+            <p className="text-xs font-semibold uppercase text-gray-500">{item.label}</p>
+            <p className={`min-w-0 truncate text-sm font-semibold text-gray-900 sm:mt-1 sm:text-base`}>{item.value}</p>
+          </div>
+        ))}
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-600">Request Date</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-semibold">{format(order.createdAt, 'MMM dd, yyyy')}</p>
-          </CardContent>
-        </Card>
+      <details className="mb-2 rounded-lg border border-gray-200 bg-white px-3">
+        <summary className="min-h-10 cursor-pointer content-center text-sm font-medium text-green-700">View timeline</summary>
+        <OrderTimeline
+        currentStatus={order.status}
+        createdAt={order.createdAt}
+        shippedAt={order.shippedAt}
+        deliveredAt={order.deliveredAt}
+        className="mb-3"
+        cancelledDescription="This request was cancelled. Message the grower if you need more detail."
+      />
+      </details>
+      <details className="mb-4 rounded-lg border border-gray-200 bg-white px-3">
+        <summary className="min-h-10 cursor-pointer content-center text-sm font-medium text-green-700">View history</summary>
+        <div className="mb-3"><OrderHistory events={order.statusEvents} /></div>
+      </details>
 
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-600">Estimated value</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-semibold text-green-600">{formatCurrency(order.totalAmount)}</p>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-white shadow-sm border border-gray-200">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-gray-600">Grower</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-xl font-semibold">{order.grower?.businessName}</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <StatusTimeline order={order} />
-
-      <div id="buyer-actions" className="mb-6 scroll-mt-4">
+      <div id="buyer-actions" className="mb-4 scroll-mt-24 sm:scroll-mt-4">
         <OrderDetailActions
+          orderDbId={order.id}
           orderId={order.orderId}
           status={order.status}
           growerId={order.grower.id}
@@ -298,16 +221,21 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
               inventoryQty: item.product!.inventoryQty,
               isAvailable: item.product!.isAvailable,
             }))}
+          createdBy={order.createdBy}
+          buyerAcknowledgedAt={order.buyerAcknowledgedAt?.toISOString() || null}
+          isOffPlatform={order.dispensary.isOffPlatform}
         />
       </div>
 
+
+
       {/* Items Table */}
-      <Card className="bg-white shadow-sm border border-gray-200 mb-6">
+      <Card className="bg-white shadow-sm border border-gray-200 mb-4">
         <CardHeader>
           <CardTitle className="text-lg">Requested Items</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
+          <div className="hidden overflow-x-auto sm:block">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
@@ -335,12 +263,29 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
             </table>
           </div>
 
+          <div className="divide-y divide-gray-100 sm:hidden">
+            {order.items.map((item) => (
+              <div key={`mobile-${item.id}`} className="space-y-2 px-4 py-3">
+                <p className="break-words text-sm font-semibold text-gray-900">
+                  {item.product?.name || 'Unknown Product'}
+                  {item.product?.strain ? <span className="font-normal text-gray-500"> ({item.product.strain})</span> : null}
+                </p>
+                <div className="flex items-baseline justify-between gap-3 text-sm">
+                  <span className="min-w-0 text-gray-600">
+                    {item.quantity} x {formatCurrency(item.unitPrice)}
+                  </span>
+                  <span className="shrink-0 font-semibold text-gray-900">{formatCurrency(item.totalPrice)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Totals */}
-          <div className="border-t border-gray-200 px-6 py-4 bg-gray-50 space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm text-gray-600">Estimated item value:</span>
+          <div className="border-t border-gray-200 px-4 py-3 bg-gray-50 space-y-2 sm:px-6 sm:py-4">
+            {(order.tax > 0 || order.shippingFee > 0) && <div className="flex justify-between">
+              <span className="text-sm text-gray-600">Subtotal</span>
               <span className="text-sm font-medium">{formatCurrency(order.subtotal)}</span>
-            </div>
+            </div>}
             {order.tax > 0 && (
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Recorded tax:</span>
@@ -353,40 +298,37 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
                 <span className="text-sm font-medium">{formatCurrency(order.shippingFee)}</span>
               </div>
             )}
-            <div className="flex justify-between border-t border-gray-300 pt-2">
-              <span className="text-sm font-semibold">Estimated request value:</span>
+            <div className="flex justify-between">
+              <span className="text-sm font-semibold">Total</span>
               <span className="text-sm font-bold text-green-600">{formatCurrency(order.totalAmount)}</span>
             </div>
-            <p className="pt-1 text-xs text-gray-500">
-              PhenoFarm tracks request value only. Wholesale payment is handled directly between buyer and grower.
-            </p>
           </div>
         </CardContent>
       </Card>
 
       {hasRequestDetails && (
-        <Card className="bg-yellow-50 border-yellow-200">
+        <Card className="bg-white border-gray-200">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-yellow-900">Request Details</CardTitle>
+            <CardTitle className="text-sm font-medium text-gray-900">Request details</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3 text-sm text-yellow-900">
-            <div className="grid gap-3 sm:grid-cols-3">
+          <CardContent className="space-y-3 text-sm text-gray-900">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-yellow-700">Fulfillment</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Fulfillment</p>
                 <p>{requestNotes.details.fulfillmentMethod || 'Coordinate with grower'}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-yellow-700">Requested Window</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Requested Window</p>
                 <p>{requestNotes.details.requestedWindow || 'Coordinate after acceptance'}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-yellow-700">Direct Payment Terms</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Payment terms</p>
                 <p>{requestNotes.details.paymentTerms || 'Handled directly'}</p>
               </div>
             </div>
             {(requestNotes.details.buyerNotes || requestNotes.legacyNotes) && (
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-yellow-700">Notes</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Notes</p>
                 <p className="whitespace-pre-wrap">{requestNotes.details.buyerNotes || requestNotes.legacyNotes}</p>
               </div>
             )}
@@ -394,22 +336,7 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
         </Card>
       )}
 
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 px-4 py-3 shadow-[0_-10px_25px_rgba(15,23,42,0.08)] backdrop-blur sm:hidden">
-        <div className="flex gap-2">
-          <Link
-            href="/dispensary/orders"
-            className="rounded-lg border border-gray-300 px-4 py-3 text-sm font-semibold text-gray-700"
-          >
-            Orders
-          </Link>
-          <a
-            href="#buyer-actions"
-            className="flex-1 rounded-lg bg-green-600 px-4 py-3 text-center text-sm font-semibold text-white"
-          >
-            Buyer actions
-          </a>
-        </div>
-      </div>
+      <MobileOrderNavBar ordersHref="/dispensary/orders" ordersLabel="Orders" targetId="buyer-actions" targetLabel="Buyer actions" />
     </div>
   );
 }

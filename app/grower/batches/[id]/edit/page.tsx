@@ -2,14 +2,15 @@
 
 import { useRouter, useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
+import { Card, CardContent } from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
+import { PageHeader } from '@/app/components/ui/PageHeader';
 import { toast } from '@/app/hooks/useToast';
+import { getTodayDateInputValue, isFutureDateInput, suggestBatchNumber, toDateInputValue } from '@/lib/batch-utils';
 import {
   BatchLabDocumentUploaders,
   BatchLabDocuments,
   createEmptyBatchLabDocuments,
-  hasBatchLabDocuments
 } from '@/app/grower/components/BatchLabDocumentUploaders';
 
 interface Strain {
@@ -36,14 +37,19 @@ interface Batch {
 
 interface BatchFormData {
   batchNumber: string;
+  lotNumber: string;
   harvestDate: string;
   strainId: string;
   thc: string;
   cbd: string;
   totalCannabinoids: string;
-  terpenes: string;
   labDocuments: BatchLabDocuments;
   notes: string;
+}
+
+interface BatchSummary {
+  id: string;
+  batchNumber: string;
 }
 
 export default function EditBatchPage() {
@@ -51,19 +57,25 @@ export default function EditBatchPage() {
   const params = useParams();
   const batchId = params?.id as string;
   
+  const [uploadingDocuments, setUploadingDocuments] = useState(false);
   const [loading, setLoading] = useState(false);
   const [fetching, setFetching] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [batch, setBatch] = useState<Batch | null>(null);
   const [strains, setStrains] = useState<Strain[]>([]);
+  const [existingBatches, setExistingBatches] = useState<BatchSummary[]>([]);
+  const [terpeneRows, setTerpeneRows] = useState<{ id: string; name: string; percentage: string }[]>([]);
+  const [terpenesEdited, setTerpenesEdited] = useState(false);
+  const [unrecognizedTerpenes, setUnrecognizedTerpenes] = useState(false);
+  const todayDate = getTodayDateInputValue();
   const [formData, setFormData] = useState<BatchFormData>({
     batchNumber: '',
+    lotNumber: '',
     harvestDate: '',
     strainId: '',
     thc: '',
     cbd: '',
     totalCannabinoids: '',
-    terpenes: '',
     labDocuments: createEmptyBatchLabDocuments(),
     notes: ''
   });
@@ -72,26 +84,29 @@ export default function EditBatchPage() {
     const fetchData = async () => {
       try {
         setFetching(true);
-        // Fetch strains
-        const strainsRes = await fetch('/api/strains');
-        if (strainsRes.ok) {
-          const strainsData = await strainsRes.json();
-          setStrains(strainsData);
-        }
-        
-        // Fetch batch
-        const batchRes = await fetch('/api/batches/' + batchId);
+        const [strainsRes, batchesRes, batchRes] = await Promise.all([
+          fetch('/api/strains?summary=true'), fetch('/api/batches'), fetch('/api/batches/' + batchId),
+        ]);
+        if (!strainsRes.ok || !batchesRes.ok) throw new Error('Could not load batch options');
+        const [strainsData, batchesData] = await Promise.all([strainsRes.json(), batchesRes.json()]);
+        setStrains(Array.isArray(strainsData) ? strainsData : []);
+        setExistingBatches(Array.isArray(batchesData) ? batchesData : []);
         if (batchRes.ok) {
           const data = await batchRes.json();
           setBatch(data);
+          const entries = data.terpenes && typeof data.terpenes === 'object' && !Array.isArray(data.terpenes)
+            ? Object.entries(data.terpenes) : [];
+          const readable = !data.terpenes || (entries.length >= 0 && typeof data.terpenes === 'object' && !Array.isArray(data.terpenes) && entries.every(([, value]) => typeof value === 'number' || (typeof value === 'string' && value.trim() !== '' && Number.isFinite(Number(value)))));
+          setUnrecognizedTerpenes(!readable);
+          setTerpeneRows(readable ? entries.map(([name, value], index) => ({ id: String(index), name, percentage: String(value) })) : []);
           setFormData({
             batchNumber: data.batchNumber || '',
-            harvestDate: data.harvestDate ? data.harvestDate.split('T')[0] : '',
+            lotNumber: data.lotNumber || '',
+            harvestDate: toDateInputValue(data.harvestDate),
             strainId: data.strainId || '',
             thc: data.thc?.toString() || '',
             cbd: data.cbd?.toString() || '',
             totalCannabinoids: data.totalCannabinoids?.toString() || '',
-            terpenes: data.terpenes ? JSON.stringify(data.terpenes, null, 2) : '',
             labDocuments: data.testResults?.labDocuments || createEmptyBatchLabDocuments(),
             notes: data.notes || ''
           });
@@ -115,7 +130,7 @@ export default function EditBatchPage() {
     if (error) setError(null);
   };
 
-  const canSubmit = !loading && !fetching && Boolean(formData.batchNumber.trim() && formData.harvestDate && formData.strainId);
+  const canSubmit = !uploadingDocuments && !loading && !fetching && Boolean(formData.batchNumber.trim() && formData.harvestDate && formData.strainId);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,19 +140,23 @@ export default function EditBatchPage() {
       return;
     }
 
+    if (isFutureDateInput(formData.harvestDate, todayDate)) {
+      setError('Harvest date cannot be in the future');
+      return;
+    }
+
     try {
       setLoading(true);
       setError(null);
 
-      let terpenesParsed = null;
-      if (formData.terpenes.trim()) {
-        try {
-          terpenesParsed = JSON.parse(formData.terpenes.trim());
-        } catch {
-          setError('Invalid JSON format for terpenes');
-          setLoading(false);
-          return;
+      let terpenesParsed = batch?.terpenes ?? null;
+      if (terpenesEdited) {
+        const names = terpeneRows.map((row) => row.name.trim().toLowerCase());
+        if (terpeneRows.some((row) => !row.name.trim() || !row.percentage.trim() || !Number.isFinite(Number(row.percentage)) || Number(row.percentage) < 0 || Number(row.percentage) > 100)) {
+          throw new Error('Enter a terpene name and a percentage from 0 to 100 for each row.');
         }
+        if (new Set(names).size !== names.length) throw new Error('Use each terpene name only once.');
+        terpenesParsed = terpeneRows.length ? Object.fromEntries(terpeneRows.map((row) => [row.name.trim(), Number(row.percentage)])) : null;
       }
 
       const response = await fetch('/api/batches/' + batchId, {
@@ -145,22 +164,20 @@ export default function EditBatchPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           batchNumber: formData.batchNumber.trim(),
+          lotNumber: formData.lotNumber.trim() || null,
           harvestDate: formData.harvestDate,
           strainId: formData.strainId,
           thc: formData.thc.trim() || null,
           cbd: formData.cbd.trim() || null,
           totalCannabinoids: formData.totalCannabinoids.trim() || null,
           terpenes: terpenesParsed,
-          coaDocumentUrl: null,
-          testResults: hasBatchLabDocuments(formData.labDocuments)
-            ? { labDocuments: formData.labDocuments }
-            : null,
+          testResults: { ...batch?.testResults, labDocuments: formData.labDocuments },
           notes: formData.notes.trim() || null
         })
       });
 
       if (!response.ok) {
-        const data = await response.json();
+        const data = await response.json().catch(() => ({}));
         throw new Error(data.error || 'Failed to update batch');
       }
 
@@ -171,6 +188,18 @@ export default function EditBatchPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const applySuggestedBatchNumber = () => {
+    handleChange(
+      'batchNumber',
+      suggestBatchNumber(
+        existingBatches
+          .filter((existingBatch) => existingBatch.id !== batchId)
+          .map((existingBatch) => existingBatch.batchNumber),
+        formData.harvestDate || todayDate
+      )
+    );
   };
 
   if (fetching) {
@@ -193,11 +222,8 @@ export default function EditBatchPage() {
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-5 sm:space-y-6">
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Edit Batch</h1>
-        <p className="text-sm sm:text-base text-gray-600 mt-1">Update batch details and lab results</p>
-      </div>
+    <div className="w-full max-w-3xl mx-auto space-y-3 sm:space-y-6">
+      <PageHeader title="Edit batch" />
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -206,42 +232,61 @@ export default function EditBatchPage() {
       )}
 
       <Card>
-        <CardHeader>
-          <CardTitle>Batch Details</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="batchNumber" className="block text-sm font-medium text-gray-700">
-                Batch Number *
-              </label>
-              <input
-                id="batchNumber"
-                type="text"
-                required
-                value={formData.batchNumber}
-                onChange={(e) => handleChange('batchNumber', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="e.g., OGK-2024-001"
-              />
+        <CardContent className="pt-4">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
+            <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
+              <div className="space-y-1.5 sm:space-y-2">
+                <div className="flex items-center justify-between gap-3">
+                  <label htmlFor="batchNumber" className="block text-sm font-medium text-gray-700">
+                    Batch # *
+                  </label>
+                  <Button type="button" variant="outline" size="sm" onClick={applySuggestedBatchNumber}>
+                    Generate
+                  </Button>
+                </div>
+                <input
+                  id="batchNumber"
+                  type="text"
+                  required
+                  value={formData.batchNumber}
+                  onChange={(e) => handleChange('batchNumber', e.target.value)}
+                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="Batch number"
+                />
+              </div>
+
+              <div className="space-y-1.5 sm:space-y-2">
+                <label htmlFor="lotNumber" className="block text-sm font-medium text-gray-700">
+                  Lot #
+                </label>
+                <input
+                  id="lotNumber"
+                  type="text"
+                  value={formData.lotNumber}
+                  onChange={(e) => handleChange('lotNumber', e.target.value)}
+                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  placeholder="Internal or lab lot"
+                />
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="space-y-2">
+            <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label htmlFor="harvestDate" className="block text-sm font-medium text-gray-700">
-                  Harvest Date *
+                  Harvest date *
                 </label>
                 <input
                   id="harvestDate"
                   type="date"
                   required
+                  max={todayDate}
                   value={formData.harvestDate}
                   onChange={(e) => handleChange('harvestDate', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label htmlFor="strainId" className="block text-sm font-medium text-gray-700">
                   Strain *
                 </label>
@@ -250,7 +295,7 @@ export default function EditBatchPage() {
                   required
                   value={formData.strainId}
                   onChange={(e) => handleChange('strainId', e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   <option value="">Select a strain</option>
                   {strains.map(strain => (
@@ -263,10 +308,10 @@ export default function EditBatchPage() {
             </div>
 
             {/* Lab Results */}
-            <div className="border-t border-gray-200 pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Lab Results</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="space-y-2">
+            <div className="border-t border-gray-200 pt-4 sm:pt-6">
+              <h3 className="text-base font-semibold text-gray-900 mb-3 sm:text-lg sm:mb-4">Lab Results</h3>
+              <div className="grid grid-cols-3 gap-3">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="thc" className="block text-sm font-medium text-gray-700">
                     THC (%)
                   </label>
@@ -278,12 +323,12 @@ export default function EditBatchPage() {
                     max="100"
                     value={formData.thc}
                     onChange={(e) => handleChange('thc', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="e.g., 18.5"
+                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="18.5"
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="cbd" className="block text-sm font-medium text-gray-700">
                     CBD (%)
                   </label>
@@ -295,14 +340,14 @@ export default function EditBatchPage() {
                     max="100"
                     value={formData.cbd}
                     onChange={(e) => handleChange('cbd', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="e.g., 0.5"
+                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="0.5"
                   />
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="totalCannabinoids" className="block text-sm font-medium text-gray-700">
-                    Total Cannabinoids (%)
+                    Total (%)
                   </label>
                   <input
                     id="totalCannabinoids"
@@ -312,34 +357,44 @@ export default function EditBatchPage() {
                     max="100"
                     value={formData.totalCannabinoids}
                     onChange={(e) => handleChange('totalCannabinoids', e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    placeholder="e.g., 22.0"
+                    className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="22.0"
                   />
                 </div>
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="terpenes" className="block text-sm font-medium text-gray-700">
-                Terpenes (JSON)
-              </label>
-              <textarea
-                id="terpenes"
-                rows={3}
-                value={formData.terpenes}
-                onChange={(e) => handleChange('terpenes', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent font-mono text-sm"
-                placeholder='{"myrcene": 0.5, "limonene": 0.3}'
-              />
-            </div>
+            <fieldset className="space-y-3">
+              <legend className="mb-2 text-sm font-medium text-gray-700">Terpenes</legend>
+              {unrecognizedTerpenes && !terpenesEdited ? (
+                <div className="space-y-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+                  <p>Existing terpene details will be kept. Replace them to enter percentages here.</p>
+                  <Button type="button" variant="outline" size="sm" onClick={() => { setTerpenesEdited(true); setTerpeneRows([]); }}>Replace terpene details</Button>
+                </div>
+              ) : <>
+                {terpeneRows.map((row, index) => (
+                  <div key={row.id} className="grid grid-cols-[minmax(0,1fr)_5rem_auto] items-end gap-2">
+                    <label className="min-w-0 text-sm text-gray-700">Terpene
+                      <input value={row.name} required placeholder="Myrcene" onChange={(event) => { setTerpenesEdited(true); setTerpeneRows((rows) => rows.map((item) => item.id === row.id ? { ...item, name: event.target.value } : item)); }} className="mt-1 h-10 w-full rounded-lg border border-gray-300 px-3 text-base" />
+                    </label>
+                    <label className="text-sm text-gray-700">%
+                      <input type="number" value={row.percentage} required min="0" max="100" step="0.01" onChange={(event) => { setTerpenesEdited(true); setTerpeneRows((rows) => rows.map((item) => item.id === row.id ? { ...item, percentage: event.target.value } : item)); }} className="mt-1 h-10 w-full rounded-lg border border-gray-300 px-2 text-base" />
+                    </label>
+                    <Button type="button" variant="ghost" aria-label={`Remove terpene ${index + 1}`} onClick={() => { setTerpenesEdited(true); setTerpeneRows((rows) => rows.filter((item) => item.id !== row.id)); }}>×</Button>
+                  </div>
+                ))}
+                <Button type="button" variant="outline" size="sm" onClick={() => { setTerpenesEdited(true); setTerpeneRows((rows) => [...rows, { id: crypto.randomUUID(), name: '', percentage: '' }]); }}>Add terpene</Button>
+              </>}
+            </fieldset>
 
             <BatchLabDocumentUploaders
+                onUploadingChange={setUploadingDocuments}
               value={formData.labDocuments}
               onChange={(documents) => handleChange('labDocuments', documents)}
               onError={setError}
             />
 
-            <div className="space-y-2">
+            <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
                 Notes
               </label>
@@ -348,19 +403,19 @@ export default function EditBatchPage() {
                 rows={3}
                 value={formData.notes}
                 onChange={(e) => handleChange('notes', e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                placeholder="Additional notes about this batch..."
+                className="min-h-10 w-full rounded-lg border border-gray-300 px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Batch notes"
               />
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
-              <Button type="submit" variant="primary" className="w-full sm:w-auto" disabled={!canSubmit}>
+            <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
+              <Button type="submit" variant="primary" className="flex-1 sm:flex-none" disabled={!canSubmit}>
                 {loading ? 'Saving...' : 'Save Changes'}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                className="w-full sm:w-auto"
+                className="flex-1 sm:flex-none"
                 onClick={() => router.push('/grower/batches')}
                 disabled={loading}
               >

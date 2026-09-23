@@ -1,0 +1,35 @@
+{
+  "slug": "11-batches",
+  "route": "/grower/batches",
+  "pass1": {
+    "inspected": [
+      "pass-1/11-batches-desktop.png",
+      "pass-1/11-batches-mobile.png"
+    ],
+    "status": "blocked-render",
+    "strengths": [],
+    "issues": [
+      {
+        "key": "batches-render-blocker",
+        "priority": "high",
+        "viewport": "desktop and mobile",
+        "observation": "The Batches page fails before rendering its list: runtime TypeError ‘batch.thc.toFixed is not a function’. Both fresh navigations show the application error overlay.",
+        "recommendation": "Normalize batch lab values before numeric formatting and show a recoverable error state when data is invalid. The normal list layout has separate two-pass findings under 11b-batches-ready."
+      }
+    ],
+    "limits": [
+      "Observed locally in the disposable clone using one synthetic batch with numeric THC/CBD values; not a production claim. The error screen does not support layout conclusions. The same route was also reviewed successfully in both passes with null lab fields; see 11b-batches-ready. No app source fix was made."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/11-batches-desktop.png",
+      "pass-2/11-batches-mobile.png"
+    ],
+    "notes": "Independent second reproduction after root temporarily restored the synthetic clone batch to THC 24.8 and CBD 0.6: both desktop and mobile again fail with batch.thc.toFixed is not a function at app/grower/batches/page.tsx:187. Both fresh error screenshots were inspected. Root was asked to restore only the clone fixture labs to null afterward; normal UI has separate completed two-pass evidence under 11b-batches-ready.",
+    "confirmedIssueKeys": [
+      "batches-render-blocker"
+    ],
+    "newIssues": []
+  }
+}

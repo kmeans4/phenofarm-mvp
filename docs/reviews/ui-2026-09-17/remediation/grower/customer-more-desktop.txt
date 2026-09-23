@@ -1,0 +1,121 @@
+- generic
+  - complementary
+    - StaticText "P"
+    - StaticText "PhenoFarm"
+    - StaticText "GROWER"
+    - button "Search" [ref=e3343]
+      - StaticText "Search..."
+      - StaticText "⌘K"
+    - button "Notifications" [expanded=false, ref=e3344]
+      - StaticText "Notifications"
+      - StaticText "17"
+    - navigation "Portal navigation" [ref=e3345]
+      - StaticText "SELL"
+      - link "Dashboard" [ref=e3347]
+        - StaticText "Dashboard"
+      - link "Catalog" [ref=e3348]
+        - StaticText "Catalog"
+      - link "Products" [ref=e3349]
+        - StaticText "Products"
+      - link "Inventory" [ref=e3350]
+        - StaticText "Inventory"
+      - link "Requests 17" [ref=e3351]
+        - StaticText "Requests"
+        - StaticText "17"
+      - StaticText "GROW"
+      - link "Strains" [ref=e3352]
+        - StaticText "Strains"
+      - link "Batches" [ref=e3353]
+        - StaticText "Batches"
+      - link "Customers" [ref=e3354]
+        - StaticText "Customers"
+      - link "Reports" [ref=e3355]
+        - StaticText "Reports"
+      - StaticText "ACCOUNT"
+      - link "Settings" [ref=e3356]
+        - StaticText "Settings"
+    - StaticText "VN"
+    - StaticText "Vermont Nurseries"
+    - StaticText "Grower account"
+    - button "Sign out" [ref=e3346]
+  - main
+    - link "← Customers" [ref=e3309]
+    - link "Statement" [ref=e3310]
+    - sectionheader
+      - heading "Edit customer" [level=1, ref=e3312]
+    - form
+      - heading "Business" [level=2, ref=e3313]
+      - LabelText
+        - StaticText "Business Name *"
+      - textbox "Enter business name" [ref=e3314]: Maple Street Market
+        - StaticText "Maple Street Market"
+      - LabelText
+        - StaticText "License Number"
+      - textbox "License #" [ref=e3315]: VT-UI-2026-104
+        - StaticText "VT-UI-2026-104"
+      - LabelText
+        - StaticText "Website"
+      - textbox "https://..." [ref=e3316]
+      - LabelText
+        - StaticText "Description"
+      - textbox "Brief description..." [ref=e3317]
+      - paragraph
+        - StaticText "0/500 characters"
+      - heading "Contact" [level=2, ref=e3318]
+      - LabelText
+        - StaticText "Contact Person"
+      - textbox "Full name" [ref=e3319]: Alex Morgan
+        - StaticText "Alex Morgan"
+      - LabelText
+        - StaticText "Email"
+      - textbox "email@example.com" [ref=e3320]: orders@example.test
+        - StaticText "orders@example.test"
+      - LabelText
+        - StaticText "Phone"
+      - textbox "(555) 123-4567" [ref=e3321]: 802-555-0142
+        - StaticText "802-555-0142"
+      - heading "Address" [level=2, ref=e3322]
+      - LabelText
+        - StaticText "Street Address"
+      - textbox "123 Main St" [ref=e3323]: 25 Maple Street
+        - StaticText "25 Maple Street"
+      - LabelText
+        - StaticText "City"
+      - textbox "City" [ref=e3324]: Burlington
+        - StaticText "Burlington"
+      - LabelText
+        - StaticText "State"
+      - combobox [expanded=false, ref=e3325]: Vermont
+        - MenuListPopup
+          - option "Vermont" [selected, ref=e3330]
+          - option "Maine" [ref=e3331]
+          - option "Massachusetts" [ref=e3332]
+          - option "Connecticut" [ref=e3333]
+          - option "Rhode Island" [ref=e3334]
+          - option "New Hampshire" [ref=e3335]
+          - option "New York" [ref=e3336]
+          - option "New Jersey" [ref=e3337]
+          - option "Pennsylvania" [ref=e3338]
+          - option "Delaware" [ref=e3339]
+          - option "Maryland" [ref=e3340]
+          - option "District of Columbia" [ref=e3341]
+          - option "Virginia" [ref=e3342]
+      - LabelText
+        - StaticText "ZIP"
+      - textbox "12345" [ref=e3326]: 05401
+        - StaticText "05401"
+      - button "More actions for Maple Street Market" [ref=e3329]
+        - StaticText "More"
+      - link "Cancel" [ref=e3327]
+      - button "Save changes" [ref=e3328]
+  - generic
+    - button "Open recent activity" [expanded=false, ref=e3357]
+    - button "Open messages" [ref=e3311]
+  - region "Notifications alt+T" [ref=e3305]
+  - alert
+  - dialog "More actions"
+    - heading "More actions" [level=2, ref=e3358]
+    - button "Close More actions" [ref=e3359]
+    - paragraph
+      - StaticText "Maple Street Market"
+    - button "Delete contact" [ref=e3360]

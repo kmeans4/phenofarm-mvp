@@ -1,5 +1,3 @@
-'use client';
-
 import { BadgeCheck, FileCheck2, Handshake, Leaf, MessagesSquare, ShieldCheck, Timer, Wallet } from 'lucide-react';
 
 const ITEMS = [

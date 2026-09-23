@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
+import { createNotification } from '@/lib/notifications';
 
 export async function POST(
   request: Request,
@@ -18,7 +19,7 @@ export async function POST(
   try {
     const dispensary = await db.dispensary.findUnique({
       where: { id },
-      select: { isVerified: true }
+      select: { businessName: true, isVerified: true, userId: true }
     });
 
     if (!dispensary) {
@@ -29,14 +30,20 @@ export async function POST(
 
     // Order submission gates on licenseStatus, so verification has to keep
     // both fields in sync — toggling isVerified alone leaves buyers blocked.
-    await db.dispensary.update({
-      where: { id },
-      data: verifying
-        ? { isVerified: true, licenseStatus: 'verified', verifiedAt: new Date() }
-        : { isVerified: false, licenseStatus: 'pending_review', verifiedAt: null }
+    await db.$transaction(async (tx) => {
+      await tx.dispensary.update({ where: { id }, data: verifying ? { isVerified: true, licenseStatus: 'verified', verifiedAt: new Date() } : { isVerified: false, licenseStatus: 'pending_review', verifiedAt: null } });
+      await createNotification(tx, { userId: dispensary.userId, type: 'VERIFICATION_DECISION', title: verifying ? 'License verified' : 'Verification removed', body: verifying ? 'Ordering is now unlocked for your dispensary.' : 'Ordering is paused until PhenoFarm verifies your license again.', href: '/dispensary/dashboard' });
     });
 
-    return NextResponse.redirect(new URL('/admin/dispensaries', request.url));
+    if (request.headers.get('accept')?.includes('application/json')) {
+      return NextResponse.json({
+        success: true,
+        verified: verifying,
+        message: `${dispensary.businessName} ${verifying ? 'verified' : 'unverified'}.`,
+      });
+    }
+
+    return NextResponse.redirect(new URL('/admin/dispensaries', request.url), 303);
   } catch (error) {
     console.error('Error toggling dispensary verification:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

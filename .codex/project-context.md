@@ -5,7 +5,7 @@
 - Repo path: `/Users/sam/dev/phenofarm-mvp`
 - Default branch: `main`
 - GitHub remote: `https://github.com/kmeans4/phenofarm-mvp.git`
-- Linear project: `PhenoFarm` (`https://linear.app/kmeans/project/phenofarm-84a18a3ae4fa`)
+- External project tracker: none configured.
 
 ## Service bindings
 
@@ -49,7 +49,7 @@
 - Prisma studio: `npm run prisma:studio`
 
 ## Repo notes
-- Use the `kmeans-app-workflow` skill for implementation, provider, deploy, and browser-QA work.
+- Use `kmeans-app-workflow` when coordinating multiple projects or resolving shared workflow boundaries.
 - Read `.codex/provider-runbook.md` before provider, env-var, auth, billing, database, or deployment work.
 - Production auth is configured around `NEXTAUTH_URL`; the current production env points to `https://phenofarm-mvp.vercel.app`.
 - This repo mixes local-only and production env files. Confirm the target before changing database or auth behavior.
@@ -69,28 +69,10 @@
 - `npm run smoke`: run the shared Codex smoke spec against `SMOKE_BASE_URL` or the local dev URL.
 - `npm run verify`: app-level verification; this now starts with `env:check`.
 
-## Codex Skill Routing
+## Task-scoped tools and context
 
-- Default workflow skill: `kmeans-app-workflow`.
-- Skill routing matrix: `/Users/sam/Documents/Playground/.codex/skill-routing.md`.
-- Workspace skill list: `.codex/workspace.json` under `skills`.
-- Invoke provider-specific skills when the work touches Vercel, Neon, Stripe, GitHub, Linear, browser QA, docs, or spreadsheet/data workflows.
-
-## UI Design Skill Defaults
-
-- Use `vercel:shadcn` for production component composition and app UI patterns.
-- Use `vercel:react-best-practices` after broad TSX edits.
-- Use `vercel:geist` for typography, density, and visual hierarchy polish.
-- Use `vercel:v0-dev` for UI ideation and alternate screen drafts.
-- Use `vercel:swr` for client-side loading, pagination, optimistic updates, and revalidation.
-- Use `vercel:ai-elements` and `vercel:json-render` for AI/chat or structured output interfaces.
-- Verify UI changes with `browser:control-in-app-browser`; use `playwright-interactive` or `screenshot` when deeper visual QA is needed.
-
-## RTK Token Efficiency
-
-- RTK is installed globally at `/opt/homebrew/bin/rtk`.
-- Shared workflow: `/Users/sam/Documents/Playground/.codex/rtk-workflow.md`.
-- Use `rtk-token-efficiency` for noisy shell output, broad repo exploration, test/build output, git diffs/status/logs, and GitHub CLI output.
-- Prefer `rtk git status`, `rtk git diff`, `rtk grep`, `rtk find`, `rtk npm run verify`, `rtk npm run build`, and `rtk gh ...` when output may be large.
-- Use normal shell commands or `rtk proxy <cmd>` when exact output, full logs, or exact line text matters.
-- Telemetry is disabled and should stay disabled unless explicitly requested.
+- Start with `AGENTS.md`; load a provider runbook only when provider state or release behavior is in scope. Recorded deployment IDs, database counts, account access, and environment descriptions are snapshots; verify the active target before a live claim or mutation.
+- Use skills actually available in the session when the task needs them. Prefer existing UI primitives and data-fetching patterns. UI work alone does not require shadcn, SWR, v0, or AI component libraries.
+- Use the available browser tools for rendered checks. `playwright-interactive` is optional when its persistent runtime is already available; do not reconfigure Codex just for ordinary QA.
+- Follow global RTK guidance for noisy commands. Use bounded `rg` searches and exact reads when needed; no separate Playground routing/workflow file is required.
+- Run focused checks during iteration. Before broad changes or releases, run the aggregate verification once; its included checks do not need separate duplicate runs. Specialized release gates in `AGENTS.md` take precedence. Documentation-only changes need consistency/link checks, not an application build or deployment.

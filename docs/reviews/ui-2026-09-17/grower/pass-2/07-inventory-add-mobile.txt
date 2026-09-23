@@ -1,0 +1,47 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e3137]
+- button "Notifications" [expanded=false, ref=e3138]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e3139]
+- main
+  - sectionheader
+    - heading "Update Stock" [level=1, ref=e3141]
+    - paragraph
+      - StaticText "Set the current stock level for a product. Batch, harvest, and compliance details live on the product itself."
+    - link "+ Add Product" [ref=e3142]
+  - form
+    - heading "Stock Details" [level=2, ref=e3143]
+    - LabelText
+      - StaticText "Select Product *"
+    - searchbox "Select Product *" [ref=e3144]
+    - paragraph
+      - StaticText "Search and choose a product before entering the new stock level."
+    - button "Mystery Pricing Batch Flower · Greenhouse · Assorted 25 Eighth" [ref=e3145]
+      - StaticText "Mystery Pricing Batch"
+      - StaticText "Flower · Greenhouse · Assorted"
+      - StaticText "25"
+      - StaticText "Eighth"
+    - button "Silver Haze Concentrate Bulk Extract · Live Resin · Silver Haze 50 Gram" [ref=e3146]
+      - StaticText "Silver Haze Concentrate"
+      - StaticText "Bulk Extract · Live Resin · Silver Haze"
+      - StaticText "50"
+      - StaticText "Gram"
+    - button "Purple Haze Flowers Flower · Indoor · Purple Haze 240 Gram" [ref=e3147]
+      - StaticText "Purple Haze Flowers"
+      - StaticText "Flower · Indoor · Purple Haze"
+      - StaticText "240"
+      - StaticText "Gram"
+    - LabelText
+      - StaticText "New Stock Level *"
+    - spinbutton "New Stock Level *" [required, ref=e3148]
+    - paragraph
+      - StaticText "This replaces the current stock level; it is not added to it."
+    - link "Cancel" [ref=e3149]
+    - button "Update Stock" [disabled, ref=e3150]
+- button "Open messages" [ref=e3140]
+- region "Notifications alt+T" [ref=e3136]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3151]
+  - image
+- alert

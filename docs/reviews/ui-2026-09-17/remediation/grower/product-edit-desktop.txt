@@ -1,0 +1,226 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e1077]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1078]
+    - StaticText "Notifications"
+  - navigation "Portal navigation" [ref=e1079]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e1083]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e1084]
+      - StaticText "Catalog"
+    - link "Products" [ref=e1085]
+      - StaticText "Products"
+    - link "Inventory" [ref=e1086]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e1087]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e1088]
+      - StaticText "Strains"
+    - link "Batches" [ref=e1089]
+      - StaticText "Batches"
+    - link "Customers" [ref=e1090]
+      - StaticText "Customers"
+    - link "Reports" [ref=e1091]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e1092]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e1080]
+- main
+  - link "Products" [ref=e1081]
+    - image
+    - StaticText "Products"
+  - sectionheader
+    - heading "Edit product" [level=1, ref=e1093]
+  - form
+    - navigation "Product sections" [ref=e1094]
+      - link "Basics" [ref=e1096]
+      - link "Pricing" [ref=e1097]
+      - link "Stock" [ref=e1098]
+      - link "Details" [ref=e1099]
+    - generic
+      - heading "Basics" [level=3, ref=e1100]
+      - LabelText
+        - StaticText "Name *"
+      - textbox "Name *" [ref=e1101]: Purple Haze Flowers
+        - StaticText "Purple Haze Flowers"
+      - LabelText
+        - StaticText "Product Type *"
+      - combobox "Product Type *" [expanded=false, ref=e1102]: Flower
+        - MenuListPopup
+          - option "Select a product type" [ref=e1132]
+          - option "Bulk Extract" [ref=e1133]
+          - option "Cartridge" [ref=e1134]
+          - option "Edibles" [ref=e1135]
+          - option "Beverages" [ref=e1136]
+          - option "Flower" [selected, ref=e1137]
+          - option "Live Plant" [ref=e1138]
+          - option "Plant Material" [ref=e1139]
+          - option "Prepack" [ref=e1140]
+          - option "Preroll" [ref=e1141]
+          - option "Tincture" [ref=e1142]
+          - option "Topicals & Wellness" [ref=e1143]
+      - LabelText
+        - StaticText "Sub Type"
+      - combobox "Sub Type" [expanded=false, ref=e1103]: Indoor
+        - MenuListPopup
+          - option "Select a sub type" [ref=e1144]
+          - option "Indoor" [selected, ref=e1145]
+          - option "A Bud" [ref=e1146]
+          - option "B Bud" [ref=e1147]
+          - option "C Bud" [ref=e1148]
+          - option "Infused Flower" [ref=e1149]
+          - option "Popcorn" [ref=e1150]
+          - option "Other (custom)" [ref=e1151]
+      - LabelText
+        - StaticText "Strain"
+      - combobox [expanded=false, ref=e1104]: Purple Haze
+        - MenuListPopup
+          - option "Select a strain (optional)" [ref=e1152]
+          - option "Assorted" [ref=e1153]
+          - option "Audit Test Kush • Hybrid" [ref=e1154]
+          - option "Purple Haze" [selected, ref=e1155]
+          - option "Silver Haze" [ref=e1156]
+      - button "+ New" [ref=e1105]
+      - LabelText
+        - StaticText "Batch"
+      - combobox [expanded=false, disabled, ref=e1106]: Loading batches...
+        - MenuListPopup
+          - option "Loading batches..." [disabled, ref=e1157]
+      - button "+ New" [ref=e1107]
+      - StaticText "No batches for this strain."
+    - generic
+      - heading "Pricing" [level=3, ref=e1108]
+      - LabelText
+        - StaticText "Price ($) *"
+      - spinbutton "Price ($) *" [ref=e1109]: 25
+        - StaticText "25"
+      - LabelText
+        - StaticText "Unit *"
+      - combobox "Unit *" [expanded=false, ref=e1110]: Gram
+        - MenuListPopup
+          - option "Select a unit" [ref=e1158]
+          - option "Gram" [selected, ref=e1159]
+          - option "Half Ounce" [ref=e1160]
+          - option "Ounce" [ref=e1161]
+          - option "Eighth" [ref=e1162]
+          - option "Quarter" [ref=e1163]
+          - option "Unit" [ref=e1164]
+          - option "Pack" [ref=e1165]
+          - option "Each" [ref=e1166]
+          - option "Lb" [ref=e1167]
+      - LabelText
+        - StaticText "Price visibility"
+      - paragraph
+        - StaticText "Quote-only listings hide the price."
+      - button "Show price" [ref=e1111]
+        - StaticText "Show price"
+      - button "Quote only" [ref=e1112]
+        - StaticText "Quote only"
+    - generic
+      - heading "Stock" [level=3, ref=e1113]
+      - LabelText
+        - StaticText "Stock *"
+      - spinbutton "Stock *" [ref=e1114]: 240
+        - StaticText "240"
+      - LabelText
+        - StaticText "SKU"
+      - textbox "SKU" [ref=e1115]
+      - LabelText
+        - StaticText "Brand"
+      - textbox "Brand" [ref=e1116]
+      - LabelText
+        - StaticText "Available"
+      - paragraph
+        - StaticText "Buyers can request this product"
+      - button "Mark product unavailable" [ref=e1117]
+    - group
+      - DisclosureTriangle "More details & photos Cannabinoids, harvest date, description and photos. Optional" [expanded=true]
+        - heading "More details & photos" [level=3, ref=e1125]
+        - paragraph
+          - StaticText "Cannabinoids, harvest date, description and photos."
+        - StaticText "Optional"
+      - heading "Cannabinoids" [level=3, ref=e1118]
+      - LabelText
+        - StaticText "THC Min (%)"
+      - spinbutton "THC Min (%)" [ref=e1119]: 22
+        - StaticText "22"
+      - LabelText
+        - StaticText "THC Max (%)"
+      - spinbutton "THC Max (%)" [ref=e1120]: 22
+        - StaticText "22"
+      - LabelText
+        - StaticText "CBD Min (%)"
+      - spinbutton "CBD Min (%)" [ref=e1121]: 0.5
+        - StaticText "0.5"
+      - LabelText
+        - StaticText "CBD Max (%)"
+      - spinbutton "CBD Max (%)" [ref=e1122]: 0.5
+        - StaticText "0.5"
+      - LabelText
+        - StaticText "Harvest Date"
+      - Date "Harvest Date"
+        - generic
+          - spinbutton "Month Month" [ref=e1168]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e1169]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e1170]: 0
+            - StaticText "yyyy"
+        - button "Show date picker" [ref=e1126]
+      - LabelText
+        - StaticText "Description"
+      - textbox "Description" [ref=e1123]: Indica-dominant hybrid with notes of grape and spice
+        - StaticText "Indica-dominant hybrid with notes of grape and spice"
+      - paragraph
+        - StaticText "52/2000 characters"
+      - generic
+        - LabelText
+          - StaticText "Product Images"
+        - paragraph
+          - StaticText "Up to 2 photos · JPG, PNG, WebP · 1MB each"
+        - button "Choose Files" [ref=e1127]: No file chosen
+        - image "Product image preview 1"
+        - button "Remove" [ref=e1128]
+        - paragraph
+          - StaticText "1/2 image slots used."
+    - complementary
+      - heading "Summary" [level=3, ref=e1124]
+      - StaticText "Available"
+      - DescriptionList
+        - term "Listing"
+        - definition
+          - StaticText "Purple Haze Flowers"
+        - term "Type"
+        - definition
+          - StaticText "Flower"
+        - term "Price"
+        - definition
+          - StaticText "$25/g"
+        - term "Stock"
+        - definition
+          - StaticText "240 g"
+        - term "Visibility"
+        - definition
+          - StaticText "Available · price visible"
+      - button "Save changes" [ref=e1129]
+      - button "Cancel" [ref=e1130]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1095]
+  - button "Open messages" [ref=e1082]
+- region "Notifications alt+T" [ref=e1076]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1131]
+  - image
+- alert

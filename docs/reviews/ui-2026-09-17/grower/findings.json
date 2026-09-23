@@ -1,0 +1,3664 @@
+[
+  {
+    "id": "G01",
+    "sourceKey": "setup-density",
+    "page": "Dashboard",
+    "slug": "01-dashboard",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "A six-row readiness checklist and setup pitch appear before daily attention items. On mobile, attention begins at y1700 after an approximately 1100px setup block; completed items each keep explanation and Complete badge.",
+    "recommendation": "Put pending requests first; collapse completed setup items into ‘Setup · 3 left’. Use ‘Review 17 requests’ and remove ‘Pending requests are the fastest path to keeping buyers moving.’",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/01-dashboard-desktop.png",
+      "grower/pass-1/01-dashboard-mobile.png",
+      "grower/pass-2/01-dashboard-desktop.png",
+      "grower/pass-2/01-dashboard-mobile.png"
+    ],
+    "pass1": {
+      "note": "A six-row readiness checklist and setup pitch appear before daily attention items. On mobile, attention begins at y1700 after an approximately 1100px setup block; completed items each keep explanation and Complete badge.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No setup, billing, or request action submitted. Development toolbar excluded from recommendations."
+    ],
+    "title": "Put pending work before the setup checklist",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/01-dashboard-desktop.png",
+        "grower/pass-1/01-dashboard-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/01-dashboard-desktop.png",
+        "grower/pass-2/01-dashboard-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "A six-row readiness checklist and setup pitch appear before daily attention items. On mobile, attention begins at y1700 after an approximately 1100px setup block; completed items each keep explanation and Complete badge.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission.",
+      "finalReview": "Priority calibrated in final cross-review: density and initial offscreen content are usability concerns; horizontal scrolling remains available."
+    }
+  },
+  {
+    "id": "G02",
+    "sourceKey": "repeated-dashboard-copy",
+    "page": "Dashboard",
+    "slug": "01-dashboard",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘ATTENTION CENTER’ repeats ‘What needs your attention’; ‘Activity Feed’ and ‘Recent Activity’ create two headings for one list plus instructional subtitles. KPI helper text repeats linked destinations.",
+    "recommendation": "Use one ‘Needs attention’ heading and one ‘Recent activity’ heading; remove generic subtitles. Shorten KPIs to ‘Requests’, ‘Delivered value’, ‘Customers’, ‘Products’. Keep one concise settlement qualifier near value.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/01-dashboard-desktop.png",
+      "grower/pass-1/01-dashboard-mobile.png",
+      "grower/pass-2/01-dashboard-desktop.png",
+      "grower/pass-2/01-dashboard-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘ATTENTION CENTER’ repeats ‘What needs your attention’; ‘Activity Feed’ and ‘Recent Activity’ create two headings for one list plus instructional subtitles. KPI helper text repeats linked destinations.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No setup, billing, or request action submitted. Development toolbar excluded from recommendations."
+    ],
+    "title": "Remove repeated dashboard headings",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/01-dashboard-desktop.png",
+        "grower/pass-1/01-dashboard-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/01-dashboard-desktop.png",
+        "grower/pass-2/01-dashboard-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘ATTENTION CENTER’ repeats ‘What needs your attention’; ‘Activity Feed’ and ‘Recent Activity’ create two headings for one list plus instructional subtitles. KPI helper text repeats linked destinations.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G03",
+    "sourceKey": "chart-history-default",
+    "page": "Dashboard",
+    "slug": "01-dashboard",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Delivered-value chart shows mostly empty space and oldest days first; the only visible $450 bar is outside the initial horizontal window. Desktop card is approximately340px tall; mobile swipe view initially looks empty.",
+    "recommendation": "Default to the most recent days or a seven-day mobile view; use ‘Delivered value · 30 days’, reduce chart height, and make date range visible.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/01-dashboard-desktop.png",
+      "grower/pass-1/01-dashboard-mobile.png",
+      "grower/pass-2/01-dashboard-desktop.png",
+      "grower/pass-2/01-dashboard-mobile.png"
+    ],
+    "pass1": {
+      "note": "Delivered-value chart shows mostly empty space and oldest days first; the only visible $450 bar is outside the initial horizontal window. Desktop card is approximately340px tall; mobile swipe view initially looks empty.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No setup, billing, or request action submitted. Development toolbar excluded from recommendations.",
+      "Observed with the local fixture; production prevalence was not checked and no save behavior was tested."
+    ],
+    "title": "Show recent chart data first",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/01-dashboard-desktop.png",
+        "grower/pass-1/01-dashboard-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/01-dashboard-desktop.png",
+        "grower/pass-2/01-dashboard-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Delivered-value chart shows mostly empty space and oldest days first; the only visible $450 bar is outside the initial horizontal window. Desktop card is approximately340px tall; mobile swipe view initially looks empty.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G04",
+    "sourceKey": "setup-provider-copy",
+    "page": "Dashboard",
+    "slug": "01-dashboard",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Subscription readiness text exposes ‘when Stripe Billing is ready’, while commercial terms lists five implementation concepts.",
+    "recommendation": "Use ‘Choose a plan to activate your account’ only when available, otherwise ‘Billing is not available yet’; use ‘Set order and delivery defaults’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/01-dashboard-desktop.png",
+      "grower/pass-1/01-dashboard-mobile.png",
+      "grower/pass-2/01-dashboard-desktop.png",
+      "grower/pass-2/01-dashboard-mobile.png"
+    ],
+    "pass1": {
+      "note": "Subscription readiness text exposes ‘when Stripe Billing is ready’, while commercial terms lists five implementation concepts.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No setup, billing, or request action submitted. Development toolbar excluded from recommendations."
+    ],
+    "title": "Use plain subscription and terms copy",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/01-dashboard-desktop.png",
+        "grower/pass-1/01-dashboard-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/01-dashboard-desktop.png",
+        "grower/pass-2/01-dashboard-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Subscription readiness text exposes ‘when Stripe Billing is ready’, while commercial terms lists five implementation concepts.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G05",
+    "sourceKey": "catalog-repetition",
+    "page": "Catalog overview",
+    "slug": "02-catalog",
+    "route": "/grower/catalog",
+    "routePattern": "/grower/catalog",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Overview navigation opens ‘Catalog Workspace’; the page describes managing listings in the subtitle, next-action banner, Listings card, and Catalog health area. Four navigation cards repeat sidebar destinations with explanatory paragraphs.",
+    "recommendation": "Use ‘Catalog overview’. Replace the generic banner with one actionable issue count. Compress destinations into ‘Listings · 3’, ‘Inventory’, ‘Buyer preview’, and ‘Price visibility’, with one-line helper text only where needed.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/02-catalog-desktop.png",
+      "grower/pass-1/02-catalog-mobile.png",
+      "grower/pass-2/02-catalog-desktop.png",
+      "grower/pass-2/02-catalog-mobile.png"
+    ],
+    "pass1": {
+      "note": "Overview navigation opens ‘Catalog Workspace’; the page describes managing listings in the subtitle, next-action banner, Listings card, and Catalog health area. Four navigation cards repeat sidebar destinations with explanatory paragraphs.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Revisited both widths. Catalog health remains below1211px mobile and status pills still wrap over several lines. Refined priority: compact navigation cards and zero-count checks first; keep the useful two-by-two metric layout. No new issue.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No advanced-setup panel or destination writes used."
+    ],
+    "title": "Make the catalog overview concise",
+    "routes": [
+      "/grower/catalog"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/02-catalog-desktop.png",
+        "grower/pass-1/02-catalog-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/02-catalog-desktop.png",
+        "grower/pass-2/02-catalog-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Overview navigation opens ‘Catalog Workspace’; the page describes managing listings in the subtitle, next-action banner, Listings card, and Catalog health area. Four navigation cards repeat sidebar destinations with explanatory paragraphs.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Revisited both widths. Catalog health remains below1211px mobile and status pills still wrap over several lines. Refined priority: compact navigation cards and zero-count checks first; keep the useful two-by-two metric layout. No new issue.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G06",
+    "sourceKey": "catalog-pill-wrap",
+    "page": "Catalog overview",
+    "slug": "02-catalog",
+    "route": "/grower/catalog",
+    "routePattern": "/grower/catalog",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "The status pills on four destination cards are narrow enough to wrap ‘3 buyer-visible listings’ or ‘1 quote-only listing’ over three or four lines; mobile cards consume about450px before health details.",
+    "recommendation": "Use short badges ‘3 live’, ‘1 quote-only’, ‘0 low stock’; keep counts beside titles or use a secondary line rather than circular multi-line pills.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/02-catalog-desktop.png",
+      "grower/pass-1/02-catalog-mobile.png",
+      "grower/pass-2/02-catalog-desktop.png",
+      "grower/pass-2/02-catalog-mobile.png"
+    ],
+    "pass1": {
+      "note": "The status pills on four destination cards are narrow enough to wrap ‘3 buyer-visible listings’ or ‘1 quote-only listing’ over three or four lines; mobile cards consume about450px before health details.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Revisited both widths. Catalog health remains below1211px mobile and status pills still wrap over several lines. Refined priority: compact navigation cards and zero-count checks first; keep the useful two-by-two metric layout. No new issue.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No advanced-setup panel or destination writes used."
+    ],
+    "title": "Shorten multi-line status badges",
+    "routes": [
+      "/grower/catalog"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/02-catalog-desktop.png",
+        "grower/pass-1/02-catalog-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/02-catalog-desktop.png",
+        "grower/pass-2/02-catalog-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The status pills on four destination cards are narrow enough to wrap ‘3 buyer-visible listings’ or ‘1 quote-only listing’ over three or four lines; mobile cards consume about450px before health details.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Revisited both widths. Catalog health remains below1211px mobile and status pills still wrap over several lines. Refined priority: compact navigation cards and zero-count checks first; keep the useful two-by-two metric layout. No new issue.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G07",
+    "sourceKey": "catalog-health-density",
+    "page": "Catalog overview",
+    "slug": "02-catalog",
+    "route": "/grower/catalog",
+    "routePattern": "/grower/catalog",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Catalog health begins at y1211 and shows four tall cards with instructional copy even when three counts are zero; page reaches1977px for a summary screen.",
+    "recommendation": "Show only issues by default with compact rows, ‘Images missing · 0’, ‘Type missing · 0’, ‘Quote only · 1’, ‘Low stock · 0’; hide zero-count details behind ‘All checks’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/02-catalog-mobile.png",
+      "grower/pass-2/02-catalog-mobile.png"
+    ],
+    "pass1": {
+      "note": "Catalog health begins at y1211 and shows four tall cards with instructional copy even when three counts are zero; page reaches1977px for a summary screen.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Revisited both widths. Catalog health remains below1211px mobile and status pills still wrap over several lines. Refined priority: compact navigation cards and zero-count checks first; keep the useful two-by-two metric layout. No new issue.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No advanced-setup panel or destination writes used."
+    ],
+    "title": "Compact catalog health checks",
+    "routes": [
+      "/grower/catalog"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/02-catalog-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/02-catalog-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Catalog health begins at y1211 and shows four tall cards with instructional copy even when three counts are zero; page reaches1977px for a summary screen.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Revisited both widths. Catalog health remains below1211px mobile and status pills still wrap over several lines. Refined priority: compact navigation cards and zero-count checks first; keep the useful two-by-two metric layout. No new issue.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G08",
+    "sourceKey": "products-before-content",
+    "page": "Products",
+    "slug": "03-products",
+    "route": "/grower/products",
+    "routePattern": "/grower/products",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Three full-width actions, three stacked KPI cards, a views panel, grouping/display panel, and bulk instructions push the first product to y1295. Most of the first screen contains repeated catalog context rather than products.",
+    "recommendation": "Keep one Add action with Quick add/Import in its menu. Put three metrics in one compact row; combine filters, grouping, and display in a compact toolbar. Show bulk controls after selection. Aim for the first product within the initial screen.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/03-products-mobile.png",
+      "grower/pass-2/03-products-mobile.png",
+      "grower/pass-2/03-products-narrow.png"
+    ],
+    "pass1": {
+      "note": "Three full-width actions, three stacked KPI cards, a views panel, grouping/display panel, and bulk instructions push the first product to y1295. Most of the first screen contains repeated catalog context rather than products.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Second desktop/mobile pass confirms the first product is below the fold and stock/actions are hidden inside horizontal table scrolling. Additional360px capture worsens clipping: Price is nearly entirely offscreen and filter chips gain another row. Keep high priority for mobile list composition; no distinct new issue.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No selection, edit, or bulk mutation performed."
+    ],
+    "title": "Bring products into the first mobile screen",
+    "routes": [
+      "/grower/products"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/03-products-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/03-products-mobile.png",
+        "grower/pass-2/03-products-narrow.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Three full-width actions, three stacked KPI cards, a views panel, grouping/display panel, and bulk instructions push the first product to y1295. Most of the first screen contains repeated catalog context rather than products.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Second desktop/mobile pass confirms the first product is below the fold and stock/actions are hidden inside horizontal table scrolling. Additional360px capture worsens clipping: Price is nearly entirely offscreen and filter chips gain another row. Keep high priority for mobile list composition; no distinct new issue.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission.",
+      "finalReview": "Priority calibrated in final cross-review: density and initial offscreen content are usability concerns; horizontal scrolling remains available."
+    }
+  },
+  {
+    "id": "G09",
+    "sourceKey": "products-copy",
+    "page": "Products",
+    "slug": "03-products",
+    "route": "/grower/products",
+    "routePattern": "/grower/products",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Saved workflow views’ plus ‘Use these before grouping…’ explains basic controls; ‘Select products for bulk cleanup’ is followed by another cleanup sentence. ‘All’ appears in saved views, grouping, and an All Products section header.",
+    "recommendation": "Use ‘Filters’, ‘Low stock’, ‘Missing photos’, ‘Hidden’; label grouping as ‘Group by’. Remove both bulk instruction sentences and the All Products divider when ungrouped. Shorten quote badge to ‘Quote only’ with a tooltip explaining price visibility.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/03-products-desktop.png",
+      "grower/pass-1/03-products-mobile.png",
+      "grower/pass-2/03-products-desktop.png",
+      "grower/pass-2/03-products-mobile.png",
+      "grower/pass-2/03-products-narrow.png"
+    ],
+    "pass1": {
+      "note": "‘Saved workflow views’ plus ‘Use these before grouping…’ explains basic controls; ‘Select products for bulk cleanup’ is followed by another cleanup sentence. ‘All’ appears in saved views, grouping, and an All Products section header.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Second desktop/mobile pass confirms the first product is below the fold and stock/actions are hidden inside horizontal table scrolling. Additional360px capture worsens clipping: Price is nearly entirely offscreen and filter chips gain another row. Keep high priority for mobile list composition; no distinct new issue.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No selection, edit, or bulk mutation performed."
+    ],
+    "title": "Simplify product toolbar labels",
+    "routes": [
+      "/grower/products"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/03-products-desktop.png",
+        "grower/pass-1/03-products-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/03-products-desktop.png",
+        "grower/pass-2/03-products-mobile.png",
+        "grower/pass-2/03-products-narrow.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Saved workflow views’ plus ‘Use these before grouping…’ explains basic controls; ‘Select products for bulk cleanup’ is followed by another cleanup sentence. ‘All’ appears in saved views, grouping, and an All Products section header.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Second desktop/mobile pass confirms the first product is below the fold and stock/actions are hidden inside horizontal table scrolling. Additional360px capture worsens clipping: Price is nearly entirely offscreen and filter chips gain another row. Keep high priority for mobile list composition; no distinct new issue.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G10",
+    "sourceKey": "products-mobile-table",
+    "page": "Products",
+    "slug": "03-products",
+    "route": "/grower/products",
+    "routePattern": "/grower/products",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "The table retains desktop columns. At 390px, price is partly offscreen and stock plus Edit/actions are outside the initial view; horizontal scrolling is required to reach them. At 360px even more of the price is hidden. There is no explicit horizontal-scroll cue, and the long quote-only pill forms a tall narrow stack.",
+    "recommendation": "Use compact mobile product rows showing name, status, price, stock and an always-visible action menu. If the table remains, pin product/actions and add an explicit horizontal-scroll cue; use ‘g’ and ‘ea’ only where unit meaning is clear.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/03-products-mobile.png",
+      "grower/pass-2/03-products-mobile.png",
+      "grower/pass-2/03-products-narrow.png"
+    ],
+    "pass1": {
+      "note": "The table retains desktop columns: the visible mobile area clips the price and hides stock plus Edit/actions to the right; the long quote-only pill breaks into a tall narrow stack.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Second desktop/mobile pass confirms the first product is below the fold and stock/actions are hidden inside horizontal table scrolling. Additional360px capture worsens clipping: Price is nearly entirely offscreen and filter chips gain another row. Keep high priority for mobile list composition; no distinct new issue.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No selection, edit, or bulk mutation performed."
+    ],
+    "title": "Keep product price, stock, and actions visible",
+    "routes": [
+      "/grower/products"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/03-products-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/03-products-mobile.png",
+        "grower/pass-2/03-products-narrow.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The table retains desktop columns: the visible mobile area clips the price and hides stock plus Edit/actions to the right; the long quote-only pill breaks into a tall narrow stack.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Second desktop/mobile pass confirms the first product is below the fold and stock/actions are hidden inside horizontal table scrolling. Additional360px capture worsens clipping: Price is nearly entirely offscreen and filter chips gain another row. Keep high priority for mobile list composition; no distinct new issue.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission.",
+      "finalReview": "Priority calibrated in final cross-review: density and initial offscreen content are usability concerns; horizontal scrolling remains available."
+    }
+  },
+  {
+    "id": "G11",
+    "sourceKey": "quick-add-copy",
+    "page": "Quick add product",
+    "slug": "03a-quick-add",
+    "route": "/grower/products",
+    "routePattern": "/grower/products",
+    "state": "Quick add expanded",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Quick add expands a panel with ‘QUICK PRODUCT CREATION’, ‘Create the basic listing now’, and a 20-word explanation; on mobile its header/defaults/draft controls consume about250px before the first field.",
+    "recommendation": "Use one ‘Quick add’ heading and ‘Add details later’ helper. Put Close in the heading row and make defaults a compact ‘Flower · g’ control; pair price and stock fields when space permits.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/03a-quick-add-desktop.png",
+      "grower/pass-1/03a-quick-add-mobile.png",
+      "grower/pass-2/03a-quick-add-desktop.png",
+      "grower/pass-2/03a-quick-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "Quick add expands a panel with ‘QUICK PRODUCT CREATION’, ‘Create the basic listing now’, and a 20-word explanation; on mobile its header/defaults/draft controls consume about250px before the first field.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Reopened Quick add after a fresh Products navigation at both widths. Same expanded form and existing draft indication; repeated header/defaults copy remains the main space opportunity. No added issue; no input changed.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Existing draft only viewed; no field typed, draft cleared, defaults changed, or listing created."
+    ],
+    "title": "Make Quick add quick to scan",
+    "routes": [
+      "/grower/products"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/03a-quick-add-desktop.png",
+        "grower/pass-1/03a-quick-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/03a-quick-add-desktop.png",
+        "grower/pass-2/03a-quick-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Quick add expands a panel with ‘QUICK PRODUCT CREATION’, ‘Create the basic listing now’, and a 20-word explanation; on mobile its header/defaults/draft controls consume about250px before the first field.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Reopened Quick add after a fresh Products navigation at both widths. Same expanded form and existing draft indication; repeated header/defaults copy remains the main space opportunity. No added issue; no input changed.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G12",
+    "sourceKey": "product-form-guidance",
+    "page": "Add product",
+    "slug": "04-product-add",
+    "route": "/grower/products/add",
+    "routePattern": "/grower/products/add",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Title/subtitle, five-step setup block and its paragraph, defaults panel, then Step 1 description consume nearly the first mobile screen before editing. Each later section also explains its heading; default form totals3223px.",
+    "recommendation": "Use ‘Add product’; replace setup block with compact section links ‘Basics · Pricing · Stock · Details’. Put reusable defaults beside the Type field. Remove instructions such as ‘so mobile setup stays easier to scan’, ‘Name the product…’ and ‘Add the starting quantity…’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/04-product-add-mobile.png",
+      "grower/pass-2/04-product-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "Title/subtitle, five-step setup block and its paragraph, defaults panel, then Step 1 description consume nearly the first mobile screen before editing. Each later section also explains its heading; default form totals3223px.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh second pass confirms the same3223px mobile form, duplicated summaries/actions and Publish/Create naming mismatch. Keep optional details collapsed by default but remove the guide paragraphs; no extra issue found.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No values changed and no save/publish/draft action used."
+    ],
+    "title": "Reduce product setup guidance",
+    "routes": [
+      "/grower/products/add"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/04-product-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/04-product-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Title/subtitle, five-step setup block and its paragraph, defaults panel, then Step 1 description consume nearly the first mobile screen before editing. Each later section also explains its heading; default form totals3223px.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh second pass confirms the same3223px mobile form, duplicated summaries/actions and Publish/Create naming mismatch. Keep optional details collapsed by default but remove the guide paragraphs; no extra issue found.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission.",
+      "finalReview": "Priority calibrated in final cross-review: density and initial offscreen content are usability concerns; horizontal scrolling remains available."
+    }
+  },
+  {
+    "id": "G13",
+    "sourceKey": "product-form-save-duplication",
+    "page": "Add product",
+    "slug": "04-product-add",
+    "route": "/grower/products/add",
+    "routePattern": "/grower/products/add",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Mobile has sticky ‘Publish product’ plus bottom ‘Create Product’, separate Cancel buttons, a five-card save summary, and repeated browser-autosave text; primary labels disagree for the same action. Desktop draft helper is a narrow five-line paragraph.",
+    "recommendation": "Use one action label ‘Publish product’ across widths. Keep draft as a secondary action, show a compact one- or two-line review summary and one ‘Draft saved on this device’ note; avoid repeating the full footer behind the sticky action bar.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/04-product-add-desktop.png",
+      "grower/pass-1/04-product-add-mobile.png",
+      "grower/pass-2/04-product-add-desktop.png",
+      "grower/pass-2/04-product-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "Mobile has sticky ‘Publish product’ plus bottom ‘Create Product’, separate Cancel buttons, a five-card save summary, and repeated browser-autosave text; primary labels disagree for the same action. Desktop draft helper is a narrow five-line paragraph.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh second pass confirms the same3223px mobile form, duplicated summaries/actions and Publish/Create naming mismatch. Keep optional details collapsed by default but remove the guide paragraphs; no extra issue found.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No values changed and no save/publish/draft action used."
+    ],
+    "title": "Use one consistent publish action",
+    "routes": [
+      "/grower/products/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/04-product-add-desktop.png",
+        "grower/pass-1/04-product-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/04-product-add-desktop.png",
+        "grower/pass-2/04-product-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Mobile has sticky ‘Publish product’ plus bottom ‘Create Product’, separate Cancel buttons, a five-card save summary, and repeated browser-autosave text; primary labels disagree for the same action. Desktop draft helper is a narrow five-line paragraph.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh second pass confirms the same3223px mobile form, duplicated summaries/actions and Publish/Create naming mismatch. Keep optional details collapsed by default but remove the guide paragraphs; no extra issue found.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G14",
+    "sourceKey": "product-form-label-length",
+    "page": "Add product",
+    "slug": "04-product-add",
+    "route": "/grower/products/add",
+    "routePattern": "/grower/products/add",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Initial Inventory Quantity’, ‘Availability Status’, and nested ‘Pricing Display’ repeat context already supplied by their sections; price visibility options each include near-synonymous helper copy.",
+    "recommendation": "Use ‘Starting stock’, ‘Available’, and ‘Show price / Quote only’, with a single explanation ‘Quote-only listings hide the price’. Shorten ‘Optional profile, compliance, and images’ to ‘More details & photos’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/04-product-add-desktop.png",
+      "grower/pass-1/04-product-add-mobile.png",
+      "grower/pass-2/04-product-add-desktop.png",
+      "grower/pass-2/04-product-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Initial Inventory Quantity’, ‘Availability Status’, and nested ‘Pricing Display’ repeat context already supplied by their sections; price visibility options each include near-synonymous helper copy.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh second pass confirms the same3223px mobile form, duplicated summaries/actions and Publish/Create naming mismatch. Keep optional details collapsed by default but remove the guide paragraphs; no extra issue found.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No values changed and no save/publish/draft action used."
+    ],
+    "title": "Shorten product field labels",
+    "routes": [
+      "/grower/products/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/04-product-add-desktop.png",
+        "grower/pass-1/04-product-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/04-product-add-desktop.png",
+        "grower/pass-2/04-product-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Initial Inventory Quantity’, ‘Availability Status’, and nested ‘Pricing Display’ repeat context already supplied by their sections; price visibility options each include near-synonymous helper copy.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh second pass confirms the same3223px mobile form, duplicated summaries/actions and Publish/Create naming mismatch. Keep optional details collapsed by default but remove the guide paragraphs; no extra issue found.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G15",
+    "sourceKey": "product-optional-copy",
+    "page": "Expanded product details",
+    "slug": "04a-product-details",
+    "route": "/grower/products/add",
+    "routePattern": "/grower/products/add",
+    "state": "Optional details expanded",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Optional appears in the section title, badge and ‘Cannabinoid Profile (Optional)’. Image helper includes the implementation detail ‘Images upload separately before you save the product.’",
+    "recommendation": "Use ‘Cannabinoids’ inside the already optional section. Keep the upload helper to ‘Up to 2 photos · JPG, PNG, WebP · 1MB each’ and show actual upload status only when needed.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/04a-product-details-desktop.png",
+      "grower/pass-1/04a-product-details-mobile.png",
+      "grower/pass-2/04a-product-details-desktop.png",
+      "grower/pass-2/04a-product-details-mobile.png"
+    ],
+    "pass1": {
+      "note": "Optional appears in the section title, badge and ‘Cannabinoid Profile (Optional)’. Image helper includes the implementation detail ‘Images upload separately before you save the product.’",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop and mobile expanded-details captures confirm repetitive optional labels and technical image-upload helper text. The mobile sticky action uses Publish product while the footer uses Create Product. Both captures reset scroll before capture; the fixed action bar position in a full-page screenshot is not a separate defect.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Expanded by clicking heading; no fields changed. Fullpage fixed-header position reflects the scroll position at capture, not an asserted sticky-header defect."
+    ],
+    "title": "Remove repeated optional and upload wording",
+    "routes": [
+      "/grower/products/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/04a-product-details-desktop.png",
+        "grower/pass-1/04a-product-details-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/04a-product-details-desktop.png",
+        "grower/pass-2/04a-product-details-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Optional appears in the section title, badge and ‘Cannabinoid Profile (Optional)’. Image helper includes the implementation detail ‘Images upload separately before you save the product.’",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop and mobile expanded-details captures confirm repetitive optional labels and technical image-upload helper text. The mobile sticky action uses Publish product while the footer uses Create Product. Both captures reset scroll before capture; the fixed action bar position in a full-page screenshot is not a separate defect.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G16",
+    "sourceKey": "edit-unit-display",
+    "page": "Edit product",
+    "slug": "05-product-edit",
+    "route": "/grower/products/product-001/edit",
+    "routePattern": "/grower/products/[id]/edit",
+    "state": "default",
+    "priority": "high",
+    "category": "display consistency",
+    "viewport": "desktop and mobile",
+    "observation": "Unit is a required select showing ‘Select a unit’ while the same form summary says ‘$25/gram’ and ‘240 gram’. The screen does not clearly indicate the current unit.",
+    "recommendation": "Normalize existing units to the available options and show the selected value. Use ‘g’ consistently in summary after a labeled ‘Unit’ control; verify unchanged edits preserve the unit.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/05-product-edit-desktop.png",
+      "grower/pass-1/05-product-edit-mobile.png",
+      "grower/pass-2/05-product-edit-desktop.png",
+      "grower/pass-2/05-product-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "Unit is a required select showing ‘Select a unit’ while the same form summary says ‘$25/gram’ and ‘240 gram’. The screen does not clearly indicate the current unit.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisits confirm the required Unit select displays Select a unit while the summary shows $25/gram and 240 gram. The unlinked batch still presents View batch details. New-listing guidance and repeated save labels remain in edit mode; no fields were changed and no save attempted. Sample-data limitations apply to the unit/batch mismatch.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Viewed existing record only; no field or data changed. Gray thumbnail may be synthetic fixture imagery and is not treated as a production defect.",
+      "Observed with the local fixture; production prevalence was not checked and no save behavior was tested."
+    ],
+    "title": "Show the saved unit in the edit form",
+    "routes": [
+      "/grower/products/product-001/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/05-product-edit-desktop.png",
+        "grower/pass-1/05-product-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/05-product-edit-desktop.png",
+        "grower/pass-2/05-product-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Unit is a required select showing ‘Select a unit’ while the same form summary says ‘$25/gram’ and ‘240 gram’. The screen does not clearly indicate the current unit.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisits confirm the required Unit select displays Select a unit while the summary shows $25/gram and 240 gram. The unlinked batch still presents View batch details. New-listing guidance and repeated save labels remain in edit mode; no fields were changed and no save attempted. Sample-data limitations apply to the unit/batch mismatch.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G17",
+    "sourceKey": "edit-form-density",
+    "page": "Edit product",
+    "slug": "05-product-edit",
+    "route": "/grower/products/product-001/edit",
+    "routePattern": "/grower/products/[id]/edit",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "The five-step new-listing guide and creation-oriented sentences remain on Edit Product. Mobile reaches3982px; the summary repeats five values in separate cards. Desktop main form occupies a narrow column with a large empty right side below the sticky summary.",
+    "recommendation": "For edit mode use ‘Edit product’ plus compact section links, remove the creation guide, and use ‘Stock’ rather than ‘Initial Inventory Quantity’. Keep one ‘Save changes’ label across sticky and standard actions. Compact the summary into rows; give editable fields more desktop width.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/05-product-edit-desktop.png",
+      "grower/pass-1/05-product-edit-mobile.png",
+      "grower/pass-2/05-product-edit-desktop.png",
+      "grower/pass-2/05-product-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "The five-step new-listing guide and creation-oriented sentences remain on Edit Product. Mobile reaches3982px; the summary repeats five values in separate cards. Desktop main form occupies a narrow column with a large empty right side below the sticky summary.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisits confirm the required Unit select displays Select a unit while the summary shows $25/gram and 240 gram. The unlinked batch still presents View batch details. New-listing guidance and repeated save labels remain in edit mode; no fields were changed and no save attempted. Sample-data limitations apply to the unit/batch mismatch.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Viewed existing record only; no field or data changed. Gray thumbnail may be synthetic fixture imagery and is not treated as a production defect."
+    ],
+    "title": "Use a focused product-edit layout",
+    "routes": [
+      "/grower/products/product-001/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/05-product-edit-desktop.png",
+        "grower/pass-1/05-product-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/05-product-edit-desktop.png",
+        "grower/pass-2/05-product-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The five-step new-listing guide and creation-oriented sentences remain on Edit Product. Mobile reaches3982px; the summary repeats five values in separate cards. Desktop main form occupies a narrow column with a large empty right side below the sticky summary.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisits confirm the required Unit select displays Select a unit while the summary shows $25/gram and 240 gram. The unlinked batch still presents View batch details. New-listing guidance and repeated save labels remain in edit mode; no fields were changed and no save attempted. Sample-data limitations apply to the unit/batch mismatch.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G18",
+    "sourceKey": "edit-batch-helper",
+    "page": "Edit product",
+    "slug": "05-product-edit",
+    "route": "/grower/products/product-001/edit",
+    "routePattern": "/grower/products/[id]/edit",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Batch area has ‘No batches available yet…’, a ‘View batch details’ link, and ‘Link to a harvest batch for lab results’ together even though no batch is selected.",
+    "recommendation": "Use ‘No batches for this strain’ beside a ‘New batch’ action; hide ‘View batch details’ until a batch is selected. Remove the extra linkage explanation.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/05-product-edit-desktop.png",
+      "grower/pass-1/05-product-edit-mobile.png",
+      "grower/pass-2/05-product-edit-desktop.png",
+      "grower/pass-2/05-product-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "Batch area has ‘No batches available yet…’, a ‘View batch details’ link, and ‘Link to a harvest batch for lab results’ together even though no batch is selected.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisits confirm the required Unit select displays Select a unit while the summary shows $25/gram and 240 gram. The unlinked batch still presents View batch details. New-listing guidance and repeated save labels remain in edit mode; no fields were changed and no save attempted. Sample-data limitations apply to the unit/batch mismatch.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Viewed existing record only; no field or data changed. Gray thumbnail may be synthetic fixture imagery and is not treated as a production defect.",
+      "Observed with the local fixture; production prevalence was not checked and no save behavior was tested."
+    ],
+    "title": "Hide irrelevant batch-detail guidance",
+    "routes": [
+      "/grower/products/product-001/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/05-product-edit-desktop.png",
+        "grower/pass-1/05-product-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/05-product-edit-desktop.png",
+        "grower/pass-2/05-product-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Batch area has ‘No batches available yet…’, a ‘View batch details’ link, and ‘Link to a harvest batch for lab results’ together even though no batch is selected.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisits confirm the required Unit select displays Select a unit while the summary shows $25/gram and 240 gram. The unlinked batch still presents View batch details. New-listing guidance and repeated save labels remain in edit mode; no fields were changed and no save attempted. Sample-data limitations apply to the unit/batch mismatch.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G19",
+    "sourceKey": "inventory-top-density",
+    "page": "Inventory",
+    "slug": "06-inventory",
+    "route": "/grower/inventory",
+    "routePattern": "/grower/inventory",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Two full-width actions and three stacked metric cards push the first product below the844px initial viewport. ‘Inventory’ is followed by ‘Product Inventory’ plus two similar explanations.",
+    "recommendation": "Use a compact metrics row and one Add action; move ‘Update stock’ next to filters or label it ‘Stock update’. Remove the second heading and use one short helper ‘Enter current stock’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/06-inventory-mobile.png",
+      "grower/pass-2/06-inventory-mobile.png"
+    ],
+    "pass1": {
+      "note": "Two full-width actions and three stacked metric cards push the first product below the844px initial viewport. ‘Inventory’ is followed by ‘Product Inventory’ plus two similar explanations.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm the three stacked mobile metrics and repeated inventory introduction place the first product below the 844px fold. Inventory cards themselves remain readable with visible quantity controls. Total Value still renders $10000.00 without grouping. No stock controls were used.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Stock controls and Update Stock not activated; no inventory changes."
+    ],
+    "title": "Compact inventory summaries",
+    "routes": [
+      "/grower/inventory"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/06-inventory-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/06-inventory-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Two full-width actions and three stacked metric cards push the first product below the844px initial viewport. ‘Inventory’ is followed by ‘Product Inventory’ plus two similar explanations.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm the three stacked mobile metrics and repeated inventory introduction place the first product below the 844px fold. Inventory cards themselves remain readable with visible quantity controls. Total Value still renders $10000.00 without grouping. No stock controls were used.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G20",
+    "sourceKey": "inventory-units-format",
+    "page": "Inventory",
+    "slug": "06-inventory",
+    "route": "/grower/inventory",
+    "routePattern": "/grower/inventory",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "The value is ‘$10000.00’ here versus ‘$10,000.00’ in Products; rows repeat the quantity beneath the stock input and spell out ‘gram’ in prices.",
+    "recommendation": "Format value as ‘$10,000’ when cents are zero. Put units beside stock inputs and use ‘$25/g’, ‘240 g’ consistently, keeping less familiar package units written out.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/06-inventory-desktop.png",
+      "grower/pass-1/06-inventory-mobile.png",
+      "grower/pass-2/06-inventory-desktop.png",
+      "grower/pass-2/06-inventory-mobile.png"
+    ],
+    "pass1": {
+      "note": "The value is ‘$10000.00’ here versus ‘$10,000.00’ in Products; rows repeat the quantity beneath the stock input and spell out ‘gram’ in prices.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm the three stacked mobile metrics and repeated inventory introduction place the first product below the 844px fold. Inventory cards themselves remain readable with visible quantity controls. Total Value still renders $10000.00 without grouping. No stock controls were used.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Stock controls and Update Stock not activated; no inventory changes."
+    ],
+    "title": "Format values and units consistently",
+    "routes": [
+      "/grower/inventory"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/06-inventory-desktop.png",
+        "grower/pass-1/06-inventory-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/06-inventory-desktop.png",
+        "grower/pass-2/06-inventory-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The value is ‘$10000.00’ here versus ‘$10,000.00’ in Products; rows repeat the quantity beneath the stock input and spell out ‘gram’ in prices.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm the three stacked mobile metrics and repeated inventory introduction place the first product below the 844px fold. Inventory cards themselves remain readable with visible quantity controls. Total Value still renders $10000.00 without grouping. No stock controls were used.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G21",
+    "sourceKey": "inventory-technical-copy",
+    "page": "Inventory",
+    "slug": "06-inventory",
+    "route": "/grower/inventory",
+    "routePattern": "/grower/inventory",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Changes save as absolute quantities’ describes implementation rather than the user's action.",
+    "recommendation": "Use ‘Set the amount currently in stock’ or ‘Enter current stock; changes save automatically’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/06-inventory-desktop.png",
+      "grower/pass-1/06-inventory-mobile.png",
+      "grower/pass-2/06-inventory-desktop.png",
+      "grower/pass-2/06-inventory-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Changes save as absolute quantities’ describes implementation rather than the user's action.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm the three stacked mobile metrics and repeated inventory introduction place the first product below the 844px fold. Inventory cards themselves remain readable with visible quantity controls. Total Value still renders $10000.00 without grouping. No stock controls were used.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Stock controls and Update Stock not activated; no inventory changes."
+    ],
+    "title": "Explain stock edits in plain language",
+    "routes": [
+      "/grower/inventory"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/06-inventory-desktop.png",
+        "grower/pass-1/06-inventory-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/06-inventory-desktop.png",
+        "grower/pass-2/06-inventory-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Changes save as absolute quantities’ describes implementation rather than the user's action.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm the three stacked mobile metrics and repeated inventory introduction place the first product below the 844px fold. Inventory cards themselves remain readable with visible quantity controls. Total Value still renders $10000.00 without grouping. No stock controls were used.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G22",
+    "sourceKey": "stock-form-focus",
+    "page": "Update stock",
+    "slug": "07-inventory-add",
+    "route": "/grower/inventory/add",
+    "routePattern": "/grower/inventory/add",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "The top Add Product action competes with the stock task. The subtitle's second sentence and search helper repeat obvious context, while ‘Stock Details’ adds another heading for two fields. Desktop input spans nearly1100px.",
+    "recommendation": "Use subtitle ‘Set a product’s current stock’. Move ‘New product’ beside search or into the empty state. Label fields ‘Product’ and ‘New stock’; retain ‘Replaces current stock’. Constrain desktop form width and place Cancel/Save side by side on mobile.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/07-inventory-add-desktop.png",
+      "grower/pass-1/07-inventory-add-mobile.png",
+      "grower/pass-2/07-inventory-add-desktop.png",
+      "grower/pass-2/07-inventory-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "The top Add Product action competes with the stock task. The subtitle's second sentence and search helper repeat obvious context, while ‘Stock Details’ adds another heading for two fields. Desktop input spans nearly1100px.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisits confirm the form is short and readable; only the secondary Add Product action, repeated search instruction, and wide desktop fields add avoidable space. Keep the stock-replacement warning because it prevents a meaningful mistake. No product was selected and no stock update was submitted.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No product selected and no stock submitted."
+    ],
+    "title": "Keep stock updates focused",
+    "routes": [
+      "/grower/inventory/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/07-inventory-add-desktop.png",
+        "grower/pass-1/07-inventory-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/07-inventory-add-desktop.png",
+        "grower/pass-2/07-inventory-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The top Add Product action competes with the stock task. The subtitle's second sentence and search helper repeat obvious context, while ‘Stock Details’ adds another heading for two fields. Desktop input spans nearly1100px.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisits confirm the form is short and readable; only the secondary Add Product action, repeated search instruction, and wide desktop fields add avoidable space. Keep the stock-replacement warning because it prevents a meaningful mistake. No product was selected and no stock update was submitted.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G23",
+    "sourceKey": "strain-list-density",
+    "page": "Strains",
+    "slug": "08-strains",
+    "route": "/grower/strains",
+    "routePattern": "/grower/strains",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Four sparse strain cards have a large gap between counts and buttons. On mobile the three metric cards alone consume300px and the first strain starts at y626; four strains extend the page to1537px.",
+    "recommendation": "Use ‘Strains’ as the title and remove the generic subtitle. Put counts in a compact summary row. Use shorter strain rows/cards with counts beside the name and Edit/Add product in a small action row; reserve card height for actual genetics details.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/08-strains-desktop.png",
+      "grower/pass-1/08-strains-mobile.png",
+      "grower/pass-2/08-strains-desktop.png",
+      "grower/pass-2/08-strains-mobile.png"
+    ],
+    "pass1": {
+      "note": "Four sparse strain cards have a large gap between counts and buttons. On mobile the three metric cards alone consume300px and the first strain starts at y626; four strains extend the page to1537px.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm three stacked metric cards and the verbose Strain Management title. The sparse card bodies reserve substantial vertical space, while Add Product is abbreviated to + Product inconsistently. No view preference or record action was changed.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No view preference changed and no create/delete action used."
+    ],
+    "title": "Use denser strain cards and counts",
+    "routes": [
+      "/grower/strains"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/08-strains-desktop.png",
+        "grower/pass-1/08-strains-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/08-strains-desktop.png",
+        "grower/pass-2/08-strains-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Four sparse strain cards have a large gap between counts and buttons. On mobile the three metric cards alone consume300px and the first strain starts at y626; four strains extend the page to1537px.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm three stacked metric cards and the verbose Strain Management title. The sparse card bodies reserve substantial vertical space, while Add Product is abbreviated to + Product inconsistently. No view preference or record action was changed.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G24",
+    "sourceKey": "strain-action-wording",
+    "page": "Strains",
+    "slug": "08-strains",
+    "route": "/grower/strains",
+    "routePattern": "/grower/strains",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "The green ‘+ Product’ action is shorter than other create labels but does not clearly say it creates a product from this strain; delete icons receive strong red emphasis on every card.",
+    "recommendation": "Use ‘Add product’ consistently and move destructive actions into an overflow menu, keeping Edit most prominent for library maintenance.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/08-strains-desktop.png",
+      "grower/pass-1/08-strains-mobile.png",
+      "grower/pass-2/08-strains-desktop.png",
+      "grower/pass-2/08-strains-mobile.png"
+    ],
+    "pass1": {
+      "note": "The green ‘+ Product’ action is shorter than other create labels but does not clearly say it creates a product from this strain; delete icons receive strong red emphasis on every card.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm three stacked metric cards and the verbose Strain Management title. The sparse card bodies reserve substantial vertical space, while Add Product is abbreviated to + Product inconsistently. No view preference or record action was changed.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No view preference changed and no create/delete action used."
+    ],
+    "title": "Clarify strain actions",
+    "routes": [
+      "/grower/strains"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/08-strains-desktop.png",
+        "grower/pass-1/08-strains-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/08-strains-desktop.png",
+        "grower/pass-2/08-strains-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The green ‘+ Product’ action is shorter than other create labels but does not clearly say it creates a product from this strain; delete icons receive strong red emphasis on every card.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm three stacked metric cards and the verbose Strain Management title. The sparse card bodies reserve substantial vertical space, while Add Product is abbreviated to + Product inconsistently. No view preference or record action was changed.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G25",
+    "sourceKey": "strain-type-explainer",
+    "page": "Add strain",
+    "slug": "09-strain-add",
+    "route": "/grower/strains/add",
+    "routePattern": "/grower/strains/add",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "All five strain-type definitions are displayed below the select. They mostly restate the option name and take216px on mobile before Lineage.",
+    "recommendation": "Show help only for the selected option or behind ‘About strain types’. Use compact options ‘Indica’, ‘Sativa’, ‘Hybrid’, ‘Sativa dominant’, ‘Indica dominant’ and remove generic buyer-positioning wording.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/09-strain-add-desktop.png",
+      "grower/pass-1/09-strain-add-mobile.png",
+      "grower/pass-2/09-strain-add-desktop.png",
+      "grower/pass-2/09-strain-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "All five strain-type definitions are displayed below the select. They mostly restate the option name and take216px on mobile before Lineage.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm all five strain definitions remain visible below the selector and occupy about 216px on mobile. The header repeats Add New Strain, Create a new cannabis genetics entry, and Strain Details. Long example placeholders clip while the form labels remain readable. No form values were entered.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No form inputs modified or submitted."
+    ],
+    "title": "Show strain-type help on demand",
+    "routes": [
+      "/grower/strains/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/09-strain-add-desktop.png",
+        "grower/pass-1/09-strain-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/09-strain-add-desktop.png",
+        "grower/pass-2/09-strain-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "All five strain-type definitions are displayed below the select. They mostly restate the option name and take216px on mobile before Lineage.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm all five strain definitions remain visible below the selector and occupy about 216px on mobile. The header repeats Add New Strain, Create a new cannabis genetics entry, and Strain Details. Long example placeholders clip while the form labels remain readable. No form values were entered.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G26",
+    "sourceKey": "strain-form-copy",
+    "page": "Add strain",
+    "slug": "09-strain-add",
+    "route": "/grower/strains/add",
+    "routePattern": "/grower/strains/add",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Add New Strain’, ‘Create a new cannabis genetics entry’, and ‘Strain Details’ repeat the same task; placeholders list several long examples and truncate on mobile. Description and Grower Notes do not explain their distinct purposes.",
+    "recommendation": "Use ‘Add strain’, omit the subtitle or inner title, and shorten labels to ‘Name’, ‘Type’, ‘Lineage’. Use one brief example per placeholder. Clarify the audience/purpose of Description versus Grower notes instead of overlapping generic examples.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/09-strain-add-desktop.png",
+      "grower/pass-1/09-strain-add-mobile.png",
+      "grower/pass-2/09-strain-add-desktop.png",
+      "grower/pass-2/09-strain-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Add New Strain’, ‘Create a new cannabis genetics entry’, and ‘Strain Details’ repeat the same task; placeholders list several long examples and truncate on mobile. Description and Grower Notes do not explain their distinct purposes.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm all five strain definitions remain visible below the selector and occupy about 216px on mobile. The header repeats Add New Strain, Create a new cannabis genetics entry, and Strain Details. Long example placeholders clip while the form labels remain readable. No form values were entered.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No form inputs modified or submitted."
+    ],
+    "title": "Shorten strain-form copy",
+    "routes": [
+      "/grower/strains/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/09-strain-add-desktop.png",
+        "grower/pass-1/09-strain-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/09-strain-add-desktop.png",
+        "grower/pass-2/09-strain-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Add New Strain’, ‘Create a new cannabis genetics entry’, and ‘Strain Details’ repeat the same task; placeholders list several long examples and truncate on mobile. Description and Grower Notes do not explain their distinct purposes.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm all five strain definitions remain visible below the selector and occupy about 216px on mobile. The header repeats Add New Strain, Create a new cannabis genetics entry, and Strain Details. Long example placeholders clip while the form labels remain readable. No form values were entered.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G27",
+    "sourceKey": "strain-edit-repeated-help",
+    "page": "Edit strain",
+    "slug": "10-strain-edit",
+    "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+    "routePattern": "/grower/strains/[id]/edit",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Editing an existing Hybrid still displays all five definitions and three levels of repeated ‘strain details’ wording. The help block consumes216px on mobile and pushes optional fields below the fold.",
+    "recommendation": "Apply the add-form simplification here: ‘Edit strain’, then fields without another details heading; show only selected-type help on demand. Use ‘Name’, ‘Type’, ‘Lineage’ and define the different purposes of description and notes.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/10-strain-edit-desktop.png",
+      "grower/pass-1/10-strain-edit-mobile.png",
+      "grower/pass-2/10-strain-edit-desktop.png",
+      "grower/pass-2/10-strain-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "Editing an existing Hybrid still displays all five definitions and three levels of repeated ‘strain details’ wording. The help block consumes216px on mobile and pushes optional fields below the fold.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile revisits confirm the same five-definition helper block is displayed even with Hybrid selected, adding about 216px on mobile. The selected value and form labels remain readable. No edit or save occurred.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No values edited or save submitted; sparse optional fields reflect the synthetic fixture."
+    ],
+    "title": "Remove repeated help from strain editing",
+    "routes": [
+      "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/10-strain-edit-desktop.png",
+        "grower/pass-1/10-strain-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/10-strain-edit-desktop.png",
+        "grower/pass-2/10-strain-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Editing an existing Hybrid still displays all five definitions and three levels of repeated ‘strain details’ wording. The help block consumes216px on mobile and pushes optional fields below the fold.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile revisits confirm the same five-definition helper block is displayed even with Hybrid selected, adding about 216px on mobile. The selected value and form labels remain readable. No edit or save occurred.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G28",
+    "sourceKey": "batches-render-blocker",
+    "page": "Batches: numeric-lab error",
+    "slug": "11-batches",
+    "route": "/grower/batches",
+    "routePattern": "/grower/batches",
+    "state": "default",
+    "priority": "high",
+    "category": "runtime blocker",
+    "viewport": "desktop and mobile",
+    "observation": "The Batches page fails before rendering its list: runtime TypeError ‘batch.thc.toFixed is not a function’. Both fresh navigations show the application error overlay.",
+    "recommendation": "Normalize batch lab values before numeric formatting and show a recoverable error state when data is invalid. The normal list layout has separate two-pass findings under 11b-batches-ready.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/11-batches-desktop.png",
+      "grower/pass-1/11-batches-mobile.png",
+      "grower/pass-2/11-batches-desktop.png",
+      "grower/pass-2/11-batches-mobile.png"
+    ],
+    "pass1": {
+      "note": "The Batches page fails before rendering its list: runtime TypeError ‘batch.thc.toFixed is not a function’. Both fresh navigations show the application error overlay.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent second reproduction after root temporarily restored the synthetic clone batch to THC 24.8 and CBD 0.6: both desktop and mobile again fail with batch.thc.toFixed is not a function at app/grower/batches/page.tsx:187. Both fresh error screenshots were inspected. Root was asked to restore only the clone fixture labs to null afterward; normal UI has separate completed two-pass evidence under 11b-batches-ready.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Observed locally in the disposable clone using one synthetic batch with numeric THC/CBD values; not a production claim. The error screen does not support layout conclusions. The same route was also reviewed successfully in both passes with null lab fields; see 11b-batches-ready. No app source fix was made.",
+      "Observed with the local fixture; production prevalence was not checked and no save behavior was tested."
+    ],
+    "title": "Repair the batch list render failure",
+    "routes": [
+      "/grower/batches"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/11-batches-desktop.png",
+        "grower/pass-1/11-batches-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/11-batches-desktop.png",
+        "grower/pass-2/11-batches-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The Batches page fails before rendering its list: runtime TypeError ‘batch.thc.toFixed is not a function’. Both fresh navigations show the application error overlay.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent second reproduction after root temporarily restored the synthetic clone batch to THC 24.8 and CBD 0.6: both desktop and mobile again fail with batch.thc.toFixed is not a function at app/grower/batches/page.tsx:187. Both fresh error screenshots were inspected. Root was asked to restore only the clone fixture labs to null afterward; normal UI has separate completed two-pass evidence under 11b-batches-ready.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G29",
+    "sourceKey": "batch-date-consistency",
+    "page": "Batches: rendered list",
+    "slug": "11b-batches-ready",
+    "route": "/grower/batches",
+    "routePattern": "/grower/batches",
+    "state": "Synthetic batch THC/CBD empty so list renders",
+    "priority": "high",
+    "category": "display consistency",
+    "viewport": "desktop and mobile",
+    "observation": "The same batch lists ‘Sep11,2026’ here but edit form shows harvest date09/12/2026. A date-only field appears to shift by one day between views.",
+    "recommendation": "Use the same date-only formatting in list and edit views so harvest dates agree; verify across time zones without altering the stored harvest day.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/11b-batches-ready-desktop.png",
+      "grower/pass-1/11b-batches-ready-mobile.png",
+      "grower/pass-1/13-batch-edit-desktop.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/11b-batches-ready-desktop.png",
+      "grower/pass-2/11b-batches-ready-mobile.png",
+      "grower/pass-2/13-batch-edit-desktop.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "The same batch lists ‘Sep11,2026’ here but edit form shows harvest date09/12/2026. A date-only field appears to shift by one day between views.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile successful-list captures use the disposable fixture with THC/CBD null, separate from the original numeric-lab render failure. Three stacked metrics and three full-width mobile actions remain prominent. The list shows Sep 11, 2026; the edit form is cross-checked separately. No action was clicked.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Parent changed only synthetic batch THC/CBD to null in disposable audit clone to unlock visual coverage. No app fix performed; numeric-value failure remains an independent finding. Empty averages are fixture-limited.",
+      "Observed with the local fixture; production prevalence was not checked and no save behavior was tested."
+    ],
+    "title": "Keep harvest dates consistent",
+    "routes": [
+      "/grower/batches",
+      "/grower/batches/ui-review-batch/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/11b-batches-ready-desktop.png",
+        "grower/pass-1/11b-batches-ready-mobile.png",
+        "grower/pass-1/13-batch-edit-desktop.png",
+        "grower/pass-1/13-batch-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/11b-batches-ready-desktop.png",
+        "grower/pass-2/11b-batches-ready-mobile.png",
+        "grower/pass-2/13-batch-edit-desktop.png",
+        "grower/pass-2/13-batch-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The same batch lists ‘Sep11,2026’ here but edit form shows harvest date09/12/2026. A date-only field appears to shift by one day between views.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile successful-list captures use the disposable fixture with THC/CBD null, separate from the original numeric-lab render failure. Three stacked metrics and three full-width mobile actions remain prominent. The list shows Sep 11, 2026; the edit form is cross-checked separately. No action was clicked.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G30",
+    "sourceKey": "batch-list-density",
+    "page": "Batches: rendered list",
+    "slug": "11b-batches-ready",
+    "route": "/grower/batches",
+    "routePattern": "/grower/batches",
+    "state": "Synthetic batch THC/CBD empty so list renders",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Three stacked metrics push the first batch to y558; the batch's three actions each consume a full row, and Delete is the largest bright-red emphasis.",
+    "recommendation": "Use ‘Batches’, compact metrics, and a single action row with ‘Edit’, ‘Add product’ and an overflow menu for Delete. Shorten ‘+ Product from batch’ to ‘Add product’; the batch context already supplies the relationship.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/11b-batches-ready-mobile.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/11b-batches-ready-mobile.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "Three stacked metrics push the first batch to y558; the batch's three actions each consume a full row, and Delete is the largest bright-red emphasis.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile successful-list captures use the disposable fixture with THC/CBD null, separate from the original numeric-lab render failure. Three stacked metrics and three full-width mobile actions remain prominent. The list shows Sep 11, 2026; the edit form is cross-checked separately. No action was clicked.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Parent changed only synthetic batch THC/CBD to null in disposable audit clone to unlock visual coverage. No app fix performed; numeric-value failure remains an independent finding. Empty averages are fixture-limited."
+    ],
+    "title": "Compact mobile batch actions",
+    "routes": [
+      "/grower/batches"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/11b-batches-ready-mobile.png",
+        "grower/pass-1/13-batch-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/11b-batches-ready-mobile.png",
+        "grower/pass-2/13-batch-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Three stacked metrics push the first batch to y558; the batch's three actions each consume a full row, and Delete is the largest bright-red emphasis.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile successful-list captures use the disposable fixture with THC/CBD null, separate from the original numeric-lab render failure. Three stacked metrics and three full-width mobile actions remain prominent. The list shows Sep 11, 2026; the edit form is cross-checked separately. No action was clicked.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G31",
+    "sourceKey": "batch-upload-density",
+    "page": "Add batch",
+    "slug": "12-batch-add",
+    "route": "/grower/batches/add",
+    "routePattern": "/grower/batches/add",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Three upload cards each repeat the test name in a sentence, display a Missing badge and a separate Upload PDF button. On mobile these occupy roughly560px; the introductory upload paragraph adds another80px.",
+    "recommendation": "Use ‘Lab PDFs · up to2MB each’ once, then compact rows ‘Potency’, ‘Pesticides’, ‘Microbials’ with status and Upload. Reserve explanation for help or an error. Avoid ‘Missing’ warning styling on a brand-new untouched form unless required.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/12-batch-add-desktop.png",
+      "grower/pass-1/12-batch-add-mobile.png",
+      "grower/pass-2/12-batch-add-desktop.png",
+      "grower/pass-2/12-batch-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "Three upload cards each repeat the test name in a sentence, display a Missing badge and a separate Upload PDF button. On mobile these occupy roughly560px; the introductory upload paragraph adds another80px.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm the three upload cards repeat the same instruction and Missing status, while the three compact numeric lab fields become full-width rows on mobile. The sample format hint repeats the placeholder. Upload limits remain useful and should be preserved in a concise shared line. No files or values were entered.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No generated batch number, files, or form values submitted."
+    ],
+    "title": "Use compact lab-document rows",
+    "routes": [
+      "/grower/batches/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/12-batch-add-desktop.png",
+        "grower/pass-1/12-batch-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/12-batch-add-desktop.png",
+        "grower/pass-2/12-batch-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Three upload cards each repeat the test name in a sentence, display a Missing badge and a separate Upload PDF button. On mobile these occupy roughly560px; the introductory upload paragraph adds another80px.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm the three upload cards repeat the same instruction and Missing status, while the three compact numeric lab fields become full-width rows on mobile. The sample format hint repeats the placeholder. Upload limits remain useful and should be preserved in a concise shared line. No files or values were entered.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G32",
+    "sourceKey": "batch-form-density",
+    "page": "Add batch",
+    "slug": "12-batch-add",
+    "route": "/grower/batches/add",
+    "routePattern": "/grower/batches/add",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "THC, CBD and total cannabinoids each occupy a full-width row despite short numeric values; Add New Batch/subtitle/Batch Details repeat the task, and the batch-number example is shown twice.",
+    "recommendation": "Use ‘Add batch’, one ‘Batch ID’ example and a ‘Generate’ control. Pair THC/CBD in a grid with total below or use a compact three-column lab row if labels remain readable; use ‘Total (%)’ inside Lab results.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/12-batch-add-mobile.png",
+      "grower/pass-2/12-batch-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "THC, CBD and total cannabinoids each occupy a full-width row despite short numeric values; Add New Batch/subtitle/Batch Details repeat the task, and the batch-number example is shown twice.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm the three upload cards repeat the same instruction and Missing status, while the three compact numeric lab fields become full-width rows on mobile. The sample format hint repeats the placeholder. Upload limits remain useful and should be preserved in a concise shared line. No files or values were entered.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No generated batch number, files, or form values submitted."
+    ],
+    "title": "Pair short lab fields",
+    "routes": [
+      "/grower/batches/add"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/12-batch-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/12-batch-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "THC, CBD and total cannabinoids each occupy a full-width row despite short numeric values; Add New Batch/subtitle/Batch Details repeat the task, and the batch-number example is shown twice.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm the three upload cards repeat the same instruction and Missing status, while the three compact numeric lab fields become full-width rows on mobile. The sample format hint repeats the placeholder. Upload limits remain useful and should be preserved in a concise shared line. No files or values were entered.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G33",
+    "sourceKey": "batch-terpenes-json",
+    "page": "Edit batch",
+    "slug": "13-batch-edit",
+    "route": "/grower/batches/ui-review-batch/edit",
+    "routePattern": "/grower/batches/[id]/edit",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "The edit form asks growers to enter ‘Terpenes (JSON)’ in a code-style textarea. On mobile the example wraps as raw braces, quoted keys and numeric values.",
+    "recommendation": "Replace raw JSON with repeatable ‘Terpene’ and ‘%’ fields plus ‘Add terpene’. Put an advanced import option behind disclosure only if technical users need it.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/13-batch-edit-desktop.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/13-batch-edit-desktop.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "The edit form asks growers to enter ‘Terpenes (JSON)’ in a code-style textarea. On mobile the example wraps as raw braces, quoted keys and numeric values.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm the raw Terpenes (JSON) editor and repeated upload-card copy. Harvest Date displays 09/12/2026 while the same batch list displays Sep 11, 2026, reproducing the date inconsistency in both passes. The suggested batch format also differs from this synthetic existing record. No values or files were changed. Priority refined to medium for the JSON input: editing difficulty is visible, but no failed save or data loss was tested.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No edits or uploads submitted. Parent nulled only synthetic fixture THC/CBD in disposable clone before this capture to allow list coverage; total cannabinoids remains27.2. Original failure evidence retained."
+    ],
+    "title": "Replace the raw JSON terpene editor",
+    "routes": [
+      "/grower/batches/ui-review-batch/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/13-batch-edit-desktop.png",
+        "grower/pass-1/13-batch-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/13-batch-edit-desktop.png",
+        "grower/pass-2/13-batch-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The edit form asks growers to enter ‘Terpenes (JSON)’ in a code-style textarea. On mobile the example wraps as raw braces, quoted keys and numeric values.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm the raw Terpenes (JSON) editor and repeated upload-card copy. Harvest Date displays 09/12/2026 while the same batch list displays Sep 11, 2026, reproducing the date inconsistency in both passes. The suggested batch format also differs from this synthetic existing record. No values or files were changed. Priority refined to medium for the JSON input: editing difficulty is visible, but no failed save or data loss was tested.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G34",
+    "sourceKey": "batch-edit-density",
+    "page": "Edit batch",
+    "slug": "13-batch-edit",
+    "route": "/grower/batches/ui-review-batch/edit",
+    "routePattern": "/grower/batches/[id]/edit",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "As on Add Batch, three lab-document cards repeat headings in their descriptions, and three numeric lab fields stack full-width on mobile. The Edit Batch/Update batch details/Batch Details trio repeats context.",
+    "recommendation": "Use one ‘Edit batch’ heading, a compact lab-results grid and document rows labeled ‘Potency’, ‘Pesticides’, ‘Microbials’. State ‘PDF ·2MB max’ once and use a concise Upload/Replace action per row.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/13-batch-edit-desktop.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/13-batch-edit-desktop.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "As on Add Batch, three lab-document cards repeat headings in their descriptions, and three numeric lab fields stack full-width on mobile. The Edit Batch/Update batch details/Batch Details trio repeats context.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm the raw Terpenes (JSON) editor and repeated upload-card copy. Harvest Date displays 09/12/2026 while the same batch list displays Sep 11, 2026, reproducing the date inconsistency in both passes. The suggested batch format also differs from this synthetic existing record. No values or files were changed. Priority refined to medium for the JSON input: editing difficulty is visible, but no failed save or data loss was tested.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No edits or uploads submitted. Parent nulled only synthetic fixture THC/CBD in disposable clone before this capture to allow list coverage; total cannabinoids remains27.2. Original failure evidence retained."
+    ],
+    "title": "Reduce repeated batch-edit content",
+    "routes": [
+      "/grower/batches/ui-review-batch/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/13-batch-edit-desktop.png",
+        "grower/pass-1/13-batch-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/13-batch-edit-desktop.png",
+        "grower/pass-2/13-batch-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "As on Add Batch, three lab-document cards repeat headings in their descriptions, and three numeric lab fields stack full-width on mobile. The Edit Batch/Update batch details/Batch Details trio repeats context.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm the raw Terpenes (JSON) editor and repeated upload-card copy. Harvest Date displays 09/12/2026 while the same batch list displays Sep 11, 2026, reproducing the date inconsistency in both passes. The suggested batch format also differs from this synthetic existing record. No values or files were changed. Priority refined to medium for the JSON input: editing difficulty is visible, but no failed save or data loss was tested.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G35",
+    "sourceKey": "batch-id-instruction",
+    "page": "Edit batch",
+    "slug": "13-batch-edit",
+    "route": "/grower/batches/ui-review-batch/edit",
+    "routePattern": "/grower/batches/[id]/edit",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Expected format: BATCH-YYYYMMDD-XX…’ remains beside an existing VN-2026-0912 ID, implying the existing record is invalid without showing a validation error.",
+    "recommendation": "If it is only guidance, label it ‘Example: BATCH-20260917-01’ or omit it in edit mode. If mandatory, show a specific validation message rather than generic expected-format copy.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/13-batch-edit-desktop.png",
+      "grower/pass-1/13-batch-edit-mobile.png",
+      "grower/pass-2/13-batch-edit-desktop.png",
+      "grower/pass-2/13-batch-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Expected format: BATCH-YYYYMMDD-XX…’ remains beside an existing VN-2026-0912 ID, implying the existing record is invalid without showing a validation error.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile captures confirm the raw Terpenes (JSON) editor and repeated upload-card copy. Harvest Date displays 09/12/2026 while the same batch list displays Sep 11, 2026, reproducing the date inconsistency in both passes. The suggested batch format also differs from this synthetic existing record. No values or files were changed. Priority refined to medium for the JSON input: editing difficulty is visible, but no failed save or data loss was tested.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "No edits or uploads submitted. Parent nulled only synthetic fixture THC/CBD in disposable clone before this capture to allow list coverage; total cannabinoids remains27.2. Original failure evidence retained.",
+      "Observed with the local fixture; production prevalence was not checked and no save behavior was tested."
+    ],
+    "title": "Clarify the batch-number example",
+    "routes": [
+      "/grower/batches/ui-review-batch/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/13-batch-edit-desktop.png",
+        "grower/pass-1/13-batch-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/13-batch-edit-desktop.png",
+        "grower/pass-2/13-batch-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Expected format: BATCH-YYYYMMDD-XX…’ remains beside an existing VN-2026-0912 ID, implying the existing record is invalid without showing a validation error.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile captures confirm the raw Terpenes (JSON) editor and repeated upload-card copy. Harvest Date displays 09/12/2026 while the same batch list displays Sep 11, 2026, reproducing the date inconsistency in both passes. The suggested batch format also differs from this synthetic existing record. No values or files were changed. Priority refined to medium for the JSON input: editing difficulty is visible, but no failed save or data loss was tested.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G36",
+    "sourceKey": "requests-mobile-table",
+    "page": "Requests",
+    "slug": "14-orders",
+    "route": "/grower/orders",
+    "routePattern": "/grower/orders",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "At 390px the initial table view shows selection, a long request ID, and dispensary. Date, value, status, and View are offscreen and require horizontal scrolling. The identifier wraps over multiple lines while decision-making fields remain outside the initial view, with no clear scroll cue.",
+    "recommendation": "Use compact mobile request cards/rows with buyer, short request reference, value, status and a visible View action. Keep full ID available in details or copy action. If retaining table scrolling, pin identifier/action and add a clear scroll hint.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/14-orders-mobile.png",
+      "grower/pass-2/14-orders-mobile.png"
+    ],
+    "pass1": {
+      "note": "At390px the table shows only selection, long request ID and dispensary; date, value, status and View action are outside the visible area with no clear scroll cue. The identifier wraps over multiple lines while the decision-making fields are hidden.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed the mobile table hides value, status and View; tall summaries delay the request list. Status tabs and counts repeat context. Desktop rows remain readable. No actions were submitted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status, density preference, selection, batch action, or request data changed. Long historical IDs are local fixture data, but clipping is measured in this viewport."
+    ],
+    "title": "Keep request status, value, and View visible",
+    "routes": [
+      "/grower/orders"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/14-orders-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/14-orders-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "At390px the table shows only selection, long request ID and dispensary; date, value, status and View action are outside the visible area with no clear scroll cue. The identifier wraps over multiple lines while the decision-making fields are hidden.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed the mobile table hides value, status and View; tall summaries delay the request list. Status tabs and counts repeat context. Desktop rows remain readable. No actions were submitted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission.",
+      "finalReview": "Priority calibrated in final cross-review: density and initial offscreen content are usability concerns; horizontal scrolling remains available."
+    }
+  },
+  {
+    "id": "G37",
+    "sourceKey": "requests-top-density",
+    "page": "Requests",
+    "slug": "14-orders",
+    "route": "/grower/orders",
+    "routePattern": "/grower/orders",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Four full-width metric cards and the saved-view explanation push Active Requests below y1000; the first actual request is beyond the first screen. Active and Needs Review counts are repeated in cards, filters and section heading.",
+    "recommendation": "Combine metrics into a compact two-by-two or single summary strip, use a short status filter row, and put Record request/History in one compact header row. Show ‘18 active ·17 need review’ once near the list.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/14-orders-mobile.png",
+      "grower/pass-2/14-orders-mobile.png"
+    ],
+    "pass1": {
+      "note": "Four full-width metric cards and the saved-view explanation push Active Requests below y1000; the first actual request is beyond the first screen. Active and Needs Review counts are repeated in cards, filters and section heading.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed the mobile table hides value, status and View; tall summaries delay the request list. Status tabs and counts repeat context. Desktop rows remain readable. No actions were submitted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status, density preference, selection, batch action, or request data changed. Long historical IDs are local fixture data, but clipping is measured in this viewport."
+    ],
+    "title": "Move requests above summary clutter",
+    "routes": [
+      "/grower/orders"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/14-orders-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/14-orders-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Four full-width metric cards and the saved-view explanation push Active Requests below y1000; the first actual request is beyond the first screen. Active and Needs Review counts are repeated in cards, filters and section heading.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed the mobile table hides value, status and View; tall summaries delay the request list. Status tabs and counts repeat context. Desktop rows remain readable. No actions were submitted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission.",
+      "finalReview": "Priority calibrated in final cross-review: density and initial offscreen content are usability concerns; horizontal scrolling remains available."
+    }
+  },
+  {
+    "id": "G38",
+    "sourceKey": "requests-jargon",
+    "page": "Requests",
+    "slug": "14-orders",
+    "route": "/grower/orders",
+    "routePattern": "/grower/orders",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Saved workflow views’, ‘Start with the next request state before selecting batch actions’, and the heading subtitle's ‘without in-app payment settlement’ add administrative wording before the core list.",
+    "recommendation": "Use title ‘Requests’, filters labeled by status, and no instructional sentence. Keep the payment model as a concise contextual note ‘Payment is arranged directly’ where order value/payment decisions are shown.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/14-orders-desktop.png",
+      "grower/pass-1/14-orders-mobile.png",
+      "grower/pass-2/14-orders-desktop.png",
+      "grower/pass-2/14-orders-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Saved workflow views’, ‘Start with the next request state before selecting batch actions’, and the heading subtitle's ‘without in-app payment settlement’ add administrative wording before the core list.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed the mobile table hides value, status and View; tall summaries delay the request list. Status tabs and counts repeat context. Desktop rows remain readable. No actions were submitted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status, density preference, selection, batch action, or request data changed. Long historical IDs are local fixture data, but clipping is measured in this viewport."
+    ],
+    "title": "Replace request workflow jargon",
+    "routes": [
+      "/grower/orders"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/14-orders-desktop.png",
+        "grower/pass-1/14-orders-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/14-orders-desktop.png",
+        "grower/pass-2/14-orders-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Saved workflow views’, ‘Start with the next request state before selecting batch actions’, and the heading subtitle's ‘without in-app payment settlement’ add administrative wording before the core list.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed the mobile table hides value, status and View; tall summaries delay the request list. Status tabs and counts repeat context. Desktop rows remain readable. No actions were submitted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G39",
+    "sourceKey": "history-mobile-table",
+    "page": "Request history",
+    "slug": "15-order-history",
+    "route": "/grower/orders/history",
+    "routePattern": "/grower/orders/history",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "The history table requires horizontal scrolling to reveal estimated value, status, and View actions on mobile. Long request IDs wrap to three or four lines and dominate the initial view while buyer, value, status, and action information is harder to scan.",
+    "recommendation": "Use mobile history rows with customer, shortened reference, closed date, value and status plus a visible open action. Preserve complete references in the detail page or copy control.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/15-order-history-mobile.png",
+      "grower/pass-2/15-order-history-mobile.png"
+    ],
+    "pass1": {
+      "note": "The history table clips estimated value, status and View actions to the right; long request IDs wrap to three/four lines and outweigh buyer/date. A user cannot inspect a request from the visible mobile columns.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed nearly 500px of stacked mobile metrics and long wrapped IDs; value, status and actions remain offscreen. Sparse desktop space is record density, not a defect.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No request opened from table or status changed; current records are local fixture history."
+    ],
+    "title": "Keep history values and actions visible",
+    "routes": [
+      "/grower/orders/history"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/15-order-history-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/15-order-history-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The history table clips estimated value, status and View actions to the right; long request IDs wrap to three/four lines and outweigh buyer/date. A user cannot inspect a request from the visible mobile columns.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed nearly 500px of stacked mobile metrics and long wrapped IDs; value, status and actions remain offscreen. Sparse desktop space is record density, not a defect.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission.",
+      "finalReview": "Priority calibrated in final cross-review: density and initial offscreen content are usability concerns; horizontal scrolling remains available."
+    }
+  },
+  {
+    "id": "G40",
+    "sourceKey": "history-summary-density",
+    "page": "Request history",
+    "slug": "15-order-history",
+    "route": "/grower/orders/history",
+    "routePattern": "/grower/orders/history",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Four full-width metrics occupy about490px; the two-row history list begins near y930. ‘Historical Requests’, ‘Delivered & Cancelled Requests’ and filter counts repeat the same summary.",
+    "recommendation": "Use ‘History’ with a compact ‘2 requests ·1 delivered ·1 cancelled’ summary and delivered value beside it. Shorten navigation to ‘Active requests’; remove the second long list heading.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/15-order-history-mobile.png",
+      "grower/pass-2/15-order-history-mobile.png"
+    ],
+    "pass1": {
+      "note": "Four full-width metrics occupy about490px; the two-row history list begins near y930. ‘Historical Requests’, ‘Delivered & Cancelled Requests’ and filter counts repeat the same summary.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed nearly 500px of stacked mobile metrics and long wrapped IDs; value, status and actions remain offscreen. Sparse desktop space is record density, not a defect.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No request opened from table or status changed; current records are local fixture history."
+    ],
+    "title": "Compact history summaries",
+    "routes": [
+      "/grower/orders/history"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/15-order-history-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/15-order-history-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Four full-width metrics occupy about490px; the two-row history list begins near y930. ‘Historical Requests’, ‘Delivered & Cancelled Requests’ and filter counts repeat the same summary.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed nearly 500px of stacked mobile metrics and long wrapped IDs; value, status and actions remain offscreen. Sparse desktop space is record density, not a defect.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G41",
+    "sourceKey": "direct-request-jargon",
+    "page": "Record request",
+    "slug": "16-order-add",
+    "route": "/grower/orders/add",
+    "routePattern": "/grower/orders/add",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Record Direct Request’ repeats in title and button; subtitle uses ‘outside PhenoFarm payment rails’. Search placeholder and helper both describe filtering by business/city.",
+    "recommendation": "Use ‘Record request’, with one clear note ‘For orders arranged directly with a buyer. Payment is handled outside PhenoFarm.’ Keep a single search placeholder ‘Search buyers by name or city’ and remove the duplicate helper.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/16-order-add-desktop.png",
+      "grower/pass-1/16-order-add-mobile.png",
+      "grower/pass-2/16-order-add-desktop.png",
+      "grower/pass-2/16-order-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Record Direct Request’ repeats in title and button; subtitle uses ‘outside PhenoFarm payment rails’. Search placeholder and helper both describe filtering by business/city.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed verbose request/payment copy and optional fields placed before Items. It also identified the floating message launcher partly overlapping Add item on mobile. No row was added by the independent reviewer; the separate 16a state covers the unsaved row.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No buyer, products, fields, or request submitted."
+    ],
+    "title": "Use plain record-request copy",
+    "routes": [
+      "/grower/orders/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/16-order-add-desktop.png",
+        "grower/pass-1/16-order-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/16-order-add-desktop.png",
+        "grower/pass-2/16-order-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Record Direct Request’ repeats in title and button; subtitle uses ‘outside PhenoFarm payment rails’. Search placeholder and helper both describe filtering by business/city.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed verbose request/payment copy and optional fields placed before Items. It also identified the floating message launcher partly overlapping Add item on mobile. No row was added by the independent reviewer; the separate 16a state covers the unsaved row.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G42",
+    "sourceKey": "direct-request-flow-density",
+    "page": "Record request",
+    "slug": "16-order-add",
+    "route": "/grower/orders/add",
+    "routePattern": "/grower/orders/add",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Two stacked action buttons and an instruction precede the form, while Notes and a full-width shipping field come before Items. The empty Items panel starts at y769, and its Add button is near the floating message launcher.",
+    "recommendation": "Order the form Buyer → Items → shipping/notes. Use ‘Add item’ inside a compact empty state instead of a separate header button plus two explanatory lines; keep a single save action at the end or in a compact sticky footer.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/16-order-add-mobile.png",
+      "grower/pass-2/16-order-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "Two stacked action buttons and an instruction precede the form, while Notes and a full-width shipping field come before Items. The empty Items panel starts at y769, and its Add button is near the floating message launcher.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed verbose request/payment copy and optional fields placed before Items. It also identified the floating message launcher partly overlapping Add item on mobile. No row was added by the independent reviewer; the separate 16a state covers the unsaved row.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No buyer, products, fields, or request submitted."
+    ],
+    "title": "Put items before optional request details",
+    "routes": [
+      "/grower/orders/add"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/16-order-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/16-order-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Two stacked action buttons and an instruction precede the form, while Notes and a full-width shipping field come before Items. The empty Items panel starts at y769, and its Add button is near the floating message launcher.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed verbose request/payment copy and optional fields placed before Items. It also identified the floating message launcher partly overlapping Add item on mobile. No row was added by the independent reviewer; the separate 16a state covers the unsaved row.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G43",
+    "sourceKey": "request-add-launcher-overlap",
+    "page": "Record request",
+    "slug": "16-order-add",
+    "route": "/grower/orders/add",
+    "routePattern": "/grower/orders/add",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "The floating message button partly overlaps Add item at the initial mobile viewport: launcher x334–378/y788–832; Add x289–357/y769–809. This competes with the next required form action.",
+    "recommendation": "Reserve space around the floating launcher or move it away from form action rows. Keep Add item fully visible and tappable.",
+    "status": "second-pass refinement",
+    "evidence": [
+      "grower/pass-1/16-order-add-mobile.png",
+      "grower/pass-2/16-order-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "Related screen inspected in pass 1; this specific observation was separated during the independent second-pass review.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed verbose request/payment copy and optional fields placed before Items. It also identified the floating message launcher partly overlapping Add item on mobile. No row was added by the independent reviewer; the separate 16a state covers the unsaved row.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No buyer, products, fields, or request submitted."
+    ],
+    "title": "Keep the message launcher clear of Add item",
+    "routes": [
+      "/grower/orders/add"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/16-order-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/16-order-add-mobile.png"
+      ]
+    },
+    "verified": "Independent second-pass refinement; both screen captures retained",
+    "verification": {
+      "pass1": {
+        "note": "Related screen inspected in pass 1; this specific observation was separated during the independent second-pass review.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed verbose request/payment copy and optional fields placed before Items. It also identified the floating message launcher partly overlapping Add item on mobile. No row was added by the independent reviewer; the separate 16a state covers the unsaved row.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G44",
+    "sourceKey": "request-item-repetition",
+    "page": "Unsaved request item row",
+    "slug": "16a-product-picker",
+    "route": "/grower/orders/add",
+    "routePattern": "/grower/orders/add",
+    "state": "One unsaved item row",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "One item repeats its price in the product option, next to ‘Agreed price’, and in the input. Stock appears both in the option and an ‘Available now’ badge. Mobile row is about350px; its long select text truncates. Desktop price column is narrow enough to wrap its help over three lines while product select is very wide.",
+    "recommendation": "Select by product name, show ‘25 available · List $40/eighth’ once below, pair Qty and Unit price, and place Remove in the row corner. Use ‘Subtotal’, ‘Shipping’, ‘Est. total’ and one concise ‘Payment arranged directly’ note.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/16a-product-picker-desktop.png",
+      "grower/pass-1/16a-product-picker-mobile.png",
+      "grower/pass-2/16a-product-picker-desktop.png",
+      "grower/pass-2/16a-product-picker-mobile.png"
+    ],
+    "pass1": {
+      "note": "One item repeats its price in the product option, next to ‘Agreed price’, and in the input. Stock appears both in the option and an ‘Available now’ badge. Mobile row is about350px; its long select text truncates. Desktop price column is narrow enough to wrap its help over three lines while product select is very wide.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh unsaved item-row captures confirm repeated price and availability values, narrow desktop price-help wrapping, and a tall mobile item card. The floating message launcher partly overlaps Add on mobile, matching the independent base-form second-pass observation. Only the local + Add row action was used; no request was submitted.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Clicked Add to reveal a local unsaved row only; no request submitted, quantity or price changed, or data saved."
+    ],
+    "title": "Remove repeated item prices and stock",
+    "routes": [
+      "/grower/orders/add"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/16a-product-picker-desktop.png",
+        "grower/pass-1/16a-product-picker-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/16a-product-picker-desktop.png",
+        "grower/pass-2/16a-product-picker-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "One item repeats its price in the product option, next to ‘Agreed price’, and in the input. Stock appears both in the option and an ‘Available now’ badge. Mobile row is about350px; its long select text truncates. Desktop price column is narrow enough to wrap its help over three lines while product select is very wide.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh unsaved item-row captures confirm repeated price and availability values, narrow desktop price-help wrapping, and a tall mobile item card. The floating message launcher partly overlaps Add on mobile, matching the independent base-form second-pass observation. Only the local + Add row action was used; no request was submitted.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G45",
+    "sourceKey": "request-detail-mobile-actions",
+    "page": "Request detail",
+    "slug": "17-order-detail",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "routePattern": "/grower/orders/[id]",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Long32px request heading plus four stacked navigation/edit/print/export actions precede the item. The primary fulfillment decision Accept/Cancel is far lower on the page, while sticky footer repeats All orders and Edit request rather than the next action.",
+    "recommendation": "Use ‘Request’ with a smaller reference line; put back navigation once, keep the next status action near the summary, and move Edit/Print/Export into an overflow menu. Use ‘Requests’ consistently instead of ‘All orders’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/17-order-detail-mobile.png",
+      "grower/pass-2/17-order-detail-mobile.png"
+    ],
+    "pass1": {
+      "note": "Long32px request heading plus four stacked navigation/edit/print/export actions precede the item. The primary fulfillment decision Accept/Cancel is far lower on the page, while sticky footer repeats All orders and Edit request rather than the next action.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status, edit, print, export or Message buyer action activated; only existing request read."
+    ],
+    "title": "Prioritize the next request action",
+    "routes": [
+      "/grower/orders/cmre7ky2400aaekhl0qlnwhqd"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/17-order-detail-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/17-order-detail-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Long32px request heading plus four stacked navigation/edit/print/export actions precede the item. The primary fulfillment decision Accept/Cancel is far lower on the page, while sticky footer repeats All orders and Edit request rather than the next action.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission.",
+      "finalReview": "Priority calibrated in final cross-review: density and initial offscreen content are usability concerns; horizontal scrolling remains available."
+    }
+  },
+  {
+    "id": "G46",
+    "sourceKey": "request-status-repetition",
+    "page": "Request detail",
+    "slug": "17-order-detail",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "routePattern": "/grower/orders/[id]",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Submitted appears in the title area, Update Status badge, timeline, ‘Currently: Submitted’ callout and History. Timeline lists four future stages with Pending; mobile stretches it into a tall block, followed by a near-duplicate History card.",
+    "recommendation": "Use one current-status chip and one compact progress/history area. Collapse future stages; remove ‘5 stages’, ‘Quick actions to move fulfillment forward’ and the duplicate current-status callout.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/17-order-detail-desktop.png",
+      "grower/pass-1/17-order-detail-mobile.png",
+      "grower/pass-2/17-order-detail-desktop.png",
+      "grower/pass-2/17-order-detail-mobile.png"
+    ],
+    "pass1": {
+      "note": "Submitted appears in the title area, Update Status badge, timeline, ‘Currently: Submitted’ callout and History. Timeline lists four future stages with Pending; mobile stretches it into a tall block, followed by a near-duplicate History card.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status, edit, print, export or Message buyer action activated; only existing request read."
+    ],
+    "title": "Consolidate repeated request status",
+    "routes": [
+      "/grower/orders/cmre7ky2400aaekhl0qlnwhqd"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/17-order-detail-desktop.png",
+        "grower/pass-1/17-order-detail-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/17-order-detail-desktop.png",
+        "grower/pass-2/17-order-detail-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Submitted appears in the title area, Update Status badge, timeline, ‘Currently: Submitted’ callout and History. Timeline lists four future stages with Pending; mobile stretches it into a tall block, followed by a near-duplicate History card.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G47",
+    "sourceKey": "request-value-copy",
+    "page": "Request detail",
+    "slug": "17-order-detail",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "routePattern": "/grower/orders/[id]",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Requested Items’, ‘Estimated item value’, ‘Estimated request value’ and repeated direct-payment wording lengthen a one-item request.",
+    "recommendation": "Use ‘Items’, ‘Subtotal’, ‘Est. total’ and one payment note ‘Payment arranged directly’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/17-order-detail-desktop.png",
+      "grower/pass-1/17-order-detail-mobile.png",
+      "grower/pass-2/17-order-detail-desktop.png",
+      "grower/pass-2/17-order-detail-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Requested Items’, ‘Estimated item value’, ‘Estimated request value’ and repeated direct-payment wording lengthen a one-item request.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status, edit, print, export or Message buyer action activated; only existing request read."
+    ],
+    "title": "Shorten request totals copy",
+    "routes": [
+      "/grower/orders/cmre7ky2400aaekhl0qlnwhqd"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/17-order-detail-desktop.png",
+        "grower/pass-1/17-order-detail-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/17-order-detail-desktop.png",
+        "grower/pass-2/17-order-detail-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Requested Items’, ‘Estimated item value’, ‘Estimated request value’ and repeated direct-payment wording lengthen a one-item request.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G48",
+    "sourceKey": "request-address-separator",
+    "page": "Request detail",
+    "slug": "17-order-detail",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+    "routePattern": "/grower/orders/[id]",
+    "state": "default",
+    "priority": "medium",
+    "category": "display consistency",
+    "viewport": "mobile",
+    "observation": "The customer address joins street and city as “456 Market StreetBurlington, VT 05401” with no separator. It was visible in both passes and independently confirmed in the second.",
+    "recommendation": "Preserve a line break or insert a comma between street and city in compact address layouts.",
+    "status": "second-pass refinement",
+    "evidence": [
+      "grower/pass-1/17-order-detail-mobile.png",
+      "grower/pass-2/17-order-detail-mobile.png"
+    ],
+    "pass1": {
+      "note": "Related screen inspected in pass 1; this specific observation was separated during the independent second-pass review.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status, edit, print, export or Message buyer action activated; only existing request read."
+    ],
+    "title": "Separate street and city in addresses",
+    "routes": [
+      "/grower/orders/cmre7ky2400aaekhl0qlnwhqd"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/17-order-detail-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/17-order-detail-mobile.png"
+      ]
+    },
+    "verified": "Independent second-pass refinement; both screen captures retained",
+    "verification": {
+      "pass1": {
+        "note": "Related screen inspected in pass 1; this specific observation was separated during the independent second-pass review.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed oversized request ID, duplicated navigation and status, a low placement of Accept, and a concatenated mobile address. Desktop right-column stacking leaves a large lower-left gap. No request was edited or accepted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G49",
+    "sourceKey": "request-edit-status-density",
+    "page": "Edit request",
+    "slug": "18-order-edit",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+    "routePattern": "/grower/orders/[id]/edit",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Submitted is shown beside the page heading and again in a full tinted Current Status box. ‘Order Status’ disagrees with request terminology and ‘Choose a valid next status’ adds procedural wording. Mobile status area is nearly310px before the item.",
+    "recommendation": "Use one ‘Status · Submitted’ header with compact next-state choices beneath it; remove the second badge, large Current status panel and ‘valid’ wording. Use ‘Request’ consistently.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/18-order-edit-desktop.png",
+      "grower/pass-1/18-order-edit-mobile.png",
+      "grower/pass-2/18-order-edit-desktop.png",
+      "grower/pass-2/18-order-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "Submitted is shown beside the page heading and again in a full tinted Current Status box. ‘Order Status’ disagrees with request terminology and ‘Choose a valid next status’ adds procedural wording. Mobile status area is nearly310px before the item.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed duplicated status presentation and short numeric fields using separate mobile rows. The compact heading/reference and quantity control fit well. The maximum quantity of 241 is expected: one reserved unit plus 240 available. No save occurred.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status selected, items changed, fields edited or save submitted."
+    ],
+    "title": "Use one request status panel",
+    "routes": [
+      "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/18-order-edit-desktop.png",
+        "grower/pass-1/18-order-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/18-order-edit-desktop.png",
+        "grower/pass-2/18-order-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Submitted is shown beside the page heading and again in a full tinted Current Status box. ‘Order Status’ disagrees with request terminology and ‘Choose a valid next status’ adds procedural wording. Mobile status area is nearly310px before the item.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed duplicated status presentation and short numeric fields using separate mobile rows. The compact heading/reference and quantity control fit well. The maximum quantity of 241 is expected: one reserved unit plus 240 available. No save occurred.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G50",
+    "sourceKey": "request-edit-spacing-copy",
+    "page": "Edit request",
+    "slug": "18-order-edit",
+    "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+    "routePattern": "/grower/orders/[id]/edit",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Shipping and recorded tax fields each use a full row with help text, followed by a large Notes field and separate Summary card. One item produces a1920px page.",
+    "recommendation": "Pair Shipping/Tax where readable, use ‘Shipping ($)’ and ‘Tax ($, optional)’, preserve the essential ‘Only if included on your invoice’ note, and shorten ‘Request Notes/Request Summary’ to ‘Notes/Summary’. Keep current readable item controls.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/18-order-edit-mobile.png",
+      "grower/pass-2/18-order-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "Shipping and recorded tax fields each use a full row with help text, followed by a large Notes field and separate Summary card. One item produces a1920px page.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed duplicated status presentation and short numeric fields using separate mobile rows. The compact heading/reference and quantity control fit well. The maximum quantity of 241 is expected: one reserved unit plus 240 available. No save occurred.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No status selected, items changed, fields edited or save submitted."
+    ],
+    "title": "Compact short request fields",
+    "routes": [
+      "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/18-order-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/18-order-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Shipping and recorded tax fields each use a full row with help text, followed by a large Notes field and separate Summary card. One item produces a1920px page.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed duplicated status presentation and short numeric fields using separate mobile rows. The compact heading/reference and quantity control fit well. The maximum quantity of 241 is expected: one reserved unit plus 240 available. No save occurred.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G51",
+    "sourceKey": "customers-entry-points",
+    "page": "Customers",
+    "slug": "19-customers",
+    "route": "/grower/customers",
+    "routePattern": "/grower/customers",
+    "state": "default",
+    "priority": "medium",
+    "category": "discoverability/context",
+    "viewport": "desktop and mobile",
+    "observation": "The customer directory exposes only View requests and Message. Add customer, edit saved contact and statement routes exist but have no visible entry point on this directory in the audited account.",
+    "recommendation": "If the existing Add/Edit/Statement screens are intended for everyday contact management, add an “Add customer” action and “Edit contact”/“Statement” menu entries for eligible owned contacts. Respect platform-managed restrictions.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/19-customers-desktop.png",
+      "grower/pass-1/19-customers-mobile.png",
+      "grower/pass-2/19-customers-desktop.png",
+      "grower/pass-2/19-customers-mobile.png"
+    ],
+    "pass1": {
+      "note": "The customer directory exposes only View requests and Message. Add customer, edit saved contact and statement routes exist but have no visible entry point on this directory in the audited account.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed stacked mobile metrics, repeated contact/business names, and missing visible Add/Edit/Statement entry points for supported contact-management screens. Existing desktop contact text is already small and should not be reduced.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No Message or record actions used. Availability of add/edit/statement routes verified separately; this is a discoverability finding for the visible directory."
+    ],
+    "title": "Expose supported customer-management actions",
+    "routes": [
+      "/grower/customers"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/19-customers-desktop.png",
+        "grower/pass-1/19-customers-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/19-customers-desktop.png",
+        "grower/pass-2/19-customers-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The customer directory exposes only View requests and Message. Add customer, edit saved contact and statement routes exist but have no visible entry point on this directory in the audited account.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed stacked mobile metrics, repeated contact/business names, and missing visible Add/Edit/Statement entry points for supported contact-management screens. Existing desktop contact text is already small and should not be reduced.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G52",
+    "sourceKey": "customers-mobile-density",
+    "page": "Customers",
+    "slug": "19-customers",
+    "route": "/grower/customers",
+    "routePattern": "/grower/customers",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Three summary cards push the first customer to y583. Each card prints labeled contact/email/phone/location lines plus totals; ‘Customers’ and ‘Customer List’ repeat, and Orders terminology differs from Requests elsewhere.",
+    "recommendation": "Use a compact summary ‘2 customers ·2 active ·20 requests’. Remove Customer List heading and simplify subtitle to ‘Saved contacts and buyers’. Group contact details compactly, skip duplicate contact name when it equals business name, and use Requests consistently.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/19-customers-mobile.png",
+      "grower/pass-2/19-customers-mobile.png"
+    ],
+    "pass1": {
+      "note": "Three summary cards push the first customer to y583. Each card prints labeled contact/email/phone/location lines plus totals; ‘Customers’ and ‘Customer List’ repeat, and Orders terminology differs from Requests elsewhere.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed stacked mobile metrics, repeated contact/business names, and missing visible Add/Edit/Statement entry points for supported contact-management screens. Existing desktop contact text is already small and should not be reduced.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No Message or record actions used. Availability of add/edit/statement routes verified separately; this is a discoverability finding for the visible directory."
+    ],
+    "title": "Compact customer summaries and metadata",
+    "routes": [
+      "/grower/customers"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/19-customers-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/19-customers-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Three summary cards push the first customer to y583. Each card prints labeled contact/email/phone/location lines plus totals; ‘Customers’ and ‘Customer List’ repeat, and Orders terminology differs from Requests elsewhere.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed stacked mobile metrics, repeated contact/business names, and missing visible Add/Edit/Statement entry points for supported contact-management screens. Existing desktop contact text is already small and should not be reduced.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G53",
+    "sourceKey": "customer-form-small-density",
+    "page": "Add customer",
+    "slug": "20-customer-add",
+    "route": "/grower/customers/add",
+    "routePattern": "/grower/customers/add",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "‘Add New Customer’, ‘Add a new dispensary customer’, and ‘Customer Information’ repeat the task. State and ZIP each consume a full row despite short values, and both footer actions are full-width.",
+    "recommendation": "Use ‘Add customer’ and omit the duplicate subtitle/inner title. Keep State and ZIP side by side with City above; pair Cancel/Add at the bottom while retaining adequate tap sizes.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/20-customer-add-mobile.png",
+      "grower/pass-2/20-customer-add-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Add New Customer’, ‘Add a new dispensary customer’, and ‘Customer Information’ repeat the task. State and ZIP each consume a full row despite short values, and both footer actions are full-width.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed only minor copy and spacing improvements: three repeated task labels and separate State/ZIP rows. Input text and targets remain readable; desktop grid works well.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No values entered or customer created; otherwise no new major issue observed."
+    ],
+    "title": "Trim repeated customer-form context",
+    "routes": [
+      "/grower/customers/add"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/20-customer-add-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/20-customer-add-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Add New Customer’, ‘Add a new dispensary customer’, and ‘Customer Information’ repeat the task. State and ZIP each consume a full row despite short values, and both footer actions are full-width.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed only minor copy and spacing improvements: three repeated task labels and separate State/ZIP rows. Input text and targets remain readable; desktop grid works well.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G54",
+    "sourceKey": "customer-edit-header-space",
+    "page": "Edit customer",
+    "slug": "21-customer-edit",
+    "route": "/grower/customers/ui-review-customer/edit",
+    "routePattern": "/grower/customers/[id]/edit",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "View statement sits alone at the top right, followed by a separate back link, then title and repeated subtitle. Mobile title starts at y214 rather than the usual96; the header spends over200px before the form.",
+    "recommendation": "Place ‘Customers’ back link and ‘Statement’ in one compact row, followed by ‘Edit customer’. Remove ‘Update customer information’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/21-customer-edit-desktop.png",
+      "grower/pass-1/21-customer-edit-mobile.png",
+      "grower/pass-2/21-customer-edit-desktop.png",
+      "grower/pass-2/21-customer-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "View statement sits alone at the top right, followed by a separate back link, then title and repeated subtitle. Mobile title starts at y214 rather than the usual96; the header spends over200px before the form.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed the isolated Statement row delays the mobile heading to y=214. Repeated section names and State/ZIP stacking add height. Keep Delete separate from Save; no changes were submitted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No fields changed or customer saved/deleted. The contact is synthetic and has one delivered request."
+    ],
+    "title": "Combine the customer-edit header rows",
+    "routes": [
+      "/grower/customers/ui-review-customer/edit"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/21-customer-edit-desktop.png",
+        "grower/pass-1/21-customer-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/21-customer-edit-desktop.png",
+        "grower/pass-2/21-customer-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "View statement sits alone at the top right, followed by a separate back link, then title and repeated subtitle. Mobile title starts at y214 rather than the usual96; the header spends over200px before the form.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed the isolated Statement row delays the mobile heading to y=214. Repeated section names and State/ZIP stacking add height. Keep Delete separate from Save; no changes were submitted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G55",
+    "sourceKey": "customer-edit-form-density",
+    "page": "Edit customer",
+    "slug": "21-customer-edit",
+    "route": "/grower/customers/ui-review-customer/edit",
+    "routePattern": "/grower/customers/[id]/edit",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Large gaps/padding in three form cards plus full rows for City, State, ZIP and three footer actions make this contact form1862px tall. The delete action is prominently positioned above save even for a contact with request history.",
+    "recommendation": "Use ‘Business’, ‘Contact’, ‘Address’ headings with tighter spacing; pair State/ZIP. Put Delete in a secondary menu or explain why it is unavailable when history must be retained. Keep Cancel/Save together.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/21-customer-edit-mobile.png",
+      "grower/pass-2/21-customer-edit-mobile.png"
+    ],
+    "pass1": {
+      "note": "Large gaps/padding in three form cards plus full rows for City, State, ZIP and three footer actions make this contact form1862px tall. The delete action is prominently positioned above save even for a contact with request history.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed the isolated Statement row delays the mobile heading to y=214. Repeated section names and State/ZIP stacking add height. Keep Delete separate from Save; no changes were submitted.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No fields changed or customer saved/deleted. The contact is synthetic and has one delivered request."
+    ],
+    "title": "Tighten customer-edit form spacing",
+    "routes": [
+      "/grower/customers/ui-review-customer/edit"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/21-customer-edit-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/21-customer-edit-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Large gaps/padding in three form cards plus full rows for City, State, ZIP and three footer actions make this contact form1862px tall. The delete action is prominently positioned above save even for a contact with request history.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed the isolated Statement row delays the mobile heading to y=214. Repeated section names and State/ZIP stacking add height. Keep Delete separate from Save; no changes were submitted.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G56",
+    "sourceKey": "statement-mobile-columns",
+    "page": "Customer statement",
+    "slug": "22-customer-statement",
+    "route": "/grower/customers/ui-review-customer/statement",
+    "routePattern": "/grower/customers/[id]/statement",
+    "state": "default",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "Mobile statement shows request and delivered date but clips Items and Value to the right. The overall total is visible, but per-request details needed to reconcile the statement are hidden without a scroll hint.",
+    "recommendation": "Use mobile statement rows with reference/date on one line and item summary/value below; alternatively pin value and provide a clear horizontal-scroll affordance.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/22-customer-statement-mobile.png",
+      "grower/pass-2/22-customer-statement-mobile.png"
+    ],
+    "pass1": {
+      "note": "Mobile statement shows request and delivered date but clips Items and Value to the right. The overall total is visible, but per-request details needed to reconcile the statement are hidden without a scroll hint.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed long title/copy, singular-count grammar, and hidden per-request values on mobile. From/To already fit a two-column row. The September 15 delivered date is the expected local conversion of a September 16 midnight-UTC instant and is not reported as a bug.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No date filter submitted or CSV exported; read-only view of one synthetic delivered request."
+    ],
+    "title": "Keep statement values visible on mobile",
+    "routes": [
+      "/grower/customers/ui-review-customer/statement"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/22-customer-statement-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/22-customer-statement-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Mobile statement shows request and delivered date but clips Items and Value to the right. The overall total is visible, but per-request details needed to reconcile the statement are hidden without a scroll hint.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed long title/copy, singular-count grammar, and hidden per-request values on mobile. From/To already fit a two-column row. The September 15 delivered date is the expected local conversion of a September 16 midnight-UTC instant and is not reported as a bug.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G57",
+    "sourceKey": "statement-copy",
+    "page": "Customer statement",
+    "slug": "22-customer-statement",
+    "route": "/grower/customers/ui-review-customer/statement",
+    "routePattern": "/grower/customers/[id]/statement",
+    "state": "default",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "The long customer-name-plus-statement32px title takes two mobile lines; ‘Customer relationship’ is an abstract back label; direct-settlement explanation appears in subtitle and footer, and singular count reads ‘1 delivered requests’.",
+    "recommendation": "Use ‘Statement’ with ‘Maple Street Market’ as a smaller subtitle, back label ‘Customer’, count ‘1 delivered request’, and one concise ‘Payments are arranged directly; PhenoFarm does not collect funds’ note.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/22-customer-statement-desktop.png",
+      "grower/pass-1/22-customer-statement-mobile.png",
+      "grower/pass-2/22-customer-statement-desktop.png",
+      "grower/pass-2/22-customer-statement-mobile.png"
+    ],
+    "pass1": {
+      "note": "The long customer-name-plus-statement32px title takes two mobile lines; ‘Customer relationship’ is an abstract back label; direct-settlement explanation appears in subtitle and footer, and singular count reads ‘1 delivered requests’.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Independent fresh desktop/mobile inspection confirmed long title/copy, singular-count grammar, and hidden per-request values on mobile. From/To already fit a two-column row. The September 15 delivered date is the expected local conversion of a September 16 midnight-UTC instant and is not reported as a bug.",
+      "inspectedBy": "root"
+    },
+    "limitations": [
+      "No date filter submitted or CSV exported; read-only view of one synthetic delivered request."
+    ],
+    "title": "Shorten statement copy and fix singular counts",
+    "routes": [
+      "/grower/customers/ui-review-customer/statement"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/22-customer-statement-desktop.png",
+        "grower/pass-1/22-customer-statement-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/22-customer-statement-desktop.png",
+        "grower/pass-2/22-customer-statement-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The long customer-name-plus-statement32px title takes two mobile lines; ‘Customer relationship’ is an abstract back label; direct-settlement explanation appears in subtitle and footer, and singular count reads ‘1 delivered requests’.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Independent fresh desktop/mobile inspection confirmed long title/copy, singular-count grammar, and hidden per-request values on mobile. From/To already fit a two-column row. The September 15 delivered date is the expected local conversion of a September 16 midnight-UTC instant and is not reported as a bug.",
+        "inspectedBy": "root"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G58",
+    "sourceKey": "navigation-overview-label",
+    "page": "Navigation",
+    "slug": "24-navigation",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "Shared desktop sidebar and mobile navigation drawer",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "‘Dashboard’ and ‘Overview’ are adjacent destinations, but Overview opens Catalog Workspace. The shell calls the role Cultivator while the mobile drawer says Grower Portal and Grower.",
+    "recommendation": "Rename Overview to ‘Catalog’ or ‘Catalog overview’. Pick one user-facing role term across the shell; remove ‘Portal’ where it adds no information.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/24-navigation-desktop.png",
+      "grower/pass-1/24-navigation-mobile.png",
+      "grower/pass-2/24-navigation-desktop.png",
+      "grower/pass-2/24-navigation-mobile.png"
+    ],
+    "pass1": {
+      "note": "‘Dashboard’ and ‘Overview’ are adjacent destinations, but Overview opens Catalog Workspace. The shell calls the role Cultivator while the mobile drawer says Grower Portal and Grower.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop sidebar and reopened mobile menu were inspected. Mobile rows fit the viewport and remain comfortably spaced; only the Overview versus Dashboard distinction and Cultivator versus Grower naming need simplification. No navigation preference was changed.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Menu only opened/closed; no navigation preference or sign-out used. No desktop drawer exists; persistent sidebar is the desktop equivalent."
+    ],
+    "title": "Name the catalog destination clearly",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/24-navigation-desktop.png",
+        "grower/pass-1/24-navigation-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/24-navigation-desktop.png",
+        "grower/pass-2/24-navigation-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "‘Dashboard’ and ‘Overview’ are adjacent destinations, but Overview opens Catalog Workspace. The shell calls the role Cultivator while the mobile drawer says Grower Portal and Grower.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop sidebar and reopened mobile menu were inspected. Mobile rows fit the viewport and remain comfortably spaced; only the Overview versus Dashboard distinction and Cultivator versus Grower naming need simplification. No navigation preference was changed.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G59",
+    "sourceKey": "search-mobile-copy",
+    "page": "Search: empty state",
+    "slug": "25-search",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "Search dialog empty",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "mobile",
+    "observation": "The long input placeholder truncates at390px and uses Orders while navigation says Requests. Keyboard-only navigation hints remain in the mobile footer.",
+    "recommendation": "Use placeholder ‘Search PhenoFarm’ and one category hint ‘Products, requests, customers, strains’. Hide arrow/Enter/Esc instructions on touch layouts; keep them on desktop.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/25-search-mobile.png",
+      "grower/pass-2/25-search-mobile.png"
+    ],
+    "pass1": {
+      "note": "The long input placeholder truncates at390px and uses Orders while navigation says Requests. Keyboard-only navigation hints remain in the mobile footer.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Freshly reopened desktop/mobile search confirms the long placeholder clips on mobile and keyboard navigation hints remain at the bottom on touch layout. Search still calls requests Orders. The harmless recent-search chip reflects the prior read-only Purple query; no result was opened.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Dialog only; no result navigation or data changes."
+    ],
+    "title": "Shorten mobile search guidance",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/25-search-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/25-search-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The long input placeholder truncates at390px and uses Orders while navigation says Requests. Keyboard-only navigation hints remain in the mobile footer.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Freshly reopened desktop/mobile search confirms the long placeholder clips on mobile and keyboard navigation hints remain at the bottom on touch layout. Search still calls requests Orders. The harmless recent-search chip reflects the prior read-only Purple query; no result was opened.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G60",
+    "sourceKey": "messages-empty-copy",
+    "page": "Messages: conversation list",
+    "slug": "26-messages",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "Messages drawer, conversation list",
+    "priority": "low",
+    "category": "layout/copy",
+    "viewport": "desktop",
+    "observation": "Before a thread is selected, ‘Select a conversation’ appears in the header, an empty-state card and composer placeholder. Quote/pricing controls and settlement note still occupy the bottom.",
+    "recommendation": "Use one centered ‘Choose a conversation’ prompt and hide composer/quote actions until selection. The explanatory sentence about context, pricing actions and templates is unnecessary.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/26-messages-desktop.png",
+      "grower/pass-2/26-messages-desktop.png"
+    ],
+    "pass1": {
+      "note": "Before a thread is selected, ‘Select a conversation’ appears in the header, an empty-state card and composer placeholder. Quote/pricing controls and settlement note still occupy the bottom.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile message drawer opens to the conversation list. Desktop repeats Select a conversation in the header, placeholder panel, and disabled composer while showing pricing actions before selection. The single conversation and blank mobile list space are fixture density, not a separate layout defect.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Read-only conversation list; large empty list space reflects a single fixture conversation and is not treated as a defect."
+    ],
+    "title": "Use one conversation-selection prompt",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/26-messages-desktop.png"
+      ],
+      "pass2": [
+        "grower/pass-2/26-messages-desktop.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Before a thread is selected, ‘Select a conversation’ appears in the header, an empty-state card and composer placeholder. Quote/pricing controls and settlement note still occupy the bottom.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile message drawer opens to the conversation list. Desktop repeats Select a conversation in the header, placeholder panel, and disabled composer while showing pricing actions before selection. The single conversation and blank mobile list space are fixture density, not a separate layout defect.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G61",
+    "sourceKey": "message-composer-noise",
+    "page": "Messages: existing conversation",
+    "slug": "26a-message-thread",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "Existing conversation open",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Composer has a horizontal row of six templates, two quote/pricing buttons and a two-line role/settlement note. Settlement is already a chip beneath the conversation header; on mobile the template row clips a label at the right edge.",
+    "recommendation": "Keep the message box and Send primary. Put templates under ‘Templates’ and pricing actions under ‘Quote’. Show one payment note only in quote context, with concise ‘Payment arranged directly’. Use shorter template names such as ‘Follow up’, ‘Availability’, ‘Delivery’, ‘Terms’.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/26a-message-thread-desktop.png",
+      "grower/pass-1/26a-message-thread-mobile.png",
+      "grower/pass-2/26a-message-thread-desktop.png",
+      "grower/pass-2/26a-message-thread-mobile.png"
+    ],
+    "pass1": {
+      "note": "Composer has a horizontal row of six templates, two quote/pricing buttons and a two-line role/settlement note. Settlement is already a chip beneath the conversation header; on mobile the template row clips a label at the right edge.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Reopened existing conversation at both widths confirms the horizontally clipped template strip, two pricing actions, and repeated settlement/role text around the composer. Message bubbles remain readable. Read receipts were mocked; no template, message, quote, or pricing request was submitted.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Existing conversation viewed only; read receipt endpoint mocked to avoid database writes. No message typed/sent or template inserted; sparse message content is fixture-limited."
+    ],
+    "title": "Reduce message-composer clutter",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/26a-message-thread-desktop.png",
+        "grower/pass-1/26a-message-thread-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/26a-message-thread-desktop.png",
+        "grower/pass-2/26a-message-thread-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Composer has a horizontal row of six templates, two quote/pricing buttons and a two-line role/settlement note. Settlement is already a chip beneath the conversation header; on mobile the template row clips a label at the right edge.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Reopened existing conversation at both widths confirms the horizontally clipped template strip, two pricing actions, and repeated settlement/role text around the composer. Message bubbles remain readable. Read receipts were mocked; no template, message, quote, or pricing request was submitted.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G62",
+    "sourceKey": "quote-form-context",
+    "page": "Messages: quote form",
+    "slug": "26b-quote-form",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "Quote form expanded in existing conversation",
+    "priority": "medium",
+    "category": "discoverability/context",
+    "viewport": "desktop and mobile",
+    "observation": "The quote form uses only placeholders—‘Quote unit price’, ‘Qty (optional)’, ‘Quote terms note (optional)’—with no visible currency/unit or product context. It sits above the still-visible message composer and two other pricing controls.",
+    "recommendation": "Give the form a ‘Quote’ heading and persistent labels ‘Unit price ($/unit)’, ‘Qty’, ‘Terms’; show the product/unit being quoted or require a product choice if necessary. While quoting, replace the normal composer/actions with this form to avoid competing send controls.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/26b-quote-form-desktop.png",
+      "grower/pass-1/26b-quote-form-mobile.png",
+      "grower/pass-2/26b-quote-form-desktop.png",
+      "grower/pass-2/26b-quote-form-mobile.png"
+    ],
+    "pass1": {
+      "note": "The quote form uses only placeholders—‘Quote unit price’, ‘Qty (optional)’, ‘Quote terms note (optional)’—with no visible currency/unit or product context. It sits above the still-visible message composer and two other pricing controls.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Reopened quote form at both widths again shows placeholder-only unit-price and quantity fields, no visible currency/unit or product context for this general conversation, and two competing send surfaces. Persistent field labels and an explicit product/unit context would be clearer. No quote values or message were entered or submitted.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Expanded form only; no quote fields entered, pricing request made, or quote sent. This fixture conversation has no visible product context; recommendation is based on that state."
+    ],
+    "title": "Give quotes persistent labels and context",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/26b-quote-form-desktop.png",
+        "grower/pass-1/26b-quote-form-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/26b-quote-form-desktop.png",
+        "grower/pass-2/26b-quote-form-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "The quote form uses only placeholders—‘Quote unit price’, ‘Qty (optional)’, ‘Quote terms note (optional)’—with no visible currency/unit or product context. It sits above the still-visible message composer and two other pricing controls.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Reopened quote form at both widths again shows placeholder-only unit-price and quantity fields, no visible currency/unit or product context for this general conversation, and two competing send surfaces. Persistent field labels and an explicit product/unit context would be clearer. No quote values or message were entered or submitted.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  },
+  {
+    "id": "G63",
+    "sourceKey": "notification-specific-copy",
+    "page": "Notifications",
+    "slug": "27-notifications",
+    "route": "/grower/dashboard",
+    "routePattern": "/grower/dashboard",
+    "state": "Notifications panel",
+    "priority": "medium",
+    "category": "layout/copy",
+    "viewport": "desktop and mobile",
+    "observation": "Repeated ‘New order request’ and ‘New counter quote’ titles are followed by full generic sentences (‘The other party sent revised quote terms for your review’). Adjacent rows look almost identical and lack a visible request/product reference.",
+    "recommendation": "Use shorter, specific rows such as ‘Green Vermont · Request #XPJO3I’ or ‘Revised quote · Purple Haze’; show a concise value/status preview rather than ‘the other party’. Keep relative time and unread styling.",
+    "status": "confirmed in two passes",
+    "evidence": [
+      "grower/pass-1/27-notifications-desktop.png",
+      "grower/pass-1/27-notifications-mobile.png",
+      "grower/pass-2/27-notifications-desktop.png",
+      "grower/pass-2/27-notifications-mobile.png"
+    ],
+    "pass1": {
+      "note": "Repeated ‘New order request’ and ‘New counter quote’ titles are followed by full generic sentences (‘The other party sent revised quote terms for your review’). Adjacent rows look almost identical and lack a visible request/product reference.",
+      "inspectedBy": "grower reviewer"
+    },
+    "pass2": {
+      "note": "Fresh desktop/mobile notification panels were reopened and inspected independently after resizing. Repeated generic New order request and New counter quote sentences still omit useful request/product context. The panel fits both widths. No notification or Mark all read action was clicked.",
+      "inspectedBy": "grower reviewer"
+    },
+    "limitations": [
+      "Panel opened only; no notification or Mark all read clicked. Desktop panel was reopened after viewport change and screenshot replaced because first resized capture had closed it; accepted screenshot shows correct panel."
+    ],
+    "title": "Make notifications specific and concise",
+    "routes": [
+      "/grower/dashboard"
+    ],
+    "view": "Desktop and mobile",
+    "evidenceByPass": {
+      "pass1": [
+        "grower/pass-1/27-notifications-desktop.png",
+        "grower/pass-1/27-notifications-mobile.png"
+      ],
+      "pass2": [
+        "grower/pass-2/27-notifications-desktop.png",
+        "grower/pass-2/27-notifications-mobile.png"
+      ]
+    },
+    "verified": "Both fresh passes",
+    "verification": {
+      "pass1": {
+        "note": "Repeated ‘New order request’ and ‘New counter quote’ titles are followed by full generic sentences (‘The other party sent revised quote terms for your review’). Adjacent rows look almost identical and lack a visible request/product reference.",
+        "inspectedBy": "grower reviewer"
+      },
+      "pass2": {
+        "note": "Fresh desktop/mobile notification panels were reopened and inspected independently after resizing. Repeated generic New order request and New counter quote sentences still omit useful request/product context. The panel fits both widths. No notification or Mark all read action was clicked.",
+        "inspectedBy": "grower reviewer"
+      },
+      "method": "Fresh browser navigation/state recreation, screenshot inspection, accessibility snapshot, and DOM geometry review. No action submission."
+    }
+  }
+]

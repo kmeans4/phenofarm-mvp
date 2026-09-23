@@ -1,0 +1,43 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e58]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e59]
+- main
+  - sectionheader
+    - heading "Dispensaries" [level=1, ref=e60]
+    - paragraph
+      - StaticText "View dispensary licenses and access."
+    - form
+      - LabelText
+        - StaticText "Search dispensaries"
+      - searchbox "Search dispensaries" [ref=e64]
+      - button "Search" [ref=e65]
+      - LabelText
+        - StaticText "Verification status"
+      - combobox "Verification status" [expanded=false, ref=e66]: All statuses
+        - MenuListPopup
+          - option "All statuses" [selected, ref=e67]
+          - option "Pending only" [ref=e68]
+          - option "Verified only" [ref=e69]
+          - option "Expiring within 30 days" [ref=e70]
+          - option "Expired" [ref=e71]
+      - StaticText "1 dispensary"
+  - article
+    - heading "Green Vermont Dispensary" [level=2, ref=e61]
+    - link "dispensary@greenvermont.com" [ref=e62]
+    - StaticText "Verified"
+    - DescriptionList
+      - term "LICENSE"
+      - definition
+        - StaticText "VT-RTL-2024-001"
+      - term "EXPIRY"
+      - definition
+        - time
+          - StaticText "Dec 30, 2027"
+      - term "ORDERING"
+      - definition
+        - StaticText "Can order"
+    - button "Unverify" [ref=e63]
+- region "Notifications alt+T" [ref=e57]
+- alert

@@ -1,0 +1,60 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e1608]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1609]
+    - StaticText "Notifications"
+    - StaticText "20"
+  - navigation "Portal navigation" [ref=e1610]
+    - link "Dashboard" [ref=e1612]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e1613]
+      - StaticText "Catalog"
+    - link "Request Draft" [ref=e1614]
+      - StaticText "Request Draft"
+    - link "Orders 17" [ref=e1615]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e1616]
+      - StaticText "Saved"
+    - link "Settings" [ref=e1617]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e1611]
+- main
+  - sectionheader
+    - heading "Request draft" [level=1, ref=e1607]
+    - paragraph
+      - StaticText "Send requests here; arrange payment with the grower."
+  - heading "Your draft is empty" [level=2, ref=e1600]
+  - paragraph
+    - StaticText "Add products to get started."
+  - heading "Saved and recent products" [level=3, ref=e1601]
+  - paragraph
+    - StaticText "Mystery Pricing Batch"
+  - StaticText "Favorite"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - paragraph
+    - StaticText "Quote only · 25 available"
+  - button "Request pricing" [ref=e1602]
+  - paragraph
+    - StaticText "Purple Haze Flowers"
+  - StaticText "Recent"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - paragraph
+    - StaticText "$25.00/gram · 240 available"
+  - button "Add" [ref=e1603]
+  - link "Browse products" [ref=e1604]
+  - link "Saved items" [ref=e1605]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1618]
+  - button "Open messages" [ref=e1606]
+- region "Notifications alt+T" [ref=e1596]
+- alert

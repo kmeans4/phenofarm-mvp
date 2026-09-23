@@ -1,0 +1,42 @@
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- generic [ref=e853] clickable [onclick]
+  - button "Open messages" [ref=e857]
+- button "Search" [ref=e854]
+- button "Notifications" [expanded=false, ref=e855]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e856]
+- main
+  - sectionheader
+    - heading "Saved" [level=1, ref=e858]
+    - link "Catalog" [ref=e859]
+  - tablist "Saved workspace"
+    - tab "Favorites (1)" [ref=e860]
+      - StaticText "Favorites"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Alerts (1)" [ref=e861]
+      - StaticText "Alerts"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Recent (1)" [selected, ref=e862]
+      - StaticText "Recent"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+  - tabpanel "Recent (1)"
+    - paragraph
+      - StaticText "Purple Haze Flowers"
+    - paragraph
+      - StaticText "Vermont Nurseries · 19 requests · Jul 9"
+    - StaticText "$"
+    - StaticText "25.00"
+    - StaticText "/g"
+    - link "Find again" [ref=e863]
+    - link "View grower" [ref=e864]
+- region "Notifications alt+T" [ref=e852]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e865]
+  - image
+- alert

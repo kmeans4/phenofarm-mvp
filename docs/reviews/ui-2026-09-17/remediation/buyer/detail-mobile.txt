@@ -1,0 +1,64 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e679]
+- button "Notifications" [expanded=false, ref=e680]
+  - StaticText "18"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e681]
+- main
+  - link "← Orders" [ref=e682]
+  - sectionheader
+    - heading "Request #ORD-20260710-XPJO3I" [level=1, ref=e686]
+      - StaticText "Request"
+      - generic
+        - StaticText "#ORD-20260710-XPJO3I"
+    - paragraph
+      - StaticText "Waiting for grower review"
+    - StaticText "Submitted"
+    - button "Export CSV" [ref=e687]
+  - paragraph
+    - StaticText "REQUEST DATE"
+  - paragraph
+    - StaticText "Jul 09, 2026"
+  - paragraph
+    - StaticText "GROWER"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - group
+    - DisclosureTriangle "View timeline" [expanded=false]
+      - StaticText "View timeline"
+  - group
+    - DisclosureTriangle "View history" [expanded=false]
+      - StaticText "View history"
+  - heading "Buyer actions" [level=2, ref=e688]
+  - button "Message grower" [ref=e689]
+  - button "Withdraw request" [ref=e690]
+  - heading "Requested Items" [level=3, ref=e683]
+  - paragraph
+    - StaticText "Purple Haze Flowers (Purple Haze)"
+  - StaticText "1"
+  - StaticText " x "
+  - StaticText "$25.00"
+  - StaticText "$25.00"
+  - StaticText "Total"
+  - StaticText "$25.00"
+  - heading "Request details" [level=3, ref=e684]
+  - paragraph
+    - StaticText "FULFILLMENT"
+  - paragraph
+    - StaticText "Flexible"
+  - paragraph
+    - StaticText "REQUESTED WINDOW"
+  - paragraph
+    - StaticText "Coordinate with grower"
+  - paragraph
+    - StaticText "PAYMENT TERMS"
+  - paragraph
+    - StaticText "Handled directly"
+  - link "Orders" [ref=e691]
+  - button "Buyer actions" [ref=e692]
+- button "Open messages" [ref=e685]
+- region "Notifications alt+T" [ref=e678]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e693]
+  - image
+- alert

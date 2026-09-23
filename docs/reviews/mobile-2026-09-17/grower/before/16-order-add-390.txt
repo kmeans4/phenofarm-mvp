@@ -1,0 +1,32 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e798]
+- button "Notifications" [expanded=false, ref=e799]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e800]
+- main
+  - sectionheader
+    - heading "Record request" [level=1, ref=e802]
+    - paragraph
+      - StaticText "Record an agreement made directly with a buyer."
+  - form
+    - LabelText
+      - StaticText "Buyer *"
+    - combobox "Buyer *" [expanded=false, required, ref=e807]
+    - heading "Items" [level=2, ref=e803]
+    - button "Add item" [ref=e804]
+    - paragraph
+      - StaticText "Add products to this request"
+    - paragraph
+      - StaticText "Use Add item to begin."
+    - group
+      - DisclosureTriangle "Shipping & notes" [expanded=false]
+        - StaticText "Shipping & notes"
+    - button "Record request" [disabled, ref=e805]
+    - link "Cancel" [ref=e806]
+    - paragraph
+      - StaticText "Select a dispensary before recording the request."
+- button "Open messages" [ref=e801]
+- region "Notifications alt+T" [ref=e797]
+- alert

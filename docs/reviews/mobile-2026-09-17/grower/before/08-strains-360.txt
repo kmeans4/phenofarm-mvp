@@ -1,0 +1,61 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e297]
+- button "Notifications" [expanded=false, ref=e298]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e299]
+- main
+  - sectionheader
+    - heading "Strains" [level=1, ref=e327]
+    - link "Add strain" [ref=e328]
+  - generic "Summary"
+    - paragraph
+      - StaticText "Strains"
+    - paragraph
+      - StaticText "4"
+    - paragraph
+      - StaticText "Batches"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "Products"
+    - paragraph
+      - StaticText "3"
+  - button "Card View" [ref=e300]
+    - image
+  - button "List View" [ref=e301]
+    - image
+  - heading "Assorted" [level=3, ref=e302]
+  - link "0 batches" [ref=e303]
+  - link "1 product" [ref=e304]
+  - link "Edit" [ref=e305]
+  - link "Add product" [ref=e306]
+  - button "More actions for Assorted" [ref=e307]
+    - StaticText "More"
+  - heading "Audit Test Kush" [level=3, ref=e308]
+  - paragraph
+    - StaticText "Hybrid"
+  - link "1 batch" [ref=e309]
+  - link "0 products" [ref=e310]
+  - link "Edit" [ref=e311]
+  - link "Add product" [ref=e312]
+  - button "More actions for Audit Test Kush" [ref=e313]
+    - StaticText "More"
+  - heading "Purple Haze" [level=3, ref=e314]
+  - link "0 batches" [ref=e315]
+  - link "1 product" [ref=e316]
+  - link "Edit" [ref=e317]
+  - link "Add product" [ref=e318]
+  - button "More actions for Purple Haze" [ref=e319]
+    - StaticText "More"
+  - heading "Silver Haze" [level=3, ref=e320]
+  - link "0 batches" [ref=e321]
+  - link "1 product" [ref=e322]
+  - link "Edit" [ref=e323]
+  - link "Add product" [ref=e324]
+  - button "More actions for Silver Haze" [ref=e325]
+    - StaticText "More"
+- button "Open messages" [ref=e326]
+- region "Notifications alt+T" [ref=e296]
+- alert

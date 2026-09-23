@@ -1,0 +1,37 @@
+{
+  "slug": "03a-quick-add",
+  "route": "/grower/products",
+  "state": "Quick add expanded",
+  "pass1": {
+    "inspected": [
+      "pass-1/03a-quick-add-desktop.png",
+      "pass-1/03a-quick-add-mobile.png"
+    ],
+    "strengths": [
+      "Only essential product fields are required; an existing draft is visibly indicated."
+    ],
+    "issues": [
+      {
+        "key": "quick-add-copy",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Quick add expands a panel with \u2018QUICK PRODUCT CREATION\u2019, \u2018Create the basic listing now\u2019, and a 20-word explanation; on mobile its header/defaults/draft controls consume about250px before the first field.",
+        "recommendation": "Use one \u2018Quick add\u2019 heading and \u2018Add details later\u2019 helper. Put Close in the heading row and make defaults a compact \u2018Flower \u00b7 g\u2019 control; pair price and stock fields when space permits."
+      }
+    ],
+    "limits": [
+      "Existing draft only viewed; no field typed, draft cleared, defaults changed, or listing created."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/03a-quick-add-desktop.png",
+      "pass-2/03a-quick-add-mobile.png"
+    ],
+    "notes": "Reopened Quick add after a fresh Products navigation at both widths. Same expanded form and existing draft indication; repeated header/defaults copy remains the main space opportunity. No added issue; no input changed.",
+    "confirmedIssueKeys": [
+      "quick-add-copy"
+    ],
+    "newIssues": []
+  }
+}

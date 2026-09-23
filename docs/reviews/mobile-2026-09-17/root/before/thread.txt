@@ -1,0 +1,97 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e108]
+  - button "Notifications" [expanded=false, ref=e109]
+    - StaticText "19"
+  - button "Open Grower navigation menu" [expanded=false, ref=e110]
+  - main
+    - sectionheader
+      - heading "Marketplace preview" [level=1, ref=e117]
+      - paragraph
+        - StaticText "How buyers see your listings."
+      - link "Add product" [ref=e118]
+    - strong
+      - StaticText "3"
+    - StaticText " active"
+    - strong
+      - StaticText "1"
+    - StaticText " quote required"
+    - link "Terms" [ref=e111]
+    - heading "Vermont Nurseries" [level=2, ref=e112]
+    - heading "Mystery Pricing Batch" [level=3, ref=e113]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "19"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.3"
+    - StaticText "%"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "Strain:Assorted"
+    - paragraph
+      - StaticText "25eighth available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e119]
+    - heading "Silver Haze Concentrate" [level=3, ref=e114]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "85"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.2"
+    - StaticText "%"
+    - StaticText "Concentrate"
+    - paragraph
+      - StaticText "Strain:Silver Haze"
+    - paragraph
+      - StaticText "50g available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e120]
+    - heading "Purple Haze Flowers" [level=3, ref=e115]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "24.8"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.6"
+    - StaticText "%"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "Strain:Purple Haze"
+    - paragraph
+      - StaticText "240g available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e121]
+  - button "Open messages" [ref=e116]
+  - region "Notifications alt+T" [ref=e107]
+  - alert
+  - generic
+    - button "Close messages overlay" [ref=e143]
+    - dialog "Messages"
+      - button "Back to conversations" [ref=e147]
+      - paragraph
+        - StaticText "Green Vermont Dispensary"
+      - paragraph
+        - StaticText "Cancellation follow-up"
+      - button "Close messages" [ref=e148]
+      - StaticText "JUN 10"
+      - paragraph
+        - StaticText "Green Vermont Dispensary • 4:39 PM"
+      - paragraph
+        - StaticText "Hi Vermont Nurseries, please review whether order #ORD-1781123929454-1 can be cancelled before fulfillment."
+      - textbox "Message" [ref=e149]
+      - button "Send message" [disabled, ref=e150]
+      - combobox "Message templates" [expanded=false, ref=e151]: Templates
+        - MenuListPopup
+          - option "Templates" [disabled, ref=e152]
+          - option "Follow up" [ref=e153]
+          - option "Availability" [ref=e154]
+          - option "Delivery" [ref=e155]
+          - option "Request update" [ref=e156]
+          - option "Terms" [ref=e157]
+      - group
+        - DisclosureTriangle "Quote" [expanded=false]
+          - StaticText "Quote"

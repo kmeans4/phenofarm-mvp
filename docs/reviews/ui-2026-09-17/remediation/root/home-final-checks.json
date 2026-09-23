@@ -1,0 +1,30 @@
+[
+  {
+    "route": "/",
+    "width": 1440,
+    "reducedMotion": "reduce",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "reducedMotion": "reduce",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "route": "/",
+    "width": 1440,
+    "reducedMotion": "no-preference",
+    "errors": [],
+    "overflow": false
+  },
+  {
+    "route": "/",
+    "width": 390,
+    "reducedMotion": "no-preference",
+    "errors": [],
+    "overflow": false
+  }
+]

@@ -1,13 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ExtendedUser } from '@/types';
 import { Button } from '@/app/components/ui/Button';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { OperationsSummary } from '@/app/grower/components/OperationsSummary';
+import { RecordActions } from '@/app/grower/components/RecordActions';
+import { deleteRecord } from '@/app/components/ui/deleteRecord';
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
 import { toast } from '@/app/hooks/useToast';
+import { pluralize } from '@/lib/utils';
+import { formatBatchMetric, formatHarvestDate, parseOptionalBatchMetric } from '@/lib/batch-utils';
 
 interface Strain {
   id: string;
@@ -17,6 +21,7 @@ interface Strain {
 interface Batch {
   id: string;
   batchNumber: string;
+  lotNumber: string | null;
   harvestDate: string;
   strainId: string;
   strain: Strain;
@@ -24,47 +29,38 @@ interface Batch {
   cbd: number | null;
   totalCannabinoids: number | null;
   coaDocumentUrl: string | null;
+  labDocumentCount: number;
   _count: {
     products: number;
   };
 }
 
 export default function BatchesPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
+  const searchParams = useSearchParams();
+  const strainFilterParam = searchParams?.get('strain') || searchParams?.get('strainId') || '';
   const [batches, setBatches] = useState<Batch[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [filterStrain, setFilterStrain] = useState<string>('');
+  const filterStrain = strainFilterParam;
   const [deleteCandidate, setDeleteCandidate] = useState<Batch | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const deleteRef = useRef(false);
 
-  useEffect(() => {
-    if (status === 'loading') return;
-    
-    if (!session) {
-      router.push('/auth/sign_in');
-      return;
-    }
-
-    const user = session.user as ExtendedUser;
-    if (user.role !== 'GROWER') {
-      router.push('/dashboard');
-      return;
-    }
-
-    fetchBatches();
-  }, [status, session, router]);
-
-  const fetchBatches = async () => {
+  const fetchBatches = useCallback(async (strainId = '') => {
     try {
       setLoading(true);
       setError(null);
-      const url = filterStrain ? `/api/batches?strainId=${filterStrain}` : '/api/batches';
+      const url = strainId ? `/api/batches?strainId=${encodeURIComponent(strainId)}` : '/api/batches';
       const response = await fetch(url);
       if (response.ok) {
         const data = await response.json();
         if (Array.isArray(data)) {
-          setBatches(data);
+          setBatches(data.map((batch: Batch) => ({
+            ...batch,
+            thc: parseOptionalBatchMetric(batch.thc),
+            cbd: parseOptionalBatchMetric(batch.cbd),
+            totalCannabinoids: parseOptionalBatchMetric(batch.totalCannabinoids),
+          })));
         }
       } else {
         const errData = await response.json().catch(() => ({}));
@@ -75,32 +71,33 @@ export default function BatchesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchBatches(strainFilterParam);
+  }, [strainFilterParam, fetchBatches]);
 
   const deleteBatch = async (batchId: string) => {
+    if (deleteRef.current) return;
+    deleteRef.current = true;
+    setDeleting(true);
     try {
-      const response = await fetch('/api/batches/' + batchId, { method: 'DELETE' });
-      if (response.ok) {
-        setBatches(batches.filter(b => b.id !== batchId));
-        toast.success('Batch deleted');
-      } else {
-        const err = await response.json();
-        toast.error(err.error || 'Failed to delete batch');
-      }
-    } catch {
-      toast.error('Network error deleting batch');
+      await deleteRecord('/api/batches/' + batchId, 'Failed to delete batch');
+      setBatches((current) => current.filter(item => item.id !== batchId));
+      toast.success('Batch deleted');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Network error deleting batch');
     } finally {
+      deleteRef.current = false;
+      setDeleting(false);
       setDeleteCandidate(null);
     }
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  };
+  const activeStrainFilterName = filterStrain ? batches[0]?.strain?.name || 'selected strain' : '';
+  const batchesWithThc = batches.filter((batch) => typeof batch.thc === 'number' && Number.isFinite(batch.thc));
+  const productsHref = (batchId: string) => `/grower/products?batch=${encodeURIComponent(batchId)}`;
+  const labDocumentSummary = (batch: Batch) => `${(batch.labDocumentCount || 0)}/3 lab docs`;
 
   if (loading) {
     return (
@@ -114,46 +111,42 @@ export default function BatchesPage() {
   }
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Batch Management</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your harvest batches and lab results</p>
-        </div>
-        <Button variant="primary" asChild className="w-full sm:w-auto">
-          <Link href="/grower/batches/add" className="inline-flex w-full sm:w-auto justify-center">+ Add Batch</Link>
-        </Button>
-      </div>
+    <div className="space-y-3 sm:space-y-6">
+      <PageHeader
+        mobileInlineActions
+        title="Batches"
+        actions={
+          <Button variant="primary" asChild className="shrink-0">
+            <Link href="/grower/batches/add" className="inline-flex w-full sm:w-auto justify-center">Add batch</Link>
+          </Button>
+        }
+      />
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
           <p className="text-red-600">{error}</p>
-          <Button variant="secondary" onClick={fetchBatches} className="mt-2">Retry</Button>
+          <Button variant="secondary" onClick={() => fetchBatches(filterStrain)} className="mt-2">Retry</Button>
         </div>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Total Batches</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{batches.length}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Total Products</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
-            {batches.reduce((sum, b) => sum + b._count.products, 0)}
+      <OperationsSummary items={[
+        { label: 'Batches', value: batches.length },
+        { label: 'Products', value: batches.reduce((sum, batch) => sum + batch._count.products, 0) },
+        { label: 'Avg. THC', value: batchesWithThc.length
+          ? formatBatchMetric(batchesWithThc.reduce((sum, batch) => sum + (batch.thc ?? 0), 0) / batchesWithThc.length)
+          : '—' },
+      ]} />
+
+      {filterStrain && (
+        <div className="flex flex-col gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-900 sm:flex-row sm:items-center sm:justify-between">
+          <p>
+            Showing batches for <span className="font-semibold">{activeStrainFilterName}</span>.
           </p>
+          <Button variant="outline" size="sm" asChild className="bg-white">
+            <Link href="/grower/batches">Clear strain filter</Link>
+          </Button>
         </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Avg. THC</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
-            {batches.filter(b => b.thc).length > 0
-              ? (batches.reduce((sum, b) => sum + (b.thc || 0), 0) / batches.filter(b => b.thc).length).toFixed(1)
-              : 'N/A'}%
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* Batches Display */}
       {batches.length > 0 ? (
@@ -163,49 +156,43 @@ export default function BatchesPage() {
               <div key={batch.id} className="bg-white rounded-xl shadow-sm border border-gray-200 p-3 sm:p-4 space-y-2.5 sm:space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div>
-                    <p className="text-xs text-gray-500">Batch #</p>
-                    <p className="font-semibold text-gray-900">{batch.batchNumber}</p>
+                    <p className="text-sm font-semibold text-gray-900">{batch.batchNumber}</p>
+                    {batch.lotNumber && <p className="text-xs text-gray-500">Lot {batch.lotNumber}</p>}
                   </div>
-                  <span className="text-xs text-gray-500">{formatDate(batch.harvestDate)}</span>
+                  <span className="text-xs text-gray-500">{formatHarvestDate(batch.harvestDate)}</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-sm">
-                  <div>
-                    <p className="text-xs text-gray-500">Strain</p>
-                    <p className="text-gray-900 truncate">{batch.strain?.name || 'N/A'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">Products</p>
-                    <p className="text-gray-900">{batch._count.products}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">THC</p>
-                    <p className="text-green-600 font-medium">{batch.thc ? `${batch.thc.toFixed(1)}%` : '-'}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-gray-500">CBD</p>
-                    <p className="text-blue-600 font-medium">{batch.cbd ? `${batch.cbd.toFixed(1)}%` : '-'}</p>
-                  </div>
+                <p className="text-sm text-gray-600">{batch.strain?.name || 'No strain'}</p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                  <p className="text-green-700">THC <span className="font-semibold">{formatBatchMetric(batch.thc)}</span></p>
+                  <p className="text-blue-700">CBD <span className="font-semibold">{formatBatchMetric(batch.cbd)}</span></p>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 text-sm">
+                    <Link
+                      href={productsHref(batch.id)}
+                      className="inline-flex min-h-10 items-center text-gray-900 underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    >
+                      {pluralize(batch._count.products, 'product')}
+                    </Link>
+                <p className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-semibold ${
+                  (batch.labDocumentCount || 0) === 3
+                    ? 'border-green-200 bg-green-50 text-green-700'
+                    : 'border-amber-200 bg-amber-50 text-amber-700'
+                }`}>
+                  {labDocumentSummary(batch)}
+                </p>
                 </div>
 
-                <div className="flex flex-col gap-2 pt-2 border-t border-gray-100">
-                  <Button variant="outline" size="sm" asChild className="w-full">
+                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-100">
+                  <Button variant="outline" size="sm" asChild>
                     <Link href={'/grower/batches/' + batch.id + '/edit'}>Edit</Link>
                   </Button>
-                  <Button variant="primary" size="sm" asChild className="w-full">
+                  <Button variant="primary" size="sm" asChild>
                     <Link href={'/grower/products/add?strainId=' + batch.strainId + '&batchId=' + batch.id}>
-                      + Product
+                      Add product
                     </Link>
                   </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    className="w-full"
-                    onClick={() => setDeleteCandidate(batch)}
-                  >
-                    Delete
-                  </Button>
+                  <RecordActions name={batch.batchNumber} actions={[{ label: 'Delete batch', destructive: true, onSelect: () => setDeleteCandidate(batch) }]} />
                 </div>
               </div>
             ))}
@@ -232,18 +219,28 @@ export default function BatchesPage() {
                         <span className="font-medium text-sm sm:text-base text-gray-900">{batch.batchNumber}</span>
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{batch.strain?.name || 'N/A'}</td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{formatDate(batch.harvestDate)}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{formatHarvestDate(batch.harvestDate)}</td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
-                        {batch.thc ? (
-                          <span className="text-green-600 font-medium">{batch.thc.toFixed(1)}%</span>
-                        ) : <span className="text-gray-400">-</span>}
+                        <span className="text-green-600 font-medium">{formatBatchMetric(batch.thc)}</span>
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
-                        {batch.cbd ? (
-                          <span className="text-blue-600 font-medium">{batch.cbd.toFixed(1)}%</span>
-                        ) : <span className="text-gray-400">-</span>}
+                        <span className="text-blue-600 font-medium">{formatBatchMetric(batch.cbd)}</span>
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">{batch._count.products}</td>
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
+                        <Link
+                          href={productsHref(batch.id)}
+                          className="underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                        >
+                          {pluralize(batch._count.products, 'product')}
+                        </Link>
+                        <div className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
+                          (batch.labDocumentCount || 0) === 3
+                            ? 'border-green-200 bg-green-50 text-green-700'
+                            : 'border-amber-200 bg-amber-50 text-amber-700'
+                        }`}>
+                          {labDocumentSummary(batch)}
+                        </div>
+                      </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3">
                         <div className="flex gap-2">
                           <Button variant="outline" size="sm" asChild>
@@ -255,17 +252,10 @@ export default function BatchesPage() {
                             asChild
                           >
                             <Link href={'/grower/products/add?strainId=' + batch.strainId + '&batchId=' + batch.id}>
-                              + Product
+                              Add product
                             </Link>
                           </Button>
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setDeleteCandidate(batch)}
-                          >
-                            Delete
-                          </Button>
+                          <RecordActions name={batch.batchNumber} actions={[{ label: 'Delete batch', destructive: true, onSelect: () => setDeleteCandidate(batch) }]} />
                         </div>
                       </td>
                     </tr>
@@ -294,6 +284,7 @@ export default function BatchesPage() {
       )}
 
       <ConfirmDialog
+        loading={deleting}
         open={Boolean(deleteCandidate)}
         title="Delete batch?"
         description={`Delete ${deleteCandidate?.batchNumber || 'this batch'}. Products attached to this batch should be reviewed before removing it.`}

@@ -4,6 +4,7 @@ interface DraftAutosaveStatusProps {
   savedAt: string | null;
   label?: string;
   onClear?: () => void;
+  compact?: boolean;
 }
 
 function formatSavedAt(savedAt: string) {
@@ -16,8 +17,16 @@ export function DraftAutosaveStatus({
   savedAt,
   label = 'Browser draft',
   onClear,
+  compact = false,
 }: DraftAutosaveStatusProps) {
   if (!savedAt) return null;
+
+  if (compact) return (
+    <div className="flex min-h-10 items-center justify-between gap-2 text-xs text-gray-500">
+      <span role="status">{label} {formatSavedAt(savedAt)}</span>
+      {onClear && <button type="button" onClick={onClear} className="min-h-10 px-2 font-medium text-green-700">Clear draft</button>}
+    </div>
+  );
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-900 sm:flex-row sm:items-center sm:justify-between">

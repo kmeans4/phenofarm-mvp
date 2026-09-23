@@ -1,0 +1,98 @@
+[
+  {
+    "id": "M-P01",
+    "routes": [
+      "/contact"
+    ],
+    "viewport": "360x800",
+    "title": "Contact heading wraps to three lines at the narrowest mobile width",
+    "before": "At 360px, \u201cTalk about wholesale workflows.\u201d occupies three lines. Together with the four-line intro and three information cards, the Email us form begins around y=886px.",
+    "change": "Shortened the heading to \u201cWholesale workflow help.\u201d so the title uses two lines at 360px while the surrounding context and contact details remain intact.",
+    "files": [
+      "app/contact/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/mobile-2026-09-17/public-admin/baseline/public/03-contact.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/baseline/public-390/03-contact.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/public/contact-360.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/public/contact-390.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/public/contact-430.png"
+    ],
+    "verification": {
+      "status": "verified-production",
+      "server": "http://localhost:3144",
+      "checks": [
+        "Fresh 360x800, 390x844, and 430x932 screenshots captured and inspected.",
+        "Rendered H1 text is \u201cWholesale workflow help.\u201d and measures two 40px lines at all three widths.",
+        "agent-browser errors --json returned errors: [] after the captures."
+      ],
+      "followUp": "None. Final 360px screenshot inspection confirmed the change remains rendered in the rebuilt production process."
+    }
+  },
+  {
+    "id": "M-A01",
+    "routes": [
+      "/admin/users?role=dispensary"
+    ],
+    "viewport": "360x800",
+    "title": "Filtered user search placeholder clips beside Clear",
+    "before": "With the Dispensary role filter active, the 142px search field shows \u201cEmail or busines\u2026\u201d because the Clear action shares the row.",
+    "change": "Shortened the page-local placeholder to \u201cEmail or name\u201d so the prompt fits the filtered mobile row without changing search behavior or labels.",
+    "files": [
+      "app/admin/users/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/mobile-2026-09-17/public-admin/baseline/admin/02-users-dispensary-filter.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/users-filter-360.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/users-filter-390.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/users-filter-430.png"
+    ],
+    "verification": {
+      "status": "verified-production",
+      "server": "http://localhost:3144",
+      "checks": [
+        "Fresh 360x800, 390x844, and 430x932 screenshots captured and inspected with admin state loaded.",
+        "The actual search field widths are 141.875px, 171.875px, and 211.875px; placeholder is fully rendered as \u201cEmail or name\u201d; document width matches viewport at all three widths.",
+        "agent-browser errors --json returned errors: [] after the captures."
+      ],
+      "followUp": "None. Final 360px screenshot inspection confirmed the change remains rendered in the rebuilt production process."
+    }
+  },
+  {
+    "id": "M-A02",
+    "routes": [
+      "/admin/growers",
+      "/admin/dispensaries",
+      "/admin/users"
+    ],
+    "viewport": "360x800, 390x844, 430x932",
+    "title": "Admin mobile search controls use readable input text",
+    "before": "The grower and dispensary verification search fields and status selects, plus the users search field, rendered at 14px on mobile. That is below the 16px input baseline and can trigger iOS focus zoom.",
+    "change": "Set the affected input and select controls to 16px on mobile with text-base and preserve the existing 14px text-sm size from the sm breakpoint upward.",
+    "files": [
+      "app/admin/components/AdminVerificationFilters.tsx",
+      "app/admin/users/page.tsx"
+    ],
+    "evidence": [
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-growers-360.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-growers-390.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-growers-430.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-dispensaries-360.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-dispensaries-390.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-dispensaries-430.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-users-360.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-users-390.png",
+      "docs/reviews/mobile-2026-09-17/public-admin/post/admin/filters-font-users-430.png"
+    ],
+    "verification": {
+      "status": "verified-production",
+      "server": "http://localhost:3144",
+      "checks": [
+        "Targeted ESLint passes for both changed files.",
+        "Production 3144 computed 16px for grower and dispensary search inputs/status selects and the users search input at 360x800, 390x844, and 430x932.",
+        "All nine post-rebuild screenshots were captured and inspected; document width matched viewport at every width with no control overflow."
+      ],
+      "followUp": "None."
+    }
+  }
+]

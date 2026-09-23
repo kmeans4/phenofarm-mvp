@@ -1,0 +1,60 @@
+{
+  "slug": "01-dashboard",
+  "route": "/grower/dashboard",
+  "pass1": {
+    "inspected": [
+      "pass-1/01-dashboard-desktop.png",
+      "pass-1/01-dashboard-mobile.png"
+    ],
+    "strengths": [
+      "Clear account identity and actionable request count; mobile cards reflow without page overflow."
+    ],
+    "issues": [
+      {
+        "key": "setup-density",
+        "priority": "high",
+        "viewport": "desktop and mobile",
+        "observation": "A six-row readiness checklist and setup pitch appear before daily attention items. On mobile, attention begins at y1700 after an approximately 1100px setup block; completed items each keep explanation and Complete badge.",
+        "recommendation": "Put pending requests first; collapse completed setup items into \u2018Setup \u00b7 3 left\u2019. Use \u2018Review 17 requests\u2019 and remove \u2018Pending requests are the fastest path to keeping buyers moving.\u2019"
+      },
+      {
+        "key": "repeated-dashboard-copy",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "\u2018ATTENTION CENTER\u2019 repeats \u2018What needs your attention\u2019; \u2018Activity Feed\u2019 and \u2018Recent Activity\u2019 create two headings for one list plus instructional subtitles. KPI helper text repeats linked destinations.",
+        "recommendation": "Use one \u2018Needs attention\u2019 heading and one \u2018Recent activity\u2019 heading; remove generic subtitles. Shorten KPIs to \u2018Requests\u2019, \u2018Delivered value\u2019, \u2018Customers\u2019, \u2018Products\u2019. Keep one concise settlement qualifier near value."
+      },
+      {
+        "key": "chart-history-default",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Delivered-value chart shows mostly empty space and oldest days first; the only visible $450 bar is outside the initial horizontal window. Desktop card is approximately340px tall; mobile swipe view initially looks empty.",
+        "recommendation": "Default to the most recent days or a seven-day mobile view; use \u2018Delivered value \u00b7 30 days\u2019, reduce chart height, and make date range visible."
+      },
+      {
+        "key": "setup-provider-copy",
+        "priority": "low",
+        "viewport": "desktop and mobile",
+        "observation": "Subscription readiness text exposes \u2018when Stripe Billing is ready\u2019, while commercial terms lists five implementation concepts.",
+        "recommendation": "Use \u2018Choose a plan to activate your account\u2019 only when available, otherwise \u2018Billing is not available yet\u2019; use \u2018Set order and delivery defaults\u2019."
+      }
+    ],
+    "limits": [
+      "No setup, billing, or request action submitted. Development toolbar excluded from recommendations."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/01-dashboard-desktop.png",
+      "pass-2/01-dashboard-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile revisit confirms3168px mobile length, attention at y1700, duplicated activity headings and oldest-first chart window. No additional issue; retain both useful KPI links and readable two-column mobile cards.",
+    "confirmedIssueKeys": [
+      "setup-density",
+      "repeated-dashboard-copy",
+      "chart-history-default",
+      "setup-provider-copy"
+    ],
+    "newIssues": []
+  }
+}

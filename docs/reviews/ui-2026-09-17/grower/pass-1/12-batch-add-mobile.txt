@@ -1,0 +1,89 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e1019]
+- button "Notifications" [expanded=false, ref=e1020]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e1021]
+- main
+  - sectionheader
+    - heading "Add New Batch" [level=1, ref=e1024]
+    - paragraph
+      - StaticText "Create a harvest batch with lab results"
+  - heading "Batch Details" [level=3, ref=e1022]
+  - form
+    - LabelText
+      - StaticText "Batch Number *"
+    - button "Suggest" [ref=e1025]
+    - textbox "Batch Number *" [required, ref=e1026]
+    - paragraph
+      - StaticText "Expected format: BATCH-YYYYMMDD-XX, such as BATCH-20260706-01."
+    - LabelText
+      - StaticText "Lot Number"
+    - textbox "Lot Number" [ref=e1027]
+    - LabelText
+      - StaticText "Harvest Date *"
+    - Date "Harvest Date *": 2026-09-17
+      - generic
+        - spinbutton "Month Month" [ref=e1044]: 9
+          - StaticText "09"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e1045]: 17
+          - StaticText "17"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e1046]: 2026
+          - StaticText "2026"
+      - button "Show date picker" [ref=e1043]
+    - LabelText
+      - StaticText "Strain *"
+    - combobox "Strain *" [expanded=false, ref=e1028]: Select a strain
+      - MenuListPopup
+        - option "Select a strain" [selected, ref=e1047]
+        - option "Assorted " [ref=e1048]
+        - option "Audit Test Kush " [ref=e1049]
+        - option "Purple Haze " [ref=e1050]
+        - option "Silver Haze " [ref=e1051]
+    - heading "Lab Results" [level=3, ref=e1029]
+    - LabelText
+      - StaticText "THC (%)"
+    - spinbutton "THC (%)" [ref=e1030]
+    - LabelText
+      - StaticText "CBD (%)"
+    - spinbutton "CBD (%)" [ref=e1031]
+    - LabelText
+      - StaticText "Total Cannabinoids (%)"
+    - spinbutton "Total Cannabinoids (%)" [ref=e1032]
+    - heading "Lab Result Documents" [level=4, ref=e1033]
+    - paragraph
+      - StaticText "Upload the three lab PDFs growers typically receive before selling flower. Each PDF must be 2MB or smaller."
+    - LabelText
+      - StaticText "Potency Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the PDF showing THC, CBD, and total cannabinoids."
+    - button "Potency Test" [ref=e1034]: No file chosen
+    - button "Upload PDF" [ref=e1035]
+    - LabelText
+      - StaticText "Pesticide Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the pesticide test PDF for this batch."
+    - button "Pesticide Test" [ref=e1036]: No file chosen
+    - button "Upload PDF" [ref=e1037]
+    - LabelText
+      - StaticText "Microbial Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the microbial test PDF for this batch."
+    - button "Microbial Test" [ref=e1038]: No file chosen
+    - button "Upload PDF" [ref=e1039]
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Notes" [ref=e1040]
+    - button "Create Batch" [disabled, ref=e1041]
+    - button "Cancel" [ref=e1042]
+- button "Open messages" [ref=e1023]
+- region "Notifications alt+T" [ref=e1018]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1052]
+  - image
+- alert

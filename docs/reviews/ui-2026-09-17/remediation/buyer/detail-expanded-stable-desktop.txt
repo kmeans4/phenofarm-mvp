@@ -1,0 +1,114 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e2277]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2278]
+    - StaticText "Notifications"
+    - StaticText "22"
+  - navigation "Portal navigation" [ref=e2279]
+    - link "Dashboard" [ref=e2281]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2282]
+      - StaticText "Catalog"
+    - link "Request Draft 2" [ref=e2283]
+      - StaticText "Request Draft"
+      - StaticText "2"
+    - link "Orders 17" [ref=e2284]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e2285]
+      - StaticText "Saved"
+    - link "Settings" [ref=e2286]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e2280]
+- main
+  - link "← Orders" [ref=e2264]
+  - sectionheader
+    - heading "Request #ORD-20260710-XPJO3I" [level=1, ref=e2268]
+      - StaticText "Request"
+      - generic
+        - StaticText "#ORD-20260710-XPJO3I"
+    - paragraph
+      - StaticText "Waiting for grower review"
+    - StaticText "Submitted"
+    - button "Export CSV" [ref=e2269]
+  - paragraph
+    - StaticText "REQUEST DATE"
+  - paragraph
+    - StaticText "Jul 09, 2026"
+  - paragraph
+    - StaticText "GROWER"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - group
+    - DisclosureTriangle "View timeline" [expanded=true]
+      - StaticText "View timeline"
+    - heading "Timeline" [level=3, ref=e2270]
+    - list
+      - listitem [level=1]
+        - StaticText "Submitted"
+        - StaticText "Jul 9, 2026 8:39 PM"
+      - listitem [level=1]
+        - StaticText "Accepted"
+      - listitem [level=1]
+        - StaticText "Preparing"
+      - listitem [level=1]
+        - StaticText "Ready"
+      - listitem [level=1]
+        - StaticText "Delivered"
+    - paragraph
+      - StaticText "Buyer request received"
+  - group
+    - DisclosureTriangle "View history" [expanded=true]
+      - StaticText "View history"
+    - generic
+      - heading "History" [level=2, ref=e2276]
+      - list
+        - listitem [level=1]
+          - paragraph
+            - StaticText "Submitted"
+          - paragraph
+            - StaticText "Dispensary · Jul 9, 2026 8:39 PM"
+  - heading "Buyer actions" [level=2, ref=e2271]
+  - button "Message grower" [ref=e2272]
+  - button "Withdraw request" [ref=e2273]
+  - heading "Requested Items" [level=3, ref=e2265]
+  - table
+    - rowgroup
+      - row
+        - columnheader "PRODUCT" [ref=e2292]
+        - columnheader "QTY" [ref=e2293]
+        - columnheader "PRICE" [ref=e2294]
+        - columnheader "LINE VALUE" [ref=e2295]
+    - row
+      - cell "Purple Haze Flowers (Purple Haze)" [ref=e2288]
+        - StaticText "Purple Haze Flowers (Purple Haze)"
+      - cell "1" [ref=e2289]
+      - cell "$25.00" [ref=e2290]
+      - cell "$25.00" [ref=e2291]
+  - StaticText "Total"
+  - StaticText "$25.00"
+  - heading "Request details" [level=3, ref=e2266]
+  - paragraph
+    - StaticText "FULFILLMENT"
+  - paragraph
+    - StaticText "Flexible"
+  - paragraph
+    - StaticText "REQUESTED WINDOW"
+  - paragraph
+    - StaticText "Coordinate with grower"
+  - paragraph
+    - StaticText "PAYMENT TERMS"
+  - paragraph
+    - StaticText "Handled directly"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2287]
+  - button "Open messages" [ref=e2267]
+- region "Notifications alt+T" [ref=e2260]
+- alert

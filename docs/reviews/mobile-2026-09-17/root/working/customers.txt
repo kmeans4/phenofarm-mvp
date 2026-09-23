@@ -1,0 +1,82 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e525] clickable [onclick]
+  - button "Open messages" [ref=e531]
+- button "Search" [ref=e526]
+- button "Notifications" [expanded=false, ref=e527]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e528]
+- main
+  - sectionheader
+    - heading "Customers" [level=1, ref=e532]
+    - link "Add customer" [ref=e533]
+      - StaticText "Add"
+  - generic "Summary"
+    - paragraph
+      - StaticText "Customers"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "Active · 90 days"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "Requests"
+    - paragraph
+      - StaticText "20"
+  - link "View Green Vermont Dispensary" [ref=e529]
+    - paragraph
+      - StaticText "Green Vermont Dispensary"
+    - paragraph
+      - StaticText "License: VT-RTL-2024-001"
+    - paragraph
+      - StaticText "Email:"
+      - StaticText "dispensary@greenvermont.com"
+    - paragraph
+      - StaticText "Phone:"
+      - StaticText "(802) 555-0145"
+    - paragraph
+      - StaticText "Location:"
+      - StaticText "Burlington, VT"
+    - paragraph
+      - StaticText "Last request:Jul 9, 2026"
+    - paragraph
+      - StaticText "Delivered:$0.00"
+    - StaticText "PhenoFarm member"
+    - StaticText "19"
+    - StaticText " request"
+    - StaticText "s"
+    - link "Details" [ref=e534]
+    - link "Statement" [ref=e535]
+    - link "Requests" [ref=e536]
+    - button "Message" [ref=e537]
+  - link "View Maple Street Market" [ref=e530]
+    - paragraph
+      - StaticText "Maple Street Market"
+    - paragraph
+      - StaticText "License: VT-UI-2026-104"
+    - paragraph
+      - StaticText "Alex Morgan"
+    - paragraph
+      - StaticText "Email:"
+      - StaticText "orders@example.test"
+    - paragraph
+      - StaticText "Phone:"
+      - StaticText "802-555-0142"
+    - paragraph
+      - StaticText "Location:"
+      - StaticText "Burlington, VT"
+    - paragraph
+      - StaticText "Last request:Sep 13, 2026"
+    - paragraph
+      - StaticText "Delivered:$450.00"
+    - StaticText "1"
+    - StaticText " request"
+    - link "Edit contact" [ref=e538]
+    - link "Statement" [ref=e539]
+    - link "Requests" [ref=e540]
+    - button "Message" [ref=e541]
+- region "Notifications alt+T" [ref=e524]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e542]
+  - image
+- alert

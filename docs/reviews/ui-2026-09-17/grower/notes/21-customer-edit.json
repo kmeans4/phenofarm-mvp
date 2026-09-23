@@ -1,0 +1,48 @@
+{
+  "slug": "21-customer-edit",
+  "route": "/grower/customers/ui-review-customer/edit",
+  "routePattern": "/grower/customers/[id]/edit",
+  "pass1": {
+    "inspected": [
+      "pass-1/21-customer-edit-desktop.png",
+      "pass-1/21-customer-edit-mobile.png"
+    ],
+    "strengths": [
+      "Business, contact and address groups are clearly separated; the statement link is available here; fields have readable values."
+    ],
+    "issues": [
+      {
+        "key": "customer-edit-header-space",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "View statement sits alone at the top right, followed by a separate back link, then title and repeated subtitle. Mobile title starts at y214 rather than the usual96; the header spends over200px before the form.",
+        "recommendation": "Place ‘Customers’ back link and ‘Statement’ in one compact row, followed by ‘Edit customer’. Remove ‘Update customer information’."
+      },
+      {
+        "key": "customer-edit-form-density",
+        "priority": "low",
+        "viewport": "mobile",
+        "observation": "Large gaps/padding in three form cards plus full rows for City, State, ZIP and three footer actions make this contact form1862px tall. The delete action is prominently positioned above save even for a contact with request history.",
+        "recommendation": "Use ‘Business’, ‘Contact’, ‘Address’ headings with tighter spacing; pair State/ZIP. Put Delete in a secondary menu or explain why it is unavailable when history must be retained. Keep Cancel/Save together."
+      }
+    ],
+    "limits": [
+      "No fields changed or customer saved/deleted. The contact is synthetic and has one delivered request."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/21-customer-edit-desktop.png",
+      "pass-2/21-customer-edit-mobile.png"
+    ],
+    "inspectedBy": "root",
+    "inspectionConfirmation": "Root confirmed all 18 fresh screenshots individually inspected on 2026-09-17.",
+    "notes": "Independent fresh desktop/mobile inspection confirmed the isolated Statement row delays the mobile heading to y=214. Repeated section names and State/ZIP stacking add height. Keep Delete separate from Save; no changes were submitted.",
+    "confirmedIssueKeys": [
+      "customer-edit-header-space",
+      "customer-edit-form-density"
+    ],
+    "newIssues": [],
+    "source": "root-pass2-notes.md"
+  }
+}

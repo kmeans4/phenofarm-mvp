@@ -1,0 +1,76 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e360]
+- button "Notifications" [expanded=false, ref=e361]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e362]
+- main
+  - sectionheader
+    - heading "Marketplace preview" [level=1, ref=e366]
+      - StaticText "Marketplace"
+      - StaticText "preview"
+    - paragraph
+      - StaticText "How buyers see your listings."
+    - link "Add product" [ref=e367]
+  - strong
+    - StaticText "3"
+  - StaticText " active"
+  - strong
+    - StaticText "1"
+  - StaticText " quote required"
+  - link "Terms" [ref=e363]
+  - heading "Vermont Nurseries" [level=2, ref=e364]
+  - generic
+    - heading "Mystery Pricing Batch" [level=3, ref=e368]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "19"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.3"
+    - StaticText "%"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "Strain:Assorted"
+    - paragraph
+      - StaticText "25eighth available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e371]
+  - generic
+    - heading "Silver Haze Concentrate" [level=3, ref=e369]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "85"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.2"
+    - StaticText "%"
+    - StaticText "Concentrate"
+    - paragraph
+      - StaticText "Strain:Silver Haze"
+    - paragraph
+      - StaticText "50g available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e372]
+  - generic
+    - heading "Purple Haze Flowers" [level=3, ref=e370]
+    - StaticText "Hybrid"
+    - StaticText "THC "
+    - StaticText "24.8"
+    - StaticText "%"
+    - StaticText "CBD "
+    - StaticText "0.6"
+    - StaticText "%"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "Strain:Purple Haze"
+    - paragraph
+      - StaticText "240g available"
+    - StaticText "Lab results on request"
+    - link "Edit listing" [ref=e373]
+- button "Open messages" [ref=e365]
+- region "Notifications alt+T" [ref=e359]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e374]
+  - image
+- alert

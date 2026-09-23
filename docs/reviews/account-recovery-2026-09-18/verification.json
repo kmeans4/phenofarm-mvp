@@ -1,0 +1,76 @@
+{
+  "status": "implemented_and_locally_verified",
+  "production_activation": "Pending mail provider and verified sender selection, followed by authorized external delivery proof. The production storage/database release intentionally retains the previous sign-in behavior; new recovery and email-verification enforcement remains undeployed.",
+  "local_database": "phenofarm_auth_20260918",
+  "app_port": 3150,
+  "mail_sink_port": 3151,
+  "security_and_ui_cases": 16,
+  "initial_suite": {
+    "passed": 15,
+    "failed": 0,
+    "seconds": 23.9
+  },
+  "added_all_role_case": "passed",
+  "expanded_mobile_desktop_flows": {
+    "passed": 2,
+    "failed": 0,
+    "seconds": 9.4
+  },
+  "source_checks": [
+    "Prisma client generation passed",
+    "Additive migration applied to isolated auth clone",
+    "Focused ESLint passed",
+    "Standalone TypeScript passed before final copy-only change; aggregate verification coordinated by root",
+    "Independent auth/security review by dispensary agent found no actionable bypass"
+  ],
+  "visual_evidence": {
+    "viewports": [
+      360,
+      1440
+    ],
+    "screenshots": [
+      "change-email-1440.png",
+      "change-email-360.png",
+      "confirm-email-1440.png",
+      "confirm-email-360.png",
+      "request-reset-1440.png",
+      "request-reset-360.png",
+      "reset-1440.png",
+      "reset-360.png",
+      "reset-final-1440.png",
+      "reset-final-360.png",
+      "used-link-1440.png",
+      "used-link-360.png",
+      "verify-1440.png",
+      "verify-360.png"
+    ],
+    "all_images_inspected": true,
+    "final_copy_screenshots": [
+      "reset-final-360.png",
+      "reset-final-1440.png"
+    ]
+  },
+  "limitations": [
+    "Chrome viewport emulation; no physical-device testing",
+    "No external email sent",
+    "Mail transport has not yet been configured or proven in production"
+  ],
+  "aggregateVerification": {
+    "command": "npm run verify",
+    "status": "passed",
+    "includes": [
+      "Environment documentation",
+      "ESLint",
+      "Prisma generation",
+      "Next.js production build",
+      "TypeScript"
+    ]
+  },
+  "existingWorkflowRegressions": {
+    "passed": 63,
+    "failed": 0,
+    "seconds": 52,
+    "localDatabaseOnly": true
+  },
+  "production_checkpoint_date": "2026-09-18"
+}

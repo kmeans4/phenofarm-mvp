@@ -1,0 +1,80 @@
+- main
+  - generic
+    - generic
+    - link "PF PhenoFarm" [ref=e616]
+      - StaticText "PF"
+      - StaticText "PhenoFarm"
+    - generic
+      - paragraph
+        - StaticText "JOIN THE LICENSED NETWORK"
+      - heading "Build your verified profile." [level=1, ref=e617]
+      - paragraph
+        - StaticText "One account covers grower catalog or dispensary buying workflows."
+      - StaticText "Marketplace identity from your business profile"
+      - StaticText "License-aware dispensary ordering gates"
+      - StaticText "Cultivator subscription billing only"
+    - paragraph
+      - StaticText "Already registered?"
+      - link "Sign in" [ref=e618]
+  - heading "Create your account" [level=2, ref=e615]
+  - paragraph
+    - StaticText "Already have an account?"
+    - link "Sign in" [ref=e619]
+  - form
+    - group "Personal contact"
+      - Legend
+        - StaticText "Personal contact"
+      - LabelText
+        - StaticText "First Name *"
+      - textbox "First Name *" [required, ref=e623]
+      - LabelText
+        - StaticText "Last Name *"
+      - textbox "Last Name *" [required, ref=e624]
+    - group "Business profile"
+      - Legend
+        - StaticText "Business profile"
+      - LabelText
+        - StaticText "Business Name"
+      - textbox "Business Name" [ref=e625]
+      - paragraph
+        - StaticText "Shown to marketplace partners — defaults to your name if left blank."
+      - LabelText
+        - StaticText "Business Type *"
+      - combobox "Business Type *" [expanded=false, ref=e626]: Cannabis Grower
+        - MenuListPopup
+          - option "Cannabis Grower" [selected, ref=e633]
+          - option "Dispensary/Retailer" [ref=e634]
+    - group "Account security"
+      - Legend
+        - StaticText "Account security"
+      - LabelText
+        - StaticText "Email address *"
+      - textbox "Email address *" [required, ref=e627]
+      - LabelText
+        - StaticText "Password *"
+      - generic
+        - textbox "Password *" [required, ref=e629]
+        - button "Show password" [ref=e630]
+      - paragraph
+        - StaticText "Use at least 12 characters."
+      - LabelText
+        - StaticText "Confirm Password *"
+      - generic
+        - textbox "Confirm Password *" [required, ref=e631]
+        - button "Show password" [ref=e632]
+      - paragraph
+        - StaticText "Confirm your password."
+    - button "Create account" [ref=e620]
+  - generic
+    - StaticText "By signing up, you agree to the"
+    - link "Terms" [ref=e621]
+    - StaticText "and"
+    - link "Privacy Policy" [ref=e622]
+    - StaticText "."
+- button "Open Next.js Dev Tools" [ref=e628]
+  - generic
+    - StaticText "Compiling"
+    - StaticText "."
+    - StaticText "."
+    - StaticText "."
+- alert

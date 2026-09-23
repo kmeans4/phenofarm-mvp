@@ -1,0 +1,81 @@
+{
+  "summary": [
+    "All 216 original finding IDs are covered exactly once, including all 9 high-priority findings.",
+    "48 pages checked at 1440px desktop and 390px mobile: 96 views, no page errors or horizontal overflow. All five redirects passed.",
+    "81 distinct workflow and regression tests passed across targeted local runs. Real upload/storage and development-only seed checks ran against the development server; all tests used the isolated database.",
+    "Critical buyer dialogs and list controls also passed at 360px. Admin responsive layouts, heading sizes, badges and confirmations passed at 1440, 1024, 768, 390 and 360px.",
+    "Landing page checked with normal and reduced motion at 1440/390px: four clean hydration and overflow checks.",
+    "Final npm run verify passed: environment validation, lint, Prisma generation and production build."
+  ],
+  "environment": {
+    "url": "http://localhost:3144",
+    "database": "phenofarm_ui_fixes_20260917",
+    "production_deployed": false,
+    "git_published": false,
+    "metrc": "Excluded; integration behavior unchanged"
+  },
+  "workflow_tests": [
+    {
+      "file": "tests/buyer-ui-layout-regressions.spec.ts",
+      "passed": 5,
+      "runtime": "production"
+    },
+    {
+      "file": "tests/cursor-review-regressions.spec.ts",
+      "passed": 14,
+      "runtime": "production"
+    },
+    {
+      "file": "tests/dispensary-remediation.spec.ts",
+      "passed": 14,
+      "runtime": "production"
+    },
+    {
+      "file": "tests/profile-hardening.spec.ts",
+      "passed": 5,
+      "runtime": "production"
+    },
+    {
+      "file": "tests/grower-review-regressions.spec.ts",
+      "passed": 18,
+      "runtime": "production; server-page hydration check also passed an isolated rerun"
+    },
+    {
+      "file": "tests/messaging-workflow.spec.ts",
+      "passed": 3,
+      "runtime": "production"
+    },
+    {
+      "file": "tests/ui-grower-data-regressions.spec.ts",
+      "passed": 3,
+      "runtime": "production"
+    },
+    {
+      "file": "tests/ui-notification-context.spec.ts",
+      "passed": 1,
+      "runtime": "production"
+    },
+    {
+      "file": "tests/ui-shared-density-regressions.spec.ts",
+      "passed": 6,
+      "runtime": "production"
+    },
+    {
+      "file": "tests/order-inventory-and-import.spec.ts",
+      "passed": 10,
+      "runtime": "development; real local file storage"
+    },
+    {
+      "file": "tests/review-admin-and-product-apis.spec.ts",
+      "passed": 2,
+      "runtime": "development; local storage and production-disabled seed guard"
+    }
+  ],
+  "build_id": "JZA3rlQU3f7l3vqfRoILw",
+  "notes": [
+    "Original screenshots and findings were preserved. Fix evidence is in remediation/.",
+    "Earlier test runs exposed obsolete labels after copy changes; assertions were updated to exercise the same behaviors. A previously skipped license-denial test now submits a populated draft to a mocked denial and verifies the error.",
+    "Reduced-motion homepage hydration mismatches were fixed. Intermittent hydration warnings during a concurrent run were not reproduced in fresh diagnostic sessions, focused production reruns or the final serialized 96-view sweep.",
+    "No production provider, live billing, Git publication or deployment claim is made."
+  ]
+}

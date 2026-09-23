@@ -1,0 +1,37 @@
+{
+  "slug": "10-strain-edit",
+  "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+  "routePattern": "/grower/strains/[id]/edit",
+  "pass1": {
+    "inspected": [
+      "pass-1/10-strain-edit-desktop.png",
+      "pass-1/10-strain-edit-mobile.png"
+    ],
+    "strengths": [
+      "Name/type are prefilled and Save Changes is concise; desktop width is appropriate for reading/editing."
+    ],
+    "issues": [
+      {
+        "key": "strain-edit-repeated-help",
+        "priority": "medium",
+        "viewport": "desktop and mobile",
+        "observation": "Editing an existing Hybrid still displays all five definitions and three levels of repeated \u2018strain details\u2019 wording. The help block consumes216px on mobile and pushes optional fields below the fold.",
+        "recommendation": "Apply the add-form simplification here: \u2018Edit strain\u2019, then fields without another details heading; show only selected-type help on demand. Use \u2018Name\u2019, \u2018Type\u2019, \u2018Lineage\u2019 and define the different purposes of description and notes."
+      }
+    ],
+    "limits": [
+      "No values edited or save submitted; sparse optional fields reflect the synthetic fixture."
+    ]
+  },
+  "pass2": {
+    "inspected": [
+      "pass-2/10-strain-edit-desktop.png",
+      "pass-2/10-strain-edit-mobile.png"
+    ],
+    "notes": "Fresh desktop/mobile revisits confirm the same five-definition helper block is displayed even with Hybrid selected, adding about 216px on mobile. The selected value and form labels remain readable. No edit or save occurred.",
+    "confirmedIssueKeys": [
+      "strain-edit-repeated-help"
+    ],
+    "newIssues": []
+  }
+}

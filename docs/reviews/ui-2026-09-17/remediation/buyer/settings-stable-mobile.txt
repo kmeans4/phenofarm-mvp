@@ -1,0 +1,88 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e2129]
+- button "Notifications" [expanded=false, ref=e2130]
+  - StaticText "22"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e2131]
+- main
+  - sectionheader
+    - heading "Settings" [level=1, ref=e2133]
+    - paragraph
+      - StaticText "Manage your account and preferences"
+  - generic
+    - generic
+      - heading "License & verification" [level=2, ref=e2136]
+      - paragraph
+        - StaticText "Verified through 12/31/2027"
+      - LabelText
+        - StaticText "License number *"
+      - textbox "License number *" [ref=e2137]: VT-RTL-2024-001
+        - StaticText "VT-RTL-2024-001"
+      - LabelText
+        - StaticText "State *"
+      - combobox "State *" [expanded=false, ref=e2138]: Vermont (VT)
+        - MenuListPopup
+          - option "Vermont (VT)" [selected, ref=e2150]
+      - LabelText
+        - StaticText "Expiry date (recommended)"
+      - Date "Expiry date (recommended)": 2027-12-31
+        - generic
+          - spinbutton "Month Month" [ref=e2151]: 12
+            - StaticText "12"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e2152]: 31
+            - StaticText "31"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e2153]: 2027
+            - StaticText "2027"
+        - button "Show date picker" [ref=e2149]
+    - generic
+      - heading "Business profile" [level=2, ref=e2139]
+      - LabelText
+        - StaticText "Business Name *"
+      - textbox "Business Name *" [ref=e2140]: Green Vermont Dispensary
+        - StaticText "Green Vermont Dispensary"
+      - LabelText
+        - StaticText "Contact Name (optional)"
+      - textbox "Contact Name (optional)" [ref=e2141]: Sarah Cannabis
+        - StaticText "Sarah Cannabis"
+      - LabelText
+        - StaticText "Email *"
+      - textbox "Email *" [ref=e2142]: dispensary@greenvermont.com
+        - StaticText "dispensary@greenvermont.com"
+      - LabelText
+        - StaticText "Phone (optional)"
+      - textbox "Phone (optional)" [ref=e2143]: (802) 555-0145
+        - StaticText "(802) 555-0145"
+      - LabelText
+        - StaticText "Address"
+      - generic
+        - textbox "Address" [ref=e2154]: 456 Market Street
+          - StaticText "456 Market Street"
+        - image
+      - paragraph
+        - StaticText "Type 3+ characters to see suggestions (includes city, state, ZIP)"
+      - LabelText
+        - StaticText "Website (optional)"
+      - textbox "Website (optional)" [ref=e2144]: https://greenvermontdispensary.com
+        - StaticText "https://greenvermontdispensary.com"
+      - LabelText
+        - StaticText "Description (optional)"
+      - textbox "Description (optional)" [ref=e2145]: Vermont's premier cannabis retail destination
+        - StaticText "Vermont's premier cannabis retail destination"
+      - paragraph
+        - StaticText "45/500"
+    - generic
+      - heading "Branding" [level=2, ref=e2146]
+      - image
+      - StaticText "No logo"
+      - button "Upload Logo" [ref=e2147]
+      - paragraph
+        - StaticText "JPG, PNG, or WebP. Max 500KB."
+    - heading "Account" [level=2, ref=e2134]
+    - button "Sign out" [ref=e2135]
+    - button "Save settings" [ref=e2148]
+- button "Open messages" [ref=e2132]
+- region "Notifications alt+T" [ref=e2128]
+- alert

@@ -1,0 +1,33 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e544] clickable [onclick]
+  - button "Open messages" [ref=e548]
+- button "Search" [ref=e545]
+- button "Notifications" [expanded=false, ref=e546]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e547]
+- main
+  - sectionheader
+    - heading "Add customer" [level=1, ref=e549]
+  - form
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox "Business Name *" [required, ref=e550]
+    - LabelText
+      - StaticText "Contact Name *"
+    - textbox "Contact Name *" [required, ref=e551]
+    - LabelText
+      - StaticText "Email *"
+    - textbox "Email *" [required, ref=e552]
+    - LabelText
+      - StaticText "Phone *"
+    - textbox "Phone *" [required, ref=e553]
+    - group
+      - DisclosureTriangle "Address & license (optional)" [expanded=false]
+        - StaticText "Address & license (optional)"
+    - link "Cancel" [ref=e554]
+    - button "Add customer" [disabled, ref=e555]
+- region "Notifications alt+T" [ref=e543]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e556]
+  - image
+- alert

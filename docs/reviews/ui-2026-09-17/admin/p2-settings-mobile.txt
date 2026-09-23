@@ -1,0 +1,114 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "ADMIN"
+- button "Notifications" [expanded=false, ref=e214]
+- button "Open Admin Panel navigation menu" [expanded=false, ref=e215]
+- main
+  - sectionheader
+    - heading "Platform Settings" [level=1, ref=e217]
+    - paragraph
+      - StaticText "Read-only operations view for billing, policy, and support configuration. Changes are made in provider settings or code so admins are not shown controls that silently fail."
+      - StaticText "Last checked "
+      - StaticText "Sep 17, 2026, 1:45 PM"
+  - paragraph
+    - StaticText "PhenoFarm subscription revenue only"
+  - paragraph
+    - StaticText "Cultivators pay PhenoFarm for software subscriptions. Wholesale order payment and settlement are coordinated directly between businesses outside the app."
+  - generic
+    - heading "Support Profile" [level=2, ref=e218]
+    - paragraph
+      - StaticText "Displayed policy and support facts for operators."
+    - DescriptionList
+      - term "Platform"
+      - definition
+        - StaticText "PhenoFarm"
+      - term "Support email"
+      - definition
+        - link "support@phenofarm.com" [ref=e221]
+        - button "Copy support email" [ref=e222]
+          - StaticText "Copy"
+      - term "Wholesale settlement"
+      - definition
+        - StaticText "Handled directly between buyer and grower"
+      - term "In-app payment flow"
+      - definition
+        - StaticText "Cultivator subscriptions paid to PhenoFarm"
+  - generic
+    - heading "Cultivator Billing Configuration" [level=2, ref=e219]
+    - paragraph
+      - StaticText "Provider readiness for Stripe Billing subscriptions."
+    - paragraph
+      - StaticText "Stripe secret key"
+    - paragraph
+      - StaticText "Configured"
+    - StaticText "Ready"
+    - paragraph
+      - StaticText "Required to start cultivator subscription Checkout."
+    - paragraph
+      - StaticText "Stripe webhook secret"
+    - paragraph
+      - StaticText "Needs provider setup"
+    - StaticText "Review"
+    - paragraph
+      - StaticText "Required to keep subscription status synced after checkout and portal updates."
+    - paragraph
+      - StaticText "Configure in Vercel Project Settings > Environment Variables, then redeploy."
+    - paragraph
+      - StaticText "Pro price ID"
+    - paragraph
+      - StaticText "Needs provider setup"
+    - StaticText "Review"
+    - paragraph
+      - StaticText "Enables the Pro cultivator plan button in grower settings."
+    - paragraph
+      - StaticText "Configure in Vercel Project Settings > Environment Variables, then redeploy."
+    - paragraph
+      - StaticText "Business price ID"
+    - paragraph
+      - StaticText "Needs provider setup"
+    - StaticText "Review"
+    - paragraph
+      - StaticText "Enables the Business cultivator plan button in grower settings."
+    - paragraph
+      - StaticText "Configure in Vercel Project Settings > Environment Variables, then redeploy."
+    - paragraph
+      - StaticText "Wholesale payments"
+    - paragraph
+      - StaticText "Not processed in PhenoFarm"
+    - StaticText "Policy"
+    - paragraph
+      - StaticText "Order values are operational records only; buyer-seller settlement stays outside the app."
+  - generic
+    - heading "Operational Policies" [level=2, ref=e220]
+    - paragraph
+      - StaticText "Current admin rules that affect launch readiness."
+    - paragraph
+      - StaticText "License review"
+    - paragraph
+      - StaticText "Admin-controlled"
+    - StaticText "Policy"
+    - paragraph
+      - StaticText "Use the grower and dispensary review queues to verify license status before marketplace access."
+    - paragraph
+      - StaticText "Notification templates"
+    - paragraph
+      - StaticText "Code-managed"
+    - StaticText "Policy"
+    - paragraph
+      - StaticText "Transactional message copy should be changed in code until a durable settings store exists."
+    - paragraph
+      - StaticText "Demo accounts"
+    - paragraph
+      - StaticText "Enabled by request"
+    - StaticText "Review"
+    - paragraph
+      - StaticText "Demo access is intentionally retained for now. Review before any public production launch."
+  - paragraph
+    - StaticText "Need to update subscription prices?"
+  - paragraph
+    - StaticText "Update Stripe price IDs in the deployment environment, then redeploy before testing checkout."
+  - link "Admin dashboard" [ref=e216]
+- region "Notifications alt+T" [ref=e213]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e223]
+  - image
+- alert

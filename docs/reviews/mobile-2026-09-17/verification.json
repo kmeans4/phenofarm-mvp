@@ -1,0 +1,65 @@
+{
+  "scope": "Local mobile UI review and fixes; METRC excluded. No commit, push, migration or deployment.",
+  "summary": "63 findings addressed. Lint, TypeScript and production build passed. All 57 distinct workflow regressions, 4 customer interaction checks and 5 redirects passed. 48 pages checked at 360, 390, 430 and 1440 pixels with no page overflow or runtime errors; 12 affected pages repeated after final corrections.",
+  "database": "Isolated local review clone; no production database used.",
+  "build": {
+    "aggregate": "npm run verify passed",
+    "finalBuild": "npm run build passed after final visual refinements",
+    "scopedLint": "Every final correction passed focused ESLint",
+    "diffCheck": "git diff --check passed"
+  },
+  "workflows": {
+    "distinctCasesPassed": 57,
+    "failed": 0,
+    "initialRunPassed": 56,
+    "initialRunSeconds": 51.2,
+    "finalTargetedRunPassed": 13,
+    "finalTargetedRunSeconds": 20.5,
+    "repeatedCases": 12,
+    "newFinalCase": "Messages Escape restores focus for both roles and notification panels hide floating controls",
+    "specs": [
+      "buyer-ui-layout-regressions",
+      "dispensary-remediation",
+      "grower-review-regressions",
+      "profile-hardening",
+      "ui-grower-data-regressions",
+      "messaging-workflow",
+      "ui-shared-density-regressions"
+    ]
+  },
+  "additionalInteractions": {
+    "customerChecks": 4,
+    "source": "customer-interaction-checks.json",
+    "headerWidths": [
+      320,
+      360,
+      430,
+      1440
+    ],
+    "customerBreakpointWidths": [
+      360,
+      700,
+      768
+    ],
+    "notFound": "404 recovery state also inspected and regression tested."
+  },
+  "routes": {
+    "pages": 48,
+    "widths": [
+      360,
+      390,
+      430,
+      1440
+    ],
+    "views": 192,
+    "affectedPageRepeatViews": 48,
+    "redirects": 5,
+    "errors": 0,
+    "overflows": 0,
+    "phoneFieldsBelow16px": 0
+  },
+  "limits": [
+    "Chrome viewport emulation; physical iOS and Android devices were not used.",
+    "This verifies the local source and isolated build, not a deployed release."
+  ]
+}

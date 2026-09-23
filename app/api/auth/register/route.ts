@@ -1,86 +1,65 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest } from 'next/server';
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { db } from '@/lib/db';
-import { logApiError } from '@/lib/api-response';
+import { consumeAuthLimit, requestIp } from '@/lib/auth-rate-limit';
+import { accountMailConfigured } from '@/lib/account-mail';
+import { emailVerificationRequired } from '@/lib/auth-rollout.cjs';
+import { accountBody, accountJson } from '@/lib/account-security-api';
+import { ACCOUNT_REQUEST_MESSAGE, passwordRequirement, normalizeAccountEmail, requestAccountLink, validAccountEmail, validNewPassword } from '@/lib/account-security';
 
-/**
- * POST /api/auth/register
- *
- * Creates a user account with a grower or dispensary business profile.
- * New dispensaries start with licenseStatus pending_review and cannot
- * submit order requests until an admin verifies the license.
- */
+export const runtime = 'nodejs';
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json().catch(() => null);
-
-    const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : '';
-    const password = typeof body?.password === 'string' ? body.password : '';
-    const firstName = typeof body?.firstName === 'string' ? body.firstName.trim() : '';
-    const lastName = typeof body?.lastName === 'string' ? body.lastName.trim() : '';
-    const businessName = typeof body?.businessName === 'string' ? body.businessName.trim() : '';
-    const businessType = body?.businessType === 'dispensary' ? 'dispensary' : body?.businessType === 'grower' ? 'grower' : null;
-
-    if (!email || !email.includes('@')) {
-      return NextResponse.json({ error: 'A valid email address is required' }, { status: 400 });
-    }
-    if (password.length < 6) {
-      return NextResponse.json({ error: 'Password must be at least 6 characters' }, { status: 400 });
-    }
-    if (!businessType) {
-      return NextResponse.json({ error: 'Choose grower or dispensary' }, { status: 400 });
-    }
-
-    const existing = await db.user.findUnique({ where: { email }, select: { id: true } });
-    if (existing) {
-      return NextResponse.json({ error: 'An account with this email already exists' }, { status: 409 });
-    }
-
-    const passwordHash = await bcrypt.hash(password, 10);
+    // Keep public account creation closed while existing pilot accounts migrate.
+    if (!emailVerificationRequired()) return accountJson({ error: 'Sign-up is temporarily unavailable. Please try again later.' }, 503);
+    const body = await accountBody(request);
+    if (!body) return accountJson({ error: 'Invalid sign-up request.' }, 400);
+    const email = normalizeAccountEmail(body.email);
+    const password = body.password;
+    const firstName = typeof body.firstName === 'string' ? body.firstName.trim() : '';
+    const lastName = typeof body.lastName === 'string' ? body.lastName.trim() : '';
+    const businessName = typeof body.businessName === 'string' ? body.businessName.trim() : '';
+    const businessType = body.businessType === 'dispensary' ? 'dispensary' : body.businessType === 'grower' ? 'grower' : null;
     const name = [firstName, lastName].filter(Boolean).join(' ') || businessName;
     const resolvedBusinessName = businessName || name;
-
-    if (!resolvedBusinessName) {
-      return NextResponse.json({ error: 'Business name or contact name is required' }, { status: 400 });
+    if (!validAccountEmail(email)) return accountJson({ error: 'A valid email address is required.' }, 400);
+    if (!validNewPassword(password)) return accountJson({ error: passwordRequirement(password) }, 400);
+    if (!businessType) return accountJson({ error: 'Choose grower or dispensary.' }, 400);
+    if (!resolvedBusinessName || resolvedBusinessName.length > 200 || name.length > 200) return accountJson({ error: 'Business name or contact name is required (up to 200 characters).' }, 400);
+    const [ipAllowed, emailAllowed] = await Promise.all([
+      consumeAuthLimit('register-ip', requestIp(Object.fromEntries(request.headers)), 10, 3600),
+      consumeAuthLimit('register-email', email, 4, 3600),
+    ]);
+    if (!ipAllowed || !emailAllowed) return accountJson({ error: 'Too many sign-up attempts. Try again in an hour.' }, 429);
+    if (!accountMailConfigured()) return accountJson({ error: 'Email delivery is temporarily unavailable. Please try again later.' }, 503);
+    // Complete durable account/profile creation before acknowledging success.
+    // Hash on both paths and keep the same response for existing addresses.
+    const passwordHash = await bcrypt.hash(password, 10);
+    try {
+      await db.$transaction(async tx => {
+        const user = await tx.user.create({ data: { email, name, passwordHash, role: businessType === 'grower' ? 'GROWER' : 'DISPENSARY' } });
+        if (businessType === 'grower') {
+          const profile = await tx.grower.create({ data: { userId: user.id, businessName: resolvedBusinessName, contactName: name } });
+          await tx.user.update({ where: { id: user.id }, data: { growerId: profile.id } });
+        } else {
+          const profile = await tx.dispensary.create({ data: { userId: user.id, businessName: resolvedBusinessName, contactName: name } });
+          await tx.user.update({ where: { id: user.id }, data: { dispensaryId: profile.id } });
+        }
+      });
+    } catch (error) {
+      if (!(error instanceof Prisma.PrismaClientKnownRequestError) || error.code !== 'P2002'
+        || !await db.user.findUnique({ where: { email }, select: { id: true } })) throw error;
+      // A concurrent or existing account is never overwritten.
     }
-
-    const user = await db.$transaction(async (tx) => {
-      const created = await tx.user.create({
-        data: {
-          email,
-          name,
-          passwordHash,
-          role: businessType === 'grower' ? 'GROWER' : 'DISPENSARY',
-        },
-      });
-
-      if (businessType === 'grower') {
-        const grower = await tx.grower.create({
-          data: {
-            userId: created.id,
-            businessName: resolvedBusinessName,
-            contactName: name,
-          },
-        });
-        return tx.user.update({ where: { id: created.id }, data: { growerId: grower.id } });
-      }
-
-      const dispensary = await tx.dispensary.create({
-        data: {
-          userId: created.id,
-          businessName,
-          contactName: name,
-        },
-      });
-      return tx.user.update({ where: { id: created.id }, data: { dispensaryId: dispensary.id } });
+    // Only delivery is deferred. A failed delivery can be retried through resend.
+    after(async () => {
+      try { await requestAccountLink(email, 'VERIFY_EMAIL'); }
+      catch { console.error('[account-registration]', { code: 'VERIFICATION_DELIVERY_FAILED' }); }
     });
-
-    return NextResponse.json(
-      { success: true, userId: user.id, role: user.role },
-      { status: 201 }
-    );
-  } catch (error) {
-    logApiError('auth.register', error, { route: '/api/auth/register' });
-    return NextResponse.json({ error: 'Failed to create account. Please try again.' }, { status: 500 });
+    return accountJson({ success: true, message: ACCOUNT_REQUEST_MESSAGE }, 201);
+  } catch {
+    return accountJson({ error: 'Unable to process sign-up. Please try again.' }, 503);
   }
 }

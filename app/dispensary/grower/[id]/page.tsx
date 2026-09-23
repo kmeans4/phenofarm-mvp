@@ -1,275 +1,205 @@
-import { notFound } from "next/navigation";
+import { getBuyerCatalog } from '@/lib/buyer-catalog';
+import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
-import { db } from "@/prisma/client";
+import { db } from "@/lib/db";
+import { getAuthSession } from "@/lib/auth-helpers";
 import { 
   MapPin, 
   Phone, 
   Globe, 
   CheckCircle, 
-  Package, 
-  TrendingUp, 
-  MessageCircle,
+  Package,
   ArrowLeft,
   Shield
 } from "lucide-react";
+import { PageHeader } from "@/app/components/ui/PageHeader";
+import { DEFAULT_COMMERCIAL_TERMS } from "@/lib/ux-workflow";
 import GrowerShopContent from "./GrowerShopContent";
+import { marketplaceGrowerWhere } from "@/lib/license";
 
 interface GrowerPageProps {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ search?: string }>;
 }
 
 async function getGrowerWithProducts(id: string) {
-  const grower = await db.grower.findUnique({
-    where: { id },
-    include: {
-      products: {
-        where: { 
-          isAvailable: true,
-          isDeleted: false 
-        },
-        include: {
-          strain: true,
-          batch: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
+  const [grower, fulfilledRequests] = await Promise.all([
+    db.grower.findFirst({
+      where: { id, ...marketplaceGrowerWhere() },
+      select: {
+        id: true, businessName: true, description: true, logo: true, isVerified: true,
+        city: true, state: true, phone: true, website: true, licenseNumber: true,
+        commercialMinimumOrder: true, commercialFulfillmentMethods: true, commercialFulfillmentRegion: true,
+        commercialPaymentTerms: true, commercialResponseWindow: true, commercialContactNote: true,
       },
-      user: {
-        select: {
-          email: true,
-        },
+    }),
+    db.order.count({
+      where: {
+        growerId: id,
+        status: "DELIVERED",
       },
-      _count: {
-        select: {
-          products: {
-            where: {
-              isAvailable: true,
-              isDeleted: false,
-            },
-          },
-          orders: true,
-        },
-      },
-    },
-  });
+    }),
+  ]);
 
-  return grower;
+  return grower ? { ...grower, fulfilledRequests } : null;
 }
 
-function serializeShopProducts(products: NonNullable<Awaited<ReturnType<typeof getGrowerWithProducts>>>['products']) {
-  return products.map((product) => ({
-    id: product.id,
-    name: product.name,
-    price: Number(product.price),
-    isPriceVisible: product.isPriceVisible,
-    strain: product.strain ? { name: product.strain.name } : null,
-    productType: product.productType,
-    subType: product.subType,
-    unit: product.unit,
-    batch: product.batch ? { thc: product.batch.thc ?? null } : null,
-    thcLegacy: product.thcLegacy,
-    inventoryQty: product.inventoryQty,
-    images: product.images,
-    description: product.description,
-  }));
+function getInitials(name: string) {
+  const initials = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part.charAt(0).toUpperCase())
+    .join("");
+
+  return initials || "PF";
 }
 
-export default async function GrowerPage({ params }: GrowerPageProps) {
+function displayTerm(value: string | null | undefined, fallback: string) {
+  return value?.trim() || fallback;
+}
+
+export default async function GrowerPage({ params, searchParams }: GrowerPageProps) {
+  const session = await getAuthSession();
+  if (!session) redirect('/auth/sign_in');
+  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) redirect('/dashboard');
   const { id } = await params;
-  const grower = await getGrowerWithProducts(id);
+  const query = await searchParams;
+  const [grower, catalog] = await Promise.all([
+    getGrowerWithProducts(id),
+    getBuyerCatalog(session.user.dispensaryId, new URLSearchParams({ growerId: id, limit: '24', search: query.search || '' })),
+  ]);
 
   if (!grower) {
     notFound();
   }
 
+  const website = (() => { try { const url = new URL(grower.website || ''); return ['http:', 'https:'].includes(url.protocol) ? url.href : null; } catch { return null; } })();
+
   // Calculate stats
-  const totalProducts = grower._count.products;
-  const totalOrders = grower._count.orders;
-  const avgThc = grower.products.length > 0
-    ? grower.products.reduce((sum, p) => sum + (p.batch?.thc || p.thcLegacy || 0), 0) / grower.products.length
-    : 0;
+  const fulfilledRequests = grower.fulfilledRequests;
 
   // Get unique product types
-  const productTypes = [...new Set(grower.products.map(p => p.productType).filter(Boolean))];
+  const commercialTerms = {
+    minimumOrder: displayTerm(grower.commercialMinimumOrder, DEFAULT_COMMERCIAL_TERMS.minimumOrder),
+    fulfillmentMethods: displayTerm(grower.commercialFulfillmentMethods, DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods),
+    fulfillmentRegion: displayTerm(grower.commercialFulfillmentRegion, DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion),
+    paymentTerms: displayTerm(grower.commercialPaymentTerms, DEFAULT_COMMERCIAL_TERMS.paymentTerms),
+    responseWindow: displayTerm(grower.commercialResponseWindow, DEFAULT_COMMERCIAL_TERMS.responseWindow),
+    contactNote: displayTerm(grower.commercialContactNote, DEFAULT_COMMERCIAL_TERMS.contactNote),
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Back Navigation */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link 
-            href="/dispensary/catalog" 
-            className="inline-flex items-center text-sm text-gray-600 hover:text-green-700 transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Catalog
-          </Link>
-        </div>
-      </div>
+    <div className="space-y-4 sm:space-y-6 pb-20 sm:pb-24">
+      <PageHeader
+        title={grower.businessName}
+        description={grower.description || "Browse available products and request wholesale terms directly from this grower."}
+        actions={
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <Link
+              href="/dispensary/catalog"
+              className="inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 transition-colors hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              Catalog
+            </Link>
+            <Link
+              href="#shop-products"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+            >
+              <Package className="h-4 w-4" />
+              Browse products
+            </Link>
+          </div>
+        }
+      />
 
-      {/* Grower Header / Banner */}
-      <div className="bg-gradient-to-r from-green-900 to-green-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
-            {/* Logo / Avatar */}
-            <div className="flex-shrink-0">
-              {grower.logo ? (
-                <img 
-                  src={grower.logo} 
-                  alt={grower.businessName}
-                  className="w-32 h-32 rounded-2xl object-cover border-4 border-white/20 shadow-lg"
-                />
-              ) : (
-                <div className="w-32 h-32 rounded-2xl bg-white/10 backdrop-blur flex items-center justify-center border-4 border-white/20">
-                  <span className="text-4xl font-bold text-white/80">
-                    {grower.businessName.charAt(0).toUpperCase()}
-                  </span>
-                </div>
+      <div className="rounded-xl border border-green-900/20 bg-gradient-to-r from-green-900 to-green-700 p-4 text-white shadow-sm sm:p-6">
+        <div className="flex items-start gap-4 sm:items-center">
+          <div className="flex-shrink-0">
+            {grower.logo ? (
+              // eslint-disable-next-line @next/next/no-img-element -- Existing logos can use legacy inline or local URLs until the Blob backfill.
+              <img
+                src={grower.logo}
+                alt={grower.businessName}
+                width={112}
+                height={112}
+                className="h-14 w-14 rounded-2xl border-4 border-white/20 object-cover shadow-lg sm:h-20 sm:w-20"
+              />
+            ) : (
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border-4 border-white/20 bg-gradient-to-br from-emerald-500 to-green-800 shadow-lg sm:h-20 sm:w-20">
+                <span className="text-3xl font-bold text-white">
+                  {getInitials(grower.businessName)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            {grower.isVerified && (
+              <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-green-500/20 px-3 py-1">
+                <CheckCircle className="h-5 w-5 text-green-300" />
+                <span className="text-sm font-medium text-green-100">Verified</span>
+              </div>
+            )}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-green-100">
+              {grower.city && grower.state && (
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-4 w-4" />
+                  {grower.city}, {grower.state}
+                </span>
+              )}
+              {grower.phone && (
+                <span className="flex items-center gap-1">
+                  <Phone className="h-4 w-4" />
+                  {grower.phone}
+                </span>
+              )}
+              {website && (
+                <a
+                  href={website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1 rounded-sm transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-green-800"
+                >
+                  <Globe className="h-4 w-4" />
+                  Website
+                </a>
+              )}
+              {grower.licenseNumber && (
+                <span className="flex items-center gap-1">
+                  <Shield className="h-4 w-4" />
+                  License: {grower.licenseNumber}
+                </span>
               )}
             </div>
-
-            {/* Grower Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-2">
-                <h1 className="text-3xl md:text-4xl font-bold">{grower.businessName}</h1>
-                {grower.isVerified && (
-                  <div className="flex items-center gap-1 bg-green-500/20 px-3 py-1 rounded-full">
-                    <CheckCircle className="w-5 h-5 text-green-300" />
-                    <span className="text-sm font-medium text-green-100">Verified</span>
-                  </div>
-                )}
-              </div>
-
-              {grower.description && (
-                <p className="text-green-100 text-lg max-w-2xl mb-4">
-                  {grower.description}
-                </p>
-              )}
-
-              {/* Contact Info */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-green-100">
-                {grower.city && grower.state && (
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-4 h-4" />
-                    {grower.city}, {grower.state}
-                  </span>
-                )}
-                {grower.phone && (
-                  <span className="flex items-center gap-1">
-                    <Phone className="w-4 h-4" />
-                    {grower.phone}
-                  </span>
-                )}
-                {grower.website && (
-                  <a 
-                    href={grower.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 hover:text-white transition-colors"
-                  >
-                    <Globe className="w-4 h-4" />
-                    Website
-                  </a>
-                )}
-                {grower.licenseNumber && (
-                  <span className="flex items-center gap-1">
-                    <Shield className="w-4 h-4" />
-                    License: {grower.licenseNumber}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex flex-col gap-3">
-              <button className="inline-flex items-center justify-center gap-2 bg-white text-green-900 px-6 py-3 rounded-lg font-semibold hover:bg-green-50 transition-colors">
-                <MessageCircle className="w-5 h-5" />
-                Contact Grower
-              </button>
-              <button className="inline-flex items-center justify-center gap-2 bg-green-600/30 text-white border border-green-400/30 px-6 py-3 rounded-lg font-semibold hover:bg-green-600/50 transition-colors">
-                Follow Shop
-              </button>
-            </div>
           </div>
         </div>
       </div>
 
-      {/* Stats Bar */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 py-6">
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2 text-gray-500 mb-1">
-                <Package className="w-4 h-4" />
-                <span className="text-sm">Products</span>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{totalProducts}</p>
-            </div>
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2 text-gray-500 mb-1">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm">Orders Filled</span>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{totalOrders}</p>
-            </div>
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2 text-gray-500 mb-1">
-                <span className="text-sm">Avg THC</span>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">
-                {avgThc > 0 ? `${avgThc.toFixed(1)}%` : "N/A"}
-              </p>
-            </div>
-            <div className="text-center md:text-left">
-              <div className="flex items-center justify-center md:justify-start gap-2 text-gray-500 mb-1">
-                <span className="text-sm">Categories</span>
-              </div>
-              <p className="text-2xl font-bold text-gray-900">{productTypes.length}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <p className="text-sm text-gray-600">
+        {commercialTerms.fulfillmentMethods === DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods ? 'Pickup or delivery' : commercialTerms.fulfillmentMethods}
+        {' · '}{commercialTerms.minimumOrder}
+      </p>
 
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-          <div className="grid gap-3 md:grid-cols-4">
-            <div className="rounded-lg border border-green-200 bg-green-50 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-green-700">License</p>
-              <p className="mt-1 text-sm font-medium text-green-950">
-                {grower.isVerified ? 'Verified grower' : 'Verification pending'}
-              </p>
-              <p className="mt-1 text-xs text-green-800">{grower.licenseNumber || 'License number not provided'}</p>
-            </div>
-            <div className="rounded-lg border border-blue-200 bg-blue-50 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">Fulfillment Region</p>
-              <p className="mt-1 text-sm font-medium text-blue-950">
-                {[grower.city, grower.state].filter(Boolean).join(', ') || 'Coordinate with grower'}
-              </p>
-              <p className="mt-1 text-xs text-blue-800">Pickup or delivery terms are confirmed per request.</p>
-            </div>
-            <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Order Minimums</p>
-              <p className="mt-1 text-sm font-medium text-amber-950">Shown by product when available</p>
-              <p className="mt-1 text-xs text-amber-800">Use quote messaging for hidden prices or custom terms.</p>
-            </div>
-            <div className="rounded-lg border border-gray-200 bg-gray-50 p-3">
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">Settlement</p>
-              <p className="mt-1 text-sm font-medium text-gray-950">Direct between businesses</p>
-              <p className="mt-1 text-xs text-gray-700">PhenoFarm tracks requests and fulfillment only.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <GrowerShopContent 
-          products={serializeShopProducts(grower.products)}
-          growerName={grower.businessName}
-          growerId={grower.id}
-        />
-      </div>
+      <GrowerShopContent key={grower.id}
+        initialData={catalog}
+        growerName={grower.businessName}
+        growerId={grower.id}
+      />
+      <details className="rounded-xl border border-gray-200 bg-white p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-gray-900">Shop details</summary>
+        <dl className="mt-4 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
+          <div><dt className="text-gray-500">Region</dt><dd>{commercialTerms.fulfillmentRegion}</dd></div>
+          <div><dt className="text-gray-500">Fulfillment</dt><dd>{commercialTerms.fulfillmentMethods}</dd></div>
+          <div><dt className="text-gray-500">Minimum</dt><dd>{commercialTerms.minimumOrder}</dd></div>
+          <div><dt className="text-gray-500">Replies</dt><dd>{commercialTerms.responseWindow === DEFAULT_COMMERCIAL_TERMS.responseWindow ? '1 business day' : commercialTerms.responseWindow}</dd></div>
+          <div><dt className="text-gray-500">Payment terms</dt><dd>{commercialTerms.paymentTerms === DEFAULT_COMMERCIAL_TERMS.paymentTerms ? 'Direct with grower' : commercialTerms.paymentTerms}</dd></div>
+          <div><dt className="text-gray-500">Requests fulfilled</dt><dd>{fulfilledRequests}</dd></div>
+          {commercialTerms.contactNote !== DEFAULT_COMMERCIAL_TERMS.contactNote && <div className="sm:col-span-2"><dt className="text-gray-500">Contact note</dt><dd>{commercialTerms.contactNote}</dd></div>}
+        </dl>
+      </details>
     </div>
   );
 }

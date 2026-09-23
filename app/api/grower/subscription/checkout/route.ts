@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { db } from '@/lib/db';
-import { getSubscriptionPriceId, STRIPE_CONFIG, stripe, type SubscriptionPlan } from '@/lib/stripe';
+import { getSubscriptionPriceId, type SubscriptionPlan } from '@/lib/stripe';
+
+import { beginSubscriptionCheckout, SubscriptionCheckoutError } from '@/lib/subscription-checkout';
 
 const VALID_PLANS = new Set<SubscriptionPlan>(['pro', 'business']);
 
@@ -35,50 +36,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: `Stripe price ID is missing for the ${plan} plan` }, { status: 503 });
   }
 
-  const grower = await db.grower.findUnique({
-    where: { id: user.growerId },
-    select: {
-      id: true,
-      businessName: true,
-      stripeCustomerId: true,
-      user: {
-        select: {
-          email: true,
-          name: true,
-        },
-      },
-    },
-  });
-
-  if (!grower) {
-    return NextResponse.json({ error: 'Grower not found' }, { status: 404 });
+  try {
+    const url = await beginSubscriptionCheckout(user.growerId, plan);
+    return NextResponse.json({ url });
+  } catch (error) {
+    if (error instanceof SubscriptionCheckoutError) return NextResponse.json({ error: error.message }, { status: error.status });
+    return NextResponse.json({ error: 'Billing is temporarily unavailable. Please try again.' }, { status: 503 });
   }
-
-  const checkoutSession = await stripe.checkout.sessions.create({
-    mode: 'subscription',
-    customer: grower.stripeCustomerId || undefined,
-    customer_email: grower.stripeCustomerId ? undefined : grower.user.email,
-    client_reference_id: grower.id,
-    line_items: [{ price: priceId, quantity: 1 }],
-    allow_promotion_codes: true,
-    success_url: STRIPE_CONFIG.getSubscriptionSuccessUrl(),
-    cancel_url: STRIPE_CONFIG.getSubscriptionCancelUrl(),
-    metadata: {
-      growerId: grower.id,
-      plan,
-      businessName: grower.businessName,
-    },
-    subscription_data: {
-      metadata: {
-        growerId: grower.id,
-        plan,
-      },
-    },
-  }) as { url?: string | null };
-
-  if (!checkoutSession.url) {
-    return NextResponse.json({ error: 'Stripe did not return a checkout URL' }, { status: 502 });
-  }
-
-  return NextResponse.json({ url: checkoutSession.url });
 }

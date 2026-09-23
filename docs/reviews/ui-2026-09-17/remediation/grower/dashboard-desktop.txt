@@ -1,0 +1,220 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e717]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e718]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e719]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e727]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e728]
+      - StaticText "Catalog"
+    - link "Products" [ref=e729]
+      - StaticText "Products"
+    - link "Inventory" [ref=e730]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e731]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e732]
+      - StaticText "Strains"
+    - link "Batches" [ref=e733]
+      - StaticText "Batches"
+    - link "Customers" [ref=e734]
+      - StaticText "Customers"
+    - link "Reports" [ref=e735]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e736]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e720]
+- main
+  - sectionheader
+    - paragraph
+      - StaticText "GOOD MORNING"
+    - heading "Vermont Nurseries" [level=1, ref=e737]
+  - generic "Summary"
+    - link "Requests 20" [ref=e738]
+      - paragraph
+        - StaticText "Requests"
+      - paragraph
+        - StaticText "20"
+    - link "Delivered value $450" [ref=e739]
+      - paragraph
+        - StaticText "Delivered value"
+      - paragraph
+        - StaticText "$450"
+    - link "Customers 2" [ref=e740]
+      - paragraph
+        - StaticText "Customers"
+      - paragraph
+        - StaticText "2"
+    - link "Products 3" [ref=e741]
+      - paragraph
+        - StaticText "Products"
+      - paragraph
+        - StaticText "3"
+  - generic
+    - heading "Needs attention" [level=2, ref=e742]
+    - StaticText "18"
+    - paragraph
+      - StaticText "New requests"
+    - paragraph
+      - StaticText "17"
+    - paragraph
+      - StaticText "Unread messages"
+    - paragraph
+      - StaticText "0"
+    - paragraph
+      - StaticText "Cancellations"
+    - paragraph
+      - StaticText "0"
+    - paragraph
+      - StaticText "Status changes"
+    - paragraph
+      - StaticText "1"
+    - article
+      - heading "6 new buyer requests" [level=3, ref=e745]
+      - StaticText "Review all"
+      - paragraph
+        - StaticText "Green Vermont Dispensary has 6 requests waiting for review."
+      - link "Review" [ref=e746]
+    - article
+      - heading "Recently delivered" [level=3, ref=e747]
+      - StaticText "Delivered"
+      - paragraph
+        - StaticText "ORD-20260917-REVIEW for Maple Street Market moved to Delivered."
+      - link "Review" [ref=e748]
+    - link "Review 17 requests →" [ref=e743]
+      - StaticText "Review 17 requests →"
+  - group
+    - DisclosureTriangle "Setup · 3 left" [expanded=false]
+      - StaticText "Setup · 3 left"
+  - heading "Delivered value · 30 days" [level=2, ref=e721]
+  - paragraph
+    - StaticText "Aug 19–Sep 17 · Payment is arranged directly with buyers."
+  - image "Delivered request value bar chart for the last 30 days. Maximum daily value is $450."
+    - generic
+      - StaticText "$0"
+    - StaticText "8/19"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/20"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/21"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/22"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/23"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/24"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/25"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/26"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/27"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/28"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/29"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/30"
+    - generic
+      - StaticText "$0"
+    - StaticText "8/31"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/1"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/2"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/3"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/4"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/5"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/6"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/7"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/8"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/9"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/10"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/11"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/12"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/13"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/14"
+    - generic
+      - StaticText "$450"
+    - StaticText "9/15"
+    - StaticText "$450"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/16"
+    - generic
+      - StaticText "$0"
+    - StaticText "9/17"
+  - heading "Recent activity" [level=2, ref=e722]
+  - combobox "Date range" [expanded=false, ref=e723]: Last 30 Days
+    - MenuListPopup
+      - option "Today" [ref=e749]
+      - option "Last 7 Days" [ref=e750]
+      - option "Last 30 Days" [selected, ref=e751]
+      - option "This Month" [ref=e752]
+      - option "Last Month" [ref=e753]
+      - option "All Time" [ref=e754]
+  - link "All requests" [ref=e724]
+  - link "Request #ORD-20260917-REVIEW From Maple Street Market Sep 13, 8:00 PM" [ref=e725]
+    - paragraph
+      - StaticText "Request #ORD-20260917-REVIEW"
+    - paragraph
+      - StaticText "From Maple Street Market"
+    - paragraph
+      - StaticText "Sep 13, 8:00 PM"
+- generic
+  - button "Open recent activity" [expanded=false, ref=e744]
+  - button "Open messages" [ref=e726]
+- region "Notifications alt+T" [ref=e716]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e755]
+  - image
+- alert

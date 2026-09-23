@@ -1,0 +1,8 @@
+- main
+  - link "PhenoFarm" [ref=e158]
+  - heading "Page not found" [level=1, ref=e159]
+  - paragraph
+    - StaticText "This page may have moved or is no longer available."
+  - link "Dashboard" [ref=e160]
+  - link "Home" [ref=e161]
+- alert

@@ -1,8 +1,6 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from '@/lib/auth';
-import { redirect } from "next/navigation";
-import { CheckCircle2, CircleAlert, ExternalLink, ShieldCheck } from "lucide-react";
-import Link from "next/link";
+import { CheckCircle2, CircleAlert, ShieldCheck } from "lucide-react";
+import { CopyToClipboardButton } from "@/app/admin/components/CopyToClipboardButton";
+import { PageHeader } from "@/app/components/ui/PageHeader";
 
 interface StatusItem {
   label: string;
@@ -12,11 +10,11 @@ interface StatusItem {
 }
 
 const supportProfile = [
-  { label: "Platform", value: "PhenoFarm" },
   { label: "Support email", value: "support@phenofarm.com" },
-  { label: "Wholesale settlement", value: "Handled directly between buyer and grower" },
-  { label: "In-app payment flow", value: "Cultivator subscriptions paid to PhenoFarm" },
 ];
+
+const supportEmail = "support@phenofarm.com";
+const providerSetupLocation = "Configure in Vercel Project Settings > Environment Variables, then redeploy.";
 
 function envStatus(key: string, label: string, helper: string): StatusItem {
   const configured = Boolean(process.env[key]);
@@ -31,24 +29,24 @@ function envStatus(key: string, label: string, helper: string): StatusItem {
 function StatusBadge({ status }: { status: StatusItem["status"] }) {
   if (status === "ready") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
+      <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-800">
         <CheckCircle2 className="h-3.5 w-3.5" />
-        Ready
+        Configured
       </span>
     );
   }
 
   if (status === "attention") {
     return (
-      <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
+      <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-800">
         <CircleAlert className="h-3.5 w-3.5" />
-        Review
+        Needs setup
       </span>
     );
   }
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
+    <span className="inline-flex w-fit shrink-0 self-start items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
       <ShieldCheck className="h-3.5 w-3.5" />
       Policy
     </span>
@@ -56,27 +54,11 @@ function StatusBadge({ status }: { status: StatusItem["status"] }) {
 }
 
 export default async function AdminSettingsPage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session) {
-    redirect("/auth/sign_in");
-  }
-
-  if (session.user?.role !== "ADMIN") {
-    redirect("/dashboard");
-  }
-
   const subscriptionConfig: StatusItem[] = [
-    envStatus("STRIPE_SECRET_KEY", "Stripe secret key", "Required to start cultivator subscription Checkout."),
+    envStatus("STRIPE_SECRET_KEY", "Stripe secret key", "Required to start grower subscription checkout."),
     envStatus("STRIPE_WEBHOOK_SECRET", "Stripe webhook secret", "Required to keep subscription status synced after checkout and portal updates."),
-    envStatus("STRIPE_PRO_PRICE_ID", "Pro price ID", "Enables the Pro cultivator plan button in grower settings."),
-    envStatus("STRIPE_BUSINESS_PRICE_ID", "Business price ID", "Enables the Business cultivator plan button in grower settings."),
-    {
-      label: "Wholesale payments",
-      value: "Not processed in PhenoFarm",
-      status: "info",
-      helper: "Order values are operational records only; buyer-seller settlement stays outside the app.",
-    },
+    envStatus("STRIPE_PRO_PRICE_ID", "Pro price ID", "Enables the Pro plan in grower settings."),
+    envStatus("STRIPE_BUSINESS_PRICE_ID", "Business price ID", "Enables the Business plan in grower settings."),
   ];
 
   const operationalPolicies: StatusItem[] = [
@@ -90,7 +72,7 @@ export default async function AdminSettingsPage() {
       label: "Notification templates",
       value: "Code-managed",
       status: "info",
-      helper: "Transactional message copy should be changed in code until a durable settings store exists.",
+      helper: "Transactional templates are managed by the product team.",
     },
     {
       label: "Demo accounts",
@@ -102,96 +84,91 @@ export default async function AdminSettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-900">Platform Settings</h1>
-        <p className="mt-1 text-sm text-gray-600">
-          Read-only operations view for billing, policy, and support configuration. Changes are made in provider
-          settings or code so admins are not shown controls that silently fail.
-        </p>
-      </div>
+      <PageHeader
+          compact
+        title="Settings"
+        description="View billing, support, and policies."
+      />
 
-      <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-950">
-        <p className="font-semibold">PhenoFarm subscription revenue only</p>
+      <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-sm text-green-950">
+        <p className="font-semibold">Settlement policy</p>
         <p className="mt-1">
-          Cultivators pay PhenoFarm for software subscriptions. Wholesale order payment and settlement are coordinated
-          directly between businesses outside the app.
+          PhenoFarm bills only grower subscriptions. Wholesale payment stays between licensed businesses.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
         <section className="rounded-lg border border-gray-200 bg-white shadow-sm">
           <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">Support Profile</h2>
-            <p className="mt-1 text-sm text-gray-500">Displayed policy and support facts for operators.</p>
+            <h2 className="text-lg font-semibold text-gray-900">Grower billing</h2>
+            <p className="mt-1 text-sm text-gray-500">Stripe subscription readiness.</p>
+          </div>
+          <div className="border-b border-gray-100 bg-amber-50 px-6 py-3 text-xs text-amber-900">
+            {subscriptionConfig.some((item) => item.status === "attention") ? providerSetupLocation : "Stripe settings are ready for testing."}
+          </div>
+          <div className="divide-y divide-gray-100">
+            {subscriptionConfig.filter(item => item.status === 'attention').map(item => (
+              <div key={item.label} className="px-4 py-3 sm:px-6">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-sm font-semibold text-gray-900">{item.label}</p>
+                  <StatusBadge status={item.status} />
+                </div>
+                <p className="mt-1 text-xs text-gray-500">{item.helper}</p>
+              </div>
+            ))}
+          </div>
+          {subscriptionConfig.some(item => item.status === 'ready') && <details className="border-t border-gray-100 px-4 py-3 sm:px-6">
+            <summary className="cursor-pointer text-sm font-medium text-gray-700">{subscriptionConfig.filter(item => item.status === 'ready').length} configured</summary>
+            <div className="mt-3 space-y-3">
+              {subscriptionConfig.filter(item => item.status === 'ready').map(item => (
+                <div key={item.label} className="flex items-start justify-between gap-3"><span className="text-sm text-gray-700">{item.label}</span><StatusBadge status={item.status} /></div>
+              ))}
+            </div>
+          </details>}
+
+        </section>
+
+        <section className="rounded-lg border border-gray-200 bg-white shadow-sm">
+          <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+            <h2 className="text-lg font-semibold text-gray-900">Support</h2>
           </div>
           <dl className="divide-y divide-gray-100">
             {supportProfile.map((item) => (
               <div key={item.label} className="grid gap-1 px-6 py-4 sm:grid-cols-[180px_1fr]">
                 <dt className="text-sm font-medium text-gray-500">{item.label}</dt>
-                <dd className="text-sm font-semibold text-gray-900">{item.value}</dd>
+                <dd className="text-sm font-semibold text-gray-900">
+                  {item.value === supportEmail ? (
+                    <div className="flex flex-wrap items-center gap-2">
+                      <a
+                        href={`mailto:${supportEmail}`}
+                        className="text-green-700 hover:text-green-800 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                      >
+                        {supportEmail}
+                      </a>
+                      <CopyToClipboardButton value={supportEmail} label="Copy support email" />
+                    </div>
+                  ) : item.value}
+                </dd>
               </div>
             ))}
           </dl>
         </section>
 
-        <section className="rounded-lg border border-gray-200 bg-white shadow-sm">
-          <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">Cultivator Billing Configuration</h2>
-            <p className="mt-1 text-sm text-gray-500">Provider readiness for Stripe Billing subscriptions.</p>
-          </div>
-          <div className="divide-y divide-gray-100">
-            {subscriptionConfig.map((item) => (
-              <div key={item.label} className="px-6 py-4">
-                <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{item.label}</p>
-                    <p className="mt-1 text-sm text-gray-600">{item.value}</p>
-                  </div>
-                  <StatusBadge status={item.status} />
-                </div>
-                <p className="mt-2 text-xs text-gray-500">{item.helper}</p>
-              </div>
-            ))}
-          </div>
-        </section>
-
         <section className="rounded-lg border border-gray-200 bg-white shadow-sm lg:col-span-2">
           <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
-            <h2 className="text-lg font-semibold text-gray-900">Operational Policies</h2>
-            <p className="mt-1 text-sm text-gray-500">Current admin rules that affect launch readiness.</p>
+            <h2 className="text-lg font-semibold text-gray-900">Policies</h2>
           </div>
-          <div className="grid gap-4 p-6 md:grid-cols-3">
-            {operationalPolicies.map((item) => (
-              <div key={item.label} className="rounded-lg border border-gray-200 p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900">{item.label}</p>
-                    <p className="mt-1 text-sm text-gray-600">{item.value}</p>
-                  </div>
-                  <StatusBadge status={item.status} />
-                </div>
-                <p className="mt-3 text-xs leading-5 text-gray-500">{item.helper}</p>
+          <dl className="divide-y divide-gray-100">
+            {operationalPolicies.map(item => (
+              <div key={item.label} className="px-4 py-3 sm:px-6">
+                <div className="flex flex-wrap items-baseline justify-between gap-2"><dt className="text-sm font-semibold text-gray-900">{item.label}</dt><dd className="text-sm text-gray-600">{item.value}</dd></div>
+                <details className="mt-1 text-xs text-gray-500"><summary className="cursor-pointer">Details</summary><p className="mt-2 leading-5">{item.helper}</p></details>
               </div>
             ))}
-          </div>
+          </dl>
         </section>
       </div>
 
-      <div className="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-gray-900">Need to update subscription prices?</p>
-          <p className="mt-1 text-sm text-gray-600">
-            Update Stripe price IDs in the deployment environment, then redeploy before testing checkout.
-          </p>
-        </div>
-        <Link
-          href="/admin/dashboard"
-          className="inline-flex items-center justify-center gap-2 rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50"
-        >
-          Admin dashboard
-          <ExternalLink className="h-4 w-4" />
-        </Link>
-      </div>
     </div>
   );
 }

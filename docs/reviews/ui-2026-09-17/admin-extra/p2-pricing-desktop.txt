@@ -1,0 +1,124 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e350]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e351]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e352]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e356]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e357]
+      - StaticText "Overview"
+    - link "Products" [ref=e358]
+      - StaticText "Products"
+    - link "Inventory" [ref=e359]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e360]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e361]
+      - StaticText "Strains"
+    - link "Batches" [ref=e362]
+      - StaticText "Batches"
+    - link "Customers" [ref=e363]
+      - StaticText "Customers"
+    - link "Reports" [ref=e364]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e365]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e353]
+- main
+  - sectionheader
+    - heading "Cultivator Subscription Plans" [level=1, ref=e366]
+    - paragraph
+      - StaticText "Choose the PhenoFarm software plan that fits your grower workflow."
+  - paragraph
+    - StaticText "Buyer-seller wholesale payment is never processed by PhenoFarm."
+  - paragraph
+    - StaticText "The only in-app payment flow is the cultivator subscription paid to PhenoFarm. Wholesale invoices, ACH, checks, COD, and other settlement terms stay directly between licensed businesses."
+  - heading "Current subscription Free" [level=3, ref=e354]
+    - StaticText "Current subscription"
+    - StaticText "Free"
+  - paragraph
+    - StaticText "Free plan"
+  - paragraph
+    - StaticText "No paid subscription period is connected yet."
+  - paragraph
+    - StaticText "Stripe Billing is not configured for this environment."
+  - paragraph
+    - StaticText "Add STRIPE_PRO_PRICE_ID or STRIPE_BUSINESS_PRICE_ID in the environment to enable Stripe Billing checkout."
+  - heading "Free" [level=2, ref=e367]
+  - StaticText "Current plan"
+  - paragraph
+    - StaticText "Evaluate the marketplace workflow before enabling paid plans."
+  - paragraph
+    - StaticText "$0"
+  - paragraph
+    - StaticText "/mo"
+  - list
+    - listitem [level=1]
+      - StaticText "Demo and review access"
+    - listitem [level=1]
+      - StaticText "Catalog and request workflow preview"
+    - listitem [level=1]
+      - StaticText "Up to 50 product listings"
+    - listitem [level=1]
+      - StaticText "Basic marketplace records"
+    - listitem [level=1]
+      - StaticText "Standard support"
+  - button "Current plan" [disabled, ref=e371]
+  - StaticText "Most popular"
+  - heading "Pro" [level=2, ref=e368]
+  - paragraph
+    - StaticText "Cultivator subscription for active wholesale teams."
+  - paragraph
+    - StaticText "$249"
+  - paragraph
+    - StaticText "/mo ($199/mo billed annually)"
+  - list
+    - listitem [level=1]
+      - StaticText "Everything in Free"
+    - listitem [level=1]
+      - StaticText "Unlimited product listings"
+    - listitem [level=1]
+      - StaticText "Priority support & higher limits"
+    - listitem [level=1]
+      - StaticText "CSV bulk upload"
+    - listitem [level=1]
+      - StaticText "Metrc integration ready"
+    - listitem [level=1]
+      - StaticText "Priority support"
+  - paragraph
+    - StaticText "Checkout unavailable"
+  - heading "Business" [level=2, ref=e369]
+  - paragraph
+    - StaticText "For multi-license operations that need deeper integrations."
+  - paragraph
+    - StaticText "Custom"
+  - list
+    - listitem [level=1]
+      - StaticText "Everything in Pro"
+    - listitem [level=1]
+      - StaticText "API access"
+    - listitem [level=1]
+      - StaticText "Custom branding"
+    - listitem [level=1]
+      - StaticText "Dedicated onboarding"
+  - link "Contact sales" [ref=e372]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e370]
+  - button "Open messages" [ref=e355]
+- region "Notifications alt+T" [ref=e349]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e373]
+  - image
+- alert

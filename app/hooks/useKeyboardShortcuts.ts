@@ -3,7 +3,6 @@
 import { useEffect, useCallback } from 'react';
 
 interface KeyboardShortcutsOptions {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onSave?: (...args: unknown[]) => void | Promise<void>;
   onCancel?: () => void;
   isDirty?: boolean;
@@ -32,7 +31,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!enabled) return;
+      if (!enabled || e.defaultPrevented || document.querySelector('[aria-modal="true"]')) return;
 
       // Ctrl+S or Cmd+S to save
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -44,7 +43,7 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
       }
 
       // Esc to cancel/go back
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && !(e.target instanceof HTMLElement && (e.target.isContentEditable || e.target.closest('input, textarea, select, [role=combobox]')))) {
         e.preventDefault();
         if (onCancel) {
           onCancel();

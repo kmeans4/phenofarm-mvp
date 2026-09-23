@@ -1,6 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
 import { LogoUpload } from '@/app/components/settings/LogoUpload';
 import { SignOutButton } from '@/app/components/SignOutButton';
@@ -9,6 +11,7 @@ import { useToast } from '@/app/hooks/useToast';
 import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
 import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
 import { useLocalDraft } from '@/app/hooks/useLocalDraft';
+import { formatLicenseExpiry, isLicenseExpired } from '@/lib/license';
 
 interface SettingsData {
   businessName: string;
@@ -26,10 +29,11 @@ interface SettingsData {
   description: string;
   logo: string;
   licenseStatus: 'pending_review' | 'verified' | 'expired' | 'rejected';
+  licenseReviewNotes: string;
 }
 
 interface SettingsFormProps {
-  defaultValues: SettingsData;
+  initialSettings: SettingsData;
 }
 
 interface FieldErrors {
@@ -85,10 +89,8 @@ const validateLicenseNumber = (license: string): string | undefined => {
 
 const validateLicenseExpiry = (expiry: string): string | undefined => {
   if (!expiry) return undefined;
-  const expiryDate = new Date(expiry);
-  const now = new Date();
-  if (isNaN(expiryDate.getTime())) return 'Invalid date format';
-  if (expiryDate < now) return 'License expiry must be in the future';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(expiry) || Number.isNaN(new Date(`${expiry}T12:00:00`).getTime())) return 'Invalid date format';
+  if (isLicenseExpired(expiry)) return 'License expiry cannot be in the past';
   return undefined;
 };
 
@@ -106,16 +108,74 @@ const formatPhoneNumber = (value: string): string => {
   return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`;
 };
 
-export function SettingsForm({ defaultValues }: SettingsFormProps) {
-  const [loading, setLoading] = useState(true);
+const LICENSE_REVIEW_WINDOW = '1-2 business days';
+
+const sectionLinks = [
+  { href: '#license-verification', label: 'License & verification' },
+  { href: '#business-profile', label: 'Business profile' },
+  { href: '#branding', label: 'Branding' },
+];
+
+function getLicenseStatusLabel(status: SettingsData['licenseStatus']) {
+  switch (status) {
+    case 'verified':
+      return 'Verified';
+    case 'rejected':
+      return 'Rejected';
+    case 'expired':
+      return 'Expired';
+    case 'pending_review':
+    default:
+      return 'Pending review';
+  }
+}
+
+function getLicenseStatusTone(status: SettingsData['licenseStatus']) {
+  switch (status) {
+    case 'verified':
+      return 'border-green-200 bg-green-50 text-green-800';
+    case 'rejected':
+      return 'border-orange-200 bg-orange-50 text-orange-800';
+    case 'expired':
+      return 'border-red-200 bg-red-50 text-red-800';
+    case 'pending_review':
+    default:
+      return 'border-blue-200 bg-blue-50 text-blue-800';
+  }
+}
+
+function getLicenseActionCopy(status: SettingsData['licenseStatus']) {
+  switch (status) {
+    case 'rejected':
+      return `Update the license fields below using the review notes, then save. PhenoFarm reviews updates within ${LICENSE_REVIEW_WINDOW}.`;
+    case 'expired':
+      return `Update the license fields below with current details, then save. PhenoFarm reviews updates within ${LICENSE_REVIEW_WINDOW}.`;
+    case 'pending_review':
+    default:
+      return `Complete the required license fields below and save. PhenoFarm reviews new dispensary licenses within ${LICENSE_REVIEW_WINDOW}.`;
+  }
+}
+
+const editableDraftFields = ['businessName', 'licenseNumber', 'licenseExpiry', 'licenseState', 'contactName', 'phone', 'address', 'city', 'state', 'zip', 'website', 'description'] as const;
+type SettingsDraft = Partial<Pick<SettingsData, typeof editableDraftFields[number]>>;
+function editableDraft(value: unknown): SettingsDraft {
+  if (!value || typeof value !== 'object') return {};
+  const record = value as Record<string, unknown>;
+  return Object.fromEntries(editableDraftFields.filter(key => typeof record[key] === 'string').map(key => [key, String(record[key]).slice(0, key === 'description' ? 500 : 254)]));
+}
+
+export function SettingsForm({ initialSettings }: SettingsFormProps) {
+  const savingRef = useRef(false);
+  const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (savedTimer.current) clearTimeout(savedTimer.current); }, []);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-  const [formData, setFormData] = useState<SettingsData>(defaultValues);
-  const [initialData, setInitialData] = useState<SettingsData>(defaultValues);
+  const [formData, setFormData] = useState<SettingsData>(initialSettings);
+  const [initialData, setInitialData] = useState<SettingsData>(initialSettings);
   const { update, showToast } = useToast();
 
   const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
@@ -123,20 +183,19 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     message: 'You have unsaved changes in your settings. Are you sure you want to leave?',
   });
 
-  const settingsDraft = useLocalDraft<SettingsData>({
+  const settingsDraft = useLocalDraft<SettingsDraft>({
     key: 'phenofarm:draft:dispensary-settings',
-    value: formData,
-    enabled: !loading,
-    onRestore: (value) => setFormData((prev) => ({ ...prev, ...value })),
-    shouldSave: (value) => JSON.stringify(value) !== JSON.stringify(initialData),
+    value: editableDraft(formData),
+    enabled: true,
+    onRestore: (value) => setFormData((prev) => ({ ...prev, ...editableDraft(value) })),
+    shouldSave: (value) => JSON.stringify(value) !== JSON.stringify(editableDraft(initialData)),
   });
   const clearSettingsDraft = settingsDraft.clearDraft;
 
   useEffect(() => {
-    if (loading) return;
     const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
     setIsDirty(hasChanges);
-  }, [formData, initialData, loading, setIsDirty]);
+  }, [formData, initialData, setIsDirty]);
 
   const validateForm = useCallback((): boolean => {
     const errors: FieldErrors = {
@@ -184,57 +243,6 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     return !fieldError;
   }, []);
 
-  useEffect(() => {
-    const controller = new AbortController();
-    let isActive = true;
-
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/dispensary/settings', { signal: controller.signal });
-        if (!isActive) return;
-
-        if (res.ok) {
-          const data = await res.json();
-          const loadedData: SettingsData = {
-            businessName: data.businessName || '',
-            licenseNumber: data.licenseNumber || '',
-            licenseExpiry: data.licenseExpiry ? new Date(data.licenseExpiry).toISOString().split('T')[0] : '',
-            licenseState: data.licenseState || 'VT',
-            contactName: data.contactName || '',
-            email: data.email || '',
-            phone: data.phone || '',
-            address: data.address || '',
-            city: data.city || '',
-            state: data.state || 'VT',
-            zip: data.zip || '',
-            website: data.website || '',
-            description: data.description || '',
-            logo: data.logo || '',
-            licenseStatus: data.licenseStatus || 'pending_review',
-          };
-          setFormData(loadedData);
-          setInitialData(loadedData);
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') return;
-        if (isActive) {
-          showToast('error', 'Failed to load settings');
-        }
-      } finally {
-        if (isActive) {
-          setLoading(false);
-        }
-      }
-    }
-
-    fetchSettings();
-
-    return () => {
-      isActive = false;
-      controller.abort();
-    };
-  }, [showToast]);
-
   const handleAddressSelect = (address: {
     fullAddress: string;
     street: string;
@@ -251,10 +259,17 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     }));
   };
 
-  const handleLogoUpload = async (logoBase64: string) => {
-    const nextData = { ...formData, logo: logoBase64 };
-    setFormData(nextData);
-    await handleSave(true, nextData);
+  const handleLogoUpload = async (url: string) => {
+    if (savingRef.current) throw new Error('Wait for the current save to finish.');
+    savingRef.current = true; setSaving(true);
+    try {
+      const response = await fetch('/api/dispensary/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logo: url }) });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || 'Unable to save logo.');
+      setFormData(previous => ({ ...previous, logo: url }));
+      setInitialData(previous => ({ ...previous, logo: url }));
+      showToast('success', 'Logo saved');
+    } finally { savingRef.current = false; setSaving(false); }
   };
 
   const handleChange = (field: keyof SettingsData) => (
@@ -278,8 +293,9 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
     validateField(field, formData[field] as string);
   };
 
-  const handleSave = useCallback(async (isLogoSave = false, dataOverride?: SettingsData) => {
-    if (!isLogoSave) {
+  const handleSave = useCallback(async () => {
+    if (savingRef.current) return;
+    {
       const isValid = validateForm();
       if (!isValid) {
         setTouched({
@@ -297,14 +313,15 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
       }
     }
 
-    const payload = dataOverride ?? formData;
+    const payload = { ...editableDraft(formData), email: formData.email.trim().toLowerCase() };
+    savingRef.current = true;
 
     setSaving(true);
     setError('');
-    if (!isLogoSave) setSaved(false);
+    setSaved(false);
 
     try {
-      const itemName = isLogoSave ? 'Logo' : 'Settings';
+      const itemName = 'Settings';
       await update(
         itemName,
         fetch('/api/dispensary/settings', {
@@ -321,82 +338,52 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         { duration: 3000 }
       );
 
-      setInitialData(payload);
+      const latestResponse = await fetch('/api/dispensary/settings');
+      const latest = latestResponse.ok ? await latestResponse.json() : null;
+      const savedData = { ...formData, ...payload,
+        ...(latest ? { licenseStatus: latest.licenseStatus, licenseReviewNotes: latest.licenseReviewNotes || '' } : {}) };
+      setInitialData(savedData);
+      setFormData(previous => {
+        const editedWhileSaving = Object.fromEntries(editableDraftFields.filter(key => previous[key] !== formData[key]).map(key => [key, previous[key]]));
+        return { ...savedData, ...editedWhileSaving };
+      });
       clearSettingsDraft();
       resetDirtyState();
 
-      if (!isLogoSave) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
-      }
+      setSaved(true);
+      if (savedTimer.current) clearTimeout(savedTimer.current);
+      savedTimer.current = setTimeout(() => setSaved(false), 3000);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Failed to save settings';
       setError(msg);
       showToast('error', 'Failed to save', { description: msg });
     } finally {
+      savingRef.current = false;
       setSaving(false);
     }
   }, [clearSettingsDraft, formData, resetDirtyState, showToast, update, validateForm]);
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-        e.preventDefault();
-        if (!saving && !loading) {
-          handleSave(false);
-        }
-      }
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+      event.preventDefault(); if (!saving) void handleSave();
+    }
+    if (event.key === 'Escape' && event.target === event.currentTarget && isDirty && !saving && window.confirm('Discard your unsaved settings changes?')) {
+      setFormData(initialData); setTouched({}); setFieldErrors({}); setError(''); setIsDirty(false); clearSettingsDraft();
+    }
+  };
 
-      if (e.key === 'Escape' && !loading) {
-        setFormData(initialData);
-        setTouched({});
-        setFieldErrors({});
-        setError('');
-        setIsDirty(false);
-        showToast('info', 'Changes discarded');
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [handleSave, saving, loading, initialData, setIsDirty, showToast]);
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600"></div>
-      </div>
-    );
-  }
+  const licenseStatusLabel = getLicenseStatusLabel(formData.licenseStatus);
+  const licenseStatusTone = getLicenseStatusTone(formData.licenseStatus);
+  const isLicenseVerified = formData.licenseStatus === 'verified';
+  const licenseReviewNotes = formData.licenseReviewNotes.trim();
 
   return (
-    <div className="space-y-4 sm:space-y-6">
-      <div className="hidden sm:flex items-center gap-4 text-xs text-gray-500 bg-gray-50 px-4 py-2 rounded-lg">
-        <span className="flex items-center gap-1">
-          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Ctrl</kbd>
-          <span>+</span>
-          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">S</kbd>
-          <span className="ml-1">to save</span>
-        </span>
-        <span className="text-gray-300">|</span>
-        <span className="flex items-center gap-1">
-          <kbd className="px-1.5 py-0.5 bg-white border border-gray-300 rounded text-gray-600 font-mono">Esc</kbd>
-          <span className="ml-1">to cancel</span>
-        </span>
-      </div>
-
-      <div className="rounded-lg border border-green-100 bg-green-50 px-4 py-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-green-800">Required first</p>
-        <p className="mt-1 text-sm text-green-900">
-          Finish business name, license state, license number, and email first. Expiry, logo, address, website, and description can be completed later.
-        </p>
-      </div>
-
-      <DraftAutosaveStatus
+    <div onKeyDown={handleKeyDown} tabIndex={-1} className="space-y-4 sm:space-y-6">
+      {isDirty && <DraftAutosaveStatus
         savedAt={settingsDraft.savedAt}
         label="Settings browser draft"
         onClear={settingsDraft.clearDraft}
-      />
+      />}
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-600 flex items-start gap-3">
@@ -416,107 +403,70 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
         </div>
       )}
 
-      {isDirty && (
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-700 flex items-start gap-3">
-          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-          <span>You have unsaved changes. Don&apos;t forget to save before leaving.</span>
-        </div>
-      )}
 
-      {formData.licenseStatus && (
-        <div className={`p-4 border rounded-lg flex items-start gap-3 ${
-          formData.licenseStatus === 'verified'
-            ? 'bg-green-50 border-green-200 text-green-700'
-            : formData.licenseStatus === 'pending_review'
-            ? 'bg-blue-50 border-blue-200 text-blue-700'
-            : formData.licenseStatus === 'expired'
-            ? 'bg-red-50 border-red-200 text-red-700'
-            : 'bg-orange-50 border-orange-200 text-orange-700'
-        }`}>
-          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
-          </svg>
-          <div>
-            <p className="font-medium">
-              {formData.licenseStatus === 'verified' && 'License Verified'}
-              {formData.licenseStatus === 'pending_review' && 'License Pending Review'}
-              {formData.licenseStatus === 'expired' && 'License Expired'}
-              {formData.licenseStatus === 'rejected' && 'License Rejected'}
+
+      <nav className="hidden lg:sticky lg:top-4 lg:z-10 lg:flex lg:items-center lg:gap-2 rounded-lg border border-gray-200 bg-white/95 p-2 shadow-sm backdrop-blur">
+        <span className="px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Sections</span>
+        {sectionLinks.map((section) => (
+          <a
+            key={section.href}
+            href={section.href}
+            className="rounded-md px-3 py-2 text-sm font-medium text-gray-600 transition hover:bg-green-50 hover:text-green-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+          >
+            {section.label}
+          </a>
+        ))}
+      </nav>
+
+      <section id="license-verification" className="scroll-mt-24 rounded-lg border border-gray-200 bg-white shadow-sm">
+        <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 sm:px-6 sm:py-4">
+          <h2 className="text-base font-semibold text-gray-900 sm:text-lg">License & verification</h2>
+        </div>
+        <div className="space-y-4 p-4 sm:p-6">
+          {isLicenseVerified ? (
+            <p className="text-sm font-medium text-green-700">
+              {formData.licenseExpiry ? `Verified through ${formatLicenseExpiry(formData.licenseExpiry)}` : 'Verified · expiry not provided'}
             </p>
-            <p className="text-sm mt-1">
-              {formData.licenseStatus === 'verified' && (formData.licenseExpiry
-                ? `Your license is verified through ${new Date(formData.licenseExpiry).toLocaleDateString()}.`
-                : 'Your license is verified. No expiry date is currently on file.')}
-              {formData.licenseStatus === 'pending_review' && 'Your license is being reviewed by our team. You will be notified once verified.'}
-              {formData.licenseStatus === 'expired' && 'Your license has expired. Please update your license information.'}
-              {formData.licenseStatus === 'rejected' && 'Your license was rejected. Please contact support for more information.'}
-            </p>
-          </div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Company Logo</h2>
-          </div>
-          <div className="p-4 sm:p-6">
-            <LogoUpload currentLogo={formData.logo} onUpload={handleLogoUpload} />
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Business Information</h2>
-          </div>
-          <div className="p-4 sm:p-6 space-y-3 sm:space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Name <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
-                value={formData.businessName}
-                onChange={handleChange('businessName')}
-                onBlur={handleBlur('businessName')}
-                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
-                  touched.businessName && fieldErrors.businessName
-                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
-                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
-                }`}
-                placeholder="Your business name"
-              />
-              {touched.businessName && fieldErrors.businessName && (
-                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {fieldErrors.businessName}
-                </p>
+          ) : (
+            <div className={`rounded-lg border p-4 ${licenseStatusTone}`}>
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wide">Verification needed</p>
+                  <h3 className="mt-1 text-lg font-semibold text-gray-900">
+                    Current status: {licenseStatusLabel}
+                  </h3>
+                  <p className="mt-2 text-sm text-gray-700">
+                    Submitting requests is blocked until PhenoFarm verifies this dispensary license.
+                  </p>
+                </div>
+                <span className="inline-flex w-fit rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-gray-700 ring-1 ring-inset ring-black/10">
+                  Requests locked
+                </span>
+              </div>
+              {formData.licenseStatus === 'rejected' && licenseReviewNotes && (
+                <div className="mt-4 rounded-lg border border-orange-200 bg-white/80 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-orange-800">Review notes</p>
+                  <p className="mt-1 text-sm text-gray-700">{licenseReviewNotes}</p>
+                </div>
               )}
+              <div className="mt-4 rounded-lg bg-white/80 p-3 text-sm text-gray-700 ring-1 ring-inset ring-black/5">
+                <p className="font-medium text-gray-900">What to do next</p>
+                <p className="mt-1">{getLicenseActionCopy(formData.licenseStatus)}</p>
+              </div>
             </div>
+          )}
 
+          {(!formData.businessName.trim() || !formData.licenseNumber.trim() || !formData.licenseState.trim() || !formData.email.trim()) && (
+            <p className="text-sm text-gray-600">Add your business name, license details, and email to complete setup.</p>
+          )}
+          <div className="grid gap-4 sm:grid-cols-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Contact Name <span className="text-gray-400 text-xs">(optional)</span>
+              <label htmlFor="dispensary-setting-licenseNumber" className="block text-sm font-medium text-gray-700 mb-1">
+                License number <span className="text-red-500">*</span>
               </label>
               <input
                 type="text"
-                value={formData.contactName}
-                onChange={handleChange('contactName')}
-                placeholder="Primary contact person"
-                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Dispensary License Number <span className="text-red-500">*</span>
-              </label>
-              <input
-                type="text"
+                id="dispensary-setting-licenseNumber"
                 value={formData.licenseNumber}
                 onChange={handleChange('licenseNumber')}
                 onBlur={handleBlur('licenseNumber')}
@@ -538,10 +488,11 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                License State <span className="text-red-500">*</span>
+              <label htmlFor="dispensary-setting-licenseState" className="block text-sm font-medium text-gray-700 mb-1">
+                State <span className="text-red-500">*</span>
               </label>
               <select
+                id="dispensary-setting-licenseState"
                 value={formData.licenseState}
                 onChange={handleChange('licenseState')}
                 onBlur={handleBlur('licenseState')}
@@ -565,7 +516,7 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
 
             <div>
               <label htmlFor="licenseExpiry" className="block text-sm font-medium text-gray-700 mb-1">
-                License Expiry Date <span className="text-gray-400 text-xs">(recommended)</span>
+                Expiry date <span className="text-gray-400 text-xs">(recommended)</span>
               </label>
               <input
                 id="licenseExpiry"
@@ -590,15 +541,67 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               )}
             </div>
 
+          </div>
+        </div>
+      </section>
+
+      <div className="grid grid-cols-1 items-start gap-4 sm:gap-6 xl:grid-cols-[minmax(0,2fr)_minmax(16rem,1fr)]">
+        <div id="business-profile" className="scroll-mt-24 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Business profile</h2>
+          </div>
+          <div className="grid gap-4 p-4 sm:grid-cols-2 sm:p-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Email <span className="text-red-500">*</span>
+              <label htmlFor="dispensary-setting-businessName" className="block text-sm font-medium text-gray-700 mb-1">
+                Business name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                id="dispensary-setting-businessName"
+                value={formData.businessName}
+                onChange={handleChange('businessName')}
+                onBlur={handleBlur('businessName')}
+                className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
+                  touched.businessName && fieldErrors.businessName
+                    ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                }`}
+                placeholder="Your business name"
+              />
+              {touched.businessName && fieldErrors.businessName && (
+                <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  {fieldErrors.businessName}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label htmlFor="dispensary-setting-contactName" className="block text-sm font-medium text-gray-700 mb-1">
+                Contact name <span className="text-gray-400 text-xs">(optional)</span>
+              </label>
+              <input
+                type="text"
+                id="dispensary-setting-contactName"
+                value={formData.contactName}
+                onChange={handleChange('contactName')}
+                placeholder="Primary contact person"
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 placeholder-gray-400 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="dispensary-setting-email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email <span className="text-red-500">*</span>
               </label>
               <input
                 type="email"
+                id="dispensary-setting-email"
                 value={formData.email}
-                onChange={handleChange('email')}
-                onBlur={handleBlur('email')}
+                readOnly
+                aria-describedby="account-email-help"
                 className={`w-full rounded-lg border bg-white px-4 py-2 text-gray-900 focus:ring-1 focus:outline-none transition-colors ${
                   touched.email && fieldErrors.email
                     ? 'border-red-300 focus:border-red-500 focus:ring-red-500'
@@ -606,6 +609,9 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
                 }`}
                 placeholder="your@email.com"
               />
+              <p id="account-email-help" className="mt-1 text-sm text-gray-600">
+                Verified login address. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-green-700 underline">Change email</Link>
+              </p>
               {touched.email && fieldErrors.email && (
                 <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -617,11 +623,12 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Phone <span className="text-gray-400 text-xs">(optional)</span>
+              <label htmlFor="dispensary-setting-phone" className="block text-sm font-medium text-gray-700 mb-1">
+                Phone <span className="text-gray-400 text-xs">(optional)</span>
               </label>
               <input
                 type="tel"
+                id="dispensary-setting-phone"
                 value={formData.phone}
                 onChange={handleChange('phone')}
                 onBlur={handleBlur('phone')}
@@ -642,25 +649,27 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Address <span className="text-green-600 text-xs font-medium">(Autocomplete)</span>
+            <div className="sm:col-span-2">
+              <label htmlFor="dispensary-setting-address" className="block text-sm font-medium text-gray-700 mb-1">
+                Address
               </label>
               <AddressAutocomplete
+                id="dispensary-setting-address"
                 value={formData.address}
                 onChange={(value) => setFormData(prev => ({ ...prev, address: value }))}
                 onSelect={handleAddressSelect}
-                placeholder="Type your address..."
+                placeholder="Start typing to search"
               />
-              <p className="text-xs text-gray-500 mt-1">Type 3+ characters to see suggestions (includes city, state, ZIP)</p>
+              <p className="text-xs text-gray-500 mt-1">Type 3+ characters to find an address.</p>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label htmlFor="dispensary-setting-website" className="block text-sm font-medium text-gray-700 mb-1">
                 Website <span className="text-gray-400 text-xs">(optional)</span>
               </label>
               <input
                 type="url"
+                id="dispensary-setting-website"
                 value={formData.website}
                 onChange={handleChange('website')}
                 onBlur={handleBlur('website')}
@@ -681,12 +690,14 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               )}
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Business Description <span className="text-gray-400 text-xs">(optional)</span>
+            <div className="sm:col-span-2">
+              <label htmlFor="dispensary-setting-description" className="block text-sm font-medium text-gray-700 mb-1">
+                Description <span className="text-gray-400 text-xs">(optional)</span>
               </label>
               <textarea
+                maxLength={500}
                 rows={3}
+                id="dispensary-setting-description"
                 value={formData.description}
                 onChange={handleChange('description')}
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-gray-900 focus:border-green-500 focus:ring-1 focus:ring-green-500 focus:outline-none"
@@ -696,25 +707,35 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
             </div>
           </div>
         </div>
-      </div>
 
-      <div className="rounded-lg border border-gray-200 bg-white p-4 sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 className="text-base font-semibold text-gray-900">Account</h2>
-            <p className="mt-1 text-sm text-gray-600">Sign out of your dispensary account from this device.</p>
+        <div id="branding" className="scroll-mt-24 bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-base sm:text-lg font-semibold text-gray-900">Branding</h2>
           </div>
-          <div className="self-start sm:self-auto">
-            <SignOutButton />
+          <div className="p-4 sm:p-6">
+            <LogoUpload disabled={saving} currentLogo={formData.logo} onUpload={handleLogoUpload} />
           </div>
         </div>
       </div>
 
-      <div className="flex justify-end pt-2 sm:pt-4">
+      <div className="border-t border-gray-200 pt-4">
+        <div className="flex items-center justify-between gap-3 rounded-lg bg-gray-50 px-4 py-3">
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">Account</h2>
+          </div>
+          <div className="self-start sm:self-auto">
+            <SignOutButton variant="sidebar" />
+          </div>
+        </div>
+      </div>
+
+      <div className="sticky bottom-4 z-20 hidden items-center justify-between gap-4 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur sm:flex">
+        <p className="text-sm text-gray-600" role="status">{saving ? 'Saving…' : isDirty ? 'Unsaved changes' : saved ? 'Saved' : ''}</p>
         <button
-          onClick={() => handleSave(false)}
+          type="button"
+          onClick={() => handleSave()}
           disabled={saving}
-          className="w-full sm:w-auto bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 font-medium transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex min-w-[9rem] items-center justify-center rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
         >
           {saving ? (
             <span className="flex items-center gap-2">
@@ -725,16 +746,16 @@ export function SettingsForm({ defaultValues }: SettingsFormProps) {
               Saving...
             </span>
           ) : (
-            'Save Changes'
+            'Save settings'
           )}
         </button>
       </div>
 
       <StickyMobileActionBar
         primaryLabel={saving ? 'Saving...' : 'Save settings'}
-        onPrimary={() => void handleSave(false)}
+        onPrimary={() => void handleSave()}
         disabled={saving}
-        helperText="Settings drafts save in this browser."
+        helperText={isDirty ? 'Unsaved changes' : saved ? 'Saved' : undefined}
       />
     </div>
   );

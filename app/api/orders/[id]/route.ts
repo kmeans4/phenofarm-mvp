@@ -3,16 +3,19 @@ import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import {
   canTransitionOrderStatus,
+  getOrderStatusLabel,
   getInvalidOrderStatusTransitionMessage,
   isOrderStatus,
   type OrderStatusValue,
 } from '@/lib/order-workflow';
+import { claimOrder, restoreInventory, OrderConflictError } from '@/lib/order-mutations';
+import { PATCH as changeStatus } from './status/route';
+import { createNotification } from '@/lib/notifications';
 
 interface OrderItemUpdateInput {
   id?: string;
   productId?: string;
   quantity: number;
-  unitPrice: number | null;
 }
 
 interface InventoryIssue {
@@ -97,7 +100,6 @@ function normalizeItems(value: unknown): OrderItemUpdateInput[] | null {
       id,
       productId,
       quantity: parsePositiveQuantity(record.quantity),
-      unitPrice: record.unitPrice === undefined ? null : parseMoney(record.unitPrice, 'unitPrice'),
     };
   });
 }
@@ -135,10 +137,10 @@ export async function GET(
         growerId: user.growerId,
       },
       include: {
-        dispensary: true,
+        dispensary: { select: { id: true, businessName: true, contactName: true, phone: true, address: true, city: true, state: true, zip: true } },
         items: {
           include: {
-            product: true,
+            product: { select: { id: true, name: true, unit: true, productType: true, inventoryQty: true, isAvailable: true, isDeleted: true } },
           },
         },
       },
@@ -150,6 +152,7 @@ export async function GET(
 
     return NextResponse.json(order, { status: 200 });
   } catch (error) {
+    if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Error fetching order:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -181,6 +184,7 @@ export async function PUT(
         growerId: user.growerId,
       },
       include: {
+        dispensary: { select: { userId: true } },
         items: {
           include: {
             product: { select: { id: true, name: true, inventoryQty: true, isAvailable: true, isDeleted: true } },
@@ -203,7 +207,7 @@ export async function PUT(
       ? parseMoney(body.tax, 'tax')
       : Number(existingOrder.tax);
 
-    if (notes !== undefined && String(notes).length > 1000) {
+    if (notes !== undefined && (typeof notes !== 'string' || notes.length > 1000)) {
       throw new OrderEditError('Notes must be less than 1000 characters');
     }
 
@@ -244,8 +248,7 @@ export async function PUT(
           if (!item.id || !existingIds.has(item.id)) return true;
           const existingItem = existingItemsById.get(item.id);
           return !existingItem ||
-            existingItem.quantity !== item.quantity ||
-            (item.unitPrice !== null && Number(existingItem.unitPrice) !== item.unitPrice);
+            existingItem.quantity !== item.quantity;
         }) ||
         removedItems.length > 0
       : false;
@@ -266,6 +269,7 @@ export async function PUT(
     }
 
     const updatedOrder = await db.$transaction(async (tx) => {
+      await claimOrder(tx, existingOrder);
       if (isCancellation) {
         // Return the inventory that was reserved when the request was created
         const items = await tx.orderItem.findMany({
@@ -274,10 +278,7 @@ export async function PUT(
         });
 
         for (const item of items) {
-          await tx.product.updateMany({
-            where: { id: item.productId },
-            data: { inventoryQty: { increment: item.quantity } },
-          });
+          await restoreInventory(tx, item.productId, item.quantity);
         }
       }
 
@@ -285,17 +286,15 @@ export async function PUT(
 
       if (requestedItems && !isCancellation) {
         for (const item of removedItems) {
-          await tx.product.updateMany({
-            where: { id: item.productId, growerId: user.growerId },
-            data: { inventoryQty: { increment: item.quantity } },
-          });
+          await restoreInventory(tx, item.productId, item.quantity);
           await tx.orderItem.delete({ where: { id: item.id } });
         }
 
         for (const item of requestedItems) {
           if (item.id) {
             const existingItem = existingItemsById.get(item.id)!;
-            const unitPrice = item.unitPrice ?? Number(existingItem.unitPrice);
+            // Existing agreed prices are immutable snapshots; quantity edits cannot reprice a line.
+            const unitPrice = Number(existingItem.unitPrice);
             const quantityDelta = item.quantity - existingItem.quantity;
 
             if (quantityDelta > 0) {
@@ -322,11 +321,9 @@ export async function PUT(
                   available: Number(latest?.inventoryQty || 0),
                 }]);
               }
+              await tx.product.updateMany({ where: { id: existingItem.productId, growerId: user.growerId, inventoryQty: 0 }, data: { isAvailable: false } });
             } else if (quantityDelta < 0) {
-              await tx.product.updateMany({
-                where: { id: existingItem.productId, growerId: user.growerId },
-                data: { inventoryQty: { increment: Math.abs(quantityDelta) } },
-              });
+              await restoreInventory(tx, existingItem.productId, Math.abs(quantityDelta));
             }
 
             await tx.orderItem.update({
@@ -341,7 +338,7 @@ export async function PUT(
             const productId = item.productId!;
             const product = await tx.product.findFirst({
               where: { id: productId, growerId: user.growerId, isDeleted: false },
-              select: { id: true, name: true, price: true, inventoryQty: true, isAvailable: true },
+              select: { id: true, name: true, inventoryQty: true, isAvailable: true },
             });
 
             if (!product || !product.isAvailable || product.inventoryQty < item.quantity) {
@@ -353,7 +350,6 @@ export async function PUT(
               }]);
             }
 
-            const unitPrice = item.unitPrice ?? Number(product.price);
             const updateResult = await tx.product.updateMany({
               where: {
                 id: productId,
@@ -378,6 +374,10 @@ export async function PUT(
               }]);
             }
 
+            await tx.product.updateMany({ where: { id: productId, growerId: user.growerId, inventoryQty: 0 }, data: { isAvailable: false } });
+            // Read the price after acquiring the inventory row lock.
+            const pricedProduct = await tx.product.findUniqueOrThrow({ where: { id: productId }, select: { price: true } });
+            const unitPrice = Number(pricedProduct.price);
             await tx.orderItem.create({
               data: {
                 orderId,
@@ -385,6 +385,7 @@ export async function PUT(
                 growerId: user.growerId!,
                 quantity: item.quantity,
                 unitPrice,
+                catalogUnitPrice: unitPrice,
                 totalPrice: Math.round(item.quantity * unitPrice * 100) / 100,
               },
             });
@@ -416,7 +417,7 @@ export async function PUT(
           ? new Date()
           : existingOrder.deliveredAt;
 
-      return tx.order.update({
+      const updated = await tx.order.update({
         where: { id: orderId },
         data: {
           status: status || existingOrder.status,
@@ -429,18 +430,40 @@ export async function PUT(
           totalAmount: Math.round((subtotal + requestedShippingFee + requestedTax) * 100) / 100,
         },
         include: {
-          dispensary: true,
+          dispensary: { select: { id: true, businessName: true, contactName: true, phone: true, address: true, city: true, state: true, zip: true } },
           items: {
             include: {
-              product: true,
+              product: { select: { id: true, name: true, unit: true, productType: true, inventoryQty: true, isAvailable: true, isDeleted: true } },
             },
           },
         },
       });
+
+      if (status && status !== existingOrder.status) {
+        await tx.orderStatusEvent.create({
+          data: {
+            orderId,
+            fromStatus: existingOrder.status,
+            toStatus: status,
+            actorUserId: user.id,
+            actorRole: 'GROWER',
+          },
+        });
+        await createNotification(tx, {
+          userId: existingOrder.dispensary.userId,
+          type: 'ORDER_STATUS_CHANGED',
+          title: `Request ${getOrderStatusLabel(status).toLowerCase()}`,
+          body: `Request #${existingOrder.orderId} is now ${getOrderStatusLabel(status)}.`,
+          href: `/dispensary/orders/${existingOrder.id}`,
+        });
+      }
+
+      return updated;
     });
 
     return NextResponse.json(updatedOrder, { status: 200 });
   } catch (error) {
+    if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
     if (error instanceof OrderEditError) {
       return buildEditResponse(error);
     }
@@ -457,69 +480,10 @@ export async function PUT(
   }
 }
 
-// DELETE an order (cancel)
-export async function DELETE(
-  request: NextRequest,
-  context: { params: Promise<{ id: string }> }
-) {
-  try {
-    const session = await getAuthSession();
-
-    if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const user = session.user;
-    
-    if (user.role !== 'GROWER') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
-
-    const orderId = (await context.params).id;
-
-    // Check if order exists and belongs to grower
-    const existingOrder = await db.order.findFirst({
-      where: {
-        id: orderId,
-        growerId: user.growerId,
-      },
-    });
-
-    if (!existingOrder) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
-    }
-
-    // Only allow cancellation of pending/confirmed orders
-    if (!['PENDING', 'CONFIRMED', 'PROCESSING'].includes(existingOrder.status)) {
-      return NextResponse.json({ 
-        error: 'Cannot cancel order with status: ' + existingOrder.status 
-      }, { status: 400 });
-    }
-
-    // Update inventory back
-    const orderItems = await db.orderItem.findMany({
-      where: { orderId },
-    });
-
-    for (const item of orderItems) {
-      await db.product.update({
-        where: { id: item.productId },
-        data: {
-          inventoryQty: {
-            increment: item.quantity,
-          },
-        },
-      });
-    }
-
-    // Delete the order
-    await db.order.delete({
-      where: { id: orderId },
-    });
-
-    return NextResponse.json({ message: 'Order request cancelled successfully' }, { status: 200 });
-  } catch (error) {
-    console.error('Error deleting order:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
-  }
+// Keep the legacy DELETE route compatible while retaining the order and its audit trail.
+export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const session = await getAuthSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (session.user.role !== 'GROWER' || !session.user.growerId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  return changeStatus(new NextRequest(request.url, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status: 'CANCELLED' }) }), context);
 }

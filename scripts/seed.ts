@@ -75,6 +75,24 @@ export async function seedDatabase() {
       },
     });
 
+    const [purpleHaze, silverHaze, assorted] = await Promise.all([
+      db.strain.upsert({
+        where: { growerId_name: { growerId: grower.id, name: 'Purple Haze' } },
+        update: {},
+        create: { growerId: grower.id, name: 'Purple Haze' },
+      }),
+      db.strain.upsert({
+        where: { growerId_name: { growerId: grower.id, name: 'Silver Haze' } },
+        update: {},
+        create: { growerId: grower.id, name: 'Silver Haze' },
+      }),
+      db.strain.upsert({
+        where: { growerId_name: { growerId: grower.id, name: 'Assorted' } },
+        update: {},
+        create: { growerId: grower.id, name: 'Assorted' },
+      }),
+    ]);
+
     // Create sample products
     const product1 = await db.product.upsert({
       where: { id: 'product-001' },
@@ -83,10 +101,12 @@ export async function seedDatabase() {
         id: 'product-001',
         growerId: grower.id,
         name: 'Purple Haze Flowers',
-        strainLegacy: 'Purple Haze',
-        categoryLegacy: 'Flowers',
-        thcLegacy: 22,
-        cbdLegacy: 0.5,
+        strainId: purpleHaze.id,
+        productType: 'Flower',
+        thcMin: 22,
+        thcMax: 22,
+        cbdMin: 0.5,
+        cbdMax: 0.5,
         price: 25,
         inventoryQty: 100,
         unit: 'gram',
@@ -103,10 +123,12 @@ export async function seedDatabase() {
         id: 'product-002',
         growerId: grower.id,
         name: 'Silver Haze Concentrates',
-        strainLegacy: 'Silver Haze',
-        categoryLegacy: 'Concentrates',
-        thcLegacy: 85,
-        cbdLegacy: 0.2,
+        strainId: silverHaze.id,
+        productType: 'Bulk Extract',
+        thcMin: 85,
+        thcMax: 85,
+        cbdMin: 0.2,
+        cbdMax: 0.2,
         price: 60,
         inventoryQty: 50,
         unit: 'gram',
@@ -123,10 +145,12 @@ export async function seedDatabase() {
         id: 'product-003',
         growerId: grower.id,
         name: 'Artisan Edibles Assortment',
-        strainLegacy: 'Assorted',
-        categoryLegacy: 'Edibles',
-        thcLegacy: 100,
-        cbdLegacy: 0,
+        strainId: assorted.id,
+        productType: 'Edibles',
+        thcMin: 100,
+        thcMax: 100,
+        cbdMin: 0,
+        cbdMax: 0,
         price: 45,
         inventoryQty: 30,
         unit: 'piece',
@@ -232,17 +256,6 @@ export async function seedDatabase() {
         quantity: 10,
         unitPrice: 45,
         totalPrice: 450,
-      },
-    });
-
-    // Create sample Metrc sync logs
-    await db.metrcSyncLog.create({
-      data: {
-        id: 'metrc-log-001',
-        growerId: grower.id,
-        recordsSynced: 25,
-        success: true,
-        createdAt: new Date(),
       },
     });
 

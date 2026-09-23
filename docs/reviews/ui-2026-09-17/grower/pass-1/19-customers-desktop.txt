@@ -1,0 +1,98 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e1884]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1885]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e1886]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e1890]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e1891]
+      - StaticText "Overview"
+    - link "Products" [ref=e1892]
+      - StaticText "Products"
+    - link "Inventory" [ref=e1893]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e1894]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e1895]
+      - StaticText "Strains"
+    - link "Batches" [ref=e1896]
+      - StaticText "Batches"
+    - link "Customers" [ref=e1897]
+      - StaticText "Customers"
+    - link "Reports" [ref=e1898]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e1899]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e1887]
+- main
+  - sectionheader
+    - heading "Customers" [level=1, ref=e1900]
+    - paragraph
+      - StaticText "Your saved contacts and dispensaries with requests or conversations with your grower account."
+  - paragraph
+    - StaticText "Total Customers"
+  - paragraph
+    - StaticText "2"
+  - paragraph
+    - StaticText "Ordered in last 90 days"
+  - paragraph
+    - StaticText "2"
+  - paragraph
+    - StaticText "Orders"
+  - paragraph
+    - StaticText "20"
+  - heading "Customer List" [level=2, ref=e1888]
+  - table
+    - rowgroup
+      - row
+        - columnheader "BUSINESS" [ref=e1908]
+        - columnheader "CONTACT" [ref=e1909]
+        - columnheader "LAST ORDER" [ref=e1910]
+        - columnheader "DELIVERED VALUE" [ref=e1911]
+        - columnheader "LOCATION" [ref=e1912]
+        - columnheader "ACTIONS" [ref=e1913]
+    - link "View Green Vermont Dispensary" [ref=e1901]
+      - StaticText "Green Vermont Dispensary"
+      - generic
+        - StaticText "License: VT-RTL-2024-001"
+      - StaticText "PhenoFarm member"
+      - StaticText "Green Vermont Dispensary"
+      - StaticText "dispensary@greenvermont.com"
+      - StaticText "(802) 555-0145"
+      - StaticText "Jul 9, 2026"
+      - StaticText "$0.00"
+      - StaticText "Burlington, VT"
+      - link "View requests" [ref=e1904]
+      - button "Message" [ref=e1905]
+    - link "View Maple Street Market" [ref=e1902]
+      - StaticText "Maple Street Market"
+      - generic
+        - StaticText "License: VT-UI-2026-104"
+      - StaticText "Alex Morgan"
+      - StaticText "orders@example.test"
+      - StaticText "802-555-0142"
+      - StaticText "Sep 13, 2026"
+      - StaticText "$450.00"
+      - StaticText "Burlington, VT"
+      - link "View requests" [ref=e1906]
+      - button "Message" [ref=e1907]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1903]
+  - button "Open messages" [ref=e1889]
+- region "Notifications alt+T" [ref=e1883]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1914]
+  - image
+- alert

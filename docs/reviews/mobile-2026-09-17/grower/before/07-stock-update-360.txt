@@ -1,0 +1,40 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e283]
+- button "Notifications" [expanded=false, ref=e284]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e285]
+- main
+  - sectionheader
+    - heading "Update stock" [level=1, ref=e288]
+  - form
+    - LabelText
+      - StaticText "Product *"
+    - searchbox "Product *" [ref=e289]
+    - button "Mystery Pricing Batch Flower · Greenhouse · Assorted 25 eighth" [ref=e290]
+      - StaticText "Mystery Pricing Batch"
+      - StaticText "Flower · Greenhouse · Assorted"
+      - StaticText "25"
+      - StaticText "eighth"
+    - button "Silver Haze Concentrate Bulk Extract · Live Resin · Silver Haze 50 g" [ref=e291]
+      - StaticText "Silver Haze Concentrate"
+      - StaticText "Bulk Extract · Live Resin · Silver Haze"
+      - StaticText "50"
+      - StaticText "g"
+    - button "Purple Haze Flowers Flower · Indoor · Purple Haze 240 g" [ref=e292]
+      - StaticText "Purple Haze Flowers"
+      - StaticText "Flower · Indoor · Purple Haze"
+      - StaticText "240"
+      - StaticText "g"
+    - LabelText
+      - StaticText "Stock on hand *"
+    - spinbutton "Stock on hand *" [required, ref=e293]
+    - paragraph
+      - StaticText "This replaces the current stock level; it is not added to it."
+    - link "Cancel" [ref=e294]
+    - button "Save stock" [disabled, ref=e295]
+  - link "Add a new product →" [ref=e286]
+- button "Open messages" [ref=e287]
+- region "Notifications alt+T" [ref=e282]
+- alert

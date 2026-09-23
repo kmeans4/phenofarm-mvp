@@ -1,108 +1,63 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { readCart, writeCart, mergeCartItems } from '@/lib/cart';
 import { Plus, Check, ClipboardList, Loader2 } from "lucide-react";
 import { toast } from '@/app/hooks/useToast';
 
 interface ProductData {
   id: string;
   name: string;
-  price: number;
+  price: number | null;
   strain: string | null;
   unit: string | null;
   thc: number | null;
   inventoryQty: number;
+  images?: string[];
+  productType?: string | null;
 }
 
-interface CartItem {
-  id: string;
-  name: string;
-  grower: string;
-  growerId: string;
-  price: number;
-  quantity: number;
-  maxQty: number;
-  strain?: string;
-  unit?: string;
-  thc?: number;
-}
-
-export default function AddToCartButton({ 
-  product, 
-  growerName, 
+export default function AddToCartButton({
+  product,
+  growerName,
   growerId,
-  compact = false
-}: { 
-  product: ProductData; 
+  compact = false,
+  compactLabel,
+}: {
+  product: ProductData;
   growerName: string;
   growerId: string;
   compact?: boolean;
+  compactLabel?: string;
 }) {
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(() => () => { if (resetTimer.current) clearTimeout(resetTimer.current); }, []);
 
   const addToCart = (qty: number = quantity) => {
     if (qty < 1 || qty > product.inventoryQty) {
       toast.warning(`Select quantity between 1 and ${product.inventoryQty}`);
       return;
     }
-    
+
+    if (product.price == null) { toast.warning('Request pricing before adding this product.'); return; }
+    const cart = readCart();
+    const existing = cart.items.find(item => item.id === product.id);
+    if ((existing?.quantity ?? 0) + qty > product.inventoryQty) {
+      toast.warning('The requested quantity exceeds available inventory.'); return;
+    }
     setLoading(true);
-    
-    // Simulate async operation for better UX
-    setTimeout(() => {
-      const saved = localStorage.getItem('phenofarm-cart');
-      let cart = { items: [] as CartItem[], subtotal: 0, tax: 0, total: 0 };
-      
-      if (saved) {
-        try {
-          cart = JSON.parse(saved);
-        } catch {
-          // use default
-        }
-      }
-      
-      const existingIndex = cart.items.findIndex((item: CartItem) => item.id === product.id);
-      
-      if (existingIndex >= 0) {
-        const newQty = cart.items[existingIndex].quantity + qty;
-        if (newQty > product.inventoryQty) {
-          toast.warning(`Cannot add ${qty} more`, {
-            description: `Only ${product.inventoryQty - cart.items[existingIndex].quantity} available.`,
-          });
-          setLoading(false);
-          return;
-        }
-        cart.items[existingIndex].quantity = newQty;
-      } else {
-        cart.items.push({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          grower: growerName,
-          growerId: growerId,
-          quantity: qty,
-          maxQty: product.inventoryQty,
-          strain: product.strain || undefined,
-          unit: product.unit || undefined,
-          thc: product.thc || undefined,
-        });
-      }
-      
-      cart.subtotal = cart.items.reduce((sum: number, item: CartItem) => sum + item.price * item.quantity, 0);
-      cart.tax = cart.subtotal * 0.06;
-      cart.total = cart.subtotal + cart.tax;
-      
-      localStorage.setItem('phenofarm-cart', JSON.stringify(cart));
-      
-      setAdded(true);
-      setLoading(false);
-      setQuantity(1);
-      
-      setTimeout(() => setAdded(false), 2000);
-      window.dispatchEvent(new Event('cart-updated'));
-    }, 300); // Small delay for better UX feedback
+    const next = mergeCartItems(cart, [{ id: product.id, name: product.name, price: product.price,
+      grower: growerName, growerId, quantity: qty, maxQty: product.inventoryQty,
+      strain: product.strain ?? undefined, unit: product.unit ?? 'unit',
+      image: product.images?.[0], productType: product.productType ?? undefined }]);
+    if (!writeCart(next)) { toast.warning('Unable to save your request draft. Free up browser storage and try again.'); setLoading(false); return; }
+    setAdded(true); setLoading(false); setQuantity(1);
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(() => setAdded(false), 2000);
   };
 
   const isOutOfStock = product.inventoryQty < 1;
@@ -111,13 +66,15 @@ export default function AddToCartButton({
   // Compact mode for list view - single click to add 1 unit
   if (compact) {
     return (
-      <button 
+      <button type="button"
+        aria-label={`Add ${product.name} to request draft`}
         onClick={() => addToCart(1)}
         disabled={loading || isOutOfStock || added}
         className={`
-          p-2.5 rounded-lg flex items-center justify-center transition-all duration-200
-          ${added 
-            ? 'bg-green-700 text-white scale-105 shadow-md' 
+          min-h-10 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2
+          ${compactLabel ? 'px-4 py-2 text-sm font-semibold' : 'p-2.5'}
+          ${added
+            ? 'bg-green-700 text-white scale-105 shadow-md'
             : isOutOfStock
               ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
               : loading
@@ -136,49 +93,56 @@ export default function AddToCartButton({
         ) : (
           <Plus size={20} />
         )}
+        {compactLabel && (
+          <span>{loading ? 'Adding...' : added ? 'Added' : isOutOfStock ? 'Out of stock' : compactLabel}</span>
+        )}
       </button>
     );
   }
 
   // Full mode for grid view
   return (
-    <div className="space-y-2">
+    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2 sm:block sm:space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm text-gray-600 font-medium">Qty:</label>
+        <span className="hidden text-sm text-gray-600 font-medium sm:inline">Qty:</span>
         <div className="flex items-center border-2 border-gray-200 rounded-lg overflow-hidden focus-within:border-green-500 transition-colors">
-          <button 
+          <button type="button"
+            aria-label={`Decrease quantity for ${product.name}`}
             onClick={() => setQuantity(Math.max(1, quantity - 1))}
             disabled={loading || isOutOfStock}
-            className="px-3 py-1.5 hover:bg-gray-100 text-gray-600 disabled:opacity-40 transition-colors font-medium"
+            className="h-10 w-10 shrink-0 hover:bg-gray-100 text-gray-600 disabled:opacity-40 transition-colors font-medium"
           >
             −
           </button>
           <input
+            aria-label={`Quantity for ${product.name}`}
             type="number"
             min={1}
             max={product.inventoryQty}
             value={quantity}
             onChange={(e) => setQuantity(Math.max(1, Math.min(product.inventoryQty, parseInt(e.target.value) || 1)))}
-            className="w-14 text-center text-sm py-1.5 border-x-2 border-gray-200 focus:outline-none bg-transparent font-medium"
+            className="h-10 w-11 min-w-0 text-center text-base border-x-2 border-gray-200 focus:outline-none bg-transparent font-medium sm:w-14"
             disabled={loading || isOutOfStock}
           />
-          <button 
+          <button type="button"
+            aria-label={`Increase quantity for ${product.name}`}
             onClick={() => setQuantity(Math.min(product.inventoryQty, quantity + 1))}
             disabled={loading || isOutOfStock}
-            className="px-3 py-1.5 hover:bg-gray-100 text-gray-600 disabled:opacity-40 transition-colors font-medium"
+            className="h-10 w-10 shrink-0 hover:bg-gray-100 text-gray-600 disabled:opacity-40 transition-colors font-medium"
           >
             +
           </button>
         </div>
       </div>
-      
-      <button 
+
+      <button type="button"
+        aria-label={loading ? 'Adding to draft' : added ? 'Added to draft' : isOutOfStock ? 'Out of stock' : 'Add to draft'}
         onClick={() => addToCart()}
         disabled={loading || isOutOfStock}
         className={`
-          w-full py-2.5 rounded-lg flex items-center justify-center gap-2 font-semibold transition-all duration-200
-          ${added 
-            ? 'bg-green-700 text-white shadow-md scale-[1.02]' 
+          min-h-11 w-full px-2 py-2.5 rounded-lg flex items-center justify-center gap-1 text-sm font-semibold transition-all duration-200 sm:gap-2 sm:text-base
+          ${added
+            ? 'bg-green-700 text-white shadow-md scale-[1.02]'
             : isOutOfStock
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : loading
@@ -195,7 +159,7 @@ export default function AddToCartButton({
         ) : added ? (
           <>
             <Check size={18} />
-            <span>Added to Request</span>
+            <span>Added<span className="hidden sm:inline"> to draft</span></span>
           </>
         ) : isOutOfStock ? (
           <>
@@ -205,14 +169,14 @@ export default function AddToCartButton({
         ) : (
           <>
             <Plus size={18} />
-            <span>Add to Request</span>
+            <span>Add<span className="hidden sm:inline"> to draft</span></span>
           </>
         )}
       </button>
-      
-      <div className="flex items-center justify-center gap-2">
+
+      <div className="col-span-2 flex items-center justify-center gap-2">
         <span className={`text-xs ${isOutOfStock ? 'text-red-500' : isLowStock ? 'text-orange-500' : 'text-gray-500'}`}>
-          {isOutOfStock ? 'Out of Stock' : isLowStock ? `Only ${product.inventoryQty} left!` : `${product.inventoryQty} Available`}
+          {isOutOfStock ? 'Out of stock' : isLowStock ? `Only ${product.inventoryQty} left` : `${product.inventoryQty} available`}
         </span>
       </div>
     </div>

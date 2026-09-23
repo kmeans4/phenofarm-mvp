@@ -1,28 +1,30 @@
 import Stripe from 'stripe';
 
-const apiKey = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_TEST_SECRET_KEY;
-
-// Lazy initialization or mock for build
-const stripeInstance: Stripe | {
-  checkout: { sessions: { create: (params?: unknown) => Promise<unknown> } };
-  billingPortal: { sessions: { create: (params?: unknown) => Promise<unknown> } };
-  webhooks: { constructEvent: () => null };
-} = apiKey 
-  ? new Stripe(apiKey, { apiVersion: '2025-12-30.basil' as Stripe.LatestApiVersion })
-  : { 
-      checkout: { sessions: { create: async () => ({}) } },
-      billingPortal: { sessions: { create: async () => ({}) } },
-      webhooks: { constructEvent: () => null } 
-    };
-
-export const stripe = stripeInstance;
+let client: Stripe | undefined;
+export function isStripeConfigured() {
+  return Boolean(process.env.STRIPE_SECRET_KEY || process.env.STRIPE_TEST_SECRET_KEY);
+}
+export function getStripe(): Stripe {
+  const key = process.env.STRIPE_SECRET_KEY || process.env.STRIPE_TEST_SECRET_KEY;
+  if (!key) throw new Error('Stripe Billing is not configured');
+  // Pin the real API version supported by the installed SDK; no mock success path.
+  return client ??= new Stripe(key, { apiVersion: '2026-01-28.clover', timeout: 10000 });
+}
+function appOrigin() {
+  const value = process.env.NEXTAUTH_URL;
+  if (!value) throw new Error('NEXTAUTH_URL is required for billing');
+  const url = new URL(value);
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new Error('Invalid billing origin');
+  if (process.env.NODE_ENV === 'production' && url.protocol !== 'https:') throw new Error('Billing requires an HTTPS origin');
+  return url.origin;
+}
 
 export const STRIPE_CONFIG = {
   proPriceId: process.env.STRIPE_PRO_PRICE_ID || process.env.STRIPE_CULTIVATOR_PRO_PRICE_ID || '',
   businessPriceId: process.env.STRIPE_BUSINESS_PRICE_ID || process.env.STRIPE_CULTIVATOR_BUSINESS_PRICE_ID || '',
-  getSubscriptionSuccessUrl: () => `${process.env.NEXTAUTH_URL || ''}/grower/settings?subscription=success`,
-  getSubscriptionCancelUrl: () => `${process.env.NEXTAUTH_URL || ''}/grower/settings?subscription=cancelled`,
-  getPortalReturnUrl: () => `${process.env.NEXTAUTH_URL || ''}/grower/settings`,
+  getSubscriptionSuccessUrl: () => `${appOrigin()}/grower/settings?subscription=success`,
+  getSubscriptionCancelUrl: () => `${appOrigin()}/grower/settings?subscription=cancelled`,
+  getPortalReturnUrl: () => `${appOrigin()}/grower/settings`,
 };
 
 export type SubscriptionPlan = 'pro' | 'business';

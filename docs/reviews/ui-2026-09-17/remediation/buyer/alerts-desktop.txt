@@ -1,0 +1,85 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e480]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e481]
+    - StaticText "Notifications"
+    - StaticText "18"
+  - navigation "Portal navigation" [ref=e482]
+    - link "Dashboard" [ref=e485]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e486]
+      - StaticText "Catalog"
+    - link "Request Draft 2" [ref=e487]
+      - StaticText "Request Draft"
+      - StaticText "2"
+    - link "Orders 17" [ref=e488]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e489]
+      - StaticText "Saved"
+    - link "Settings" [ref=e490]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e483]
+- main
+  - sectionheader
+    - heading "Saved" [level=1, ref=e491]
+    - link "Browse Catalog" [ref=e492]
+  - tablist "Saved workspace"
+    - tab "Favorites (1)" [ref=e493]
+      - StaticText "Favorites"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Alerts (1)" [selected, ref=e494]
+      - StaticText "Alerts"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Recent (1)" [ref=e495]
+      - StaticText "Recent"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+  - tabpanel "Alerts (1)"
+    - paragraph
+      - StaticText "Checks when you visit or refresh."
+    - button "Refresh prices" [ref=e496]
+      - StaticText "Refresh"
+    - group
+      - DisclosureTriangle "More" [expanded=false]
+    - button "Active (1)" [ref=e497]
+    - button "Triggered (0)" [ref=e498]
+    - button "All" [ref=e499]
+    - link "Purple Haze Flowers" [ref=e500]
+      - image "Purple Haze Flowers"
+    - heading "Purple Haze Flowers" [level=3, ref=e501]
+    - paragraph
+      - StaticText "by "
+      - link "Vermont Nurseries" [ref=e504]
+    - StaticText "THC "
+    - StaticText "24.8"
+    - StaticText "%"
+    - StaticText "Flower"
+    - paragraph
+      - StaticText "CURRENT"
+    - paragraph
+      - StaticText "$25.00/g"
+    - paragraph
+      - StaticText "TARGET"
+    - paragraph
+      - StaticText "$20.00/g"
+    - button "Remove alert" [ref=e502]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e503]
+  - button "Open messages" [ref=e484]
+- region "Notifications alt+T" [ref=e479]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e505]
+  - image
+- alert

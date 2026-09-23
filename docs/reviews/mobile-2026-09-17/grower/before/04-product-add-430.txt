@@ -1,0 +1,134 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e738]
+- button "Notifications" [expanded=false, ref=e739]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e740]
+- main
+  - sectionheader
+    - heading "Add product" [level=1, ref=e742]
+  - form
+    - navigation "Product sections" [ref=e743]
+      - link "Basics" [ref=e747]
+      - link "Pricing" [ref=e748]
+      - link "Stock" [ref=e749]
+      - link "Details" [ref=e750]
+    - paragraph
+      - StaticText "Prefill type, unit & price"
+    - button "Reset defaults" [ref=e744]
+    - generic
+      - heading "Basics" [level=3, ref=e751]
+      - LabelText
+        - StaticText "Name *"
+      - textbox "Name *" [ref=e752]
+      - LabelText
+        - StaticText "Product Type *"
+      - combobox "Product Type *" [expanded=false, ref=e753]: Select a product type
+        - MenuListPopup
+          - option "Select a product type" [selected, ref=e770]
+          - option "Bulk Extract" [ref=e771]
+          - option "Cartridge" [ref=e772]
+          - option "Edibles" [ref=e773]
+          - option "Beverages" [ref=e774]
+          - option "Flower" [ref=e775]
+          - option "Live Plant" [ref=e776]
+          - option "Plant Material" [ref=e777]
+          - option "Prepack" [ref=e778]
+          - option "Preroll" [ref=e779]
+          - option "Tincture" [ref=e780]
+          - option "Topicals & Wellness" [ref=e781]
+      - LabelText
+        - StaticText "Sub Type"
+      - textbox "Select a product type first" [disabled, ref=e754]
+      - LabelText
+        - StaticText "Strain"
+      - combobox [expanded=false, ref=e755]: Select a strain (optional)
+        - MenuListPopup
+          - option "Select a strain (optional)" [selected, ref=e782]
+          - option "Assorted" [ref=e783]
+          - option "Audit Test Kush • Hybrid" [ref=e784]
+          - option "Purple Haze" [ref=e785]
+          - option "Silver Haze" [ref=e786]
+      - button "+ New" [ref=e756]
+      - LabelText
+        - StaticText "Batch"
+      - StaticText "Pick a strain to attach a batch"
+    - generic
+      - heading "Pricing" [level=3, ref=e757]
+      - LabelText
+        - StaticText "Price ($) *"
+      - spinbutton "Price ($) *" [ref=e758]
+      - LabelText
+        - StaticText "Unit *"
+      - combobox "Unit *" [expanded=false, ref=e759]: Gram
+        - MenuListPopup
+          - option "Select a unit" [ref=e787]
+          - option "Gram" [selected, ref=e788]
+          - option "Half Ounce" [ref=e789]
+          - option "Ounce" [ref=e790]
+          - option "Eighth" [ref=e791]
+          - option "Quarter" [ref=e792]
+          - option "Unit" [ref=e793]
+          - option "Pack" [ref=e794]
+          - option "Each" [ref=e795]
+          - option "Lb" [ref=e796]
+      - LabelText
+        - StaticText "Price visibility"
+      - paragraph
+        - StaticText "Quote-only listings hide the price."
+      - button "Show price" [ref=e760]
+        - StaticText "Show price"
+      - button "Quote only" [ref=e761]
+        - StaticText "Quote only"
+    - generic
+      - heading "Stock" [level=3, ref=e762]
+      - LabelText
+        - StaticText "Starting stock *"
+      - spinbutton "Starting stock *" [ref=e763]: 0
+        - StaticText "0"
+      - LabelText
+        - StaticText "SKU"
+      - textbox "SKU" [ref=e764]
+      - LabelText
+        - StaticText "Brand"
+      - textbox "Brand" [ref=e765]: Vermont Nurseries
+        - StaticText "Vermont Nurseries"
+      - LabelText
+        - StaticText "Available"
+      - paragraph
+        - StaticText "Buyers can request this product"
+      - button "Mark product unavailable" [ref=e766]
+    - group
+      - DisclosureTriangle "More details & photos Cannabinoids, harvest date, description and photos. Optional" [expanded=false]
+        - heading "More details & photos" [level=3, ref=e769]
+        - paragraph
+          - StaticText "Cannabinoids, harvest date, description and photos."
+        - StaticText "Optional"
+    - complementary
+      - heading "Summary" [level=3, ref=e767]
+      - StaticText "Available"
+      - DescriptionList
+        - term "Listing"
+        - definition
+          - StaticText "Unnamed product"
+        - term "Type"
+        - definition
+          - StaticText "Not selected"
+        - term "Price"
+        - definition
+          - StaticText "Not priced"
+        - term "Stock"
+        - definition
+          - StaticText "0 g"
+        - term "Visibility"
+        - definition
+          - StaticText "Available · price visible"
+      - button "Save draft" [ref=e768]
+      - paragraph
+        - StaticText "Hidden from buyers until published."
+  - button "Cancel" [ref=e745]
+  - button "Publish product" [ref=e746]
+- button "Open messages" [ref=e741]
+- region "Notifications alt+T" [ref=e737]
+- alert

@@ -1,7 +1,31 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { animate, motion, useInView, useReducedMotion } from 'framer-motion';
+import { animate, LazyMotion, m, useInView, useReducedMotion } from 'framer-motion';
+
+const loadFeatures = () => import('./motion-features').then((module) => module.default);
+
+// Static section contents are rendered on the server and passed through this
+// small animation boundary; they do not become part of the client bundle.
+export function Reveal({ children, className, delay = 0, as = 'div' }: {
+  children: React.ReactNode; className?: string; delay?: number; as?: 'div' | 'figure';
+}) {
+  const reduced = useReducedMotion();
+  const Component = as === 'figure' ? m.figure : m.div;
+  return <Component initial={{ opacity: 0, y: reduced ? 0 : 24 }}
+    whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }}
+    transition={{ duration: reduced ? 0 : 0.55, delay: reduced ? 0 : delay }} className={className}>
+    {children}
+  </Component>;
+}
+
+export function MarketingMotion({ children }: { children: React.ReactNode }) {
+  return (
+    <LazyMotion features={loadFeatures} strict>
+      {children}
+    </LazyMotion>
+  );
+}
 
 /** Eased number counter that runs once when scrolled into view. */
 export function CountUp({
@@ -63,7 +87,7 @@ export function SectionHeading({
 }) {
   const alignCls = align === 'center' ? 'mx-auto text-center' : 'text-left';
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
@@ -75,7 +99,7 @@ export function SectionHeading({
         {title}
       </h2>
       {lede && <p className="mt-5 text-pretty leading-relaxed text-gray-400">{lede}</p>}
-    </motion.div>
+    </m.div>
   );
 }
 
@@ -97,19 +121,23 @@ export function StaggeredWords({
     <span className={className} aria-label={text} role="text">
       {words.map((word, i) => (
         <span key={`${word}-${i}`} aria-hidden className="inline-block overflow-hidden pb-1 align-bottom">
-          <motion.span
+          <m.span
             className={`inline-block ${
               accentFrom !== undefined && i >= accentFrom
                 ? 'bg-gradient-to-br from-emerald-200 via-emerald-400 to-teal-400 bg-clip-text text-transparent'
                 : ''
             }`}
-            initial={reduced ? false : { y: '110%' }}
+            initial={{ y: '110%' }}
             animate={{ y: 0 }}
-            transition={{ duration: 0.7, delay: 0.15 + i * 0.07, ease: [0.16, 1, 0.3, 1] }}
+            transition={{
+              duration: reduced ? 0 : 0.7,
+              delay: reduced ? 0 : 0.15 + i * 0.07,
+              ease: [0.16, 1, 0.3, 1],
+            }}
           >
             {word}
             {i < words.length - 1 ? ' ' : ''}
-          </motion.span>
+          </m.span>
         </span>
       ))}
     </span>

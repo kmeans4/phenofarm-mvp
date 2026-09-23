@@ -1,0 +1,42 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e349]
+- button "Notifications" [expanded=false, ref=e350]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e351]
+- main
+  - sectionheader
+    - heading "Edit strain" [level=1, ref=e353]
+  - form
+    - LabelText
+      - StaticText "Name *"
+    - combobox "Name *" [required, ref=e354]: Audit Test Kush
+      - StaticText "Audit Test Kush"
+    - LabelText
+      - StaticText "Type *"
+    - combobox "Type *" [expanded=false, ref=e355]: Hybrid
+      - MenuListPopup
+        - option "Select strain type" [ref=e361]
+        - option "Indica" [ref=e362]
+        - option "Sativa" [ref=e363]
+        - option "Hybrid" [selected, ref=e364]
+        - option "Sativa Dom. Hybrid" [ref=e365]
+        - option "Indica Dom. Hybrid" [ref=e366]
+    - group
+      - DisclosureTriangle "About strain types" [expanded=false]
+        - StaticText "About strain types"
+    - LabelText
+      - StaticText "Genetics"
+    - textbox "Genetics" [ref=e356]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e357]
+    - LabelText
+      - StaticText "Growing notes"
+    - textbox "Growing notes" [ref=e358]
+    - button "Save Changes" [ref=e359]
+    - button "Cancel" [ref=e360]
+- button "Open messages" [ref=e352]
+- region "Notifications alt+T" [ref=e348]
+- alert

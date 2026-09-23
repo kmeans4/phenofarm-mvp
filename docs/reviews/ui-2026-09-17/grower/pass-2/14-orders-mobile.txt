@@ -1,0 +1,310 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e740]
+- button "Notifications" [expanded=false, ref=e741]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e742]
+- main
+  - sectionheader
+    - heading "Order Requests" [level=1, ref=e744]
+    - paragraph
+      - StaticText "Review, accept, and fulfill buyer requests without in-app payment settlement"
+    - link "View History" [ref=e745]
+    - link "Record Request" [ref=e746]
+  - paragraph
+    - StaticText "Total Requests"
+  - paragraph
+    - StaticText "20"
+  - paragraph
+    - StaticText "Active Requests"
+  - paragraph
+    - StaticText "18"
+  - paragraph
+    - StaticText "Needs Review"
+  - paragraph
+    - StaticText "17"
+  - paragraph
+    - StaticText "Estimated Request Value"
+  - paragraph
+    - StaticText "$910.50"
+  - paragraph
+    - StaticText "Excludes cancelled"
+  - generic
+    - paragraph
+      - StaticText "Saved workflow views"
+    - paragraph
+      - StaticText "Start with the next request state before selecting batch actions."
+    - button "All: 18 requests" [ref=e747]
+      - StaticText "All"
+      - StaticText "18"
+    - button "Needs review: 17 requests" [ref=e748]
+      - StaticText "Needs review"
+      - StaticText "17"
+    - button "Accepted: 1 requests" [ref=e749]
+      - StaticText "Accepted"
+      - StaticText "1"
+    - button "Preparing: 0 requests" [ref=e750]
+      - StaticText "Preparing"
+      - StaticText "0"
+    - button "Ready: 0 requests" [ref=e751]
+      - StaticText "Ready"
+      - StaticText "0"
+    - button "Delivered: 0 requests" [ref=e752]
+      - StaticText "Delivered"
+      - StaticText "0"
+    - heading "Active Requests (18)" [level=3, ref=e753]
+      - StaticText "Active Requests (18)"
+    - StaticText "Density"
+    - button "Comfort" [ref=e754]
+    - button "Compact" [ref=e755]
+    - table
+      - rowgroup
+        - row
+          - columnheader "Select all visible requests" [ref=e901]
+            - checkbox "Select all visible requests" [checked=false, ref=e944]
+          - columnheader "REQUEST #" [ref=e902]
+          - columnheader "DISPENSARY" [ref=e903]
+          - columnheader "DATE" [ref=e904]
+          - columnheader "EST. VALUE" [ref=e905]
+          - columnheader "STATUS" [ref=e906]
+          - columnheader "ACTIONS" [ref=e907]
+      - row [ref=e756] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-20260710-XPJO3I" [ref=e775]
+          - checkbox "Select request #ORD-20260710-XPJO3I" [checked=false, ref=e908]
+        - cell "#ORD-20260710-XPJO3I" [ref=e776]
+          - generic
+            - StaticText "#ORD-20260710-XPJO3I"
+        - cell "Green Vermont Dispensary" [ref=e777]
+        - cell "Jul 9, 2026" [ref=e778]
+        - cell "$25.00" [ref=e779]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e780]
+        - cell "View" [ref=e781]
+          - link "View" [ref=e909]
+      - row [ref=e757] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-20260710-03UYXZ" [ref=e782]
+          - checkbox "Select request #ORD-20260710-03UYXZ" [checked=false, ref=e910]
+        - cell "#ORD-20260710-03UYXZ" [ref=e783]
+          - generic
+            - StaticText "#ORD-20260710-03UYXZ"
+        - cell "Green Vermont Dispensary" [ref=e784]
+        - cell "Jul 9, 2026" [ref=e785]
+        - cell "$25.00" [ref=e786]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e787]
+        - cell "View" [ref=e788]
+          - link "View" [ref=e911]
+      - row [ref=e758] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-20260710-O78T5N" [ref=e789]
+          - checkbox "Select request #ORD-20260710-O78T5N" [checked=false, ref=e912]
+        - cell "#ORD-20260710-O78T5N" [ref=e790]
+          - generic
+            - StaticText "#ORD-20260710-O78T5N"
+        - cell "Green Vermont Dispensary" [ref=e791]
+        - cell "Jul 9, 2026" [ref=e792]
+        - cell "$25.00" [ref=e793]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e794]
+        - cell "View" [ref=e795]
+          - link "View" [ref=e913]
+      - row [ref=e759] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-20260710-ZYGM3S" [ref=e796]
+          - checkbox "Select request #ORD-20260710-ZYGM3S" [checked=false, ref=e914]
+        - cell "#ORD-20260710-ZYGM3S" [ref=e797]
+          - generic
+            - StaticText "#ORD-20260710-ZYGM3S"
+        - cell "Green Vermont Dispensary" [ref=e798]
+        - cell "Jul 9, 2026" [ref=e799]
+        - cell "$25.00" [ref=e800]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e801]
+        - cell "View" [ref=e802]
+          - link "View" [ref=e915]
+      - row [ref=e760] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-20260710-FMBIOT" [ref=e803]
+          - checkbox "Select request #ORD-20260710-FMBIOT" [checked=false, ref=e916]
+        - cell "#ORD-20260710-FMBIOT" [ref=e804]
+          - generic
+            - StaticText "#ORD-20260710-FMBIOT"
+        - cell "Green Vermont Dispensary" [ref=e805]
+        - cell "Jul 9, 2026" [ref=e806]
+        - cell "$25.00" [ref=e807]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e808]
+        - cell "View" [ref=e809]
+          - link "View" [ref=e917]
+      - row [ref=e761] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1783641718088-1" [ref=e810]
+          - checkbox "Select request #ORD-1783641718088-1" [checked=false, ref=e918]
+        - cell "#ORD-1783641718088-1" [ref=e811]
+          - generic
+            - StaticText "#ORD-1783641718088-1"
+        - cell "Green Vermont Dispensary" [ref=e812]
+        - cell "Jul 9, 2026" [ref=e813]
+        - cell "$25.00" [ref=e814]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e815]
+        - cell "View" [ref=e816]
+          - link "View" [ref=e919]
+      - row [ref=e762] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1783641503047-1" [ref=e817]
+          - checkbox "Select request #ORD-1783641503047-1" [checked=false, ref=e920]
+        - cell "#ORD-1783641503047-1" [ref=e818]
+          - generic
+            - StaticText "#ORD-1783641503047-1"
+        - cell "Green Vermont Dispensary" [ref=e819]
+        - cell "Jul 9, 2026" [ref=e820]
+        - cell "$25.00" [ref=e821]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e822]
+        - cell "View" [ref=e823]
+          - link "View" [ref=e921]
+      - row [ref=e763] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1781196282824-1" [ref=e824]
+          - checkbox "Select request #ORD-1781196282824-1" [checked=false, ref=e922]
+        - cell "#ORD-1781196282824-1" [ref=e825]
+          - generic
+            - StaticText "#ORD-1781196282824-1"
+        - cell "Green Vermont Dispensary" [ref=e826]
+        - cell "Jun 11, 2026" [ref=e827]
+        - cell "$25.00" [ref=e828]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e829]
+        - cell "View" [ref=e830]
+          - link "View" [ref=e923]
+      - row [ref=e764] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1781145140815-1" [ref=e831]
+          - checkbox "Select request #ORD-1781145140815-1" [checked=false, ref=e924]
+        - cell "#ORD-1781145140815-1" [ref=e832]
+          - generic
+            - StaticText "#ORD-1781145140815-1"
+        - cell "Green Vermont Dispensary" [ref=e833]
+        - cell "Jun 10, 2026" [ref=e834]
+        - cell "$25.00" [ref=e835]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e836]
+        - cell "View" [ref=e837]
+          - link "View" [ref=e925]
+      - row [ref=e765] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1781144783465-1" [ref=e838]
+          - checkbox "Select request #ORD-1781144783465-1" [checked=false, ref=e926]
+        - cell "#ORD-1781144783465-1" [ref=e839]
+          - generic
+            - StaticText "#ORD-1781144783465-1"
+        - cell "Green Vermont Dispensary" [ref=e840]
+        - cell "Jun 10, 2026" [ref=e841]
+        - cell "$25.00" [ref=e842]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e843]
+        - cell "View" [ref=e844]
+          - link "View" [ref=e927]
+      - row [ref=e766] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1781144724494-1" [ref=e845]
+          - checkbox "Select request #ORD-1781144724494-1" [checked=false, ref=e928]
+        - cell "#ORD-1781144724494-1" [ref=e846]
+          - generic
+            - StaticText "#ORD-1781144724494-1"
+        - cell "Green Vermont Dispensary" [ref=e847]
+        - cell "Jun 10, 2026" [ref=e848]
+        - cell "$25.00" [ref=e849]
+          - StaticText "$25.00"
+        - cell "Submitted" [ref=e850]
+        - cell "View" [ref=e851]
+          - link "View" [ref=e929]
+      - row [ref=e767] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1777395857103-1" [ref=e852]
+          - checkbox "Select request #ORD-1777395857103-1" [checked=false, ref=e930]
+        - cell "#ORD-1777395857103-1" [ref=e853]
+          - generic
+            - StaticText "#ORD-1777395857103-1"
+        - cell "Green Vermont Dispensary" [ref=e854]
+        - cell "Apr 28, 2026" [ref=e855]
+        - cell "$26.50" [ref=e856]
+          - StaticText "$26.50"
+        - cell "Accepted" [ref=e857]
+        - cell "View" [ref=e858]
+          - link "View" [ref=e931]
+      - row [ref=e768] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1777395448158-1" [ref=e859]
+          - checkbox "Select request #ORD-1777395448158-1" [checked=false, ref=e932]
+        - cell "#ORD-1777395448158-1" [ref=e860]
+          - generic
+            - StaticText "#ORD-1777395448158-1"
+        - cell "Green Vermont Dispensary" [ref=e861]
+        - cell "Apr 28, 2026" [ref=e862]
+        - cell "$26.50" [ref=e863]
+          - StaticText "$26.50"
+        - cell "Submitted" [ref=e864]
+        - cell "View" [ref=e865]
+          - link "View" [ref=e933]
+      - row [ref=e769] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1777395128040-1" [ref=e866]
+          - checkbox "Select request #ORD-1777395128040-1" [checked=false, ref=e934]
+        - cell "#ORD-1777395128040-1" [ref=e867]
+          - generic
+            - StaticText "#ORD-1777395128040-1"
+        - cell "Green Vermont Dispensary" [ref=e868]
+        - cell "Apr 28, 2026" [ref=e869]
+        - cell "$26.50" [ref=e870]
+          - StaticText "$26.50"
+        - cell "Submitted" [ref=e871]
+        - cell "View" [ref=e872]
+          - link "View" [ref=e935]
+      - row [ref=e770] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1776721375263-1" [ref=e873]
+          - checkbox "Select request #ORD-1776721375263-1" [checked=false, ref=e936]
+        - cell "#ORD-1776721375263-1" [ref=e874]
+          - generic
+            - StaticText "#ORD-1776721375263-1"
+        - cell "Green Vermont Dispensary" [ref=e875]
+        - cell "Apr 20, 2026" [ref=e876]
+        - cell "$26.50" [ref=e877]
+          - StaticText "$26.50"
+        - cell "Submitted" [ref=e878]
+        - cell "View" [ref=e879]
+          - link "View" [ref=e937]
+      - row [ref=e771] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1776721208544-1" [ref=e880]
+          - checkbox "Select request #ORD-1776721208544-1" [checked=false, ref=e938]
+        - cell "#ORD-1776721208544-1" [ref=e881]
+          - generic
+            - StaticText "#ORD-1776721208544-1"
+        - cell "Green Vermont Dispensary" [ref=e882]
+        - cell "Apr 20, 2026" [ref=e883]
+        - cell "$26.50" [ref=e884]
+          - StaticText "$26.50"
+        - cell "Submitted" [ref=e885]
+        - cell "View" [ref=e886]
+          - link "View" [ref=e939]
+      - row [ref=e772] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1776352194185-1" [ref=e887]
+          - checkbox "Select request #ORD-1776352194185-1" [checked=false, ref=e940]
+        - cell "#ORD-1776352194185-1" [ref=e888]
+          - generic
+            - StaticText "#ORD-1776352194185-1"
+        - cell "Green Vermont Dispensary" [ref=e889]
+        - cell "Apr 16, 2026" [ref=e890]
+        - cell "$26.50" [ref=e891]
+          - StaticText "$26.50"
+        - cell "Submitted" [ref=e892]
+        - cell "View" [ref=e893]
+          - link "View" [ref=e941]
+      - row [ref=e773] clickable [cursor:pointer, onclick]
+        - cell "Select request #ORD-1776352143510-1" [ref=e894]
+          - checkbox "Select request #ORD-1776352143510-1" [checked=false, ref=e942]
+        - cell "#ORD-1776352143510-1" [ref=e895]
+          - generic
+            - StaticText "#ORD-1776352143510-1"
+        - cell "Green Vermont Dispensary" [ref=e896]
+        - cell "Apr 16, 2026" [ref=e897]
+        - cell "$26.50" [ref=e898]
+          - StaticText "$26.50"
+        - cell "Submitted" [ref=e899]
+        - cell "View" [ref=e900]
+          - link "View" [ref=e943]
+- button "Open messages" [ref=e743]
+- region "Notifications alt+T" [ref=e739]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e774]
+  - image
+- alert

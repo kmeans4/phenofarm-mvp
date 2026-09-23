@@ -1,0 +1,123 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e972]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e973]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e974]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e978]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e979]
+      - StaticText "Overview"
+    - link "Products" [ref=e980]
+      - StaticText "Products"
+    - link "Inventory" [ref=e981]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e982]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e983]
+      - StaticText "Strains"
+    - link "Batches" [ref=e984]
+      - StaticText "Batches"
+    - link "Customers" [ref=e985]
+      - StaticText "Customers"
+    - link "Reports" [ref=e986]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e987]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e975]
+- main
+  - sectionheader
+    - heading "Add New Batch" [level=1, ref=e988]
+    - paragraph
+      - StaticText "Create a harvest batch with lab results"
+  - heading "Batch Details" [level=3, ref=e976]
+  - form
+    - LabelText
+      - StaticText "Batch Number *"
+    - button "Suggest" [ref=e989]
+    - textbox "Batch Number *" [required, ref=e990]
+    - paragraph
+      - StaticText "Expected format: BATCH-YYYYMMDD-XX, such as BATCH-20260706-01."
+    - LabelText
+      - StaticText "Lot Number"
+    - textbox "Lot Number" [ref=e991]
+    - LabelText
+      - StaticText "Harvest Date *"
+    - Date "Harvest Date *": 2026-09-17
+      - generic
+        - spinbutton "Month Month" [ref=e1009]: 9
+          - StaticText "09"
+        - StaticText "/"
+        - spinbutton "Day Day" [ref=e1010]: 17
+          - StaticText "17"
+        - StaticText "/"
+        - spinbutton "Year Year" [ref=e1011]: 2026
+          - StaticText "2026"
+      - button "Show date picker" [ref=e1008]
+    - LabelText
+      - StaticText "Strain *"
+    - combobox "Strain *" [expanded=false, ref=e992]: Select a strain
+      - MenuListPopup
+        - option "Select a strain" [selected, ref=e1012]
+        - option "Assorted " [ref=e1013]
+        - option "Audit Test Kush " [ref=e1014]
+        - option "Purple Haze " [ref=e1015]
+        - option "Silver Haze " [ref=e1016]
+    - heading "Lab Results" [level=3, ref=e993]
+    - LabelText
+      - StaticText "THC (%)"
+    - spinbutton "THC (%)" [ref=e994]
+    - LabelText
+      - StaticText "CBD (%)"
+    - spinbutton "CBD (%)" [ref=e995]
+    - LabelText
+      - StaticText "Total Cannabinoids (%)"
+    - spinbutton "Total Cannabinoids (%)" [ref=e996]
+    - heading "Lab Result Documents" [level=4, ref=e997]
+    - paragraph
+      - StaticText "Upload the three lab PDFs growers typically receive before selling flower. Each PDF must be 2MB or smaller."
+    - LabelText
+      - StaticText "Potency Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the PDF showing THC, CBD, and total cannabinoids."
+    - button "Potency Test" [ref=e998]: No file chosen
+    - button "Upload PDF" [ref=e999]
+    - LabelText
+      - StaticText "Pesticide Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the pesticide test PDF for this batch."
+    - button "Pesticide Test" [ref=e1000]: No file chosen
+    - button "Upload PDF" [ref=e1001]
+    - LabelText
+      - StaticText "Microbial Test"
+    - StaticText "Missing"
+    - paragraph
+      - StaticText "Upload the microbial test PDF for this batch."
+    - button "Microbial Test" [ref=e1002]: No file chosen
+    - button "Upload PDF" [ref=e1003]
+    - LabelText
+      - StaticText "Notes"
+    - textbox "Notes" [ref=e1004]
+    - button "Create Batch" [disabled, ref=e1005]
+    - button "Cancel" [ref=e1006]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1007]
+  - button "Open messages" [ref=e977]
+- region "Notifications alt+T" [ref=e971]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1017]
+  - image
+- alert

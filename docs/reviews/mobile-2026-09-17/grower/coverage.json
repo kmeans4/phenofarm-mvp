@@ -1,0 +1,1083 @@
+{
+  "scope": "22 grower operational pages;18 implemented by this agent and4 customer pages implemented by root with M-C IDs. Shared shell/components tracked by root. METRC excluded.",
+  "environment": "Local isolated phenofarm_ui_fixes_20260917 clone; before production3144, preview3146; no database writes submitted by this visual review.",
+  "before": {
+    "viewport": {
+      "width": 360,
+      "height": 800
+    },
+    "all_pages_captured_before_edits": true,
+    "wider_spots": [
+      390,
+      430
+    ],
+    "inspected_screenshot_count": 42,
+    "initial_baseline_screenshots": 41,
+    "late_pre_correction_screenshots": 1
+  },
+  "pages": [
+    {
+      "route": "/grower/dashboard",
+      "page": "01-dashboard",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/01-dashboard-360.png",
+      "before_inspected": true,
+      "before_height": 1717,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_dashboard-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_dashboard-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_dashboard-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_dashboard-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G01"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 1397,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/catalog",
+      "page": "02-catalog",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/02-catalog-360.png",
+      "before_inspected": true,
+      "before_height": 1242,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_catalog-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_catalog-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_catalog-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_catalog-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G02"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 800,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/products",
+      "page": "03-products",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/03-products-360.png",
+      "before_inspected": true,
+      "before_height": 1379,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G03"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 1063,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360,
+        390,
+        1440
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/products/add",
+      "page": "04-product-add",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/04-product-add-360.png",
+      "before_inspected": true,
+      "before_height": 1962,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products_add-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products_add-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products_add-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products_add-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G04"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 1526,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360,
+        430,
+        1440
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/products/product-001/edit",
+      "page": "05-product-edit",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/05-product-edit-360.png",
+      "before_inspected": true,
+      "before_height": 2731,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products__id__edit-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products__id__edit-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products__id__edit-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_products__id__edit-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G05"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 2427,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/inventory",
+      "page": "06-inventory",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/06-inventory-360.png",
+      "before_inspected": true,
+      "before_height": 1415,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_inventory-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_inventory-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_inventory-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_inventory-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G06"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 979,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360,
+        430
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/inventory/add",
+      "page": "07-stock-update",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/07-stock-update-360.png",
+      "before_inspected": true,
+      "before_height": 800,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_inventory_add-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_inventory_add-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_inventory_add-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_inventory_add-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G07"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 800,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/strains",
+      "page": "08-strains",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/08-strains-360.png",
+      "before_inspected": true,
+      "before_height": 1246,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G08",
+        "M-G21"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 1002,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/strains/add",
+      "page": "09-strain-add",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/09-strain-add-360.png",
+      "before_inspected": true,
+      "before_height": 946,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains_add-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains_add-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains_add-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains_add-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G09"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 868,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/strains/0e0cc401-8c6d-4447-b60b-49cfb65c0258/edit",
+      "page": "10-strain-edit",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/10-strain-edit-360.png",
+      "before_inspected": true,
+      "before_height": 946,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains__id__edit-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains__id__edit-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains__id__edit-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_strains__id__edit-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G10"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 868,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/batches",
+      "page": "11-batches",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/11-batches-360.png",
+      "before_inspected": true,
+      "before_height": 800,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G11"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 800,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/batches/add",
+      "page": "12-batch-add",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/12-batch-add-360.png",
+      "before_inspected": true,
+      "before_height": 1311,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches_add-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches_add-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches_add-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches_add-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G12"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 1153,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/batches/ui-review-batch/edit",
+      "page": "13-batch-edit",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/13-batch-edit-360.png",
+      "before_inspected": true,
+      "before_height": 1370,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches__id__edit-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches__id__edit-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches__id__edit-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_batches__id__edit-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G13"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 1210,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360,
+        1440
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/orders",
+      "page": "14-orders",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/14-orders-360.png",
+      "before_inspected": true,
+      "before_height": 4012,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G14"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 3593,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/orders/history",
+      "page": "15-order-history",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/15-order-history-360.png",
+      "before_inspected": true,
+      "before_height": 970,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders_history-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders_history-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders_history-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders_history-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G15"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 800,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/orders/add",
+      "page": "16-order-add",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/16-order-add-360.png",
+      "before_inspected": true,
+      "before_height": 824,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders_add-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders_add-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders_add-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders_add-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G16"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 800,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360,
+        390
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "page": "17-order-detail",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/17-order-detail-360.png",
+      "before_inspected": true,
+      "before_height": 1668,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders__id_-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders__id_-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders__id_-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders__id_-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G17"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 1277,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+      "page": "18-order-edit",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/18-order-edit-360.png",
+      "before_inspected": true,
+      "before_height": 1686,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders__id__edit-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders__id__edit-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders__id__edit-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_orders__id__edit-1440.png"
+      ],
+      "status": "fixed_verified",
+      "finding_ids": [
+        "M-G18"
+      ],
+      "remediation_owner": "grower agent",
+      "after_height": 1344,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manually_inspected_widths": [
+        360,
+        1440
+      ],
+      "manual_review_owner": "grower agent",
+      "after_inspected": true,
+      "review_notes": "Full 360px screenshot inspected, including below-fold content; alternate states listed below. Other widths have automated geometry/runtime proof unless listed as manually inspected."
+    },
+    {
+      "route": "/grower/customers",
+      "page": "19-customers",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/19-customers-360.png",
+      "before_inspected": true,
+      "before_height": 1132,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers-1440.png"
+      ],
+      "status": "verified_by_root",
+      "finding_ids": [
+        "M-C01"
+      ],
+      "remediation_owner": "root",
+      "after_height": 949,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manual_review_owner": "root",
+      "manual_evidence_source": "docs/reviews/mobile-2026-09-17/root/findings.json",
+      "review_notes": "Baseline captured and inspected by grower agent; implementation and final visual/interaction verification completed by root."
+    },
+    {
+      "route": "/grower/customers/add",
+      "page": "20-customer-add",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/20-customer-add-360.png",
+      "before_inspected": true,
+      "before_height": 984,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers_add-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers_add-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers_add-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers_add-1440.png"
+      ],
+      "status": "verified_by_root",
+      "finding_ids": [
+        "M-C02"
+      ],
+      "remediation_owner": "root",
+      "after_height": 800,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manual_review_owner": "root",
+      "manual_evidence_source": "docs/reviews/mobile-2026-09-17/root/findings.json",
+      "review_notes": "Baseline captured and inspected by grower agent; implementation and final visual/interaction verification completed by root."
+    },
+    {
+      "route": "/grower/customers/ui-review-customer/edit",
+      "page": "21-customer-edit",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/21-customer-edit-360.png",
+      "before_inspected": true,
+      "before_height": 1568,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers__id__edit-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers__id__edit-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers__id__edit-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers__id__edit-1440.png"
+      ],
+      "status": "verified_by_root",
+      "finding_ids": [
+        "M-C03",
+        "M-C05"
+      ],
+      "remediation_owner": "root",
+      "after_height": 1237,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manual_review_owner": "root",
+      "manual_evidence_source": "docs/reviews/mobile-2026-09-17/root/findings.json",
+      "review_notes": "Baseline captured and inspected by grower agent; implementation and final visual/interaction verification completed by root."
+    },
+    {
+      "route": "/grower/customers/ui-review-customer/statement",
+      "page": "22-customer-statement",
+      "before": "docs/reviews/mobile-2026-09-17/grower/before/22-customer-statement-360.png",
+      "before_inspected": true,
+      "before_height": 824,
+      "after": [
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers__id__statement-360.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers__id__statement-390.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers__id__statement-430.png",
+        "docs/reviews/mobile-2026-09-17/final-pages/_grower_customers__id__statement-1440.png"
+      ],
+      "status": "verified_by_root",
+      "finding_ids": [
+        "M-C04"
+      ],
+      "remediation_owner": "root",
+      "after_height": 800,
+      "automated_widths": [
+        360,
+        390,
+        430,
+        1440
+      ],
+      "automated_result": {
+        "http_status": 200,
+        "page_overflow": false,
+        "runtime_errors": 0,
+        "phone_fields_below_16px": 0
+      },
+      "manual_review_owner": "root",
+      "manual_evidence_source": "docs/reviews/mobile-2026-09-17/root/findings.json",
+      "review_notes": "Baseline captured and inspected by grower agent; implementation and final visual/interaction verification completed by root."
+    }
+  ],
+  "interactions": [
+    {
+      "route": "/grower/dashboard",
+      "state": "Setup open/closed",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/01-dashboard-final-360.png",
+        "docs/reviews/mobile-2026-09-17/grower/after/01-dashboard-setup-360.png"
+      ],
+      "checks": "Read and inspected; no setup action submitted."
+    },
+    {
+      "route": "/grower/catalog",
+      "state": "All checks and Strains, batches & customers expanded",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/02-catalog-final-360.png",
+        "docs/reviews/mobile-2026-09-17/grower/after/02-catalog-expanded-360.png"
+      ],
+      "checks": "Both disclosures opened and all links inspected."
+    },
+    {
+      "route": "/grower/products",
+      "state": "Quote-only filter",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/03-products-filter-360.png"
+      ],
+      "checks": "Expected listing shown; reset to All."
+    },
+    {
+      "route": "/grower/products",
+      "state": "Quick add",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/03-products-quick-360.png"
+      ],
+      "checks": "Restored local draft preserved; inspected without submission and closed."
+    },
+    {
+      "route": "/grower/products",
+      "state": "More actions",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/03-products-more-360.png"
+      ],
+      "checks": "Menu opened, inspected and dismissed with Escape; no action submitted."
+    },
+    {
+      "route": "/grower/products",
+      "state": "Selection toolbar and 40px checkbox target",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/03-products-selection-360.png"
+      ],
+      "checks": "Checked one product; measured 40 by 40px label; cleared selection without a bulk action."
+    },
+    {
+      "route": "/grower/products/add",
+      "state": "Details & photos expanded",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/04-product-add-details-360.png"
+      ],
+      "checks": "All expanded fields inspected through the bottom; no submit."
+    },
+    {
+      "route": "/grower/products/product-001/edit",
+      "state": "New strain inline form",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/05-product-new-strain-360.png"
+      ],
+      "checks": "Fields and close inspected; closed without creation."
+    },
+    {
+      "route": "/grower/products/product-001/edit",
+      "state": "New batch dialog top and bottom",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/05-product-new-batch-top-360.png",
+        "docs/reviews/mobile-2026-09-17/grower/after/05-product-new-batch-bottom-360.png"
+      ],
+      "checks": "Dialog title and footer inspected; Escape closes and returns focus to + New."
+    },
+    {
+      "route": "/grower/inventory",
+      "state": "Low-stock filter",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/06-inventory-filter-360.png"
+      ],
+      "checks": "Empty state inspected; reset to All. Auto-save stock controls were not changed."
+    },
+    {
+      "route": "/grower/strains",
+      "state": "List view and horizontally scrolled Actions",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/08-strains-list-360.png",
+        "docs/reviews/mobile-2026-09-17/grower/after/08-strains-list-actions-360.png"
+      ],
+      "checks": "All rows measured 57px and screenshots inspected; restored Card View."
+    },
+    {
+      "route": "/grower/strains/add",
+      "state": "About strain types",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/09-strain-help-360.png"
+      ],
+      "checks": "Expanded and read; no form submitted."
+    },
+    {
+      "route": "/grower/batches/ui-review-batch/edit",
+      "state": "Optional terpene row",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/13-batch-edit-terpenes-360.png"
+      ],
+      "checks": "Added a blank unsaved row, inspected and removed it without saving."
+    },
+    {
+      "route": "/grower/orders",
+      "state": "Selection toolbar",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/14-orders-selection-360.png"
+      ],
+      "checks": "Selected one request, inspected toolbar and cleared selection; no bulk mutation."
+    },
+    {
+      "route": "/grower/orders",
+      "state": "Accepted filter",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/14-orders-filter-360.png"
+      ],
+      "checks": "Expected record shown; reset to All."
+    },
+    {
+      "route": "/grower/orders",
+      "state": "Last records below the fold",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/14-orders-bottom-360.png"
+      ],
+      "checks": "Final cards and actions inspected at viewport scale in addition to full-page review."
+    },
+    {
+      "route": "/grower/orders/add",
+      "state": "Unsaved item and shipping/notes",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/16-order-add-item-360.png"
+      ],
+      "checks": "Item editor, totals and expanded details inspected; navigation discarded unsaved form."
+    },
+    {
+      "route": "/grower/orders/add",
+      "state": "Buyer options",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/16-order-buyer-options-360.png"
+      ],
+      "checks": "Options opened and inspected; no request submitted."
+    },
+    {
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "state": "Actions menu",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/17-order-actions-360.png"
+      ],
+      "checks": "Menu fits within right edge; dismissed without action."
+    },
+    {
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "state": "Progress disclosure",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/17-order-progress-360.png"
+      ],
+      "checks": "Expanded timeline inspected; Request history remained closed in this screenshot."
+    },
+    {
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "state": "Request history disclosure",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/17-order-history-360.png"
+      ],
+      "checks": "Separately expanded and inspected history timestamp/actor."
+    },
+    {
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd",
+      "state": "Accept confirmation",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/17-order-confirmation-360.png"
+      ],
+      "checks": "First Accept click only; confirmation inspected, then Cancel dismissed it. No status mutation submitted."
+    },
+    {
+      "route": "/grower/orders/cmre7ky2400aaekhl0qlnwhqd/edit",
+      "state": "Remove-item confirmation",
+      "after_status": "inspected_passed",
+      "screenshots": [
+        "docs/reviews/mobile-2026-09-17/grower/after/18-order-remove-confirmation-360.png"
+      ],
+      "checks": "Dialog inspected and dismissed with Escape; no removal or save."
+    },
+    {
+      "route": "/grower/customers/ui-review-customer/edit",
+      "state": "Customer More menu, optional fields and validation",
+      "after_status": "verified_by_root",
+      "evidence": "docs/reviews/mobile-2026-09-17/customer-interaction-checks.json",
+      "checks": "Root verified final customer interactions; grower agent captured the initial baseline."
+    }
+  ],
+  "checks": [
+    "Task-only source snapshot: /tmp/phenofarm-mobile-grower-source-before; later correction snapshots: /tmp/phenofarm-mobile-grower-final-correction-before.",
+    "Scoped ESLint and diff whitespace checks passed; source changes frozen.",
+    "Root-coordinated npm run verify and final production build passed.",
+    "All 56 selected workflow regressions passed, including grower-review-regressions, ui-grower-data-regressions and profile-hardening.",
+    "Root captured 48 pages at 360/390/430/1440 and repeated 44 affected views after final corrections; all returned successfully with zero page overflow/runtime errors and no phone input text below 16px.",
+    "No database writes were submitted by this visual inspection; regression tests were separately run by root against the isolated clone.",
+    "Fixture counts and calendar dates can vary between captures; form density comparisons preserve the same field set."
+  ],
+  "after": {
+    "owned_pages_inspected_at_360": 18,
+    "wider_mobile_spot_screenshots": 4,
+    "desktop_spot_screenshots": 4,
+    "owned_state_and_final_correction_screenshots": 28,
+    "all_owned_image_inspections_complete": true,
+    "automated_owned_views": 72,
+    "source_frozen": true,
+    "pending_owned_findings": 0,
+    "final_corrections_rechecked": [
+      "Dashboard bottom spacing",
+      "Catalog bottom spacing and expanded disclosures",
+      "Product selection hit area",
+      "Strain List row height and horizontal actions",
+      "Request detail bottom spacing"
+    ]
+  },
+  "limits": [
+    "Chrome viewport emulation, not physical iOS/Android device testing.",
+    "Local isolated build only; no commit, push, migration or deployment.",
+    "Shared shell, settings, reports, pricing, marketplace and customer fixes have root-owned evidence. METRC excluded."
+  ]
+}

@@ -1,21 +1,7 @@
+import { getBuyerCatalog } from '@/lib/buyer-catalog';
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { expandProductTypeFilters } from '@/lib/product-types';
-import { Prisma } from '@prisma/client';
 import { apiError, logApiError } from '@/lib/api-response';
-import {
-  toSafeAvailability,
-  toSafeBoolean,
-  toSafeNonNegativeInteger,
-  toSafeNonNegativeNumber,
-  toSafeOptionalNumber,
-  toSafeOptionalString,
-  toSafeProductName,
-  toSafeProductType,
-  toSafeStringArray,
-  toSafeUnit,
-} from '@/lib/product-serializers';
 
 /**
  * Dispensary Catalog API
@@ -24,31 +10,18 @@ import {
  *
  * Query Parameters:
  * - page (optional): Page number, defaults to 1
- * - limit (optional): Products per page, defaults to 20, max 50
+ * - limit (optional): Products per page, defaults to 20, max 100
+ * - cursor (optional): Product id from nextCursor
  * - search (optional): Search products by name, strain, or type
  * - productTypes (optional): Comma-separated list of product types
  * - thcRanges (optional): Comma-separated list of THC range IDs (low, medium, high, very-high)
- * - priceRanges (optional): Comma-separated list of price range IDs (budget, standard, premium, luxury)
+ * - priceRanges (optional): Comma-separated list of unit-price range IDs (budget, standard, premium, luxury)
  * - sortBy (optional): Sort option (default, price-asc, price-desc, thc-asc, thc-desc, name-asc, name-desc)
  * - recentlyAdded (optional): Show only products added in last 7 days (true/false)
  * - trending (optional): Show trending products sorted by order volume (true/false)
  *
  * Response: 200 OK - { products: [], hasMore: boolean, total: number }
  */
-
-const THC_RANGES = {
-  low: { min: 0, max: 15 },
-  medium: { min: 15, max: 20 },
-  high: { min: 20, max: 25 },
-  'very-high': { min: 25, max: 100 },
-};
-
-const PRICE_RANGES = {
-  budget: { min: 0, max: 5 },
-  standard: { min: 5, max: 10 },
-  premium: { min: 10, max: 25 },
-  luxury: { min: 25, max: 10000 },
-};
 
 export async function GET(request: NextRequest) {
   try {
@@ -60,250 +33,11 @@ export async function GET(request: NextRequest) {
 
     const user = session.user;
 
-    if (user.role !== 'DISPENSARY') {
+    if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
       return apiError(403, 'FORBIDDEN', 'Forbidden - Dispensary access only');
     }
 
-    const { searchParams } = new URL(request.url);
-
-    // Pagination params
-    const page = Math.max(1, parseInt(searchParams.get('page') || '1'));
-    const limit = Math.min(50, Math.max(1, parseInt(searchParams.get('limit') || '20')));
-    const skip = (page - 1) * limit;
-
-    // Filter params
-    const search = searchParams.get('search');
-    const productTypes = searchParams.get('productTypes')?.split(',').filter(Boolean);
-    const thcRanges = searchParams.get('thcRanges')?.split(',').filter(Boolean);
-    const priceRanges = searchParams.get('priceRanges')?.split(',').filter(Boolean);
-    const sortBy = searchParams.get('sortBy') || 'default';
-    const recentlyAdded = searchParams.get('recentlyAdded') === 'true';
-    const trending = searchParams.get('trending') === 'true';
-
-    // Build where clause
-    const where: Prisma.ProductWhereInput = {
-      isAvailable: true,
-      inventoryQty: { gt: 0 },
-    };
-    const andClauses: Prisma.ProductWhereInput[] = [];
-
-    // Recently Added filter (last 7 days)
-    if (recentlyAdded) {
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-      where.createdAt = { gte: sevenDaysAgo };
-    }
-
-    // Trending filter - products with order volume in last 30 days
-    if (trending) {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      where.orderItems = { some: { createdAt: { gte: thirtyDaysAgo } } };
-    }
-
-    // Search filter
-    if (search) {
-      where.OR = [
-        { name: { contains: search, mode: 'insensitive' } },
-        { strainLegacy: { contains: search, mode: 'insensitive' } },
-        { productType: { contains: search, mode: 'insensitive' } },
-        {
-          strain: {
-            name: { contains: search, mode: 'insensitive' },
-          },
-        },
-      ];
-    }
-
-    // Product type filter
-    if (productTypes && productTypes.length > 0) {
-      where.productType = { in: expandProductTypeFilters(productTypes) };
-    }
-
-    // Build THC range filter
-    if (thcRanges && thcRanges.length > 0) {
-      const thcConditions = thcRanges
-        .map((rangeId) => {
-          const range = THC_RANGES[rangeId as keyof typeof THC_RANGES];
-          if (!range) return null;
-          return {
-            OR: [
-              {
-                batch: {
-                  thc: { gte: range.min, lt: range.max },
-                },
-              },
-              {
-                thcLegacy: { gte: range.min, lt: range.max },
-              },
-            ],
-          };
-        })
-        .filter(Boolean);
-
-      if (thcConditions.length > 0) {
-        andClauses.push({ OR: thcConditions as Prisma.ProductWhereInput[] });
-      }
-    }
-
-    // Build price range filter
-    if (priceRanges && priceRanges.length > 0) {
-      const priceConditions = priceRanges
-        .map((rangeId) => {
-          const range = PRICE_RANGES[rangeId as keyof typeof PRICE_RANGES];
-          if (!range) return null;
-          return {
-            price: { gte: range.min, lt: range.max },
-          };
-        })
-        .filter(Boolean);
-
-      if (priceConditions.length > 0) {
-        andClauses.push({ OR: priceConditions as Prisma.ProductWhereInput[] });
-      }
-    }
-
-    if (andClauses.length > 0) {
-      where.AND = andClauses;
-    }
-
-    // Determine order by
-    let orderBy: Prisma.ProductOrderByWithRelationInput | Prisma.ProductOrderByWithRelationInput[] = {};
-    let trendingSort = false;
-
-    if (trending) {
-      trendingSort = true;
-      orderBy = { id: 'asc' }; // placeholder, will sort manually
-    } else {
-      switch (sortBy) {
-        case 'price-asc':
-          orderBy = { price: 'asc' };
-          break;
-        case 'price-desc':
-          orderBy = { price: 'desc' };
-          break;
-        case 'thc-asc':
-          orderBy = { batch: { thc: 'asc' } };
-          break;
-        case 'thc-desc':
-          orderBy = { batch: { thc: 'desc' } };
-          break;
-        case 'name-asc':
-          orderBy = { name: 'asc' };
-          break;
-        case 'name-desc':
-          orderBy = { name: 'desc' };
-          break;
-        default:
-          orderBy = [{ grower: { businessName: 'asc' } }, { name: 'asc' }];
-      }
-    }
-
-    // Build include object conditionally
-    const include: Prisma.ProductInclude = {
-      grower: {
-        select: {
-          id: true,
-          businessName: true,
-          city: true,
-          state: true,
-          isVerified: true,
-        },
-      },
-      strain: {
-        select: {
-          id: true,
-          name: true,
-          genetics: true,
-        },
-      },
-      batch: {
-        select: {
-          thc: true,
-          cbd: true,
-        },
-      },
-    };
-
-    if (trendingSort) {
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-      include.orderItems = {
-        where: { createdAt: { gte: thirtyDaysAgo } },
-        select: { quantity: true },
-      };
-    }
-
-    // Get total count for pagination info
-    const total = await db.product.count({ where });
-
-    // Fetch products
-    const products = await db.product.findMany({
-      where,
-      include,
-      orderBy,
-      skip: trendingSort ? 0 : skip,
-      take: trendingSort ? 1000 : limit,
-    });
-
-    // Calculate trending score if needed and sort
-    let processedProducts = products;
-    if (trendingSort) {
-      processedProducts = products
-        .map((p) => ({
-          ...p,
-          _orderVolume: (p.orderItems || []).reduce((sum, item) => sum + (item.quantity || 0), 0),
-        }))
-        .sort((a, b) => b._orderVolume - a._orderVolume)
-        .slice(skip, skip + limit);
-    }
-
-    const serializedProducts = processedProducts.map((p) => {
-      const inventoryQty = toSafeNonNegativeInteger(p.inventoryQty, 0);
-
-      return {
-        id: p.id,
-        name: toSafeProductName(p.name),
-        price: toSafeNonNegativeNumber(p.price, 0),
-        isPriceVisible: toSafeBoolean(p.isPriceVisible, true),
-        strain: toSafeOptionalString(p.strain?.name || p.strainLegacy),
-        strainId: p.strainId,
-        strainType: toSafeOptionalString(p.strain?.genetics),
-        productType: toSafeProductType(p.productType, p.categoryLegacy),
-        subType: toSafeOptionalString(p.subType),
-        unit: toSafeUnit(p.unit),
-        thc: toSafeOptionalNumber(p.batch?.thc ?? p.thcLegacy),
-        cbd: toSafeOptionalNumber(p.batch?.cbd ?? p.cbdLegacy),
-        images: toSafeStringArray(p.images),
-        inventoryQty,
-        isAvailable: toSafeAvailability(p.isAvailable, inventoryQty),
-        createdAt: p.createdAt,
-        grower: {
-          id: p.grower.id,
-          businessName: toSafeOptionalString(p.grower.businessName) || 'Unknown Grower',
-          location:
-            p.grower.city && p.grower.state
-              ? `${p.grower.city}, ${p.grower.state}`
-              : p.grower.city || p.grower.state || null,
-          isVerified: toSafeBoolean(p.grower.isVerified, false),
-        },
-      };
-    });
-
-    const hasMore = skip + serializedProducts.length < total;
-
-    return NextResponse.json(
-      {
-        products: serializedProducts,
-        hasMore,
-        total,
-        page,
-        limit,
-        recentlyAdded,
-        trending,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json(await getBuyerCatalog(user.dispensaryId, new URL(request.url).searchParams));
   } catch (error) {
     logApiError('dispensary.catalog.GET', error, { route: '/api/dispensary/catalog' });
     return apiError(500, 'INTERNAL_SERVER_ERROR', 'Internal server error');

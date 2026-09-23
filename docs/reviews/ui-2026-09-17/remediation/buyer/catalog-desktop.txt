@@ -1,0 +1,183 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "DISPENSARY"
+  - button "Search" [ref=e317]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e318]
+    - StaticText "Notifications"
+    - StaticText "18"
+  - navigation "Portal navigation" [ref=e319]
+    - link "Dashboard" [ref=e322]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e323]
+      - StaticText "Catalog"
+    - link "Request Draft 2" [ref=e324]
+      - StaticText "Request Draft"
+      - StaticText "2"
+    - link "Orders 17" [ref=e325]
+      - StaticText "Orders"
+      - StaticText "17"
+    - link "Saved" [ref=e326]
+      - StaticText "Saved"
+    - link "Settings" [ref=e327]
+      - StaticText "Settings"
+  - StaticText "GV"
+  - StaticText "Green Vermont Dispensary"
+  - StaticText "Verified buyer"
+  - button "Sign out" [ref=e320]
+- main
+  - generic
+    - sectionheader
+      - heading "Catalog" [level=1, ref=e331]
+      - paragraph
+        - StaticText "Browse verified growers."
+      - link "View draft 2" [ref=e332]
+        - StaticText "View draft"
+        - StaticText "2"
+    - generic
+      - generic
+        - LabelText
+          - StaticText "Search catalog"
+        - combobox "Search catalog" [expanded=false, ref=e361]
+      - combobox "Sort catalog results" [expanded=false, ref=e357]: Grouped by grower
+        - MenuListPopup
+          - option "Grouped by grower" [selected, ref=e367]
+          - option "Price: Low to High" [ref=e368]
+          - option "Price: High to Low" [ref=e369]
+          - option "THC: High to Low" [ref=e370]
+          - option "THC: Low to High" [ref=e371]
+          - option "Name: A-Z" [ref=e372]
+          - option "Name: Z-A" [ref=e373]
+      - button "Toggle filters" [expanded=false, ref=e333]
+        - StaticText "Filters"
+      - button "Grid view" [ref=e334]
+        - StaticText "Grid"
+      - button "List view" [ref=e335]
+        - StaticText "List"
+    - StaticText "3 of 3 products"
+    - heading "Vermont Nurseries" [level=2, ref=e328]
+    - link "View Shop →" [ref=e329]
+    - generic
+      - generic
+        - button "Remove from favorites" [ref=e362]
+        - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e336]
+      - image
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "19"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.3"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Strain: Assorted"
+      - paragraph
+        - StaticText "25 available"
+      - button "Request pricing" [ref=e337]
+      - button "Message grower" [ref=e338]
+      - button "Remove Mystery Pricing Batch from comparison" [ref=e339]
+        - StaticText "Remove from compare"
+      - StaticText "Lab results on request"
+    - generic
+      - generic
+        - button "Add to favorites" [ref=e363]
+        - button "Price alert set" [ref=e364]
+        - image "Purple Haze Flowers"
+      - heading "Purple Haze Flowers" [level=3, ref=e340]
+      - image
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "24.8"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.6"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Strain: Purple Haze"
+      - generic
+        - StaticText "$25.00/ Gram"
+      - LabelText
+        - StaticText "Qty:"
+      - button "Decrease quantity for Purple Haze Flowers" [ref=e341]
+        - StaticText "−"
+      - spinbutton "Quantity for Purple Haze Flowers" [ref=e342]: 1
+        - StaticText "1"
+      - button "Increase quantity for Purple Haze Flowers" [ref=e343]
+        - StaticText "+"
+      - button "Add to draft" [ref=e344]
+        - StaticText "Add to draft"
+      - StaticText "240 Available"
+      - button "Message grower" [ref=e345]
+      - button "Remove Purple Haze Flowers from comparison" [ref=e346]
+        - StaticText "Remove from compare"
+      - StaticText "Lab results on request"
+    - generic
+      - generic
+        - button "Add to favorites" [ref=e365]
+        - button "Set price alert" [ref=e366]
+        - image "Silver Haze Concentrate"
+      - heading "Silver Haze Concentrate" [level=3, ref=e347]
+      - image
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "85"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.2"
+      - StaticText "%"
+      - StaticText "Bulk Extract"
+      - paragraph
+        - StaticText "Strain: Silver Haze"
+      - generic
+        - StaticText "$60.00/ Gram"
+      - LabelText
+        - StaticText "Qty:"
+      - button "Decrease quantity for Silver Haze Concentrate" [ref=e348]
+        - StaticText "−"
+      - spinbutton "Quantity for Silver Haze Concentrate" [ref=e349]: 1
+        - StaticText "1"
+      - button "Increase quantity for Silver Haze Concentrate" [ref=e350]
+        - StaticText "+"
+      - button "Add to draft" [ref=e351]
+        - StaticText "Add to draft"
+      - StaticText "50 Available"
+      - button "Message grower" [ref=e352]
+      - button "Compare Silver Haze Concentrate" [ref=e353]
+        - StaticText "Compare"
+      - StaticText "Lab results on request"
+    - paragraph
+      - StaticText "End of results"
+    - StaticText "Compare ("
+    - StaticText "2"
+    - StaticText "/"
+    - StaticText "3"
+    - StaticText ")"
+    - generic
+      - image "Purple Haze Flowers thumbnail"
+      - StaticText "Purple Haze Flowers"
+      - button "Remove Purple Haze Flowers from compare" [ref=e358]
+      - image "Mystery Pricing Batch thumbnail"
+      - StaticText "Mystery Pricing Batch"
+      - button "Remove Mystery Pricing Batch from compare" [ref=e359]
+    - button "Compare Now" [ref=e354]
+    - button "Clear compare list" [ref=e355]
+      - StaticText "Clear"
+    - button "Hide compare bar" [ref=e356]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e330]
+  - button "Open messages" [ref=e321]
+- region "Notifications alt+T" [ref=e316]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e360]
+  - image
+- alert

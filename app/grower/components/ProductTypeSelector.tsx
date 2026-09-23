@@ -18,8 +18,7 @@ interface ProductTypeSelectorProps {
 }
 
 // Consistent input/select styles - h-10 matches text inputs
-const INPUT_CLASSES = "w-full h-10 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
-const ALLOWED_PRODUCT_TYPES = ['Bulk Extract', 'Flower', 'Cartridge'];
+const INPUT_CLASSES = "w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
 
 export function ProductTypeSelector({
   productType,
@@ -69,9 +68,7 @@ export function ProductTypeSelector({
   const normalizedProductType = useMemo(() => canonicalizeProductType(productType) || '', [productType]);
 
   const typeOptions = useMemo(() => {
-    const mergedTypes = mergedConfigs
-      .map((config) => config.type)
-      .filter((type) => ALLOWED_PRODUCT_TYPES.includes(type));
+    const mergedTypes = mergedConfigs.map((config) => config.type);
 
     if (normalizedProductType && !mergedTypes.includes(normalizedProductType)) {
       return [normalizedProductType, ...mergedTypes];
@@ -93,12 +90,6 @@ export function ProductTypeSelector({
   }, [mergedConfigs, normalizedProductType, subType]);
 
   const hasSubTypes = subTypes.length > 0;
-
-  useEffect(() => {
-    if (productType && normalizedProductType && productType !== normalizedProductType) {
-      onProductTypeChange(normalizedProductType);
-    }
-  }, [productType, normalizedProductType, onProductTypeChange]);
 
   useEffect(() => {
     // Check if current subType is not in the list (custom)
@@ -137,12 +128,12 @@ export function ProductTypeSelector({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Product Type */}
-        <div className="space-y-2">
+    <div className="space-y-3 sm:space-y-4">
+      <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
+        {/* Type */}
+        <div className="space-y-1.5 sm:space-y-2">
           <label htmlFor="productType" className="block text-sm font-medium text-gray-700">
-            Product Type *
+            Type *
           </label>
           <select
             id="productType"
@@ -150,18 +141,18 @@ export function ProductTypeSelector({
             onChange={(e) => handleProductTypeChange(e.target.value)}
             className={INPUT_CLASSES}
           >
-            <option value="">Select a product type</option>
+            <option value="">Choose type</option>
             {typeOptions.map((type) => (
               <option key={type} value={type}>{type}</option>
             ))}
           </select>
         </div>
 
-        {/* Sub Type - Only show if product type has subtypes */}
+        {/* Subtype - Only show if product type has subtypes */}
         {normalizedProductType && hasSubTypes && (
-          <div className="space-y-2">
+          <div className="space-y-1.5 sm:space-y-2">
             <label htmlFor="subType" className="block text-sm font-medium text-gray-700">
-              Sub Type
+              Subtype
             </label>
             <select
               id="subType"
@@ -169,7 +160,7 @@ export function ProductTypeSelector({
               onChange={(e) => handleSubTypeChange(e.target.value)}
               className={INPUT_CLASSES}
             >
-              <option value="">Select a sub type</option>
+              <option value="">Choose subtype</option>
               {subTypes.map(sub => (
                 <option key={sub} value={sub}>{sub}</option>
               ))}
@@ -190,31 +181,31 @@ export function ProductTypeSelector({
 
         {/* Show placeholder when product type selected but no subtypes */}
         {normalizedProductType && !hasSubTypes && (
-          <div className="space-y-2">
+          <div className="hidden space-y-2 sm:block">
             <label className="block text-sm font-medium text-gray-400">
-              Sub Type
+              Subtype
             </label>
             <input
               type="text"
               disabled
               value="N/A"
-              className="w-full h-10 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-400"
+              className="w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-400"
             />
           </div>
         )}
 
         {/* Placeholder when no product type selected */}
         {!normalizedProductType && (
-          <div className="space-y-2">
+          <div className="hidden space-y-2 sm:block">
             <label htmlFor="subType" className="block text-sm font-medium text-gray-700">
-              Sub Type
+              Subtype
             </label>
             <input
               type="text"
               disabled
               value=""
-              className="w-full h-10 px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
-              placeholder="Select a product type first"
+              className="w-full h-10 px-3 py-2 text-base sm:px-4 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+              placeholder="Choose type first"
             />
           </div>
         )}

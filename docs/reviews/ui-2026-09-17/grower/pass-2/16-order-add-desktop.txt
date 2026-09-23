@@ -1,0 +1,75 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e1024]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e1025]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e1026]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e1029]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e1030]
+      - StaticText "Overview"
+    - link "Products" [ref=e1031]
+      - StaticText "Products"
+    - link "Inventory" [ref=e1032]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e1033]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e1034]
+      - StaticText "Strains"
+    - link "Batches" [ref=e1035]
+      - StaticText "Batches"
+    - link "Customers" [ref=e1036]
+      - StaticText "Customers"
+    - link "Reports" [ref=e1037]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e1038]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e1027]
+- main
+  - sectionheader
+    - heading "Record Direct Request" [level=1, ref=e1039]
+    - paragraph
+      - StaticText "Record a request coordinated directly with a dispensary outside PhenoFarm payment rails"
+    - link "Cancel" [ref=e1040]
+    - button "Record Direct Request" [disabled, ref=e1041]
+    - paragraph
+      - StaticText "Select a dispensary before recording the request."
+  - form
+    - heading "Request Details" [level=2, ref=e1042]
+    - LabelText
+      - StaticText "Dispensary *"
+    - combobox "Search dispensaries by name or city" [expanded=false, required, ref=e1048]
+    - paragraph
+      - StaticText "Filter by business name, city, or state."
+    - LabelText
+      - StaticText "Notes"
+    - textbox [ref=e1043]
+    - LabelText
+      - StaticText "Shipping estimate ($)"
+    - spinbutton [ref=e1044]: 0
+      - StaticText "0"
+    - heading "Items" [level=2, ref=e1045]
+    - button "+ Add" [ref=e1046]
+    - paragraph
+      - StaticText "No items in this direct request yet"
+    - paragraph
+      - StaticText "Click Add above to include your first line item."
+- generic
+  - button "Open recent activity" [expanded=false, ref=e1047]
+  - button "Open messages" [ref=e1028]
+- region "Notifications alt+T" [ref=e1023]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1049]
+  - image
+- alert

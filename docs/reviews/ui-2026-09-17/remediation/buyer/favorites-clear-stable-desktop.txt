@@ -1,0 +1,92 @@
+- generic
+  - complementary
+    - StaticText "P"
+    - StaticText "PhenoFarm"
+    - StaticText "DISPENSARY"
+    - button "Search" [ref=e2345]
+      - StaticText "Search..."
+      - StaticText "⌘K"
+    - button "Notifications" [expanded=false, ref=e2346]
+      - StaticText "Notifications"
+      - StaticText "22"
+    - navigation "Portal navigation" [ref=e2347]
+      - link "Dashboard" [ref=e2349]
+        - StaticText "Dashboard"
+      - link "Catalog" [ref=e2350]
+        - StaticText "Catalog"
+      - link "Request Draft 2" [ref=e2351]
+        - StaticText "Request Draft"
+        - StaticText "2"
+      - link "Orders 17" [ref=e2352]
+        - StaticText "Orders"
+        - StaticText "17"
+      - link "Saved" [ref=e2353]
+        - StaticText "Saved"
+      - link "Settings" [ref=e2354]
+        - StaticText "Settings"
+    - StaticText "GV"
+    - StaticText "Green Vermont Dispensary"
+    - StaticText "Verified buyer"
+    - button "Sign out" [ref=e2348]
+  - main
+    - sectionheader
+      - heading "Saved" [level=1, ref=e2320]
+      - link "Browse Catalog" [ref=e2321]
+    - tablist "Saved workspace"
+      - tab "Favorites (1)" [selected, ref=e2322]
+        - StaticText "Favorites"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Alerts (1)" [ref=e2323]
+        - StaticText "Alerts"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+      - tab "Recent (1)" [ref=e2324]
+        - StaticText "Recent"
+        - StaticText " ("
+        - StaticText "1"
+        - StaticText ")"
+    - tabpanel "Favorites (1)"
+      - combobox "Sort favorites" [expanded=false, ref=e2327]: Recently Added
+        - MenuListPopup
+          - option "Recently Added" [selected, ref=e2333]
+          - option "Price: Low to High" [ref=e2334]
+          - option "Price: High to Low" [ref=e2335]
+          - option "THC: High to Low" [ref=e2336]
+          - option "Name: A-Z" [ref=e2337]
+          - option "Name: Z-A" [ref=e2338]
+          - option "THC: Low to High" [ref=e2339]
+      - button "Grid view" [ref=e2325]
+        - StaticText "Grid"
+      - button "List view" [ref=e2326]
+        - StaticText "List"
+      - group
+        - DisclosureTriangle "More" [expanded=true]
+        - button "Clear favorites" [ref=e2340]
+      - article
+        - image "Mystery Pricing Batch"
+        - heading "Mystery Pricing Batch" [level=3, ref=e2328]
+        - link "Vermont Nurseries" [ref=e2329]
+        - StaticText "Flower"
+        - StaticText "THC "
+        - StaticText "19"
+        - StaticText "%"
+        - StaticText "25"
+        - StaticText " available"
+        - button "Request pricing" [ref=e2330]
+        - button "Message" [ref=e2331]
+        - button "Remove Mystery Pricing Batch from favorites" [ref=e2332]
+  - generic
+    - button "Open recent activity" [expanded=false, ref=e2355]
+    - button "Open messages" [ref=e2319]
+  - region "Notifications alt+T" [ref=e2315]
+  - alert
+  - dialog "Clear favorites?"
+    - heading "Clear favorites?" [level=2, ref=e2341]
+    - button "Close Clear favorites?" [ref=e2342]
+    - paragraph
+      - StaticText "Remove your saved products? You can save them again from the catalog."
+    - button "Cancel" [ref=e2343]
+    - button "Clear favorites" [ref=e2344]

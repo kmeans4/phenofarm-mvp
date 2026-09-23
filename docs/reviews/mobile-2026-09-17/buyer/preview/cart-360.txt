@@ -1,0 +1,39 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e573]
+- button "Notifications" [expanded=false, ref=e574]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e575]
+- main
+  - sectionheader
+    - heading "Request draft" [level=1, ref=e583]
+    - paragraph
+      - StaticText "Build a request for your grower."
+  - heading "Your draft is empty" [level=2, ref=e576]
+  - paragraph
+    - StaticText "Add products to get started."
+  - heading "Suggested products" [level=3, ref=e577]
+  - paragraph
+    - StaticText "Mystery Pricing Batch"
+  - StaticText "Favorite"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - paragraph
+    - StaticText "Quote only · 25 available"
+  - button "Request pricing" [ref=e578]
+  - paragraph
+    - StaticText "Purple Haze Flowers"
+  - StaticText "Recent"
+  - paragraph
+    - StaticText "Vermont Nurseries"
+  - paragraph
+    - StaticText "$25.00/g · 240 available"
+  - button "Add" [ref=e579]
+  - link "Browse catalog" [ref=e580]
+  - link "Saved" [ref=e581]
+- button "Open messages" [ref=e582]
+- region "Notifications alt+T" [ref=e572]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e584]
+  - image
+- alert

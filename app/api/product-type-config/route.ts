@@ -1,10 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { canonicalizeProductType, mergeProductTypeOptions } from '@/lib/product-types';
+import { mergeProductTypeOptions } from '@/lib/product-types';
+
+const MAX_TYPE_LENGTH = 100;
+const MAX_SUBTYPE_LENGTH = 100;
+const MAX_SUBTYPES = 100;
+
+type ConfigInput =
+  | { error: string }
+  | { type: string; subTypes: string[] };
+
+function validateConfigInput(body: unknown): ConfigInput {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) {
+    return { error: 'Request body must be an object.' };
+  }
+
+  const input = body as { type?: unknown; subTypes?: unknown };
+  if (typeof input.type !== 'string' || !input.type.trim()) {
+    return { error: 'Type is required.' };
+  }
+
+  const type = input.type.trim();
+  if (type.length > MAX_TYPE_LENGTH) {
+    return { error: `Type must be ${MAX_TYPE_LENGTH} characters or fewer.` };
+  }
+
+  if (!Array.isArray(input.subTypes) || input.subTypes.length === 0) {
+    return { error: 'subTypes must be a non-empty array.' };
+  }
+  if (input.subTypes.length > MAX_SUBTYPES) {
+    return { error: `subTypes may contain at most ${MAX_SUBTYPES} items.` };
+  }
+
+  const subTypes: string[] = [];
+  for (const subType of input.subTypes) {
+    if (typeof subType !== 'string' || !subType.trim()) {
+      return { error: 'Each subType must be a non-empty string.' };
+    }
+    const normalized = subType.trim();
+    if (normalized.length > MAX_SUBTYPE_LENGTH) {
+      return { error: `Each subType must be ${MAX_SUBTYPE_LENGTH} characters or fewer.` };
+    }
+    subTypes.push(normalized);
+  }
+
+  return { type, subTypes };
+}
 
 // GET product type configs (global defaults + grower's custom configs)
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getAuthSession();
 
@@ -25,8 +70,8 @@ export async function GET(request: NextRequest) {
     const configs = await db.productTypeConfig.findMany({
       where: {
         OR: [
-          { growerId: null }, // Global defaults (legacy)
-          { growerId }        // Grower's custom configs
+          { growerId: null },
+          { growerId }
         ]
       },
       orderBy: { type: 'asc' }
@@ -53,6 +98,7 @@ export async function GET(request: NextRequest) {
           growerId: null,
           isCustom: false,
           createdAt: new Date(0),
+          updatedAt: new Date(0),
         });
       }
     }
@@ -83,11 +129,11 @@ export async function POST(request: NextRequest) {
 
     const growerId = user.growerId;
     const body = await request.json();
-    const { type, subTypes } = body;
-
-    if (!type || !subTypes || !Array.isArray(subTypes) || subTypes.length === 0) {
-      return NextResponse.json({ error: 'Type and subTypes array are required' }, { status: 400 });
+    const input = validateConfigInput(body);
+    if ('error' in input) {
+      return NextResponse.json({ error: input.error }, { status: 400 });
     }
+    const { type, subTypes } = input;
 
     // Check if config already exists (either global or custom)
     const existing = await db.productTypeConfig.findFirst({
@@ -117,6 +163,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(created, { status: 201 });
     }
   } catch (error) {
+    if (error instanceof Error && 'code' in error && error.code === 'P2002') {
+      return NextResponse.json({ error: 'A product type config with this type already exists.' }, { status: 409 });
+    }
     console.error('Error creating/updating product type config:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

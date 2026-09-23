@@ -1,0 +1,56 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e965]
+- button "Notifications" [expanded=false, ref=e966]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e967]
+- main
+  - sectionheader
+    - heading "Add strain" [level=1, ref=e969]
+  - form
+    - LabelText
+      - StaticText "Name *"
+    - combobox "Name *" [required, ref=e970]
+    - LabelText
+      - StaticText "Type *"
+    - combobox "Type *" [expanded=false, ref=e971]: Select strain type
+      - MenuListPopup
+        - option "Select strain type" [selected, ref=e977]
+        - option "Indica" [ref=e978]
+        - option "Sativa" [ref=e979]
+        - option "Hybrid" [ref=e980]
+        - option "Sativa Dom. Hybrid" [ref=e981]
+        - option "Indica Dom. Hybrid" [ref=e982]
+    - group
+      - DisclosureTriangle "About strain types" [expanded=true]
+        - StaticText "About strain types"
+      - paragraph
+        - StaticText "Indica"
+        - StaticText " — Generally selected for indica-leaning genetics and buyer expectations."
+      - paragraph
+        - StaticText "Sativa"
+        - StaticText " — Generally selected for sativa-leaning genetics and buyer expectations."
+      - paragraph
+        - StaticText "Hybrid"
+        - StaticText " — Balanced hybrid genetics without a strong indica or sativa lean."
+      - paragraph
+        - StaticText "Sativa Dom. Hybrid"
+        - StaticText " — Hybrid genetics that lean sativa in growth traits or buyer positioning."
+      - paragraph
+        - StaticText "Indica Dom. Hybrid"
+        - StaticText " — Hybrid genetics that lean indica in growth traits or buyer positioning."
+    - LabelText
+      - StaticText "Genetics"
+    - textbox "Genetics" [ref=e972]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e973]
+    - LabelText
+      - StaticText "Growing notes"
+    - textbox "Growing notes" [ref=e974]
+    - button "Create Strain" [disabled, ref=e975]
+    - button "Cancel" [ref=e976]
+- button "Open messages" [ref=e968]
+- region "Notifications alt+T" [ref=e964]
+- alert

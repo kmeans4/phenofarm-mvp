@@ -1,0 +1,60 @@
+- main
+  - link "PF PhenoFarm" [ref=e323]
+    - StaticText "PF"
+    - StaticText "PhenoFarm"
+  - heading "Create your account" [level=2, ref=e322]
+  - paragraph
+    - StaticText "Already have an account?"
+    - link "Sign in" [ref=e324]
+  - form
+    - group "Personal contact"
+      - Legend
+        - StaticText "Personal contact"
+      - LabelText
+        - StaticText "First Name *"
+      - textbox "First Name *" [required, ref=e328]
+      - LabelText
+        - StaticText "Last Name *"
+      - textbox "Last Name *" [required, ref=e329]
+    - group "Business profile"
+      - Legend
+        - StaticText "Business profile"
+      - LabelText
+        - StaticText "Business Name"
+      - textbox "Business Name" [ref=e330]
+      - paragraph
+        - StaticText "Shown to marketplace partners — defaults to your name if left blank."
+      - LabelText
+        - StaticText "Business Type *"
+      - combobox "Business Type *" [expanded=false, ref=e331]: Cannabis Grower
+        - MenuListPopup
+          - option "Cannabis Grower" [selected, ref=e337]
+          - option "Dispensary/Retailer" [ref=e338]
+    - group "Account security"
+      - Legend
+        - StaticText "Account security"
+      - LabelText
+        - StaticText "Email address *"
+      - textbox "Email address *" [required, ref=e332]
+      - LabelText
+        - StaticText "Password *"
+      - generic
+        - textbox "Password *" [required, ref=e333]
+        - button "Show password" [ref=e334]
+      - paragraph
+        - StaticText "Use at least 12 characters."
+      - LabelText
+        - StaticText "Confirm Password *"
+      - generic
+        - textbox "Confirm Password *" [required, ref=e335]
+        - button "Show password" [ref=e336]
+      - paragraph
+        - StaticText "Confirm your password."
+    - button "Create account" [ref=e325]
+  - generic
+    - StaticText "By signing up, you agree to the"
+    - link "Terms" [ref=e326]
+    - StaticText "and"
+    - link "Privacy Policy" [ref=e327]
+    - StaticText "."
+- alert

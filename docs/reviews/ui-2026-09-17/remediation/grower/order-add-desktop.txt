@@ -1,0 +1,66 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e2109]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e2110]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e2111]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e2114]
+      - StaticText "Dashboard"
+    - link "Catalog" [ref=e2115]
+      - StaticText "Catalog"
+    - link "Products" [ref=e2116]
+      - StaticText "Products"
+    - link "Inventory" [ref=e2117]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e2118]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e2119]
+      - StaticText "Strains"
+    - link "Batches" [ref=e2120]
+      - StaticText "Batches"
+    - link "Customers" [ref=e2121]
+      - StaticText "Customers"
+    - link "Reports" [ref=e2122]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e2123]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e2112]
+- main
+  - sectionheader
+    - heading "Record request" [level=1, ref=e2124]
+    - paragraph
+      - StaticText "Record an agreement made directly with a buyer."
+  - form
+    - LabelText
+      - StaticText "Buyer *"
+    - combobox "Buyer *" [expanded=false, required, ref=e2130]
+    - heading "Items" [level=2, ref=e2125]
+    - button "Add item" [ref=e2126]
+    - paragraph
+      - StaticText "Add products to this request"
+    - paragraph
+      - StaticText "Use Add item to begin."
+    - group
+      - DisclosureTriangle "Shipping & notes" [expanded=false]
+        - StaticText "Shipping & notes"
+    - button "Record request" [disabled, ref=e2127]
+    - link "Cancel" [ref=e2128]
+    - paragraph
+      - StaticText "Select a dispensary before recording the request."
+- generic
+  - button "Open recent activity" [expanded=false, ref=e2129]
+  - button "Open messages" [ref=e2113]
+- region "Notifications alt+T" [ref=e2108]
+- alert

@@ -1,0 +1,12 @@
+- main
+  - link "PF PhenoFarm" [ref=e157]
+    - StaticText "PF"
+    - StaticText "PhenoFarm"
+  - heading "Authentication is not configured" [level=2, ref=e154]
+  - alert
+    - StaticText "The sign-in service is not configured correctly. Contact support if this continues."
+  - paragraph
+    - StaticText "If this keeps happening, email support from the account owner address and include your business name."
+  - link "Back to sign in" [ref=e155]
+  - link "Contact support" [ref=e156]
+- alert

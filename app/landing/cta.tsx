@@ -1,8 +1,7 @@
-'use client';
-
 import Link from 'next/link';
-import { motion, useMotionValue, useReducedMotion, useSpring } from 'framer-motion';
-import { ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Reveal } from './motion';
+import { MagneticButton } from './magnetic-button';
+import { CheckCircle2 } from 'lucide-react';
 
 const assurances = [
   'No wholesale payment processing',
@@ -10,49 +9,10 @@ const assurances = [
   'Demo access available',
 ];
 
-/** Primary CTA that leans gently toward the cursor (mouse only). */
-function MagneticButton({ href, children }: { href: string; children: React.ReactNode }) {
-  const reduced = useReducedMotion();
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const sx = useSpring(x, { stiffness: 220, damping: 16 });
-  const sy = useSpring(y, { stiffness: 220, damping: 16 });
-
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (reduced || e.pointerType !== 'mouse') return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    x.set(((e.clientX - rect.left) / rect.width - 0.5) * 12);
-    y.set(((e.clientY - rect.top) / rect.height - 0.5) * 10);
-  };
-
-  const reset = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  return (
-    <div onPointerMove={onPointerMove} onPointerLeave={reset} className="inline-block p-2 -m-2">
-      <motion.div style={{ x: sx, y: sy }}>
-        <Link
-          href={href}
-          className="group inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-8 py-4 text-sm font-semibold text-white shadow-[0_0_40px_rgba(16,185,129,0.3)] transition-colors hover:bg-emerald-400"
-        >
-          {children}
-          <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-        </Link>
-      </motion.div>
-    </div>
-  );
-}
-
 export function Cta() {
   return (
     <section className="relative border-t border-white/[0.06] px-6 py-28 md:py-36">
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.4 }}
-        transition={{ duration: 0.7 }}
+      <Reveal
         className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-emerald-500/15 bg-[#0a0d0b] px-6 py-20 text-center md:py-24"
       >
         <div aria-hidden className="absolute inset-0">
@@ -97,7 +57,7 @@ export function Cta() {
             ))}
           </div>
         </div>
-      </motion.div>
+      </Reveal>
     </section>
   );
 }

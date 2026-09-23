@@ -1,0 +1,6 @@
+- generic
+  - heading "404" [level=1, ref=e1]
+  - heading "This page could not be found." [level=2, ref=e2]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3]
+  - image
+- alert

@@ -1,0 +1,481 @@
+{
+  "audit": "public marketing and auth UI",
+  "date": "2026-09-17",
+  "viewports": [
+    "1440x1000",
+    "390x844"
+  ],
+  "baseScreens": 20,
+  "interactionStates": 13,
+  "screens": [
+    {
+      "route": "/",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/home-desktop.png",
+      "pass2": "screenshots/pass2/home-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-016"
+      ]
+    },
+    {
+      "route": "/",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/home-mobile.png",
+      "pass2": "screenshots/pass2/home-mobile.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-003",
+        "PUB-016",
+        "PUB-017"
+      ]
+    },
+    {
+      "route": "/help",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/help-desktop.png",
+      "pass2": "screenshots/pass2/help-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-004"
+      ]
+    },
+    {
+      "route": "/help",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/help-mobile.png",
+      "pass2": "screenshots/pass2/help-mobile.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-004"
+      ]
+    },
+    {
+      "route": "/contact",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/contact-desktop.png",
+      "pass2": "screenshots/pass2/contact-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-006"
+      ]
+    },
+    {
+      "route": "/contact",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/contact-mobile.png",
+      "pass2": "screenshots/pass2/contact-mobile.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-005",
+        "PUB-006"
+      ]
+    },
+    {
+      "route": "/legal/privacy",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/privacy-desktop.png",
+      "pass2": "screenshots/pass2/privacy-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-007"
+      ]
+    },
+    {
+      "route": "/legal/privacy",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/privacy-mobile.png",
+      "pass2": "screenshots/pass2/privacy-mobile.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-007"
+      ]
+    },
+    {
+      "route": "/legal/terms",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/terms-desktop.png",
+      "pass2": "screenshots/pass2/terms-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-008"
+      ]
+    },
+    {
+      "route": "/legal/terms",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/terms-mobile.png",
+      "pass2": "screenshots/pass2/terms-mobile.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-008"
+      ]
+    },
+    {
+      "route": "/legal/cookies",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/cookies-desktop.png",
+      "pass2": "screenshots/pass2/cookies-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-009",
+        "PUB-010"
+      ]
+    },
+    {
+      "route": "/legal/cookies",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/cookies-mobile.png",
+      "pass2": "screenshots/pass2/cookies-mobile.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-009",
+        "PUB-010"
+      ]
+    },
+    {
+      "route": "/auth/sign_in",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/sign-in-desktop.png",
+      "pass2": "screenshots/pass2/sign-in-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-011"
+      ]
+    },
+    {
+      "route": "/auth/sign_in",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/sign-in-mobile.png",
+      "pass2": "screenshots/pass2/sign-in-mobile.png",
+      "horizontalOverflow": false,
+      "findings": []
+    },
+    {
+      "route": "/auth/sign_up",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/sign-up-desktop.png",
+      "pass2": "screenshots/pass2/sign-up-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-012"
+      ]
+    },
+    {
+      "route": "/auth/sign_up",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/sign-up-mobile.png",
+      "pass2": "screenshots/pass2/sign-up-mobile.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-013"
+      ]
+    },
+    {
+      "route": "/auth/error?error=Configuration",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/error-configuration-desktop.png",
+      "pass2": "screenshots/pass2/error-configuration-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-014"
+      ]
+    },
+    {
+      "route": "/auth/error?error=Configuration",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/error-configuration-mobile.png",
+      "pass2": "screenshots/pass2/error-configuration-mobile.png",
+      "horizontalOverflow": false,
+      "findings": []
+    },
+    {
+      "route": "/auth/error?error=CredentialsSignin",
+      "viewport": "1440x1000",
+      "pass1": "screenshots/pass1/error-credentials-desktop.png",
+      "pass2": "screenshots/pass2/error-credentials-desktop.png",
+      "horizontalOverflow": false,
+      "findings": [
+        "PUB-015"
+      ]
+    },
+    {
+      "route": "/auth/error?error=CredentialsSignin",
+      "viewport": "390x844",
+      "pass1": "screenshots/pass1/error-credentials-mobile.png",
+      "pass2": "screenshots/pass2/error-credentials-mobile.png",
+      "horizontalOverflow": false,
+      "findings": []
+    },
+    {
+      "route": "/",
+      "viewport": "390x844 menu open",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/home-mobile-menu-open.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Menu opened and closed without clipping; links remain visible."
+    },
+    {
+      "route": "/help",
+      "viewport": "390x844 first grower disclosure open",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/help-mobile-grower-open.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Disclosure answer opens within the card."
+    },
+    {
+      "route": "/help",
+      "viewport": "1440x1000 dispensary payment disclosure open",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/help-desktop-dispensary-open.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Disclosure answer expands without disrupting the three-column layout."
+    },
+    {
+      "route": "/auth/sign_in",
+      "viewport": "390x844 password visible",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/sign-in-mobile-password-visible.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Visibility toggle changes to Hide password and stays aligned."
+    },
+    {
+      "route": "/auth/sign_in",
+      "viewport": "1440x1000 password visible",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/sign-in-desktop-password-visible.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Visibility toggle changes to Hide password and stays aligned."
+    },
+    {
+      "route": "/auth/sign_up",
+      "viewport": "390x844 dispensary + password visible",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/sign-up-mobile-dispensary-password-visible.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Role-specific license guidance appears and the password toggle remains aligned."
+    },
+    {
+      "route": "/auth/sign_up",
+      "viewport": "1440x1000 dispensary + password visible",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/sign-up-desktop-dispensary-password-visible.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Role-specific license guidance appears without clipping."
+    },
+    {
+      "route": "/legal/privacy",
+      "viewport": "390x844 bottom",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/privacy-mobile-bottom.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Lower legal sections and contact card remain readable."
+    },
+    {
+      "route": "/legal/privacy",
+      "viewport": "1440x1000 bottom",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/privacy-desktop-bottom.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Lower legal sections and contact card remain readable."
+    },
+    {
+      "route": "/legal/terms",
+      "viewport": "390x844 bottom",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/terms-mobile-bottom.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Lower legal sections and contact card remain readable."
+    },
+    {
+      "route": "/legal/terms",
+      "viewport": "1440x1000 bottom",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/terms-desktop-bottom.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Lower legal sections and contact card remain readable."
+    },
+    {
+      "route": "/legal/cookies",
+      "viewport": "390x844 bottom",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/cookies-mobile-bottom.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Lower legal sections and contact card remain readable."
+    },
+    {
+      "route": "/legal/cookies",
+      "viewport": "1440x1000 bottom",
+      "pass1": "not applicable",
+      "pass2": "screenshots/pass2/cookies-desktop-bottom.png",
+      "horizontalOverflow": false,
+      "findings": [],
+      "note": "Lower legal sections and contact card remain readable."
+    }
+  ],
+  "withdrawnFindings": [
+    "PUB-001",
+    "PUB-002"
+  ],
+  "settledScroll": {
+    "route": "/",
+    "revealVerified": true,
+    "passes": {
+      "pass1": {
+        "1440x1000": {
+          "pageHeight": 8041,
+          "positions": [
+            0,
+            840,
+            1680,
+            2520,
+            3360,
+            4200,
+            5040,
+            5880,
+            6720,
+            7041
+          ],
+          "screenshots": "screenshots/settled/pass1/desktop"
+        },
+        "390x844": {
+          "pageHeight": 11163,
+          "positions": [
+            0,
+            708,
+            1416,
+            2124,
+            2832,
+            3540,
+            4248,
+            4956,
+            5664,
+            6372,
+            7080,
+            7788,
+            8496,
+            9204,
+            9912,
+            10319
+          ],
+          "screenshots": "screenshots/settled/pass1/mobile"
+        }
+      },
+      "pass2": {
+        "1440x1000": {
+          "pageHeight": 8041,
+          "positions": [
+            0,
+            840,
+            1680,
+            2520,
+            3360,
+            4200,
+            5040,
+            5880,
+            6720,
+            7041
+          ],
+          "screenshots": "screenshots/settled/pass2/desktop"
+        },
+        "390x844": {
+          "pageHeight": 11163,
+          "positions": [
+            0,
+            708,
+            1416,
+            2124,
+            2832,
+            3540,
+            4248,
+            4956,
+            5664,
+            6372,
+            7080,
+            7788,
+            8496,
+            9204,
+            9912,
+            10319
+          ],
+          "screenshots": "screenshots/settled/pass2/mobile"
+        }
+      }
+    },
+    "method": "Instant viewport scroll with 1100ms reveal settle at every listed position; all homepage sections were visually inspected."
+  },
+  "revealChecks": {
+    "sourceAudit": "The homepage and /contact use framer-motion reveal hooks; /help, /legal/privacy, /legal/terms, /legal/cookies, and /auth pages have no reveal hooks in the narrow source scan.",
+    "contact": {
+      "pass1": {
+        "1440x1000": {
+          "pageHeight": 1000,
+          "positions": [
+            0
+          ],
+          "screenshots": "screenshots/settled/contact/pass1/desktop"
+        },
+        "390x844": {
+          "pageHeight": 1670,
+          "positions": [
+            0,
+            826
+          ],
+          "screenshots": "screenshots/settled/contact/pass1/mobile"
+        }
+      },
+      "pass2": {
+        "1440x1000": {
+          "pageHeight": 1000,
+          "positions": [
+            0
+          ],
+          "screenshots": "screenshots/settled/contact/pass2/desktop"
+        },
+        "390x844": {
+          "pageHeight": 1670,
+          "positions": [
+            0,
+            826
+          ],
+          "screenshots": "screenshots/settled/contact/pass2/mobile"
+        }
+      },
+      "result": "Form reveal completed at the settled viewport positions in both passes and widths; no animation artifact finding was added."
+    }
+  },
+  "settledFindings": [
+    {
+      "id": "PUB-016",
+      "screenshots": [
+        "screenshots/settled/pass1/desktop/y04200.png",
+        "screenshots/settled/pass2/desktop/y04200.png",
+        "screenshots/settled/pass1/mobile/y05664.png",
+        "screenshots/settled/pass2/mobile/y05664.png"
+      ],
+      "note": "Settled viewport evidence for the narrower testimonial-to-pricing spacing observation."
+    },
+    {
+      "id": "PUB-017",
+      "screenshots": [
+        "screenshots/settled/pass1/mobile/y09912.png",
+        "screenshots/settled/pass1/mobile/y10319.png",
+        "screenshots/settled/pass2/mobile/y09912.png",
+        "screenshots/settled/pass2/mobile/y10319.png"
+      ],
+      "note": "Settled mobile footer evidence for duplicated policy destinations."
+    }
+  ]
+}

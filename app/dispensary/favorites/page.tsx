@@ -1,7 +1,4 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from '@/lib/auth';
 import { redirect } from "next/navigation";
-import FavoritesContent from "./FavoritesContent";
 
 export const metadata = {
   title: "My Favorites | PhenoFarm",
@@ -9,17 +6,5 @@ export const metadata = {
 };
 
 export default async function FavoritesPage() {
-  const session = await getServerSession(authOptions);
-  
-  if (!session) {
-    redirect('/auth/sign_in');
-  }
-
-  const user = session.user as { role: string };
-  
-  if (user.role !== 'DISPENSARY') {
-    redirect('/dashboard');
-  }
-
-  return <FavoritesContent />;
+  redirect('/dispensary/saved?tab=favorites');
 }

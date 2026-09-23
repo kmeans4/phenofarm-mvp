@@ -1,0 +1,62 @@
+- generic
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "GROWER"
+  - button "Search" [ref=e3655]
+  - button "Notifications" [expanded=false, ref=e3656]
+    - StaticText "18"
+  - button "Open Grower navigation menu" [expanded=false, ref=e3657]
+  - main
+    - sectionheader
+      - heading "Batches" [level=1, ref=e3663]
+      - link "Add batch" [ref=e3664]
+    - generic "Summary"
+      - paragraph
+        - StaticText "Batches"
+      - paragraph
+        - StaticText "1"
+      - paragraph
+        - StaticText "Products"
+      - paragraph
+        - StaticText "1"
+      - paragraph
+        - StaticText "Avg. THC"
+      - paragraph
+        - StaticText "24.8%"
+    - paragraph
+      - StaticText "Batch #"
+    - paragraph
+      - StaticText "VN-2026-0912"
+    - paragraph
+      - StaticText "Lot VT-A104"
+    - StaticText "Sep 12, 2026"
+    - paragraph
+      - StaticText "Strain"
+    - paragraph
+      - StaticText "Audit Test Kush"
+    - paragraph
+      - StaticText "Products"
+    - link "1 product" [ref=e3658]
+    - paragraph
+      - StaticText "THC"
+    - paragraph
+      - StaticText "24.8%"
+    - paragraph
+      - StaticText "CBD"
+    - paragraph
+      - StaticText "0.6%"
+    - paragraph
+      - StaticText "0/3 lab docs"
+    - link "Edit" [ref=e3659]
+    - link "Add product" [ref=e3660]
+    - button "More actions for VN-2026-0912" [ref=e3661]
+      - StaticText "More"
+  - button "Open messages" [ref=e3662]
+  - region "Notifications alt+T" [ref=e3654]
+  - alert
+  - dialog "More actions"
+    - heading "More actions" [level=2, ref=e3680]
+    - button "Close More actions" [ref=e3681]
+    - paragraph
+      - StaticText "VN-2026-0912"
+    - button "Delete batch" [ref=e3682]

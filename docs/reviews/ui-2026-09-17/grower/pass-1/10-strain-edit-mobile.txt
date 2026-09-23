@@ -1,0 +1,59 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e923]
+- button "Notifications" [expanded=false, ref=e924]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e925]
+- main
+  - sectionheader
+    - heading "Edit Strain" [level=1, ref=e928]
+    - paragraph
+      - StaticText "Update strain details"
+  - heading "Strain Details" [level=3, ref=e926]
+  - form
+    - LabelText
+      - StaticText "Strain Name *"
+    - combobox "Strain Name *" [required, ref=e929]: Audit Test Kush
+      - StaticText "Audit Test Kush"
+    - LabelText
+      - StaticText "Strain Type *"
+    - combobox "Strain Type *" [expanded=false, ref=e930]: Hybrid
+      - MenuListPopup
+        - option "Select strain type" [ref=e936]
+        - option "Indica" [ref=e937]
+        - option "Sativa" [ref=e938]
+        - option "Hybrid" [selected, ref=e939]
+        - option "Sativa Dom. Hybrid" [ref=e940]
+        - option "Indica Dom. Hybrid" [ref=e941]
+    - paragraph
+      - StaticText "Indica"
+      - StaticText " — Generally selected for indica-leaning genetics and buyer expectations."
+    - paragraph
+      - StaticText "Sativa"
+      - StaticText " — Generally selected for sativa-leaning genetics and buyer expectations."
+    - paragraph
+      - StaticText "Hybrid"
+      - StaticText " — Balanced hybrid genetics without a strong indica or sativa lean."
+    - paragraph
+      - StaticText "Sativa Dom. Hybrid"
+      - StaticText " — Hybrid genetics that lean sativa in growth traits or buyer positioning."
+    - paragraph
+      - StaticText "Indica Dom. Hybrid"
+      - StaticText " — Hybrid genetics that lean indica in growth traits or buyer positioning."
+    - LabelText
+      - StaticText "Genetics / Lineage"
+    - textbox "Genetics / Lineage" [ref=e931]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e932]
+    - LabelText
+      - StaticText "Grower Notes"
+    - textbox "Grower Notes" [ref=e933]
+    - button "Save Changes" [ref=e934]
+    - button "Cancel" [ref=e935]
+- button "Open messages" [ref=e927]
+- region "Notifications alt+T" [ref=e922]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e942]
+  - image
+- alert

@@ -1,0 +1,77 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "ADMIN"
+  - button "Notifications" [expanded=false, ref=e688]
+    - StaticText "Notifications"
+  - navigation "Portal navigation" [ref=e689]
+    - link "Dashboard" [ref=e694]
+      - StaticText "Dashboard"
+    - link "Users" [ref=e695]
+      - StaticText "Users"
+    - link "Growers" [ref=e696]
+      - StaticText "Growers"
+    - link "Dispensaries" [ref=e697]
+      - StaticText "Dispensaries"
+    - link "Settings" [ref=e698]
+      - StaticText "Settings"
+  - StaticText "A"
+  - StaticText "admin@phenofarm.com"
+  - StaticText "Full system access"
+  - button "Sign out" [ref=e690]
+- main
+  - sectionheader
+    - heading "Dashboard" [level=1, ref=e699]
+    - paragraph
+      - StaticText "Manage subscriptions, verification, and marketplace operations"
+  - link "Total Users 4" [ref=e691]
+    - paragraph
+      - StaticText "Total Users"
+    - paragraph
+      - StaticText "4"
+  - link "Growers 2 2 verified" [ref=e692]
+    - paragraph
+      - StaticText "Growers"
+    - paragraph
+      - StaticText "2"
+    - paragraph
+      - StaticText "2 verified"
+  - link "Dispensaries 1 0 pending" [ref=e693]
+    - paragraph
+      - StaticText "Dispensaries"
+    - paragraph
+      - StaticText "1"
+    - paragraph
+      - StaticText "0 pending"
+  - generic
+    - paragraph
+      - StaticText "OPERATIONS CHECKLIST"
+    - heading "Review subscription settings" [level=2, ref=e700]
+    - paragraph
+      - StaticText "Keep PhenoFarm subscription configuration current for grower billing."
+    - link "Open settings" [ref=e701]
+    - paragraph
+      - StaticText "Subscription configuration"
+    - paragraph
+      - StaticText "Confirm Stripe Billing price IDs and support details before enabling paid plans."
+    - link "Open settings" [ref=e702]
+    - group
+      - DisclosureTriangle "3 checks complete" [expanded=false]
+        - StaticText "3 checks complete"
+  - paragraph
+    - StaticText "VERIFICATION QUEUE"
+  - heading "No accounts awaiting review" [level=2, ref=e703]
+  - link "Growers" [ref=e704]
+  - link "Dispensaries" [ref=e705]
+  - paragraph
+    - StaticText "SETTLEMENT POLICY"
+  - paragraph
+    - StaticText "PhenoFarm bills only grower subscriptions; wholesale payments stay between businesses."
+    - link "Read the payment model." [ref=e706]
+  - group
+    - DisclosureTriangle "Developer tools Demo data seeding" [expanded=false]
+      - StaticText "Developer tools Demo data seeding"
+- region "Notifications alt+T" [ref=e687]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e707]
+  - image
+- alert

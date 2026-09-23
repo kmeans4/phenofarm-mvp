@@ -1,0 +1,165 @@
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- generic [ref=e1723] clickable [onclick]
+  - button "Open messages" [ref=e1727]
+- button "Search" [ref=e1724]
+- button "Notifications" [expanded=false, ref=e1725]
+  - StaticText "19"
+- button "Open Grower navigation menu" [expanded=false, ref=e1726]
+- main
+  - sectionheader
+    - heading "Add product" [level=1, ref=e1728]
+  - form
+    - navigation "Product sections" [ref=e1729]
+      - link "Basics" [ref=e1733]
+      - link "Pricing" [ref=e1734]
+      - link "Stock" [ref=e1735]
+      - link "Details" [ref=e1736]
+    - paragraph
+      - StaticText "Defaults"
+    - button "Reset defaults" [ref=e1730]
+    - generic
+      - heading "Basics" [level=3, ref=e1737]
+      - LabelText
+        - StaticText "Name *"
+      - textbox "Name *" [ref=e1738]
+      - LabelText
+        - StaticText "Type *"
+      - combobox "Type *" [expanded=false, ref=e1739]: Choose type
+        - MenuListPopup
+          - option "Choose type" [selected, ref=e1763]
+          - option "Bulk Extract" [ref=e1764]
+          - option "Cartridge" [ref=e1765]
+          - option "Edibles" [ref=e1766]
+          - option "Beverages" [ref=e1767]
+          - option "Flower" [ref=e1768]
+          - option "Live Plant" [ref=e1769]
+          - option "Plant Material" [ref=e1770]
+          - option "Prepack" [ref=e1771]
+          - option "Preroll" [ref=e1772]
+          - option "Tincture" [ref=e1773]
+          - option "Topicals & Wellness" [ref=e1774]
+      - LabelText
+        - StaticText "Strain"
+      - combobox "Strain" [expanded=false, ref=e1740]: Choose strain
+        - MenuListPopup
+          - option "Choose strain" [selected, ref=e1775]
+          - option "Assorted" [ref=e1776]
+          - option "Audit Test Kush • Hybrid" [ref=e1777]
+          - option "Purple Haze" [ref=e1778]
+          - option "Silver Haze" [ref=e1779]
+      - button "+ New" [ref=e1741]
+    - generic
+      - heading "Pricing" [level=3, ref=e1742]
+      - LabelText
+        - StaticText "Price ($) *"
+      - spinbutton "Price ($) *" [ref=e1743]
+      - LabelText
+        - StaticText "Unit *"
+      - combobox "Unit *" [expanded=false, ref=e1744]: Gram
+        - MenuListPopup
+          - option "Select a unit" [ref=e1780]
+          - option "Gram" [selected, ref=e1781]
+          - option "Half Ounce" [ref=e1782]
+          - option "Ounce" [ref=e1783]
+          - option "Eighth" [ref=e1784]
+          - option "Quarter" [ref=e1785]
+          - option "Unit" [ref=e1786]
+          - option "Pack" [ref=e1787]
+          - option "Each" [ref=e1788]
+          - option "Lb" [ref=e1789]
+      - LabelText
+        - StaticText "Price visibility"
+      - paragraph
+        - StaticText "Quote only hides the price."
+      - button "Show price" [ref=e1745]
+        - StaticText "Show price"
+      - button "Quote only" [ref=e1746]
+        - StaticText "Quote only"
+    - generic
+      - heading "Stock" [level=3, ref=e1747]
+      - LabelText
+        - StaticText "Stock *"
+      - spinbutton "Stock *" [ref=e1748]: 0
+        - StaticText "0"
+      - LabelText
+        - StaticText "SKU"
+      - textbox "SKU" [ref=e1749]
+      - LabelText
+        - StaticText "Brand"
+      - textbox "Brand" [ref=e1750]: Vermont Nurseries
+        - StaticText "Vermont Nurseries"
+      - LabelText
+        - StaticText "Available"
+      - paragraph
+        - StaticText "Buyers can request this product"
+      - button "Mark product unavailable" [ref=e1751]
+    - group
+      - DisclosureTriangle "Details & photos Optional" [expanded=true]
+        - heading "Details & photos" [level=3, ref=e1760]
+        - StaticText "Optional"
+      - heading "Cannabinoids" [level=3, ref=e1752]
+      - LabelText
+        - StaticText "THC Min (%)"
+      - spinbutton "THC Min (%)" [ref=e1753]
+      - LabelText
+        - StaticText "THC Max (%)"
+      - spinbutton "THC Max (%)" [ref=e1754]
+      - LabelText
+        - StaticText "CBD Min (%)"
+      - spinbutton "CBD Min (%)" [ref=e1755]
+      - LabelText
+        - StaticText "CBD Max (%)"
+      - spinbutton "CBD Max (%)" [ref=e1756]
+      - LabelText
+        - StaticText "Harvest Date"
+      - Date "Harvest Date"
+        - generic
+          - spinbutton "Month Month" [ref=e1790]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e1791]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e1792]: 0
+            - StaticText "yyyy"
+        - button "Show date picker Show date picker" [ref=e1761]
+      - LabelText
+        - StaticText "Description"
+      - textbox "Description" [ref=e1757]
+      - paragraph
+        - StaticText "0/2000 characters"
+      - generic
+        - LabelText
+          - StaticText "Product Images"
+        - paragraph
+          - StaticText "Up to 2 photos · JPG, PNG, WebP · 1MB each"
+        - button "Choose Files" [ref=e1762]: No file chosen
+        - paragraph
+          - StaticText "0/2 image slots used."
+    - complementary
+      - heading "Summary" [level=3, ref=e1758]
+      - StaticText "Available"
+      - DescriptionList
+        - term "Listing"
+        - definition
+          - StaticText "Unnamed product"
+        - term "Type"
+        - definition
+          - StaticText "Not selected"
+        - term "Price"
+        - definition
+          - StaticText "Not priced"
+        - term "Stock"
+        - definition
+          - StaticText "0 g"
+        - term "Visibility"
+        - definition
+          - StaticText "Available · price visible"
+      - button "Save draft" [ref=e1759]
+      - paragraph
+        - StaticText "Hidden from buyers until published."
+  - button "Cancel" [ref=e1731]
+  - button "Publish product" [ref=e1732]
+- region "Notifications alt+T" [ref=e1722]
+- alert

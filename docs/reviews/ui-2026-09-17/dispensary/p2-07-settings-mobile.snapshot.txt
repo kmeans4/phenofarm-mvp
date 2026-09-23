@@ -1,0 +1,28 @@
+- button "Search" [ref=e1654]
+- button "Notifications" [expanded=false, ref=e1655]
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1656]
+- heading "Dispensary Settings" [level=1, ref=e1658]
+- heading "License & verification" [level=2, ref=e1660]
+- heading "Business profile" [level=2, ref=e1661]
+- textbox "Business Name *" [ref=e1662]: Green Vermont Dispensary
+- textbox "Contact Name (optional)" [ref=e1663]: Sarah Cannabis
+- textbox "Dispensary License Number *" [ref=e1664]: VT-RTL-2024-001
+- combobox "License State *" [expanded=false, ref=e1665]: Vermont (VT)
+  - option "Vermont (VT)" [selected, ref=e1676]
+- spinbutton "Month Month" [ref=e1677]: 12
+- spinbutton "Day Day" [ref=e1678]: 31
+- spinbutton "Year Year" [ref=e1679]: 2027
+- button "Show date picker" [ref=e1674]
+- textbox "Business Email *" [ref=e1666]: dispensary@greenvermont.com
+- textbox "Business Phone (optional)" [ref=e1667]: (802) 555-0145
+- textbox "Business Address" [ref=e1680]: 456 Market Street
+- textbox "Website (optional)" [ref=e1668]: https://greenvermontdispensary.com
+- textbox "Business Description (optional)" [ref=e1669]: Vermont's premier cannabis retail destination
+- heading "Branding" [level=2, ref=e1670]
+- button "Upload Logo" [ref=e1671]
+- heading "Account" [level=2, ref=e1659]
+- button "Sign Out" [ref=e1672]
+- button "Save settings" [ref=e1673]
+- button "Open messages" [ref=e1657]
+- region "Notifications alt+T" [ref=e1653]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1675]

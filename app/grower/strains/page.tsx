@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { AuthSession } from '@/types';
 import { Button } from '@/app/components/ui/Button';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { OperationsSummary } from '../components/OperationsSummary';
+import { RecordActions } from '../components/RecordActions';
+import { deleteRecord } from '@/app/components/ui/deleteRecord';
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
 import { toast } from '@/app/hooks/useToast';
 import { STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
+import { pluralize } from '@/lib/utils';
 
 interface Strain {
   id: string;
@@ -25,46 +27,15 @@ interface Strain {
 }
 
 export default function StrainsPage() {
-  const { data: session, status } = useSession();
-  const router = useRouter();
   const [strains, setStrains] = useState<Strain[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'card' | 'list'>('card');
   const [deleteCandidate, setDeleteCandidate] = useState<Strain | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const deleteRef = useRef(false);
 
-  // Load view mode from localStorage on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('strainViewMode');
-    if (saved === 'card' || saved === 'list') {
-      setViewMode(saved);
-    }
-  }, []);
-
-  // Save view mode to localStorage when changed
-  const handleViewModeChange = (mode: 'card' | 'list') => {
-    setViewMode(mode);
-    localStorage.setItem('strainViewMode', mode);
-  };
-
-  useEffect(() => {
-    if (status === 'loading') return;
-    
-    if (!session) {
-      router.push('/auth/sign_in');
-      return;
-    }
-
-    const user = (session as AuthSession).user;
-    if (user.role !== 'GROWER') {
-      router.push('/dashboard');
-      return;
-    }
-
-    fetchStrains();
-  }, [status, session, router]);
-
-  const fetchStrains = async () => {
+  const fetchStrains = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
@@ -83,24 +54,45 @@ export default function StrainsPage() {
     } finally {
       setLoading(false);
     }
+  }, []);
+
+  // Load view mode from localStorage on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('strainViewMode');
+    if (saved === 'card' || saved === 'list') {
+      setViewMode(saved);
+    }
+  }, []);
+
+  // Save view mode to localStorage when changed
+  const handleViewModeChange = (mode: 'card' | 'list') => {
+    setViewMode(mode);
+    localStorage.setItem('strainViewMode', mode);
   };
 
+  useEffect(() => {
+    fetchStrains();
+  }, [fetchStrains]);
+
   const deleteStrain = async (strainId: string) => {
+    if (deleteRef.current) return;
+    deleteRef.current = true;
+    setDeleting(true);
     try {
-      const response = await fetch('/api/strains/' + strainId, { method: 'DELETE' });
-      if (response.ok) {
-        setStrains(strains.filter(s => s.id !== strainId));
-        toast.success('Strain deleted');
-      } else {
-        const err = await response.json();
-        toast.error(err.error || 'Failed to delete strain');
-      }
-    } catch {
-      toast.error('Network error deleting strain');
+      await deleteRecord('/api/strains/' + strainId, 'Failed to delete strain');
+      setStrains((current) => current.filter(item => item.id !== strainId));
+      toast.success('Strain deleted');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Network error deleting strain');
     } finally {
+      deleteRef.current = false;
+      setDeleting(false);
       setDeleteCandidate(null);
     }
   };
+
+  const batchesHref = (strainId: string) => `/grower/batches?strain=${encodeURIComponent(strainId)}`;
+  const productsHref = (strainId: string) => `/grower/products?strain=${encodeURIComponent(strainId)}`;
 
   if (loading) {
     return (
@@ -114,17 +106,16 @@ export default function StrainsPage() {
   }
 
   return (
-    <div className="space-y-5 sm:space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Strain Management</h1>
-          <p className="text-sm sm:text-base text-gray-600 mt-1">Manage your cannabis genetics library</p>
-        </div>
-        <Button variant="primary" asChild className="w-full sm:w-auto">
-          <Link href="/grower/strains/add" className="inline-flex w-full sm:w-auto justify-center">+ Add Strain</Link>
-        </Button>
-      </div>
+    <div className="space-y-3 sm:space-y-6">
+      <PageHeader
+        mobileInlineActions
+        title="Strains"
+        actions={
+          <Button variant="primary" asChild className="shrink-0">
+            <Link href="/grower/strains/add" className="inline-flex w-full sm:w-auto justify-center">Add strain</Link>
+          </Button>
+        }
+      />
 
       {error && (
         <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
@@ -133,32 +124,14 @@ export default function StrainsPage() {
         </div>
       )}
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Total Strains</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{strains.length}</p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Total Batches</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
-            {strains.reduce((sum, s) => sum + s._count.batches, 0)}
-          </p>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
-          <p className="text-sm text-gray-600">Products</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">
-            {strains.reduce((sum, s) => sum + s._count.products, 0)}
-          </p>
-        </div>
-      </div>
+      <OperationsSummary items={[{label: 'Strains', value: strains.length}, {label: 'Batches', value: strains.reduce((sum, item) => sum + item._count.batches, 0)}, {label: 'Products', value: strains.reduce((sum, item) => sum + item._count.products, 0)}]} />
 
       {/* View Toggle */}
       <div className="flex justify-start sm:justify-end">
         <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-lg">
           <button
             onClick={() => handleViewModeChange('card')}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+            className={`flex min-h-10 min-w-10 items-center justify-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
               viewMode === 'card'
                 ? 'bg-white text-gray-900 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
@@ -172,7 +145,7 @@ export default function StrainsPage() {
           </button>
           <button
             onClick={() => handleViewModeChange('list')}
-            className={`flex items-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+            className={`flex min-h-10 min-w-10 items-center justify-center gap-1 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
               viewMode === 'list'
                 ? 'bg-white text-gray-900 shadow-sm'
                 : 'text-gray-600 hover:text-gray-900'
@@ -190,12 +163,12 @@ export default function StrainsPage() {
       {/* Strains Display */}
       {strains.length > 0 ? (
         viewMode === 'card' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {strains.map((strain) => (
               <div key={strain.id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
-                <div className="p-4">
+                <div className="p-3 sm:p-4">
                   <div className="flex justify-between items-start">
-                    <div>
+                    <div className="min-w-0">
                       <h3 className="font-semibold text-gray-900">{strain.name}</h3>
                       {strain.strainType && (
                         <p className="text-xs text-gray-500 mt-1">{STRAIN_TYPE_LABELS[strain.strainType]}</p>
@@ -204,9 +177,6 @@ export default function StrainsPage() {
                         <p className="text-sm text-gray-500 mt-1">{strain.genetics}</p>
                       )}
                     </div>
-                    <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 border border-purple-200">
-                      Strain
-                    </span>
                   </div>
 
                   {strain.description && (
@@ -217,34 +187,36 @@ export default function StrainsPage() {
                     <p className="text-sm text-gray-500 mt-2 italic line-clamp-2">{strain.growerNotes}</p>
                   )}
 
-                  <div className="flex items-center gap-4 mt-4 text-sm text-gray-500">
-                    <span>{strain._count.batches} batches</span>
-                    <span>{strain._count.products} products</span>
+                  <div className="flex items-center gap-3 mt-1 text-sm sm:mt-4">
+                    <Link
+                      href={batchesHref(strain.id)}
+                      className="inline-flex min-h-10 items-center rounded-md text-gray-500 underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    >
+                      {pluralize(strain._count.batches, 'batch', 'batches')}
+                    </Link>
+                    <Link
+                      href={productsHref(strain.id)}
+                      className="inline-flex min-h-10 items-center rounded-md text-gray-500 underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                    >
+                      {pluralize(strain._count.products, 'product')}
+                    </Link>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-2 mt-4 pt-4 border-t border-gray-100">
-                    <Button variant="outline" size="sm" asChild className="w-full sm:flex-1">
+                  <div className="flex flex-wrap items-center gap-2 mt-1 pt-2 border-t sm:mt-3 sm:pt-3 border-gray-100">
+                    <Button variant="outline" size="sm" asChild className="flex-1">
                       <Link href={'/grower/strains/' + strain.id + '/edit'} className="inline-flex w-full justify-center">Edit</Link>
                     </Button>
                     <Button 
                       variant="primary" 
                       size="sm"
                       asChild
-                      className="w-full sm:flex-1"
+                      className="flex-1"
                     >
                       <Link href={'/grower/products/add?strainId=' + strain.id} className="inline-flex w-full justify-center">
-                        + Product
+                        Add product
                       </Link>
                     </Button>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      size="sm"
-                      className="w-full sm:flex-1"
-                      onClick={() => setDeleteCandidate(strain)}
-                    >
-                      Delete
-                    </Button>
+                    <RecordActions name={strain.name} actions={[{label: 'Delete strain', destructive: true, onSelect: () => setDeleteCandidate(strain)}]} />
                   </div>
                 </div>
               </div>
@@ -256,11 +228,11 @@ export default function StrainsPage() {
               <table className="w-full min-w-[620px]">
                 <thead className="bg-gray-50 border-b border-gray-200">
                   <tr>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Strain</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Genetics</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Batches</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Strain</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Genetics</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Batches</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Products</th>
+                    <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -269,7 +241,7 @@ export default function StrainsPage() {
                       <td className="px-3 sm:px-4 py-2 sm:py-3">
                         <div className="font-medium text-sm sm:text-base text-gray-900">{strain.name}</div>
                         {strain.strainType && (
-                          <div className="text-[11px] sm:text-xs text-gray-500">{STRAIN_TYPE_LABELS[strain.strainType]}</div>
+                          <div className="text-xs text-gray-500">{STRAIN_TYPE_LABELS[strain.strainType]}</div>
                         )}
                         {strain.description && (
                           <div className="text-xs sm:text-sm text-gray-500 line-clamp-1">{strain.description}</div>
@@ -279,13 +251,23 @@ export default function StrainsPage() {
                         {strain.genetics || '-'}
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
-                        {strain._count.batches}
+                        <Link
+                          href={batchesHref(strain.id)}
+                          className="inline-flex min-h-10 items-center rounded-md underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                        >
+                          {strain._count.batches}
+                        </Link>
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-600">
-                        {strain._count.products}
+                        <Link
+                          href={productsHref(strain.id)}
+                          className="inline-flex min-h-10 items-center rounded-md underline-offset-4 hover:text-green-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600 focus-visible:ring-offset-2"
+                        >
+                          {strain._count.products}
+                        </Link>
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3">
-                        <div className="flex flex-col sm:flex-row gap-2">
+                        <div className="flex items-center gap-2">
                           <Button variant="outline" size="sm" asChild>
                             <Link href={'/grower/strains/' + strain.id + '/edit'} className="whitespace-nowrap">Edit</Link>
                           </Button>
@@ -295,17 +277,10 @@ export default function StrainsPage() {
                             asChild
                           >
                             <Link href={'/grower/products/add?strainId=' + strain.id} className="whitespace-nowrap">
-                              + Product
+                              Add product
                             </Link>
                           </Button>
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => setDeleteCandidate(strain)}
-                          >
-                            Delete
-                          </Button>
+                          <RecordActions name={strain.name} actions={[{label: 'Delete strain', destructive: true, onSelect: () => setDeleteCandidate(strain)}]} />
                         </div>
                       </td>
                     </tr>
@@ -334,6 +309,7 @@ export default function StrainsPage() {
       )}
 
       <ConfirmDialog
+        loading={deleting}
         open={Boolean(deleteCandidate)}
         title="Delete strain?"
         description={`Delete ${deleteCandidate?.name || 'this strain'}. Review attached batches and products before removing it.`}

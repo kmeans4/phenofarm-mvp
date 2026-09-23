@@ -1,0 +1,134 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e528]
+- button "Notifications" [expanded=false, ref=e529]
+  - StaticText "24"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e530]
+- main
+  - generic
+    - sectionheader
+      - heading "Catalog" [level=1, ref=e534]
+    - generic
+      - generic
+        - LabelText
+          - StaticText "Search catalog"
+        - combobox "Search catalog" [expanded=false, ref=e563]
+      - combobox "Sort catalog results" [expanded=false, ref=e561]: Grouped by grower
+        - MenuListPopup
+          - option "Grouped by grower" [selected, ref=e564]
+          - option "Price: Low to High" [ref=e565]
+          - option "Price: High to Low" [ref=e566]
+          - option "THC: High to Low" [ref=e567]
+          - option "THC: Low to High" [ref=e568]
+          - option "Name: A-Z" [ref=e569]
+          - option "Name: Z-A" [ref=e570]
+      - button "Toggle filters" [expanded=false, ref=e535]
+      - button "Grid view" [ref=e536]
+      - button "List view" [ref=e537]
+    - StaticText "3 of 3 products"
+    - heading "Vermont Nurseries" [level=2, ref=e532]
+    - link "Shop →" [ref=e533]
+    - generic
+      - generic
+        - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e538]
+      - image
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "19"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.3"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Strain: Assorted"
+      - paragraph
+        - StaticText "25 available"
+      - button "Request pricing" [ref=e539]
+      - button "Remove Mystery Pricing Batch from favorites" [ref=e540]
+      - button "Message" [ref=e541]
+        - StaticText "Message"
+      - button "Compare Mystery Pricing Batch" [ref=e542]
+        - StaticText "Compare"
+      - StaticText "Labs on request"
+    - generic
+      - generic
+        - image "Purple Haze Flowers"
+      - heading "Purple Haze Flowers" [level=3, ref=e543]
+      - image
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "24.8"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.6"
+      - StaticText "%"
+      - StaticText "Flower"
+      - paragraph
+        - StaticText "Strain: Purple Haze"
+      - generic
+        - StaticText "$25.00/ g"
+      - button "Decrease quantity for Purple Haze Flowers" [ref=e544]
+        - StaticText "−"
+      - spinbutton "Quantity for Purple Haze Flowers" [ref=e545]: 1
+        - StaticText "1"
+      - button "Increase quantity for Purple Haze Flowers" [ref=e546]
+        - StaticText "+"
+      - button "Add to draft" [ref=e547]
+        - StaticText "Add"
+      - StaticText "240 available"
+      - button "Favorite Purple Haze Flowers" [ref=e548]
+      - button "Price alert for Purple Haze Flowers" [ref=e549]
+      - button "Message" [ref=e550]
+        - StaticText "Message"
+      - button "Compare Purple Haze Flowers" [ref=e551]
+        - StaticText "Compare"
+      - StaticText "Labs on request"
+    - generic
+      - generic
+        - image "Silver Haze Concentrate"
+      - heading "Silver Haze Concentrate" [level=3, ref=e552]
+      - image
+      - StaticText "Hybrid"
+      - image
+      - StaticText "THC "
+      - StaticText "85"
+      - StaticText "%"
+      - image
+      - StaticText "CBD "
+      - StaticText "0.2"
+      - StaticText "%"
+      - StaticText "Bulk Extract"
+      - paragraph
+        - StaticText "Strain: Silver Haze"
+      - generic
+        - StaticText "$60.00/ g"
+      - button "Decrease quantity for Silver Haze Concentrate" [ref=e553]
+        - StaticText "−"
+      - spinbutton "Quantity for Silver Haze Concentrate" [ref=e554]: 1
+        - StaticText "1"
+      - button "Increase quantity for Silver Haze Concentrate" [ref=e555]
+        - StaticText "+"
+      - button "Add to draft" [ref=e556]
+        - StaticText "Add"
+      - StaticText "50 available"
+      - button "Favorite Silver Haze Concentrate" [ref=e557]
+      - button "Price alert for Silver Haze Concentrate" [ref=e558]
+      - button "Message" [ref=e559]
+        - StaticText "Message"
+      - button "Compare Silver Haze Concentrate" [ref=e560]
+        - StaticText "Compare"
+      - StaticText "Labs on request"
+    - paragraph
+      - StaticText "End of results"
+- button "Open messages" [ref=e531]
+- region "Notifications alt+T" [ref=e527]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e562]
+  - image
+- alert

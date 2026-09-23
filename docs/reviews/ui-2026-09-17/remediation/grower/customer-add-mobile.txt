@@ -1,0 +1,44 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "GROWER"
+- button "Search" [ref=e2343]
+- button "Notifications" [expanded=false, ref=e2344]
+  - StaticText "16"
+- button "Open Grower navigation menu" [expanded=false, ref=e2345]
+- main
+  - sectionheader
+    - heading "Add customer" [level=1, ref=e2347]
+  - form
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox "Business Name *" [required, ref=e2348]
+    - LabelText
+      - StaticText "Contact Name *"
+    - textbox "Contact Name *" [required, ref=e2349]
+    - LabelText
+      - StaticText "Email *"
+    - textbox "Email *" [required, ref=e2350]
+    - LabelText
+      - StaticText "Phone *"
+    - textbox "Phone *" [required, ref=e2351]
+    - LabelText
+      - StaticText "Address"
+    - textbox "Address" [ref=e2352]
+    - LabelText
+      - StaticText "City"
+    - textbox "City" [ref=e2353]
+    - LabelText
+      - StaticText "State"
+    - textbox "State" [ref=e2354]: VT
+      - StaticText "VT"
+    - LabelText
+      - StaticText "ZIP"
+    - textbox "ZIP" [ref=e2355]
+    - LabelText
+      - StaticText "License Number"
+    - textbox "License Number" [ref=e2356]
+    - link "Cancel" [ref=e2357]
+    - button "Add customer" [disabled, ref=e2358]
+- button "Open messages" [ref=e2346]
+- region "Notifications alt+T" [ref=e2342]
+- alert

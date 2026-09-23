@@ -1,0 +1,92 @@
+- complementary
+  - StaticText "P"
+  - StaticText "PhenoFarm"
+  - StaticText "CULTIVATOR"
+  - button "Search" [ref=e3233]
+    - StaticText "Search..."
+    - StaticText "⌘K"
+  - button "Notifications" [expanded=false, ref=e3234]
+    - StaticText "Notifications"
+    - StaticText "16"
+  - navigation "Portal navigation" [ref=e3235]
+    - StaticText "SELL"
+    - link "Dashboard" [ref=e3239]
+      - StaticText "Dashboard"
+    - link "Overview" [ref=e3240]
+      - StaticText "Overview"
+    - link "Products" [ref=e3241]
+      - StaticText "Products"
+    - link "Inventory" [ref=e3242]
+      - StaticText "Inventory"
+    - link "Requests 17" [ref=e3243]
+      - StaticText "Requests"
+      - StaticText "17"
+    - StaticText "GROW"
+    - link "Strains" [ref=e3244]
+      - StaticText "Strains"
+    - link "Batches" [ref=e3245]
+      - StaticText "Batches"
+    - link "Customers" [ref=e3246]
+      - StaticText "Customers"
+    - link "Reports" [ref=e3247]
+      - StaticText "Reports"
+    - StaticText "ACCOUNT"
+    - link "Settings" [ref=e3248]
+      - StaticText "Settings"
+  - StaticText "VN"
+  - StaticText "Vermont Nurseries"
+  - StaticText "Grower account"
+  - button "Sign out" [ref=e3236]
+- main
+  - sectionheader
+    - heading "Add New Strain" [level=1, ref=e3249]
+    - paragraph
+      - StaticText "Create a new cannabis genetics entry"
+  - heading "Strain Details" [level=3, ref=e3237]
+  - form
+    - LabelText
+      - StaticText "Strain Name *"
+    - combobox "Strain Name *" [required, ref=e3250]
+    - LabelText
+      - StaticText "Strain Type *"
+    - combobox "Strain Type *" [expanded=false, ref=e3251]: Select strain type
+      - MenuListPopup
+        - option "Select strain type" [selected, ref=e3258]
+        - option "Indica" [ref=e3259]
+        - option "Sativa" [ref=e3260]
+        - option "Hybrid" [ref=e3261]
+        - option "Sativa Dom. Hybrid" [ref=e3262]
+        - option "Indica Dom. Hybrid" [ref=e3263]
+    - paragraph
+      - StaticText "Indica"
+      - StaticText " — Generally selected for indica-leaning genetics and buyer expectations."
+    - paragraph
+      - StaticText "Sativa"
+      - StaticText " — Generally selected for sativa-leaning genetics and buyer expectations."
+    - paragraph
+      - StaticText "Hybrid"
+      - StaticText " — Balanced hybrid genetics without a strong indica or sativa lean."
+    - paragraph
+      - StaticText "Sativa Dom. Hybrid"
+      - StaticText " — Hybrid genetics that lean sativa in growth traits or buyer positioning."
+    - paragraph
+      - StaticText "Indica Dom. Hybrid"
+      - StaticText " — Hybrid genetics that lean indica in growth traits or buyer positioning."
+    - LabelText
+      - StaticText "Genetics / Lineage"
+    - textbox "Genetics / Lineage" [ref=e3252]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Description" [ref=e3253]
+    - LabelText
+      - StaticText "Grower Notes"
+    - textbox "Grower Notes" [ref=e3254]
+    - button "Create Strain" [disabled, ref=e3255]
+    - button "Cancel" [ref=e3256]
+- generic
+  - button "Open recent activity" [expanded=false, ref=e3257]
+  - button "Open messages" [ref=e3238]
+- region "Notifications alt+T" [ref=e3232]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e3264]
+  - image
+- alert

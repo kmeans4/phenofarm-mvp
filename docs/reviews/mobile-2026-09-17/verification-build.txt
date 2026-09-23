@@ -1,0 +1,169 @@
+
+> phenofarm-mvp@0.1.0 verify
+> npm run env:check && npm run lint && npm run build
+
+
+> phenofarm-mvp@0.1.0 env:check
+> node scripts/validate-env.mjs
+
+[env:check] PhenoFarm example ok (4 required, 6 optional)
+
+> phenofarm-mvp@0.1.0 lint
+> eslint
+
+
+> phenofarm-mvp@0.1.0 build
+> prisma generate && next build
+
+Environment variables loaded from .env
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.5.0) to ./node_modules/@prisma/client in 93ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Curious about the SQL queries Prisma ORM generates? Optimize helps you enhance your visibility: https://pris.ly/tip-2-optimize
+
+┌─────────────────────────────────────────────────────────┐
+│  Update available 6.5.0 -> 8.0.0-rc.15                  │
+│                                                         │
+│  This is a major update - please follow the guide at    │
+│  https://pris.ly/d/major-version-upgrade                │
+│                                                         │
+│  Run the following to update                            │
+│    npm i --save-dev prisma@latest                       │
+│    npm i @prisma/client@latest                          │
+└─────────────────────────────────────────────────────────┘
+▲ Next.js 16.1.6 (Turbopack)
+- Environments: .env.local, .env.production, .env
+
+  Creating an optimized production build ...
+(node:61836) [DEP0205] DeprecationWarning: `module.register()` is deprecated. Use `module.registerHooks()` instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+Browserslist: browsers data (caniuse-lite) is 8 months old. Please run:
+  npx update-browserslist-db@latest
+  Why you should do it regularly: https://github.com/browserslist/update-db#readme
+✓ Compiled successfully in 3.1s
+  Running TypeScript ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/86) ...
+  Generating static pages using 9 workers (21/86) 
+  Generating static pages using 9 workers (42/86) 
+  Generating static pages using 9 workers (64/86) 
+✓ Generating static pages using 9 workers (86/86) in 148.2ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ○ /
+├ ○ /_not-found
+├ ƒ /admin
+├ ƒ /admin/dashboard
+├ ƒ /admin/dispensaries
+├ ƒ /admin/dispensaries/[id]/verify
+├ ƒ /admin/growers
+├ ƒ /admin/growers/[id]/verify
+├ ƒ /admin/settings
+├ ƒ /admin/users
+├ ƒ /api/admin/seed
+├ ƒ /api/auth/[...nextauth]
+├ ƒ /api/auth/register
+├ ƒ /api/batches
+├ ƒ /api/batches/[id]
+├ ƒ /api/checkout
+├ ƒ /api/customers
+├ ƒ /api/customers/[id]
+├ ƒ /api/dispensaries
+├ ƒ /api/dispensary/accepted-quotes
+├ ƒ /api/dispensary/cart/validate
+├ ƒ /api/dispensary/catalog
+├ ƒ /api/dispensary/favorites
+├ ƒ /api/dispensary/grower-terms
+├ ƒ /api/dispensary/price-alerts
+├ ƒ /api/dispensary/price-alerts/refresh
+├ ƒ /api/dispensary/products
+├ ƒ /api/dispensary/products/[id]/thumbnail
+├ ƒ /api/dispensary/recent-products
+├ ƒ /api/dispensary/saved-filters
+├ ƒ /api/dispensary/search-suggestions
+├ ƒ /api/dispensary/settings
+├ ƒ /api/grower/attention
+├ ƒ /api/grower/commercial-terms
+├ ƒ /api/grower/settings
+├ ƒ /api/grower/subscription
+├ ƒ /api/grower/subscription/checkout
+├ ƒ /api/grower/subscription/portal
+├ ƒ /api/growers/me
+├ ƒ /api/inventory
+├ ƒ /api/messages/conversations
+├ ƒ /api/messages/conversations/[id]/messages
+├ ƒ /api/messages/conversations/[id]/read
+├ ƒ /api/messages/messages/[id]/offer-action
+├ ƒ /api/notifications
+├ ƒ /api/orders
+├ ƒ /api/orders/[id]
+├ ƒ /api/orders/[id]/acknowledge
+├ ƒ /api/orders/[id]/status
+├ ƒ /api/orders/batch-status
+├ ƒ /api/product-type-config
+├ ƒ /api/products
+├ ƒ /api/products/[id]
+├ ƒ /api/products/bulk
+├ ƒ /api/products/bulk-update
+├ ƒ /api/products/upload
+├ ƒ /api/products/upload-document
+├ ƒ /api/search
+├ ƒ /api/strains
+├ ƒ /api/strains/[id]
+├ ƒ /api/stripe/webhooks
+├ ƒ /auth/error
+├ ○ /auth/sign_in
+├ ○ /auth/sign_up
+├ ○ /contact
+├ ƒ /dashboard
+├ ƒ /dispensary/cart
+├ ƒ /dispensary/catalog
+├ ƒ /dispensary/dashboard
+├ ƒ /dispensary/favorites
+├ ƒ /dispensary/grower/[id]
+├ ƒ /dispensary/orders
+├ ƒ /dispensary/orders/[id]
+├ ƒ /dispensary/price-alerts
+├ ƒ /dispensary/saved
+├ ƒ /dispensary/settings
+├ ƒ /grower
+├ ƒ /grower/batches
+├ ƒ /grower/batches/[id]/edit
+├ ƒ /grower/batches/add
+├ ƒ /grower/catalog
+├ ƒ /grower/customers
+├ ƒ /grower/customers/[id]/edit
+├ ƒ /grower/customers/[id]/statement
+├ ƒ /grower/customers/add
+├ ƒ /grower/dashboard
+├ ƒ /grower/inventory
+├ ƒ /grower/inventory/add
+├ ƒ /grower/marketplace
+├ ƒ /grower/orders
+├ ƒ /grower/orders/[id]
+├ ƒ /grower/orders/[id]/edit
+├ ƒ /grower/orders/add
+├ ƒ /grower/orders/history
+├ ƒ /grower/pricing
+├ ƒ /grower/products
+├ ƒ /grower/products/[id]/edit
+├ ƒ /grower/products/add
+├ ƒ /grower/products/api/upload
+├ ƒ /grower/reports
+├ ƒ /grower/settings
+├ ƒ /grower/strains
+├ ƒ /grower/strains/[id]/edit
+├ ƒ /grower/strains/add
+├ ○ /help
+├ ○ /legal/cookies
+├ ○ /legal/privacy
+└ ○ /legal/terms
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

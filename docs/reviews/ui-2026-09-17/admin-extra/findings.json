@@ -1,0 +1,393 @@
+[
+  {
+    "id": "E01",
+    "page": "Grower reports",
+    "route": "/grower/reports",
+    "priority": "Low",
+    "title": "Shorten report headings and repeated range wording",
+    "observation": "Analytics & Reports repeats the navigation label; four KPI helpers repeat the selected date range, plus settlement and export explanations.",
+    "recommendation": "Use Reports, Delivered value and Avg. delivered value; state the date range once and omit routine export/settlement reminders. Preserve the distinction between delivered value and paid revenue.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E02",
+    "page": "Grower reports",
+    "route": "/grower/reports",
+    "priority": "Medium",
+    "title": "Compact mobile exports and date presets",
+    "observation": "Two full-width export buttons, a helper line and a two-row date-range card precede the metrics.",
+    "recommendation": "Use one Export menu or inline PDF/CSV; use 30 d,90 d,12 mo,All with full accessible names.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E03",
+    "page": "Grower reports",
+    "route": "/grower/reports",
+    "priority": "Medium",
+    "title": "Remove the orphan KPI half-row",
+    "observation": "The first metric spans the full row; the next three create an empty lower-right half-row. The trend starts around y 887.",
+    "recommendation": "Use a consistent 2\u00d72 mobile grid, with subtle highlighting instead of forcing the first metric full-width.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E04",
+    "page": "Grower reports",
+    "route": "/grower/reports",
+    "priority": "Medium",
+    "title": "Right-size a one-period chart and empty statuses",
+    "observation": "The one-period chart has a 490 px-wide bar and roughly 200 px unused space below it. Four of six status rows contain zero in the sampled 90 day view.",
+    "recommendation": "Constrain bar width and chart height for sparse data; present zero statuses compactly or under a reveal control. Preserve access to every status.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E05",
+    "page": "Grower reports",
+    "route": "/grower/reports",
+    "priority": "High",
+    "title": "Correct the month displayed on the trend",
+    "observation": "September sample request value is labeled Aug 26 in both passes and the 30 day view. The month formatter parses a UTC month-start date then displays it in local time.",
+    "recommendation": "Format year/month as a calendar month without timezone shifting; verify September remains September across timezones.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E06",
+    "page": "Grower reports",
+    "route": "/grower/reports",
+    "priority": "Low",
+    "title": "Use singular count wording",
+    "observation": "The sample renders \u201c1 delivered requests\u201d and \u201c1 orders\u201d.",
+    "recommendation": "Use \u201c1 delivered request\u201d and \u201c1 order\u201d.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E07",
+    "page": "Grower reports",
+    "route": "/grower/reports",
+    "priority": "Medium",
+    "title": "Preserve customer context in the compact mobile list",
+    "observation": "Recent Requests hides customer and date, leaving cryptic IDs, status and value.",
+    "recommendation": "Make customer the primary row label, with a short date/ID metadata line; keep status and value alongside.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-reports-desktop.png",
+      "admin-extra/p1-reports-mobile.png",
+      "admin-extra/p2-reports-desktop.png",
+      "admin-extra/p2-reports-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E08",
+    "page": "Grower plans",
+    "route": "/grower/pricing",
+    "priority": "Medium",
+    "title": "Reduce the plan-page preamble",
+    "observation": "The first plan begins around y 825 on mobile. A two-line title, long disclosure and large current-plan panel repeat information before comparisons.",
+    "recommendation": "Use Plans; one short subscription/settlement disclosure; a compact \u201cCurrent plan: Free\u201d line. Preserve price and billing terms.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-pricing-desktop.png",
+      "admin-extra/p1-pricing-mobile.png",
+      "admin-extra/p2-pricing-desktop.png",
+      "admin-extra/p2-pricing-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E09",
+    "page": "Grower plans",
+    "route": "/grower/pricing",
+    "priority": "Medium",
+    "title": "Show useful unavailable-upgrade copy",
+    "observation": "The local unavailable state tells growers to add STRIPE_PRO_PRICE_ID or STRIPE_BUSINESS_PRICE_ID.",
+    "recommendation": "Show \u201cPaid upgrades are unavailable. Contact support.\u201d Put configuration steps in the admin view. This is not a claim about production billing.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-pricing-desktop.png",
+      "admin-extra/p1-pricing-mobile.png",
+      "admin-extra/p2-pricing-desktop.png",
+      "admin-extra/p2-pricing-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E10",
+    "page": "Grower plans",
+    "route": "/grower/pricing",
+    "priority": "Low",
+    "title": "Remove repeated plan labels and features",
+    "observation": "Free/current plan is repeated across the summary, badge and button; Pro lists priority support twice; some Free entitlements overlap vaguely.",
+    "recommendation": "Keep one current-plan badge, one support benefit and distinct concise entitlements. Make the Free status badge fit-content on mobile.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-pricing-desktop.png",
+      "admin-extra/p1-pricing-mobile.png",
+      "admin-extra/p2-pricing-desktop.png",
+      "admin-extra/p2-pricing-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E11",
+    "page": "Grower plans",
+    "route": "/grower/pricing",
+    "priority": "Medium",
+    "title": "Make mobile plan comparison less scroll-heavy",
+    "observation": "The three plans require over 2200 px of page height; Pro starts around y 1287.",
+    "recommendation": "Use compact plan summaries with optional feature expansion or a concise comparison. Keep actual prices, annual terms and primary actions visible.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-pricing-desktop.png",
+      "admin-extra/p1-pricing-mobile.png",
+      "admin-extra/p2-pricing-desktop.png",
+      "admin-extra/p2-pricing-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E12",
+    "page": "Grower settings",
+    "route": "/grower/settings",
+    "priority": "Medium",
+    "title": "Explain settlement once",
+    "observation": "The subscription panel, separate Wholesale Settlement panel and Commercial terms note repeat the payment boundary.",
+    "recommendation": "Keep one concise disclosure near the relevant subscription/terms action and remove the separate repeated explanation.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E13",
+    "page": "Grower settings",
+    "route": "/grower/settings",
+    "priority": "Medium",
+    "title": "Rebalance profile and logo space",
+    "observation": "The business form occupies a single narrow column while the short logo card leaves a large unused column below it. The app sidebar plus section sidebar further compress the form.",
+    "recommendation": "Put logo in a compact profile header, arrange short fields in two columns on desktop and consider horizontal section navigation.",
+    "view": "Desktop",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E14",
+    "page": "Grower settings",
+    "route": "/grower/settings",
+    "priority": "Medium",
+    "title": "Restore mobile section navigation",
+    "observation": "The page is 3606 px tall, Business profile starts at y 1902, and the desktop section navigation disappears on mobile.",
+    "recommendation": "Add a compact section chooser or anchored tabs so users can reach Profile, Terms and Branding directly.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E15",
+    "page": "Grower settings",
+    "route": "/grower/settings",
+    "priority": "Medium",
+    "title": "Reduce the persistent save strip and clarify its scope",
+    "observation": "An untouched page reserves 92 px at the bottom for Save settings and a draft note. Commercial terms simultaneously has its own Save terms control.",
+    "recommendation": "Show a compact save strip when relevant/dirty; label its scope \u201cSave profile\u201d if it only saves profile fields. Keep Save terms distinct.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E16",
+    "page": "Grower settings",
+    "route": "/grower/settings",
+    "priority": "Low",
+    "title": "Replace repeated form instructions with targeted guidance",
+    "observation": "Required-first prose lists fields already marked required; Business prefixes repeat within the profile; title/nav names vary between Business Information and Business profile.",
+    "recommendation": "Use Settings, Business profile, Name/Email/Phone/Address, Logo and Upload. Show one short required-field key or only the missing required items.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E17",
+    "page": "Grower settings",
+    "route": "/grower/settings",
+    "priority": "Medium",
+    "title": "Keep the contact note readable",
+    "observation": "The single-line Contact note input clips the end of its default sentence on mobile.",
+    "recommendation": "Use a concise default such as \u201cMessage before confirming fulfillment\u201d or a compact two-line field when longer content is needed.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E18",
+    "page": "Grower settings",
+    "route": "/grower/settings",
+    "priority": "Low",
+    "title": "Remove the redundant desktop sign-out card",
+    "observation": "An Account card repeats the sign-out action already in the sidebar.",
+    "recommendation": "Use one consistent account action; retain a clear mobile route to sign out.",
+    "view": "Desktop",
+    "evidence": [
+      "admin-extra/p1-settings-desktop.png",
+      "admin-extra/p1-settings-mobile.png",
+      "admin-extra/p2-settings-desktop.png",
+      "admin-extra/p2-settings-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E19",
+    "page": "Grower marketplace preview",
+    "route": "/grower/marketplace",
+    "priority": "Medium",
+    "title": "State the preview purpose once",
+    "observation": "Page title/intro, Buyer preview heading/subtitle and a green banner repeat the same purpose.",
+    "recommendation": "Use Marketplace preview and one sentence: \u201cHow buyers see your listings.\u201d Use Add product for the primary action.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-marketplace-desktop.png",
+      "admin-extra/p1-marketplace-mobile.png",
+      "admin-extra/p2-marketplace-desktop.png",
+      "admin-extra/p2-marketplace-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E20",
+    "page": "Grower marketplace preview",
+    "route": "/grower/marketplace",
+    "priority": "Medium",
+    "title": "Replace four stacked preamble cards",
+    "observation": "Two counts and two standing instructions get equally large cards; the mobile preview heading starts at y 739.",
+    "recommendation": "Use compact Active and Quote required counts, then one Terms link and a short relevant policy note.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-marketplace-desktop.png",
+      "admin-extra/p1-marketplace-mobile.png",
+      "admin-extra/p2-marketplace-desktop.png",
+      "admin-extra/p2-marketplace-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E21",
+    "page": "Grower marketplace preview",
+    "route": "/grower/marketplace",
+    "priority": "Medium",
+    "title": "Remove nested mobile card padding",
+    "observation": "The preview panel and product cards both add borders/padding, leaving about 278 px for content inside a 390 px screen.",
+    "recommendation": "Use a single product-card shell on mobile and remove the outer preview padding.",
+    "view": "Mobile",
+    "evidence": [
+      "admin-extra/p1-marketplace-desktop.png",
+      "admin-extra/p1-marketplace-mobile.png",
+      "admin-extra/p2-marketplace-desktop.png",
+      "admin-extra/p2-marketplace-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E22",
+    "page": "Grower marketplace preview",
+    "route": "/grower/marketplace",
+    "priority": "Medium",
+    "title": "Simplify shared product-card repetition",
+    "observation": "Large placeholder art repeats category; cards repeat stock status/quantity, unit and long lab-availability text. Three products make the mobile page 3011 px tall.",
+    "recommendation": "Shrink placeholder-only art, use category once, condense stock/unit and use \u201cLab results: request\u201d. Coordinate with the buyer catalog so preview stays accurate. Preserve supplied photos and safety-relevant lab facts.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-marketplace-desktop.png",
+      "admin-extra/p1-marketplace-mobile.png",
+      "admin-extra/p2-marketplace-desktop.png",
+      "admin-extra/p2-marketplace-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  },
+  {
+    "id": "E23",
+    "page": "Global 404 state",
+    "route": "Unmatched URL (404)",
+    "priority": "Medium",
+    "title": "Give missing pages a recovery action",
+    "observation": "The default 404 page shows only the error code and \u201cThis page could not be found\u201d, without branding or a route back into the app.",
+    "recommendation": "Use a concise \u201cPage not found\u201d message and Home/Back to dashboard action with the normal brand treatment. Do not add filler to the empty area.",
+    "view": "Desktop and mobile",
+    "evidence": [
+      "admin-extra/p1-not-found-desktop.png",
+      "admin-extra/p1-not-found-mobile.png",
+      "admin-extra/p2-not-found-desktop.png",
+      "admin-extra/p2-not-found-mobile.png"
+    ],
+    "verified": "Both fresh passes"
+  }
+]

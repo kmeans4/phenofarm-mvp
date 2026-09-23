@@ -1,0 +1,83 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e2031]
+- button "Notifications" [expanded=false, ref=e2032]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e2033]
+- main
+  - link "View statement" [ref=e2034]
+  - link "← Back to Customers" [ref=e2035]
+  - sectionheader
+    - heading "Edit Customer" [level=1, ref=e2037]
+    - paragraph
+      - StaticText "Update customer information"
+  - form
+    - heading "Business Information" [level=2, ref=e2038]
+    - LabelText
+      - StaticText "Business Name *"
+    - textbox "Enter business name" [ref=e2039]: Maple Street Market
+      - StaticText "Maple Street Market"
+    - LabelText
+      - StaticText "License Number"
+    - textbox "License #" [ref=e2040]: VT-UI-2026-104
+      - StaticText "VT-UI-2026-104"
+    - LabelText
+      - StaticText "Website"
+    - textbox "https://..." [ref=e2041]
+    - LabelText
+      - StaticText "Description"
+    - textbox "Brief description..." [ref=e2042]
+    - paragraph
+      - StaticText "0/500 characters"
+    - heading "Contact Information" [level=2, ref=e2043]
+    - LabelText
+      - StaticText "Contact Person"
+    - textbox "Full name" [ref=e2044]: Alex Morgan
+      - StaticText "Alex Morgan"
+    - LabelText
+      - StaticText "Email"
+    - textbox "email@example.com" [ref=e2045]: orders@example.test
+      - StaticText "orders@example.test"
+    - LabelText
+      - StaticText "Phone"
+    - textbox "(555) 123-4567" [ref=e2046]: 802-555-0142
+      - StaticText "802-555-0142"
+    - heading "Address" [level=2, ref=e2047]
+    - LabelText
+      - StaticText "Street Address"
+    - textbox "123 Main St" [ref=e2048]: 25 Maple Street
+      - StaticText "25 Maple Street"
+    - LabelText
+      - StaticText "City"
+    - textbox "City" [ref=e2049]: Burlington
+      - StaticText "Burlington"
+    - LabelText
+      - StaticText "State"
+    - combobox [expanded=false, ref=e2050]: Vermont
+      - MenuListPopup
+        - option "Vermont" [selected, ref=e2055]
+        - option "Maine" [ref=e2056]
+        - option "Massachusetts" [ref=e2057]
+        - option "Connecticut" [ref=e2058]
+        - option "Rhode Island" [ref=e2059]
+        - option "New Hampshire" [ref=e2060]
+        - option "New York" [ref=e2061]
+        - option "New Jersey" [ref=e2062]
+        - option "Pennsylvania" [ref=e2063]
+        - option "Delaware" [ref=e2064]
+        - option "Maryland" [ref=e2065]
+        - option "District of Columbia" [ref=e2066]
+        - option "Virginia" [ref=e2067]
+    - LabelText
+      - StaticText "ZIP Code"
+    - textbox "12345" [ref=e2051]: 05401
+      - StaticText "05401"
+    - button "Delete Customer" [ref=e2052]
+    - link "Cancel" [ref=e2053]
+    - button "Save Changes" [ref=e2054]
+- button "Open messages" [ref=e2036]
+- region "Notifications alt+T" [ref=e2030]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e2068]
+  - image
+- alert

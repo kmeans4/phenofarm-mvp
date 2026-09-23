@@ -1,0 +1,223 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e2765]
+- button "Notifications" [expanded=false, ref=e2766]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e2767]
+- main
+  - sectionheader
+    - paragraph
+      - StaticText "PRODUCTS / NEW PRODUCT"
+    - heading "Add a product" [level=1, ref=e2769]
+    - paragraph
+      - StaticText "Create a new cannabis product listing"
+  - form
+    - paragraph
+      - StaticText "GUIDED LISTING SETUP"
+    - generic
+      - StaticText "1"
+      - StaticText "Basics"
+    - generic
+      - StaticText "2"
+      - StaticText "Pricing"
+    - generic
+      - StaticText "3"
+      - StaticText "Inventory"
+    - generic
+      - StaticText "4"
+      - StaticText "Profile"
+    - generic
+      - StaticText "5"
+      - StaticText "Images"
+    - paragraph
+      - StaticText "Fill the core listing first. Optional profile, lab, and image details stay grouped so mobile setup stays easier to scan."
+    - paragraph
+      - StaticText "Smart defaults"
+    - paragraph
+      - StaticText "Reuse your last product type, unit, price, and pricing visibility."
+    - button "Use starter defaults" [ref=e2770]
+    - paragraph
+      - StaticText "STEP 1"
+    - heading "Basics" [level=3, ref=e2771]
+    - paragraph
+      - StaticText "Name the product and connect it to strain and batch context when available."
+    - LabelText
+      - StaticText "Product Name *"
+    - textbox "Product Name *" [ref=e2772]
+    - LabelText
+      - StaticText "Product Type *"
+    - combobox "Product Type *" [expanded=false, ref=e2773]: Select a product type
+      - MenuListPopup
+        - option "Select a product type" [selected, ref=e2793]
+        - option "Bulk Extract" [ref=e2794]
+        - option "Cartridge" [ref=e2795]
+        - option "Edibles" [ref=e2796]
+        - option "Beverages" [ref=e2797]
+        - option "Flower" [ref=e2798]
+        - option "Live Plant" [ref=e2799]
+        - option "Plant Material" [ref=e2800]
+        - option "Prepack" [ref=e2801]
+        - option "Preroll" [ref=e2802]
+        - option "Tincture" [ref=e2803]
+        - option "Topicals & Wellness" [ref=e2804]
+    - LabelText
+      - StaticText "Sub Type"
+    - textbox "Select a product type first" [disabled, ref=e2774]
+    - LabelText
+      - StaticText "Strain"
+    - combobox [expanded=false, ref=e2775]: Select a strain (optional)
+      - MenuListPopup
+        - option "Select a strain (optional)" [selected, ref=e2805]
+        - option "Assorted" [ref=e2806]
+        - option "Audit Test Kush • Hybrid" [ref=e2807]
+        - option "Purple Haze" [ref=e2808]
+        - option "Silver Haze" [ref=e2809]
+    - button "+ New" [ref=e2776]
+    - paragraph
+      - StaticText "Link to a strain for better inventory tracking"
+    - LabelText
+      - StaticText "Batch"
+    - StaticText "Pick a strain to attach a batch"
+    - paragraph
+      - StaticText "Batches become available after a strain is selected."
+    - paragraph
+      - StaticText "STEP 2"
+    - heading "Pricing" [level=3, ref=e2777]
+    - paragraph
+      - StaticText "Set the buyer-facing unit price or require a pricing request."
+    - LabelText
+      - StaticText "Price ($) *"
+    - spinbutton "Price ($) *" [ref=e2778]
+    - LabelText
+      - StaticText "Unit *"
+    - combobox "Unit *" [expanded=false, ref=e2779]: Gram
+      - MenuListPopup
+        - option "Select a unit" [ref=e2810]
+        - option "Gram" [selected, ref=e2811]
+        - option "Half Ounce" [ref=e2812]
+        - option "Ounce" [ref=e2813]
+        - option "Eighth" [ref=e2814]
+        - option "Quarter" [ref=e2815]
+        - option "Unit" [ref=e2816]
+        - option "Pack" [ref=e2817]
+        - option "Each" [ref=e2818]
+        - option "Lb" [ref=e2819]
+    - LabelText
+      - StaticText "Pricing Display"
+    - paragraph
+      - StaticText "Choose whether dispensaries see your price or must request pricing via message."
+    - button "Show Price Display public product price" [ref=e2780]
+      - StaticText "Show Price"
+      - StaticText "Display public product price"
+    - button "Request Pricing Hide price and require inquiry" [ref=e2781]
+      - StaticText "Request Pricing"
+      - StaticText "Hide price and require inquiry"
+    - paragraph
+      - StaticText "STEP 3"
+    - heading "Inventory and status" [level=3, ref=e2782]
+    - paragraph
+      - StaticText "Add the starting quantity and decide whether this listing is available now."
+    - LabelText
+      - StaticText "Initial Inventory Quantity *"
+    - spinbutton "Initial Inventory Quantity *" [ref=e2783]: 0
+      - StaticText "0"
+    - LabelText
+      - StaticText "SKU"
+    - textbox "SKU" [ref=e2784]
+    - LabelText
+      - StaticText "Brand"
+    - textbox "Brand" [ref=e2785]: Vermont Nurseries
+      - StaticText "Vermont Nurseries"
+    - LabelText
+      - StaticText "Availability Status"
+    - paragraph
+      - StaticText "Make product available for buyer requests"
+    - button "Mark product unavailable" [ref=e2786]
+    - group
+      - DisclosureTriangle "STEPS 4 AND 5 Optional profile, compliance, and images Add cannabinoids, harvest details, descriptions, and product imagery when needed. Optional" [expanded=true]
+        - paragraph
+          - StaticText "STEPS 4 AND 5"
+        - heading "Optional profile, compliance, and images" [level=3, ref=e2820]
+        - paragraph
+          - StaticText "Add cannabinoids, harvest details, descriptions, and product imagery when needed."
+        - StaticText "Optional"
+      - heading "Cannabinoid Profile (Optional)" [level=3, ref=e2822]
+      - LabelText
+        - StaticText "THC Min (%)"
+      - spinbutton "THC Min (%)" [ref=e2823]
+      - LabelText
+        - StaticText "THC Max (%)"
+      - spinbutton "THC Max (%)" [ref=e2824]
+      - LabelText
+        - StaticText "CBD Min (%)"
+      - spinbutton "CBD Min (%)" [ref=e2825]
+      - LabelText
+        - StaticText "CBD Max (%)"
+      - spinbutton "CBD Max (%)" [ref=e2826]
+      - LabelText
+        - StaticText "Harvest Date"
+      - Date "Harvest Date"
+        - generic
+          - spinbutton "Month Month" [ref=e2830]: 0
+            - StaticText "mm"
+          - StaticText "/"
+          - spinbutton "Day Day" [ref=e2831]: 0
+            - StaticText "dd"
+          - StaticText "/"
+          - spinbutton "Year Year" [ref=e2832]: 0
+            - StaticText "yyyy"
+        - button "Show date picker" [ref=e2828]
+      - LabelText
+        - StaticText "Description"
+      - textbox "Description" [ref=e2827]
+      - paragraph
+        - StaticText "0/2000 characters"
+      - generic
+        - LabelText
+          - StaticText "Product Images"
+        - paragraph
+          - StaticText "Add up to 2 images. JPG, PNG, or WebP, max 1MB each. Images upload separately before you save the product."
+        - button "Choose Files" [ref=e2829]: No file chosen
+        - paragraph
+          - StaticText "0/2 image slots used."
+    - complementary
+      - paragraph
+        - StaticText "SAVE SUMMARY"
+      - heading "Review before saving" [level=3, ref=e2789]
+      - StaticText "Available"
+      - paragraph
+        - StaticText "Listing"
+      - paragraph
+        - StaticText "Unnamed product"
+      - paragraph
+        - StaticText "Type"
+      - paragraph
+        - StaticText "Not selected"
+      - paragraph
+        - StaticText "Price"
+      - paragraph
+        - StaticText "Not priced"
+      - paragraph
+        - StaticText "Inventory"
+      - paragraph
+        - StaticText "0 Gram"
+      - paragraph
+        - StaticText "Visibility"
+      - paragraph
+        - StaticText "Available · price visible"
+      - button "Create Product" [ref=e2790]
+      - button "Save Draft" [ref=e2791]
+      - paragraph
+        - StaticText "Creates a hidden draft listing. Browser autosave stays on this device until you create or save the product."
+      - button "Cancel" [ref=e2792]
+  - generic
+    - paragraph
+      - StaticText "Browser autosave stays on this device."
+    - button "Cancel" [ref=e2787]
+    - button "Publish product" [ref=e2788]
+- button "Open messages" [ref=e2768]
+- region "Notifications alt+T" [ref=e2764]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e2821]
+  - image
+- alert

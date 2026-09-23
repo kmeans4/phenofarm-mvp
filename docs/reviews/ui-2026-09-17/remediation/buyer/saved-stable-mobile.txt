@@ -1,0 +1,57 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "DISPENSARY"
+- button "Search" [ref=e1788]
+- button "Notifications" [expanded=false, ref=e1789]
+  - StaticText "20"
+- button "Open Dispensary Portal navigation menu" [expanded=false, ref=e1790]
+- main
+  - sectionheader
+    - heading "Saved" [level=1, ref=e1792]
+    - link "Browse Catalog" [ref=e1793]
+  - tablist "Saved workspace"
+    - tab "Favorites (1)" [selected, ref=e1794]
+      - StaticText "Favorites"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Alerts (1)" [ref=e1795]
+      - StaticText "Alerts"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+    - tab "Recent (1)" [ref=e1796]
+      - StaticText "Recent"
+      - StaticText " ("
+      - StaticText "1"
+      - StaticText ")"
+  - tabpanel "Favorites (1)"
+    - combobox "Sort favorites" [expanded=false, ref=e1799]: Recently Added
+      - MenuListPopup
+        - option "Recently Added" [selected, ref=e1805]
+        - option "Price: Low to High" [ref=e1806]
+        - option "Price: High to Low" [ref=e1807]
+        - option "THC: High to Low" [ref=e1808]
+        - option "Name: A-Z" [ref=e1809]
+        - option "Name: Z-A" [ref=e1810]
+        - option "THC: Low to High" [ref=e1811]
+    - button "Grid view" [ref=e1797]
+    - button "List view" [ref=e1798]
+    - group
+      - DisclosureTriangle "More" [expanded=false]
+    - article
+      - image "Mystery Pricing Batch"
+      - heading "Mystery Pricing Batch" [level=3, ref=e1800]
+      - link "Vermont Nurseries" [ref=e1801]
+      - StaticText "Flower"
+      - StaticText "THC "
+      - StaticText "19"
+      - StaticText "%"
+      - StaticText "25"
+      - StaticText " available"
+      - button "Request pricing" [ref=e1802]
+      - button "Message" [ref=e1803]
+      - button "Remove Mystery Pricing Batch from favorites" [ref=e1804]
+- button "Open messages" [ref=e1791]
+- region "Notifications alt+T" [ref=e1787]
+- alert

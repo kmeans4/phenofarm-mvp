@@ -1,0 +1,74 @@
+- StaticText "P"
+- StaticText "PhenoFarm"
+- StaticText "CULTIVATOR"
+- button "Search" [ref=e1916]
+- button "Notifications" [expanded=false, ref=e1917]
+  - StaticText "16"
+- button "Open Grower Portal navigation menu" [expanded=false, ref=e1918]
+- main
+  - sectionheader
+    - heading "Customers" [level=1, ref=e1923]
+    - paragraph
+      - StaticText "Your saved contacts and dispensaries with requests or conversations with your grower account."
+  - paragraph
+    - StaticText "Total Customers"
+  - paragraph
+    - StaticText "2"
+  - paragraph
+    - StaticText "Ordered in last 90 days"
+  - paragraph
+    - StaticText "2"
+  - paragraph
+    - StaticText "Orders"
+  - paragraph
+    - StaticText "20"
+  - heading "Customer List" [level=2, ref=e1919]
+  - link "View Green Vermont Dispensary" [ref=e1920]
+    - paragraph
+      - StaticText "Green Vermont Dispensary"
+    - paragraph
+      - StaticText "License: VT-RTL-2024-001"
+    - paragraph
+      - StaticText "Contact:Green Vermont Dispensary"
+    - paragraph
+      - StaticText "Email:dispensary@greenvermont.com"
+    - paragraph
+      - StaticText "Phone:(802) 555-0145"
+    - paragraph
+      - StaticText "Location:Burlington, VT"
+    - paragraph
+      - StaticText "Last order:Jul 9, 2026"
+    - paragraph
+      - StaticText "Delivered value:$0.00"
+    - StaticText "PhenoFarm member"
+    - StaticText "19"
+    - StaticText " request"
+    - StaticText "s"
+    - link "View requests" [ref=e1924]
+    - button "Message" [ref=e1925]
+  - link "View Maple Street Market" [ref=e1921]
+    - paragraph
+      - StaticText "Maple Street Market"
+    - paragraph
+      - StaticText "License: VT-UI-2026-104"
+    - paragraph
+      - StaticText "Contact:Alex Morgan"
+    - paragraph
+      - StaticText "Email:orders@example.test"
+    - paragraph
+      - StaticText "Phone:802-555-0142"
+    - paragraph
+      - StaticText "Location:Burlington, VT"
+    - paragraph
+      - StaticText "Last order:Sep 13, 2026"
+    - paragraph
+      - StaticText "Delivered value:$450.00"
+    - StaticText "1"
+    - StaticText " request"
+    - link "View requests" [ref=e1926]
+    - button "Message" [ref=e1927]
+- button "Open messages" [ref=e1922]
+- region "Notifications alt+T" [ref=e1915]
+- button "Open Next.js Dev Tools" [expanded=false, ref=e1928]
+  - image
+- alert
