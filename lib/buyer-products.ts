@@ -1,6 +1,8 @@
 import type { Prisma } from '@prisma/client';
 import { marketplaceGrowerWhere } from '@/lib/license';
 import { productImagesById } from '@/lib/product-images';
+import { productLabReportsById } from '@/lib/buyer-lab-reports';
+import type { LabReportKey } from '@/lib/lab-reports';
 
 // List payloads deliberately exclude image blobs and unused legacy/test fields.
 export const buyerProductSelect = {
@@ -21,7 +23,7 @@ export function productThumbnail(id: string) {
   return `/api/dispensary/products/${encodeURIComponent(id)}/thumbnail`;
 }
 
-export function serializeBuyerProduct(product: Prisma.ProductGetPayload<{ select: typeof buyerProductSelect }>, images: string[] = []) {
+export function serializeBuyerProduct(product: Prisma.ProductGetPayload<{ select: typeof buyerProductSelect }>, images: string[] = [], labReports: LabReportKey[] = []) {
   const number = (value: unknown) => value == null ? null : Number(value);
   return {
     id: product.id, name: product.name,
@@ -32,7 +34,7 @@ export function serializeBuyerProduct(product: Prisma.ProductGetPayload<{ select
     subType: product.subType, unit: product.unit,
     thc: number(product.batch?.thc ?? product.thcMax ?? product.thcMin),
     cbd: number(product.batch?.cbd ?? product.cbdMax ?? product.cbdMin),
-    images, inventoryQty: product.inventoryQty,
+    images, labReports, inventoryQty: product.inventoryQty,
     isAvailable: product.isAvailable && product.inventoryQty > 0,
     createdAt: product.createdAt.toISOString(),
     grower: { id: product.grower.id, businessName: product.grower.businessName,
@@ -42,8 +44,9 @@ export function serializeBuyerProduct(product: Prisma.ProductGetPayload<{ select
 }
 
 export async function serializeBuyerProducts(products: Prisma.ProductGetPayload<{ select: typeof buyerProductSelect }>[]) {
-  const images = await productImagesById(products.map(product => product.id));
-  return products.map(product => serializeBuyerProduct(product, images.get(product.id)));
+  const ids = products.map(product => product.id);
+  const [images, reports] = await Promise.all([productImagesById(ids), productLabReportsById(ids)]);
+  return products.map(product => serializeBuyerProduct(product, images.get(product.id), reports.get(product.id)));
 }
 
 export function parsePage(value: string | null, fallback = 1, maximum = 100000) {

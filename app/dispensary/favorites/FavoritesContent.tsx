@@ -10,6 +10,8 @@ import AddToCartButton from "../catalog/components/AddToCartButton";
 import { PageHeader } from "@/app/components/ui/PageHeader";
 import { toast } from '@/app/hooks/useToast';
 import { ProductImage } from '@/app/components/ui/ProductImage';
+import type { LabReportKey } from '@/lib/lab-reports';
+import { LabReportDownloads } from '@/app/dispensary/components/LabReportDownloads';
 
 function displayUnit(unit: string | null | undefined) { return unit?.toLowerCase() === 'gram' ? 'g' : unit || 'unit'; }
 
@@ -27,6 +29,7 @@ interface Product {
   thc: number | null;
   cbd: number | null;
   images: string[];
+  labReports: LabReportKey[];
   inventoryQty: number;
   grower: {
     id: string;
@@ -371,6 +374,8 @@ function FavoriteCard({
           </div>
         )}
 
+        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mb-3" />
+
         {/* Price & Actions */}
         <div className="pt-3 border-t border-pf-line">
           {product.isPriceVisible ? (
@@ -440,6 +445,7 @@ function FavoriteListItem({
           {product.thc != null && <span>THC {product.thc}%</span>}
           <span>{product.inventoryQty} available</span>
         </div>
+        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mt-2" />
       </div>
       <div className="col-span-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-pf-line pt-3 sm:max-w-xs sm:border-0 sm:pt-0">
         {product.isPriceVisible ? <>

@@ -288,7 +288,7 @@ export function validateProductImageList(images: unknown): UploadValidationResul
 export function validateDocumentReference(value: unknown): UploadValidationResult {
   if (value === undefined || value === null || value === '') return { ok: true };
   if (typeof value !== 'string') return { ok: false, error: 'Document reference must be text.' };
-  if (isHttpUrl(value)) return { ok: true };
+  if (isHttpUrl(value) || isLocalDocumentReference(value)) return { ok: true };
 
   const dataUrl = parseDataUrl(value);
   if (!dataUrl || !PRODUCT_DOCUMENT_MIME_TYPES.includes(dataUrl.mimeType as (typeof PRODUCT_DOCUMENT_MIME_TYPES)[number])) {
@@ -325,7 +325,7 @@ export function validateBatchLabDocumentsPayload(value: unknown): UploadValidati
     const record = document as Record<string, unknown>;
     const dataUrl = typeof record.dataUrl === 'string' ? parseDataUrl(record.dataUrl) : null;
 
-    if (typeof record.dataUrl === 'string' && isHttpUrl(record.dataUrl)) continue;
+    if (typeof record.dataUrl === 'string' && (isHttpUrl(record.dataUrl) || isLocalDocumentReference(record.dataUrl))) continue;
 
     if (!dataUrl || dataUrl.mimeType !== 'application/pdf') {
       return { ok: false, error: `Lab document ${key} must be a PDF data URL.` };
@@ -346,4 +346,9 @@ export function validateBatchLabDocumentsPayload(value: unknown): UploadValidati
   }
 
   return { ok: true };
+}
+
+// Match the dev-only URLs returned by storeUpload; production requires Blob.
+function isLocalDocumentReference(value: string) {
+  return process.env.NODE_ENV !== 'production' && !process.env.VERCEL && /^\/uploads\/[a-zA-Z0-9-]+\.pdf$/.test(value);
 }

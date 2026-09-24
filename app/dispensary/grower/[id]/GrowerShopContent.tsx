@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import type { BuyerCatalogPage } from '@/lib/buyer-catalog';
+import type { LabReportKey } from '@/lib/lab-reports';
+import { LabReportDownloads } from '@/app/dispensary/components/LabReportDownloads';
 import {
   LayoutGrid,
   List as ListIcon,
@@ -29,6 +31,7 @@ interface Product {
   thc: number | null;
   inventoryQty: number;
   images: string[];
+  labReports: LabReportKey[];
 
 }
 
@@ -464,6 +467,7 @@ function ProductDisplay({ product, growerName, growerId, onRequestPricing, onMes
         {product.strain?.name && <p className="mt-1 text-sm text-pf-muted">{product.strain.name}</p>}
         {product.subType && <p className="text-sm text-pf-muted">{product.subType}</p>}
         {!priced && <p className="mt-2 text-xs text-pf-muted">{product.inventoryQty} available</p>}
+        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mt-2" />
       </div>
       <div className={list ? 'col-span-2 min-w-0 space-y-2 border-t border-pf-line pt-3 sm:w-64 sm:shrink-0 sm:border-0 sm:pt-0' : 'col-span-2 space-y-2 border-t border-pf-line pt-2 sm:m-4 sm:space-y-3 sm:pt-3'}>
         {priced ? <>
