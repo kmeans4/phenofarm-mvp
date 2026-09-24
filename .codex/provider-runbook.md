@@ -36,3 +36,7 @@
 ## Flow Tests
 - `npm run test`
 - `npm run test:headed`
+
+## Ongoing backups
+
+Production Neon now has a 7-day recovery-history window and daily 07:00 UTC snapshots retained 35 days. The private `kmeans4/phenoshop-backups` repository runs daily database/media archives at 07:17 UTC, retains them 35 days, downloads and restores them for verification, and repeats a recovery/freshness check at 09:47 UTC. Failures alert `support@phenoshop.app`. See [backup operations](../docs/operations/backups.md) for exact provider IDs, credential boundaries, limitations, and recovery steps. Verify actual provider/run status before relying on this recorded configuration.
