@@ -62,11 +62,15 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
   }, [open]);
 
   useEffect(() => {
-    void load();
+    let active = true;
+    // Let an immediate effect cleanup cancel startup before a request is sent.
+    // React's development remount check otherwise starts two count requests.
+    queueMicrotask(() => { if (active) void load(); });
     const interval = window.setInterval(() => void load(), 60_000);
     document.addEventListener('visibilitychange', load);
     window.addEventListener('resize', load);
     return () => {
+      active = false;
       window.clearInterval(interval);
       document.removeEventListener('visibilitychange', load);
       window.removeEventListener('resize', load);

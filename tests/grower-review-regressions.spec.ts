@@ -251,6 +251,8 @@ test('delivered daily totals aggregate in SQL with calendar boundaries and legac
   try {
     expect(await deliveredValueByDay(growerId, new Date('2026-09-01T04:00:00Z'), new Date('2026-09-03T04:00:00Z'), 'America/New_York'))
       .toEqual([{ date: '2026-09-01', revenue: 10 }, { date: '2026-09-02', revenue: 20 }]);
+    expect(await deliveredValueByDay(growerId, new Date('2026-09-02T04:00:00Z'), new Date('2026-09-03T04:00:00Z'), 'America/New_York'))
+      .toEqual([{ date: '2026-09-02', revenue: 20 }]);
     const otherGrower = await db.grower.findUniqueOrThrow({ where: { userId: otherUserId } });
     expect(await deliveredValueByDay(otherGrower.id, new Date('2026-09-01T04:00:00Z'), new Date('2026-09-03T04:00:00Z'), 'America/New_York')).toEqual([]);
   } finally { await db.order.deleteMany({ where: { orderId: { startsWith: key } } }); }
