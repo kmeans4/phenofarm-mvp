@@ -45,7 +45,8 @@
 - Production configuration: `AUTH_MAIL_PROVIDER=resend`, `AUTH_MAIL_FROM`, `RESEND_API_KEY`, and `AUTH_REQUIRE_EMAIL_VERIFICATION=true`.
 - Signup, verification, and reset were exercised live on September 23, 2026; the user confirmed the sender test reached their Yahoo inbox. Existing unverified users must follow their verification email before signing in.
 - The custom-domain signup, verification, reset, session-revocation, and signed-in page checks passed after cutover. The synthetic account was removed and existing business records matched the baseline.
-- Support forwarding and `AUTH_MAIL_REPLY_TO` remain pending destination-inbox confirmation. PR #6 keeps the new public support links in draft until forwarding is ready.
+- Porkbun hosts the active `support@phenoshop.app` mailbox ($36/year, approved annual renewal, initial term through September 24, 2027). Incoming test delivery was confirmed in webmail, and Porkbun DKIM/DMARC/SPF records are published alongside the preserved Resend records. The sender name is `PhenoFarm Support`.
+- Production `AUTH_MAIL_REPLY_TO=support@phenoshop.app` is configured for the next deployment. PR #6 publishes the new public support links. See `docs/PHENOSHOP_DOMAIN_ROLLOUT.md` and the PR's release verification for deployment and delivery evidence.
 
 ## Working commands
 - Install: `npm install`

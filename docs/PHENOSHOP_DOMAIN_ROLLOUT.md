@@ -1,6 +1,6 @@
 # PhenoShop domain rollout
 
-Updated September 23, 2026. **Website cutover is live; support forwarding is pending destination confirmation.** The product brand remains PhenoFarm.
+Updated September 23, 2026. **Website cutover and the Porkbun support mailbox are active. This PR publishes the new contact links; its release verification records the final production deployment.** The product brand remains PhenoFarm.
 
 ## Completed website cutover
 
@@ -13,15 +13,17 @@ Updated September 23, 2026. **Website cutover is live; support forwarding is pen
 - The synthetic account was removed. All existing business-record count/hash snapshots across the 19 business tables matched the baseline. No migration was needed.
 - Both production smoke checks passed. Chrome rendered signup correctly at desktop and 390px widths on the new domain.
 
-## Prepared source changes
+## Source changes
 
-PR #6 updates public, legal, authentication, billing-help, and admin support links to `support@phenoshop.app`, and sets the metadata base to `https://phenoshop.app`. These source changes are still in draft, separate from the live website/auth-origin switch, because the support inbox has not been configured. The prepared source passed the production build and broad 112-test local workflow run; the contact address was inspected at desktop and 390px widths.
+PR #6 updates public, legal, authentication, billing-help, and admin support links to `support@phenoshop.app`, sets the metadata base to `https://phenoshop.app`, and updates the landing-page workspace preview address. The prepared source passed the production build and broad 112-test local workflow run; the contact address was inspected at desktop and 390px widths. GitHub verification and the Vercel preview passed on the final application source.
 
-## Remaining support release steps
+## Support mailbox and release
 
-1. Confirm the destination inbox for `support@phenoshop.app`. Porkbun access is available, and its forwarding form is prepared. Do not store passwords, keys, or the forwarding destination in this document.
-2. Create the free support forward. Verify required root MX records without changing the working Resend sending records.
-3. Send an authorized forwarding test and confirm it reaches the destination inbox. Set production `AUTH_MAIL_REPLY_TO=support@phenoshop.app` after forwarding is ready.
-4. Mark PR #6 ready, merge, and deploy to the existing project. Verify the new public contact links and reply-to header, and record the final deployment. Account verification enforcement remains enabled throughout.
+1. Completed: purchased one Porkbun hosted mailbox for $36 after the user approved the checkout agreement and automatic annual renewal. Porkbun confirmed the charge and lists the initial expiration as September 24, 2027. Do not store payment details, passwords, or keys in this document.
+2. The user created `support@phenoshop.app` and entered its password directly. Webmail access works; the display name is `PhenoFarm Support`. The root MX records point to `fwd1.porkbun.com` (priority 10) and `fwd2.porkbun.com` (priority 20). Root SPF authorizes `_spf.porkbun.com`, Porkbun DKIM uses `default._domainkey`, and DMARC is configured. Existing website and Resend records remain intact.
+3. An incoming Resend test was marked delivered and appeared in the support inbox. An outgoing message was sent to the user's approved test inbox for reply confirmation. Production `AUTH_MAIL_REPLY_TO=support@phenoshop.app` is saved for the release. Automated account mail continues through Resend.
+4. Release sequence: mark PR #6 ready, merge, verify the new production deployment and public contact links, and exercise account verification/reset with the support reply-to header. Record the deployment and final delivery results in the PR's release verification. Account verification enforcement remains enabled throughout.
+
+For Outlook, use the complete address as the username, IMAP `imap.porkbun.com` on port 993 with SSL/TLS, and SMTP `smtp.porkbun.com` on port 465 with SSL/TLS. Porkbun documents port 465 as an alternative for Outlook clients affected by its STARTTLS issue. The user enters the mailbox password directly; no password belongs in application configuration or this repository.
 
 If website cutover must be rolled back, remove the old-host redirect first, restore the previous production auth origin, and redeploy the last working source. Preserve all account-email DNS records and application data. Users may need to sign in again because cookies do not cross domains.
