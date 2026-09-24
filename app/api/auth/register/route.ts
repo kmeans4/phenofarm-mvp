@@ -1,3 +1,5 @@
+import { logApiError } from '@/lib/api-response';
+import { CURRENT_POLICIES, validPolicyAcceptance } from '@/lib/policies/current';
 import { after, NextRequest } from 'next/server';
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -16,6 +18,7 @@ export async function POST(request: NextRequest) {
     if (!emailVerificationRequired()) return accountJson({ error: 'Sign-up is temporarily unavailable. Please try again later.' }, 503);
     const body = await accountBody(request);
     if (!body) return accountJson({ error: 'Invalid sign-up request.' }, 400);
+    if (!validPolicyAcceptance(body)) return accountJson({ error: 'Please agree to the current Terms and acknowledge the Privacy Policy.' }, 400);
     const email = normalizeAccountEmail(body.email);
     const password = body.password;
     const firstName = typeof body.firstName === 'string' ? body.firstName.trim() : '';
@@ -39,7 +42,7 @@ export async function POST(request: NextRequest) {
     const passwordHash = await bcrypt.hash(password, 10);
     try {
       await db.$transaction(async tx => {
-        const user = await tx.user.create({ data: { email, name, passwordHash, role: businessType === 'grower' ? 'GROWER' : 'DISPENSARY' } });
+        const user = await tx.user.create({ data: { email, name, passwordHash, role: businessType === 'grower' ? 'GROWER' : 'DISPENSARY', policyAcceptances: { create: { ...CURRENT_POLICIES, source: 'signup' } } } });
         if (businessType === 'grower') {
           const profile = await tx.grower.create({ data: { userId: user.id, businessName: resolvedBusinessName, contactName: name } });
           await tx.user.update({ where: { id: user.id }, data: { growerId: profile.id } });
@@ -59,7 +62,8 @@ export async function POST(request: NextRequest) {
       catch { console.error('[account-registration]', { code: 'VERIFICATION_DELIVERY_FAILED' }); }
     });
     return accountJson({ success: true, message: ACCOUNT_REQUEST_MESSAGE }, 201);
-  } catch {
+  } catch (error) {
+    logApiError('account.request', error);
     return accountJson({ error: 'Unable to process sign-up. Please try again.' }, 503);
   }
 }

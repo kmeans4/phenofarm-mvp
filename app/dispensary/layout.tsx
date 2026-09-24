@@ -1,3 +1,4 @@
+import { requirePolicyAcceptance } from '@/lib/policies/server';
 import { PortalDesktopHeader } from '@/app/components/ui/PortalDesktopHeader';
 import { unstable_cache } from 'next/cache';
 import type { Session } from 'next-auth';
@@ -33,6 +34,8 @@ export default async function DispensaryLayout({ children }: { children: React.R
   if (!session) {
     redirect('/auth/sign_in');
   }
+
+  await requirePolicyAcceptance(session.user.id);
 
   const user = session.user as SessionUser;
   

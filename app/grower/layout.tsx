@@ -1,3 +1,4 @@
+import { requirePolicyAcceptance } from '@/lib/policies/server';
 import { PortalDesktopHeader } from '@/app/components/ui/PortalDesktopHeader';
 import type { Session } from 'next-auth';
 import { redirect } from "next/navigation";
@@ -18,6 +19,8 @@ export default async function GrowerLayout({ children }: { children: React.React
   if (!session) {
     redirect('/auth/sign_in');
   }
+
+  await requirePolicyAcceptance(session.user.id);
 
   const user = session.user as {
     id: string;

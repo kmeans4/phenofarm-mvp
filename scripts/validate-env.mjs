@@ -22,7 +22,9 @@ const OPTIONAL = [
   "AUTH_MAIL_FROM",
   "AUTH_MAIL_REPLY_TO",
   "AUTH_MAIL_TEST_URL",
-  "AUTH_MAIL_TEST_KEY"
+  "AUTH_MAIL_TEST_KEY",
+  "MONITORING_ENABLED",
+  "MONITORING_TOKEN"
 ];
 const ALL_KEYS = [...REQUIRED, ...OPTIONAL];
 const PLACEHOLDER_RE = /^(|change-me|change-me-too|replace-with.*|your[-_].*|\[.*\]|postgresql:\/\/\[|postgres:\/\/USER|postgresql:\/\/USER|sk_test_|pk_test_|whsec_|billing@example\.com)$/i;
