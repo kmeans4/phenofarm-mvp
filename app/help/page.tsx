@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { ChevronDown, Mail, ShieldCheck } from 'lucide-react';
 
-const SUPPORT_EMAIL = 'support@phenofarm.com';
+const SUPPORT_EMAIL = 'support@phenoshop.app';
 
 const faqGroups = [
   {

@@ -152,7 +152,7 @@ export function Pricing() {
               </ul>
 
               <Link
-                href={plan.cta === 'Contact Sales' ? 'mailto:support@phenofarm.com' : '/auth/sign_up'}
+                href={plan.cta === 'Contact Sales' ? 'mailto:support@phenoshop.app' : '/auth/sign_up'}
                 className={`mt-auto inline-flex w-full items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold transition-all ${
                   plan.highlighted
                     ? 'bg-emerald-500 text-white shadow-[0_0_32px_rgba(16,185,129,0.25)] hover:bg-emerald-400'

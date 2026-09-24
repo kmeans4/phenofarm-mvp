@@ -11,6 +11,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://phenoshop.app'),
   title: 'PhenoFarm - B2B Cannabis Marketplace',
   description: 'Connect licensed growers and dispensaries for wholesale requests, fulfillment coordination, and direct settlement',
   appleWebApp: {

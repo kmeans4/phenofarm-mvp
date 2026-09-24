@@ -5,7 +5,7 @@ import { motion, useInView } from 'framer-motion';
 import { ArrowLeft, Mail, MapPin, Send, ShieldCheck } from 'lucide-react';
 import { useRef, useState } from 'react';
 
-const SUPPORT_EMAIL = 'support@phenofarm.com';
+const SUPPORT_EMAIL = 'support@phenoshop.app';
 
 const businessTypes = [
   { value: 'grower', label: 'Grower' },

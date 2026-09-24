@@ -10,10 +10,10 @@ interface StatusItem {
 }
 
 const supportProfile = [
-  { label: "Support email", value: "support@phenofarm.com" },
+  { label: "Support email", value: "support@phenoshop.app" },
 ];
 
-const supportEmail = "support@phenofarm.com";
+const supportEmail = "support@phenoshop.app";
 const providerSetupLocation = "Configure in Vercel Project Settings > Environment Variables, then redeploy.";
 
 function envStatus(key: string, label: string, helper: string): StatusItem {

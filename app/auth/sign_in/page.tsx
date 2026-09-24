@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { getSession, signIn } from 'next-auth/react';
 import { Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
 
-const SUPPORT_EMAIL = 'support@phenofarm.com';
+const SUPPORT_EMAIL = 'support@phenoshop.app';
 
 type SignInResult = Awaited<ReturnType<typeof signIn>>;
 

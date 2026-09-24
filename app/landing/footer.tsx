@@ -12,7 +12,7 @@ const footerLinks = {
     { label: 'Pricing', href: '#pricing' },
   ],
   Company: [
-    { label: 'Contact', href: 'mailto:support@phenofarm.com' },
+    { label: 'Contact', href: 'mailto:support@phenoshop.app' },
     { label: 'Help center', href: '/help' },
   ],
 };
@@ -35,10 +35,10 @@ export function Footer() {
               requests, fulfillment, and direct settlement.
             </p>
             <a
-              href="mailto:support@phenofarm.com"
+              href="mailto:support@phenoshop.app"
               className="mt-5 inline-flex min-h-10 items-center text-sm text-gray-400 transition-colors hover:text-emerald-400"
             >
-              support@phenofarm.com
+              support@phenoshop.app
             </a>
           </div>
 

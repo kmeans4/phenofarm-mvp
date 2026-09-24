@@ -270,7 +270,7 @@ export function PricingPlans() {
                     </Button>
                   ) : plan.id === 'business' ? (
                     <Button type="button" variant="outline" className="w-full" asChild>
-                      <a href="mailto:support@phenofarm.com?subject=PhenoFarm%20Business%20plan">Contact sales</a>
+                      <a href="mailto:support@phenoshop.app?subject=PhenoFarm%20Business%20plan">Contact sales</a>
                     </Button>
                   ) : !billingConfigured ? (
                     <p className="rounded-lg bg-pf-canvas px-3 py-2 text-center text-sm text-pf-muted">
