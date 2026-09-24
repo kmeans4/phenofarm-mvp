@@ -21,3 +21,11 @@ The Terms cover licensed adult business users, lab-report responsibility, prohib
 Publication is not attorney approval. State-specific cannabis requirements and payment-provider eligibility remain separate. The manual privacy-request procedure is retained in `docs/legal/launch-policies-2026-09-24.md`; it must be followed when requests arrive. Dedicated versioned policy-acceptance records are not implemented by this publication.
 
 The pre-existing untracked `docs/reviews/final-production-2026-09-24/` directory is unrelated and excluded from this commit and release.
+
+## Production result
+
+- Application source commit `161939195c4c5850645200ec8400f5bd16057294` was pushed to `origin/main`.
+- Deployed from an archive of that commit (no local env files or untracked review files) to Vercel deployment `dpl_4pxwjwN1Y92Jh9ifwPkoqd1LX7fM`, `phenofarm-lk9j6vdxt-kevin-means-projects.vercel.app`.
+- Canonical `https://phenoshop.app` resolved to that Ready deployment.
+- Repeated all nine browser page/viewport checks on the canonical production site: all passed, no overflow, broken anchors, or runtime errors. Actual cross-policy clicks and signup Terms/Privacy links passed. Live mobile screenshot was also inspected.
+- No migrations, database writes, auth setting changes, provider purchases, or transactional messages were performed.
