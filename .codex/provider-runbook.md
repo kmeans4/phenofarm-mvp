@@ -2,6 +2,7 @@
 
 ## Providers
 - Vercel hosts the production app.
+- Canonical website/auth origin: `https://phenoshop.app`. The `www` name and former `phenofarm-mvp.vercel.app` canonical hostname redirect there with status 308.
 - Neon/Postgres stores marketplace data.
 - NextAuth owns app authentication.
 - Resend delivers account verification and password-reset emails from `accounts@phenoshop.app` through a Vercel Marketplace integration.
@@ -17,6 +18,7 @@
 - `NEXT_PUBLIC_API_URL`
 - `AUTH_MAIL_PROVIDER` (`resend` in production)
 - `AUTH_MAIL_FROM` (`PhenoFarm <accounts@phenoshop.app>` in production)
+- `AUTH_MAIL_REPLY_TO` (optional; set to `support@phenoshop.app` only after support forwarding is configured and tested)
 - `RESEND_API_KEY` (provided by the Marketplace integration; never print its value)
 - `AUTH_REQUIRE_EMAIL_VERIFICATION` (`true` in production)
 
