@@ -691,7 +691,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
               </div>
             </div>}
 
-            {canEditItems && <p className="mt-2 text-xs text-pf-muted">Optional tax: enter only the amount on your invoice. PhenoFarm does not calculate tax.</p>}
+            {canEditItems && <p className="mt-2 text-xs text-pf-muted">Optional tax: enter only the amount on your invoice. PhenoShop does not calculate tax.</p>}
             <div className={canEditItems ? 'mt-3 sm:mt-4' : ''}>
               <label htmlFor="order-notes" className={canEditItems ? 'block text-sm font-medium text-pf-secondary mb-1.5' : 'sr-only'}>
                 Notes

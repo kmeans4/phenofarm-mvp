@@ -1,5 +1,7 @@
 'use client';
 
+import { BrandMark } from '@/app/components/ui/BrandLogo';
+
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import {
@@ -91,7 +93,7 @@ function LiveWorkspace() {
         {/* Sidebar */}
         <div className="hidden w-44 shrink-0 border-r border-white/[0.06] p-4 sm:block">
           <div className="mb-5 flex items-center gap-2">
-            <div className="flex h-6 w-6 items-center justify-center rounded-md bg-emerald-500 text-[10px] font-bold text-white">PF</div>
+            <BrandMark className="h-6 w-6" />
             <span className="text-xs font-semibold text-gray-200">Grower Portal</span>
           </div>
           {['Dashboard', 'Catalog', 'Orders', 'Customers', 'Reports'].map((item) => (
@@ -245,7 +247,7 @@ export function Hero() {
             className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-gray-400"
           >
             Verified partners, recorded quotes, and live request tracking — while settlement
-            stays direct. PhenoFarm takes no cut.
+            stays direct. PhenoShop takes no cut.
           </motion.p>
 
           <motion.div

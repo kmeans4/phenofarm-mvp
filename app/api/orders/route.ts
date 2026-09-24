@@ -13,7 +13,7 @@ import { createWithOrderIdRetry } from '@/lib/order-id';
  * Authentication: Required (GROWER or DISPENSARY role)
  * 
  * This endpoint manages wholesale order records between growers and dispensaries.
- * PhenoFarm tracks operational value and fulfillment status only; wholesale
+ * PhenoShop tracks operational value and fulfillment status only; wholesale
  * payment settlement happens directly between the businesses.
  */
 
@@ -58,7 +58,7 @@ class InventoryConflictError extends Error {
  * 
  * Business Logic:
  * - Catalog prices are read under inventory locks; explicit owner overrides are audited
- * - Tax is not calculated or collected by PhenoFarm
+ * - Tax is not calculated or collected by PhenoShop
  * - Total amount = subtotal + optional shipping estimate
  * - Order status is set to 'PENDING' on creation
  * - Order ID is auto-generated as 'ORD-{timestamp}'

@@ -1,3 +1,5 @@
+
+import { BrandLogo } from '@/app/components/ui/BrandLogo';
 import Link from 'next/link';
 
 export interface LegalSection {
@@ -32,10 +34,7 @@ export function LegalDocument({ title, description, sections }: LegalDocumentPro
       <div className="relative mx-auto max-w-5xl">
         <nav className="mb-10 flex items-center justify-between gap-4">
           <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
-              PF
-            </span>
-            <span className="text-lg font-semibold tracking-tight">PhenoFarm</span>
+            <BrandLogo className="w-40" />
           </Link>
           <Link href="/help" className="rounded-full border border-white/[0.10] px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-emerald-300/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
             Help

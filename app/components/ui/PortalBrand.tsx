@@ -1,3 +1,4 @@
+import { BrandLogo } from './BrandLogo';
 import { SignOutButton } from '@/app/components/SignOutButton';
 
 interface PortalBrandProps {
@@ -7,9 +8,8 @@ interface PortalBrandProps {
 
 export function PortalBrand({ portalLabel, compactOnMobile = false }: PortalBrandProps) {
   return (
-    <div className="flex items-center gap-2.5 px-1" aria-label={`PhenoFarm ${portalLabel}`}>
-      <span className={`h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white ${compactOnMobile ? 'hidden sm:flex' : 'flex'}`}>PF</span>
-      <span className="text-[18px] font-semibold tracking-tight text-pf-text">PhenoFarm</span>
+    <div className="flex items-center gap-2.5 px-1" aria-label={`PhenoShop ${portalLabel}`}>
+      <BrandLogo className={compactOnMobile ? 'w-[108px] sm:w-40' : 'w-36 sm:w-40'} />
     </div>
   );
 }
@@ -25,7 +25,7 @@ export function PortalAccount({ accountName, roleLabel }: PortalAccountProps) {
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part[0]?.toUpperCase())
-    .join('') || 'PF';
+    .join('') || 'PS';
 
   return (
     <div className="border-t border-white/[0.07] px-1 pt-4">

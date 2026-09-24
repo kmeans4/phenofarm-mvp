@@ -1,4 +1,4 @@
-# PhenoFarm Provider Runbook
+# PhenoShop Provider Runbook
 
 ## Providers
 - Vercel hosts the production app.
@@ -18,7 +18,7 @@
 - `STRIPE_WEBHOOK_SECRET`
 - `NEXT_PUBLIC_API_URL`
 - `AUTH_MAIL_PROVIDER` (`resend` in production)
-- `AUTH_MAIL_FROM` (`PhenoFarm <accounts@phenoshop.app>` in production)
+- `AUTH_MAIL_FROM` (`PhenoShop <accounts@phenoshop.app>` in production)
 - `AUTH_MAIL_REPLY_TO` (`support@phenoshop.app`; the Porkbun mailbox has been created and incoming delivery verified)
 - `RESEND_API_KEY` (provided by the Marketplace integration; never print its value)
 - `AUTH_REQUIRE_EMAIL_VERIFICATION` (`true` in production)

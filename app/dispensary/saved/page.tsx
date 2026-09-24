@@ -6,7 +6,7 @@ import SavedContent from './SavedContent';
 type SavedTab = 'favorites' | 'alerts' | 'recent';
 
 export const metadata = {
-  title: 'Saved | PhenoFarm',
+  title: 'Saved | PhenoShop',
   description: 'Buyer saved products, price alerts, and recent order requests',
 };
 

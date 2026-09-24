@@ -1,3 +1,5 @@
+
+import { BrandLogo } from '@/app/components/ui/BrandLogo';
 import Link from 'next/link';
 import { ChevronDown, Mail, ShieldCheck } from 'lucide-react';
 
@@ -16,7 +18,7 @@ const faqGroups = [
       {
         question: 'What happens when a dispensary submits a request?',
         answer:
-          'PhenoFarm creates a wholesale request for the grower to review. Requests move through the friendly status flow: Submitted, Accepted, Preparing, Ready / In transit, Delivered, or Cancelled.',
+          'PhenoShop creates a wholesale request for the grower to review. Requests move through the friendly status flow: Submitted, Accepted, Preparing, Ready / In transit, Delivered, or Cancelled.',
       },
       {
         question: 'Can growers send quote terms before accepting a request?',
@@ -24,9 +26,9 @@ const faqGroups = [
           'Yes. The messaging workflow supports structured quote terms such as quantity, unit price, and notes. Quote terms are recorded for coordination, but the buyer and grower still handle payment directly.',
       },
       {
-        question: 'What payments does PhenoFarm process for growers?',
+        question: 'What payments does PhenoShop process for growers?',
         answer:
-          'Only the cultivator software subscription is paid through PhenoFarm using Stripe Billing. Wholesale invoices, ACH, checks, cash-on-delivery, and other settlement terms stay directly between the licensed businesses.',
+          'Only the cultivator software subscription is paid through PhenoShop using Stripe Billing. Wholesale invoices, ACH, checks, cash-on-delivery, and other settlement terms stay directly between the licensed businesses.',
       },
     ],
   },
@@ -37,12 +39,12 @@ const faqGroups = [
       {
         question: 'Why can I browse but not submit an order request?',
         answer:
-          'Dispensary ordering is gated by license verification. New dispensary accounts can submit license details after signup, and ordering unlocks after PhenoFarm verifies the license.',
+          'Dispensary ordering is gated by license verification. New dispensary accounts can submit license details after signup, and ordering unlocks after PhenoShop verifies the license.',
       },
       {
         question: 'How do I request products from growers?',
         answer:
-          'Use the catalog or grower shop pages to add products to a request draft. During review, confirm quantities, fulfillment details, requested timing, and direct payment terms. If the draft includes multiple growers, PhenoFarm creates one request per grower.',
+          'Use the catalog or grower shop pages to add products to a request draft. During review, confirm quantities, fulfillment details, requested timing, and direct payment terms. If the draft includes multiple growers, PhenoShop creates one request per grower.',
       },
       {
         question: 'How do quote requests work?',
@@ -50,9 +52,9 @@ const faqGroups = [
           'If pricing or availability needs confirmation, use messaging to request a quote. Growers can send structured terms, and buyers can accept, reject, or counter. Accepted quote terms help both sides coordinate the order request.',
       },
       {
-        question: 'Does PhenoFarm collect wholesale payment from dispensaries?',
+        question: 'Does PhenoShop collect wholesale payment from dispensaries?',
         answer:
-          'No. PhenoFarm tracks request value and fulfillment status for marketplace operations, but it does not collect, remit, escrow, or pay out wholesale order funds.',
+          'No. PhenoShop tracks request value and fulfillment status for marketplace operations, but it does not collect, remit, escrow, or pay out wholesale order funds.',
       },
     ],
   },
@@ -80,7 +82,7 @@ const faqGroups = [
           'Grower accounts can manage Free, Pro, or Business subscription access from grower settings. Stripe checkout starts paid subscriptions, and the Stripe customer portal becomes available after checkout.',
       },
       {
-        question: 'How do I reach PhenoFarm support?',
+        question: 'How do I reach PhenoShop support?',
         answer:
           `Email ${SUPPORT_EMAIL} for account access, license verification, order workflow, quote, catalog, or subscription questions.`,
       },
@@ -100,10 +102,7 @@ export default function HelpPage() {
         <div className="relative mx-auto max-w-6xl">
           <nav className="flex items-center justify-between gap-4">
             <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
-              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
-                PF
-              </span>
-              <span className="text-lg font-semibold tracking-tight">PhenoFarm</span>
+              <BrandLogo className="w-40" />
             </Link>
             <Link href="/auth/sign_in" className="rounded-full border border-white/[0.10] px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-emerald-300/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
               Sign in
@@ -169,7 +168,7 @@ export default function HelpPage() {
           <div className="mt-10 rounded-2xl border border-emerald-300/20 bg-emerald-400/[0.06] p-5 text-sm leading-6 text-emerald-50">
             <p className="font-semibold">Payment model reminder</p>
             <p className="mt-1 text-emerald-100/80">
-              PhenoFarm never processes wholesale payments. Buyers and growers settle directly; the only in-app payment flow is the cultivator subscription.
+              PhenoShop never processes wholesale payments. Buyers and growers settle directly; the only in-app payment flow is the cultivator subscription.
             </p>
           </div>
         </div>

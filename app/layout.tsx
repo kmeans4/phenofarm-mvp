@@ -12,12 +12,20 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://phenoshop.app'),
-  title: 'PhenoFarm - B2B Cannabis Marketplace',
+  title: 'PhenoShop - B2B Cannabis Marketplace',
   description: 'Connect licensed growers and dispensaries for wholesale requests, fulfillment coordination, and direct settlement',
+  applicationName: 'PhenoShop',
+  openGraph: {
+    siteName: 'PhenoShop',
+    title: 'PhenoShop - B2B Cannabis Marketplace',
+    description: 'Connect licensed growers and dispensaries for wholesale requests, fulfillment coordination, and direct settlement',
+    type: 'website',
+  },
+  twitter: { card: 'summary_large_image', title: 'PhenoShop - B2B Cannabis Marketplace' },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'PhenoFarm',
+    title: 'PhenoShop',
   },
 }
 

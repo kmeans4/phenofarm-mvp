@@ -132,7 +132,7 @@ export default function CustomersList({ customers }: CustomersListProps) {
             <div className="flex flex-wrap items-center gap-2 text-xs">
               {customer.isPlatformMember && (
                 <span className="inline-flex items-center rounded-full bg-pf-info-bg px-2.5 py-1 font-medium text-pf-info">
-                  PhenoFarm member
+                  PhenoShop member
                 </span>
               )}
               <span className="inline-flex items-center rounded-full bg-pf-accent-bg px-2.5 py-1 font-medium text-pf-accent">
@@ -197,7 +197,7 @@ export default function CustomersList({ customers }: CustomersListProps) {
                   {customer.licenseNumber && <div className="text-xs text-pf-muted">License: {customer.licenseNumber}</div>}
                   {customer.isPlatformMember && (
                     <span className="mt-1 inline-flex items-center rounded-full bg-pf-info-bg px-2 py-0.5 text-xs font-medium text-pf-info">
-                      PhenoFarm member
+                      PhenoShop member
                     </span>
                   )}
                 </td>

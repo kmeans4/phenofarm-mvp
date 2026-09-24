@@ -19,7 +19,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   if (!user || user.role !== 'ADMIN') {
     redirect('/dashboard');
   }
-  const accountName = user.name || user.email || 'PhenoFarm admin';
+  const accountName = user.name || user.email || 'PhenoShop admin';
 
   const navLinks = [
     { name: 'Overview', href: '/admin/dashboard', group: 'Operations' },

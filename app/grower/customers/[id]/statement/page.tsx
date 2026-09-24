@@ -16,7 +16,7 @@ export default async function CustomerStatementPage({ params, searchParams }: { 
   const customer = await db.dispensary.findFirst({ where: { id, ...customerWhere(user.growerId) }, select: { businessName: true } }); if (!customer) redirect('/grower/customers');
   const orders = await db.order.findMany({ where: { growerId: user.growerId, dispensaryId: id, status: 'DELIVERED', ...(from || to ? { deliveredAt: { ...(from ? { gte: from } : {}), ...(to ? { lte: to } : {}) } } : {}) }, orderBy: { deliveredAt: 'desc' }, include: { items: { include: { product: { select: { name: true, unit: true } }, acceptedQuote: { select: { id: true } } } } } });
   const total = orders.reduce((sum, order) => sum + Number(order.totalAmount), 0);
-  const rows = [['Request ID','Delivered date','Product','Quantity','Unit','Unit price','Line total','Pricing source','Settlement'], ...orders.flatMap((order) => order.items.map((item) => [order.orderId, order.deliveredAt ? format(order.deliveredAt, 'yyyy-MM-dd') : '', item.product?.name || 'Unknown product', String(item.quantity), item.product?.unit || 'unit', Number(item.unitPrice).toFixed(2), Number(item.totalPrice).toFixed(2), item.acceptedQuoteId ? 'Accepted quote' : 'List price', 'Settled directly between businesses — no funds processed by PhenoFarm']))];
+  const rows = [['Request ID','Delivered date','Product','Quantity','Unit','Unit price','Line total','Pricing source','Settlement'], ...orders.flatMap((order) => order.items.map((item) => [order.orderId, order.deliveredAt ? format(order.deliveredAt, 'yyyy-MM-dd') : '', item.product?.name || 'Unknown product', String(item.quantity), item.product?.unit || 'unit', Number(item.unitPrice).toFixed(2), Number(item.totalPrice).toFixed(2), item.acceptedQuoteId ? 'Accepted quote' : 'List price', 'Settled directly between businesses — no funds processed by PhenoShop']))];
   return (
     <div className="space-y-4 pb-8 sm:space-y-5">
       <Link href={`/grower/customers/${id}/edit`} className="text-sm font-semibold text-pf-accent">← Customer</Link>
@@ -37,7 +37,7 @@ export default async function CustomerStatementPage({ params, searchParams }: { 
           <div className="hidden overflow-x-auto sm:block"><table className="w-full min-w-[720px] text-sm"><thead className="bg-pf-canvas"><tr><th className="p-3 text-left">Request</th><th className="p-3 text-left">Delivered</th><th className="p-3 text-left">Items</th><th className="p-3 text-right">Value</th></tr></thead><tbody>{orders.map(order => <tr key={order.id} className="border-t border-pf-line"><td className="p-3"><Link href={`/grower/orders/${order.id}`} className="font-semibold text-pf-accent">#{order.orderId}</Link></td><td className="p-3">{order.deliveredAt ? format(order.deliveredAt, 'MMM d, yyyy') : 'Not recorded'}</td><td className="p-3">{order.items.map(item => `${item.product?.name || 'Product'} × ${item.quantity}`).join(', ')}</td><td className="p-3 text-right font-semibold">{formatProductMoney(Number(order.totalAmount))}</td></tr>)}</tbody></table></div>
         </> : <p className="p-8 text-center text-sm text-pf-muted">No delivered requests in this date range.</p>}
       </section>
-      <p className="text-xs text-pf-muted">Payments stay between businesses; PhenoFarm does not collect funds.</p>
+      <p className="text-xs text-pf-muted">Payments stay between businesses; PhenoShop does not collect funds.</p>
     </div>
   );
 }

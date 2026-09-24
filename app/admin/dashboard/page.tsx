@@ -162,7 +162,7 @@ export default async function AdminPage() {
         }
       : {
           title: 'Review subscription settings',
-          description: 'Keep PhenoFarm subscription configuration current for grower billing.',
+          description: 'Keep PhenoShop subscription configuration current for grower billing.',
           href: '/admin/settings',
           cta: 'Open settings',
       };

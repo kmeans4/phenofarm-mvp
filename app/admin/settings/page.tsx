@@ -93,7 +93,7 @@ export default async function AdminSettingsPage() {
       <div className="rounded-lg border border-pf-accent-line bg-pf-accent-bg p-3 text-sm text-pf-accent">
         <p className="font-semibold">Settlement policy</p>
         <p className="mt-1">
-          PhenoFarm bills only grower subscriptions. Wholesale payment stays between licensed businesses.
+          PhenoShop bills only grower subscriptions. Wholesale payment stays between licensed businesses.
         </p>
       </div>
 

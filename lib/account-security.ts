@@ -45,8 +45,8 @@ export async function requestAccountLink(email: string, purpose: AccountActionPu
     if (!token) return;
     tokenId = token.id;
     const url = `${accountOrigin()}${path[purpose]}#token=${raw}`;
-    await sendAccountMail({ to: token.email, subject: `${action[purpose]} — PhenoFarm`, text:
-      `${action[purpose]}\n\nOpen this link to continue:\n${url}\n\nThis link expires in ${expiryMinutes[purpose]} minutes and works once. ${purpose === 'VERIFY_EMAIL' ? 'You will also need the password you chose for this account. ' : ''}If you did not request this, ignore this email. Do not share the link.\n\nPhenoFarm` });
+    await sendAccountMail({ to: token.email, subject: `${action[purpose]} — PhenoShop`, text:
+      `${action[purpose]}\n\nOpen this link to continue:\n${url}\n\nThis link expires in ${expiryMinutes[purpose]} minutes and works once. ${purpose === 'VERIFY_EMAIL' ? 'You will also need the password you chose for this account. ' : ''}If you did not request this, ignore this email. Do not share the link.\n\nPhenoShop` });
     await db.accountActionToken.deleteMany({ where: { expiresAt: { lt: new Date(Date.now() - 86_400_000) } } });
   } catch {
     if (tokenId) await db.accountActionToken.deleteMany({ where: { id: tokenId, consumedAt: null } }).catch(() => undefined);

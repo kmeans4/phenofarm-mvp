@@ -1,6 +1,6 @@
 # Launch policy package — September 24, 2026
 
-Owner-confirmed operator: **PhenoShop**, 166 Skeet Road, Medford, NJ 08055. The owner supplied this address for publication. No company suffix or incorporation status is asserted. PhenoFarm remains the app name; PhenoShop is its operator.
+Owner-confirmed operator: **PhenoShop**, 166 Skeet Road, Medford, NJ 08055. The owner supplied this address for publication. No company suffix or incorporation status is asserted. PhenoShop is the operator and app name.
 
 The initial recruiting focus is Vermont. Eligibility is not limited to Vermont: licensed U.S. businesses may use the service where their use is lawful, subject to license and account review. This is not a representation of nationwide regulatory approval, and cross-state cannabis transfers remain prohibited by the Terms. No Vermont-only registration gate is introduced.
 
@@ -12,7 +12,7 @@ Effective date: September 24, 2026.
 
 ### Operator and agreement
 
-PhenoShop ("we," "us," or "our"), located at 166 Skeet Road, Medford, NJ 08055, operates the PhenoFarm service at phenoshop.app. These Terms govern your access to our business software. By creating an account or using the service, you agree to these Terms on behalf of yourself and the business you are authorized to represent. If you do not agree, do not use the service. Our Privacy Policy and Cookie Notice explain how we handle information.
+PhenoShop ("we," "us," or "our"), located at 166 Skeet Road, Medford, NJ 08055, operates the PhenoShop service at phenoshop.app. These Terms govern your access to our business software. By creating an account or using the service, you agree to these Terms on behalf of yourself and the business you are authorized to represent. If you do not agree, do not use the service. Our Privacy Policy and Cookie Notice explain how we handle information.
 
 ### Who may use PhenoShop
 
@@ -74,7 +74,7 @@ Effective date: September 24, 2026.
 
 ### Who we are and what this covers
 
-PhenoShop, operating the PhenoFarm service at phenoshop.app, is responsible for the information described in this policy. Contact support@phenoshop.app or 166 Skeet Road, Medford, NJ 08055 about privacy. This policy covers our website, business accounts, marketplace tools, and support. Other businesses you deal with and external services have their own privacy practices.
+PhenoShop, operating the PhenoShop service at phenoshop.app, is responsible for the information described in this policy. Contact support@phenoshop.app or 166 Skeet Road, Medford, NJ 08055 about privacy. This policy covers our website, business accounts, marketplace tools, and support. Other businesses you deal with and external services have their own privacy practices.
 
 ### Information we collect
 

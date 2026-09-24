@@ -35,7 +35,7 @@ const flows = {
       },
       {
         title: 'Invoice on your terms',
-        description: 'Settle directly with the buyer. PhenoFarm keeps the record, never the money.',
+        description: 'Settle directly with the buyer. PhenoShop keeps the record, never the money.',
         icon: Handshake,
       },
     ],

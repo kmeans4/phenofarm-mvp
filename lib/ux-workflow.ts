@@ -32,7 +32,7 @@ export const DEFAULT_COMMERCIAL_TERMS: CommercialTermsDefaults = {
   fulfillmentRegion: 'Vermont buyers',
   paymentTerms: 'Handled directly',
   responseWindow: 'Respond within 1 business day',
-  contactNote: 'Message through PhenoFarm before confirming fulfillment.',
+  contactNote: 'Message through PhenoShop before confirming fulfillment.',
 };
 
 export const DEFAULT_PRODUCT_DEFAULTS: ProductDefaults = {
@@ -64,7 +64,7 @@ export const REQUEST_NOTE_TEMPLATES = [
   },
   {
     label: 'Payment terms',
-    body: 'Payment terms will be coordinated directly outside PhenoFarm after request acceptance.',
+    body: 'Payment terms will be coordinated directly outside PhenoShop after request acceptance.',
   },
 ];
 
@@ -81,6 +81,6 @@ export const MESSAGE_TEMPLATE_GROUPS = {
     { label: 'Availability', body: 'This item is available. I can confirm final quantity and fulfillment timing shortly.' },
     { label: 'Delivery timing', body: 'I can coordinate pickup or delivery timing once the request is accepted.' },
     { label: 'Request update', body: 'I am reviewing the request now and will update the fulfillment status shortly.' },
-    { label: 'Commercial terms', body: 'Wholesale payment will be handled directly outside PhenoFarm after terms are confirmed.' },
+    { label: 'Commercial terms', body: 'Wholesale payment will be handled directly outside PhenoShop after terms are confirmed.' },
   ],
 } as const;

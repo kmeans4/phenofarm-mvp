@@ -3,12 +3,12 @@ import { SectionHeading } from './motion';
 
 const FAQS = [
   {
-    q: 'Does PhenoFarm process our wholesale payments?',
-    a: 'No — deliberately. Order value is tracked for your records only; invoicing and settlement happen directly between buyer and grower on whatever terms you agree. PhenoFarm charges cultivators a flat software subscription and takes 0% of wholesale value.',
+    q: 'Does PhenoShop process our wholesale payments?',
+    a: 'No — deliberately. Order value is tracked for your records only; invoicing and settlement happen directly between buyer and grower on whatever terms you agree. PhenoShop charges cultivators a flat software subscription and takes 0% of wholesale value.',
   },
   {
     q: 'How does license verification work?',
-    a: 'Dispensaries submit license details in settings; the PhenoFarm team reviews them. Until a license is verified, a buyer account can browse but cannot submit order requests — verification is enforced by the order pipeline itself, not just shown as a badge.',
+    a: 'Dispensaries submit license details in settings; the PhenoShop team reviews them. Until a license is verified, a buyer account can browse but cannot submit order requests — verification is enforced by the order pipeline itself, not just shown as a badge.',
   },
   {
     q: 'What happens when a request is cancelled?',

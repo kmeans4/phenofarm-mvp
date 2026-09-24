@@ -69,7 +69,7 @@ export function Pricing() {
           </h2>
           <p className="mt-5 text-pretty leading-relaxed text-gray-400">
             Cultivators pay for software, not per transaction. Wholesale value moves directly
-            between businesses — PhenoFarm never touches it.
+            between businesses — PhenoShop never touches it.
           </p>
 
           {/* Billing toggle */}

@@ -11,7 +11,7 @@ const sections: LegalSection[] = [
     "id": "who-we-are-and-what-this-covers",
     "title": "Who we are and what this covers",
     "paragraphs": [
-      "PhenoShop, operating the PhenoFarm service at phenoshop.app, is responsible for the information described in this policy. Contact support@phenoshop.app or 166 Skeet Road, Medford, NJ 08055 about privacy. This policy covers our website, business accounts, marketplace tools, and support. Other businesses you deal with and external services have their own privacy practices."
+      "PhenoShop, operating the PhenoShop service at phenoshop.app, is responsible for the information described in this policy. Contact support@phenoshop.app or 166 Skeet Road, Medford, NJ 08055 about privacy. This policy covers our website, business accounts, marketplace tools, and support. Other businesses you deal with and external services have their own privacy practices."
     ]
   },
   {

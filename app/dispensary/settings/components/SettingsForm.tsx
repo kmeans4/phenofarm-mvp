@@ -147,12 +147,12 @@ function getLicenseStatusTone(status: SettingsData['licenseStatus']) {
 function getLicenseActionCopy(status: SettingsData['licenseStatus']) {
   switch (status) {
     case 'rejected':
-      return `Update the license fields below using the review notes, then save. PhenoFarm reviews updates within ${LICENSE_REVIEW_WINDOW}.`;
+      return `Update the license fields below using the review notes, then save. PhenoShop reviews updates within ${LICENSE_REVIEW_WINDOW}.`;
     case 'expired':
-      return `Update the license fields below with current details, then save. PhenoFarm reviews updates within ${LICENSE_REVIEW_WINDOW}.`;
+      return `Update the license fields below with current details, then save. PhenoShop reviews updates within ${LICENSE_REVIEW_WINDOW}.`;
     case 'pending_review':
     default:
-      return `Complete the required license fields below and save. PhenoFarm reviews new dispensary licenses within ${LICENSE_REVIEW_WINDOW}.`;
+      return `Complete the required license fields below and save. PhenoShop reviews new dispensary licenses within ${LICENSE_REVIEW_WINDOW}.`;
   }
 }
 

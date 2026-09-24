@@ -333,13 +333,13 @@ export function SearchDialog({ variant = 'default', className = '' }: SearchDial
       >
         {/* Header */}
         <div className="flex items-center justify-between gap-3 border-b border-pf-line px-4 py-3">
-          <h2 id={titleId} className="sr-only">Search PhenoFarm</h2>
+          <h2 id={titleId} className="sr-only">Search PhenoShop</h2>
           <div className="flex items-center gap-3 flex-1">
             <Search className="w-5 h-5 text-pf-muted" />
             <input
               ref={inputRef}
               type="text"
-              placeholder="Search PhenoFarm"
+              placeholder="Search PhenoShop"
               aria-label={isDispensaryRoute ? 'Search products, requests, growers, and strains' : 'Search products, requests, customers, and strains'}
               aria-controls={resultsId}
               aria-activedescendant={activeIndex >= 0 ? `${resultsId}-result-${activeIndex}` : undefined}

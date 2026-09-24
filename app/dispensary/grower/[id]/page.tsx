@@ -53,7 +53,7 @@ function getInitials(name: string) {
     .map((part) => part.charAt(0).toUpperCase())
     .join("");
 
-  return initials || "PF";
+  return initials || "PS";
 }
 
 function displayTerm(value: string | null | undefined, fallback: string) {

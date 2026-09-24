@@ -1219,7 +1219,7 @@ export default function GrowerProductsPage() {
       </div>
 
       {growerAccess && (!growerAccess.isVerified || isLicenseExpired(growerAccess.licenseExpiry)) ? (
-        <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4 text-sm text-pf-warning"><strong>Listings are hidden from buyers.</strong> PhenoFarm must verify your account and current license before products appear in the marketplace. <Link href="/grower/settings#business-profile" className="font-semibold underline">Review license details</Link></section>
+        <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4 text-sm text-pf-warning"><strong>Listings are hidden from buyers.</strong> PhenoShop must verify your account and current license before products appear in the marketplace. <Link href="/grower/settings#business-profile" className="font-semibold underline">Review license details</Link></section>
       ) : null}
 
       {showQuickCreate && (

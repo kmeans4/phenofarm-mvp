@@ -28,7 +28,7 @@ export function LicenseVerificationCard() {
   }
 
   if (submitted) {
-    return <section className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-4"><p className="flex items-center gap-2 font-semibold text-pf-accent"><BadgeCheck className="h-5 w-5" /> Submitted for review</p><p className="mt-1 text-sm text-pf-accent">PhenoFarm verifies license details within 1 business day.</p></section>;
+    return <section className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-4"><p className="flex items-center gap-2 font-semibold text-pf-accent"><BadgeCheck className="h-5 w-5" /> Submitted for review</p><p className="mt-1 text-sm text-pf-accent">PhenoShop verifies license details within 1 business day.</p></section>;
   }
 
   return (

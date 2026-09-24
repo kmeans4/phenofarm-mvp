@@ -17,7 +17,7 @@ const testimonials = [
   },
   {
     quote:
-      'Settlement staying direct was the deciding factor. PhenoFarm organizes the workflow without taking a position in the transaction.',
+      'Settlement staying direct was the deciding factor. PhenoShop organizes the workflow without taking a position in the transaction.',
     author: 'David Kim',
     role: 'Operations Director, Elevate Wellness',
     initials: 'DK',

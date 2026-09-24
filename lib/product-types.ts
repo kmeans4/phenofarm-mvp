@@ -1,5 +1,5 @@
 /**
- * PhenoFarm Product Types and Subtypes
+ * PhenoShop Product Types and Subtypes
  * Centralized definitions for type safety across the application
  */
 

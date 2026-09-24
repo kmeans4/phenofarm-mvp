@@ -11,7 +11,7 @@ const sections: LegalSection[] = [
     "id": "operator-and-agreement",
     "title": "Operator and agreement",
     "paragraphs": [
-      "PhenoShop (\"we,\" \"us,\" or \"our\"), located at 166 Skeet Road, Medford, NJ 08055, operates the PhenoFarm service at phenoshop.app. These Terms govern your access to our business software. By creating an account or using the service, you agree to these Terms on behalf of yourself and the business you are authorized to represent. If you do not agree, do not use the service. Our Privacy Policy and Cookie Notice explain how we handle information."
+      "PhenoShop (\"we,\" \"us,\" or \"our\"), located at 166 Skeet Road, Medford, NJ 08055, operates the PhenoShop service at phenoshop.app. These Terms govern your access to our business software. By creating an account or using the service, you agree to these Terms on behalf of yourself and the business you are authorized to represent. If you do not agree, do not use the service. Our Privacy Policy and Cookie Notice explain how we handle information."
     ]
   },
   {

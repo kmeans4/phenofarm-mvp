@@ -67,7 +67,7 @@ export default function ContactPage() {
 
   const buildMailtoUrl = () => {
     const businessTypeLabel = selectedBusinessType?.label || 'Not specified';
-    const subject = `PhenoFarm inquiry from ${formData.name.trim()} (${businessTypeLabel})`;
+    const subject = `PhenoShop inquiry from ${formData.name.trim()} (${businessTypeLabel})`;
     const body = [
       `Name: ${formData.name.trim()}`,
       `Email: ${formData.email.trim()}`,
@@ -112,14 +112,14 @@ export default function ContactPage() {
         >
           <div>
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400">
-              Contact PhenoFarm
+              Contact PhenoShop
             </p>
             <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
               Wholesale workflow help.
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-gray-400 sm:text-lg">
               Tell us whether you are a grower, dispensary, or partner and include the details the
-              PhenoFarm support team should know.
+              PhenoShop support team should know.
             </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
@@ -157,7 +157,7 @@ export default function ContactPage() {
               <div className="flex items-start gap-3">
                 <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
                 <p className="text-sm leading-6 text-gray-400">
-                  PhenoFarm coordinates marketplace workflows and cultivator subscriptions. Wholesale payment
+                  PhenoShop coordinates marketplace workflows and cultivator subscriptions. Wholesale payment
                   settlement stays directly between licensed businesses.
                 </p>
               </div>

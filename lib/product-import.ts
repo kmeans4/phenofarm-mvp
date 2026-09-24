@@ -276,6 +276,6 @@ export function validateProductImport(content: string): ProductImportValidationR
 export function productImportTemplateCsv() {
   return [
     ['name', 'productType', 'subType', 'strain', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'isPriceVisible', 'images', 'sku', 'brand', 'thc', 'cbd'].join(','),
-    ['Blue Dream - 3.5g Jar', 'Flower', '3.5g Jar', 'Blue Dream', '45.00', '100', 'Gram', 'Premium sativa flower with berry aroma', 'true', 'true', 'https://example.com/image1.jpg', 'BD-001', 'PhenoFarm', '22', '1'].map((value) => `"${value}"`).join(','),
+    ['Blue Dream - 3.5g Jar', 'Flower', '3.5g Jar', 'Blue Dream', '45.00', '100', 'Gram', 'Premium sativa flower with berry aroma', 'true', 'true', 'https://example.com/image1.jpg', 'BD-001', 'PhenoShop', '22', '1'].map((value) => `"${value}"`).join(','),
   ].join('\n');
 }

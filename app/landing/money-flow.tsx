@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { AnimatePresence, m as motion } from 'framer-motion';
 import { Building2, Landmark, Sprout } from 'lucide-react';
+import { BrandMark } from '@/app/components/ui/BrandLogo';
 import { SectionHeading } from './motion';
 
 type Mode = 'marketplace' | 'phenofarm';
@@ -25,9 +26,9 @@ function Node({
         ? 'border-red-500/25 bg-red-500/[0.05]'
         : 'border-white/[0.08] bg-white/[0.03]';
   return (
-    <div className={`flex w-[104px] flex-col items-center gap-2 rounded-2xl border px-3 py-4 text-center sm:w-36 ${ring}`}>
+    <div className={`flex w-[72px] shrink-0 flex-col items-center gap-2 rounded-2xl border px-1.5 py-4 text-center sm:w-36 sm:px-3 ${ring}`}>
       <Icon className={`h-5 w-5 ${tone === 'emerald' ? 'text-emerald-300' : tone === 'red' ? 'text-red-300' : 'text-gray-300'}`} />
-      <div className="text-xs font-semibold text-gray-100 sm:text-sm">{label}</div>
+      <div className="text-[10px] font-semibold text-gray-100 sm:text-sm">{label}</div>
       <div className="text-[10px] leading-snug text-gray-500 sm:text-[11px]">{sublabel}</div>
     </div>
   );
@@ -76,9 +77,9 @@ export function MoneyFlow() {
     <section id="money-flow" className="relative scroll-mt-20 border-t border-white/[0.06] py-28 md:py-36">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
-          eyebrow="Why PhenoFarm"
+          eyebrow="Why PhenoShop"
           title="Your money never routes through us"
-          lede="Typical marketplaces sit in the middle of the transaction and take a percentage. PhenoFarm carries the workflow — verification, quotes, fulfillment records — and leaves settlement exactly where it belongs."
+          lede="Typical marketplaces sit in the middle of the transaction and take a percentage. PhenoShop carries the workflow — verification, quotes, fulfillment records — and leaves settlement exactly where it belongs."
         />
 
         {/* Mode toggle */}
@@ -87,7 +88,7 @@ export function MoneyFlow() {
             {(
               [
                 { id: 'marketplace', label: 'Typical marketplace' },
-                { id: 'phenofarm', label: 'PhenoFarm' },
+                { id: 'phenofarm', label: 'PhenoShop' },
               ] as const
             ).map((tab) => (
               <button
@@ -113,7 +114,7 @@ export function MoneyFlow() {
         </div>
 
         {/* Diagram */}
-        <div className="relative mx-auto mt-12 max-w-3xl rounded-3xl border border-white/[0.06] bg-white/[0.015] p-6 sm:p-10">
+        <div className="relative mx-auto mt-12 max-w-3xl rounded-3xl border border-white/[0.06] bg-white/[0.015] p-3 sm:p-10">
           <div className="flex items-start justify-between gap-2 sm:gap-6">
             <Node icon={Building2} label="Dispensary" sublabel="Buys wholesale" />
             <div className="relative mt-2 flex-1">
@@ -155,7 +156,7 @@ export function MoneyFlow() {
                     transition={{ duration: 0.3 }}
                   >
                     {isPheno ? (
-                      <Node icon={Landmark} label="PhenoFarm" sublabel="Records only — verification, quotes, status" tone="emerald" />
+                      <Node icon={BrandMark} label="PhenoShop" sublabel="Records only — verification, quotes, status" tone="emerald" />
                     ) : (
                       <Node icon={Landmark} label="Marketplace" sublabel="Intermediates payment · 10–20% take rate" tone="red" />
                     )}
@@ -163,7 +164,7 @@ export function MoneyFlow() {
                 </AnimatePresence>
               </div>
 
-              {/* Data lane (bottom, PhenoFarm mode only) */}
+              {/* Data lane (bottom, PhenoShop mode only) */}
               <div className="relative mt-5 h-px w-full bg-white/10">
                 {isPheno && (
                   <>
@@ -194,7 +195,7 @@ export function MoneyFlow() {
               }`}
             >
               {isPheno
-                ? 'Flat software subscription. On $1M of wholesale volume, PhenoFarm costs the same as on $10k — $0 of it is ours.'
+                ? 'Flat software subscription. On $1M of wholesale volume, PhenoShop costs the same as on $10k — $0 of it is ours.'
                 : 'A 15% take rate on $1M of wholesale volume is $150,000 — paid for standing between you and your customer.'}
             </motion.div>
           </AnimatePresence>

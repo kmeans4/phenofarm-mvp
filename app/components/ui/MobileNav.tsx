@@ -163,7 +163,7 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
 
             <div className="mt-auto border-t border-white/[0.07] px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
               <div className="mb-1 rounded-lg bg-white/[0.05] px-3 py-2">
-                <p className="truncate text-sm font-semibold text-[#e3ebe3]">{accountName || 'PhenoFarm account'}</p>
+                <p className="truncate text-sm font-semibold text-[#e3ebe3]">{accountName || 'PhenoShop account'}</p>
                 <p className="text-xs font-medium text-pf-muted">{roleLabel}</p>
               </div>
               <button

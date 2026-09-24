@@ -220,7 +220,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
     <div className="w-full space-y-3 sm:space-y-6 sm:pb-24 max-w-7xl mx-auto">
       <section className="order-print-summary" aria-hidden="true">
         <header className="mb-6 border-b border-pf-line-strong pb-4">
-          <p className="text-sm font-semibold uppercase tracking-wide text-pf-muted">PhenoFarm request summary</p>
+          <p className="text-sm font-semibold uppercase tracking-wide text-pf-muted">PhenoShop request summary</p>
           <h1 className="mt-1 text-2xl font-bold text-pf-text">Order Request #{order.orderId}</h1>
           <p className="mt-1 text-sm text-pf-muted">
             Submitted {format(new Date(order.createdAt), 'MMMM d, yyyy \'at\' h:mm a')} - Status: {statusLabel}

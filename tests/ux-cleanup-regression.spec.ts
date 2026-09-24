@@ -33,7 +33,7 @@ test.describe('UX cleanup regressions', () => {
     await page.goto('/grower/pricing');
 
     await expect(page.getByRole('heading', { name: 'Cultivator Subscription Plans' })).toBeVisible();
-    await expect(page.getByText('Buyer-seller wholesale payment is never processed by PhenoFarm.')).toBeVisible();
+    await expect(page.getByText('Buyer-seller wholesale payment is never processed by PhenoShop.')).toBeVisible();
     await expect(page.getByText('Stripe Billing is not configured for this environment.')).toBeVisible();
     await expect(page.getByText('Create Custom Tier')).toHaveCount(0);
   });

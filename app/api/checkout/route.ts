@@ -14,7 +14,7 @@ import { createWithOrderIdRetry } from '@/lib/order-id';
  * Authentication: Required (DISPENSARY role)
  *
  * This compatibility endpoint submits wholesale order requests for dispensaries,
- * creating one request per grower. PhenoFarm does not process wholesale payment;
+ * creating one request per grower. PhenoShop does not process wholesale payment;
  * item value is tracked for operational reporting and settlement happens
  * directly between buyer and grower.
  */
@@ -83,7 +83,7 @@ class CheckoutConflictError extends Error {
  * - One order is created per unique grower in the cart
  * - Inventory is reserved atomically during request creation to avoid overselling
  * - Orders with insufficient inventory are skipped and reported as errors
- * - Tax is not calculated or collected by PhenoFarm
+ * - Tax is not calculated or collected by PhenoShop
  * - Order IDs are auto-generated as 'ORD-{timestamp}-{sequence}'
  *
  * Response: 200 OK - Request result with:

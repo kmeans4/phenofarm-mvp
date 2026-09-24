@@ -36,8 +36,8 @@ export async function applyVerification(kind: 'GROWER' | 'DISPENSARY', id: strin
       await createNotification(tx, { userId: current.userId, type: 'VERIFICATION_DECISION',
         title: verifying ? (kind === 'GROWER' ? 'Account verified' : 'License verified') : 'Verification removed',
         body: kind === 'GROWER'
-          ? (verifying ? 'Your listings are now visible to verified dispensaries.' : 'Your listings are hidden until PhenoFarm verifies your account again.')
-          : (verifying ? 'Ordering is now unlocked for your dispensary.' : 'Ordering is paused until PhenoFarm verifies your license again.'),
+          ? (verifying ? 'Your listings are now visible to verified dispensaries.' : 'Your listings are hidden until PhenoShop verifies your account again.')
+          : (verifying ? 'Ordering is now unlocked for your dispensary.' : 'Ordering is paused until PhenoShop verifies your license again.'),
         href: kind === 'GROWER' ? '/grower/dashboard' : '/dispensary/dashboard',
       });
     }

@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "My Favorites | PhenoFarm",
+  title: "My Favorites | PhenoShop",
   description: "View and manage your favorite cannabis products",
 };
 

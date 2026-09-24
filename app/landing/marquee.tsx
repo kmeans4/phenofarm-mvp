@@ -14,7 +14,7 @@ const ITEMS = [
 export function Marquee() {
   const track = [...ITEMS, ...ITEMS];
   return (
-    <section aria-label="PhenoFarm principles" className="relative border-t border-white/[0.06] py-6">
+    <section aria-label="PhenoShop principles" className="relative border-t border-white/[0.06] py-6">
       <div
         className="group overflow-hidden"
         style={{

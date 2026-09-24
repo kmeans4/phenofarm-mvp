@@ -52,7 +52,7 @@ test.describe('shared controls on a populated portal', () => {
     await page.locator('button[aria-label="Search"]:visible').click();
     const dialog = page.getByRole('dialog');
     await expect(dialog).not.toContainText('0 results');
-    await dialog.getByPlaceholder('Search PhenoFarm').fill('Purple');
+    await dialog.getByPlaceholder('Search PhenoShop').fill('Purple');
     await expect(dialog.getByText('1 result', { exact: true })).toBeVisible();
     await expect(dialog.getByText('↑↓ navigate · ↵ open · esc close', { exact: true })).not.toBeVisible();
     const secondary = dialog.locator('button[aria-label]:not([aria-label="Close search"])');

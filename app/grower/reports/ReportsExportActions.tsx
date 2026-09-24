@@ -167,7 +167,7 @@ export function ReportsExportActions({
 
   const exportCsv = () => {
     const rows: Array<Array<string | number>> = [
-      ['PhenoFarm Grower Report'],
+      ['PhenoShop Grower Report'],
       ['Generated At', new Date().toISOString()],
       ['Date Range', rangeLabel],
       [],
@@ -203,12 +203,12 @@ export function ReportsExportActions({
     ];
 
     const blob = new Blob([rowsToCsv(rows)], { type: 'text/csv;charset=utf-8;' });
-    downloadBlob(blob, `phenofarm-grower-report-${filenameRange}-${filenameDate}.csv`);
+    downloadBlob(blob, `phenoshop-grower-report-${filenameRange}-${filenameDate}.csv`);
   };
 
   const exportPdf = () => {
     const lines = [
-      'PhenoFarm Grower Report',
+      'PhenoShop Grower Report',
       `Generated At: ${new Date().toLocaleString()}`,
       `Date Range: ${rangeLabel}`,
       '',
@@ -240,7 +240,7 @@ export function ReportsExportActions({
         : ['No requests in this range.']),
     ];
 
-    downloadBlob(buildPdfBlob(lines), `phenofarm-grower-report-${filenameRange}-${filenameDate}.pdf`);
+    downloadBlob(buildPdfBlob(lines), `phenoshop-grower-report-${filenameRange}-${filenameDate}.pdf`);
   };
 
   return (

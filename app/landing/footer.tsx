@@ -1,3 +1,5 @@
+
+import { BrandLogo } from '@/app/components/ui/BrandLogo';
 import Link from 'next/link';
 
 const footerLinks = {
@@ -25,10 +27,7 @@ export function Footer() {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white">
-                PF
-              </div>
-              <span className="text-[15px] font-semibold tracking-tight text-white">PhenoFarm</span>
+              <BrandLogo className="w-40" />
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500">
               The B2B workspace connecting licensed cannabis growers and dispensaries for
@@ -61,7 +60,7 @@ export function Footer() {
 
         <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center md:mt-14">
           <p className="text-xs text-gray-600">
-            © {new Date().getFullYear()} PhenoFarm. For licensed operators only. Wholesale settlement stays
+            © {new Date().getFullYear()} PhenoShop. For licensed operators only. Wholesale settlement stays
             direct between businesses.
           </p>
           <div className="flex gap-6">

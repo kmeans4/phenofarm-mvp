@@ -1,5 +1,7 @@
 'use client';
 
+import { BrandLogo } from '@/app/components/ui/BrandLogo';
+
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -121,10 +123,7 @@ export default function SignUpPage() {
 
         <div className="relative">
           <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-            <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
-              PF
-            </span>
-            <span className="text-lg font-semibold tracking-tight">PhenoFarm</span>
+            <BrandLogo className="w-40" />
           </Link>
         </div>
 
@@ -161,10 +160,7 @@ export default function SignUpPage() {
         <div className="w-full max-w-2xl">
           <div className="mb-5 text-center lg:hidden">
             <Link href="/" className="mx-auto inline-flex items-center gap-3 rounded-xl text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 to-emerald-600 text-lg font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.35)]">
-                PF
-              </span>
-              <span className="text-lg font-semibold">PhenoFarm</span>
+              <BrandLogo className="w-40" />
             </Link>
           </div>
 
@@ -279,7 +275,7 @@ export default function SignUpPage() {
                     </select>
                     {formData.businessType === 'dispensary' && (
                       <p id="dispensary-license-note" className="mt-2 rounded-xl border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-xs leading-5 text-pf-accent">
-                        Dispensaries submit license details after signup; ordering unlocks once PhenoFarm verifies the license.
+                        Dispensaries submit license details after signup; ordering unlocks once PhenoShop verifies the license.
                       </p>
                     )}
                   </div>

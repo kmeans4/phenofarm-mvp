@@ -1,5 +1,7 @@
 'use client';
 
+import { BrandLogo } from '@/app/components/ui/BrandLogo';
+
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { AnimatePresence, m as motion } from 'framer-motion';
@@ -7,7 +9,7 @@ import { Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
   { label: 'Product', href: '#product' },
-  { label: 'Why PhenoFarm', href: '#money-flow' },
+  { label: 'Why PhenoShop', href: '#money-flow' },
   { label: 'Workflow', href: '#workflow' },
   { label: 'Pricing', href: '#pricing' },
   { label: 'FAQ', href: '#faq' },
@@ -59,12 +61,9 @@ export function Nav() {
         scrolled || open ? 'border-b border-white/[0.06] bg-[#070908]/85 backdrop-blur-xl' : 'bg-transparent'
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-emerald-400 to-emerald-600 text-sm font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)]">
-            PF
-          </div>
-          <span className="text-[15px] font-semibold tracking-tight text-white">PhenoFarm</span>
+          <BrandLogo className="w-32 sm:w-40" />
         </Link>
 
         <div className="hidden items-center gap-7 md:flex">
@@ -99,7 +98,7 @@ export function Nav() {
             href="/auth/sign_up"
             className="whitespace-nowrap rounded-lg bg-white px-3 py-2 text-sm font-semibold text-gray-950 transition-colors hover:bg-gray-200 sm:px-4"
           >
-            Create account
+            <span className="sm:hidden">Sign up</span><span className="hidden sm:inline">Create account</span>
           </Link>
           <button
             type="button"

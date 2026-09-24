@@ -290,7 +290,7 @@ export default async function GrowerDashboardPage() {
 
       {marketplaceHidden ? (
         <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4 text-pf-warning">
-          <h2 className="font-semibold">{licenseExpired ? 'License expired — listings are hidden' : 'Awaiting PhenoFarm verification'}</h2>
+          <h2 className="font-semibold">{licenseExpired ? 'License expired — listings are hidden' : 'Awaiting PhenoShop verification'}</h2>
           <p className="mt-1 text-sm">Listings are hidden from buyers until your account and current license are verified. You can keep building and editing the catalog.</p>
           <Link href="/grower/settings#business-profile" className="mt-3 inline-flex text-sm font-semibold underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-600">Review license details</Link>
         </section>
