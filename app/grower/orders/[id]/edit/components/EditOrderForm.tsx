@@ -8,7 +8,7 @@ import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
 import { useToast } from '@/app/hooks/useToast';
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
 import { PageHeader } from '@/app/components/ui/PageHeader';
-import { canTransitionOrderStatus, getOrderStatusLabel, type OrderStatusValue } from '@/lib/order-workflow';
+import { canEditOrderItems, canTransitionOrderStatus, getOrderStatusLabel, type OrderStatusValue } from '@/lib/order-workflow';
 import { pluralize } from '@/lib/utils';
 import { formatProductUnit } from '@/lib/product-display';
 import { CheckCircle2, ClipboardList, Flag, Package, Truck, XCircle, type LucideIcon } from 'lucide-react';
@@ -105,6 +105,7 @@ const formatCurrency = (amount: number) => {
 const getItemMaxQuantity = (item: OrderItem) => Math.max(1, item.maxQuantity ?? item.quantity);
 
 export default function EditOrderForm({ order }: { order: Order }) {
+  const canEditItems = canEditOrderItems(order.status);
   const router = useRouter();
   const { showToast } = useToast();
   const [status, setStatus] = useState(order.status);
@@ -145,8 +146,8 @@ export default function EditOrderForm({ order }: { order: Order }) {
 
   const validateForm = (): boolean => {
     const newErrors: FieldErrors = {
-      shippingFee: validateShippingFee(shippingFee),
-      tax: validateTax(tax),
+      shippingFee: canEditItems ? validateShippingFee(shippingFee) : undefined,
+      tax: canEditItems ? validateTax(tax) : undefined,
       notes: validateNotes(notes),
     };
     
@@ -156,7 +157,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
       }
     });
     
-    const invalidItems = items.filter(item => validateQuantity(item.quantity, getItemMaxQuantity(item)));
+    const invalidItems = canEditItems ? items.filter(item => validateQuantity(item.quantity, getItemMaxQuantity(item))) : [];
     if (invalidItems.length > 0) {
       showToast('error', 'One or more items have invalid quantities');
     }
@@ -187,6 +188,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
   };
 
   const handleShippingFeeChange = (value: string) => {
+    if (!canEditItems) return;
     const numValue = parseFloat(value) || 0;
     setShippingFee(numValue);
     if (touched.shippingFee) {
@@ -196,6 +198,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
   };
 
   const handleTaxChange = (value: string) => {
+    if (!canEditItems) return;
     const numValue = parseFloat(value) || 0;
     setTax(numValue);
     if (touched.tax) {
@@ -226,6 +229,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
   };
 
   const updateItemQuantity = (itemId: string, newQuantity: number) => {
+    if (!canEditItems) return;
     const item = items.find((candidate) => candidate.id === itemId);
     const error = validateQuantity(newQuantity, item ? getItemMaxQuantity(item) : undefined);
     if (error) {
@@ -246,6 +250,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
   };
 
   const removeItem = (itemId: string) => {
+    if (!canEditItems) return;
     setItems((current) => current.filter(item => item.id !== itemId));
     showToast('info', 'Item has been removed from the request');
   };
@@ -284,12 +289,14 @@ export default function EditOrderForm({ order }: { order: Order }) {
         body: JSON.stringify({
           status,
           notes,
-          shippingFee,
-          tax,
-          items: items.map(item => ({
-            id: item.id,
-            quantity: item.quantity,
-          })),
+          ...(canEditItems ? {
+            shippingFee,
+            tax,
+            items: items.map(item => ({
+              id: item.id,
+              quantity: item.quantity,
+            })),
+          } : {}),
         }),
       });
 
@@ -405,7 +412,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
             <p className="flex items-center gap-2 text-sm text-pf-muted"><CurrentStatusIcon className="h-4 w-4" aria-hidden="true" />Current: {currentStatusOption?.label || getOrderStatusLabel(order.status)}</p>
 
             <div className="mt-3 sm:mt-4">
-              <p className="mb-2 text-sm font-medium text-pf-secondary">Change to</p>
+              {validNextStatusOptions.length > 0 && <p className="mb-2 text-sm font-medium text-pf-secondary">Change to</p>}
               {validNextStatusOptions.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2">
                   {validNextStatusOptions.map((option) => {
@@ -474,6 +481,22 @@ export default function EditOrderForm({ order }: { order: Order }) {
               <span className="text-sm font-normal text-pf-muted">({items.length})</span>
             </h2>
 
+            {!canEditItems ? (
+              <div className="space-y-3">
+                <p className="text-xs text-pf-muted">Items and pricing are locked. Notes can still be updated.</p>
+                {items.map((item) => (
+                  <div key={item.id} className="flex items-start justify-between gap-3 rounded-lg border border-pf-line p-3 sm:p-4">
+                    <div className="min-w-0">
+                      <p className="break-words text-sm font-medium text-pf-text sm:text-base">{item.product?.name || 'Unknown Product'}</p>
+                      {item.product?.strain && <p className="break-words text-sm text-pf-muted">{item.product.strain}</p>}
+                      <p className="mt-1 text-xs text-pf-muted sm:text-sm">{item.quantity} {formatProductUnit(item.product?.unit)} × {formatCurrency(item.unitPrice)}</p>
+                    </div>
+                    <p className="shrink-0 text-sm font-semibold text-pf-text sm:text-base">{formatCurrency(item.totalPrice)}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+            <>
             {/* Desktop View */}
             <div className="hidden sm:block space-y-3">
               {items.map((item, index) => {
@@ -596,6 +619,9 @@ export default function EditOrderForm({ order }: { order: Order }) {
               })}
             </div>
 
+            </>
+            )}
+
             {items.length === 0 && (
               <div className="text-center py-8 text-pf-danger bg-pf-danger-bg rounded-lg border border-pf-danger-line">
                 <svg className="w-12 h-12 mx-auto mb-3 text-pf-danger" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -613,15 +639,16 @@ export default function EditOrderForm({ order }: { order: Order }) {
               <svg className="w-5 h-5 text-pf-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              Pricing
+              {canEditItems ? 'Pricing & notes' : 'Notes'}
             </h2>
 
-            <div className="grid grid-cols-2 gap-4">
+            {canEditItems && <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-pf-secondary mb-1.5">
+                <label htmlFor="order-shipping" className="block text-sm font-medium text-pf-secondary mb-1.5">
                   Shipping ($)
                 </label>
                 <input
+                  id="order-shipping"
                   type="number"
                   step="0.01"
                   min="0"
@@ -640,10 +667,11 @@ export default function EditOrderForm({ order }: { order: Order }) {
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-pf-secondary mb-1.5">
+                <label htmlFor="order-tax" className="block text-sm font-medium text-pf-secondary mb-1.5">
                   Tax ($)
                 </label>
                 <input
+                  id="order-tax"
                   type="number"
                   step="0.01"
                   min="0"
@@ -661,14 +689,15 @@ export default function EditOrderForm({ order }: { order: Order }) {
                   </p>
                 )}
               </div>
-            </div>
+            </div>}
 
-            <p className="mt-2 text-xs text-pf-muted">Optional tax: enter only the amount on your invoice. PhenoFarm does not calculate tax.</p>
-            <div className="mt-3 sm:mt-4">
-              <label className="block text-sm font-medium text-pf-secondary mb-1.5">
+            {canEditItems && <p className="mt-2 text-xs text-pf-muted">Optional tax: enter only the amount on your invoice. PhenoFarm does not calculate tax.</p>}
+            <div className={canEditItems ? 'mt-3 sm:mt-4' : ''}>
+              <label htmlFor="order-notes" className={canEditItems ? 'block text-sm font-medium text-pf-secondary mb-1.5' : 'sr-only'}>
                 Notes
               </label>
               <textarea
+                id="order-notes"
                 rows={3}
                 value={notes}
                 onChange={(e) => handleNotesChange(e.target.value)}

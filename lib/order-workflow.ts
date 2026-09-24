@@ -83,6 +83,10 @@ export function canTransitionOrderStatus(currentStatus: string, nextStatus: stri
   return getAllowedOrderStatusTransitions(currentStatus).includes(nextStatus as OrderStatusValue);
 }
 
+export function canEditOrderItems(status: string) {
+  return status === 'PENDING' || status === 'CONFIRMED' || status === 'PROCESSING';
+}
+
 export function getInvalidOrderStatusTransitionMessage(currentStatus: string, nextStatus: string) {
   const allowed = getAllowedOrderStatusTransitions(currentStatus);
   const allowedLabels = allowed.map(getOrderStatusLabel).join(', ');

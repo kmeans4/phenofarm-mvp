@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { PrismaClient, type UserRole } from '@prisma/client';
+import { PrismaClient, type OrderStatus, type UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
@@ -183,11 +183,87 @@ test('server failure after a partial commit recovers with the same receipt and r
   expect((await db.product.findUniqueOrThrow({ where: { id: b.id } })).inventoryQty).toBe(7);
 });
 
-async function recordedOrder(grower: Awaited<ReturnType<typeof account>>, buyer: Awaited<ReturnType<typeof account>>, status: 'PENDING' | 'DELIVERED' = 'DELIVERED') {
+async function recordedOrder(grower: Awaited<ReturnType<typeof account>>, buyer: Awaited<ReturnType<typeof account>>, status: OrderStatus = 'DELIVERED') {
   const item = await product(grower);
   return db.order.create({ data: { orderId: `QA-${randomUUID()}`, growerId: grower.grower!.id, dispensaryId: buyer.dispensary!.id,
     status, totalAmount: 24, subtotal: 24, notes: 'Fulfillment method: Pickup\nRequested window: Friday 10:00\nPayment terms: Net 30\nBuyer notes: Keep the original agreement',
     items: { create: { productId: item.id, growerId: item.growerId, quantity: 2, unitPrice: 12, totalPrice: 24 } } } });
+}
+
+for (const width of [1440, 390]) {
+  for (const status of ['SHIPPED', 'DELIVERED', 'CANCELLED'] as const) {
+    test(`locked order editor preserves items and pricing for ${status} at ${width}px`, async ({ page }) => {
+      const grower = await account(), buyer = await account('DISPENSARY');
+      const order = await recordedOrder(grower, buyer, status);
+      await db.order.update({ where: { id: order.id }, data: { shippingFee: 5, tax: 2, totalAmount: 31 } });
+      const line = await db.orderItem.findFirstOrThrow({ where: { orderId: order.id } });
+      const stock = (await db.product.findUniqueOrThrow({ where: { id: line.productId } })).inventoryQty;
+      await page.setViewportSize({ width, height: 1000 });
+      await login(page, grower);
+      await page.goto(`/grower/orders/${order.id}/edit`);
+      await expect(page.getByRole('button', { name: '+', exact: true })).toHaveCount(0);
+      await expect(page.getByRole('button', { name: '-', exact: true })).toHaveCount(0);
+      await expect(page.getByTitle('Remove item')).toHaveCount(0);
+      await expect(page.getByRole('spinbutton')).toHaveCount(0);
+      await expect(page.getByText('2 g × $12.00', { exact: true })).toBeVisible();
+      await expect(page.getByText('$31.00', { exact: true }).first()).toBeVisible();
+      await capture(page, `locked-editor-${status}-${width}`);
+
+      // Hidden controls do not replace the server's protection against forged edits.
+      for (const data of [{ items: [{ id: line.id, quantity: 3 }] }, { shippingFee: 6 }, { tax: 3 }]) {
+        expect((await page.request.put(`/api/orders/${order.id}`, { data })).status()).toBe(409);
+      }
+      const notes = `${order.notes}\nSettlement recorded: reference QA-2042`;
+      await page.getByPlaceholder('Instructions or notes', { exact: true }).fill(notes);
+      const response = page.waitForResponse(r => r.url().endsWith(`/api/orders/${order.id}`) && r.request().method() === 'PUT');
+      await page.getByRole('button', { name: 'Save changes', exact: true }).filter({ visible: true }).first().click();
+      const saved = await response;
+      expect(saved.status(), await saved.text()).toBe(200);
+      expect(saved.request().postDataJSON()).toEqual({ status, notes });
+      await page.waitForURL(`**/grower/orders/${order.id}`);
+      await page.reload();
+      await expect(page.getByText('Keep the original agreement', { exact: false })).toContainText('QA-2042');
+      const persisted = await db.order.findUniqueOrThrow({ where: { id: order.id }, include: { items: true } });
+      expect(persisted.notes).toBe(notes);
+      expect(persisted.status).toBe(status);
+      expect(persisted.items).toEqual([line]);
+      expect([persisted.subtotal, persisted.shippingFee, persisted.tax, persisted.totalAmount].map(Number)).toEqual([24, 5, 2, 31]);
+      expect((await db.product.findUniqueOrThrow({ where: { id: line.productId } })).inventoryQty).toBe(stock);
+
+      if (status === 'SHIPPED') {
+        await page.goto(`/grower/orders/${order.id}/edit`);
+        await page.getByText('Delivered', { exact: true }).click();
+        const delivery = page.waitForResponse(r => r.url().endsWith(`/api/orders/${order.id}`) && r.request().method() === 'PUT');
+        await page.getByRole('button', { name: 'Save changes', exact: true }).filter({ visible: true }).first().click();
+        expect((await delivery).status()).toBe(200);
+        expect((await db.order.findUniqueOrThrow({ where: { id: order.id } })).status).toBe('DELIVERED');
+      }
+    });
+  }
+
+  for (const status of ['PENDING', 'CONFIRMED', 'PROCESSING'] as const) {
+    test(`active order editor saves quantity and pricing for ${status} at ${width}px`, async ({ page }) => {
+      const grower = await account(), buyer = await account('DISPENSARY');
+      const order = await recordedOrder(grower, buyer, status);
+      const line = await db.orderItem.findFirstOrThrow({ where: { orderId: order.id } });
+      await page.setViewportSize({ width, height: 1000 });
+      await login(page, grower);
+      await page.goto(`/grower/orders/${order.id}/edit`);
+      await expect(page.getByTitle('Remove item').filter({ visible: true })).toBeVisible();
+      await page.getByRole('button', { name: '+', exact: true }).filter({ visible: true }).click();
+      await page.getByLabel('Shipping ($)', { exact: true }).fill('5');
+      await page.getByLabel('Tax ($)', { exact: true }).fill('2');
+      await capture(page, `active-editor-${status}-${width}`);
+      const response = page.waitForResponse(r => r.url().endsWith(`/api/orders/${order.id}`) && r.request().method() === 'PUT');
+      await page.getByRole('button', { name: 'Save changes', exact: true }).filter({ visible: true }).first().click();
+      const saved = await response; expect(saved.status(), await saved.text()).toBe(200);
+      const persisted = await db.order.findUniqueOrThrow({ where: { id: order.id }, include: { items: true } });
+      expect(persisted.status).toBe(status);
+      expect(persisted.items[0].quantity).toBe(3);
+      expect([persisted.subtotal, persisted.shippingFee, persisted.tax, persisted.totalAmount].map(Number)).toEqual([36, 5, 2, 43]);
+      expect((await db.product.findUniqueOrThrow({ where: { id: line.productId } })).inventoryQty).toBe(9);
+    });
+  }
 }
 
 for (const width of [1440, 390]) test(`saved settlement notes remain visible for both businesses at ${width}px`, async ({ page, browser }) => {
