@@ -1,3 +1,4 @@
+import { logApiError } from '@/lib/api-response';
 import { after, NextRequest, NextResponse } from 'next/server';
 import { AccountActionPurpose } from '@prisma/client';
 import { consumeAuthLimit, requestIp } from '@/lib/auth-rate-limit';
@@ -46,7 +47,8 @@ export async function requestPublicAccountLink(request: NextRequest, purpose: 'V
     if (!accountMailConfigured()) return accountJson({ error: 'Email delivery is temporarily unavailable. Please try again later.' }, 503);
     if (limits.identityAllowed) after(() => requestAccountLink(email, purpose));
     return accountJson({ success: true, message: ACCOUNT_REQUEST_MESSAGE });
-  } catch {
+  } catch (error) {
+    logApiError('account.request', error);
     return accountJson({ error: 'Unable to process this request. Please try again.' }, 503);
   }
 }

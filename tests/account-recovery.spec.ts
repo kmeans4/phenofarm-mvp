@@ -1,3 +1,4 @@
+import { CURRENT_POLICIES } from '../lib/policies/current';
 import { test, expect, request as requests, type APIRequestContext } from '@playwright/test';
 import { PrismaClient, AccountActionPurpose } from '@prisma/client';
 import { encode, type JWT } from 'next-auth/jwt';
@@ -78,7 +79,7 @@ async function signIn(context: APIRequestContext, email: string, secret: string)
 
 test('registration is generic and creates one unverified account without a session', async () => {
   const context = await api(); const email = `${prefix}-signup@example.test`;
-  const payload = { email, password, firstName: 'Mail', lastName: 'Owner', businessName: 'Recovery test', businessType: 'grower' };
+  const payload = { ...CURRENT_POLICIES, acceptTerms: true, email, password, firstName: 'Mail', lastName: 'Owner', businessName: 'Recovery test', businessType: 'grower' };
   const responses = await Promise.all([context.post('/api/auth/register', { data: payload }), context.post('/api/auth/register', { data: payload })]);
   expect(responses.map(value => value.status())).toEqual([201, 201]);
   const bodies = await Promise.all(responses.map(value => value.json()));
@@ -106,7 +107,7 @@ test('registration reports profile storage failures and rolls back both account 
     await db.$executeRawUnsafe('CREATE TRIGGER test_registration_failure BEFORE INSERT ON dispensaries FOR EACH ROW EXECUTE FUNCTION test_registration_failure()');
     for (const businessType of ['grower', 'dispensary']) {
       const context = await api(); const email = `${prefix}-storage-${businessType}@example.test`;
-      const response = await context.post('/api/auth/register', { data: { email, password, businessName: 'Review registration failure', businessType } });
+      const response = await context.post('/api/auth/register', { data: { email, password, businessName: 'Review registration failure', businessType, ...CURRENT_POLICIES, acceptTerms: true } });
       expect(response.status()).toBe(503);
       expect(await db.user.count({ where: { email } })).toBe(0);
       expect(await messages(email)).toEqual([]);
@@ -320,6 +321,7 @@ for(const width of [360,1440]) test(`signup, verification and recovery work in t
   await page.goto('/auth/sign_up');
   await page.locator('#firstName').fill('Mail');await page.locator('#lastName').fill('Owner');await page.locator('#businessName').fill('Recovery UI');
   await page.locator('#email').fill(email);await page.locator('#password').fill(password);await page.locator('#confirmPassword').fill(password);
+  await page.getByRole('checkbox').check();
   await page.getByRole('button',{name:'Create account',exact:true}).click();
   await expect(page).toHaveURL(/\/auth\/verify-email\?sent=1/);
   const proof=await delivered(email,'Verify your email');

@@ -3,6 +3,8 @@
 import { BrandLogo } from '@/app/components/ui/BrandLogo';
 
 import { useState } from 'react';
+import { CURRENT_POLICIES } from '@/lib/policies/current';
+import { PolicyCheckbox } from '@/app/components/PolicyCheckbox';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { CheckCircle2, Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
@@ -19,6 +21,7 @@ export default function SignUpPage() {
     businessName: '',
     businessType: 'grower',
   });
+  const [acceptTerms, setAcceptTerms] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordTouched, setPasswordTouched] = useState(false);
@@ -69,6 +72,7 @@ export default function SignUpPage() {
       return false;
     }
 
+    if (!acceptTerms) { setError('Please agree to the Terms to continue.'); return false; }
     setError('');
     return true;
   };
@@ -95,6 +99,9 @@ export default function SignUpPage() {
           lastName: formData.lastName.trim(),
           businessName: publicBusinessName,
           businessType: formData.businessType,
+          acceptTerms,
+          termsVersion: CURRENT_POLICIES.termsVersion,
+          privacyVersion: CURRENT_POLICIES.privacyVersion,
         }),
       });
 
@@ -411,6 +418,8 @@ export default function SignUpPage() {
                 </div>
               </fieldset>
 
+              <PolicyCheckbox checked={acceptTerms} onChange={setAcceptTerms} disabled={loading} />
+
               <button
                 type="submit"
                 disabled={loading}
@@ -427,17 +436,6 @@ export default function SignUpPage() {
               </button>
             </form>
 
-            <div className="mt-4 border-t border-pf-line pt-3 text-center text-sm text-pf-muted">
-              By signing up, you agree to the{' '}
-              <Link href="/legal/terms" className="inline-flex min-h-10 items-center font-medium text-pf-secondary transition-colors hover:text-pf-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-                Terms
-              </Link>{' '}
-              and{' '}
-              <Link href="/legal/privacy" className="inline-flex min-h-10 items-center font-medium text-pf-secondary transition-colors hover:text-pf-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-                Privacy Policy
-              </Link>
-              .
-            </div>
           </div>
         </div>
       </section>

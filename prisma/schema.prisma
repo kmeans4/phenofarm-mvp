@@ -19,6 +19,7 @@ model User {
   passwordHash         String?
   emailVerifiedAt      DateTime?
   sessionVersion       Int                   @default(0)
+  policyAcceptances    PolicyAcceptance[]
   accountActionTokens  AccountActionToken[]
   conversationMessages ConversationMessage[]
   createdConversations Conversation[]        @relation("ConversationCreator")
@@ -539,4 +540,29 @@ model StripeWebhookEvent {
   processedAt DateTime @default(now())
 
   @@map("stripe_webhook_events")
+}
+
+// Append-only acceptance history. No inferred or backfilled agreement.
+model PolicyAcceptance {
+  id             String   @id @default(cuid())
+  userId         String
+  termsVersion   String
+  termsSha256    String
+  privacyVersion String
+  privacySha256  String
+  acceptedAt     DateTime @default(now())
+  source         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, termsVersion, privacyVersion])
+  @@map("policy_acceptances")
+}
+
+// Aggregate only: no customer data, request URLs, bodies, or error messages.
+model OperationalSignal {
+  id             String   @id
+  count          Int      @default(0)
+  lastOccurredAt DateTime @default(now())
+
+  @@map("operational_signals")
 }
