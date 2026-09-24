@@ -1,69 +1,103 @@
+import type { Metadata } from 'next';
 import { LegalDocument, type LegalSection } from '../LegalDocument';
+
+export const metadata: Metadata = {
+  "title": "Terms of Service | PhenoShop",
+  "description": "Terms for business accounts, listings, requests, and software subscriptions."
+};
 
 const sections: LegalSection[] = [
   {
-    id: 'eligible-users',
-    title: 'Eligible users',
-    paragraphs: [
-      'PhenoFarm is intended for licensed cannabis cultivators, dispensaries, retailers, and authorized staff using the product for B2B marketplace workflows. Users are responsible for providing accurate account, business, contact, and license information.',
-    ],
+    "id": "operator-and-agreement",
+    "title": "Operator and agreement",
+    "paragraphs": [
+      "PhenoShop (\"we,\" \"us,\" or \"our\"), located at 166 Skeet Road, Medford, NJ 08055, operates the PhenoFarm service at phenoshop.app. These Terms govern your access to our business software. By creating an account or using the service, you agree to these Terms on behalf of yourself and the business you are authorized to represent. If you do not agree, do not use the service. Our Privacy Policy and Cookie Notice explain how we handle information."
+    ]
   },
   {
-    id: 'accounts-verification',
-    title: 'Accounts and verification',
-    paragraphs: [
-      'Account access is role-based. Admins manage marketplace oversight, growers manage catalog and request workflows, and dispensaries browse, draft requests, and manage buyer settings.',
-      'Dispensary ordering is gated by license verification. A dispensary may be able to create an account and browse parts of the app before it is verified, but order request submission unlocks only after PhenoFarm verifies the license.',
-    ],
+    "id": "who-may-use-phenoshop",
+    "title": "Who may use PhenoShop",
+    "paragraphs": [
+      "The service is for licensed cannabis businesses and their authorized staff, aged 21 or older, in the United States where their use of the service is lawful. Our initial recruiting focus is Vermont; eligibility is not limited to Vermont. Availability and account approval depend on applicable requirements and our review, and do not imply authorization in every state. It is not a consumer cannabis store. You must have authority to act for your business and keep your business, contact, and license information accurate. Do not use the service where doing so would violate applicable law.",
+      "We may request information to review eligibility, restrict functions while a review is pending, or suspend access when a license expires or eligibility cannot be confirmed. An account or verification badge reflects our account review; it is not government approval, a product certification, or a guarantee about another business."
+    ]
   },
   {
-    id: 'marketplace-workflows',
-    title: 'Marketplace workflows',
-    paragraphs: [
-      'Growers may create product listings, manage inventory, attach relevant documents, message buyers, send quote terms, and review order requests. Dispensaries may browse growers and products, request quote terms, add products to a request draft, and submit order requests after verification.',
-      'Order requests use friendly status labels: Submitted, Accepted, Preparing, Ready / In transit, Delivered, and Cancelled. These labels describe operational workflow status and do not represent payment processing by PhenoFarm.',
-    ],
+    "id": "accounts-and-security",
+    "title": "Accounts and security",
+    "paragraphs": [
+      "Use a working email address, complete required verification, protect your password, and give access only to authorized staff. You are responsible for activity you authorize through your account. Tell support@phenoshop.app promptly if you suspect unauthorized access or inaccurate account information. Never send passwords or recovery links to support."
+    ]
   },
   {
-    id: 'direct-settlement',
-    title: 'Direct settlement',
-    paragraphs: [
-      'PhenoFarm does not collect, remit, escrow, finance, or pay out wholesale order funds. Buyers and growers are responsible for invoices, taxes, payment terms, delivery terms, compliance obligations, and settlement outside PhenoFarm.',
-      'Request value, quote terms, and direct payment terms may be recorded in the app for coordination and reporting, but they are informational marketplace records rather than in-app payment instructions.',
-    ],
+    "id": "listings-lab-reports-and-your-content",
+    "title": "Listings, lab reports, and your content",
+    "paragraphs": [
+      "You retain your rights in the content you provide. You give PhenoShop permission to host, store, reproduce, display, and transmit that content as needed to operate and support the service, including making published listings and their uploaded lab reports available to buyers. You must have the rights and authority to share it.",
+      "Growers are responsible for listing accuracy, inventory, prices, batch associations, and complete, authentic, current lab reports. Buyers are responsible for checking that a report applies to the product and batch they intend to obtain. Displaying or downloading a report does not mean PhenoShop has independently tested the product or guarantees its safety, legality, potency, or quality.",
+      "Only upload documents appropriate for sharing. Do not upload patient records, personal identification documents, account credentials, payment-card details, or bank account numbers. Files may be accessible to anyone who has their storage link. Removing a listing or report from the interface does not recall copies already downloaded or, by itself, delete the stored file. Contact support if a file must be removed from storage."
+    ]
   },
   {
-    id: 'cultivator-subscriptions',
-    title: 'Cultivator subscriptions',
-    paragraphs: [
-      'The only in-app payment flow is the cultivator software subscription. Growers may use Free, Pro, or Business plan access depending on the configured subscription state.',
-      'Paid grower subscription checkout and subscription management use Stripe Billing. Stripe price IDs and portal availability may vary by environment while the MVP is being configured.',
-    ],
+    "id": "quotes-requests-and-fulfillment",
+    "title": "Quotes, requests, and fulfillment",
+    "paragraphs": [
+      "PhenoShop helps businesses browse listings, exchange messages and quotes, submit order requests, reserve recorded inventory, and track fulfillment and settlement records. A request, accepted quote, inventory reservation, or status label does not authorize a cannabis transfer or establish that an invoice has been paid.",
+      "The businesses involved must agree on their commercial terms and separately satisfy all applicable licensing, testing, packaging, transportation, recordkeeping, and transfer requirements. Do not arrange transfers across state lines or otherwise use the service to evade legal requirements. PhenoShop does not take title to cannabis, possess or deliver products, or guarantee either party's performance. Retain the independent records your business is required to keep."
+    ]
   },
   {
-    id: 'user-responsibilities',
-    title: 'User responsibilities',
-    bullets: [
-      'Keep business, contact, catalog, inventory, license, and order request information accurate.',
-      'Use PhenoFarm only for lawful licensed cannabis business workflows.',
-      'Do not submit false license information, misleading product records, or unauthorized account access attempts.',
-      'Coordinate fulfillment and settlement directly with the counterparty and comply with applicable laws and regulations.',
-    ],
+    "id": "direct-settlement",
+    "title": "Direct settlement",
+    "paragraphs": [
+      "Wholesale invoicing, collection, taxes, payment, refunds, and disputes are handled directly between the businesses. PhenoShop does not collect, hold, escrow, finance, remit, or pay out wholesale funds. Amounts, methods, dates, and references recorded in the app are user-entered business records; PhenoShop does not verify that funds moved or that a debt was discharged."
+    ]
   },
   {
-    id: 'support-changes',
-    title: 'Support and changes',
-    paragraphs: [
-      'During the MVP, support requests should be sent to support@phenoshop.app. PhenoFarm may update these draft terms as workflows, compliance requirements, and counsel-reviewed production terms evolve.',
-    ],
+    "id": "software-subscriptions",
+    "title": "Software subscriptions",
+    "paragraphs": [
+      "Any paid plan is a subscription to PhenoShop software, separate from cannabis transactions. You will see the price, billing interval, applicable taxes, and any trial or promotional terms before you authorize checkout. No paid subscription is created merely by browsing or submitting an order request.",
+      "If you purchase a recurring plan, you authorize charges at the disclosed interval until you cancel. Use billing settings to manage or cancel an available subscription, or contact support@phenoshop.app if you cannot access billing. Unless checkout states otherwise, cancellation stops future renewals and access continues through the paid period. Unused time is not automatically refunded, except where required by law or agreed by us. Contact support about duplicate or incorrect charges. We will give advance notice of price changes affecting future renewals and an opportunity to cancel before they apply.",
+      "Subscription checkout and management, when available, use Stripe. Stripe handles payment details under its terms and privacy policy. These Terms do not promise that every plan or payment method is available in every location."
+    ]
   },
+  {
+    "id": "acceptable-use",
+    "title": "Acceptable use",
+    "paragraphs": [
+      "Do not impersonate another person or business, falsify licenses or lab reports, infringe others' rights, harass users, send spam, upload malicious files, bypass access restrictions, scrape nonpublic information without permission, or interfere with the service. Do not enter patient or consumer health information. Report suspected misuse or rights violations to support@phenoshop.app with enough detail for us to investigate."
+    ]
+  },
+  {
+    "id": "service-changes-and-account-closure",
+    "title": "Service changes and account closure",
+    "paragraphs": [
+      "We may maintain, change, or discontinue features, and restrict content or accounts to protect users, comply with law, address misuse, or enforce these Terms. Where practical, we will explain a restriction and provide a way to contact support; urgent security or legal issues may require immediate action. Contact support to request account closure or review of a restriction. Closing an account does not cancel obligations to another business or erase records we must retain. Cancel an active subscription through billing or ask support to help before the next renewal."
+    ]
+  },
+  {
+    "id": "disclaimers-and-responsibility",
+    "title": "Disclaimers and responsibility",
+    "paragraphs": [
+      "To the extent permitted by law, the service is provided \"as is\" and \"as available,\" without warranties of uninterrupted availability, fitness for a particular purpose, or accuracy of user content. We do not provide legal, tax, laboratory, or regulatory advice. Keep appropriate independent business records and verify information before relying on it.",
+      "To the extent permitted by law, neither party is liable to the other under these Terms for indirect, special, incidental, or consequential loss, including lost profits. PhenoShop's total liability arising from the service is limited to the greater of $100 or the software subscription fees you paid us in the 12 months before the event giving rise to the claim. These limitations do not exclude liability that cannot lawfully be excluded, fraud, willful misconduct, or gross negligence, and do not limit obligations between buyers and growers under their own agreements."
+    ]
+  },
+  {
+    "id": "changes-and-contact",
+    "title": "Changes and contact",
+    "paragraphs": [
+      "We will identify the effective date of updates and provide notice through the service or your account email before material changes take effect, except where a faster change is needed for legal or security reasons. Changes apply prospectively. If you do not agree, stop using the service and contact support about closure and any active subscription. Questions and notices may be sent to support@phenoshop.app or the operator's business address above."
+    ]
+  }
 ];
 
 export default function TermsPage() {
   return (
     <LegalDocument
       title="Terms of Service"
-      description="Draft operating terms for licensed marketplace accounts, verification-gated ordering, quote workflows, direct wholesale settlement, and cultivator subscription billing."
+      description="Terms for business accounts, listings, requests, and software subscriptions."
       sections={sections}
     />
   );

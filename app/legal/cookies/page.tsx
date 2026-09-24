@@ -1,56 +1,47 @@
+import type { Metadata } from 'next';
 import { LegalDocument, type LegalSection } from '../LegalDocument';
+
+export const metadata: Metadata = {
+  "title": "Cookie Notice | PhenoShop",
+  "description": "How cookies and browser storage support sign-in, preferences, and work in progress."
+};
 
 const sections: LegalSection[] = [
   {
-    id: 'what-cookies-are',
-    title: 'Cookies and storage',
-    paragraphs: [
-      'Cookies and browser storage help web applications remember session, security, and workflow information. Similar technologies may include local storage, session storage, and framework-managed session tokens.',
-    ],
+    "id": "sign-in-and-security",
+    "title": "Sign-in and security",
+    "paragraphs": [
+      "PhenoShop uses cookies to keep you signed in and protect authentication requests. Authentication sessions are configured to last up to 30 days and can be renewed during use or revoked earlier for security. Other authentication cookies support request protection and sign-in return navigation. Blocking these cookies may prevent sign-in."
+    ]
   },
   {
-    id: 'essential-use',
-    title: 'Essential use',
-    paragraphs: [
-      'PhenoFarm uses essential cookies and storage for authentication, account routing, session security, marketplace workflow continuity, and request-draft usability.',
-    ],
-    bullets: [
-      'Sign-in and session cookies used by authentication workflows.',
-      'Security and framework cookies needed to keep the app operating correctly.',
-      'Browser storage for request draft details, workflow defaults, and similar MVP usability features.',
-      'Support or operational data needed to diagnose account, verification, or request issues.',
-    ],
+    "id": "preferences-and-work-in-progress",
+    "title": "Preferences and work in progress",
+    "paragraphs": [
+      "Local storage remembers information such as request drafts, pending-submission recovery details, saved searches, cached favorites, recent activity, table density, view preferences, and form defaults or drafts. Session storage supports temporary navigation and refresh state. These records can include business information. Local storage may persist after sign-out, so clear PhenoShop site data when you finish on a shared device. Clearing it can remove unsent drafts or recovery information; save or resolve important work first. Server-side business records are not deleted by clearing browser storage."
+    ]
   },
   {
-    id: 'billing-and-third-parties',
-    title: 'Billing and third-party services',
-    paragraphs: [
-      'Cultivator subscription checkout and subscription management are handled through Stripe Billing. Stripe may use its own cookies or browser storage when a grower opens checkout or the billing portal.',
-      'PhenoFarm does not use cookies to process wholesale buyer-seller payments because wholesale settlement is handled directly outside the app.',
-    ],
+    "id": "external-services",
+    "title": "External services",
+    "paragraphs": [
+      "Stripe may use its own cookies when you visit available subscription checkout or billing pages. Those pages are covered by Stripe's notices. Hosting and security services may use cookies needed to deliver or protect the site. The app does not currently embed advertising trackers or cross-site advertising cookies. If we introduce optional tracking, we will update this notice and provide consent or choice controls where required before enabling it."
+    ]
   },
   {
-    id: 'analytics-advertising',
-    title: 'Analytics and advertising',
-    paragraphs: [
-      'The MVP copy does not assume advertising cookies or cross-site ad tracking. If PhenoFarm adds analytics, performance monitoring, or marketing tools before launch, this notice should be updated to describe those tools clearly.',
-    ],
-  },
-  {
-    id: 'choices',
-    title: 'Your choices',
-    paragraphs: [
-      'Most browsers let you block or delete cookies and storage. Blocking essential cookies may prevent sign-in, role routing, request drafts, or subscription management from working correctly.',
-      'Questions about cookies or browser storage should be sent to support@phenoshop.app.',
-    ],
-  },
+    "id": "your-controls",
+    "title": "Your controls",
+    "paragraphs": [
+      "Use your browser's settings to inspect, delete, or block cookies and site storage for phenoshop.app. Some features will stop working if essential storage is blocked. Contact support@phenoshop.app with questions, and read the Privacy Policy for how we handle information beyond browser storage."
+    ]
+  }
 ];
 
 export default function CookiesPage() {
   return (
     <LegalDocument
       title="Cookie Notice"
-      description="How PhenoFarm uses essential cookies and browser storage for authentication, session security, request workflows, and cultivator subscription support."
+      description="How cookies and browser storage support sign-in, preferences, and work in progress."
       sections={sections}
     />
   );

@@ -13,8 +13,13 @@ interface LegalDocumentProps {
   sections: LegalSection[];
 }
 
-const LAST_UPDATED = 'July 6, 2026';
+const EFFECTIVE_DATE = 'September 24, 2026';
 const SUPPORT_EMAIL = 'support@phenoshop.app';
+const POLICIES = [
+  { href: '/legal/terms', title: 'Terms of Service' },
+  { href: '/legal/privacy', title: 'Privacy Policy' },
+  { href: '/legal/cookies', title: 'Cookie Notice' },
+];
 
 export function LegalDocument({ title, description, sections }: LegalDocumentProps) {
   return (
@@ -39,16 +44,16 @@ export function LegalDocument({ title, description, sections }: LegalDocumentPro
 
         <header className="rounded-3xl border border-white/[0.06] bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] sm:p-8">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-400">Legal</p>
-          <h1 className="mt-4 text-4xl font-semibold tracking-tight text-white sm:text-5xl">{title}</h1>
-          <p className="mt-4 text-sm font-medium text-gray-300">Last updated: {LAST_UPDATED}</p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">{title}</h1>
+          <p className="mt-4 text-sm font-medium text-gray-300">Effective: {EFFECTIVE_DATE}</p>
           <p className="mt-6 max-w-3xl text-base leading-7 text-gray-400">{description}</p>
-          <div className="mt-6 rounded-2xl border border-amber-300/20 bg-amber-300/[0.08] p-4 text-sm leading-6 text-amber-100">
-            <p className="font-semibold">Pre-launch draft pending counsel review.</p>
-            <p className="mt-1 text-amber-100/80">
-              This MVP copy is intended to describe current product behavior and is not a substitute for legal advice or final production terms.
-              No wholesale payment data is processed by PhenoFarm; buyer-seller settlement is handled directly outside the app.
-            </p>
-          </div>
+          <nav aria-label="Legal policies" className="mt-5 flex flex-wrap gap-x-5 gap-y-1">
+            {POLICIES.map((policy) => (
+              <Link key={policy.href} href={policy.href} aria-current={policy.title === title ? 'page' : undefined} className="inline-flex min-h-11 items-center rounded text-sm text-emerald-300 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 aria-[current=page]:font-semibold aria-[current=page]:text-white">
+                {policy.title}
+              </Link>
+            ))}
+          </nav>
         </header>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[16rem_1fr]">
@@ -70,8 +75,8 @@ export function LegalDocument({ title, description, sections }: LegalDocumentPro
           <article className="space-y-5">
             {sections.map((section) => (
               <section key={section.id} id={section.id} className="scroll-mt-8 rounded-2xl border border-white/[0.06] bg-white/[0.035] p-5 sm:p-6">
-                <h2 className="text-2xl font-semibold tracking-tight text-white">{section.title}</h2>
-                <div className="mt-4 space-y-4 text-sm leading-7 text-gray-300">
+                <h2 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{section.title}</h2>
+                <div className="mt-4 space-y-4 break-words text-sm leading-7 text-gray-300">
                   {section.paragraphs?.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
                   ))}
@@ -97,6 +102,11 @@ export function LegalDocument({ title, description, sections }: LegalDocumentPro
                 </a>
                 .
               </p>
+              <address className="mt-2 not-italic text-emerald-100/80">
+                PhenoShop<br />
+                166 Skeet Road<br />
+                Medford, NJ 08055
+              </address>
             </div>
           </article>
         </div>
