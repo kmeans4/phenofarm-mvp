@@ -2,11 +2,11 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import {
+  canEditOrderItems,
   canTransitionOrderStatus,
   getOrderStatusLabel,
   getInvalidOrderStatusTransitionMessage,
   isOrderStatus,
-  type OrderStatusValue,
 } from '@/lib/order-workflow';
 import { claimOrder, restoreInventory, OrderConflictError } from '@/lib/order-mutations';
 import { PATCH as changeStatus } from './status/route';
@@ -44,8 +44,6 @@ class InventoryConflictError extends Error {
     this.issues = issues;
   }
 }
-
-const ITEM_EDITABLE_STATUSES = new Set<OrderStatusValue>(['PENDING', 'CONFIRMED', 'PROCESSING']);
 
 function parseMoney(value: unknown, field: string) {
   const amount = Number(value);
@@ -257,7 +255,7 @@ export async function PUT(
       requestedShippingFee !== Number(existingOrder.shippingFee) ||
       requestedTax !== Number(existingOrder.tax);
 
-    if ((hasLineChanges || hasPricingChanges) && !ITEM_EDITABLE_STATUSES.has(existingOrder.status as OrderStatusValue)) {
+    if ((hasLineChanges || hasPricingChanges) && !canEditOrderItems(existingOrder.status)) {
       throw new OrderEditError(
         'Items, shipping, and tax can only be edited before a request is ready, delivered, or cancelled.',
         409
