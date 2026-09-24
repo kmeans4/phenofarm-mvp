@@ -1,12 +1,14 @@
 'use client';
 
 import type { BuyerCatalogPage } from '@/lib/buyer-catalog';
+import { normalizeLabReports, type LabReportKey } from '@/lib/lab-reports';
+import { LabReportDownloads } from '@/app/dispensary/components/LabReportDownloads';
 import { getThcBadgeColor, getCbdBadgeColor, getStrainTypeColor } from '@/lib/product-badges';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import Link from "next/link";
 import { createPortal } from 'react-dom';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, FileText, Loader2, Clock, TrendingUp, Search, MapPin, Scale, BarChart3, Leaf, Dna, MessageSquare, ZoomIn, BadgeCheck } from "lucide-react";
+import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, Loader2, Clock, TrendingUp, Search, MapPin, Scale, BarChart3, Leaf, Dna, MessageSquare, ZoomIn, BadgeCheck } from "lucide-react";
 import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from "lucide-react";
 import AddToCartButton from "./components/AddToCartButton";
 import { useBuyerCollection } from '../hooks/useBuyerCollection';
@@ -51,6 +53,7 @@ interface Product {
   thc: number | null;
   cbd: number | null;
   images: string[];
+  labReports: LabReportKey[];
   inventoryQty: number;
   createdAt?: string;
   grower: {
@@ -230,6 +233,7 @@ function normalizeCatalogProduct(raw: unknown): Product | null {
     thc: toSafeOptionalNumber(record.thc),
     cbd: toSafeOptionalNumber(record.cbd),
     images: toSafeStringArray(record.images),
+    labReports: normalizeLabReports(record.labReports),
     inventoryQty,
     createdAt: toSafeOptionalString(record.createdAt) || undefined,
     grower: {
@@ -1962,7 +1966,7 @@ function CompareModal({
               </div>
               <h3 className="break-words text-sm font-semibold sm:text-base">{product.name}</h3>
               <Link href={`/dispensary/grower/${product.grower.id}`} className="mt-1 inline-block text-xs text-pf-accent hover:underline">{product.grower.businessName}</Link>
-
+              <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mt-2" />
             </div>)}
           </div>
           <div className="mt-4 divide-y divide-pf-line border-t border-pf-line">
@@ -2241,13 +2245,7 @@ function ProductCard({
           </div>
         </div>
 
-        {/* Lab results trust note */}
-        <div className="col-span-2 mt-1 pt-2">
-          <p className="w-full flex items-center justify-center gap-2 text-xs font-medium text-pf-muted py-1">
-            <FileText size={14} />
-            Labs on request
-          </p>
-        </div>
+        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="col-span-2 mt-2" />
       </div>
     </div>
   );
@@ -2294,6 +2292,7 @@ function ProductListItem({
           {product.thc != null && <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getThcBadgeColor(product.thc, 'compact')}`}>THC {product.thc}%</span>}
           <span className="text-xs text-pf-muted">{product.inventoryQty} available</span>
         </div>
+        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mt-2" />
       </div>
       <div className="col-span-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-pf-line pt-3 lg:w-56 lg:shrink-0 lg:border-0 lg:pt-0">
         {product.isPriceVisible ? <>
