@@ -178,10 +178,15 @@ export async function POST(request: NextRequest) {
         .sort((a, b) => a.growerId.localeCompare(b.growerId) || a.id.localeCompare(b.id)),
       notes: notes || '',
     })).digest('hex');
-    const submission = await db.orderRequestSubmission.upsert({
+    // An empty-update Prisma upsert can race as a read followed by an insert.
+    // INSERT ON CONFLICT DO NOTHING lets simultaneous first attempts share the
+    // winning receipt without changing the payload originally bound to its key.
+    await db.orderRequestSubmission.createMany({
+      data: [{ dispensaryId, key: submissionKey, payloadHash }],
+      skipDuplicates: true,
+    });
+    const submission = await db.orderRequestSubmission.findUniqueOrThrow({
       where: { dispensaryId_key: { dispensaryId, key: submissionKey } },
-      create: { dispensaryId, key: submissionKey, payloadHash },
-      update: {},
     });
     if (submission.payloadHash !== payloadHash) {
       return NextResponse.json({ error: 'This request has already been submitted with different details. Check your requests.', code: 'SUBMISSION_CONFLICT' }, { status: 409 });

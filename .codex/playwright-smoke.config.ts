@@ -1,5 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
+const browserChannel = process.env.PLAYWRIGHT_CHANNEL;
+
 export default defineConfig({
   testDir: '.',
   testMatch: 'smoke.spec.ts',
@@ -12,7 +14,7 @@ export default defineConfig({
   projects: [
     {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { ...devices['Desktop Chrome'], ...(browserChannel ? { channel: browserChannel } : {}) },
     },
   ],
 });

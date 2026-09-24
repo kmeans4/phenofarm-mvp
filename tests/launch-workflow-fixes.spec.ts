@@ -94,10 +94,10 @@ test('request receipts deduplicate concurrent retries and preserve consumed quot
   await login(page, buyer);
   const key = randomUUID(), data = { items: [checkoutItem(item, 2)], notes: 'Net 30\nBuyer notes: Keep this agreement' };
   expect((await page.request.post('/api/checkout', { data })).status()).toBe(400);
-  const responses = await Promise.all(Array.from({ length: 3 }, () => page.request.post('/api/checkout', { data, headers: { 'Idempotency-Key': key } })));
+  const responses = await Promise.all(Array.from({ length: 8 }, () => page.request.post('/api/checkout', { data, headers: { 'Idempotency-Key': key } })));
   for (const response of responses) expect(response.status(), await response.text()).toBe(200);
   const bodies = await Promise.all(responses.map(response => response.json()));
-  expect(bodies[1]).toEqual(bodies[0]); expect(bodies[2]).toEqual(bodies[0]);
+  for (const body of bodies) expect(body).toEqual(bodies[0]);
   expect(await db.order.count({ where: { dispensaryId: buyer.dispensary!.id } })).toBe(1);
   expect((await db.product.findUniqueOrThrow({ where: { id: item.id } })).inventoryQty).toBe(0);
   expect((await db.acceptedQuote.findUniqueOrThrow({ where: { id: accepted.id } })).consumedByOrderId).toBe(bodies[0].orders[0].id);
@@ -241,7 +241,7 @@ for (const width of [1440, 390]) test(`CSV preserves settlement details without 
       const file = await download; const stream = await file.createReadStream(); const chunks = [];
       for await (const chunk of stream!) chunks.push(chunk);
       const { parse } = await import('csv-parse/sync');
-      const rows = parse(Buffer.concat(chunks).toString(), { columns: true });
+      const rows = parse<Record<string, string>>(Buffer.concat(chunks).toString(), { columns: true });
       expect(rows).toHaveLength(1); expect(rows[0]['Status']).toBe('Submitted');
       expect(rows[0]['Fulfillment method']).toBe('Pickup'); expect(rows[0]['Requested window']).toBe('Friday 10:00');
       expect(rows[0]['Payment terms']).toBe('Net 30'); expect(rows[0]['Notes']).toBe(note);
@@ -252,7 +252,7 @@ for (const width of [1440, 390]) test(`CSV preserves settlement details without 
     await buyerPage.reload(); const download = buyerPage.waitForEvent('download');
     await buyerPage.getByRole('button', { name: 'Export CSV', exact: true }).click();
     const stream = await (await download).createReadStream(); const chunks = []; for await (const chunk of stream!) chunks.push(chunk);
-    const { parse } = await import('csv-parse/sync'); const rows = parse(Buffer.concat(chunks).toString(), { columns: true });
+    const { parse } = await import('csv-parse/sync'); const rows = parse<Record<string, string>>(Buffer.concat(chunks).toString(), { columns: true });
     expect(rows[0]['Notes'].startsWith("'=HYPERLINK")).toBe(true);
   } finally { await context.close(); }
 });

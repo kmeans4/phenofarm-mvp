@@ -1037,7 +1037,9 @@ test('subscription settings and commercial terms stay scoped to software billing
       await expect(paidSubscription.json()).resolves.toMatchObject({
         plan: 'pro',
         status: 'active',
-        portalAvailable: true,
+        // A stored subscription must not expose a broken portal when billing
+        // is intentionally disabled in the app's test/release configuration.
+        portalAvailable: Boolean((process.env.STRIPE_SECRET_KEY || process.env.STRIPE_TEST_SECRET_KEY) && process.env.NEXTAUTH_URL),
       });
 
       const terms = {
