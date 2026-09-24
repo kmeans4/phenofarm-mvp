@@ -41,7 +41,7 @@ const sections: LegalSection[] = [
     title: 'Your choices',
     paragraphs: [
       'Most browsers let you block or delete cookies and storage. Blocking essential cookies may prevent sign-in, role routing, request drafts, or subscription management from working correctly.',
-      'Questions about cookies or browser storage should be sent to support@phenofarm.com.',
+      'Questions about cookies or browser storage should be sent to support@phenoshop.app.',
     ],
   },
 ];

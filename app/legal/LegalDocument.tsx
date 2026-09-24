@@ -14,7 +14,7 @@ interface LegalDocumentProps {
 }
 
 const LAST_UPDATED = 'July 6, 2026';
-const SUPPORT_EMAIL = 'support@phenofarm.com';
+const SUPPORT_EMAIL = 'support@phenoshop.app';
 
 export function LegalDocument({ title, description, sections }: LegalDocumentProps) {
   return (

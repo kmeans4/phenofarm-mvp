@@ -83,8 +83,8 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
 
         <p className="relative text-sm text-pf-muted">
           Need help?{' '}
-          <a href="mailto:support@phenofarm.com" className="text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-            support@phenofarm.com
+          <a href="mailto:support@phenoshop.app" className="text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
+            support@phenoshop.app
           </a>
         </p>
       </section>
@@ -119,7 +119,7 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
                 <ArrowLeft className="h-4 w-4" />
                 Back to sign in
               </Link>
-              <a href="mailto:support@phenofarm.com" className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-pf-line-strong px-4 py-3 text-sm font-semibold text-pf-secondary transition-colors hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
+              <a href="mailto:support@phenoshop.app" className="inline-flex min-h-11 w-full items-center justify-center rounded-xl border border-pf-line-strong px-4 py-3 text-sm font-semibold text-pf-secondary transition-colors hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
                 Contact support
               </a>
             </div>

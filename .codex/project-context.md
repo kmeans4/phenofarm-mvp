@@ -14,11 +14,13 @@
 - Team ID: `team_APmavOTWRi3vWAznGnDEny9T`
 - Project name: `phenofarm-mvp`
 - Project ID: `prj_9pLewagwNf3uOA2sle3r0O3RlQkv`
-- Verified production code release (September 23, 2026): `phenofarm-8wxiiqpg6-kevin-means-projects.vercel.app`; inspect the canonical alias for the latest deployment.
+- Verified production release (September 23, 2026): `phenofarm-a9qhfv3c5-kevin-means-projects.vercel.app`, `dpl_ASmk4MfpC5huYTZNFrFyBDoGDW8D`; inspect the canonical alias for the latest deployment.
 - Production domains:
-  - `phenofarm-mvp.vercel.app`
+  - `phenoshop.app` (canonical)
+  - `www.phenoshop.app` (308 redirect to the canonical domain)
+  - `phenofarm-mvp.vercel.app` (308 redirect to the canonical domain)
   - `phenofarm-mvp-kevin-means-projects.vercel.app`
-  - `phenofarm-mvp-kevin-means-4766-kevin-means-projects.vercel.app`
+  - `phenofarm-mvp-git-main-kevin-means-projects.vercel.app`
 
 ### Neon / Postgres
 - Local env source: `.env.local`
@@ -38,10 +40,13 @@
 
 ### Account email
 - Provider: Resend, connected through Vercel Marketplace.
-- Verified sending domain: `phenoshop.app` (email DNS at Porkbun; this does not move website hosting).
+- Verified sending domain: `phenoshop.app` (DNS remains at Porkbun; Vercel hosts the website).
 - Production sender: `PhenoFarm <accounts@phenoshop.app>`.
 - Production configuration: `AUTH_MAIL_PROVIDER=resend`, `AUTH_MAIL_FROM`, `RESEND_API_KEY`, and `AUTH_REQUIRE_EMAIL_VERIFICATION=true`.
 - Signup, verification, and reset were exercised live on September 23, 2026; the user confirmed the sender test reached their Yahoo inbox. Existing unverified users must follow their verification email before signing in.
+- The custom-domain signup, verification, reset, session-revocation, and signed-in page checks passed after cutover. The synthetic account was removed and existing business records matched the baseline.
+- Porkbun hosts the active `support@phenoshop.app` mailbox ($36/year, approved annual renewal, initial term through September 24, 2027). Incoming test delivery was confirmed in webmail, and Porkbun DKIM/DMARC/SPF records are published alongside the preserved Resend records. The sender name is `PhenoFarm Support`.
+- Production `AUTH_MAIL_REPLY_TO=support@phenoshop.app` is configured for the next deployment. PR #6 publishes the new public support links. See `docs/PHENOSHOP_DOMAIN_ROLLOUT.md` and the PR's release verification for deployment and delivery evidence.
 
 ## Working commands
 - Install: `npm install`
@@ -58,7 +63,7 @@
 ## Repo notes
 - Use `kmeans-app-workflow` when coordinating multiple projects or resolving shared workflow boundaries.
 - Read `.codex/provider-runbook.md` before provider, env-var, auth, billing, database, or deployment work.
-- Production auth is configured around `NEXTAUTH_URL`; the current production env points to `https://phenofarm-mvp.vercel.app`.
+- Production auth is configured around `NEXTAUTH_URL`; the current production env points to `https://phenoshop.app`.
 - This repo mixes local-only and production env files. Confirm the target before changing database or auth behavior.
 - Stripe secrets exist outside version control and must stay external.
 - Payment model note: `.codex/payment-model.md`. PhenoFarm processes cultivator subscriptions only; wholesale settlement stays direct between businesses.

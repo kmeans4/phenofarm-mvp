@@ -82,11 +82,8 @@ AUTH_SECRET="aBcDeFgHiJkLmNoPqRsTuVwXyZ1234567890AbCdEfGh="
 # Local development
 NEXTAUTH_URL="http://localhost:3000"
 
-# Production (Vercel)
-NEXTAUTH_URL="https://phenofarm-mvp.vercel.app"
-
-# Custom domain
-NEXTAUTH_URL="https://app.phenofarm.com"
+# Production custom domain (hosted on Vercel)
+NEXTAUTH_URL="https://phenoshop.app"
 ```
 
 **Important Notes:**
@@ -105,7 +102,7 @@ NEXTAUTH_URL="https://app.phenofarm.com"
 **Examples:**
 ```bash
 NEXT_PUBLIC_API_URL="http://localhost:3000"
-NEXT_PUBLIC_API_URL="https://phenofarm-mvp.vercel.app"
+NEXT_PUBLIC_API_URL="https://phenoshop.app"
 ```
 
 **Important Notes:**
@@ -249,7 +246,7 @@ NEXT_PUBLIC_API_URL="https://phenofarm-mvp-git-staging-kevinmeans.vercel.app"
 # Database (Neon main branch)
 DATABASE_URL="postgresql://neondb_owner:...@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require"
 
-NEXTAUTH_URL="https://phenofarm-mvp.vercel.app"  # Auto-set
+NEXTAUTH_URL="https://phenoshop.app"  # Explicit production auth origin
 AUTH_SECRET="very-secure-random-secret"
 
 # Stripe (LIVE mode for PhenoFarm software subscriptions)
@@ -259,7 +256,7 @@ STRIPE_WEBHOOK_SECRET="whsec_..."
 STRIPE_PRO_PRICE_ID="price_..."
 STRIPE_BUSINESS_PRICE_ID="price_..."
 
-NEXT_PUBLIC_API_URL="https://phenofarm-mvp.vercel.app"
+NEXT_PUBLIC_API_URL="https://phenoshop.app"  # Optional; current production uses relative API paths
 ```
 
 ---

@@ -56,7 +56,7 @@ const sections: LegalSection[] = [
     id: 'choices-contact',
     title: 'Choices and contact',
     paragraphs: [
-      'Users can update many account, business, and license details in their workspace settings. For privacy questions, correction requests, or account support, contact support@phenofarm.com.',
+      'Users can update many account, business, and license details in their workspace settings. For privacy questions, correction requests, or account support, contact support@phenoshop.app.',
     ],
   },
 ];

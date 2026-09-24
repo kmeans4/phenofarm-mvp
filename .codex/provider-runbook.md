@@ -2,9 +2,11 @@
 
 ## Providers
 - Vercel hosts the production app.
+- Canonical website/auth origin: `https://phenoshop.app`. The `www` name and former `phenofarm-mvp.vercel.app` canonical hostname redirect there with status 308.
 - Neon/Postgres stores marketplace data.
 - NextAuth owns app authentication.
 - Resend delivers account verification and password-reset emails from `accounts@phenoshop.app` through a Vercel Marketplace integration.
+- Porkbun hosts the human support mailbox `support@phenoshop.app`. Keep its root MX/SPF and `default._domainkey` separate from Resend's `send` MX/SPF and `resend._domainkey`; both senders use the same domain.
 - Stripe is intended for cultivator software subscriptions; wholesale orders and settlement remain direct between businesses. Follow `.codex/payment-model.md` before billing changes.
 
 ## Expected Env Vars
@@ -17,6 +19,7 @@
 - `NEXT_PUBLIC_API_URL`
 - `AUTH_MAIL_PROVIDER` (`resend` in production)
 - `AUTH_MAIL_FROM` (`PhenoFarm <accounts@phenoshop.app>` in production)
+- `AUTH_MAIL_REPLY_TO` (`support@phenoshop.app`; the Porkbun mailbox has been created and incoming delivery verified)
 - `RESEND_API_KEY` (provided by the Marketplace integration; never print its value)
 - `AUTH_REQUIRE_EMAIL_VERIFICATION` (`true` in production)
 

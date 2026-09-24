@@ -54,7 +54,7 @@ const sections: LegalSection[] = [
     id: 'support-changes',
     title: 'Support and changes',
     paragraphs: [
-      'During the MVP, support requests should be sent to support@phenofarm.com. PhenoFarm may update these draft terms as workflows, compliance requirements, and counsel-reviewed production terms evolve.',
+      'During the MVP, support requests should be sent to support@phenoshop.app. PhenoFarm may update these draft terms as workflows, compliance requirements, and counsel-reviewed production terms evolve.',
     ],
   },
 ];

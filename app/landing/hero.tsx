@@ -76,7 +76,7 @@ function LiveWorkspace() {
           <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
         </div>
         <div className="mx-auto flex h-7 w-full max-w-sm items-center justify-center rounded-md bg-white/[0.04] text-[11px] tracking-wide text-gray-500">
-          phenofarm.app/grower/orders
+          phenoshop.app/grower/orders
         </div>
         <span className="hidden items-center gap-1.5 text-[10px] uppercase tracking-wider text-emerald-400/80 sm:flex">
           <span className="relative flex h-2 w-2">
