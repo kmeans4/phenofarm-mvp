@@ -107,6 +107,8 @@ for (const width of [1440, 390, 320]) test(`downloads appear only with files acr
   for (const [name, url] of [['catalog', `/dispensary/catalog?search=${prefix}`], ['shop', `/dispensary/grower/${grower.grower!.id}`], ['saved', '/dispensary/saved?tab=favorites']]) {
     await page.goto(url);
     await page.getByRole('button', { name: /grid view/i }).click();
+    if (name === 'catalog') await expect(page.getByRole('button', { name: /grid view/i })).toHaveClass(/bg-emerald-500/);
+    else await expect(page.getByRole('button', { name: /grid view/i })).toHaveAttribute('aria-pressed', 'true');
     const buttons = page.getByRole('group', { name: `Lab reports for ${prefix} Reports`, exact: true });
     await expect(buttons).toBeVisible();
     await expect(buttons.getByRole('button')).toHaveCount(3);
@@ -115,16 +117,18 @@ for (const width of [1440, 390, 320]) test(`downloads appear only with files acr
     for (const button of await buttons.getByRole('button').all()) {
       const box = await button.boundingBox(); expect(box!.height).toBeGreaterThanOrEqual(40); expect(box!.x + box!.width).toBeLessThanOrEqual(width);
     }
-    if (screenshots) await page.screenshot({ path: `${screenshots}/${name}-grid-${width}.png`, fullPage: true });
+    if (screenshots) await page.screenshot({ path: `${screenshots}/${name}-grid-${width}.png`, fullPage: true, animations: 'disabled' });
     const downloadPromise = page.waitForEvent('download');
     await buttons.getByRole('button', { name: /^Download Potency/ }).click();
     const download = await downloadPromise;
     expect(download.suggestedFilename()).toContain('Potency.pdf');
     expect(readFileSync((await download.path())!)).toEqual(pdf('cannabinoids'));
     await page.getByRole('button', { name: /list view/i }).click();
+    if (name === 'catalog') await expect(page.getByRole('button', { name: /list view/i })).toHaveClass(/bg-emerald-500/);
+    else await expect(page.getByRole('button', { name: /list view/i })).toHaveAttribute('aria-pressed', 'true');
     await expect(buttons).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    if (screenshots) await page.screenshot({ path: `${screenshots}/${name}-list-${width}.png`, fullPage: true });
+    if (screenshots) await page.screenshot({ path: `${screenshots}/${name}-list-${width}.png`, fullPage: true, animations: 'disabled' });
   }
   await page.goto(`/dispensary/catalog?search=${prefix}`);
   await page.getByRole('button', { name: `Compare ${prefix} Reports`, exact: true }).click();

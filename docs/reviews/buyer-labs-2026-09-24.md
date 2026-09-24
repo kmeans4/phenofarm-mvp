@@ -23,4 +23,13 @@ Existing Blob objects use public storage links. The authenticated download route
 
 The complete proposed Terms, Privacy Policy, Cookie Notice, and manual retention/deletion procedure are in `docs/legal/launch-policies-2026-09-24.md`. They are held for the legal operator identity and launch geography; this change does not replace the current public legal pages with unconfirmed details.
 
-Production deployment and live-storage validation will be recorded separately after release. Local verification alone is not evidence of the production Blob configuration.
+## Production release and live proof
+
+- [PR #8](https://github.com/kmeans4/phenofarm-mvp/pull/8) merged as `ceb863260bb7a984cf3ba4b4f9199939b54b3b6f`. PR and main verification jobs passed.
+- Vercel production deployment `dpl_3CswejpcArGuviR2GKj6ZNLGf7hG` reached Ready. The canonical `https://phenoshop.app` alias resolved to `phenofarm-ftifni2gg-kevin-means-projects.vercel.app`; GitHub's deployment status linked that deployment to the merge commit.
+- Two disposable test accounts completed public signup, Resend test-recipient verification, and normal password login. Synthetic grower eligibility was provisioned as a fixture; this was not a new test of admin license approval. Synthetic products had zero stock and were unavailable, keeping them out of normal catalog browsing.
+- The grower uploaded three distinct, valid PDFs to production Blob storage through the real upload API and saved the batch references. The buyer's authorized product response contained the three report keys; each downloaded file matched its uploaded bytes and was returned as a noncached PDF attachment.
+- Live checks also passed for absent reports, anonymous and grower-role rejection, draft-product rejection, and report removal. No real user account, order, or product was modified.
+- Removed the two test accounts, two products, one batch, one strain, and all three uploaded Blob objects. Hashes and row counts for all 19 pre-existing business tables matched the baseline (51 records). Auth rate counters and expiring action-token tables are excluded from that comparison because normal sign-in activity changes them.
+
+The final follow-up changes only this evidence document and the regression test's wait for the grid/list selection before screenshots; application code is unchanged from the live-verified release.
