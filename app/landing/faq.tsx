@@ -12,7 +12,7 @@ const FAQS = [
   },
   {
     q: 'What happens if I withdraw a request?',
-    a: 'A buyer can withdraw a request before the grower accepts it. The reserved products return to the grower\'s available stock, and the request stays in order history.',
+    a: "A buyer can withdraw a request before the grower accepts it. The reserved products return to the grower's available stock, and the request stays in order history.",
   },
   {
     q: 'Can I reorder something I bought before?',
@@ -34,18 +34,33 @@ const FAQS = [
 
 export function Faq() {
   return (
-    <section id="faq" className="relative scroll-mt-20 border-t border-white/[0.06] py-28 md:py-36">
+    <section
+      id="faq"
+      className="relative scroll-mt-20 border-t border-white/[0.06] py-28 md:py-36"
+    >
       <div className="mx-auto max-w-3xl px-6">
-        <SectionHeading eyebrow="Common questions" title="Good to know before you start" />
+        <SectionHeading
+          eyebrow="Common questions"
+          title="Good to know before you start"
+        />
 
         <div className="mt-14 divide-y divide-white/[0.06] rounded-2xl border border-white/[0.06] bg-white/[0.015]">
           {FAQS.map((faq, i) => (
-            <details key={faq.q} name="landing-faq" open={i === 0} className="group">
+            <details
+              key={faq.q}
+              name="landing-faq"
+              open={i === 0}
+              className="group"
+            >
               <summary className="flex w-full cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-left [&::-webkit-details-marker]:hidden">
-                <span className="text-[15px] font-medium text-gray-300 group-open:text-white">{faq.q}</span>
-                <Plus className="h-4 w-4 shrink-0 text-gray-500 transition-transform group-open:rotate-45 group-open:text-emerald-400 motion-reduce:transition-none" />
+                <span className="text-[15px] font-medium text-gray-300 group-open:text-white">
+                  {faq.q}
+                </span>
+                <Plus className="h-4 w-4 shrink-0 text-gray-400 transition-transform group-open:rotate-45 group-open:text-emerald-400 motion-reduce:transition-none" />
               </summary>
-              <p className="px-6 pb-6 text-sm leading-relaxed text-gray-400">{faq.a}</p>
+              <p className="px-6 pb-6 text-sm leading-relaxed text-gray-400">
+                {faq.a}
+              </p>
             </details>
           ))}
         </div>

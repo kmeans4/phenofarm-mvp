@@ -29,7 +29,7 @@ export interface CommercialTermsDefaults {
 export const DEFAULT_COMMERCIAL_TERMS: CommercialTermsDefaults = {
   minimumOrder: 'No minimum set',
   fulfillmentMethods: 'Pickup or coordinated delivery',
-  fulfillmentRegion: 'Vermont buyers',
+  fulfillmentRegion: 'Ask grower',
   paymentTerms: 'Handled directly',
   responseWindow: 'Ask about response time',
   contactNote: 'Message through PhenoShop to confirm pickup or delivery.',
@@ -37,7 +37,7 @@ export const DEFAULT_COMMERCIAL_TERMS: CommercialTermsDefaults = {
 
 export const DEFAULT_PRODUCT_DEFAULTS: ProductDefaults = {
   productType: 'Flower',
-  unit: 'Gram',
+  unit: 'Lb',
   price: '',
   isPriceVisible: true,
 };
@@ -70,17 +70,47 @@ export const REQUEST_NOTE_TEMPLATES = [
 
 export const MESSAGE_TEMPLATE_GROUPS = {
   DISPENSARY: [
-    { label: 'Quote follow-up', body: 'Can you confirm the price, minimum order, and available quantity for this product?' },
-    { label: 'Availability', body: 'Is this product still available in the requested quantity?' },
-    { label: 'Delivery timing', body: 'Can you confirm pickup or delivery timing for this request?' },
-    { label: 'Request update', body: 'Can you share the latest status and any next step needed from us?' },
-    { label: 'Order terms', body: 'How should we arrange payment? Please also confirm any pickup or delivery requirements.' },
+    {
+      label: 'Quote follow-up',
+      body: 'Can you confirm the price, minimum order, and available quantity for this product?',
+    },
+    {
+      label: 'Availability',
+      body: 'Is this product still available in the requested quantity?',
+    },
+    {
+      label: 'Delivery timing',
+      body: 'Can you confirm pickup or delivery timing for this request?',
+    },
+    {
+      label: 'Request update',
+      body: 'Can you share the latest status and any next step needed from us?',
+    },
+    {
+      label: 'Order terms',
+      body: 'How should we arrange payment? Please also confirm any pickup or delivery requirements.',
+    },
   ],
   GROWER: [
-    { label: 'Quote follow-up', body: 'I can confirm quote terms and availability. What quantity and timing are you targeting?' },
-    { label: 'Availability', body: 'This item is available. I can confirm final quantity and pickup or delivery timing shortly.' },
-    { label: 'Delivery timing', body: 'I can coordinate pickup or delivery timing once the request is accepted.' },
-    { label: 'Request update', body: 'I am reviewing the request now and will update the order status shortly.' },
-    { label: 'Order terms', body: 'Wholesale payment will be handled directly outside PhenoShop after terms are confirmed.' },
+    {
+      label: 'Quote follow-up',
+      body: 'I can confirm quote terms and availability. What quantity and timing are you targeting?',
+    },
+    {
+      label: 'Availability',
+      body: 'This item is available. I can confirm final quantity and pickup or delivery timing shortly.',
+    },
+    {
+      label: 'Delivery timing',
+      body: 'I can coordinate pickup or delivery timing once the request is accepted.',
+    },
+    {
+      label: 'Request update',
+      body: 'I am reviewing the request now and will update the order status shortly.',
+    },
+    {
+      label: 'Order terms',
+      body: 'Wholesale payment will be handled directly outside PhenoShop after terms are confirmed.',
+    },
   ],
 } as const;

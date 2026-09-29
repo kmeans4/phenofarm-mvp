@@ -1,22 +1,55 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
-import { animate, LazyMotion, m, useInView, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { animate, LazyMotion, m, useInView } from 'framer-motion';
 
-const loadFeatures = () => import('./motion-features').then((module) => module.default);
+const loadFeatures = () =>
+  import('./motion-features').then((module) => module.default);
+const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
+function subscribeReducedMotion(onChange: () => void) {
+  const query = window.matchMedia(reducedMotionQuery);
+  query.addEventListener('change', onChange);
+  return () => query.removeEventListener('change', onChange);
+}
+const readReducedMotion = () => window.matchMedia(reducedMotionQuery).matches;
+const serverReducedMotion = () => false;
+
+// Hydration must start with the same animation values as the server. React
+// applies the browser preference immediately after that matching first render.
+function useHydratedReducedMotion() {
+  return useSyncExternalStore(
+    subscribeReducedMotion,
+    readReducedMotion,
+    serverReducedMotion
+  );
+}
 
 // Static section contents are rendered on the server and passed through this
 // small animation boundary; they do not become part of the client bundle.
-export function Reveal({ children, className, delay = 0, as = 'div' }: {
-  children: React.ReactNode; className?: string; delay?: number; as?: 'div' | 'figure';
+export function Reveal({
+  children,
+  className,
+  delay = 0,
+  as = 'div',
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+  as?: 'div' | 'figure';
 }) {
-  const reduced = useReducedMotion();
+  const reduced = useHydratedReducedMotion();
   const Component = as === 'figure' ? m.figure : m.div;
-  return <Component initial={{ opacity: 0, y: reduced ? 0 : 24 }}
-    whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.3 }}
-    transition={{ duration: reduced ? 0 : 0.55, delay: reduced ? 0 : delay }} className={className}>
-    {children}
-  </Component>;
+  return (
+    <Component
+      initial={{ opacity: 0, y: reduced ? 0 : 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: reduced ? 0 : 0.55, delay: reduced ? 0 : delay }}
+      className={className}
+    >
+      {children}
+    </Component>
+  );
 }
 
 export function MarketingMotion({ children }: { children: React.ReactNode }) {
@@ -45,7 +78,7 @@ export function CountUp({
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: '-40px' });
-  const reduced = useReducedMotion();
+  const reduced = useHydratedReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
@@ -86,19 +119,27 @@ export function SectionHeading({
   align?: 'center' | 'left';
 }) {
   const alignCls = align === 'center' ? 'mx-auto text-center' : 'text-left';
+  const reduced = useHydratedReducedMotion();
   return (
     <m.div
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.4 }}
-      transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+      transition={{
+        duration: reduced ? 0 : 0.6,
+        ease: [0.21, 0.47, 0.32, 0.98],
+      }}
       className={`max-w-2xl ${alignCls}`}
     >
-      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">{eyebrow}</p>
+      <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-400">
+        {eyebrow}
+      </p>
       <h2 className="text-balance text-3xl font-semibold tracking-tight text-white md:text-[2.6rem] md:leading-[1.15]">
         {title}
       </h2>
-      {lede && <p className="mt-5 text-pretty leading-relaxed text-gray-400">{lede}</p>}
+      {lede && (
+        <p className="mt-5 text-pretty leading-relaxed text-gray-400">{lede}</p>
+      )}
     </m.div>
   );
 }
@@ -114,13 +155,17 @@ export function StaggeredWords({
   accentFrom?: number;
   className?: string;
 }) {
-  const reduced = useReducedMotion();
+  const reduced = useHydratedReducedMotion();
   const words = text.split(' ');
 
   return (
     <span className={className} aria-label={text} role="text">
       {words.map((word, i) => (
-        <span key={`${word}-${i}`} aria-hidden className="inline-block overflow-hidden pb-1 align-bottom">
+        <span
+          key={`${word}-${i}`}
+          aria-hidden
+          className="inline-block overflow-hidden pb-1 align-bottom"
+        >
           <m.span
             className={`inline-block ${
               accentFrom !== undefined && i >= accentFrom

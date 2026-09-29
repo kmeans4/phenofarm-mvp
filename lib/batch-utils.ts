@@ -1,3 +1,4 @@
+import { formatDate } from '@/lib/format';
 export function getTodayDateInputValue(now = new Date()) {
   const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60_000);
   return localDate.toISOString().split('T')[0];
@@ -7,7 +8,9 @@ export function toDateInputValue(value: string | Date | null | undefined) {
   if (!value) return '';
 
   if (value instanceof Date) {
-    return Number.isNaN(value.getTime()) ? '' : value.toISOString().split('T')[0];
+    return Number.isNaN(value.getTime())
+      ? ''
+      : value.toISOString().split('T')[0];
   }
 
   const raw = String(value);
@@ -15,14 +18,22 @@ export function toDateInputValue(value: string | Date | null | undefined) {
   if (dateOnlyMatch) return dateOnlyMatch[0];
 
   const parsed = new Date(raw);
-  return Number.isNaN(parsed.getTime()) ? '' : parsed.toISOString().split('T')[0];
+  return Number.isNaN(parsed.getTime())
+    ? ''
+    : parsed.toISOString().split('T')[0];
 }
 
-export function isFutureDateInput(value: string, today = getTodayDateInputValue()) {
+export function isFutureDateInput(
+  value: string,
+  today = getTodayDateInputValue()
+) {
   return Boolean(value) && value > today;
 }
 
-export function suggestBatchNumber(existingBatchNumbers: string[], harvestDate: string) {
+export function suggestBatchNumber(
+  existingBatchNumbers: string[],
+  harvestDate: string
+) {
   const datePart = toDateInputValue(harvestDate) || getTodayDateInputValue();
   const compactDate = datePart.replaceAll('-', '');
   const prefix = `BATCH-${compactDate}-`;
@@ -49,18 +60,16 @@ export function parseOptionalBatchMetric(value: unknown) {
 }
 
 export function formatBatchMetric(value: unknown): string {
-  const metric = typeof value === 'number' || typeof value === 'string'
-    ? parseOptionalBatchMetric(value)
-    : null;
+  const metric =
+    typeof value === 'number' || typeof value === 'string'
+      ? parseOptionalBatchMetric(value)
+      : null;
   return metric === null ? '—' : `${metric.toFixed(1)}%`;
 }
 
 /** Harvest dates are calendar days, not timestamps in the viewer's timezone. */
-export function formatHarvestDate(value: string | Date | null | undefined): string {
-  const dateOnly = toDateInputValue(value);
-  const date = new Date(`${dateOnly}T00:00:00Z`);
-  if (!dateOnly || Number.isNaN(date.getTime())) return '—';
-  return new Intl.DateTimeFormat('en-US', {
-    year: 'numeric', month: 'short', day: 'numeric', timeZone: 'UTC',
-  }).format(date);
+export function formatHarvestDate(
+  value: string | Date | null | undefined
+): string {
+  return formatDate(toDateInputValue(value));
 }

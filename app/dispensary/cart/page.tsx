@@ -1,1071 +1,1140 @@
 'use client';
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { createPortal } from 'react-dom';
-import { useFocusTrap } from '@/app/hooks/useFocusTrap';
-import { readCart, writeCart, calculateTotals, getLineTotal, removeOrderedItems, type Cart, type CartItem } from '@/lib/cart';
-import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { PageHeader } from '@/app/components/ui/PageHeader';
-import { formatProductUnit } from '@/lib/product-display';
-import { PAYMENT_TERMS_OPTIONS, buildOrderRequestNotes } from '@/lib/order-workflow';
-import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
-import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
-import { ProductImage } from '@/app/components/ui/ProductImage';
-import { useLocalDraft } from '@/app/hooks/useLocalDraft';
-import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
+import { CheckCircle2, Trash2 } from 'lucide-react';
 import {
-  DEFAULT_COMMERCIAL_TERMS,
-  DEFAULT_REQUEST_DEFAULTS,
-  REQUEST_DEFAULTS_STORAGE_KEY,
-  REQUEST_NOTE_TEMPLATES,
-  RequestDefaults,
-} from '@/lib/ux-workflow';
-import { CheckCircle2, Loader2, Plus, Trash2 } from 'lucide-react';
+  readCart,
+  writeCart,
+  calculateTotals,
+  getLineTotal,
+  removeOrderedItems,
+  syncAccountCart,
+  getCartSyncError,
+  retryCartSync,
+  normalizeCart,
+  type Cart,
+  type CartItem,
+} from '@/lib/cart';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { ProductImage } from '@/app/components/ui/ProductImage';
+import { Modal } from '@/app/components/ui/Modal';
+import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
+import { formatProductUnit } from '@/lib/product-display';
+import { formatMoney } from '@/lib/format';
+import { buildOrderRequestNotes } from '@/lib/order-workflow';
+import { normalizeOrderDefaults } from '@/lib/buyer-defaults';
+import { isLicenseExpired } from '@/lib/license';
+import { toast } from '@/app/hooks/useToast';
+import { useLocalDraft } from '@/app/hooks/useLocalDraft';
 
-interface CheckoutIssue {
+type Details = ReturnType<typeof normalizeOrderDefaults> & {
+  deliveryAddress: string;
+};
+type Pending = {
+  key: string;
+  cart: Cart;
+  notes: string;
+  growerNotes?: Record<string, string>;
+  details: Details;
+};
+type Receipt = {
+  id: string;
+  orderId: string;
+  growerId: string;
+  orderedProductIds: string[];
+};
+type Terms = {
+  growerId: string;
+  minimumOrder: string;
+  fulfillmentMethods: string;
+  fulfillmentRegion: string;
+  paymentTerms: string;
+};
+type Issue = {
   productId: string;
   productName: string;
   requested: number;
   available: number;
-}
-
-interface RequestDraftDetails {
-  orderNotes: string;
-  fulfillmentMethod: string;
-  requestedWindow: string;
-  paymentTerms: string;
-}
-
-interface PendingSubmission {
-  key: string;
-  cart: Cart;
-  notes: string;
-  details: RequestDraftDetails;
-}
-
-function readPendingSubmission(storageKey: string): PendingSubmission | null {
-  const raw = localStorage.getItem(storageKey);
+  reason?: string;
+};
+const emptyDetails: Details = {
+  ...normalizeOrderDefaults(null),
+  deliveryAddress: '',
+};
+const inputClass =
+  'mt-1 min-h-11 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 py-2 text-base sm:text-sm';
+function readPending(key: string): Pending | null {
+  const raw = localStorage.getItem(key);
   if (!raw) return null;
-  const value = JSON.parse(raw) as PendingSubmission;
-  if (!value || typeof value.key !== 'string' || !/^[a-zA-Z0-9_-]{16,128}$/.test(value.key)
-    || !Array.isArray(value.cart?.items) || !value.cart.items.length || typeof value.notes !== 'string' || !value.details) {
-    throw new Error('Your saved request could not be read. Check your requests before submitting again.');
-  }
+  const value = JSON.parse(raw);
+  if (
+    !value ||
+    typeof value.key !== 'string' ||
+    !/^[a-zA-Z0-9_-]{16,128}$/.test(value.key) ||
+    !Array.isArray(value.cart?.items) ||
+    !value.cart.items.length ||
+    typeof value.notes !== 'string'
+  )
+    throw new Error(
+      'The saved confirmation could not be read. Check your orders before sending again.'
+    );
   return value;
 }
-
-interface SuggestedProduct {
-  id: string;
-  name: string;
-  price: number | null;
-  isPriceVisible: boolean;
-  strain: string | null;
-  unit: string | null;
-  thc: number | null;
-  inventoryQty: number;
-  grower: {
-    id: string;
-    businessName: string;
-  };
-  source: 'favorite' | 'recent';
-  orderCount?: number;
-}
-
-interface GrowerTerms {
-  fulfillmentRegion: string;
-  paymentTerms: string;
-}
-
-interface GrowerTermsResponse {
-  growerId?: string;
-  fulfillmentRegion?: string;
-  paymentTerms?: string;
-}
-
-type BuilderStep = 'items' | 'logistics' | 'terms' | 'review';
-
-const FAVORITES_KEY = 'phenofarm_favorites';
-const SUGGESTION_LIMIT = 6;
-
-function normalizeSuggestion(product: Omit<SuggestedProduct, 'source'>, source: SuggestedProduct['source']): SuggestedProduct | null {
-  if (!product?.id || !product?.grower?.id || product.inventoryQty < 1) return null;
-
-  return {
-    id: product.id,
-    name: product.name,
-    price: product.isPriceVisible && product.price != null ? Number(product.price) : null,
-    isPriceVisible: product.isPriceVisible,
-    strain: product.strain || null,
-    unit: product.unit || null,
-    thc: product.thc ?? null,
-    inventoryQty: product.inventoryQty,
-    grower: {
-      id: product.grower.id,
-      businessName: product.grower.businessName,
-    },
-    source,
-    orderCount: product.orderCount,
-  };
+function minimumValue(value: string) {
+  const match = value.match(/\$\s*([\d,]+(?:\.\d{1,2})?)/);
+  return match ? Number(match[1].replace(/,/g, '')) : null;
 }
 
 export default function DispensaryCartPage() {
-  const router = useRouter();
   const { data: session } = useSession();
-  const submissionStorageKey = session?.user?.id ? `phenofarm:pending-request:${session.user.id}` : null;
-  const [pendingSubmission, setPendingSubmission] = useState<PendingSubmission | null>(null);
-  const [submissionStorageError, setSubmissionStorageError] = useState('');
-  const [cart, setCart] = useState<Cart>({ items: [], subtotal: 0, tax: 0, total: 0 });
-  const [mounted, setMounted] = useState(false);
-  const [submittingRequest, setSubmittingRequest] = useState(false);
-  const submittingRef = useRef(false);
-  const [inventorySyncing, setInventorySyncing] = useState(false);
-  const [requestError, setRequestError] = useState('');
-  const [checkoutIssues, setCheckoutIssues] = useState<CheckoutIssue[]>([]);
-  const [inventoryAdjustmentNotice, setInventoryAdjustmentNotice] = useState('');
-  const [requestSuccess, setRequestSuccess] = useState(false);
-  const [showRequestReview, setShowRequestReview] = useState(false);
-  useBodyOverlay(showRequestReview);
-  const reviewRef = useRef<HTMLDivElement>(null);
-  useFocusTrap({ active: showRequestReview, containerRef: reviewRef, onEscape: () => setShowRequestReview(false) });
-  const [orderNotes, setOrderNotes] = useState('');
-  const [fulfillmentMethod, setFulfillmentMethod] = useState('Flexible');
-  const [requestedWindow, setRequestedWindow] = useState('');
-  const [paymentTerms, setPaymentTerms] = useState('Handled directly');
-  const [builderStep, setBuilderStep] = useState<BuilderStep>('items');
-  const [savedRequestDefaults, setSavedRequestDefaults] = useState<RequestDefaults | null>(null);
-  const [suggestedProducts, setSuggestedProducts] = useState<SuggestedProduct[]>([]);
-  const [suggestionsLoading, setSuggestionsLoading] = useState(false);
-  const [growerTerms, setGrowerTerms] = useState<Record<string, GrowerTerms>>({});
-  const [successRedirectPaused, setSuccessRedirectPaused] = useState(false);
-
-  const requestDraft = useLocalDraft<RequestDraftDetails>({
-    key: 'phenofarm:draft:order-request',
-    value: { orderNotes, fulfillmentMethod, requestedWindow, paymentTerms },
-    enabled: mounted,
+  const key = session?.user.id
+    ? `phenofarm:pending-request:${session.user.id}`
+    : null;
+  const [cart, setCart] = useState<Cart>(normalizeCart(null));
+  const [ready, setReady] = useState(false);
+  const [pending, setPending] = useState<Pending | null>(null);
+  const [storageError, setStorageError] = useState('');
+  const [syncError, setSyncError] = useState('');
+  const [error, setError] = useState('');
+  const [sending, setSending] = useState(false);
+  const busy = useRef(false);
+  const [review, setReview] = useState(false);
+  const [details, setDetails] = useState<Details>(emptyDetails);
+  const [license, setLicense] = useState<
+    'loading' | 'approved' | 'pending' | 'error'
+  >('loading');
+  const [terms, setTerms] = useState<Record<string, Terms>>({});
+  const [termChoices, setTermChoices] = useState<Record<string, string>>({});
+  const [termsError, setTermsError] = useState('');
+  const [changes, setChanges] = useState<Record<string, string>>({});
+  const [issues, setIssues] = useState<Issue[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
+  const [receipts, setReceipts] = useState<Receipt[]>([]);
+  const [quantityEdits, setQuantityEdits] = useState<Record<string, string>>(
+    {}
+  );
+  const [profileRetry, setProfileRetry] = useState(0);
+  const [termsRetry, setTermsRetry] = useState(0);
+  const persist = useCallback((next: Cart) => {
+    writeCart(next);
+    setCart(readCart());
+  }, []);
+  const draftValue = useMemo(
+    () => ({ details, termChoices }),
+    [details, termChoices]
+  );
+  const draft = useLocalDraft({
+    key: 'cart-details-v2',
+    value: draftValue,
+    enabled: ready && !pending && cart.items.length > 0,
+    autoRestore: false,
     onRestore: (value) => {
-      setOrderNotes(value.orderNotes || '');
-      setFulfillmentMethod(value.fulfillmentMethod || 'Flexible');
-      setRequestedWindow(value.requestedWindow || '');
-      setPaymentTerms(value.paymentTerms || 'Handled directly');
+      setDetails({
+        ...normalizeOrderDefaults(value?.details),
+        deliveryAddress:
+          typeof value?.details?.deliveryAddress === 'string'
+            ? value.details.deliveryAddress.slice(0, 500)
+            : '',
+      });
+      if (value?.termChoices && typeof value.termChoices === 'object')
+        setTermChoices(
+          Object.fromEntries(
+            Object.entries(value.termChoices)
+              .filter(([, term]) => typeof term === 'string')
+              .map(([id, term]) => [id, term.slice(0, 120)])
+          )
+        );
     },
-    shouldSave: (value) =>
-      Boolean(
-        value.orderNotes.trim() ||
-        value.requestedWindow.trim() ||
-        value.fulfillmentMethod !== 'Flexible' ||
-        value.paymentTerms !== 'Handled directly'
-      ),
   });
 
-  const syncCartWithLiveInventory = useCallback(async (savedCart: Cart, signal: AbortSignal) => {
-    if (!savedCart.items.length) return;
-    setInventorySyncing(true);
-    try {
-      const [response, quoteResponse] = await Promise.all([
-        fetch('/api/dispensary/cart/validate', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productIds: savedCart.items.map(item => item.id) }), signal }),
-        fetch('/api/dispensary/accepted-quotes', { signal }),
-      ]);
-      if (!response.ok || !quoteResponse.ok) throw new Error('Unable to refresh inventory.');
-      const data = await response.json();
-      const quoteData = await quoteResponse.json();
-      if (!Array.isArray(data.products) || !Array.isArray(quoteData.quotes)) throw new Error('Invalid inventory response.');
-      const live = new Map<string, { id: string; inventoryQty: number; price: number | null; isPriceVisible: boolean; isAvailable: boolean }>(data.products.map((product: { id: string }) => [product.id, product]));
-      const quotes = new Map<string, { id: string; quantity: number | null; unitPrice: number }>(quoteData.quotes.map((quote: { productId: string }) => [quote.productId, quote]));
-      if (signal.aborted) return;
-      // Reconcile against the current draft, so edits made during the request survive.
-      setCart(current => {
-        const items = current.items.map(item => {
-          const product = live.get(item.id);
-          if (!product) return item;
-          const quote = quotes.get(item.id);
-          const base = { ...item };
-          delete base.acceptedQuoteId; delete base.quotedQuantity; delete base.quotedUnitPrice;
-          return { ...base, price: quote?.unitPrice ?? product.price ?? 0, listPrice: product.price ?? undefined,
-            maxQty: product.inventoryQty, quantity: product.isAvailable ? Math.min(item.quantity, product.inventoryQty) : item.quantity,
-            unavailable: !product.isAvailable, requiresQuote: !product.isPriceVisible && (!quote || (quote.quantity != null && quote.quantity < item.quantity)),
-            ...(quote ? { acceptedQuoteId: quote.id, quotedQuantity: quote.quantity ?? product.inventoryQty, quotedUnitPrice: quote.unitPrice } : {}),
-          };
-        });
-        return { items, ...calculateTotals(items) };
-      });
-      const changed = savedCart.items.some(item => {
-        const product = live.get(item.id);
-        const quote = quotes.get(item.id);
-        return !product || !product.isAvailable || item.quantity > product.inventoryQty || item.price !== (quote?.unitPrice ?? product.price ?? 0);
-      });
-      setInventoryAdjustmentNotice(changed ? 'Prices or availability changed. Review the updated cart.' : '');
-    } catch {
-      if (!signal.aborted) setInventoryAdjustmentNotice('Inventory could not be refreshed. Your saved cart has been kept.');
-    } finally { if (!signal.aborted) setInventorySyncing(false); }
-  }, []);
-
   useEffect(() => {
-    if (!submissionStorageKey) return;
-    const saved = readCart();
-    setCart(saved);
-    setMounted(true);
-    const controller = new AbortController();
-    try {
-      const pending = readPendingSubmission(submissionStorageKey);
-      setPendingSubmission(pending);
-      if (!pending) void syncCartWithLiveInventory(saved, controller.signal);
-    } catch {
-      setSubmissionStorageError('Your saved request could not be read. Check your requests before submitting again.');
-    }
-    try {
-      setSavedRequestDefaults(JSON.parse(localStorage.getItem(REQUEST_DEFAULTS_STORAGE_KEY) || 'null'));
-    } catch { setSavedRequestDefaults(null); }
-    return () => controller.abort();
-  }, [submissionStorageKey, syncCartWithLiveInventory]);
-
-  useEffect(() => {
-    if (mounted && !writeCart(cart)) setInventoryAdjustmentNotice('This browser could not save the latest cart. Please free up storage before leaving.');
-  }, [cart, mounted]);
-
-  useEffect(() => {
-    if (!mounted) return;
-
-    let cancelled = false;
-
-    const loadSuggestedProducts = async () => {
-      setSuggestionsLoading(true);
-
+    if (!key || !session?.user.id) return;
+    let stopped = false;
+    const update = () => {
+      setCart(readCart());
+      setSyncError(getCartSyncError());
+    };
+    window.addEventListener('cart-updated', update);
+    window.addEventListener('cart-sync-updated', update);
+    void syncAccountCart(session.user.id).then(() => {
+      if (stopped) return;
+      update();
       try {
-        const storedFavoriteIds = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]') as string[];
-        const favoritesResponse = await fetch('/api/dispensary/favorites');
-        const favoritesData = favoritesResponse.ok ? await favoritesResponse.json() : { productIds: [] };
-        const favoriteIds = Array.from(
-          new Set([
-            ...(Array.isArray(favoritesData.productIds) ? favoritesData.productIds : []),
-            ...(Array.isArray(storedFavoriteIds) ? storedFavoriteIds : []),
-          ].map((id) => String(id || '').trim()).filter(Boolean))
-        ).slice(0, 20);
-
-        const [favoriteDetailsResponse, recentResponse] = await Promise.all([
-          favoriteIds.length > 0
-            ? fetch('/api/dispensary/favorites', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ productIds: favoriteIds }),
-              })
-            : Promise.resolve(null),
-          fetch('/api/dispensary/recent-products'),
-        ]);
-
-        const favoriteDetails = favoriteDetailsResponse?.ok ? await favoriteDetailsResponse.json() : { products: [] };
-        const recentDetails = recentResponse.ok ? await recentResponse.json() : { products: [] };
-        const favoriteProducts = Array.isArray(favoriteDetails.products)
-          ? favoriteIds
-              .map((id) => favoriteDetails.products.find((product: SuggestedProduct) => product.id === id))
-              .filter(Boolean)
-          : [];
-        const recentProducts = Array.isArray(recentDetails.products) ? recentDetails.products : [];
-        const merged = new Map<string, SuggestedProduct>();
-
-        for (const product of favoriteProducts) {
-          const suggestion = normalizeSuggestion(product, 'favorite');
-          if (suggestion) merged.set(suggestion.id, suggestion);
-        }
-
-        for (const product of recentProducts) {
-          const suggestion = normalizeSuggestion(product, 'recent');
-          if (suggestion && !merged.has(suggestion.id)) {
-            merged.set(suggestion.id, suggestion);
-          }
-        }
-
-        if (!cancelled) {
-          setSuggestedProducts(Array.from(merged.values()).slice(0, SUGGESTION_LIMIT));
-        }
-      } catch {
-        if (!cancelled) {
-          setSuggestedProducts([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setSuggestionsLoading(false);
-        }
+        setPending(readPending(key));
+      } catch (cause) {
+        setStorageError(
+          cause instanceof Error
+            ? cause.message
+            : 'Check your orders before sending again.'
+        );
       }
-    };
-
-    void loadSuggestedProducts();
-
+      setReady(true);
+    });
     return () => {
-      cancelled = true;
+      stopped = true;
+      window.removeEventListener('cart-updated', update);
+      window.removeEventListener('cart-sync-updated', update);
     };
-  }, [mounted]);
-
-  const growerIdsKey = Array.from(new Set(cart.items.map((item) => item.growerId).filter(Boolean))).sort().join(',');
+  }, [key, session?.user.id]);
 
   useEffect(() => {
-    if (!mounted || !growerIdsKey) {
-      setGrowerTerms({});
+    const controller = new AbortController();
+    void fetch('/api/dispensary/settings', { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        setLicense(
+          data.licenseStatus === 'verified' &&
+            !isLicenseExpired(data.licenseExpiry)
+            ? 'approved'
+            : 'pending'
+        );
+        const defaults = normalizeOrderDefaults(data.orderDefaults);
+        setDetails((current) => ({
+          ...defaults,
+          ...Object.fromEntries(
+            Object.entries(current).filter(
+              ([, value]) => value && value !== 'Coordinate with grower'
+            )
+          ),
+          deliveryAddress:
+            current.deliveryAddress ||
+            [data.address, data.city, data.state, data.zip]
+              .filter(Boolean)
+              .join(', '),
+        }));
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setLicense('error');
+      });
+    return () => controller.abort();
+  }, [profileRetry]);
+
+  const growerKey = [...new Set(cart.items.map((item) => item.growerId))]
+    .sort()
+    .join(',');
+  useEffect(() => {
+    if (!growerKey) return;
+    const controller = new AbortController();
+    setTermsError('');
+    void fetch(
+      `/api/dispensary/grower-terms?ids=${encodeURIComponent(growerKey)}`,
+      { signal: controller.signal }
+    )
+      .then(async (response) => {
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        setTerms(
+          Object.fromEntries(
+            (data.terms as Terms[]).map((term) => [term.growerId, term])
+          )
+        );
+      })
+      .catch(() => {
+        if (!controller.signal.aborted)
+          setTermsError('Grower terms could not load.');
+      });
+    return () => controller.abort();
+  }, [growerKey, termsRetry]);
+
+  const refresh = useCallback(async () => {
+    const saved = readCart();
+    if (!saved.items.length) return;
+    setRefreshing(true);
+    try {
+      const [response, quotesResponse] = await Promise.all([
+        fetch('/api/dispensary/cart/validate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            productIds: saved.items.map((item) => item.id),
+          }),
+        }),
+        fetch('/api/dispensary/accepted-quotes'),
+      ]);
+      if (!response.ok || !quotesResponse.ok)
+        throw new Error('Stock could not refresh. Please retry.');
+      const data = await response.json();
+      const quoteData = await quotesResponse.json();
+      const live = new Map<
+        string,
+        {
+          id: string;
+          inventoryQty: number;
+          price: number | null;
+          isPriceVisible: boolean;
+          isAvailable: boolean;
+        }
+      >(data.products.map((item: { id: string }) => [item.id, item]));
+      const quotes = new Map<
+        string,
+        { id: string; quantity: number | null; unitPrice: number }
+      >(
+        quoteData.quotes.map((quote: { productId: string }) => [
+          quote.productId,
+          quote,
+        ])
+      );
+      const nextChanges: Record<string, string> = {};
+      const items = readCart().items.map((item) => {
+        const product = live.get(item.id);
+        if (!product) return item;
+        const quote = quotes.get(item.id);
+        const price = quote?.unitPrice ?? product.price ?? 0;
+        const notices = [];
+        if (item.price !== price && product.isPriceVisible)
+          notices.push(`${formatMoney(item.price)} → ${formatMoney(price)}`);
+        if (!product.isAvailable) notices.push('Sold out');
+        else if (item.quantity > product.inventoryQty)
+          notices.push(`Only ${product.inventoryQty} available`);
+        if (notices.length)
+          nextChanges[item.id] = `${item.name}: ${notices.join('; ')}`;
+        const next = {
+          ...item,
+          price,
+          listPrice: product.price ?? undefined,
+          maxQty: product.inventoryQty,
+          unavailable: !product.isAvailable,
+          image: item.image || `/api/dispensary/products/${item.id}/thumbnail`,
+          requiresQuote:
+            !product.isPriceVisible &&
+            (!quote ||
+              (quote.quantity != null && quote.quantity < item.quantity)),
+        };
+        delete next.acceptedQuoteId;
+        delete next.quotedQuantity;
+        delete next.quotedUnitPrice;
+        return quote
+          ? {
+              ...next,
+              acceptedQuoteId: quote.id,
+              quotedQuantity: quote.quantity ?? product.inventoryQty,
+              quotedUnitPrice: quote.unitPrice,
+            }
+          : next;
+      });
+      setChanges(nextChanges);
+      persist({ items, ...calculateTotals(items) });
+      return items;
+    } catch (cause) {
+      setError(
+        cause instanceof Error ? cause.message : 'Could not refresh stock.'
+      );
+      return null;
+    } finally {
+      setRefreshing(false);
+    }
+  }, [persist]);
+  useEffect(() => {
+    if (ready && !pending && !storageError) void refresh();
+  }, [ready, pending, storageError, refresh]);
+
+  function remove(id: string) {
+    const removed = cart.items.find((item) => item.id === id);
+    if (!removed) return;
+    persist(
+      normalizeCart({ items: cart.items.filter((item) => item.id !== id) })
+    );
+    setIssues((value) => value.filter((issue) => issue.productId !== id));
+    toast.success(`${removed.name} removed`, {
+      action: {
+        label: 'Undo',
+        onClick: () => {
+          const current = readCart();
+          if (!current.items.some((item) => item.id === id))
+            persist(normalizeCart({ items: [...current.items, removed] }));
+        },
+      },
+    });
+  }
+  function quantity(item: CartItem, value: string) {
+    const number = Number(value.replace(/[,\s]/g, ''));
+    if (!Number.isSafeInteger(number) || number < 1) {
+      setError(`Enter a whole number of 1 or more for ${item.name}.`);
       return;
     }
-
-    let cancelled = false;
-
-    const loadGrowerTerms = async () => {
-      try {
-        const response = await fetch(`/api/dispensary/grower-terms?ids=${encodeURIComponent(growerIdsKey)}`);
-        if (!response.ok) return;
-
-        const data = await response.json();
-        const terms: GrowerTermsResponse[] = Array.isArray(data.terms) ? data.terms : [];
-        const nextTerms: Record<string, GrowerTerms> = {};
-
-        for (const term of terms) {
-          if (term.growerId) {
-            nextTerms[term.growerId] = {
-              fulfillmentRegion: term.fulfillmentRegion || DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion,
-              paymentTerms: term.paymentTerms || DEFAULT_COMMERCIAL_TERMS.paymentTerms,
-            };
-          }
-        }
-
-        if (!cancelled) {
-          setGrowerTerms(nextTerms);
-        }
-      } catch {
-        if (!cancelled) {
-          setGrowerTerms({});
-        }
-      }
-    };
-
-    void loadGrowerTerms();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [growerIdsKey, mounted]);
-
-  useEffect(() => {
-    if (!requestSuccess || successRedirectPaused) return;
-
-    const redirectTimer = window.setTimeout(() => {
-      router.push('/dispensary/orders');
-    }, 5000);
-
-    return () => window.clearTimeout(redirectTimer);
-  }, [requestSuccess, router, successRedirectPaused]);
-
-  const updateQuantity = (id: string, delta: number) => {
-    setCart(prev => {
-      const items = prev.items.map(item => {
-        if (item.id === id) {
-          const newQty = item.quantity + delta;
-          if (delta > 0 && newQty > item.maxQty) return item;
-          if (newQty < 1) return item;
-          return { ...item, quantity: newQty };
-        }
-        return item;
-      });
-      return { items, ...calculateTotals(items) };
+    persist(
+      normalizeCart({
+        items: readCart().items.map((row) =>
+          row.id === item.id
+            ? { ...row, quantity: number, maxQty: item.maxQty }
+            : row
+        ),
+      })
+    );
+    setQuantityEdits((value) => {
+      const next = { ...value };
+      delete next[item.id];
+      return next;
     });
-  };
-
-  const setExactQuantity = (id: string, qty: number) => {
-    if (qty < 1) return;
-    setCart(prev => {
-      const items = prev.items.map(item => {
-        if (item.id === id) {
-          return { ...item, quantity: Math.min(qty, item.maxQty) };
-        }
-        return item;
-      });
-      return { items, ...calculateTotals(items) };
-    });
-  };
-
-  const removeItem = (id: string) => {
-    setCart(prev => {
-      const items = prev.items.filter(item => item.id !== id);
-      return { items, ...calculateTotals(items) };
-    });
-  };
-
-  const addSuggestedProduct = (product: SuggestedProduct) => {
-    if (product.inventoryQty < 1 || product.price == null) return;
-
-    setCart((prev) => {
-      const existingIndex = prev.items.findIndex((item) => item.id === product.id);
-      let items: CartItem[];
-
-      if (existingIndex >= 0) {
-        items = prev.items.map((item, index) => {
-          if (index !== existingIndex) return item;
-          return {
-            ...item,
-            quantity: Math.min(item.quantity + 1, product.inventoryQty),
-            maxQty: product.inventoryQty,
-          };
-        });
-      } else {
-        items = [
-          ...prev.items,
-          {
-            id: product.id,
-            name: product.name,
-            grower: product.grower.businessName,
-            growerId: product.grower.id,
-            price: product.price ?? 0,
-            quantity: 1,
-            maxQty: product.inventoryQty,
-            strain: product.strain || undefined,
-            unit: product.unit || undefined,
-          },
-        ];
-      }
-
-      return { items, ...calculateTotals(items) };
-    });
-  };
-
-  const applyInventoryAdjustments = (issues: CheckoutIssue[]) => {
-    if (!issues.length) return;
-    const items = cart.items.map(item => {
-      const issue = issues.find(entry => entry.productId === item.id);
-      if (!issue) return item;
-      return { ...item, quantity: issue.available > 0 ? Math.min(item.quantity, issue.available) : item.quantity,
-        maxQty: Math.max(0, issue.available), unavailable: issue.available < 1 };
-    });
-    setCart({ items, ...calculateTotals(items) });
-    setInventoryAdjustmentNotice('Inventory quantities updated. Unavailable items remain in your cart until you remove them.');
-  };
-
-  const applySingleInventoryAdjustment = (issue: CheckoutIssue) => {
-    applyInventoryAdjustments([issue]);
-    setCheckoutIssues((prev) => prev.filter((entry) => entry.productId !== issue.productId));
-    setRequestError('');
-  };
-
-  const persistRequestDefaults = (defaults: RequestDefaults) => {
-    setSavedRequestDefaults(defaults);
-    try { localStorage.setItem(REQUEST_DEFAULTS_STORAGE_KEY, JSON.stringify(defaults)); } catch { /* Request submission does not depend on saving defaults. */ }
-  };
-
-  const applyRequestDefaults = (defaults: RequestDefaults) => {
-    setFulfillmentMethod(defaults.fulfillmentMethod || DEFAULT_REQUEST_DEFAULTS.fulfillmentMethod);
-    setRequestedWindow(defaults.requestedWindow || '');
-    setPaymentTerms(defaults.paymentTerms || DEFAULT_REQUEST_DEFAULTS.paymentTerms);
-    setOrderNotes(defaults.orderNotes || '');
-    setBuilderStep('review');
-  };
-
-  const handleSubmitRequest = async () => {
-    if (submittingRef.current || inventorySyncing || !submissionStorageKey || submissionStorageError) return;
-    if (!pendingSubmission && (!cart.items.length || cart.items.some(item => item.unavailable || item.requiresQuote))) {
-      setRequestError('Remove unavailable items and request pricing for quote-only products before sending your request.'); return;
+  }
+  function problematic(item: CartItem) {
+    return item.unavailable || item.maxQty < 1
+      ? 'Sold out'
+      : item.requiresQuote
+        ? 'Price on request'
+        : item.quantity > item.maxQty
+          ? `Only ${item.maxQty} available`
+          : '';
+  }
+  function reviewOrder() {
+    setError('');
+    const edited = Object.entries(quantityEdits).find(
+      ([, value]) => !Number.isSafeInteger(Number(value)) || Number(value) < 1
+    );
+    if (edited) {
+      setError('Enter a whole number of 1 or more.');
+      document.getElementById(`qty-${edited[0]}`)?.focus();
+      return;
     }
-    submittingRef.current = true;
-    setSubmittingRequest(true);
-    setRequestError('');
-    setCheckoutIssues([]);
-    setInventoryAdjustmentNotice('');
-
+    const problem = readCart().items.find(problematic);
+    if (problem) {
+      setError(`Review ${problem.name}: ${problematic(problem)}.`);
+      document
+        .getElementById(`cart-${problem.id}`)
+        ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      return;
+    }
+    if (
+      details.fulfillmentMethod === 'Delivery requested' &&
+      !details.deliveryAddress.trim()
+    ) {
+      setError('Add a delivery address.');
+      document.getElementById('delivery-address')?.focus();
+      return;
+    }
+    setReview(true);
+  }
+  async function send() {
+    if (
+      busy.current ||
+      !key ||
+      storageError ||
+      (!pending && license !== 'approved')
+    )
+      return;
+    busy.current = true;
+    setSending(true);
+    setError('');
     try {
-      // Persist before sending. Reuse the original payload after reload even if its
-      // inventory is sold out or its quote has since been consumed by this request.
       const prepare = () => {
-        const stored = readPendingSubmission(submissionStorageKey) || pendingSubmission;
-        if (stored) {
-          localStorage.setItem(submissionStorageKey, JSON.stringify(stored));
-          return stored;
-        }
-        const details = { orderNotes, fulfillmentMethod, requestedWindow, paymentTerms };
-        const attempt: PendingSubmission = { key: crypto.randomUUID(), cart,
-          notes: buildOrderRequestNotes({ ...details, buyerNotes: orderNotes }), details };
-        localStorage.setItem(submissionStorageKey, JSON.stringify(attempt));
+        const existing = readPending(key) || pending;
+        if (existing) return existing;
+        const current = readCart();
+        if (current.items.some(problematic))
+          throw new Error('Review unavailable products before sending.');
+        const growerNotes = Object.fromEntries(
+          [...new Set(current.items.map((item) => item.growerId))].map((id) => [
+            id,
+            buildOrderRequestNotes({
+              ...details,
+              paymentTerms:
+                termChoices[id] ||
+                terms[id]?.paymentTerms ||
+                details.paymentTerms ||
+                'Coordinate with grower',
+              buyerNotes: details.orderNotes,
+            }),
+          ])
+        );
+        const attempt: Pending = {
+          key: crypto.randomUUID(),
+          cart: current,
+          details,
+          notes: buildOrderRequestNotes({
+            ...details,
+            buyerNotes: details.orderNotes,
+          }),
+          growerNotes,
+        };
+        localStorage.setItem(key, JSON.stringify(attempt));
         return attempt;
       };
       const attempt = navigator.locks
-        ? await navigator.locks.request(submissionStorageKey, prepare) : prepare();
-      setPendingSubmission(attempt);
-      setShowRequestReview(false);
+        ? await navigator.locks.request(key, prepare)
+        : prepare();
+      setPending(attempt);
+      setReview(false);
       const response = await fetch('/api/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Idempotency-Key': attempt.key },
-        body: JSON.stringify({ items: attempt.cart.items, notes: attempt.notes }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Idempotency-Key': attempt.key,
+        },
+        body: JSON.stringify({
+          items: attempt.cart.items,
+          notes: attempt.notes,
+          growerNotes: attempt.growerNotes,
+          deliveryAddress: attempt.details.deliveryAddress,
+        }),
       });
-
       const data = await response.json().catch(() => ({}));
-      const issues = Array.isArray(data.issues) ? data.issues : [];
-
       if (!response.ok) {
-        // A validation conflict is definitive. Network/server failures can follow a
-        // commit, so their receipt must survive until a successful confirmation.
-        if ((response.status === 400 || response.status === 409) && data.code !== 'SUBMISSION_CONFLICT') {
-          localStorage.removeItem(submissionStorageKey);
-          setPendingSubmission(null);
+        const finalLicense =
+          response.status === 403 &&
+          ['LICENSE_NOT_VERIFIED', 'LICENSE_EXPIRED'].includes(data.code);
+        if (
+          ([400, 409].includes(response.status) &&
+            data.code !== 'SUBMISSION_CONFLICT') ||
+          finalLicense
+        ) {
+          if (Array.isArray(data.orders))
+            persist(removeOrderedItems(readCart(), data.orders));
+          localStorage.removeItem(key);
+          setPending(null);
         }
-        setCheckoutIssues(issues);
-        if (issues.length > 0) {
-          setInventoryAdjustmentNotice('Review the stock changes and update your quantities before sending again.');
+        if (finalLicense) {
+          setLicense('pending');
+          setError('');
+          return;
         }
-        throw new Error(data.error || 'Request submission failed');
+        setIssues(Array.isArray(data.issues) ? data.issues : []);
+        throw new Error(data.error || 'Could not send your order.');
       }
-
-      if (!Array.isArray(data.orders) || !data.orders.length || data.orders.some((order: { orderedProductIds?: unknown }) => !Array.isArray(order.orderedProductIds))) {
-        throw new Error('We could not confirm whether your request was received. Choose Check request before trying again.');
-      }
-      const remaining = removeOrderedItems(readCart(), data.orders);
-      // Save the remaining draft before forgetting the receipt; a crash between
-      // these writes can safely replay the confirmed request once more.
-      if (!writeCart(remaining)) throw new Error('Your request was received, but this browser could not save the confirmation. Free up browser storage and check the request again.');
-      localStorage.removeItem(submissionStorageKey);
-      setPendingSubmission(null);
-      setCheckoutIssues(issues);
-      persistRequestDefaults(attempt.details);
-      setCart(remaining);
-      writeCart(remaining);
-      if (remaining.items.length) {
-        setRequestError('Some requests were submitted. Items that were not ordered remain in your cart; review the issues before retrying.');
-        setShowRequestReview(false);
-        return;
-      }
-      requestDraft.clearDraft();
-      setOrderNotes('');
-      setRequestedWindow('');
-      setFulfillmentMethod('Flexible');
-      setPaymentTerms('Handled directly');
-      setBuilderStep('items');
-      setShowRequestReview(false);
-      setSuccessRedirectPaused(false);
-      setRequestSuccess(true);
-    } catch (err) {
-      const message = err instanceof Error && err.name !== 'TypeError' ? err.message : 'We could not confirm whether your request was received. Choose Check request before trying again.';
-      setRequestError(message);
+      if (
+        !Array.isArray(data.orders) ||
+        !data.orders.length ||
+        data.orders.some(
+          (order: Receipt) => !Array.isArray(order.orderedProductIds)
+        )
+      )
+        throw new Error(
+          'We could not confirm receipt. Check this order before trying again.'
+        );
+      persist(removeOrderedItems(readCart(), data.orders));
+      if (!readCart().items.length) draft.clearDraft();
+      localStorage.removeItem(key);
+      setPending(null);
+      setReceipts(data.orders);
+      setIssues(data.issues || []);
+    } catch (cause) {
+      setError(
+        cause instanceof Error && cause.name !== 'TypeError'
+          ? cause.message
+          : 'Connection lost. Check this order to confirm whether it was received.'
+      );
     } finally {
-      submittingRef.current = false;
-      setSubmittingRequest(false);
+      busy.current = false;
+      setSending(false);
     }
-  };
-
-  if (!mounted) {
-    return (
-      <div className="max-w-5xl mx-auto">
-        <PageHeader title="Cart" description="Loading your cart..." className="mb-4" />
-      </div>
-    );
   }
 
-  if (requestSuccess) {
-    return (
-      <div className="mx-auto max-w-2xl">
-        <div
-          className="rounded-2xl border border-pf-accent-line bg-pf-surface px-4 py-6 text-center sm:p-6 shadow-sm"
-          onMouseEnter={() => setSuccessRedirectPaused(true)}
-          onFocusCapture={() => setSuccessRedirectPaused(true)}
-          onTouchStart={() => setSuccessRedirectPaused(true)}
-        >
-          <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-pf-accent" />
-          <h1 className="text-xl font-semibold text-pf-text">Order request sent</h1>
-          <p className="mt-2 text-sm text-pf-muted">
-            The grower will review your request. Arrange payment directly with them.
-          </p>
-          <div className="mt-6 flex flex-col justify-center gap-2 sm:flex-row">
-            <Link
-              href="/dispensary/orders"
-              className="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-            >
-              View orders
-            </Link>
-            <span className="inline-flex h-10 items-center justify-center text-sm text-pf-muted">
-              {successRedirectPaused ? 'Staying on this page' : 'Opening your orders in 5 seconds'}
-            </span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (pendingSubmission || submissionStorageError) {
-    return (
-      <div className="mx-auto max-w-2xl">
-        <Card>
-          <CardHeader><CardTitle>{submittingRequest ? 'Sending request…' : 'Confirm your request'}</CardTitle></CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm text-pf-muted">{submittingRequest ? 'Keep this page open while we confirm your request.' : 'Choose Check request to find out whether it was received. This will not create a duplicate request.'}</p>
-            {pendingSubmission && <ul className="divide-y divide-pf-line text-sm text-pf-text">{pendingSubmission.cart.items.map(item => (
-              <li key={item.id} className="flex justify-between gap-3 py-2"><span className="min-w-0 break-words">{item.name}</span><span className="shrink-0">{item.quantity} {formatProductUnit(item.unit)}</span></li>
-            ))}</ul>}
-            {(requestError || submissionStorageError) && <p role="alert" className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">{submissionStorageError || requestError}</p>}
-            <div className="flex flex-wrap gap-3">
-              {pendingSubmission && !submissionStorageError && <button type="button" disabled={submittingRequest} onClick={handleSubmitRequest} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] disabled:opacity-60">{submittingRequest ? <><Loader2 className="h-4 w-4 animate-spin" />Confirming…</> : 'Check request'}</button>}
-              <Link href="/dispensary/orders" className="inline-flex min-h-11 items-center text-sm text-pf-accent">View orders</Link>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  const isEmpty = cart.items.length === 0;
-  const growerGroups = cart.items.reduce<Record<string, { grower: string; items: CartItem[]; subtotal: number }>>((groups, item) => {
-    if (!groups[item.growerId]) {
-      groups[item.growerId] = { grower: item.grower, items: [], subtotal: 0 };
-    }
-    groups[item.growerId].items.push(item);
-    groups[item.growerId].subtotal += getLineTotal(item);
-    return groups;
-  }, {});
-
-  const builderSteps: Array<{ key: BuilderStep; label: string; complete: boolean }> = [
-    { key: 'items', label: 'Items', complete: cart.items.length > 0 },
-    { key: 'logistics', label: 'Pickup & delivery', complete: Boolean(fulfillmentMethod.trim()) },
-    { key: 'terms', label: 'Terms', complete: Boolean(paymentTerms.trim()) },
-    { key: 'review', label: 'Review', complete: false },
-  ];
-  const requestDetailsReady = cart.items.length > 0 && Boolean(fulfillmentMethod.trim()) && Boolean(paymentTerms.trim());
-  const applyNoteTemplate = (body: string) => {
-    setOrderNotes((prev) => {
-      if (!prev.trim()) return body;
-      return `${prev.trim()}\n\n${body}`;
+  const groups = cart.items.reduce<
+    Record<string, { grower: string; items: CartItem[]; subtotal: number }>
+  >((all, item) => {
+    const group = (all[item.growerId] ||= {
+      grower: item.grower,
+      items: [],
+      subtotal: 0,
     });
-    setBuilderStep('terms');
-  };
-
+    group.items.push(item);
+    group.subtotal += getLineTotal(item);
+    return all;
+  }, {});
+  const notice =
+    license === 'pending' ? (
+      <p className="rounded-lg border border-pf-warning-line bg-pf-warning-bg p-3 text-sm text-pf-warning">
+        You can send orders once your license is approved — we’ll keep your
+        cart.{' '}
+        <Link
+          href="/dispensary/settings#license-verification"
+          className="inline-flex min-h-11 items-center font-semibold underline"
+        >
+          Check status
+        </Link>
+      </p>
+    ) : license === 'error' ? (
+      <p role="alert" className="text-sm text-pf-danger">
+        Could not check license status.{' '}
+        <button
+          onClick={() => setProfileRetry((value) => value + 1)}
+          className="min-h-11 underline"
+        >
+          Retry
+        </button>
+      </p>
+    ) : null;
+  if (!ready)
+    return (
+      <div className="mx-auto max-w-5xl">
+        <PageHeader title="Cart" />
+        <p role="status">Loading your cart…</p>
+      </div>
+    );
+  if (pending || storageError)
+    return (
+      <div className="mx-auto max-w-2xl space-y-4">
+        <PageHeader title={sending ? 'Sending order…' : 'Confirm your order'} />
+        <p>
+          Check whether your order was received. This will not create a
+          duplicate.
+        </p>
+        {(error || storageError) && (
+          <p role="alert" className="text-pf-danger">
+            {error || storageError}
+          </p>
+        )}
+        <button
+          disabled={sending || !!storageError}
+          onClick={send}
+          className="min-h-11 rounded-lg bg-emerald-500 px-4 font-semibold text-[#032116]"
+        >
+          {sending ? 'Checking…' : 'Check order'}
+        </button>
+        <Link
+          href="/dispensary/orders"
+          className="ml-4 inline-flex min-h-11 items-center text-pf-accent"
+        >
+          View orders
+        </Link>
+      </div>
+    );
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="mx-auto max-w-5xl space-y-4">
       <PageHeader
         title="Cart"
-        description="Growers confirm availability and terms. No payment is collected here."
-        className="mb-4"
+        mobileInlineActions
+        actions={
+          <Link
+            href="/dispensary/catalog"
+            className="inline-flex min-h-11 items-center text-sm text-pf-accent"
+          >
+            Add products
+          </Link>
+        }
       />
-
-      {!isEmpty && (
-        <div className="mb-4 space-y-2">
-          <div className="flex flex-wrap items-center justify-between gap-1">
-          <nav aria-label="Cart sections" className="flex gap-2 text-sm">
-            {builderSteps.filter(step => step.key !== 'review').map(step => <button key={step.key} type="button" onClick={() => { setBuilderStep(step.key); document.getElementById(`draft-${step.key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} aria-pressed={builderStep === step.key} className={`min-h-10 rounded-lg px-3 ${builderStep === step.key ? 'bg-pf-accent-bg font-semibold text-pf-accent' : 'text-pf-muted hover:bg-pf-surface'}`}>{step.label}</button>)}
-          </nav>
-          <details className="relative">
-            <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-pf-accent">Templates</summary>
-            <div className="absolute right-0 z-10 mt-1 w-48 rounded-lg border border-pf-line bg-pf-surface p-1 shadow-lg">
-              {savedRequestDefaults && <button type="button" onClick={() => applyRequestDefaults(savedRequestDefaults)} className="min-h-10 w-full rounded px-3 text-left text-sm text-pf-secondary hover:bg-pf-canvas">Reuse last request</button>}
-              <button type="button" onClick={() => applyRequestDefaults(DEFAULT_REQUEST_DEFAULTS)} className="min-h-10 w-full rounded px-3 text-left text-sm text-pf-accent hover:bg-pf-accent-bg">Use standard terms</button>
-            </div>
-          </details>
-          </div>
-
-          <DraftAutosaveStatus
-            savedAt={requestDraft.savedAt}
-            label="Cart details"
-            onClear={requestDraft.clearDraft}
-          />
+      {receipts.length > 0 && (
+        <section
+          role="status"
+          className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-4"
+        >
+          <h2 className="flex items-center gap-2 font-semibold">
+            <CheckCircle2 className="h-5 w-5" />
+            {receipts.length === 1 ? 'Order sent' : 'Orders sent'}
+          </h2>
+          <ul>
+            {receipts.map((order) => (
+              <li key={order.id}>
+                <Link
+                  href={`/dispensary/orders/${order.id}`}
+                  className="inline-flex min-h-11 items-center font-semibold text-pf-accent underline"
+                >
+                  {order.orderId}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          {cart.items.length > 0 && (
+            <p className="text-sm">
+              The remaining products are still in your cart.
+            </p>
+          )}
+        </section>
+      )}
+      {notice}
+      {draft.availableDraft && (
+        <div className="flex flex-wrap items-center gap-3 rounded-lg border border-pf-line bg-pf-surface p-3 text-sm">
+          <p>Saved pickup, delivery and notes are available.</p>
+          <button
+            type="button"
+            onClick={draft.restoreDraft}
+            className="min-h-11 font-semibold text-pf-accent"
+          >
+            Restore draft
+          </button>
+          <button
+            type="button"
+            onClick={draft.clearDraft}
+            className="min-h-11 text-pf-muted"
+          >
+            Discard draft
+          </button>
         </div>
       )}
-
-      {(requestError || inventoryAdjustmentNotice) && (
-        <div className="mb-4 space-y-3">
-          {requestError && (
-            <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger">{requestError}</div>
-          )}
-          {inventoryAdjustmentNotice && (
-            <div className="p-4 bg-pf-info-bg border border-pf-info-line rounded-lg text-pf-info">
-              {inventoryAdjustmentNotice}
-            </div>
-          )}
-          {checkoutIssues.length > 0 && (
-            <div className="p-4 bg-pf-warning-bg border border-pf-warning-line rounded-lg">
-              <p className="text-sm font-semibold text-pf-warning mb-2">Stock changes to review</p>
-              <ul className="space-y-2 text-sm text-pf-warning">
-                {checkoutIssues.map((issue) => {
-                  const currentItem = cart.items.find((item) => item.id === issue.productId);
-                  const alreadyAdjusted = !currentItem || currentItem.quantity <= issue.available;
-
-                  return (
-                    <li
-                      key={`${issue.productId}-${issue.requested}`}
-                      className="flex flex-col gap-3 rounded-lg border border-pf-warning-line bg-pf-surface px-3 py-3 sm:flex-row sm:items-center sm:justify-between"
-                    >
-                      <div>
-                        <p className="font-semibold text-pf-warning">{issue.productName}</p>
-                        <p className="mt-1 text-xs text-pf-warning">
-                          Requested {issue.requested} · Available {issue.available}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => applySingleInventoryAdjustment(issue)}
-                        disabled={alreadyAdjusted}
-                        className="inline-flex h-9 items-center justify-center rounded-lg border border-pf-warning-line px-3 text-xs font-semibold text-pf-warning transition-colors hover:bg-pf-warning-bg disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-                      >
-                        {alreadyAdjusted ? 'Adjusted' : issue.available > 0 ? `Adjust to ${issue.available}` : 'Remove item'}
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-        </div>
+      {draft.storageError && (
+        <p role="alert" className="text-sm text-pf-warning">
+          {draft.storageError}
+        </p>
       )}
-
-      {isEmpty ? (
-        <Card className="px-4 py-6 text-center">
-          <h2 className="text-xl font-semibold text-pf-text">Your cart is empty</h2>
-          <p className="mx-auto mt-2 max-w-md text-sm text-pf-muted">
-            Add products to get started.
-          </p>
-          {(suggestionsLoading || suggestedProducts.length > 0) && (
-            <div className="mx-auto mt-6 max-w-2xl text-left">
-              <div className="mb-3 flex items-center justify-between gap-3">
-                <div>
-                  <h3 className="text-sm font-semibold text-pf-text">Suggested products</h3>
-                </div>
-                {suggestionsLoading && <Loader2 className="h-4 w-4 animate-spin text-pf-accent" />}
-              </div>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {suggestionsLoading
-                  ? Array.from({ length: 2 }).map((_, index) => (
-                      <div key={index} className="h-20 animate-pulse rounded-lg border border-pf-line bg-pf-canvas" />
-                    ))
-                  : suggestedProducts.map((product) => (
-                      <div key={product.id} className="rounded-lg border border-pf-line bg-pf-surface p-3 shadow-sm">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <p className="truncate text-sm font-semibold text-pf-text">{product.name}</p>
-                            </div>
-                            <p className="mt-1 text-xs text-pf-muted">{product.grower.businessName}</p>
-                            <p className="mt-1 text-xs text-pf-muted">
-                              {product.isPriceVisible ? `$${(product.price ?? 0).toFixed(2)}${product.unit ? `/${formatProductUnit(product.unit)}` : ''}` : ''}
-                              {product.isPriceVisible ? ' · ' : ''}
-                              {product.inventoryQty} available
-                            </p>
-                          </div>
-                          <button
-                            type="button"
-                            onClick={() => product.isPriceVisible ? addSuggestedProduct(product) : router.push(`/dispensary/catalog?product=${encodeURIComponent(product.id)}&search=${encodeURIComponent(product.name)}`)}
-                            className="inline-flex min-h-10 shrink-0 items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-[#032116] transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-                          >
-                            {product.isPriceVisible && <Plus className="h-3.5 w-3.5" />}
-                            {product.isPriceVisible ? 'Add' : 'Request pricing'}
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-              </div>
-            </div>
-          )}
-          <div className="mt-4 flex flex-wrap justify-center gap-2 sm:mt-6">
-            <Link href="/dispensary/catalog" className="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] hover:bg-emerald-400">
-              Browse catalog
-            </Link>
-            <Link href="/dispensary/saved" className="inline-flex h-10 items-center justify-center rounded-lg border border-pf-line-strong px-4 text-sm font-semibold text-pf-secondary hover:bg-pf-canvas">
-              Saved
-            </Link>
-          </div>
-        </Card>
-      ) : (
-        <div id="draft-items" className="scroll-mt-24 grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2 space-y-4">
-            {cart.items.map(item => {
-              const atMax = item.quantity >= item.maxQty;
-              return (
-                <Card key={item.id}>
-                  <CardContent className="flex flex-wrap gap-3 p-3 sm:p-4 sm:flex-nowrap">
-                    <ProductImage src={item.image} alt={item.name} productType={item.productType} className="h-14 w-14 shrink-0 rounded-lg sm:h-20 sm:w-20" />
-                    <div className="min-w-0 flex-1">
-                      <p className="break-words text-sm font-semibold sm:text-base">{item.name}</p>
-                      <p className="text-xs text-pf-muted sm:text-sm">{item.grower} · ${item.price}/{formatProductUnit(item.unit)}</p>
-                      {item.acceptedQuoteId ? <p className="mt-1 inline-flex rounded-full bg-pf-accent-bg px-2 py-1 text-xs font-semibold text-pf-accent ring-1 ring-pf-accent-line">Quoted: ${item.quotedUnitPrice?.toFixed(2)}/{formatProductUnit(item.unit)} × up to {item.quotedQuantity}</p> : null}
-                    </div>
-                    <div className="flex w-full flex-wrap items-center justify-between gap-3 sm:w-auto sm:flex-nowrap sm:justify-end sm:gap-4">
-                      <div className="flex items-center rounded border border-pf-line-strong">
-                        <button aria-label={`Decrease quantity for ${item.name}`}
-                        onClick={() => updateQuantity(item.id, -1)} className="h-10 w-10">-</button>
-                        <input
-                          type="number"
-                          aria-label={`Quantity for ${item.name}`}
-                        value={item.quantity}
-                          onChange={(e) => setExactQuantity(item.id, parseInt(e.target.value) || 1)}
-                          className="h-10 w-12 text-center text-base border-x border-pf-line-strong"
-                        />
-                        <button
-                          aria-label={`Increase quantity for ${item.name}`}
-                        onClick={() => updateQuantity(item.id, 1)}
-                          disabled={atMax}
-                          className="h-10 w-10 disabled:opacity-30"
-                        >+</button>
-                      </div>
-                      <p className="font-bold">${getLineTotal(item).toFixed(2)}</p>
-                      <button aria-label={`Remove ${item.name} from cart`}
-                      onClick={() => removeItem(item.id)} className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-danger hover:bg-pf-danger-bg">
-                        <Trash2 className="h-4 w-4" />
-                      </button>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-
-            <section id="draft-logistics" className="scroll-mt-24"><Card className={builderStep === 'logistics' ? 'ring-2 ring-emerald-400' : ''}>
-              <CardHeader className="pb-2">
-                <CardTitle>Pickup &amp; delivery</CardTitle>
-              </CardHeader>
-              <CardContent className="grid gap-4 pt-0 sm:grid-cols-2">
-                <div>
-                  <label htmlFor="fulfillment-method-page" className="block text-sm font-medium text-pf-secondary">
-                    Pickup or delivery
-                  </label>
-                  <select
-                    id="fulfillment-method-page"
-                    value={fulfillmentMethod}
-                    onChange={(event) => {
-                      setFulfillmentMethod(event.target.value);
-                      setBuilderStep('logistics');
-                    }}
-                    className="mt-1 w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base sm:text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                  >
-                    <option>Flexible</option>
-                    <option>Pickup</option>
-                    <option>Delivery requested</option>
-                    <option>Coordinate with grower</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label htmlFor="requested-window-page" className="block text-sm font-medium text-pf-secondary">
-                    Preferred date or time <span className="text-xs font-normal text-pf-muted">(optional)</span>
-                  </label>
-                  <input
-                    id="requested-window-page"
-                    value={requestedWindow}
-                    onChange={(event) => {
-                      setRequestedWindow(event.target.value);
-                      setBuilderStep('logistics');
-                    }}
-                    maxLength={120}
-                    className="mt-1 w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base sm:text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                    placeholder="e.g. Tuesday morning"
-                  />
-                  <p className="mt-1 text-right text-xs text-pf-muted">{requestedWindow.length}/120</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            </section>
-            <section id="draft-terms" className="scroll-mt-24"><Card className={builderStep === 'terms' ? 'ring-2 ring-emerald-400' : ''}>
-              <CardHeader className="pb-2">
-                <CardTitle>Terms</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4 pt-0">
-                <div>
-                  <label htmlFor="payment-terms-page" className="block text-sm font-medium text-pf-secondary">
-                    Payment terms
-                  </label>
-                  <select
-                    id="payment-terms-page"
-                    value={paymentTerms}
-                    onChange={(event) => {
-                      setPaymentTerms(event.target.value);
-                      setBuilderStep('terms');
-                    }}
-                    className="mt-1 w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base sm:text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                  >
-                    {PAYMENT_TERMS_OPTIONS.map((option) => (
-                      <option key={option}>{option}</option>
-                    ))}
-                  </select>
-                  <p className="mt-1 text-xs text-pf-muted">Arrange payment directly with the grower.</p>
-                </div>
-
-                <div>
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <label htmlFor="request-notes-page" className="block text-sm font-medium text-pf-secondary">
-                      Notes <span className="font-normal text-pf-muted">(optional)</span>
-                    </label>
-                    <select aria-label="Add a note template" value="" onChange={event => { if (event.target.value) applyNoteTemplate(event.target.value); }} className="min-h-10 rounded-lg border border-pf-line-strong bg-pf-surface px-3 text-base sm:text-sm">
-                      <option value="">Add note template…</option>
-                      {REQUEST_NOTE_TEMPLATES.map(template => <option key={template.label} value={template.body}>{template.label}</option>)}
-                    </select>
-                  </div>
-                  <textarea
-                    id="request-notes-page"
-                    value={orderNotes}
-                    onChange={(event) => {
-                      setOrderNotes(event.target.value);
-                      setBuilderStep('terms');
-                    }}
-                    rows={3}
-                    maxLength={500}
-                    className="mt-1 w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base sm:text-sm focus:border-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-400"
-                    placeholder="Delivery details, PO number, or other notes."
-                  />
-                  <p className="mt-1 text-right text-xs text-pf-muted">{orderNotes.length}/500</p>
-                </div>
-              </CardContent>
-            </Card></section>
-          </div>
-
-          <Card className="h-fit">
-            <CardHeader className="pb-2"><CardTitle>Summary</CardTitle></CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between"><span>Total</span><span>${cart.subtotal.toFixed(2)}</span></div>
-              <p className="text-sm text-pf-muted">{cart.items.length} item{cart.items.length === 1 ? '' : 's'} · {Object.keys(growerGroups).length} grower{Object.keys(growerGroups).length === 1 ? '' : 's'}</p>
+      {syncError && (
+        <p role="alert" className="text-pf-warning">
+          {syncError}{' '}
+          <button onClick={retryCartSync} className="min-h-11 underline">
+            Retry sync
+          </button>
+        </p>
+      )}
+      {error && (
+        <p
+          role="alert"
+          className="rounded-lg bg-pf-danger-bg p-3 text-sm text-pf-danger"
+        >
+          {error}
+        </p>
+      )}
+      {Object.keys(changes).length > 0 && (
+        <section
+          role="status"
+          className="rounded-lg bg-pf-warning-bg p-3 text-sm text-pf-warning"
+        >
+          <h2 className="font-semibold">Cart updated</h2>
+          <ul>
+            {Object.values(changes).map((change) => (
+              <li key={change}>{change}</li>
+            ))}
+          </ul>
+        </section>
+      )}
+      {issues.length > 0 && (
+        <ul className="rounded-lg bg-pf-warning-bg p-3 text-sm">
+          {issues.map((issue) => (
+            <li key={issue.productId}>
+              {issue.productName}:{' '}
+              {issue.available > 0
+                ? `only ${issue.available} available`
+                : 'sold out'}{' '}
               <button
+                className="min-h-11 underline"
                 onClick={() => {
-                  setBuilderStep('review');
-                  setShowRequestReview(true);
-                }}
-                disabled={submittingRequest || !requestDetailsReady}
-                className="hidden w-full bg-emerald-500 text-[#032116] py-3 rounded-lg sm:block hover:bg-emerald-400 disabled:opacity-50"
-              >
-                Review request
-              </button>
-              {!requestDetailsReady && (
-                <p className="text-xs text-pf-danger">
-                  Add a product, then review pickup or delivery and payment terms.
-                </p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {showRequestReview && createPortal(
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4">
-          <div ref={reviewRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="request-review-title" className="flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-xl border border-pf-line bg-pf-surface shadow-2xl">
-            <div className="shrink-0 border-b border-pf-line bg-pf-canvas px-4 py-3">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 id="request-review-title" className="text-lg font-semibold text-pf-text">Review request</h2>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => setShowRequestReview(false)}
-                  className="rounded-lg p-2 text-pf-muted hover:bg-pf-raised hover:text-pf-text"
-                  aria-label="Close request review"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 space-y-4">
-              <div className="rounded-xl border border-pf-line bg-pf-canvas p-2 sm:p-4">
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { label: 'Items', value: `${cart.items.length} item${cart.items.length === 1 ? '' : 's'}`, step: 'items' as BuilderStep },
-                    { label: 'Growers', value: `${Object.keys(growerGroups).length}`, step: 'items' as BuilderStep },
-                    { label: 'Pickup or delivery', value: fulfillmentMethod || 'Not set', step: 'logistics' as BuilderStep },
-                    { label: 'Terms', value: paymentTerms || 'Not set', step: 'terms' as BuilderStep },
-                  ].map((item) => (
-                    <div key={item.label} className="rounded-lg bg-pf-surface px-2 py-2 ring-1 ring-pf-line sm:px-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-xs font-medium text-pf-muted">{item.label}</p>
-                          <p className="mt-0.5 text-sm font-semibold text-pf-text">{item.value}</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setShowRequestReview(false);
-                            setBuilderStep(item.step);
-                          }}
-                          className="inline-flex min-h-10 min-w-10 items-center justify-center text-xs font-semibold text-pf-accent hover:text-pf-accent"
-                        >
-                          Edit
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                {Object.entries(growerGroups).map(([growerId, group]) => {
-                  const terms = growerTerms[growerId] || {
-                    fulfillmentRegion: DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion,
-                    paymentTerms: DEFAULT_COMMERCIAL_TERMS.paymentTerms,
-                  };
-
-                  return (
-                    <div key={growerId} className="rounded-lg border border-pf-line p-3">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <h3 className="font-semibold text-pf-text">{group.grower}</h3>
-                          <p className="mt-1 text-xs text-pf-muted">
-                            {terms.fulfillmentRegion} · {terms.paymentTerms}
-                          </p>
-                        </div>
-                        <span className="text-sm font-semibold text-pf-secondary">${group.subtotal.toFixed(2)}</span>
-                      </div>
-                      <ul className="mt-3 space-y-2 text-sm text-pf-secondary">
-                        {group.items.map((item) => (
-                          <li key={item.id} className="flex justify-between gap-3">
-                            <span>{item.quantity} × {item.name}</span>
-                            <span className="font-medium">${getLineTotal(item).toFixed(2)}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                  const item = cart.items.find(
+                    (item) => item.id === issue.productId
                   );
-                })}
-              </div>
-
-              <div className="rounded-lg bg-pf-warning-bg p-3 text-xs text-pf-warning sm:p-4 sm:text-sm">
-                We check stock when you send your request. If anything changes, you can review it in your cart.
-              </div>
-            </div>
-
-            <div className="shrink-0 border-t border-pf-line bg-pf-surface px-4 py-3">
-              <div className="mb-3 space-y-1 text-sm">
-                <div className="flex justify-between text-base font-bold"><span>Total</span><span>${cart.subtotal.toFixed(2)}</span></div>
-                <p className="text-xs text-pf-muted">Growers confirm availability and terms. No payment is collected here.</p>
-              </div>
-              <div className="flex items-stretch justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowRequestReview(false)}
-                  disabled={submittingRequest || inventorySyncing}
-                  className="rounded-lg border border-pf-line-strong px-4 py-2 text-pf-secondary hover:bg-pf-canvas disabled:opacity-50"
-                >
-                  Back
-                </button>
-                <button
-                  type="button"
-                  onClick={handleSubmitRequest}
-                  disabled={submittingRequest || inventorySyncing}
-                  className="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-[#032116] hover:bg-emerald-400 disabled:opacity-50"
-                >
-                  {submittingRequest ? 'Sending order request...' : 'Send order request'}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      , document.body)}
-
-      {!isEmpty && (
-        <StickyMobileActionBar
-          primaryLabel={submittingRequest ? 'Submitting...' : 'Review request'}
-          onPrimary={() => {
-            setBuilderStep('review');
-            setShowRequestReview(true);
-          }}
-          disabled={submittingRequest || !requestDetailsReady}
-          helperText={
-            requestDetailsReady
-              ? undefined
-              : 'Review pickup or delivery and payment terms first.'
-          }
-          secondary={
+                  if (issue.available === 0) remove(issue.productId);
+                  else if (item)
+                    quantity(
+                      { ...item, maxQty: issue.available },
+                      String(issue.available)
+                    );
+                  setIssues((value) =>
+                    value.filter((row) => row.productId !== issue.productId)
+                  );
+                }}
+              >
+                {issue.available > 0
+                  ? `Set to ${issue.available}`
+                  : 'Remove item'}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {!cart.items.length ? (
+        !receipts.length && (
+          <section className="rounded-xl border border-pf-line bg-pf-surface p-6 text-center">
+            <h2 className="text-lg font-semibold">Your cart is empty</h2>
             <Link
               href="/dispensary/catalog"
-              className="rounded-lg border border-pf-line-strong px-4 py-3 text-sm font-semibold text-pf-secondary"
+              className="mt-3 inline-flex min-h-11 items-center rounded-lg bg-emerald-500 px-4 font-semibold text-[#032116]"
             >
-              Add items
+              Browse catalog
             </Link>
-          }
-        />
+            <Link
+              href="/dispensary/saved?tab=recent"
+              className="ml-3 inline-flex min-h-11 items-center text-pf-accent"
+            >
+              Recently ordered
+            </Link>
+          </section>
+        )
+      ) : (
+        <>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div className="space-y-4">
+              {Object.entries(groups).map(([id, group]) => {
+                const term = terms[id];
+                const minimum = minimumValue(term?.minimumOrder || '');
+                return (
+                  <section
+                    key={id}
+                    className="rounded-xl border border-pf-line bg-pf-surface p-3 sm:p-4"
+                  >
+                    <div className="mb-3 flex justify-between gap-3">
+                      <h2 className="font-semibold">
+                        <Link href={`/dispensary/grower/${id}`}>
+                          {group.grower}
+                        </Link>
+                      </h2>
+                      <strong>{formatMoney(group.subtotal)}</strong>
+                    </div>
+                    {term && (
+                      <p className="mb-2 text-sm text-pf-muted">
+                        {[
+                          term.minimumOrder,
+                          term.fulfillmentRegion,
+                          term.paymentTerms,
+                        ]
+                          .filter(Boolean)
+                          .join(' · ')}
+                      </p>
+                    )}
+                    {minimum != null && group.subtotal < minimum && (
+                      <p className="mb-3 text-sm text-pf-warning">
+                        Minimum {formatMoney(minimum)} — add{' '}
+                        {formatMoney(minimum - group.subtotal)} more, or agree a
+                        smaller order with the grower.
+                      </p>
+                    )}
+                    <div className="divide-y divide-pf-line">
+                      {group.items.map((item) => {
+                        const problem = problematic(item);
+                        return (
+                          <article
+                            id={`cart-${item.id}`}
+                            key={item.id}
+                            className={`scroll-mt-24 py-3 ${problem || changes[item.id] ? 'rounded-lg bg-pf-warning-bg px-2' : ''}`}
+                          >
+                            <div className="flex gap-3">
+                              <ProductImage
+                                src={
+                                  item.image ||
+                                  `/api/dispensary/products/${item.id}/thumbnail`
+                                }
+                                alt={item.name}
+                                productType={item.productType}
+                                className="h-16 w-16 shrink-0 rounded-lg"
+                              />
+                              <div className="min-w-0 flex-1">
+                                <Link
+                                  href={`/dispensary/catalog?product=${item.id}`}
+                                  className="break-words font-semibold hover:underline"
+                                >
+                                  {item.name}
+                                </Link>
+                                <p className="text-sm text-pf-muted">
+                                  {item.requiresQuote
+                                    ? 'Price on request'
+                                    : `${formatMoney(item.price)} / ${formatProductUnit(item.unit)}`}
+                                </p>
+                                {item.acceptedQuoteId && (
+                                  <p className="text-sm text-pf-accent">
+                                    Quote: {formatMoney(item.quotedUnitPrice)} /{' '}
+                                    {formatProductUnit(item.unit)} · up to{' '}
+                                    {item.quotedQuantity}
+                                  </p>
+                                )}
+                                {problem && (
+                                  <p className="text-sm font-semibold text-pf-warning">
+                                    {problem}{' '}
+                                    {item.requiresQuote && (
+                                      <Link
+                                        href={`/messages?growerId=${item.growerId}&productId=${item.id}`}
+                                        className="inline-flex min-h-11 items-center underline"
+                                      >
+                                        Ask for price
+                                      </Link>
+                                    )}
+                                    {item.quantity > item.maxQty &&
+                                      item.maxQty > 0 && (
+                                        <button
+                                          className="ml-2 min-h-11 underline"
+                                          onClick={() =>
+                                            quantity(item, String(item.maxQty))
+                                          }
+                                        >
+                                          Set to {item.maxQty}
+                                        </button>
+                                      )}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex rounded-lg border border-pf-line-strong">
+                                <button
+                                  aria-label={`Decrease quantity for ${item.name}`}
+                                  disabled={item.quantity <= 1}
+                                  onClick={() =>
+                                    quantity(item, String(item.quantity - 1))
+                                  }
+                                  className="h-11 w-11 disabled:opacity-40"
+                                >
+                                  −
+                                </button>
+                                <input
+                                  id={`qty-${item.id}`}
+                                  aria-label={`Quantity for ${item.name}`}
+                                  type="text"
+                                  inputMode="numeric"
+                                  value={
+                                    quantityEdits[item.id] ??
+                                    String(item.quantity)
+                                  }
+                                  onChange={(event) =>
+                                    setQuantityEdits((value) => ({
+                                      ...value,
+                                      [item.id]: event.target.value,
+                                    }))
+                                  }
+                                  onBlur={(event) =>
+                                    quantity(item, event.target.value)
+                                  }
+                                  className="h-11 w-14 border-x border-pf-line-strong bg-transparent text-center text-base"
+                                />
+                                <button
+                                  aria-label={`Increase quantity for ${item.name}`}
+                                  disabled={item.quantity >= item.maxQty}
+                                  onClick={() =>
+                                    quantity(item, String(item.quantity + 1))
+                                  }
+                                  className="h-11 w-11 disabled:opacity-40"
+                                >
+                                  +
+                                </button>
+                              </div>
+                              <strong>{formatMoney(getLineTotal(item))}</strong>
+                              <button
+                                aria-label={`Remove ${item.name} from cart`}
+                                onClick={() => remove(item.id)}
+                                className="flex h-11 w-11 items-center justify-center rounded-lg text-pf-danger hover:bg-pf-danger-bg"
+                              >
+                                <Trash2 className="h-5 w-5" />
+                              </button>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                    <label className="mt-3 block text-sm">
+                      Payment timing
+                      <select
+                        className={inputClass}
+                        value={
+                          termChoices[id] ||
+                          term?.paymentTerms ||
+                          details.paymentTerms ||
+                          'Coordinate with grower'
+                        }
+                        onChange={(event) =>
+                          setTermChoices((value) => ({
+                            ...value,
+                            [id]: event.target.value,
+                          }))
+                        }
+                      >
+                        {[
+                          ...new Set([
+                            term?.paymentTerms || 'Coordinate with grower',
+                            ...(details.paymentTerms
+                              ? [details.paymentTerms]
+                              : []),
+                          ]),
+                        ].map((value) => (
+                          <option key={value}>{value}</option>
+                        ))}
+                      </select>
+                    </label>
+                    {termChoices[id] &&
+                      termChoices[id] !== term?.paymentTerms && (
+                        <p className="text-sm text-pf-warning">
+                          This differs from the grower’s terms and needs their
+                          agreement.
+                        </p>
+                      )}
+                  </section>
+                );
+              })}
+              {termsError && (
+                <p role="alert" className="text-sm text-pf-warning">
+                  {termsError}{' '}
+                  <button
+                    onClick={() => setTermsRetry((value) => value + 1)}
+                    className="min-h-11 underline"
+                  >
+                    Retry
+                  </button>
+                </p>
+              )}
+              <section className="space-y-3 rounded-xl border border-pf-line bg-pf-surface p-4">
+                <h2 className="font-semibold">Pickup & delivery</h2>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <label className="text-sm">
+                    Pickup or delivery
+                    <select
+                      className={inputClass}
+                      value={details.fulfillmentMethod}
+                      onChange={(event) =>
+                        setDetails((value) => ({
+                          ...value,
+                          fulfillmentMethod: event.target.value,
+                        }))
+                      }
+                    >
+                      {[
+                        'Coordinate with grower',
+                        'Pickup',
+                        'Delivery requested',
+                      ].map((value) => (
+                        <option key={value}>{value}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="text-sm">
+                    Preferred date or time (optional)
+                    <input
+                      className={inputClass}
+                      maxLength={120}
+                      value={details.requestedWindow}
+                      onChange={(event) =>
+                        setDetails((value) => ({
+                          ...value,
+                          requestedWindow: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                </div>
+                {details.fulfillmentMethod === 'Delivery requested' && (
+                  <label className="block text-sm">
+                    Delivery address
+                    <textarea
+                      id="delivery-address"
+                      required
+                      maxLength={500}
+                      className={inputClass}
+                      rows={2}
+                      value={details.deliveryAddress}
+                      onChange={(event) =>
+                        setDetails((value) => ({
+                          ...value,
+                          deliveryAddress: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                )}
+                <label className="block text-sm">
+                  Notes (optional)
+                  <textarea
+                    className={inputClass}
+                    maxLength={500}
+                    rows={3}
+                    value={details.orderNotes}
+                    onChange={(event) =>
+                      setDetails((value) => ({
+                        ...value,
+                        orderNotes: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+              </section>
+            </div>
+            <aside className="hidden h-fit space-y-3 lg:block rounded-xl border border-pf-line bg-pf-surface p-4">
+              <h2 className="font-semibold">Summary</h2>
+              <p>
+                {cart.items.length} {cart.items.length === 1 ? 'item' : 'items'}{' '}
+                · {Object.keys(groups).length}{' '}
+                {Object.keys(groups).length === 1 ? 'grower' : 'growers'}
+              </p>
+              <p className="flex justify-between font-semibold">
+                <span>Total</span>
+                <span>{formatMoney(cart.total)}</span>
+              </p>
+              <button
+                onClick={reviewOrder}
+                disabled={sending || refreshing}
+                className="min-h-11 w-full rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] disabled:opacity-50"
+              >
+                Review order
+              </button>
+              <button
+                onClick={refresh}
+                disabled={refreshing}
+                className="min-h-11 text-sm text-pf-accent"
+              >
+                {refreshing ? 'Refreshing…' : 'Refresh stock'}
+              </button>
+            </aside>
+          </div>
+          <button
+            type="button"
+            onClick={refresh}
+            disabled={refreshing}
+            className="min-h-11 text-sm text-pf-accent lg:hidden"
+          >
+            {refreshing ? 'Refreshing…' : 'Refresh stock'}
+          </button>
+          <StickyMobileActionBar
+            primaryLabel="Review order"
+            onPrimary={reviewOrder}
+            disabled={sending || refreshing}
+            helperText={`${cart.items.length} ${cart.items.length === 1 ? 'item' : 'items'} · ${formatMoney(cart.total)}`}
+            secondary={
+              <Link
+                className="inline-flex min-h-11 items-center justify-center rounded-lg border border-pf-line-strong px-3 text-sm"
+                href="/dispensary/catalog"
+              >
+                Add items
+              </Link>
+            }
+          />
+        </>
       )}
+      <Modal
+        open={review}
+        onClose={() => setReview(false)}
+        title="Review order"
+        className="max-w-2xl"
+      >
+        <div className="space-y-4">
+          {notice}
+          <p className="text-sm">
+            {details.fulfillmentMethod}
+            {details.requestedWindow ? ` · ${details.requestedWindow}` : ''}
+          </p>
+          {details.fulfillmentMethod === 'Delivery requested' && (
+            <p className="text-sm">
+              <strong>Deliver to:</strong> {details.deliveryAddress}
+            </p>
+          )}
+          {Object.entries(groups).map(([id, group]) => (
+            <section key={id} className="rounded-lg border border-pf-line p-3">
+              <div className="flex justify-between gap-3">
+                <h3 className="font-semibold">{group.grower}</h3>
+                <strong>{formatMoney(group.subtotal)}</strong>
+              </div>
+              <p className="my-2 text-sm text-pf-muted">
+                {termChoices[id] ||
+                  terms[id]?.paymentTerms ||
+                  details.paymentTerms ||
+                  'Coordinate with grower'}
+              </p>
+              <ul className="space-y-2 text-sm">
+                {group.items.map((item) => (
+                  <li className="flex justify-between gap-3" key={item.id}>
+                    <span>
+                      {item.name} × {item.quantity}{' '}
+                      {formatProductUnit(item.unit)}
+                    </span>
+                    <span>{formatMoney(getLineTotal(item))}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ))}
+          {details.orderNotes && (
+            <p className="whitespace-pre-wrap text-sm">{details.orderNotes}</p>
+          )}
+          <p className="text-sm text-pf-muted">
+            Payment is arranged directly with each grower.
+          </p>
+          <div className="flex flex-wrap items-center justify-between gap-3 border-t border-pf-line pt-3">
+            <strong>Total {formatMoney(cart.total)}</strong>
+            <button
+              disabled={sending || license !== 'approved' || refreshing}
+              onClick={send}
+              className="min-h-11 rounded-lg bg-emerald-500 px-4 font-semibold text-[#032116] disabled:opacity-50"
+            >
+              {sending
+                ? 'Sending…'
+                : license === 'loading'
+                  ? 'Checking license…'
+                  : 'Send order'}
+            </button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

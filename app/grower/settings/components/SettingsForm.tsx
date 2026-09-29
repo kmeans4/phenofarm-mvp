@@ -1,19 +1,18 @@
 'use client';
-
 import Link from 'next/link';
-
-import { isLicenseExpired } from '@/lib/license';
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
-import { AddressAutocomplete } from '@/app/components/ui/AddressAutocomplete';
+import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Button } from '@/app/components/ui/Button';
 import { LogoUpload } from '@/app/components/settings/LogoUpload';
+import {
+  CommercialTermsPanel,
+  EMPTY_COMMERCIAL_TERMS,
+} from '@/app/components/settings/CommercialTermsPanel';
+import type { CommercialTermsDefaults } from '@/lib/ux-workflow';
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
-import { useToast } from '@/app/hooks/useToast';
-import { DraftAutosaveStatus } from '@/app/components/ux/DraftAutosaveStatus';
-import { StickyMobileActionBar } from '@/app/components/ux/StickyMobileActionBar';
-import { useKeyboardShortcuts } from '@/app/hooks/useKeyboardShortcuts';
-import { useLocalDraft } from '@/app/hooks/useLocalDraft';
-
+import { toast } from '@/app/hooks/useToast';
+import { isLicenseExpired } from '@/lib/license';
+import { US_STATES } from '@/lib/us-states';
 export interface SettingsData {
   businessName: string;
   licenseNumber: string;
@@ -29,598 +28,264 @@ export interface SettingsData {
   description: string;
   logo: string;
 }
-
-interface FieldErrors {
-  businessName?: string;
-  email?: string;
-  phone?: string;
-  website?: string;
-  licenseNumber?: string;
-  licenseExpiry?: string;
-}
-
-const validateEmail = (email: string): string | undefined => {
-  if (!email) return 'Business email is required';
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) return 'Please enter a valid email address';
-  return undefined;
-};
-
-const validatePhone = (phone: string): string | undefined => {
-  if (!phone) return undefined;
-  const digitsOnly = phone.replace(/\D/g, '');
-  if (digitsOnly.length < 10) return 'Please enter a valid 10-digit phone number';
-  if (digitsOnly.length > 11) return 'Phone number is too long';
-  return undefined;
-};
-
-const validateWebsite = (website: string): string | undefined => {
-  if (!website) return undefined;
-  const urlRegex = /^https?:\/\/.+/;
-  if (!urlRegex.test(website)) return 'Start the website address with http:// or https://.';
-  try {
-    new URL(website);
-    return undefined;
-  } catch {
-    return 'Please enter a valid URL';
-  }
-};
-
-const validateBusinessName = (name: string): string | undefined => {
-  if (!name.trim()) return 'Business name is required';
-  if (name.trim().length < 2) return 'Business name must be at least 2 characters';
-  if (name.trim().length > 100) return 'Business name must be less than 100 characters';
-  return undefined;
-};
-
-const validateLicenseNumber = (license: string): string | undefined => {
-  if (!license.trim()) return undefined;
-  if (license.trim().length < 3) return 'License number must be at least 3 characters';
-  if (license.trim().length > 50) return 'License number must be less than 50 characters';
-  return undefined;
-};
-
-const validateLicenseExpiry = (expiry: string): string | undefined => {
-  if (!expiry) return 'License expiration date is required';
-  const expiryDate = new Date(expiry);
-  if (isNaN(expiryDate.getTime())) return 'Enter a valid date.';
-  if (isLicenseExpired(expiryDate)) return 'License expiration must be today or later';
-  return undefined;
-};
-
-const formatPhoneNumber = (value: string): string => {
-  const digitsOnly = value.replace(/\D/g, '');
-  if (digitsOnly.length <= 3) return digitsOnly;
-  if (digitsOnly.length <= 6) return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3)}`;
-  if (digitsOnly.length <= 10) return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6)}`;
-  return `(${digitsOnly.slice(0, 3)}) ${digitsOnly.slice(3, 6)}-${digitsOnly.slice(6, 10)}`;
-};
-
-const DEFAULT_FORM_DATA: SettingsData = {
-  businessName: '',
-  licenseNumber: '',
-  licenseExpiry: '',
-  contactName: '',
-  email: '',
-  phone: '',
-  address: '',
-  city: '',
-  state: 'VT',
-  zip: '',
-  website: '',
-  description: '',
-  logo: '',
-};
-
-export function SettingsForm({ initialSettings }: { initialSettings?: SettingsData }) {
-  const [loading, setLoading] = useState(!initialSettings);
-  const pendingRef = useRef(false);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState('');
-  const [touched, setTouched] = useState<Record<string, boolean>>({});
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  
-  const [formData, setFormData] = useState<SettingsData>(initialSettings || DEFAULT_FORM_DATA);
-  const [initialData, setInitialData] = useState<SettingsData>(initialSettings || DEFAULT_FORM_DATA);
-  
-  const { update, showToast } = useToast();
-  
-  const { isDirty, setIsDirty, resetDirtyState } = useUnsavedChanges({
-    enabled: true,
-    message: 'You have unsaved changes in your settings. Are you sure you want to leave?',
+const field =
+  'mt-1 min-h-11 w-full rounded-lg border border-pf-line-strong bg-pf-raised px-3 text-base sm:text-sm';
+export function SettingsForm({
+  initialSettings,
+  initialTerms = EMPTY_COMMERCIAL_TERMS,
+  isVerified = false,
+}: {
+  initialSettings: SettingsData;
+  initialTerms?: CommercialTermsDefaults;
+  isVerified?: boolean;
+}) {
+  const router = useRouter();
+  const [form, setForm] = useState(initialSettings);
+  const [terms, setTerms] = useState(initialTerms);
+  const [baseline, setBaseline] = useState({
+    form: initialSettings,
+    terms: initialTerms,
   });
-
-  const draftValue = useMemo(() => {
-    const value = { ...formData };
-    delete (value as Partial<SettingsData>).logo;
-    delete (value as Partial<SettingsData>).email;
-    return value as Omit<SettingsData, 'logo' | 'email'>;
-  }, [formData]);
-  const settingsDraft = useLocalDraft<Omit<SettingsData, 'logo' | 'email'>>({
-    key: 'phenofarm:draft:grower-settings',
-    value: draftValue,
-    enabled: !loading,
-    onRestore: (value) => setFormData((prev) => ({ ...prev, ...value, logo: prev.logo, email: prev.email })),
-    shouldSave: () => isDirty,
-  });
-  const clearSettingsDraft = settingsDraft.clearDraft;
-
+  const [busy, setBusy] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [verification, setVerification] = useState(isVerified);
+  const pending = useRef(false);
+  const { setIsDirty, resetDirtyState, isDirty } = useUnsavedChanges();
+  const licenseChanged =
+    form.licenseNumber !== baseline.form.licenseNumber ||
+    form.licenseExpiry !== baseline.form.licenseExpiry;
+  useEffect(
+    () =>
+      setIsDirty(JSON.stringify({ form, terms }) !== JSON.stringify(baseline)),
+    [form, terms, baseline, setIsDirty]
+  );
   useEffect(() => {
-    if (loading) return;
-    const hasChanges = JSON.stringify(formData) !== JSON.stringify(initialData);
-    setIsDirty(hasChanges);
-  }, [formData, initialData, loading, setIsDirty]);
-
-  const validateForm = useCallback((): boolean => {
-    const errors: FieldErrors = {
-      businessName: validateBusinessName(formData.businessName),
-      email: validateEmail(formData.email),
-      phone: validatePhone(formData.phone),
-      website: validateWebsite(formData.website),
-      licenseNumber: validateLicenseNumber(formData.licenseNumber),
-      licenseExpiry: validateLicenseExpiry(formData.licenseExpiry),
+    const focusSection = () => {
+      const key = window.location.hash.slice(1);
+      if (!key) return;
+      const section = document.getElementById(key);
+      const inputs = section?.querySelectorAll<
+        HTMLInputElement | HTMLSelectElement
+      >('input:not([type="file"]),select,textarea');
+      const target =
+        Array.from(inputs || []).find((i) => !i.value) || inputs?.[0];
+      target?.focus({ preventScroll: true });
     };
-    
-    setFieldErrors(errors);
-    return !Object.values(errors).some(e => e !== undefined);
-  }, [formData]);
-
-  const validateField = useCallback((field: keyof FieldErrors, value: string) => {
-    let error: string | undefined;
-    switch (field) {
-      case 'businessName':
-        error = validateBusinessName(value);
-        break;
-      case 'email':
-        error = validateEmail(value);
-        break;
-      case 'phone':
-        error = validatePhone(value);
-        break;
-      case 'website':
-        error = validateWebsite(value);
-        break;
-      case 'licenseNumber':
-        error = validateLicenseNumber(value);
-        break;
-      case 'licenseExpiry':
-        error = validateLicenseExpiry(value);
-        break;
-    }
-    setFieldErrors(prev => ({ ...prev, [field]: error }));
-    return !error;
-  }, []);
-
-  useEffect(() => {
-    if (initialSettings) return;
-    const controller = new AbortController();
-    let isMounted = true;
-
-    async function fetchSettings() {
-      try {
-        const res = await fetch('/api/grower/settings', { signal: controller.signal });
-        if (res.ok) {
-          const data = await res.json();
-          const loadedData: SettingsData = {
-            businessName: data.businessName || '',
-            licenseNumber: data.licenseNumber || '',
-            licenseExpiry: data.licenseExpiry ? new Date(data.licenseExpiry).toISOString().split('T')[0] : '',
-            contactName: data.contactName || '',
-            email: data.email || '',
-            phone: data.phone || '',
-            address: data.address || '',
-            city: data.city || '',
-            state: data.state || 'VT',
-            zip: data.zip || '',
-            website: data.website || '',
-            description: data.description || '',
-            logo: data.logo || '',
-          };
-          if (!isMounted) return;
-          setFormData(loadedData);
-          setInitialData(loadedData);
-        }
-      } catch (err) {
-        if (controller.signal.aborted) return;
-        console.error('Failed to load settings:', err);
-        showToast('error', 'We could not load settings. Please try again.');
-      } finally {
-        if (isMounted && !controller.signal.aborted) {
-          setLoading(false);
-        }
-      }
-    }
-    fetchSettings();
-
+    const t = setTimeout(focusSection, 150);
+    window.addEventListener('hashchange', focusSection);
     return () => {
-      isMounted = false;
-      controller.abort();
+      clearTimeout(t);
+      window.removeEventListener('hashchange', focusSection);
     };
-  }, [initialSettings, showToast]);
-
-  const handleAddressSelect = (address: {
-    fullAddress: string;
-    street: string;
-    city: string;
-    state: string;
-    zip: string;
-  }) => {
-    setFormData(prev => ({
-      ...prev,
-      address: address.fullAddress,
-      city: address.city,
-      state: address.state,
-      zip: address.zip,
-    }));
-  };
-
-  const handleLogoUpload = async (logo: string) => {
-    if (pendingRef.current) throw new Error('Wait for your current save to finish.');
-    pendingRef.current = true;
-    setSaving(true);
-    try {
-      const response = await fetch('/api/grower/settings', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ logo }) });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'Could not save logo.');
-      const savedLogo = typeof data.logo === 'string' ? data.logo : logo;
-      setFormData((current) => ({ ...current, logo: savedLogo }));
-      setInitialData((current) => ({ ...current, logo: savedLogo }));
-      showToast('success', 'Logo saved');
-    } finally { pendingRef.current = false; setSaving(false); }
-  };
-
-  const handleChange = (field: keyof SettingsData) => (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    let value = e.target.value;
-    
-    if (field === 'phone') {
-      value = formatPhoneNumber(value);
+  }, []);
+  const change = (key: keyof SettingsData, value: string) =>
+    setForm((f) => ({ ...f, [key]: value }));
+  async function save() {
+    if (pending.current) return;
+    const next: Record<string, string> = {};
+    if (!form.businessName.trim())
+      next.businessName = 'Enter the business name.';
+    if (form.phone && form.phone.replace(/\D/g, '').length < 7)
+      next.phone = 'Enter a valid phone number.';
+    if (licenseChanged) {
+      if (!form.licenseNumber.trim())
+        next.licenseNumber = 'Enter the license number.';
+      if (
+        !form.licenseExpiry ||
+        !Number.isFinite(new Date(form.licenseExpiry).getTime()) ||
+        isLicenseExpired(new Date(form.licenseExpiry))
+      )
+        next.licenseExpiry = 'Choose today or a later expiration date.';
     }
-    
-    setFormData(prev => ({ ...prev, [field]: value }));
-    
-    if (touched[field as keyof FieldErrors]) {
-      validateField(field as keyof FieldErrors, value);
-    }
-  };
-
-  const handleBlur = (field: keyof FieldErrors) => () => {
-    setTouched(prev => ({ ...prev, [field]: true }));
-    validateField(field, formData[field] as string);
-  };
-
-  const handleSave = useCallback(async () => {
-    if (pendingRef.current) return;
-    if (!validateForm()) {
-      setTouched({ businessName: true, email: true, phone: true, website: true, licenseNumber: true, licenseExpiry: true });
-      setError('Check the highlighted fields before saving.');
+    if (
+      terms.minimumOrder &&
+      (!Number.isFinite(Number(terms.minimumOrder.replace(/[$,]/g, ''))) ||
+        Number(terms.minimumOrder.replace(/[$,]/g, '')) < 0)
+    )
+      next.terms = 'Minimum order must be a positive amount or blank.';
+    setErrors(next);
+    if (Object.keys(next).length) {
+      document.getElementById(`settings-${Object.keys(next)[0]}`)?.focus();
       return;
     }
-    pendingRef.current = true;
-    setSaving(true);
-    setError('');
-    setSaved(false);
+    pending.current = true;
+    setBusy(true);
     try {
-      await update('Settings', fetch('/api/grower/settings', {
-        method: 'PUT', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...draftValue, email: formData.email }),
-      }).then(async (res) => {
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || 'Failed to save settings.');
-        return data;
-      }), { duration: 3000 });
-      setInitialData(formData);
-      clearSettingsDraft();
+      const r = await fetch('/api/grower/settings', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...form, commercialTerms: terms }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok) throw new Error(d.error || 'Could not save changes.');
+      if (licenseChanged) setVerification(false);
+      setBaseline({ form, terms });
       resetDirtyState();
-      setSaved(true);
-    } catch (err) { setError(err instanceof Error ? err.message : 'Failed to save settings.'); }
-    finally { pendingRef.current = false; setSaving(false); }
-  }, [clearSettingsDraft, draftValue, formData, resetDirtyState, update, validateForm]);
-
-  useEffect(() => {
-    if (!saved) return;
-    const timeout = window.setTimeout(() => setSaved(false), 3000);
-    return () => window.clearTimeout(timeout);
-  }, [saved]);
-  useKeyboardShortcuts({ onSave: handleSave, isDirty, enabled: !loading && !saving });
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pf-accent"></div>
-      </div>
-    );
+      toast.success('Changes saved');
+      router.refresh();
+    } catch (e) {
+      setErrors({
+        form: e instanceof Error ? e.message : 'Could not save changes.',
+      });
+    } finally {
+      pending.current = false;
+      setBusy(false);
+    }
   }
-
-  return (
-    <div className="space-y-4 sm:space-y-6">
-      {isDirty && <DraftAutosaveStatus
-        savedAt={settingsDraft.savedAt}
-        label="Settings details"
-        onClear={settingsDraft.clearDraft}
-      />}
-
-      {error && (
-        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg text-pf-danger flex items-start gap-3">
-          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-          <span>{error}</span>
-        </div>
-      )}
-      
-      {saved && (
-        <div className="p-4 bg-pf-accent-bg border border-pf-accent-line rounded-lg text-pf-accent flex items-start gap-3">
-          <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-          </svg>
-          <span>Settings saved.</span>
-        </div>
-      )}
-
-      <div className="space-y-4">
-        <div id="business-profile" className="scroll-mt-36 lg:scroll-mt-20 bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-pf-line bg-pf-canvas">
-            <h2 className="text-base sm:text-lg font-semibold text-pf-text">Business profile</h2>
-            <p role="status" className="mt-1 text-sm text-pf-muted">{isDirty ? 'Unsaved profile changes — choose Save profile.' : 'Profile saved.'} Logo changes save immediately. Use Save terms to save your order terms.</p>
-          </div>
-          <div className="grid gap-3 p-4 sm:gap-4 sm:p-6 md:grid-cols-2">
-            <p className="text-xs text-pf-muted md:col-span-2">* Required</p>
-
-            <div>
-              <label htmlFor="profile-businessName" className="block text-sm font-medium text-pf-secondary mb-1">
-                Name <span className="text-pf-danger">*</span>
-              </label>
-              <input 
-                type="text" 
-                id="profile-businessName"
-                value={formData.businessName}
-                onChange={handleChange('businessName')}
-                onBlur={handleBlur('businessName')}
-                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
-                  touched.businessName && fieldErrors.businessName
-                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
-                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
-                }`}
-                placeholder="Your business name"
-              />
-              {touched.businessName && fieldErrors.businessName && (
-                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {fieldErrors.businessName}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="profile-contactName" className="block text-sm font-medium text-pf-secondary mb-1">
-                Contact
-              </label>
-              <input 
-                type="text" 
-                id="profile-contactName"
-                value={formData.contactName}
-                onChange={handleChange('contactName')}
-                placeholder="Primary contact person"
-                className="w-full rounded-lg border border-pf-line-strong bg-pf-surface px-4 py-2 text-pf-text placeholder-pf-muted focus:border-pf-accent focus:ring-1 focus:ring-pf-accent focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="profile-licenseNumber" className="block text-sm font-medium text-pf-secondary mb-1">
-                License number <span className="text-pf-danger">*</span>
-              </label>
-              <input 
-                type="text" 
-                id="profile-licenseNumber"
-                value={formData.licenseNumber}
-                onChange={handleChange('licenseNumber')}
-                onBlur={handleBlur('licenseNumber')}
-                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
-                  touched.licenseNumber && fieldErrors.licenseNumber
-                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
-                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
-                }`}
-                placeholder="License number"
-              />
-              {touched.licenseNumber && fieldErrors.licenseNumber && (
-                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {fieldErrors.licenseNumber}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="profile-licenseExpiry" className="block text-sm font-medium text-pf-secondary mb-1">
-                License expiration <span className="text-pf-danger">*</span>
-              </label>
-              <input 
-                type="date" 
-                id="profile-licenseExpiry"
-                value={formData.licenseExpiry}
-                onChange={handleChange('licenseExpiry')}
-                onBlur={handleBlur('licenseExpiry')}
-                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
-                  touched.licenseExpiry && fieldErrors.licenseExpiry
-                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
-                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
-                }`}
-              />
-              {touched.licenseExpiry && fieldErrors.licenseExpiry && (
-                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {fieldErrors.licenseExpiry}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="profile-email" className="block text-sm font-medium text-pf-secondary mb-1">
-                Email <span className="text-pf-danger">*</span>
-              </label>
-              <input 
-                type="email" 
-                id="profile-email"
-                value={formData.email}
-                readOnly
-                aria-describedby="account-email-help"
-                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
-                  touched.email && fieldErrors.email
-                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
-                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
-                }`}
-                placeholder="business@example.com"
-              />
-              <p id="account-email-help" className="mt-1 text-sm text-pf-muted">
-                Used to sign in. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-pf-accent underline">Change email</Link>
-              </p>
-              {touched.email && fieldErrors.email && (
-                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {fieldErrors.email}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="profile-phone" className="block text-sm font-medium text-pf-secondary mb-1">
-                Phone
-              </label>
-              <input 
-                type="tel" 
-                id="profile-phone"
-                value={formData.phone}
-                onChange={handleChange('phone')}
-                onBlur={handleBlur('phone')}
-                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text focus:ring-1 focus:outline-none transition-colors ${
-                  touched.phone && fieldErrors.phone
-                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
-                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
-                }`}
-                placeholder="(555) 123-4567"
-              />
-              {touched.phone && fieldErrors.phone && (
-                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {fieldErrors.phone}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label htmlFor="profile-address" className="block text-sm font-medium text-pf-secondary mb-1">
-                Address
-              </label>
-              <AddressAutocomplete
-                id="profile-address"
-                value={formData.address}
-                onChange={(value) => setFormData(prev => ({ ...prev, address: value }))}
-                onSelect={handleAddressSelect}
-                placeholder="Type your address..."
-              />
-              <p className="text-xs text-pf-muted mt-1">Includes city, state and ZIP.</p>
-            </div>
-
-            <div>
-              <label htmlFor="profile-website" className="block text-sm font-medium text-pf-secondary mb-1">
-                Website
-              </label>
-              <input 
-                type="url" 
-                id="profile-website"
-                value={formData.website}
-                onChange={handleChange('website')}
-                onBlur={handleBlur('website')}
-                className={`w-full rounded-lg border bg-pf-surface px-4 py-2 text-pf-text placeholder-pf-muted focus:ring-1 focus:outline-none transition-colors ${
-                  touched.website && fieldErrors.website
-                    ? 'border-pf-danger-line focus:border-pf-danger focus:ring-pf-danger'
-                    : 'border-pf-line-strong focus:border-pf-accent focus:ring-pf-accent'
-                }`}
-                placeholder="https://yourbusiness.com"
-              />
-              {touched.website && fieldErrors.website && (
-                <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {fieldErrors.website}
-                </p>
-              )}
-            </div>
-
-            <div className="md:col-span-2">
-              <label htmlFor="profile-description" className="block text-sm font-medium text-pf-secondary mb-1">
-                Description
-              </label>
-              <textarea 
-                rows={2}
-                id="profile-description"
-                value={formData.description}
-                onChange={handleChange('description')}
-                className="w-full rounded-lg border border-pf-line-strong bg-pf-surface px-4 py-2 text-pf-text focus:border-pf-accent focus:ring-1 focus:ring-pf-accent focus:outline-none"
-                placeholder="Tell customers about your business..."
-              />
-              <p className="text-xs text-pf-muted mt-1 text-right">{formData.description.length}/500</p>
-            </div>
-          </div>
-        </div>
-
-        <div id="branding" className="self-start scroll-mt-36 lg:scroll-mt-20 overflow-hidden rounded-lg border border-pf-line bg-pf-surface shadow-sm">
-          <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-pf-line bg-pf-canvas">
-            <h2 className="text-base sm:text-lg font-semibold text-pf-text">Logo</h2>
-          </div>
-          <div className="p-4 sm:p-6">
-            <LogoUpload
-              currentLogo={formData.logo}
-              onUpload={handleLogoUpload}
-              disabled={saving}
-            />
-          </div>
-        </div>
-      </div>
-
-      {isDirty && <div className="sticky bottom-4 z-20 hidden items-center justify-between gap-4 rounded-lg border border-pf-line bg-pf-raised/95 px-4 py-3 shadow-lg backdrop-blur sm:flex">
-        <p className="text-sm text-pf-muted">Unsaved profile changes</p>
-        <Button
-          type="button"
-          variant="primary"
-          onClick={() => handleSave()}
-          disabled={saving}
-          className="min-w-[9rem]"
+  const renderField = (
+    key: keyof SettingsData,
+    label: string,
+    type = 'text'
+  ) => (
+    <label className="block text-sm" htmlFor={`settings-${key}`}>
+      {label}
+      <input
+        id={`settings-${key}`}
+        type={type}
+        value={form[key]}
+        onChange={(e) => change(key, e.target.value)}
+        aria-invalid={!!errors[key]}
+        aria-describedby={errors[key] ? `settings-${key}-error` : undefined}
+        className={field}
+      />
+      {errors[key] && (
+        <span
+          id={`settings-${key}-error`}
+          className="mt-1 block text-sm text-pf-danger"
         >
-          {saving ? (
-            <span className="flex items-center gap-2">
-              <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-              Saving...
-            </span>
-          ) : (
-            'Save profile'
-          )}
+          {errors[key]}
+        </span>
+      )}
+    </label>
+  );
+  return (
+    <form
+      className="space-y-4"
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        void save();
+      }}
+    >
+      {errors.form && (
+        <p
+          role="alert"
+          className="rounded-lg bg-pf-danger-bg p-3 text-sm text-pf-danger"
+        >
+          {errors.form}
+        </p>
+      )}
+      <section
+        id="profile"
+        className="scroll-mt-36 rounded-xl border border-pf-line bg-pf-surface p-4 sm:p-6"
+      >
+        <span id="business-profile" className="scroll-mt-36" />
+        <h2 className="mb-4 font-semibold">Business profile</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {renderField('businessName', 'Business name')}
+          {renderField('contactName', 'Contact name (optional)')}
+          {renderField('phone', 'Phone (optional)', 'tel')}
+          {renderField('website', 'Website (optional)')}
+          <div className="text-sm">
+            <p>Email</p>
+            <p className="mt-2 break-all">{form.email}</p>
+            <Link
+              href="/auth/change-email"
+              className="inline-flex min-h-11 items-center text-pf-accent underline"
+            >
+              Change email
+            </Link>
+          </div>
+          <div className="sm:col-span-2">
+            {renderField('address', 'Street address (optional)')}
+          </div>
+          {renderField('city', 'City (optional)')}
+          <label className="text-sm" htmlFor="settings-state">
+            State (optional)
+            <select
+              id="settings-state"
+              value={form.state}
+              className={field}
+              onChange={(e) => change('state', e.target.value)}
+            >
+              <option value="">Choose state</option>
+              {US_STATES.map(([code, name]) => (
+                <option key={code} value={code}>
+                  {name}
+                </option>
+              ))}
+            </select>
+          </label>
+          {renderField('zip', 'ZIP code (optional)')}
+          <label
+            htmlFor="settings-description"
+            className="text-sm sm:col-span-2"
+          >
+            About your business (optional)
+            <textarea
+              id="settings-description"
+              rows={3}
+              value={form.description}
+              onChange={(e) => change('description', e.target.value)}
+              className={`${field} py-2`}
+            />
+          </label>
+        </div>
+      </section>
+      <section
+        id="license"
+        className="scroll-mt-36 rounded-xl border border-pf-line bg-pf-surface p-4 sm:p-6"
+      >
+        <h2 className="font-semibold">License</h2>
+        <p
+          className={`my-3 text-sm ${verification ? 'text-pf-accent' : 'text-pf-warning'}`}
+        >
+          {isLicenseExpired(new Date(baseline.form.licenseExpiry))
+            ? 'Expired — upload current license details.'
+            : verification
+              ? 'Approved'
+              : baseline.form.licenseNumber && baseline.form.licenseExpiry
+                ? 'Submitted — under review'
+                : 'Add your license details for review.'}
+        </p>
+        {licenseChanged && (
+          <p
+            role="status"
+            className="mb-3 rounded-lg bg-pf-warning-bg p-3 text-sm text-pf-warning"
+          >
+            Saving pauses your listings until the new license is verified.
+          </p>
+        )}
+        <div className="grid gap-4 sm:grid-cols-2">
+          {renderField('licenseNumber', 'License number')}
+          {renderField('licenseExpiry', 'Expiration date', 'date')}
+        </div>
+      </section>
+      <section
+        id="branding"
+        className="scroll-mt-36 rounded-xl border border-pf-line bg-pf-surface p-4 sm:p-6"
+      >
+        <h2 className="mb-4 font-semibold">Logo</h2>
+        <LogoUpload
+          currentLogo={form.logo}
+          disabled={busy}
+          onUpload={async (value) => change('logo', value)}
+        />
+      </section>
+      {errors.terms && (
+        <p role="alert" className="text-sm text-pf-danger">
+          {errors.terms}
+        </p>
+      )}
+      <CommercialTermsPanel value={terms} onChange={setTerms} disabled={busy} />
+      <div className="sticky bottom-20 z-20 flex items-center justify-between gap-3 rounded-xl border border-pf-line-strong bg-pf-surface p-3 shadow-lg lg:bottom-3">
+        <span className="text-sm text-pf-muted">
+          {isDirty ? 'Unsaved changes' : ''}
+        </span>
+        <Button type="submit" disabled={busy}>
+          {busy ? 'Saving…' : 'Save changes'}
         </Button>
-      </div>}
-
-      {isDirty && <StickyMobileActionBar
-        primaryLabel={saving ? 'Saving...' : 'Save profile'}
-        onPrimary={() => void handleSave()}
-        disabled={saving}
-        helperText="Unsaved profile changes"
-      />}
-    </div>
+      </div>
+    </form>
   );
 }

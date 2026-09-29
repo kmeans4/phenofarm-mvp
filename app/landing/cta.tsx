@@ -2,12 +2,10 @@ import Link from 'next/link';
 import { Reveal } from './motion';
 import { MagneticButton } from './magnetic-button';
 
-export function Cta() {
+export function Cta({ signedIn = false }: { signedIn?: boolean }) {
   return (
     <section className="relative border-t border-white/[0.06] px-6 py-28 md:py-36">
-      <Reveal
-        className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-emerald-500/15 bg-[#0a0d0b] px-6 py-20 text-center md:py-24"
-      >
+      <Reveal className="relative mx-auto max-w-5xl overflow-hidden rounded-3xl border border-emerald-500/15 bg-[#0a0d0b] px-6 py-20 text-center md:py-24">
         <div aria-hidden className="absolute inset-0">
           <div className="absolute left-1/2 top-0 h-72 w-[640px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/[0.12] blur-[100px]" />
           <div
@@ -16,8 +14,10 @@ export function Cta() {
               backgroundImage:
                 'linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px)',
               backgroundSize: '56px 56px',
-              maskImage: 'radial-gradient(ellipse 70% 70% at 50% 0%, black 20%, transparent 70%)',
-              WebkitMaskImage: 'radial-gradient(ellipse 70% 70% at 50% 0%, black 20%, transparent 70%)',
+              maskImage:
+                'radial-gradient(ellipse 70% 70% at 50% 0%, black 20%, transparent 70%)',
+              WebkitMaskImage:
+                'radial-gradient(ellipse 70% 70% at 50% 0%, black 20%, transparent 70%)',
             }}
           />
         </div>
@@ -27,14 +27,17 @@ export function Cta() {
             Ready to manage wholesale orders in one place?
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed text-gray-400">
-            List products, agree on prices, and follow requests through delivery.
+            List products, agree on prices, and follow requests through
+            delivery.
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <MagneticButton href="/auth/sign_up">Create a free account</MagneticButton>
+            <MagneticButton href={signedIn ? '/dashboard' : '/auth/sign_up'}>
+              {signedIn ? 'Open dashboard' : 'Create a free account'}
+            </MagneticButton>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-gray-200 transition-colors hover:border-white/20 hover:bg-white/[0.06]"
+              className="inline-flex items-center gap-2 rounded-xl border border-pf-line-strong bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-gray-200 transition-colors hover:border-pf-accent hover:bg-white/[0.06]"
             >
               Ask a question
             </Link>

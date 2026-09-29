@@ -1,27 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { getAllProductTypes } from '@/lib/product-types';
-import { buyerProductWhere, parsePage } from '@/lib/buyer-products';
-import { marketplaceGrowerWhere } from '@/lib/license';
-
+import { getBuyerCatalog } from '@/lib/buyer-catalog';
 export async function GET(request: NextRequest) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
-  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
-  const query = request.nextUrl.searchParams.get('q')?.trim().slice(0, 160) || '';
-  const limit = parsePage(request.nextUrl.searchParams.get('limit'), 8, 10);
+  if (session?.user.role !== 'DISPENSARY' || !session.user.dispensaryId)
+    return NextResponse.json(
+      { error: 'Please sign in as a dispensary.' },
+      { status: 401 }
+    );
+  const query =
+    request.nextUrl.searchParams.get('q')?.trim().slice(0, 160) || '';
   if (query.length < 2) return NextResponse.json({ suggestions: [], query });
   try {
-    const pattern = { contains: query, mode: 'insensitive' as const };
-    const available = { ...buyerProductWhere(), isAvailable: true, inventoryQty: { gt: 0 } };
-    const [products, strains, growers] = await Promise.all([
-      db.product.findMany({ where: { ...available, name: pattern }, select: { id: true, name: true }, take: limit }),
-      db.strain.findMany({ where: { OR: [{ name: pattern }, { genetics: pattern }], products: { some: available } }, select: { id: true, name: true }, take: limit }),
-      db.grower.findMany({ where: { ...marketplaceGrowerWhere(), businessName: pattern, products: { some: { isDeleted: false, status: 'PUBLISHED', isAvailable: true, inventoryQty: { gt: 0 } } } }, select: { id: true, businessName: true }, take: limit }),
-    ]);
-    const candidates = [...products.map(product => ({ text: product.name, type: 'product', id: product.id })), ...strains.map(strain => ({ text: strain.name, type: 'strain', id: strain.id })), ...growers.map(grower => ({ text: grower.businessName, type: 'grower', id: grower.id })), ...getAllProductTypes().filter(type => type.toLowerCase().includes(query.toLowerCase())).map(text => ({ text, type: 'category' }))];
-    const unique = [...new Map(candidates.map(candidate => [candidate.text.toLowerCase(), candidate])).values()];
-    return NextResponse.json({ suggestions: unique.slice(0, limit), query });
-  } catch { return NextResponse.json({ error: 'Unable to load suggestions.' }, { status: 500 }); }
+    const data = await getBuyerCatalog(
+      session.user.dispensaryId,
+      new URLSearchParams({ search: query, limit: '6', inStock: 'true' })
+    );
+    const products = data.products.map((product) => ({
+      text: product.name,
+      type: 'product',
+      id: product.id,
+    }));
+    const growers = [
+      ...new Map(
+        data.products.map((product) => [
+          product.grower.id,
+          {
+            text: product.grower.businessName,
+            type: 'grower',
+            id: product.grower.id,
+          },
+        ])
+      ).values(),
+    ].filter((grower) =>
+      query
+        .toLowerCase()
+        .split(/\s+/)
+        .some((word) => grower.text.toLowerCase().includes(word))
+    );
+    return NextResponse.json({
+      suggestions: [...products, ...growers].slice(0, 8),
+      query,
+    });
+  } catch {
+    return NextResponse.json(
+      { error: 'Unable to load suggestions.' },
+      { status: 500 }
+    );
+  }
 }

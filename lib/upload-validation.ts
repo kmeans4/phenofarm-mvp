@@ -1,26 +1,34 @@
 export const FILE_UPLOAD_LIMITS = {
-  productImageMaxBytes: 1_000_000,
-  productImagesMaxCount: 2,
+  productImageMaxBytes: 4_000_000,
+  productImagesMaxCount: 6,
   logoMaxBytes: 500_000,
-  productDocumentMaxBytes: 2_000_000,
-  batchLabDocumentMaxBytes: 2_000_000,
-  csvImportMaxBytes: 1_000_000,
+  productDocumentMaxBytes: 4_000_000,
+  batchLabDocumentMaxBytes: 4_000_000,
+  csvImportMaxBytes: 4_000_000,
 } as const;
 
-export const IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'] as const;
+export const IMAGE_MIME_TYPES = [
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+] as const;
 export const PRODUCT_DOCUMENT_MIME_TYPES = ['application/pdf'] as const;
-export const CSV_MIME_TYPES = ['text/csv', 'application/vnd.ms-excel', 'application/csv'] as const;
+export const CSV_MIME_TYPES = [
+  'text/csv',
+  'application/vnd.ms-excel',
+  'application/csv',
+] as const;
 
 const IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'webp'];
 const PDF_EXTENSIONS = ['pdf'];
-const CSV_EXTENSIONS = ['csv'];
 
 export type UploadValidationResult =
   | { ok: true }
   | { ok: false; error: string };
 
 export function formatBytes(bytes: number) {
-  if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(bytes % 1_000_000 === 0 ? 0 : 1)}MB`;
+  if (bytes >= 1_000_000)
+    return `${(bytes / 1_000_000).toFixed(bytes % 1_000_000 === 0 ? 0 : 1)}MB`;
   if (bytes >= 1_000) return `${Math.round(bytes / 1_000)}KB`;
   return `${bytes}B`;
 }
@@ -30,7 +38,12 @@ export function getFileExtension(fileName: string) {
 }
 
 export function sanitizeFileName(fileName: string) {
-  return fileName.replace(/[^\w.\- ]+/g, '').trim().slice(0, 120) || 'upload';
+  return (
+    fileName
+      .replace(/[^\w.\- ]+/g, '')
+      .trim()
+      .slice(0, 120) || 'upload'
+  );
 }
 
 function bytesStartWith(bytes: Uint8Array, signature: number[]) {
@@ -39,7 +52,8 @@ function bytesStartWith(bytes: Uint8Array, signature: number[]) {
 
 export function detectMimeFromBytes(bytes: Uint8Array) {
   if (bytesStartWith(bytes, [0xff, 0xd8, 0xff])) return 'image/jpeg';
-  if (bytesStartWith(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) return 'image/png';
+  if (bytesStartWith(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))
+    return 'image/png';
   if (
     bytes.length >= 12 &&
     bytesStartWith(bytes, [0x52, 0x49, 0x46, 0x46]) &&
@@ -50,7 +64,8 @@ export function detectMimeFromBytes(bytes: Uint8Array) {
   ) {
     return 'image/webp';
   }
-  if (bytesStartWith(bytes, [0x25, 0x50, 0x44, 0x46, 0x2d])) return 'application/pdf';
+  if (bytesStartWith(bytes, [0x25, 0x50, 0x44, 0x46, 0x2d]))
+    return 'application/pdf';
   return null;
 }
 
@@ -94,8 +109,13 @@ export function validateUploadFile(
     };
   }
 
-  const mimeAllowed = file.type ? options.allowedMimeTypes.includes(file.type) : false;
-  const extensionAllowed = hasAllowedExtension(file.name, options.allowedExtensions);
+  const mimeAllowed = file.type
+    ? options.allowedMimeTypes.includes(file.type)
+    : false;
+  const extensionAllowed = hasAllowedExtension(
+    file.name,
+    options.allowedExtensions
+  );
 
   if (!mimeAllowed || !extensionAllowed) {
     return {
@@ -116,10 +136,21 @@ export function validateProductImageFile(file: File) {
   });
 }
 
-export function validateProductImageBytes(bytes: Uint8Array, label = 'Product image'): UploadValidationResult {
+export function validateProductImageBytes(
+  bytes: Uint8Array,
+  label = 'Product image'
+): UploadValidationResult {
   const detectedMime = detectMimeFromBytes(bytes);
-  if (!detectedMime || !IMAGE_MIME_TYPES.includes(detectedMime as (typeof IMAGE_MIME_TYPES)[number])) {
-    return { ok: false, error: `${label} content must be a JPG, PNG, or WebP image.` };
+  if (
+    !detectedMime ||
+    !IMAGE_MIME_TYPES.includes(
+      detectedMime as (typeof IMAGE_MIME_TYPES)[number]
+    )
+  ) {
+    return {
+      ok: false,
+      error: `${label} content must be a JPG, PNG, or WebP image.`,
+    };
   }
   return { ok: true };
 }
@@ -142,7 +173,10 @@ export function validateProductDocumentFile(file: File) {
   });
 }
 
-export function validatePdfBytes(bytes: Uint8Array, label = 'Document'): UploadValidationResult {
+export function validatePdfBytes(
+  bytes: Uint8Array,
+  label = 'Document'
+): UploadValidationResult {
   if (detectMimeFromBytes(bytes) !== 'application/pdf') {
     return { ok: false, error: `${label} content must be a PDF.` };
   }
@@ -158,13 +192,13 @@ export function validateBatchLabDocumentFile(file: File) {
   });
 }
 
-export function validateCsvImportFile(file: File) {
-  return validateUploadFile(file, {
-    label: 'CSV import',
-    maxBytes: FILE_UPLOAD_LIMITS.csvImportMaxBytes,
-    allowedMimeTypes: CSV_MIME_TYPES,
-    allowedExtensions: CSV_EXTENSIONS,
-  });
+export function validateCsvImportFile(file: File): UploadValidationResult {
+  if (!file.size) return { ok: false, error: 'The spreadsheet is empty.' };
+  if (file.size > FILE_UPLOAD_LIMITS.csvImportMaxBytes)
+    return { ok: false, error: 'Choose a spreadsheet smaller than 4MB.' };
+  if (!['csv', 'tsv', 'xlsx'].includes(getFileExtension(file.name)))
+    return { ok: false, error: 'Choose a CSV, TSV or Excel (.xlsx) file.' };
+  return { ok: true };
 }
 
 export function parseDataUrl(value: string) {
@@ -184,7 +218,8 @@ export function parseDataUrl(value: string) {
 
 function isHttpUrl(value: string) {
   if (value.length > 2048) return false;
-  if (/^\/uploads\/[a-zA-Z0-9-]+\.(png|jpg|jpeg|webp|pdf)$/.test(value)) return true;
+  if (/^\/uploads\/[a-zA-Z0-9-]+\.(png|jpg|jpeg|webp|pdf)$/.test(value))
+    return true;
   try {
     const url = new URL(value);
     return url.protocol === 'https:' || url.protocol === 'http:';
@@ -194,10 +229,15 @@ function isHttpUrl(value: string) {
 }
 
 function isLikelyLegacyBase64(value: string) {
-  return /^[A-Za-z0-9+/=\s]+$/.test(value) && value.replace(/\s/g, '').length >= 32;
+  return (
+    /^[A-Za-z0-9+/=\s]+$/.test(value) && value.replace(/\s/g, '').length >= 32
+  );
 }
 
-export function validateImageReference(value: string, label = 'image'): UploadValidationResult {
+export function validateImageReference(
+  value: string,
+  label = 'image'
+): UploadValidationResult {
   const trimmed = value.trim();
   if (!trimmed) return { ok: false, error: `${label} is empty.` };
 
@@ -205,11 +245,20 @@ export function validateImageReference(value: string, label = 'image'): UploadVa
 
   const dataUrl = parseDataUrl(trimmed);
   if (dataUrl) {
-    if (!IMAGE_MIME_TYPES.includes(dataUrl.mimeType as (typeof IMAGE_MIME_TYPES)[number])) {
-      return { ok: false, error: `${label} must be a JPG, PNG, or WebP image.` };
+    if (
+      !IMAGE_MIME_TYPES.includes(
+        dataUrl.mimeType as (typeof IMAGE_MIME_TYPES)[number]
+      )
+    ) {
+      return {
+        ok: false,
+        error: `${label} must be a JPG, PNG, or WebP image.`,
+      };
     }
     const bytes = decodeBase64Prefix(dataUrl.base64);
-    const byteValidation = bytes ? validateProductImageBytes(bytes, label) : { ok: false as const, error: `${label} data is invalid.` };
+    const byteValidation = bytes
+      ? validateProductImageBytes(bytes, label)
+      : { ok: false as const, error: `${label} data is invalid.` };
     if (!byteValidation.ok) return byteValidation;
     if (dataUrl.sizeBytes > FILE_UPLOAD_LIMITS.productImageMaxBytes) {
       return {
@@ -222,11 +271,16 @@ export function validateImageReference(value: string, label = 'image'): UploadVa
 
   if (isLikelyLegacyBase64(trimmed)) {
     const bytes = decodeBase64Prefix(trimmed);
-    const byteValidation = bytes ? validateProductImageBytes(bytes, label) : { ok: false as const, error: `${label} data is invalid.` };
+    const byteValidation = bytes
+      ? validateProductImageBytes(bytes, label)
+      : { ok: false as const, error: `${label} data is invalid.` };
     if (!byteValidation.ok) return byteValidation;
 
     const padding = trimmed.endsWith('==') ? 2 : trimmed.endsWith('=') ? 1 : 0;
-    const sizeBytes = Math.max(0, Math.floor((trimmed.replace(/\s/g, '').length * 3) / 4) - padding);
+    const sizeBytes = Math.max(
+      0,
+      Math.floor((trimmed.replace(/\s/g, '').length * 3) / 4) - padding
+    );
     if (sizeBytes > FILE_UPLOAD_LIMITS.productImageMaxBytes) {
       return {
         ok: false,
@@ -240,17 +294,26 @@ export function validateImageReference(value: string, label = 'image'): UploadVa
 }
 
 export function validateLogoDataUrl(value: unknown): UploadValidationResult {
-  if (value === null || value === undefined || value === '') return { ok: true };
-  if (typeof value !== 'string') return { ok: false, error: 'Logo must be an image URL.' };
+  if (value === null || value === undefined || value === '')
+    return { ok: true };
+  if (typeof value !== 'string')
+    return { ok: false, error: 'Logo must be an image URL.' };
   if (isHttpUrl(value)) return { ok: true };
 
   const dataUrl = parseDataUrl(value);
-  if (!dataUrl || !IMAGE_MIME_TYPES.includes(dataUrl.mimeType as (typeof IMAGE_MIME_TYPES)[number])) {
+  if (
+    !dataUrl ||
+    !IMAGE_MIME_TYPES.includes(
+      dataUrl.mimeType as (typeof IMAGE_MIME_TYPES)[number]
+    )
+  ) {
     return { ok: false, error: 'Logo must be a JPG, PNG, or WebP image.' };
   }
 
   const bytes = decodeBase64Prefix(dataUrl.base64);
-  const byteValidation = bytes ? validateProductImageBytes(bytes, 'Logo') : { ok: false as const, error: 'Logo data is invalid.' };
+  const byteValidation = bytes
+    ? validateProductImageBytes(bytes, 'Logo')
+    : { ok: false as const, error: 'Logo data is invalid.' };
   if (!byteValidation.ok) return byteValidation;
 
   if (dataUrl.sizeBytes > FILE_UPLOAD_LIMITS.logoMaxBytes) {
@@ -263,9 +326,12 @@ export function validateLogoDataUrl(value: unknown): UploadValidationResult {
   return { ok: true };
 }
 
-export function validateProductImageList(images: unknown): UploadValidationResult {
+export function validateProductImageList(
+  images: unknown
+): UploadValidationResult {
   if (images === undefined || images === null) return { ok: true };
-  if (!Array.isArray(images)) return { ok: false, error: 'images must be an array.' };
+  if (!Array.isArray(images))
+    return { ok: false, error: 'images must be an array.' };
 
   if (images.length > FILE_UPLOAD_LIMITS.productImagesMaxCount) {
     return {
@@ -276,7 +342,10 @@ export function validateProductImageList(images: unknown): UploadValidationResul
 
   for (const [index, image] of images.entries()) {
     if (typeof image !== 'string') {
-      return { ok: false, error: `Image ${index + 1} must be a URL or data URL.` };
+      return {
+        ok: false,
+        error: `Image ${index + 1} must be a URL or data URL.`,
+      };
     }
     const result = validateImageReference(image, `Image ${index + 1}`);
     if (!result.ok) return result;
@@ -285,18 +354,29 @@ export function validateProductImageList(images: unknown): UploadValidationResul
   return { ok: true };
 }
 
-export function validateDocumentReference(value: unknown): UploadValidationResult {
-  if (value === undefined || value === null || value === '') return { ok: true };
-  if (typeof value !== 'string') return { ok: false, error: 'Document reference must be text.' };
+export function validateDocumentReference(
+  value: unknown
+): UploadValidationResult {
+  if (value === undefined || value === null || value === '')
+    return { ok: true };
+  if (typeof value !== 'string')
+    return { ok: false, error: 'Document reference must be text.' };
   if (isHttpUrl(value) || isLocalDocumentReference(value)) return { ok: true };
 
   const dataUrl = parseDataUrl(value);
-  if (!dataUrl || !PRODUCT_DOCUMENT_MIME_TYPES.includes(dataUrl.mimeType as (typeof PRODUCT_DOCUMENT_MIME_TYPES)[number])) {
+  if (
+    !dataUrl ||
+    !PRODUCT_DOCUMENT_MIME_TYPES.includes(
+      dataUrl.mimeType as (typeof PRODUCT_DOCUMENT_MIME_TYPES)[number]
+    )
+  ) {
     return { ok: false, error: 'Document must be a PDF URL or PDF data URL.' };
   }
 
   const bytes = decodeBase64Prefix(dataUrl.base64);
-  const byteValidation = bytes ? validatePdfBytes(bytes) : { ok: false as const, error: 'Document data is invalid.' };
+  const byteValidation = bytes
+    ? validatePdfBytes(bytes)
+    : { ok: false as const, error: 'Document data is invalid.' };
   if (!byteValidation.ok) return byteValidation;
 
   if (dataUrl.sizeBytes > FILE_UPLOAD_LIMITS.productDocumentMaxBytes) {
@@ -309,12 +389,16 @@ export function validateDocumentReference(value: unknown): UploadValidationResul
   return { ok: true };
 }
 
-export function validateBatchLabDocumentsPayload(value: unknown): UploadValidationResult {
+export function validateBatchLabDocumentsPayload(
+  value: unknown
+): UploadValidationResult {
   if (value === undefined || value === null) return { ok: true };
-  if (typeof value !== 'object') return { ok: false, error: 'Lab documents must be an object.' };
+  if (typeof value !== 'object')
+    return { ok: false, error: 'Lab documents must be an object.' };
 
   const payload = value as { labDocuments?: Record<string, unknown> };
-  if (JSON.stringify(value).length > 8_100_000) return { ok: false, error: 'Lab document payload is too large.' };
+  if (JSON.stringify(value).length > 8_100_000)
+    return { ok: false, error: 'Lab document payload is too large.' };
   if (!payload.labDocuments) return { ok: true };
 
   for (const [key, document] of Object.entries(payload.labDocuments)) {
@@ -323,12 +407,20 @@ export function validateBatchLabDocumentsPayload(value: unknown): UploadValidati
     }
 
     const record = document as Record<string, unknown>;
-    const dataUrl = typeof record.dataUrl === 'string' ? parseDataUrl(record.dataUrl) : null;
+    const dataUrl =
+      typeof record.dataUrl === 'string' ? parseDataUrl(record.dataUrl) : null;
 
-    if (typeof record.dataUrl === 'string' && (isHttpUrl(record.dataUrl) || isLocalDocumentReference(record.dataUrl))) continue;
+    if (
+      typeof record.dataUrl === 'string' &&
+      (isHttpUrl(record.dataUrl) || isLocalDocumentReference(record.dataUrl))
+    )
+      continue;
 
     if (!dataUrl || dataUrl.mimeType !== 'application/pdf') {
-      return { ok: false, error: `Lab document ${key} must be a PDF data URL.` };
+      return {
+        ok: false,
+        error: `Lab document ${key} must be a PDF data URL.`,
+      };
     }
 
     const bytes = decodeBase64Prefix(dataUrl.base64);
@@ -350,5 +442,9 @@ export function validateBatchLabDocumentsPayload(value: unknown): UploadValidati
 
 // Match the dev-only URLs returned by storeUpload; production requires Blob.
 function isLocalDocumentReference(value: string) {
-  return process.env.NODE_ENV !== 'production' && !process.env.VERCEL && /^\/uploads\/[a-zA-Z0-9-]+\.pdf$/.test(value);
+  return (
+    process.env.NODE_ENV !== 'production' &&
+    !process.env.VERCEL &&
+    /^\/uploads\/[a-zA-Z0-9-]+\.pdf$/.test(value)
+  );
 }

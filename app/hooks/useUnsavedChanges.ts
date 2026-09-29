@@ -1,6 +1,8 @@
 'use client';
 
 import { useEffect, useCallback, useRef, useState } from 'react';
+import { askToLeave } from '@/app/components/ui/UnsavedChangesDialog';
+import { useRouter } from 'next/navigation';
 
 interface UseUnsavedChangesOptions {
   enabled?: boolean;
@@ -12,17 +14,19 @@ interface UseUnsavedChangesOptions {
  */
 export function useUnsavedChanges({
   enabled = true,
-  message = 'You have unsaved changes. Are you sure you want to leave?',
+  message = 'Your latest changes have not been saved.',
 }: UseUnsavedChangesOptions = {}) {
+  const router = useRouter();
   const [isDirty, setIsDirty] = useState(false);
   const dirtyRef = useRef(false);
   const updateDirty = useCallback((value: boolean) => {
     dirtyRef.current = value;
     setIsDirty(value);
   }, []);
-  const confirmNavigation = useCallback(() => (
-    !enabled || !dirtyRef.current || window.confirm(message)
-  ), [enabled, message]);
+  const confirmNavigation = useCallback(
+    async () => !enabled || !dirtyRef.current || (await askToLeave(message)),
+    [enabled, message]
+  );
 
   useEffect(() => {
     if (!enabled || !isDirty) return;
@@ -32,14 +36,42 @@ export function useUnsavedChanges({
       event.returnValue = message;
     };
     const onLink = (event: MouseEvent) => {
-      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
-      const anchor = (event.target as Element | null)?.closest<HTMLAnchorElement>('a[href]');
-      if (!anchor || anchor.hasAttribute('download') || anchor.target === '_blank') return;
+      if (
+        event.defaultPrevented ||
+        event.button !== 0 ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.shiftKey ||
+        event.altKey
+      )
+        return;
+      const anchor = (
+        event.target as Element | null
+      )?.closest<HTMLAnchorElement>('a[href]');
+      if (
+        !anchor ||
+        anchor.hasAttribute('download') ||
+        anchor.target === '_blank'
+      )
+        return;
       const destination = new URL(anchor.href, window.location.href);
-      if (destination.pathname === window.location.pathname && destination.search === window.location.search) return;
-      if (!confirmNavigation()) {
+      if (
+        destination.pathname === window.location.pathname &&
+        destination.search === window.location.search
+      )
+        return;
+      if (dirtyRef.current) {
         event.preventDefault();
         event.stopPropagation();
+        void confirmNavigation().then((leave) => {
+          if (!leave) return;
+          updateDirty(false);
+          if (destination.origin === window.location.origin)
+            router.push(
+              destination.pathname + destination.search + destination.hash
+            );
+          else window.location.assign(destination.href);
+        });
       }
     };
     window.addEventListener('beforeunload', beforeUnload);
@@ -48,7 +80,7 @@ export function useUnsavedChanges({
       window.removeEventListener('beforeunload', beforeUnload);
       document.removeEventListener('click', onLink, true);
     };
-  }, [confirmNavigation, enabled, isDirty, message]);
+  }, [confirmNavigation, enabled, isDirty, message, router, updateDirty]);
 
   return {
     isDirty,

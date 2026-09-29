@@ -1,3 +1,4 @@
+import { signInDestination } from '@/lib/auth-navigation';
 import { cache } from 'react';
 import { getServerSession, type Session } from 'next-auth';
 import { authOptions } from '@/lib/auth';
@@ -16,16 +17,27 @@ export const getAuthSession = cache(async (): Promise<Session | null> => {
 
 export async function requireGrower() {
   const session = await getAuthSession();
-  if (!session) return { error: NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 }) };
+  if (!session)
+    return {
+      error: NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      ),
+    };
   if (session.user.role !== 'GROWER' || !session.user.growerId) {
-    return { error: NextResponse.json({ error: 'Grower profile required' }, { status: 403 }) };
+    return {
+      error: NextResponse.json(
+        { error: 'Grower profile required' },
+        { status: 403 }
+      ),
+    };
   }
   return { session, growerId: session.user.growerId };
 }
 
 export async function requireAuth(): Promise<Session> {
   const session = await getAuthSession();
-  if (!session) redirect('/auth/sign_in');
+  if (!session) redirect(await signInDestination());
   return session;
 }
 

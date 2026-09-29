@@ -1,3 +1,4 @@
+import { signInDestination } from '@/lib/auth-navigation';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
@@ -7,20 +8,24 @@ type SavedTab = 'favorites' | 'alerts' | 'recent';
 
 export const metadata = {
   title: 'Saved | PhenoShop',
-  description: 'Buyer saved products, price alerts, and recent order requests',
+  description: 'Buyer saved products, price alerts, and recent orders',
 };
 
 function parseSavedTab(tab: unknown): SavedTab {
   const value = Array.isArray(tab) ? tab[0] : tab;
-  return value === 'alerts' || value === 'recent' || value === 'favorites' ? value : 'favorites';
+  return value === 'alerts' || value === 'recent' || value === 'favorites'
+    ? value
+    : 'favorites';
 }
 
 async function countSavedFavorites(dispensaryId: string) {
   try {
-    return await db.dispensaryFavoriteProduct.count({ where: { dispensaryId } });
+    return await db.dispensaryFavoriteProduct.count({
+      where: { dispensaryId },
+    });
   } catch (error) {
     console.warn('Unable to count saved favorite products:', error);
-    return 0;
+    throw error;
   }
 }
 
@@ -29,7 +34,7 @@ async function countPriceAlerts(dispensaryId: string) {
     return await db.dispensaryPriceAlert.count({ where: { dispensaryId } });
   } catch (error) {
     console.warn('Unable to count saved price alerts:', error);
-    return 0;
+    throw error;
   }
 }
 
@@ -41,7 +46,7 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
   const session = await getAuthSession();
 
   if (!session) {
-    redirect('/auth/sign_in');
+    redirect(await signInDestination());
   }
 
   const user = session.user as { role?: string; dispensaryId?: string };
@@ -77,16 +82,20 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
     countPriceAlerts(user.dispensaryId),
   ]);
 
-  const recentMap = new Map<string, {
-    productId: string;
-    name: string;
-    growerName: string;
-    growerId: string;
-    unit: string | null;
-    price: number;
-    lastOrderedAt: string;
-    orderCount: number;
-  }>();
+  const recentMap = new Map<
+    string,
+    {
+      productId: string;
+      name: string;
+      growerName: string;
+      growerId: string;
+      unit: string | null;
+      price: number;
+      quantity: number;
+      lastOrderedAt: string;
+      orderCount: number;
+    }
+  >();
 
   for (const order of orders) {
     const seenProducts = new Set<string>();
@@ -108,6 +117,7 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
         growerId: order.grower?.id || order.growerId,
         unit: item.product?.unit || null,
         price: Number(item.unitPrice),
+        quantity: item.quantity,
         lastOrderedAt: order.createdAt.toISOString(),
         orderCount: 1,
       });

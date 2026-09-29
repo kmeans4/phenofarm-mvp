@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback, useId } from 'react';
 
 interface AddressResult {
   display_name: string;
@@ -43,10 +43,13 @@ export function AddressAutocomplete({
   value,
   onChange,
   onSelect,
-  placeholder = "Start typing an address...",
-  className = "",
+  placeholder = 'Start typing an address...',
+  className = '',
   disabled = false,
 }: AddressAutocompleteProps) {
+  const listId = useId();
+  const [searchError, setSearchError] = useState('');
+  const requestVersion = useRef(0);
   const [suggestions, setSuggestions] = useState<AddressResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,7 +64,9 @@ export function AddressAutocomplete({
       return;
     }
 
+    const version = ++requestVersion.current;
     setIsLoading(true);
+    setSearchError('');
     try {
       // Use Nominatim (OpenStreetMap) - free, no API key required
       const response = await fetch(
@@ -75,28 +80,36 @@ export function AddressAutocomplete({
         }
       );
 
-      if (response.ok) {
-        const data = await response.json() as AddressResult[];
+      if (!response.ok) throw new Error();
+      if (version === requestVersion.current) {
+        const data = (await response.json()) as AddressResult[];
         setSuggestions(data);
+        if (!data.length)
+          setSearchError(
+            'No address found — type it and fill in city, state and ZIP.'
+          );
         setHighlightedIndex(0);
         setIsOpen(true);
       }
-    } catch (error) {
-      console.error('Address search error:', error);
+    } catch {
+      setSearchError('Address lookup unavailable — type your address below.');
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   // Debounced search
-  const debouncedSearch = useCallback((query: string) => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    timeoutRef.current = setTimeout(() => {
-      searchAddresses(query);
-    }, 400);
-  }, [searchAddresses]);
+  const debouncedSearch = useCallback(
+    (query: string) => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      timeoutRef.current = setTimeout(() => {
+        searchAddresses(query);
+      }, 400);
+    },
+    [searchAddresses]
+  );
 
   // Cleanup timeout on unmount
   useEffect(() => {
@@ -115,16 +128,13 @@ export function AddressAutocomplete({
 
   const handleSelect = (result: AddressResult) => {
     const addr = result.address;
-    const streetParts = [
-      addr.house_number,
-      addr.road,
-    ].filter(Boolean);
-    
+    const streetParts = [addr.house_number, addr.road].filter(Boolean);
+
     const street = streetParts.join(' ');
     const city = addr.city || addr.town || addr.village || '';
     const state = addr.state || '';
     const zip = addr.postcode || '';
-    
+
     onChange(result.display_name);
     setIsOpen(false);
     setSuggestions([]);
@@ -148,7 +158,7 @@ export function AddressAutocomplete({
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex((prev) => 
+        setHighlightedIndex((prev) =>
           prev < suggestions.length - 1 ? prev + 1 : prev
         );
         break;
@@ -188,37 +198,91 @@ export function AddressAutocomplete({
           id={id}
           ref={inputRef}
           type="text"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={isOpen && suggestions.length > 0}
+          aria-controls={listId}
+          aria-activedescendant={
+            isOpen && suggestions.length
+              ? `${listId}-${highlightedIndex}`
+              : undefined
+          }
+          autoComplete="street-address"
           value={value}
           onChange={handleInputChange}
           onKeyDown={handleKeyDown}
-          onFocus={() => value.length >= 3 && suggestions.length > 0 && setIsOpen(true)}
+          onFocus={() =>
+            value.length >= 3 && suggestions.length > 0 && setIsOpen(true)
+          }
           placeholder={placeholder}
           disabled={disabled}
           className={`w-full rounded-lg border border-pf-line-strong bg-pf-surface px-4 py-2 pr-10 text-pf-text placeholder-pf-muted focus:border-green-500 focus:ring-1 focus:ring-emerald-400 disabled:bg-pf-surface disabled:cursor-not-allowed ${className}`}
         />
         {isLoading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <svg className="animate-spin h-5 w-5 text-pf-muted" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            <svg
+              className="animate-spin h-5 w-5 text-pf-muted"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              />
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              />
             </svg>
           </div>
         )}
         {!isLoading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2 text-pf-muted">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            <svg
+              className="h-5 w-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
             </svg>
           </div>
         )}
       </div>
 
+      {searchError && (
+        <p role="status" className="mt-1 text-sm text-pf-muted">
+          {searchError}
+        </p>
+      )}
       {isOpen && suggestions.length > 0 && (
-        <ul className="absolute z-50 w-full mt-1 bg-pf-surface border border-pf-line rounded-lg shadow-lg max-h-60 overflow-auto">
+        <ul
+          id={listId}
+          role="listbox"
+          className="absolute z-50 w-full mt-1 bg-pf-surface border border-pf-line rounded-lg shadow-lg max-h-60 overflow-auto"
+        >
           {suggestions.map((suggestion, index) => (
             <li
               key={index}
+              id={`${listId}-${index}`}
+              role="option"
+              aria-selected={index === highlightedIndex}
               onClick={() => handleSelect(suggestion)}
               className={`px-4 py-3 cursor-pointer text-sm ${
                 index === highlightedIndex
@@ -226,9 +290,13 @@ export function AddressAutocomplete({
                   : 'text-pf-secondary hover:bg-pf-canvas'
               }`}
             >
-              <div className="font-medium text-pf-text">{suggestion.display_name}</div>
+              <div className="font-medium text-pf-text">
+                {suggestion.display_name}
+              </div>
               <div className="text-xs text-pf-muted mt-0.5">
-                {suggestion.address.road} {suggestion.address.house_number && `#${suggestion.address.house_number}`}
+                {suggestion.address.road}{' '}
+                {suggestion.address.house_number &&
+                  `#${suggestion.address.house_number}`}
               </div>
             </li>
           ))}

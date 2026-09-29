@@ -19,6 +19,8 @@ model User {
   passwordHash         String?
   emailVerifiedAt      DateTime?
   sessionVersion       Int                   @default(0)
+  suspendedAt          DateTime?
+  signupProofHash      String?
   policyAcceptances    PolicyAcceptance[]
   accountActionTokens  AccountActionToken[]
   conversationMessages ConversationMessage[]
@@ -70,6 +72,10 @@ model Grower {
   createdAt                     DateTime            @default(now())
   updatedAt                     DateTime            @updatedAt
   isVerified                    Boolean             @default(false)
+  licenseStatus                 LicenseStatus       @default(pending_review)
+  licenseReviewNotes            String?
+  licenseSubmittedAt            DateTime?
+  previousLicenseNumber         String?
   stripeCustomerId              String?
   stripeSubscriptionId          String?
   stripeCheckoutSessionId       String?
@@ -124,6 +130,10 @@ model Dispensary {
   licenseStatus      LicenseStatus               @default(pending_review)
   verifiedAt         DateTime?
   isOffPlatform      Boolean                     @default(false)
+  cart               Json?
+  orderDefaults      Json?
+  licenseSubmittedAt DateTime?
+  previousLicenseNumber String?
   createdByGrowerId   String?
   createdByGrower     Grower? @relation("ManagedCustomers", fields: [createdByGrowerId], references: [id])
   offPlatformEmail   String?
@@ -453,6 +463,8 @@ model Notification {
 }
 
 model OrderStatusEvent {
+  note          String?
+  undoOfEventId String? @unique
   id          String       @id @default(cuid())
   orderId     String
   fromStatus  OrderStatus?

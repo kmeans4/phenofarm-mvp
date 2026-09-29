@@ -8,10 +8,10 @@ import { createWithOrderIdRetry } from '@/lib/order-id';
 
 /**
  * Orders API Endpoint
- * 
+ *
  * Base path: /api/orders
  * Authentication: Required (GROWER or DISPENSARY role)
- * 
+ *
  * This endpoint manages wholesale order records between growers and dispensaries.
  * PhenoShop tracks operational value and fulfillment status only; wholesale
  * payment settlement happens directly between the businesses.
@@ -43,26 +43,26 @@ class InventoryConflictError extends Error {
 
 /**
  * POST /api/orders
- * 
+ *
  * Creates a new order from a grower to a dispensary.
  * Only users with GROWER role can create orders.
- * 
+ *
  * Request Body:
  * - dispensaryId (required): ID of the target dispensary
  * - items (required): Array of order items, each containing:
  *   - productId (string): ID of the product
  *   - quantity (number): Quantity ordered
- *   - priceOverride (optional): Explicit agreed unit price plus a required reason
+ *   - priceOverride (optional): Agreed unit price, with an optional note (defaults to Phone price)
  * - notes (optional): Order notes or special instructions
  * - shippingFee (optional): Shipping cost as number
- * 
+ *
  * Business Logic:
  * - Catalog prices are read under inventory locks; explicit owner overrides are audited
  * - Tax is not calculated or collected by PhenoShop
  * - Total amount = subtotal + optional shipping estimate
- * - Order status is set to 'PENDING' on creation
+ * - Grower-recorded orders start as 'CONFIRMED' (Accepted)
  * - Order ID is auto-generated as 'ORD-{timestamp}'
- * 
+ *
  * Response: 201 Created - Newly created order with items and relations
  * Response: 400 Bad Request - Missing required fields (dispensaryId or items)
  * Response: 401 Unauthorized - No valid session
@@ -72,39 +72,81 @@ class InventoryConflictError extends Error {
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
-    
+
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     const user = session.user;
-    
+
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Only growers can create direct order records' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Only growers can create direct order records' },
+        { status: 403 }
+      );
     }
 
     const growerId = user.growerId;
 
     const body = await request.json().catch(() => null);
-    if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+    if (!body || typeof body !== 'object' || Array.isArray(body))
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      );
     const { dispensaryId, items, notes, shippingFee } = body;
+    const adjustStock = body.adjustStock === true;
+    const quoteId = typeof body.quoteId === 'string' ? body.quoteId : null;
 
-    if (typeof dispensaryId !== 'string' || !dispensaryId || !Array.isArray(items) || items.length === 0 || items.length > 100 || items.some(item => !item || typeof item !== 'object')) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    if (
+      typeof dispensaryId !== 'string' ||
+      !dispensaryId ||
+      !Array.isArray(items) ||
+      items.length === 0 ||
+      items.length > 100 ||
+      items.some((item) => !item || typeof item !== 'object')
+    ) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
     }
 
     const safeShippingFee = shippingFee === undefined ? 0 : Number(shippingFee);
-    if (!Number.isFinite(safeShippingFee) || safeShippingFee < 0 || safeShippingFee > 999999.99 || (notes != null && (typeof notes !== 'string' || notes.length > 1000))) {
-      return NextResponse.json({ error: 'Invalid shipping fee or notes' }, { status: 400 });
+    if (
+      !Number.isFinite(safeShippingFee) ||
+      safeShippingFee < 0 ||
+      safeShippingFee > 999999.99 ||
+      (notes != null && (typeof notes !== 'string' || notes.length > 1000))
+    ) {
+      return NextResponse.json(
+        { error: 'Invalid shipping fee or notes' },
+        { status: 400 }
+      );
     }
     // Verify dispensary license status
     const dispensary = await db.dispensary.findFirst({
-      where: { id: dispensaryId, OR: [{ userId: { not: null } }, customerWhere(growerId)] },
-      select: { userId: true, licenseStatus: true, licenseExpiry: true, isOffPlatform: true, businessName: true },
+      where: {
+        id: dispensaryId,
+        OR: [{ userId: { not: null } }, customerWhere(growerId)],
+      },
+      select: {
+        userId: true,
+        licenseStatus: true,
+        licenseExpiry: true,
+        isOffPlatform: true,
+        businessName: true,
+      },
     });
 
     if (!dispensary) {
-      return NextResponse.json({ error: 'Dispensary not found' }, { status: 404 });
+      return NextResponse.json(
+        { error: 'Dispensary not found' },
+        { status: 404 }
+      );
     }
 
     if (isLicenseExpired(dispensary.licenseExpiry)) {
@@ -124,8 +166,9 @@ export async function POST(request: NextRequest) {
 
     if (!dispensary.isOffPlatform && dispensary.licenseStatus !== 'verified') {
       return NextResponse.json(
-        { 
-          error: 'License verification required. This dispensary must have a verified license before direct order records can be created.',
+        {
+          error:
+            'License verification required. This dispensary must have a verified license before direct order records can be created.',
           code: 'LICENSE_NOT_VERIFIED',
           licenseStatus: dispensary.licenseStatus,
         },
@@ -133,33 +176,62 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const normalizedItems: OrderItemInput[] = items.map((item: Partial<OrderItemInput>) => ({
-      productId: String(item.productId || ''),
-      quantity: Number(item.quantity),
-      ...(item.priceOverride !== undefined ? { priceOverride: {
-        unitPrice: typeof item.priceOverride?.unitPrice === 'number' ? item.priceOverride.unitPrice : NaN,
-        reason: typeof item.priceOverride?.reason === 'string' ? item.priceOverride.reason.trim() : '',
-      } } : {}),
-    }));
+    const normalizedItems: OrderItemInput[] = items.map(
+      (item: Partial<OrderItemInput>) => ({
+        productId: String(item.productId || ''),
+        quantity: Number(item.quantity),
+        ...(item.priceOverride !== undefined
+          ? {
+              priceOverride: {
+                unitPrice:
+                  typeof item.priceOverride?.unitPrice === 'number'
+                    ? item.priceOverride.unitPrice
+                    : NaN,
+                reason:
+                  typeof item.priceOverride?.reason === 'string' &&
+                  item.priceOverride.reason.trim()
+                    ? item.priceOverride.reason.trim()
+                    : 'Phone price',
+              },
+            }
+          : {}),
+      })
+    );
 
-    const invalidItem = normalizedItems.some((item) =>
-      !item.productId ||
-      !Number.isInteger(item.quantity) ||
-      item.quantity <= 0 || item.quantity > 9999 ||
-      (item.priceOverride !== undefined && (
-        !Number.isFinite(item.priceOverride.unitPrice) || item.priceOverride.unitPrice < 0 || item.priceOverride.unitPrice > 999999.99 ||
-        Math.abs(item.priceOverride.unitPrice * 100 - Math.round(item.priceOverride.unitPrice * 100)) > 0.000001 ||
-        !item.priceOverride.reason || item.priceOverride.reason.length > 240
-      ))
+    const invalidItem = normalizedItems.some(
+      (item) =>
+        !item.productId ||
+        !Number.isInteger(item.quantity) ||
+        item.quantity <= 0 ||
+        item.quantity > 9999 ||
+        (item.priceOverride !== undefined &&
+          (!Number.isFinite(item.priceOverride.unitPrice) ||
+            item.priceOverride.unitPrice < 0 ||
+            item.priceOverride.unitPrice > 999999.99 ||
+            Math.abs(
+              item.priceOverride.unitPrice * 100 -
+                Math.round(item.priceOverride.unitPrice * 100)
+            ) > 0.000001 ||
+            !item.priceOverride.reason ||
+            item.priceOverride.reason.length > 240))
     );
 
     if (invalidItem) {
-      return NextResponse.json({ error: 'Invalid order items. Custom prices require a valid amount and a reason (up to 240 characters).' }, { status: 400 });
+      return NextResponse.json(
+        {
+          error:
+            'Enter whole item quantities and prices with at most two decimal places. Price notes can be up to 240 characters.',
+        },
+        { status: 400 }
+      );
     }
 
     const requestedByProduct = new Map<string, number>();
     for (const item of normalizedItems) {
-      requestedByProduct.set(item.productId, (requestedByProduct.get(item.productId) || 0) + item.quantity);
+      requestedByProduct.set(
+        item.productId,
+        (requestedByProduct.get(item.productId) || 0) + item.quantity
+      );
     }
 
     const productIds = Array.from(requestedByProduct.keys());
@@ -175,14 +247,20 @@ export async function POST(request: NextRequest) {
         name: true,
         inventoryQty: true,
         isAvailable: true,
+        status: true,
       },
     });
 
     if (products.length !== productIds.length) {
-      return NextResponse.json({ error: 'One or more selected products could not be found.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'One or more selected products could not be found.' },
+        { status: 400 }
+      );
     }
 
-    const productById = new Map(products.map((product) => [product.id, product]));
+    const productById = new Map(
+      products.map((product) => [product.id, product])
+    );
     const initialIssues: InventoryIssue[] = [];
 
     for (const [productId, requested] of requestedByProduct.entries()) {
@@ -190,7 +268,11 @@ export async function POST(request: NextRequest) {
       const available = Number(product?.inventoryQty || 0);
       const isAvailable = Boolean(product?.isAvailable);
 
-      if (!product || !isAvailable || requested > available) {
+      if (
+        !product ||
+        product.status !== 'PUBLISHED' ||
+        (!adjustStock && (!isAvailable || requested > available))
+      ) {
         initialIssues.push({
           productId,
           productName: product?.name || 'Unknown product',
@@ -210,106 +292,215 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const order = await createWithOrderIdRetry((orderId) => db.$transaction(async (tx) => {
-      for (const [productId, requested] of [...requestedByProduct.entries()].sort(([a], [b]) => a.localeCompare(b))) {
-        const updateResult = await tx.product.updateMany({
-          where: {
-            id: productId,
-            growerId,
-            isDeleted: false,
-            isAvailable: true,
-            inventoryQty: { gte: requested },
-          },
+    const order = await createWithOrderIdRetry((orderId) =>
+      db.$transaction(async (tx) => {
+        const stockCorrections: string[] = [];
+        for (const [productId, requested] of [
+          ...requestedByProduct.entries(),
+        ].sort(([a], [b]) => a.localeCompare(b))) {
+          if (adjustStock) {
+            // The grower explicitly confirms received stock. Lock before reading and correcting
+            // so another checkout cannot make this correction stale or create negative stock.
+            await tx.$queryRaw`SELECT id FROM products WHERE id = ${productId} AND "growerId" = ${growerId} FOR UPDATE`;
+            const current = await tx.product.findFirst({
+              where: {
+                id: productId,
+                growerId,
+                isDeleted: false,
+                status: 'PUBLISHED',
+              },
+              select: { inventoryQty: true, name: true },
+            });
+            if (!current)
+              throw new OrderValidationError(
+                'Only published products can be ordered.'
+              );
+            const added = Math.max(0, requested - Number(current.inventoryQty));
+            if (added > 0)
+              stockCorrections.push(
+                `${current.name}: added ${added} units before reservation`
+              );
+            await tx.product.update({
+              where: { id: productId },
+              data: {
+                ...(added > 0
+                  ? { inventoryQty: { increment: added }, isAvailable: true }
+                  : {}),
+              },
+            });
+          }
+          const updateResult = await tx.product.updateMany({
+            where: {
+              id: productId,
+              growerId,
+              isDeleted: false,
+              isAvailable: true,
+              status: 'PUBLISHED',
+              inventoryQty: { gte: requested },
+            },
+            data: {
+              inventoryQty: { decrement: requested },
+            },
+          });
+
+          if (updateResult.count === 0) {
+            const latest = await tx.product.findUnique({
+              where: { id: productId },
+              select: { id: true, name: true, inventoryQty: true },
+            });
+
+            throw new InventoryConflictError([
+              {
+                productId,
+                productName:
+                  latest?.name ||
+                  productById.get(productId)?.name ||
+                  'Unknown product',
+                requested,
+                available: Number(latest?.inventoryQty || 0),
+              },
+            ]);
+          }
+        }
+
+        await tx.product.updateMany({
+          where: { growerId, id: { in: productIds }, inventoryQty: 0 },
+          data: { isAvailable: false },
+        });
+        // Inventory updates hold the product locks through price snapshot + order creation.
+        const pricedProducts = await tx.product.findMany({
+          where: { id: { in: productIds }, growerId },
+          select: { id: true, price: true },
+        });
+        const catalogPrices = new Map(
+          pricedProducts.map((product) => [product.id, Number(product.price)])
+        );
+        const quote = quoteId
+          ? await tx.acceptedQuote.findFirst({
+              where: {
+                id: quoteId,
+                growerId,
+                dispensaryId,
+                consumedByOrderId: null,
+                expiresAt: { gt: new Date() },
+              },
+            })
+          : null;
+        if (
+          quoteId &&
+          (!quote ||
+            !requestedByProduct.has(quote.productId) ||
+            (quote.quantity != null &&
+              requestedByProduct.get(quote.productId)! > quote.quantity))
+        )
+          throw new OrderValidationError(
+            'This quote is expired, used, or does not cover this quantity.'
+          );
+        const pricedItems = normalizedItems.map((item) => {
+          const catalogUnitPrice = catalogPrices.get(item.productId);
+          if (catalogUnitPrice === undefined)
+            throw new OrderValidationError(
+              'A selected product is no longer available.'
+            );
+          const acceptedQuoteId =
+            quote?.productId === item.productId ? quote.id : null;
+          const unitPrice = acceptedQuoteId
+            ? Number(quote!.unitPrice)
+            : (item.priceOverride?.unitPrice ?? catalogUnitPrice);
+          return {
+            ...item,
+            unitPrice,
+            catalogUnitPrice,
+            acceptedQuoteId,
+            priceOverrideReason: acceptedQuoteId
+              ? null
+              : item.priceOverride?.reason || null,
+          };
+        });
+        const subtotal =
+          pricedItems.reduce(
+            (sum, item) =>
+              sum + Math.round(item.quantity * item.unitPrice * 100),
+            0
+          ) / 100;
+        const tax = 0;
+        if (Math.round((subtotal + safeShippingFee) * 100) > 9999999999)
+          throw new OrderValidationError(
+            'Order total exceeds the supported amount.'
+          );
+
+        const createdOrder = await tx.order.create({
           data: {
-            inventoryQty: { decrement: requested },
+            growerId,
+            dispensaryId,
+            orderId,
+            status: 'CONFIRMED',
+            totalAmount:
+              Math.round((subtotal + tax + safeShippingFee) * 100) / 100,
+            subtotal,
+            tax,
+            shippingFee: Math.round(safeShippingFee * 100) / 100,
+            notes: notes || null,
+            createdBy: 'GROWER',
+            items: {
+              create: pricedItems.map((item) => ({
+                product: { connect: { id: item.productId } },
+                grower: { connect: { id: growerId } },
+                quantity: item.quantity,
+                unitPrice: item.unitPrice,
+                catalogUnitPrice: item.catalogUnitPrice,
+                priceOverrideReason: item.priceOverrideReason,
+                ...(item.acceptedQuoteId
+                  ? { acceptedQuote: { connect: { id: item.acceptedQuoteId } } }
+                  : {}),
+                totalPrice:
+                  Math.round(item.quantity * item.unitPrice * 100) / 100,
+              })),
+            },
+          },
+          include: {
+            dispensary: { select: { businessName: true } },
+            items: { include: { product: { select: { name: true } } } },
           },
         });
 
-        if (updateResult.count === 0) {
-          const latest = await tx.product.findUnique({
-            where: { id: productId },
-            select: { id: true, name: true, inventoryQty: true },
+        if (quote) {
+          const consumed = await tx.acceptedQuote.updateMany({
+            where: { id: quote.id, consumedByOrderId: null },
+            data: { consumedByOrderId: createdOrder.id },
           });
-
-          throw new InventoryConflictError([
-            {
-              productId,
-              productName: latest?.name || productById.get(productId)?.name || 'Unknown product',
-              requested,
-              available: Number(latest?.inventoryQty || 0),
-            },
-          ]);
+          if (!consumed.count)
+            throw new OrderValidationError('This quote was already used.');
         }
-      }
-
-      await tx.product.updateMany({ where: { growerId, id: { in: productIds }, inventoryQty: 0 }, data: { isAvailable: false } });
-      // Inventory updates hold the product locks through price snapshot + order creation.
-      const pricedProducts = await tx.product.findMany({ where: { id: { in: productIds }, growerId }, select: { id: true, price: true } });
-      const catalogPrices = new Map(pricedProducts.map(product => [product.id, Number(product.price)]));
-      const pricedItems = normalizedItems.map(item => {
-        const catalogUnitPrice = catalogPrices.get(item.productId);
-        if (catalogUnitPrice === undefined) throw new OrderValidationError('A selected product is no longer available.');
-        const unitPrice = item.priceOverride?.unitPrice ?? catalogUnitPrice;
-        return { ...item, unitPrice, catalogUnitPrice, priceOverrideReason: item.priceOverride?.reason || null };
-      });
-      const subtotal = pricedItems.reduce((sum, item) => sum + Math.round(item.quantity * item.unitPrice * 100), 0) / 100;
-      const tax = 0;
-      if (Math.round((subtotal + safeShippingFee) * 100) > 9999999999) throw new OrderValidationError('Order total exceeds the supported amount.');
-
-      const createdOrder = await tx.order.create({
-        data: {
-          growerId,
-          dispensaryId,
-          orderId,
-          status: 'PENDING',
-          totalAmount: Math.round((subtotal + tax + safeShippingFee) * 100) / 100,
-          subtotal,
-          tax,
-          shippingFee: Math.round(safeShippingFee * 100) / 100,
-          notes: notes || null,
-          createdBy: 'GROWER',
-          items: {
-            create: pricedItems.map((item) => ({
-              product: { connect: { id: item.productId } },
-              grower: { connect: { id: growerId } },
-              quantity: item.quantity,
-              unitPrice: item.unitPrice,
-              catalogUnitPrice: item.catalogUnitPrice,
-              priceOverrideReason: item.priceOverrideReason,
-              totalPrice: Math.round(item.quantity * item.unitPrice * 100) / 100,
-            })),
+        await tx.orderStatusEvent.create({
+          data: {
+            orderId: createdOrder.id,
+            fromStatus: null,
+            toStatus: 'CONFIRMED',
+            actorUserId: user.id,
+            actorRole: 'GROWER',
+            note: stockCorrections.length
+              ? `Phone order; stock correction confirmed by grower. ${stockCorrections.join('; ')}`
+              : 'Agreed phone order recorded by grower',
           },
-        },
-        include: {
-          dispensary: { select: { businessName: true } },
-          items: { include: { product: { select: { name: true } } } },
-        },
-      });
+        });
 
-      await tx.orderStatusEvent.create({
-        data: {
-          orderId: createdOrder.id,
-          fromStatus: null,
-          toStatus: 'PENDING',
-          actorUserId: user.id,
-          actorRole: 'GROWER',
-        },
-      });
+        await createNotification(tx, {
+          userId: dispensary.userId,
+          type: 'DIRECT_ORDER_RECORDED',
+          title: 'Grower recorded your order',
+          body: `Your grower recorded agreed order #${createdOrder.orderId}. Contact them if any details need changing.`,
+          href: `/dispensary/orders/${createdOrder.id}`,
+        });
 
-      await createNotification(tx, {
-        userId: dispensary.userId,
-        type: 'DIRECT_ORDER_RECORDED',
-        title: 'Grower-recorded request needs confirmation',
-        body: `A grower recorded request #${createdOrder.orderId} for you to confirm or decline.`,
-        href: `/dispensary/orders/${createdOrder.id}`,
-      });
-
-      return createdOrder;
-    }));
+        return createdOrder;
+      })
+    );
 
     return NextResponse.json(order, { status: 201 });
   } catch (error) {
-    if (error instanceof OrderValidationError) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error instanceof OrderValidationError)
+      return NextResponse.json({ error: error.message }, { status: 400 });
     if (error instanceof InventoryConflictError) {
       return NextResponse.json(
         {
@@ -321,25 +512,28 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Error creating order:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }
 
 /**
  * GET /api/orders
- * 
+ *
  * Retrieves orders for the authenticated user.
  * - GROWERs see orders they created (outgoing orders)
  * - DISPENSARYs see orders placed with them (incoming orders)
- * 
+ *
  * Query Parameters: take (default 100, max 200), cursor (optional order id)
- * 
+ *
  * Response includes:
  * - Order details (id, orderId, status, totals, notes)
  * - Dispensary business name
  * - Order items with product names
  * - Sorted by createdAt descending (newest first)
- * 
+ *
  * Response: 200 OK - { orders: [], nextCursor }
  * Response: 401 Unauthorized - No valid session
  * Response: 500 Internal Server Error - Database or server error
@@ -347,36 +541,64 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getAuthSession();
-    
+
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     const user = session.user;
     const { searchParams } = new URL(request.url);
-    const take = Math.min(200, Math.max(1, Number.parseInt(searchParams.get('take') || '100', 10) || 100));
+    const take = Math.min(
+      200,
+      Math.max(1, Number.parseInt(searchParams.get('take') || '100', 10) || 100)
+    );
     const cursor = searchParams.get('cursor');
 
-    if (!['GROWER', 'DISPENSARY'].includes(user.role)) return NextResponse.json({ error: 'Use the admin portal to review orders' }, { status: 403 });
+    if (!['GROWER', 'DISPENSARY'].includes(user.role))
+      return NextResponse.json(
+        { error: 'Use the admin portal to review orders' },
+        { status: 403 }
+      );
     if (user.role === 'GROWER' && !user.growerId) {
-      return NextResponse.json({ error: 'Grower ID not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Grower ID not found' },
+        { status: 400 }
+      );
     }
 
     if (user.role !== 'GROWER' && !user.dispensaryId) {
-      return NextResponse.json({ error: 'Dispensary ID not found' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Dispensary ID not found' },
+        { status: 400 }
+      );
     }
 
     const rows = await db.order.findMany({
-      where: user.role === 'GROWER'
-        ? { growerId: user.growerId }
-        : { dispensaryId: user.dispensaryId },
+      where:
+        user.role === 'GROWER'
+          ? { growerId: user.growerId }
+          : { dispensaryId: user.dispensaryId },
       include: {
         dispensary: { select: { businessName: true } },
-        items: { select: {
-          id: true, orderId: true, productId: true, growerId: true, quantity: true, unitPrice: true, totalPrice: true, createdAt: true, acceptedQuoteId: true,
-          catalogUnitPrice: user.role === 'GROWER', priceOverrideReason: user.role === 'GROWER',
-          product: { select: { name: true } },
-        } },
+        items: {
+          select: {
+            id: true,
+            orderId: true,
+            productId: true,
+            growerId: true,
+            quantity: true,
+            unitPrice: true,
+            totalPrice: true,
+            createdAt: true,
+            acceptedQuoteId: true,
+            catalogUnitPrice: user.role === 'GROWER',
+            priceOverrideReason: user.role === 'GROWER',
+            product: { select: { name: true } },
+          },
+        },
       },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: take + 1,
@@ -391,6 +613,9 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching orders:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }

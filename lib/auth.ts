@@ -15,7 +15,8 @@ if (!process.env.AUTH_SECRET) {
   throw new Error('AUTH_SECRET is not configured');
 }
 
-const DUMMY_PASSWORD_HASH = '$2b$10$U0g.4Ks.6n2Yg3/5daY1POGaiLHauQVEkj8m9pCsysqR84x7tLs7i';
+const DUMMY_PASSWORD_HASH =
+  '$2b$10$U0g.4Ks.6n2Yg3/5daY1POGaiLHauQVEkj8m9pCsysqR84x7tLs7i';
 
 export const authOptions: NextAuthOptions = {
   debug: process.env.NODE_ENV === 'development',
@@ -33,23 +34,39 @@ export const authOptions: NextAuthOptions = {
 
         try {
           const email = credentials.email.trim().toLowerCase();
-          if (email.length > 254 || Buffer.byteLength(credentials.password, 'utf8') > 72) return null;
+          if (
+            email.length > 254 ||
+            Buffer.byteLength(credentials.password, 'utf8') > 72
+          )
+            return null;
           const limits = await Promise.all([
-            consumeAuthLimit('login-ip', requestIp(request.headers), 60, 15 * 60),
+            consumeAuthLimit(
+              'login-ip',
+              requestIp(request.headers),
+              60,
+              15 * 60
+            ),
             consumeAuthLimit('login-email', email, 12, 15 * 60),
           ]);
-          if (limits.some((allowed) => !allowed)) return null;
+          if (limits.some((allowed) => !allowed))
+            throw new Error('RateLimited');
           const user = await db.user.findUnique({ where: { email } });
 
-          const isValidPassword = await bcrypt.compare(credentials.password, user?.passwordHash || DUMMY_PASSWORD_HASH);
+          const isValidPassword = await bcrypt.compare(
+            credentials.password,
+            user?.passwordHash || DUMMY_PASSWORD_HASH
+          );
 
           if (!user?.passwordHash || !isValidPassword) {
             return null;
           }
-          if (emailVerificationRequired() && !user.emailVerifiedAt) throw new Error('EmailNotVerified');
+          if (user.suspendedAt) throw new Error('AccountSuspended');
+          if (emailVerificationRequired() && !user.emailVerifiedAt)
+            throw new Error('EmailNotVerified');
 
           return {
             id: user.id,
+            name: user.name,
             email: user.email,
             role: user.role,
             growerId: user.growerId || undefined,
@@ -57,8 +74,16 @@ export const authOptions: NextAuthOptions = {
             sessionVersion: user.sessionVersion,
           };
         } catch (error) {
-          if (error instanceof Error && error.message === 'EmailNotVerified') throw error;
-          logApiError('auth.credentials.authorize', error, { route: '/api/auth/session' });
+          if (
+            error instanceof Error &&
+            ['EmailNotVerified', 'RateLimited', 'AccountSuspended'].includes(
+              error.message
+            )
+          )
+            throw error;
+          logApiError('auth.credentials.authorize', error, {
+            route: '/api/auth/session',
+          });
           return null;
         }
       },
@@ -84,22 +109,44 @@ export const authOptions: NextAuthOptions = {
       }
       // Always check revocation. Mailbox proof activates only with the explicit rollout flag.
       {
-        const current = token.id ? await db.user.findUnique({
-          where: { id: token.id },
-          select: { id: true, email: true, role: true, emailVerifiedAt: true, sessionVersion: true, grower: { select: { id: true } }, dispensary: { select: { id: true } } },
-        }) : null;
+        const current = token.id
+          ? await db.user.findUnique({
+              where: { id: token.id },
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                role: true,
+                emailVerifiedAt: true,
+                suspendedAt: true,
+                sessionVersion: true,
+                grower: { select: { id: true } },
+                dispensary: { select: { id: true } },
+              },
+            })
+          : null;
         // Throwing makes NextAuth clear the cookie and return an unauthenticated session.
         // During the invitation-only rollout, pre-version tokens represent version
         // zero. A password reset still revokes them immediately by incrementing it.
         const requireVerification = emailVerificationRequired();
-        const version = token.sessionVersion === undefined && !requireVerification ? 0 : token.sessionVersion;
-        if (!current || (requireVerification && !current.emailVerifiedAt) || !Number.isInteger(version) || version !== current.sessionVersion) {
+        const version =
+          token.sessionVersion === undefined && !requireVerification
+            ? 0
+            : token.sessionVersion;
+        if (
+          !current ||
+          current.suspendedAt ||
+          (requireVerification && !current.emailVerifiedAt) ||
+          !Number.isInteger(version) ||
+          version !== current.sessionVersion
+        ) {
           throw new Error('Session is no longer valid');
         }
         token.sessionVersion = current.sessionVersion;
         token.id = current?.id || '';
         if (current) {
           token.email = current.email;
+          token.name = current.name;
           token.role = current.role;
           token.growerId = current.grower?.id;
           token.dispensaryId = current.dispensary?.id;
@@ -125,7 +172,9 @@ export const authOptions: NextAuthOptions = {
   },
   logger: {
     error(code) {
-      logApiError('nextauth.error', new Error(code), { route: '/api/auth/session' });
+      logApiError('nextauth.error', new Error(code), {
+        route: '/api/auth/session',
+      });
     },
     warn(code) {
       console.warn('[nextauth-warn]', {

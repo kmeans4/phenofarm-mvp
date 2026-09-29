@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
-import { DEFAULT_COMMERCIAL_TERMS, type CommercialTermsDefaults } from '@/lib/ux-workflow';
+import { type CommercialTermsDefaults } from '@/lib/ux-workflow';
 
 const MAX_TERM_LENGTH = 240;
 const MAX_NOTE_LENGTH = 500;
 
-function normalizeTerm(value: unknown, fallback: string, maxLength = MAX_TERM_LENGTH) {
+function normalizeTerm(
+  value: unknown,
+  fallback: string,
+  maxLength = MAX_TERM_LENGTH
+) {
   if (value === undefined || value === null) return fallback;
   if (typeof value !== 'string') {
     throw new Error('Commercial terms must be text');
@@ -17,7 +21,7 @@ function normalizeTerm(value: unknown, fallback: string, maxLength = MAX_TERM_LE
     throw new Error(`Commercial terms must be ${maxLength} characters or less`);
   }
 
-  return trimmed || fallback;
+  return trimmed;
 }
 
 function serializeTerms(grower: {
@@ -31,12 +35,12 @@ function serializeTerms(grower: {
 }) {
   return {
     terms: {
-      minimumOrder: grower.commercialMinimumOrder || DEFAULT_COMMERCIAL_TERMS.minimumOrder,
-      fulfillmentMethods: grower.commercialFulfillmentMethods || DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods,
-      fulfillmentRegion: grower.commercialFulfillmentRegion || DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion,
-      paymentTerms: grower.commercialPaymentTerms || DEFAULT_COMMERCIAL_TERMS.paymentTerms,
-      responseWindow: grower.commercialResponseWindow || DEFAULT_COMMERCIAL_TERMS.responseWindow,
-      contactNote: grower.commercialContactNote || DEFAULT_COMMERCIAL_TERMS.contactNote,
+      minimumOrder: grower.commercialMinimumOrder || '',
+      fulfillmentMethods: grower.commercialFulfillmentMethods || '',
+      fulfillmentRegion: grower.commercialFulfillmentRegion || '',
+      paymentTerms: grower.commercialPaymentTerms || '',
+      responseWindow: grower.commercialResponseWindow || '',
+      contactNote: grower.commercialContactNote || '',
     },
     savedAt: grower.commercialTermsUpdatedAt?.toISOString() || null,
   };
@@ -47,13 +51,19 @@ export async function GET() {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     const user = session.user;
 
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const grower = await db.grower.findUnique({
@@ -76,7 +86,10 @@ export async function GET() {
     return NextResponse.json(serializeTerms(grower));
   } catch (error) {
     console.error('Error fetching commercial terms:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }
 
@@ -85,31 +98,46 @@ export async function PUT(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     const user = session.user;
 
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const body = await request.json();
-    const incomingTerms = (body?.terms || body || {}) as Partial<CommercialTermsDefaults>;
+    const incomingTerms = (body?.terms ||
+      body ||
+      {}) as Partial<CommercialTermsDefaults>;
 
     let terms: CommercialTermsDefaults;
     try {
       terms = {
-        minimumOrder: normalizeTerm(incomingTerms.minimumOrder, DEFAULT_COMMERCIAL_TERMS.minimumOrder),
-        fulfillmentMethods: normalizeTerm(incomingTerms.fulfillmentMethods, DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods),
-        fulfillmentRegion: normalizeTerm(incomingTerms.fulfillmentRegion, DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion),
-        paymentTerms: normalizeTerm(incomingTerms.paymentTerms, DEFAULT_COMMERCIAL_TERMS.paymentTerms),
-        responseWindow: normalizeTerm(incomingTerms.responseWindow, DEFAULT_COMMERCIAL_TERMS.responseWindow),
-        contactNote: normalizeTerm(incomingTerms.contactNote, DEFAULT_COMMERCIAL_TERMS.contactNote, MAX_NOTE_LENGTH),
+        minimumOrder: normalizeTerm(incomingTerms.minimumOrder, ''),
+        fulfillmentMethods: normalizeTerm(incomingTerms.fulfillmentMethods, ''),
+        fulfillmentRegion: normalizeTerm(incomingTerms.fulfillmentRegion, ''),
+        paymentTerms: normalizeTerm(incomingTerms.paymentTerms, ''),
+        responseWindow: normalizeTerm(incomingTerms.responseWindow, ''),
+        contactNote: normalizeTerm(
+          incomingTerms.contactNote,
+          '',
+          MAX_NOTE_LENGTH
+        ),
       };
     } catch (error) {
       return NextResponse.json(
-        { error: error instanceof Error ? error.message : 'Invalid commercial terms' },
+        {
+          error:
+            error instanceof Error ? error.message : 'Invalid commercial terms',
+        },
         { status: 400 }
       );
     }
@@ -143,6 +171,9 @@ export async function PUT(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error updating commercial terms:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }

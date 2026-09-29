@@ -1,221 +1,210 @@
 'use client';
-
-import { BrandLogo } from '@/app/components/ui/BrandLogo';
-
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { getSession, signIn } from 'next-auth/react';
-import { Eye, EyeOff, Loader2, ShieldCheck } from 'lucide-react';
+import { signIn } from 'next-auth/react';
+import { AccountAccessCard } from '../components/AccountAccessCard';
+import { PasswordField } from '../components/PasswordField';
+import { safeInternalPath } from '@/app/components/ui/safeNavigation';
 
-const SUPPORT_EMAIL = 'support@phenoshop.app';
-
-type SignInResult = Awaited<ReturnType<typeof signIn>>;
-
-function getSignInErrorMessage(result?: SignInResult) {
-  if (result?.error === 'EmailNotVerified') return 'Verify your email before signing in. Use Resend verification email below to get a new link.';
-  if (result?.status === 401 || result?.error === 'CredentialsSignin') {
-    return 'Email or password is incorrect. Check your email and password, then try again.';
-  }
-
-  return 'We could not sign you in right now. Try again, or contact support if the problem continues.';
-}
-
-export default function SignInSection() {
+export default function SignInPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
-  const emailInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
+  const [unverified, setUnverified] = useState(false);
+  const [resending, setResending] = useState(false);
+  const [verificationNotice, setVerificationNotice] = useState('');
+  const [cooldown, setCooldown] = useState(0);
+  const [cooldownEmail, setCooldownEmail] = useState('');
+  const waitingToResend =
+    cooldown > 0 && cooldownEmail === email.trim().toLowerCase();
 
   useEffect(() => {
-    emailInputRef.current?.focus();
+    const remembered = new URLSearchParams(window.location.search).get('email');
+    if (remembered) setEmail(remembered);
   }, []);
+  useEffect(() => {
+    if (!cooldown) return;
+    const timer = setTimeout(
+      () => setCooldown((value) => Math.max(0, value - 1)),
+      1000
+    );
+    return () => clearTimeout(timer);
+  }, [cooldown]);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  async function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (loading) return;
-
+    if (busy || resending) return;
+    setBusy(true);
     setError('');
-    setLoading(true);
-
+    setUnverified(false);
+    setVerificationNotice('');
     try {
       const result = await signIn('credentials', {
         email,
         password,
         redirect: false,
       });
-
-      if (!result || result.error || result.ok === false) {
-        setError(getSignInErrorMessage(result));
-        setLoading(false);
+      if (!result?.ok || result.error) {
+        setUnverified(result?.error === 'EmailNotVerified');
+        setError(
+          result?.error === 'RateLimited'
+            ? 'Too many attempts. Wait 15 minutes or reset your password.'
+            : result?.error === 'AccountSuspended'
+              ? 'Your account is paused. Contact support@phenoshop.app.'
+              : result?.error === 'EmailNotVerified'
+                ? 'Check your inbox to verify your email.'
+                : 'Email or password is incorrect.'
+        );
+        setBusy(false);
         return;
       }
-
-      const session = await getSession();
-      const role = session?.user?.role;
-      router.push(role === 'ADMIN' ? '/admin/dashboard' : role === 'DISPENSARY' ? '/dispensary/dashboard' : '/grower/dashboard');
-      router.refresh();
+      const callback = new URLSearchParams(window.location.search).get(
+        'callbackUrl'
+      );
+      let path = callback;
+      if (callback) {
+        try {
+          const url = new URL(callback, window.location.origin);
+          path =
+            url.origin === window.location.origin
+              ? url.pathname + url.search + url.hash
+              : null;
+        } catch {
+          path = null;
+        }
+      }
+      const destination = safeInternalPath(path, '/dashboard');
+      const isAccountChange =
+        destination.split(/[?#]/)[0] === '/auth/change-email';
+      window.location.assign(
+        destination.startsWith('/auth') && !isAccountChange
+          ? '/dashboard'
+          : destination
+      );
     } catch {
-      setError('Something went wrong while signing in. Try again, or contact support if it keeps happening.');
-      setLoading(false);
+      setError('Could not connect. Please try again.');
+      setBusy(false);
     }
-  };
+  }
+
+  async function resendVerification() {
+    if (resending || busy || waitingToResend) return;
+    const recipient = email.trim().toLowerCase();
+    setResending(true);
+    setError('');
+    setVerificationNotice('');
+    try {
+      const response = await fetch('/api/auth/verification/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: recipient }),
+      });
+      const data = await response.json().catch(() => null);
+      if (!response.ok) {
+        if (response.status === 429) {
+          setCooldownEmail(recipient);
+          setCooldown(3600);
+        }
+        throw Error(
+          typeof data?.error === 'string'
+            ? data.error
+            : 'Could not send a link. Try again.'
+        );
+      }
+      setVerificationNotice(
+        `Check ${recipient} for your verification link. Check spam too.`
+      );
+      setCooldownEmail(recipient);
+      setCooldown(60);
+    } catch (reason) {
+      setError(
+        reason instanceof Error && !(reason instanceof TypeError)
+          ? reason.message
+          : 'Could not send a link. Check your connection and try again.'
+      );
+    } finally {
+      setResending(false);
+    }
+  }
 
   return (
-    <main className="min-h-dvh bg-pf-canvas text-pf-text lg:grid lg:grid-cols-2">
-      <section className="relative hidden min-h-dvh overflow-hidden bg-pf-canvas px-10 py-12 text-white lg:flex lg:flex-col lg:justify-between xl:px-16">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-[-18rem] h-[40rem] w-[52rem] -translate-x-1/2 rounded-full bg-emerald-500/[0.09] blur-[130px]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
-          <div className="absolute bottom-0 right-0 h-px w-2/3 bg-gradient-to-r from-transparent to-emerald-400/30" />
+    <AccountAccessCard title="Sign in" description="Welcome back to PhenoShop.">
+      <form onSubmit={submit} className="space-y-4">
+        <div>
+          <label htmlFor="email" className="mb-1 block text-sm font-medium">
+            Email
+          </label>
+          <input
+            id="email"
+            type="email"
+            autoComplete="email"
+            autoCapitalize="none"
+            required
+            disabled={busy || resending}
+            value={email}
+            onChange={(event) => {
+              setEmail(event.target.value);
+              setUnverified(false);
+              setVerificationNotice('');
+              setError('');
+            }}
+            className="w-full rounded-lg border border-pf-line-strong px-3 py-2.5 text-base"
+          />
         </div>
-
-        <div className="relative">
-          <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-            <BrandLogo className="w-40" />
+        <PasswordField
+          value={password}
+          onChange={setPassword}
+          disabled={busy || resending}
+        />
+        {error && (
+          <p role="alert" className="text-sm text-pf-danger">
+            {error}
+          </p>
+        )}
+        <button
+          type="submit"
+          disabled={busy || resending}
+          className="min-h-11 w-full rounded-lg bg-emerald-500 px-4 py-3 text-sm font-semibold text-pf-canvas"
+        >
+          {busy ? 'Signing in…' : 'Sign in'}
+        </button>
+        {unverified && (
+          <div className="space-y-2">
+            {verificationNotice && (
+              <p role="status" className="break-words text-sm text-pf-accent">
+                {verificationNotice}
+              </p>
+            )}
+            <button
+              type="button"
+              onClick={resendVerification}
+              disabled={busy || resending || waitingToResend}
+              className="min-h-11 w-full break-words rounded-lg border border-pf-line-strong px-3 py-2 text-sm text-pf-accent disabled:opacity-60"
+            >
+              {resending
+                ? 'Sending link…'
+                : waitingToResend
+                  ? `Resend in ${cooldown > 60 ? `${Math.ceil(cooldown / 60)}m` : `${cooldown}s`}`
+                  : `Send a new link to ${email.trim()}`}
+            </button>
+          </div>
+        )}
+        <div className="flex flex-wrap justify-between gap-2 text-sm">
+          <Link
+            className="inline-flex min-h-11 items-center text-pf-accent underline"
+            href={`/auth/forgot-password?email=${encodeURIComponent(email.trim())}`}
+          >
+            Forgot password?
+          </Link>
+          <Link
+            className="inline-flex min-h-11 items-center text-pf-accent underline"
+            href="/auth/sign_up"
+          >
+            Create account
           </Link>
         </div>
-
-        <div className="relative max-w-xl">
-          <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-pf-accent">
-            For growers and dispensaries
-          </p>
-          <h1 className="text-5xl font-semibold tracking-tight text-white xl:text-6xl">
-            Your wholesale business, in one place.
-          </h1>
-          <p className="mt-6 max-w-lg text-base leading-7 text-pf-muted">
-            List products, connect with buyers and growers, and keep track of your orders.
-          </p>
-
-          <div className="mt-10 grid gap-3">
-            {['Browse and list products', 'Track order requests', 'Message buyers and growers'].map((item) => (
-              <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
-                <ShieldCheck className="h-5 w-5 shrink-0 text-pf-accent" />
-                <span className="text-sm text-pf-secondary">{item}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <p className="relative text-sm text-pf-muted">
-          Need help signing in?{' '}
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-            {SUPPORT_EMAIL}
-          </a>
-        </p>
-      </section>
-
-      <section className="flex min-h-dvh items-start justify-center px-4 py-5 sm:items-center sm:px-6 sm:py-8 lg:px-8">
-        <div className="w-full max-w-md">
-          <div className="mb-5 text-center lg:hidden">
-            <Link href="/" className="mx-auto inline-flex items-center gap-3 rounded-xl text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-              <BrandLogo className="w-40" />
-            </Link>
-          </div>
-
-          <div className="rounded-xl border border-pf-line bg-pf-surface p-4 sm:p-6">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight text-pf-text sm:text-3xl">
-                Sign in to your account
-              </h2>
-              <p className="mt-2 text-sm text-pf-muted">
-                Or{' '}
-                <Link href="/auth/sign_up" className="inline-flex min-h-10 items-center font-medium text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-                  create a new account
-                </Link>
-              </p>
-            </div>
-
-            <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="email" className="mb-1.5 block text-sm font-medium text-pf-secondary">
-                    Email address
-                  </label>
-                  <input
-                    ref={emailInputRef}
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    inputMode="email"
-                    autoCapitalize="off"
-                    autoCorrect="off"
-                    spellCheck="false"
-                    required
-                    value={email}
-                    onChange={(event) => setEmail(event.target.value)}
-                    disabled={loading}
-                    className="relative block w-full appearance-none rounded-xl border border-pf-line-strong px-3 py-2.5 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
-                    placeholder="Email address"
-                  />
-                </div>
-
-                <div>
-                  <label htmlFor="password" className="mb-1.5 block text-sm font-medium text-pf-secondary">
-                    Password
-                  </label>
-                  <div className="relative">
-                    <input
-                      id="password"
-                      name="password"
-                      type={showPassword ? 'text' : 'password'}
-                      autoComplete="current-password"
-                      spellCheck="false"
-                      required
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      disabled={loading}
-                      className="relative block w-full appearance-none rounded-xl border border-pf-line-strong px-3 py-2.5 pr-12 text-base text-pf-text placeholder:text-pf-muted transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
-                      placeholder="Password"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowPassword((current) => !current)}
-                      disabled={loading}
-                      className="absolute right-1 top-1/2 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-md text-pf-muted transition-colors hover:bg-pf-hover hover:text-pf-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:opacity-50"
-                      aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    >
-                      {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-              {error && (
-                <div className="rounded-xl border border-pf-danger-line bg-pf-danger-bg px-4 py-3 text-sm text-pf-danger" role="alert">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex flex-wrap justify-between gap-x-4 text-sm font-medium text-pf-accent">
-                <Link href="/auth/forgot-password" className="inline-flex min-h-10 items-center underline">Forgot password?</Link>
-                <Link href="/auth/verify-email" className="inline-flex min-h-10 items-center underline">Resend verification email</Link>
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading}
-                className="group relative inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl border border-transparent bg-emerald-500 px-4 py-2.5 text-sm font-semibold text-pf-canvas transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas disabled:cursor-not-allowed disabled:bg-emerald-500/70"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    Signing in...
-                  </>
-                ) : (
-                  'Sign in'
-                )}
-              </button>
-            </form>
-
-
-          </div>
-        </div>
-      </section>
-    </main>
+      </form>
+    </AccountAccessCard>
   );
 }

@@ -1,4 +1,5 @@
 import { BrandLogo } from './BrandLogo';
+import Link from 'next/link';
 import { SignOutButton } from '@/app/components/SignOutButton';
 
 interface PortalBrandProps {
@@ -6,11 +7,21 @@ interface PortalBrandProps {
   compactOnMobile?: boolean;
 }
 
-export function PortalBrand({ portalLabel, compactOnMobile = false }: PortalBrandProps) {
+export function PortalBrand({
+  portalLabel,
+  compactOnMobile = false,
+}: PortalBrandProps) {
   return (
-    <div className="flex items-center gap-2.5 px-1" aria-label={`PhenoShop ${portalLabel}`}>
-      <BrandLogo className={compactOnMobile ? 'w-[108px] sm:w-40' : 'w-36 sm:w-40'} />
-    </div>
+    <Link
+      href={`/${portalLabel.toLowerCase().includes('admin') ? 'admin' : portalLabel.toLowerCase().includes('grower') ? 'grower' : 'dispensary'}/dashboard`}
+      className="flex min-h-11 flex-col items-start justify-center gap-1 px-1"
+      aria-label={`PhenoShop ${portalLabel} overview`}
+    >
+      <BrandLogo
+        className={compactOnMobile ? 'w-[108px] sm:w-40' : 'w-36 sm:w-40'}
+      />
+      <span className="text-sm text-pf-muted">{portalLabel}</span>
+    </Link>
   );
 }
 
@@ -20,12 +31,13 @@ interface PortalAccountProps {
 }
 
 export function PortalAccount({ accountName, roleLabel }: PortalAccountProps) {
-  const initials = accountName
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('') || 'PS';
+  const initials =
+    accountName
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase())
+      .join('') || 'PS';
 
   return (
     <div className="border-t border-white/[0.07] px-1 pt-4">
@@ -34,7 +46,9 @@ export function PortalAccount({ accountName, roleLabel }: PortalAccountProps) {
           {initials}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block truncate text-xs font-semibold text-pf-text">{accountName}</span>
+          <span className="block truncate text-xs font-semibold text-pf-text">
+            {accountName}
+          </span>
           <span className="block text-xs text-pf-muted">{roleLabel}</span>
         </span>
       </div>

@@ -23,7 +23,7 @@ export const PRODUCT_TYPES_WITH_SUBTYPES = {
     'Water Soluble',
     'Wax',
   ],
-  'Cartridge': [
+  Cartridge: [
     'CO2',
     'CO2 Disposable',
     'Cured Resin',
@@ -35,7 +35,7 @@ export const PRODUCT_TYPES_WITH_SUBTYPES = {
     'Pax Pods',
     'Syringe',
   ],
-  'Edibles': [
+  Edibles: [
     'Brownie',
     'Candy',
     'Chocolate',
@@ -51,21 +51,9 @@ export const PRODUCT_TYPES_WITH_SUBTYPES = {
     'Taffy',
     'Tincture',
   ],
-  'Beverages': [],
-  'Flower': [
-    'A Bud',
-    'B Bud',
-    'C Bud',
-    'Infused Flower',
-    'Popcorn',
-  ],
-  'Live Plant': [
-    'Clones',
-    'Seedlings',
-    'Starts',
-    'Teens',
-    'Tissue Culture',
-  ],
+  Beverages: [],
+  Flower: ['A Bud', 'B Bud', 'C Bud', 'Infused Flower', 'Popcorn'],
+  'Live Plant': ['Clones', 'Seedlings', 'Starts', 'Teens', 'Tissue Culture'],
   'Plant Material': [
     'Fresh Frozen',
     'Kief',
@@ -74,20 +62,15 @@ export const PRODUCT_TYPES_WITH_SUBTYPES = {
     'Untrimmed Flower',
     'Whole Plant',
   ],
-  'Prepack': [
-    'A Bud',
-    'B Bud',
-    'C Bud',
-    'Popcorn',
-  ],
-  'Preroll': [
+  Prepack: ['A Bud', 'B Bud', 'C Bud', 'Popcorn'],
+  Preroll: [
     'Infused',
     'Trim/Shake',
     'Whole Flower',
     'Whole Flower Blunt',
     'Whole Flower Infused',
   ],
-  'Tincture': [
+  Tincture: [
     'Broad Spectrum',
     'Full Spectrum',
     'Full Spectrum THC Free',
@@ -134,13 +117,27 @@ export type SubTypeFor<T extends ProductTypeName> =
     : never;
 
 // Union type of all product types
-export const PRODUCT_TYPE_NAMES = Object.keys(PRODUCT_TYPES_WITH_SUBTYPES) as ProductTypeName[];
+export const PRODUCT_TYPE_NAMES = Object.keys(
+  PRODUCT_TYPES_WITH_SUBTYPES
+) as ProductTypeName[];
 
 /**
  * Backward-compatible aliases.
  * Canonical values are keys of PRODUCT_TYPES_WITH_SUBTYPES.
  */
 export const PRODUCT_TYPE_ALIASES: Record<string, ProductTypeName> = {
+  flower: 'Flower',
+  flowers: 'Flower',
+  buds: 'Flower',
+  vape: 'Cartridge',
+  vapes: 'Cartridge',
+  cartridges: 'Cartridge',
+  carts: 'Cartridge',
+  edible: 'Edibles',
+  'pre-rolls': 'Preroll',
+  prerolls: 'Preroll',
+  plants: 'Live Plant',
+  tinctures: 'Tincture',
   drink: 'Beverages',
   drinks: 'Beverages',
   beverage: 'Beverages',
@@ -164,7 +161,13 @@ export function canonicalizeProductType(type?: string | null): string | null {
   if (!trimmed) return null;
 
   const aliased = PRODUCT_TYPE_ALIASES[trimmed.toLowerCase()];
-  return aliased || trimmed;
+  return (
+    aliased ||
+    PRODUCT_TYPE_NAMES.find(
+      (name) => name.toLowerCase() === trimmed.toLowerCase()
+    ) ||
+    trimmed
+  );
 }
 
 export function getEquivalentProductTypes(type?: string | null): string[] {
@@ -179,7 +182,8 @@ export function getEquivalentProductTypes(type?: string | null): string[] {
       if (alias === 'drink' || alias === 'drinks') matches.add('Drink');
       if (alias === 'topical' || alias === 'topicals') matches.add('Topicals');
       if (alias === 'pre-roll' || alias === 'pre roll') matches.add('Pre-roll');
-      if (alias === 'concentrate' || alias === 'concentrates') matches.add('Concentrate');
+      if (alias === 'concentrate' || alias === 'concentrates')
+        matches.add('Concentrate');
     }
   }
 
@@ -206,7 +210,9 @@ export function getDefaultProductTypeOptions(): ProductTypeOption[] {
   }));
 }
 
-export function mergeProductTypeOptions(configs: ProductTypeOption[] = []): ProductTypeOption[] {
+export function mergeProductTypeOptions(
+  configs: ProductTypeOption[] = []
+): ProductTypeOption[] {
   const byType = new Map<string, string[]>();
 
   for (const option of getDefaultProductTypeOptions()) {
@@ -222,7 +228,10 @@ export function mergeProductTypeOptions(configs: ProductTypeOption[] = []): Prod
     byType.set(canonicalType, [...new Set([...existing, ...incoming])]);
   }
 
-  return Array.from(byType.entries()).map(([type, subTypes]) => ({ type, subTypes }));
+  return Array.from(byType.entries()).map(([type, subTypes]) => ({
+    type,
+    subTypes,
+  }));
 }
 
 // Helper function to get subtypes for a product type
@@ -232,7 +241,14 @@ export function getSubTypesForProductType(
   const canonicalType = canonicalizeProductType(productType);
   if (!canonicalType) return [];
 
-  return (PRODUCT_TYPES_WITH_SUBTYPES as unknown as Record<string, readonly string[]>)[canonicalType] || [];
+  return (
+    (
+      PRODUCT_TYPES_WITH_SUBTYPES as unknown as Record<
+        string,
+        readonly string[]
+      >
+    )[canonicalType] || []
+  );
 }
 
 // Helper function to check if a product type has subtypes
@@ -259,4 +275,20 @@ export function getProductTypeInfo(): ProductTypeInfo[] {
     hasSubTypes: PRODUCT_TYPES_WITH_SUBTYPES[name].length > 0,
     subTypeCount: PRODUCT_TYPES_WITH_SUBTYPES[name].length,
   }));
+}
+
+export function isKnownProductType(value: string): boolean {
+  return PRODUCT_TYPE_NAMES.includes(
+    canonicalizeProductType(value) as ProductTypeName
+  );
+}
+
+export function defaultUnitForProductType(value: string): string {
+  return ['Flower', 'Plant Material'].includes(
+    canonicalizeProductType(value) || ''
+  )
+    ? 'Lb'
+    : canonicalizeProductType(value) === 'Bulk Extract'
+      ? 'Gram'
+      : 'Unit';
 }

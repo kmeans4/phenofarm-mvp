@@ -1,8 +1,16 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
-import { readCart, writeCart, mergeCartItems } from '@/lib/cart';
-import { Plus, Check, ClipboardList, Loader2 } from "lucide-react";
+import { formatProductUnit } from '@/lib/product-display';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import {
+  readCart,
+  writeCart,
+  mergeCartItems,
+  normalizeCart,
+  waitForCartSync,
+} from '@/lib/cart';
+import { Plus, Check } from 'lucide-react';
 import { toast } from '@/app/hooks/useToast';
 
 interface ProductData {
@@ -16,7 +24,6 @@ interface ProductData {
   images?: string[];
   productType?: string | null;
 }
-
 export default function AddToCartButton({
   product,
   growerName,
@@ -30,155 +37,164 @@ export default function AddToCartButton({
   compact?: boolean;
   compactLabel?: string;
 }) {
-  const [quantity, setQuantity] = useState(1);
+  const router = useRouter();
+  const [quantity, setQuantity] = useState('1');
+  const [error, setError] = useState('');
   const [added, setAdded] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  useEffect(() => () => { if (resetTimer.current) clearTimeout(resetTimer.current); }, []);
-
-  const addToCart = (qty: number = quantity) => {
-    if (qty < 1 || qty > product.inventoryQty) {
-      toast.warning(`Select quantity between 1 and ${product.inventoryQty}`);
+  const [availableQuantity, setAvailableQuantity] = useState(
+    product.inventoryQty
+  );
+  const numeric = Number(quantity.replace(/[,\s]/g, ''));
+  const soldOut = product.inventoryQty < 1;
+  async function add() {
+    await waitForCartSync();
+    const before = readCart();
+    const existing = before.items.find((item) => item.id === product.id);
+    const remaining = Math.max(
+      0,
+      product.inventoryQty - (existing?.quantity ?? 0)
+    );
+    setAvailableQuantity(remaining);
+    if (!Number.isSafeInteger(numeric) || numeric < 1) {
+      setError('Enter a whole number of 1 or more.');
       return;
     }
-
-    if (product.price == null) { toast.warning('Request pricing before adding this product.'); return; }
-    const cart = readCart();
-    const existing = cart.items.find(item => item.id === product.id);
-    if ((existing?.quantity ?? 0) + qty > product.inventoryQty) {
-      toast.warning('The requested quantity exceeds available inventory.'); return;
+    if (numeric > remaining) {
+      setError(
+        `Only ${remaining} more available${existing ? ` (${existing.quantity} in your cart)` : ''}.`
+      );
+      return;
     }
-    setLoading(true);
-    const next = mergeCartItems(cart, [{ id: product.id, name: product.name, price: product.price,
-      grower: growerName, growerId, quantity: qty, maxQty: product.inventoryQty,
-      strain: product.strain ?? undefined, unit: product.unit ?? 'unit',
-      image: product.images?.[0], productType: product.productType ?? undefined }]);
-    if (!writeCart(next)) { toast.warning('Unable to save your cart. Free up browser storage and try again.'); setLoading(false); return; }
-    setAdded(true); setLoading(false); setQuantity(1);
-    if (resetTimer.current) clearTimeout(resetTimer.current);
-    resetTimer.current = setTimeout(() => setAdded(false), 2000);
-  };
-
-  const isOutOfStock = product.inventoryQty < 1;
-  const isLowStock = product.inventoryQty > 0 && product.inventoryQty <= 10;
-
-  // Compact mode for list view - single click to add 1 unit
-  if (compact) {
-    return (
-      <button type="button"
-        aria-label={`Add ${product.name} to cart`}
-        onClick={() => addToCart(1)}
-        disabled={loading || isOutOfStock || added}
-        className={`
-          min-h-10 rounded-lg flex items-center justify-center gap-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas
-          ${compactLabel ? 'px-4 py-2 text-sm font-semibold' : 'p-2.5'}
-          ${added
-            ? 'bg-emerald-500 text-[#032116]'
-            : isOutOfStock
-              ? 'bg-pf-surface text-pf-muted cursor-not-allowed'
-              : loading
-                ? 'bg-emerald-500 text-[#032116] cursor-wait'
-                : 'bg-emerald-500 text-[#032116] hover:bg-emerald-400'
-          }
-        `}
-        title={isOutOfStock ? 'Out of stock' : `Add 1 unit to cart • ${product.inventoryQty} in stock`}
-      >
-        {loading ? (
-          <Loader2 size={20} className="animate-spin" />
-        ) : added ? (
-          <Check size={20} />
-        ) : isOutOfStock ? (
-          <ClipboardList size={20} className="opacity-50" />
-        ) : (
-          <Plus size={20} />
-        )}
-        {compactLabel && (
-          <span>{loading ? 'Adding...' : added ? 'Added' : isOutOfStock ? 'Out of stock' : compactLabel}</span>
-        )}
-      </button>
+    if (product.price == null) {
+      setError('Ask the grower for a price first.');
+      return;
+    }
+    writeCart(
+      mergeCartItems(before, [
+        {
+          id: product.id,
+          name: product.name,
+          grower: growerName,
+          growerId,
+          price: product.price,
+          quantity: numeric,
+          maxQty: product.inventoryQty,
+          strain: product.strain ?? undefined,
+          unit: product.unit ?? 'unit',
+          image:
+            product.images?.[0] ||
+            `/api/dispensary/products/${product.id}/thumbnail`,
+          productType: product.productType ?? undefined,
+        },
+      ])
     );
+    setError('');
+    setAdded(true);
+    toast.success(`Added ${numeric} × ${product.name}`, {
+      action: {
+        label: 'View cart',
+        onClick: () => router.push('/dispensary/cart'),
+      },
+      cancel: {
+        label: 'Undo',
+        onClick: () => {
+          const cart = readCart();
+          writeCart(
+            normalizeCart({
+              items: cart.items.flatMap((item) =>
+                item.id !== product.id
+                  ? [item]
+                  : item.quantity > numeric
+                    ? [{ ...item, quantity: item.quantity - numeric }]
+                    : []
+              ),
+            })
+          );
+        },
+      },
+    });
   }
-
-  // Full mode for grid view
   return (
-    <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-2 sm:block sm:space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="hidden text-sm text-pf-muted font-medium sm:inline">Qty:</span>
-        <div className="flex items-center border border-pf-line-strong rounded-lg overflow-hidden focus-within:border-emerald-400 transition-colors">
-          <button type="button"
+    <div className={compact ? 'min-w-0 space-y-1' : 'space-y-2'}>
+      <div
+        className={`flex flex-wrap items-center gap-2 ${compact ? '' : 'sm:justify-between'}`}
+      >
+        <div className="flex overflow-hidden rounded-lg border border-pf-line-strong">
+          <button
+            type="button"
             aria-label={`Decrease quantity for ${product.name}`}
-            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-            disabled={loading || isOutOfStock}
-            className="h-10 w-10 shrink-0 hover:bg-pf-raised text-pf-secondary disabled:opacity-40 transition-colors font-medium"
+            disabled={soldOut || !Number.isSafeInteger(numeric) || numeric <= 1}
+            onClick={() => {
+              setQuantity(String(numeric - 1));
+              setAdded(false);
+            }}
+            className="h-11 w-11 disabled:opacity-40"
           >
             −
           </button>
           <input
             aria-label={`Quantity for ${product.name}`}
-            type="number"
-            min={1}
-            max={product.inventoryQty}
+            aria-invalid={!!error}
+            type="text"
+            inputMode="numeric"
             value={quantity}
-            onChange={(e) => setQuantity(Math.max(1, Math.min(product.inventoryQty, parseInt(e.target.value) || 1)))}
-            className="h-10 w-11 min-w-0 text-center text-base border-x border-pf-line-strong focus:outline-none bg-transparent font-medium sm:w-14"
-            disabled={loading || isOutOfStock}
+            disabled={soldOut}
+            onChange={(event) => {
+              setQuantity(event.target.value);
+              setAdded(false);
+              setError('');
+            }}
+            className="h-11 w-12 min-w-0 border-x border-pf-line-strong bg-transparent text-center text-base"
           />
-          <button type="button"
+          <button
+            type="button"
             aria-label={`Increase quantity for ${product.name}`}
-            onClick={() => setQuantity(Math.min(product.inventoryQty, quantity + 1))}
-            disabled={loading || isOutOfStock}
-            className="h-10 w-10 shrink-0 hover:bg-pf-raised text-pf-secondary disabled:opacity-40 transition-colors font-medium"
+            disabled={
+              soldOut ||
+              !Number.isSafeInteger(numeric) ||
+              numeric >= product.inventoryQty
+            }
+            onClick={() => {
+              setQuantity(String(Math.max(1, numeric + 1)));
+              setAdded(false);
+            }}
+            className="h-11 w-11 disabled:opacity-40"
           >
             +
           </button>
         </div>
+        <button
+          type="button"
+          onClick={add}
+          disabled={soldOut}
+          aria-label={`Add ${product.name} to cart`}
+          className="flex min-h-11 flex-1 items-center justify-center gap-1 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-[#032116] hover:bg-emerald-400 disabled:opacity-40"
+        >
+          {added ? <Check className="h-4 w-4" /> : <Plus className="h-4 w-4" />}
+          {soldOut ? 'Sold out' : compactLabel || 'Add'}
+        </button>
       </div>
-
-      <button type="button"
-        aria-label={loading ? 'Adding to cart' : added ? 'Added to cart' : isOutOfStock ? 'Out of stock' : 'Add to cart'}
-        onClick={() => addToCart()}
-        disabled={loading || isOutOfStock}
-        className={`
-          min-h-11 w-full px-2 py-2.5 rounded-lg flex items-center justify-center gap-1 text-sm font-semibold transition-colors sm:gap-2
-          ${added
-            ? 'bg-emerald-500 text-[#032116]'
-            : isOutOfStock
-              ? 'bg-pf-raised text-pf-muted cursor-not-allowed'
-              : loading
-                ? 'bg-emerald-500 text-[#032116] cursor-wait'
-                : 'bg-emerald-500 text-[#032116] hover:bg-emerald-400'
-          }
-        `}
-      >
-        {loading ? (
-          <>
-            <Loader2 size={18} className="animate-spin" />
-            <span>Adding...</span>
-          </>
-        ) : added ? (
-          <>
-            <Check size={18} />
-            <span>Added to cart</span>
-          </>
-        ) : isOutOfStock ? (
-          <>
-            <ClipboardList size={18} />
-            <span>Out of stock</span>
-          </>
-        ) : (
-          <>
-            <Plus size={18} />
-            <span>Add to cart</span>
-          </>
-        )}
-      </button>
-
-      <div className="col-span-2 flex items-center justify-center gap-2">
-        <span className={`text-xs ${isOutOfStock ? 'text-pf-danger' : isLowStock ? 'text-pf-warning' : 'text-pf-muted'}`}>
-          {isOutOfStock ? 'Out of stock' : isLowStock ? `Only ${product.inventoryQty} left` : `${product.inventoryQty} available`}
-        </span>
-      </div>
+      {error && (
+        <div role="alert" className="text-sm text-pf-warning">
+          {error}
+          {numeric > availableQuantity && availableQuantity > 0 && (
+            <button
+              className="ml-2 min-h-11 underline"
+              onClick={() => {
+                setQuantity(String(availableQuantity));
+                setError('');
+              }}
+            >
+              Set to {availableQuantity}
+            </button>
+          )}
+        </div>
+      )}
+      {!compact && (
+        <p className="text-center text-sm text-pf-muted">
+          {product.inventoryQty} {formatProductUnit(product.unit)} available
+        </p>
+      )}
     </div>
   );
 }

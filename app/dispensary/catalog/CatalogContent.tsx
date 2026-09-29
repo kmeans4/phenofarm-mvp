@@ -1,20 +1,47 @@
 'use client';
 
+import { useSession } from 'next-auth/react';
+import { ProductDetailSheet } from '../components/ProductDetailSheet';
+import { LicenseOrderingNotice } from '../components/LicenseOrderingNotice';
 import type { BuyerCatalogPage } from '@/lib/buyer-catalog';
 import { normalizeLabReports, type LabReportKey } from '@/lib/lab-reports';
 import { LabReportDownloads } from '@/app/dispensary/components/LabReportDownloads';
-import { getThcBadgeColor, getCbdBadgeColor, getStrainTypeColor } from '@/lib/product-badges';
+import {
+  getThcBadgeColor,
+  getCbdBadgeColor,
+  getStrainTypeColor,
+} from '@/lib/product-badges';
 import { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import Link from "next/link";
+import { formatProductUnit } from '@/lib/product-display';
+import { formatMoney } from '@/lib/format';
+import Link from 'next/link';
 import { createPortal } from 'react-dom';
-import { usePathname, useSearchParams } from 'next/navigation';
-import { LayoutGrid, List as ListIcon, SlidersHorizontal, X, ArrowUpDown, Loader2, Clock, TrendingUp, Search, MapPin, Scale, BarChart3, Leaf, Dna, MessageSquare, ZoomIn, BadgeCheck } from "lucide-react";
-import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from "lucide-react";
-import AddToCartButton from "./components/AddToCartButton";
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
+import {
+  LayoutGrid,
+  List as ListIcon,
+  SlidersHorizontal,
+  X,
+  ArrowUpDown,
+  Loader2,
+  Clock,
+  TrendingUp,
+  Search,
+  MapPin,
+  Scale,
+  BarChart3,
+  Leaf,
+  Dna,
+  MessageSquare,
+  ZoomIn,
+} from 'lucide-react';
+import { Bookmark, BookmarkCheck, Heart, Bell, BellRing } from 'lucide-react';
+import AddToCartButton from './components/AddToCartButton';
 import { useBuyerCollection } from '../hooks/useBuyerCollection';
 import { Modal } from '@/app/components/ui/Modal';
-import CartBadge from "./components/CartBadge";
-import MobileFilterSheet from "./components/MobileFilterSheet";
+import CartBadge from './components/CartBadge';
+import { WholesaleFilters } from './components/WholesaleFilters';
+import MobileFilterSheet from './components/MobileFilterSheet';
 import { ErrorState } from '@/app/components/ui/FetchState';
 import { PageHeader } from '@/app/components/ui/PageHeader';
 import { ProductImage } from '@/app/components/ui/ProductImage';
@@ -22,7 +49,11 @@ import { useFocusTrap } from '@/app/hooks/useFocusTrap';
 import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
 import { toast } from '@/app/hooks/useToast';
 import { getAllProductTypes } from '@/lib/product-types';
-import { THC_RANGES, PRICE_RANGES, type FilterState } from '@/lib/catalog-filters';
+import {
+  THC_RANGES,
+  priceRangesForUnit,
+  type FilterState,
+} from '@/lib/catalog-filters';
 import { pluralize } from '@/lib/utils';
 import {
   toSafeAvailability,
@@ -37,7 +68,7 @@ import {
   toSafeUnit,
 } from '@/lib/product-serializers';
 
-function displayUnit(unit: string | null | undefined) { return unit?.toLowerCase() === 'gram' ? 'g' : unit || 'unit'; }
+const displayUnit = formatProductUnit;
 
 interface Product {
   id: string;
@@ -96,18 +127,40 @@ interface StoredPriceAlert {
   triggeredAt?: string;
 }
 
-type SortOption = 'default' | 'price-asc' | 'price-desc' | 'thc-asc' | 'thc-desc' | 'name-asc' | 'name-desc';
+type SortOption =
+  | 'newest'
+  | 'default'
+  | 'price-asc'
+  | 'price-desc'
+  | 'thc-asc'
+  | 'thc-desc'
+  | 'name-asc'
+  | 'name-desc';
 type ProductTypeCounts = Record<string, number>;
 type FilterChip = {
   label: string;
-  category: 'productTypes' | 'thcRanges' | 'priceRanges' | 'favorites' | 'recentlyAdded' | 'trending' | 'search' | 'sort';
+  category:
+    | 'productTypes'
+    | 'thcRanges'
+    | 'priceRanges'
+    | 'favorites'
+    | 'recentlyAdded'
+    | 'trending'
+    | 'search'
+    | 'sort'
+    | 'inStock'
+    | 'hasLabs'
+    | 'strainType'
+    | 'growerId'
+    | 'priceUnit';
   value: string;
 };
 
 const PRODUCT_TYPES = getAllProductTypes();
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'default', label: 'By grower' },
+  { value: 'default', label: 'Relevance / newest' },
+  { value: 'newest', label: 'Newest' },
   { value: 'price-asc', label: 'Price: low' },
   { value: 'price-desc', label: 'Price: high' },
   { value: 'thc-desc', label: 'THC: high' },
@@ -148,7 +201,7 @@ function readStoredArray<T>(key: string): T[] {
   if (typeof window === 'undefined') return [];
   try {
     const parsed = JSON.parse(window.localStorage.getItem(key) || '[]');
-    return Array.isArray(parsed) ? parsed as T[] : [];
+    return Array.isArray(parsed) ? (parsed as T[]) : [];
   } catch {
     return [];
   }
@@ -156,7 +209,11 @@ function readStoredArray<T>(key: string): T[] {
 
 function writeStoredArray<T>(key: string, value: T[]) {
   if (typeof window === 'undefined') return;
-  try { window.localStorage.setItem(key, JSON.stringify(value)); } catch { /* Caching is optional. */ }
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* Caching is optional. */
+  }
 }
 
 function getDisplayStrainType(product: Pick<Product, 'strain' | 'strainType'>) {
@@ -172,10 +229,16 @@ function getDisplayStrainType(product: Pick<Product, 'strain' | 'strainType'>) {
 function normalizeProductTypeCounts(value: unknown): ProductTypeCounts {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return {};
 
-  return Object.entries(value as Record<string, unknown>).reduce<ProductTypeCounts>((acc, [type, count]) => {
+  return Object.entries(
+    value as Record<string, unknown>
+  ).reduce<ProductTypeCounts>((acc, [type, count]) => {
     const normalizedType = type.trim();
     const normalizedCount = Number(count);
-    if (normalizedType && Number.isFinite(normalizedCount) && normalizedCount >= 0) {
+    if (
+      normalizedType &&
+      Number.isFinite(normalizedCount) &&
+      normalizedCount >= 0
+    ) {
       acc[normalizedType] = normalizedCount;
     }
     return acc;
@@ -183,19 +246,67 @@ function normalizeProductTypeCounts(value: unknown): ProductTypeCounts {
 }
 
 function normalizeIds(value: unknown): string[] {
-  return Array.isArray(value) ? [...new Set(value.filter((item): item is string => typeof item === 'string' && !!item))] : [];
+  return Array.isArray(value)
+    ? [
+        ...new Set(
+          value.filter(
+            (item): item is string => typeof item === 'string' && !!item
+          )
+        ),
+      ]
+    : [];
 }
 function normalizeSaved(value: unknown): SavedFilter[] {
   if (!Array.isArray(value)) return [];
-  return value.filter(item => item && typeof item === 'object' && typeof item.id === 'string' && typeof item.name === 'string' && item.filters && typeof item.filters === 'object')
-    .map(item => ({ id: item.id, name: item.name, filters: { productTypes: normalizeIds(item.filters.productTypes), thcRanges: normalizeIds(item.filters.thcRanges), priceRanges: normalizeIds(item.filters.priceRanges), recentlyAdded: item.filters.recentlyAdded === true, trending: item.filters.trending === true },
-      searchQuery: typeof item.searchQuery === 'string' ? item.searchQuery : '', sortBy: SORT_OPTIONS.some(option => option.value === item.sortBy) ? item.sortBy as SortOption : 'default' as const,
-      createdAt: typeof item.createdAt === 'string' && Number.isFinite(Date.parse(item.createdAt)) ? item.createdAt : new Date(0).toISOString(),
-    })).slice(0, MAX_SAVED_FILTERS);
+  return value
+    .filter(
+      (item) =>
+        item &&
+        typeof item === 'object' &&
+        typeof item.id === 'string' &&
+        typeof item.name === 'string' &&
+        item.filters &&
+        typeof item.filters === 'object'
+    )
+    .map((item) => ({
+      id: item.id,
+      name: item.name,
+      filters: {
+        productTypes: normalizeIds(item.filters.productTypes),
+        thcRanges: normalizeIds(item.filters.thcRanges),
+        priceRanges: normalizeIds(item.filters.priceRanges),
+        recentlyAdded: item.filters.recentlyAdded === true,
+        trending: item.filters.trending === true,
+        strainType: item.filters.strainType || '',
+        growerId: item.filters.growerId || '',
+        inStock: item.filters.inStock === true,
+        hasLabs: item.filters.hasLabs === true,
+        priceUnit: item.filters.priceUnit || '',
+      },
+      searchQuery: typeof item.searchQuery === 'string' ? item.searchQuery : '',
+      sortBy: SORT_OPTIONS.some((option) => option.value === item.sortBy)
+        ? (item.sortBy as SortOption)
+        : ('default' as const),
+      createdAt:
+        typeof item.createdAt === 'string' &&
+        Number.isFinite(Date.parse(item.createdAt))
+          ? item.createdAt
+          : new Date(0).toISOString(),
+    }))
+    .slice(0, MAX_SAVED_FILTERS);
 }
 function normalizeAlerts(value: unknown): StoredPriceAlert[] {
   if (!Array.isArray(value)) return [];
-  return value.filter((item): item is StoredPriceAlert => !!item && typeof item === 'object' && typeof item.productId === 'string' && Number.isFinite(Number(item.targetPrice)) && Number(item.targetPrice) > 0).slice(0, MAX_PRICE_ALERTS);
+  return value
+    .filter(
+      (item): item is StoredPriceAlert =>
+        !!item &&
+        typeof item === 'object' &&
+        typeof item.productId === 'string' &&
+        Number.isFinite(Number(item.targetPrice)) &&
+        Number(item.targetPrice) > 0
+    )
+    .slice(0, MAX_PRICE_ALERTS);
 }
 
 function normalizeCatalogProduct(raw: unknown): Product | null {
@@ -207,15 +318,18 @@ function normalizeCatalogProduct(raw: unknown): Product | null {
 
   const inventoryQty = toSafeNonNegativeInteger(record.inventoryQty, 0);
   const isAvailable = toSafeAvailability(record.isAvailable, inventoryQty);
-  if (!isAvailable) return null;
+  void isAvailable;
 
   const rawGrower = record.grower;
-  const growerRecord = rawGrower && typeof rawGrower === 'object'
-    ? (rawGrower as Record<string, unknown>)
-    : null;
+  const growerRecord =
+    rawGrower && typeof rawGrower === 'object'
+      ? (rawGrower as Record<string, unknown>)
+      : null;
 
   const growerId = growerRecord ? toSafeOptionalString(growerRecord.id) : null;
-  const growerName = growerRecord ? toSafeOptionalString(growerRecord.businessName) : null;
+  const growerName = growerRecord
+    ? toSafeOptionalString(growerRecord.businessName)
+    : null;
 
   if (!growerId || !growerName) return null;
 
@@ -245,36 +359,101 @@ function normalizeCatalogProduct(raw: unknown): Product | null {
   };
 }
 
-export default function CatalogContent({ initialData }: { initialData?: BuyerCatalogPage }) {
+export default function CatalogContent({
+  initialData,
+  fixedGrowerId,
+}: {
+  initialData?: BuyerCatalogPage;
+  fixedGrowerId?: string;
+}) {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const preferencesLoaded = useRef(false);
+  const [growerOptions, setGrowerOptions] = useState(
+    initialData?.growers || []
+  );
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const initialSearchQuery = searchParams.get('search') || '';
-  const initialSortBy = SORT_OPTIONS.some((option) => option.value === searchParams.get('sortBy'))
+  const initialSortBy = SORT_OPTIONS.some(
+    (option) => option.value === searchParams.get('sortBy')
+  )
     ? (searchParams.get('sortBy') as SortOption)
     : 'default';
   const highlightedProductId = searchParams.get('product') || '';
 
   // State
-  const [products, setProducts] = useState<Product[]>(() => initialData?.products.map(normalizeCatalogProduct).filter((product): product is Product => product !== null) || []);
+  const [products, setProducts] = useState<Product[]>(
+    () =>
+      initialData?.products
+        .map(normalizeCatalogProduct)
+        .filter((product): product is Product => product !== null) || []
+  );
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [showFilters, setShowFilters] = useState(false);
+  const [showFilters, setShowFilters] = useState(true);
+  const [desktopFilters, setDesktopFilters] = useState(false);
+  useEffect(() => {
+    const media = window.matchMedia('(min-width: 1024px)');
+    const update = () => setDesktopFilters(media.matches);
+    update();
+    media.addEventListener('change', update);
+    return () => media.removeEventListener('change', update);
+  }, []);
   const [sortBy, setSortBy] = useState<SortOption>(initialSortBy);
   const [filters, setFilters] = useState<FilterState>({
-    productTypes: searchParams.get('productTypes')?.split(',').filter(Boolean) || [],
+    productTypes:
+      searchParams.get('productTypes')?.split(',').filter(Boolean) || [],
     thcRanges: searchParams.get('thcRanges')?.split(',').filter(Boolean) || [],
-    priceRanges: searchParams.get('priceRanges')?.split(',').filter(Boolean) || [],
+    priceRanges:
+      searchParams.get('priceRanges')?.split(',').filter(Boolean) || [],
     recentlyAdded: searchParams.get('recentlyAdded') === 'true',
     trending: searchParams.get('trending') === 'true',
+    strainType: searchParams.get('strainType') || '',
+    growerId: searchParams.get('growerId') || '',
+    inStock: searchParams.get('inStock') === 'true',
+    hasLabs: searchParams.get('hasLabs') === 'true',
+    priceUnit: searchParams.get('priceUnit') || '',
   });
 
+  useEffect(() => {
+    if (!session?.user?.id || preferencesLoaded.current) return;
+    preferencesLoaded.current = true;
+    try {
+      const saved = JSON.parse(
+        localStorage.getItem(`phenoshop:${session.user.id}:catalog`) || 'null'
+      );
+      if (saved) {
+        setViewMode(saved.viewMode === 'list' ? 'list' : 'grid');
+        if (!searchParams.toString()) {
+          setFilters(saved.filters);
+          setSortBy(saved.sortBy || 'default');
+          setSearchQuery(saved.search || '');
+        }
+      }
+    } catch {
+      /* Defaults are usable without local preferences. */
+    }
+  }, [session?.user?.id, searchParams]);
+  useEffect(() => {
+    if (session?.user?.id && preferencesLoaded.current) {
+      try {
+        localStorage.setItem(
+          `phenoshop:${session.user.id}:catalog`,
+          JSON.stringify({ filters, sortBy, viewMode, search: searchQuery })
+        );
+      } catch {}
+    }
+  }, [filters, sortBy, viewMode, searchQuery, session?.user?.id]);
   // Mobile filter sheet state
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)');
     const closeHiddenFilters = () => {
-      if (desktop.matches) setShowMobileFilters(false);
-      else setShowFilters(false);
+      if (desktop.matches) {
+        setShowMobileFilters(false);
+        setShowFilters(true);
+      } else setShowFilters(false);
     };
     desktop.addEventListener('change', closeHiddenFilters);
     return () => desktop.removeEventListener('change', closeHiddenFilters);
@@ -283,33 +462,54 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   // Compare state
   const [compareList, setCompareList] = useState<Product[]>([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
-  const [showCompareBar, setShowCompareBar] = useState(true);  // Saved filters state
-  const { items: savedFilters, setItems: setSavedFilters, error: savedSyncError } = useBuyerCollection('saved-filters', normalizeSaved);
-  const { items: storedPriceAlerts, setItems: setStoredPriceAlerts, error: alertSyncError } = useBuyerCollection('price-alerts', normalizeAlerts);
-  const priceAlerts = storedPriceAlerts.map(alert => alert.productId);
+  const [showCompareBar, setShowCompareBar] = useState(true); // Saved filters state
+  const {
+    items: savedFilters,
+    setItems: setSavedFilters,
+    error: savedSyncError,
+    retry: retrySaved,
+  } = useBuyerCollection('saved-filters', normalizeSaved);
+  const {
+    items: storedPriceAlerts,
+    setItems: setStoredPriceAlerts,
+    error: alertSyncError,
+    retry: retryAlerts,
+  } = useBuyerCollection('price-alerts', normalizeAlerts);
+  const priceAlerts = storedPriceAlerts.map((alert) => alert.productId);
   const [showPriceAlertModal, setShowPriceAlertModal] = useState(false);
-  const [priceAlertProduct, setPriceAlertProduct] = useState<Product | null>(null);
+  const [priceAlertProduct, setPriceAlertProduct] = useState<Product | null>(
+    null
+  );
   const [targetPrice, setTargetPrice] = useState('');
   const [alertError, setAlertError] = useState('');
-  const { items: favorites, setItems: setFavorites, error: favoriteSyncError } = useBuyerCollection('favorites', normalizeIds);
-  const [showFavoritesOnly, setShowFavoritesOnly] = useState(searchParams.get('favorites') === 'true');
+  const {
+    items: favorites,
+    setItems: setFavorites,
+    error: favoriteSyncError,
+    retry: retryFavorites,
+  } = useBuyerCollection('favorites', normalizeIds);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(
+    searchParams.get('favorites') === 'true'
+  );
   const [showSaveFilterModal, setShowSaveFilterModal] = useState(false);
   const [newFilterName, setNewFilterName] = useState('');
   const [savedFilterError, setSavedFilterError] = useState('');
 
-  const [requestPricingProduct, setRequestPricingProduct] = useState<Product | null>(null);
+  const [requestPricingProduct, setRequestPricingProduct] =
+    useState<Product | null>(null);
   const [requestPricingMessage, setRequestPricingMessage] = useState('');
-  const [requestPricingMode, setRequestPricingMode] = useState<'REQUEST_PRICING' | 'QUESTION'>('REQUEST_PRICING');
+  const [requestPricingMode, setRequestPricingMode] = useState<
+    'REQUEST_PRICING' | 'QUESTION'
+  >('REQUEST_PRICING');
   const [requestPricingSending, setRequestPricingSending] = useState(false);
   const [requestPricingError, setRequestPricingError] = useState('');
   useBodyOverlay(
     showMobileFilters ||
-    showCompareModal ||
-    showPriceAlertModal ||
-    showSaveFilterModal ||
-    requestPricingProduct !== null,
+      showCompareModal ||
+      showPriceAlertModal ||
+      showSaveFilterModal ||
+      requestPricingProduct !== null
   );
-
 
   // Search autocomplete state
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
@@ -326,9 +526,12 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   const [hasMore, setHasMore] = useState(initialData?.hasMore ?? true);
   const [isLoading, setIsLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(!initialData);
+  const [alternatives, setAlternatives] = useState<Product[]>([]);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [totalProducts, setTotalProducts] = useState(initialData?.total ?? 0);
-  const [productTypeCounts, setProductTypeCounts] = useState<ProductTypeCounts>(initialData?.productTypeCounts || {});
+  const [productTypeCounts, setProductTypeCounts] = useState<ProductTypeCounts>(
+    initialData?.productTypeCounts || {}
+  );
 
   // Refs
   const loadMoreRef = useRef<HTMLDivElement>(null);
@@ -339,7 +542,6 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   const compareReady = useRef(false);
   const compareTouched = useRef(false);
   const fetchControllerRef = useRef<AbortController | null>(null);
-
 
   const requestPricingModalRef = useRef<HTMLDivElement | null>(null);
   const requestPricingTextareaRef = useRef<HTMLTextAreaElement | null>(null);
@@ -364,22 +566,36 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
     applyingUrl.current = true;
     setShowFavoritesOnly(searchParams.get('favorites') === 'true');
     const nextSearch = searchParams.get('search') || '';
-    const nextSort = SORT_OPTIONS.some((option) => option.value === searchParams.get('sortBy'))
+    const nextSort = SORT_OPTIONS.some(
+      (option) => option.value === searchParams.get('sortBy')
+    )
       ? (searchParams.get('sortBy') as SortOption)
       : 'default';
 
-    setSearchQuery((current) => (current === nextSearch ? current : nextSearch));
+    setSearchQuery((current) =>
+      current === nextSearch ? current : nextSearch
+    );
     setSortBy((current) => (current === nextSort ? current : nextSort));
     setFilters((current) => {
       const nextFilters = {
-        productTypes: searchParams.get('productTypes')?.split(',').filter(Boolean) || [],
-        thcRanges: searchParams.get('thcRanges')?.split(',').filter(Boolean) || [],
-        priceRanges: searchParams.get('priceRanges')?.split(',').filter(Boolean) || [],
+        productTypes:
+          searchParams.get('productTypes')?.split(',').filter(Boolean) || [],
+        thcRanges:
+          searchParams.get('thcRanges')?.split(',').filter(Boolean) || [],
+        priceRanges:
+          searchParams.get('priceRanges')?.split(',').filter(Boolean) || [],
         recentlyAdded: searchParams.get('recentlyAdded') === 'true',
         trending: searchParams.get('trending') === 'true',
+        strainType: searchParams.get('strainType') || '',
+        growerId: searchParams.get('growerId') || '',
+        inStock: searchParams.get('inStock') === 'true',
+        hasLabs: searchParams.get('hasLabs') === 'true',
+        priceUnit: searchParams.get('priceUnit') || '',
       };
 
-      return JSON.stringify(current) === JSON.stringify(nextFilters) ? current : nextFilters;
+      return JSON.stringify(current) === JSON.stringify(nextFilters)
+        ? current
+        : nextFilters;
     });
     setShowSuggestions(false);
   }, [searchParams]);
@@ -390,63 +606,148 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   }, [searchQuery]);
 
   useEffect(() => {
-    if (applyingUrl.current) { applyingUrl.current = false; return; }
+    if (applyingUrl.current) {
+      applyingUrl.current = false;
+      return;
+    }
     if (debouncedSearch !== searchQuery) return;
     const params = new URLSearchParams(searchParams.toString());
-    const values: Record<string, string> = { search: debouncedSearch, sortBy: sortBy === 'default' ? '' : sortBy,
-      productTypes: filters.productTypes.join(','), thcRanges: filters.thcRanges.join(','), priceRanges: filters.priceRanges.join(','),
-      recentlyAdded: filters.recentlyAdded ? 'true' : '', trending: filters.trending ? 'true' : '', favorites: showFavoritesOnly ? 'true' : '' };
-    for (const [key, value] of Object.entries(values)) { if (value) params.set(key, value); else params.delete(key); }
+    const values: Record<string, string> = {
+      search: debouncedSearch,
+      sortBy: sortBy === 'default' ? '' : sortBy,
+      productTypes: filters.productTypes.join(','),
+      thcRanges: filters.thcRanges.join(','),
+      priceRanges: filters.priceRanges.join(','),
+      strainType: filters.strainType || '',
+      growerId: filters.growerId || '',
+      inStock: filters.inStock ? 'true' : '',
+      hasLabs: filters.hasLabs ? 'true' : '',
+      priceUnit: filters.priceUnit || '',
+      recentlyAdded: filters.recentlyAdded ? 'true' : '',
+      trending: filters.trending ? 'true' : '',
+      favorites: showFavoritesOnly ? 'true' : '',
+    };
+    for (const [key, value] of Object.entries(values)) {
+      if (value) params.set(key, value);
+      else params.delete(key);
+    }
     const query = params.toString();
-    if (query !== searchParams.toString()) { writtenUrl.current = query; window.history.replaceState(null, '', `${pathname}${query ? `?${query}` : ''}`); }
-  }, [debouncedSearch, searchQuery, sortBy, filters, showFavoritesOnly, pathname, searchParams]);
+    if (query !== searchParams.toString()) {
+      writtenUrl.current = query;
+      window.history.replaceState(
+        null,
+        '',
+        `${pathname}${query ? `?${query}` : ''}`
+      );
+    }
+  }, [
+    debouncedSearch,
+    searchQuery,
+    sortBy,
+    filters,
+    showFavoritesOnly,
+    pathname,
+    searchParams,
+  ]);
 
   useEffect(() => {
     const controller = new AbortController();
     const stored = readStoredArray<unknown>(COMPARE_STORAGE_KEY);
-    const ids = normalizeIds(stored.map(value => typeof value === 'string' ? value : value && typeof value === 'object' && 'id' in value ? value.id : null)).slice(0, MAX_COMPARE_ITEMS);
+    const ids = normalizeIds(
+      stored.map((value) =>
+        typeof value === 'string'
+          ? value
+          : value && typeof value === 'object' && 'id' in value
+            ? value.id
+            : null
+      )
+    ).slice(0, MAX_COMPARE_ITEMS);
     const load = async () => {
       try {
         if (ids.length) {
-          const response = await fetch('/api/dispensary/favorites', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productIds: ids }), signal: controller.signal });
+          const response = await fetch('/api/dispensary/favorites', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ productIds: ids }),
+            signal: controller.signal,
+          });
           if (!response.ok) throw new Error('Unable to refresh comparison.');
           const data = await response.json();
-          if (!Array.isArray(data.products)) throw new Error('Invalid comparison response.');
+          if (!Array.isArray(data.products))
+            throw new Error('Invalid comparison response.');
           if (!controller.signal.aborted) {
-            if (!compareTouched.current) setCompareList(data.products.map(normalizeCatalogProduct).filter((item: Product | null): item is Product => item !== null));
+            if (!compareTouched.current)
+              setCompareList(
+                data.products
+                  .map(normalizeCatalogProduct)
+                  .filter(
+                    (item: Product | null): item is Product => item !== null
+                  )
+              );
             compareReady.current = true;
           }
         } else compareReady.current = true;
-      } catch { /* Keep stored IDs for the next successful refresh. */ }
+      } catch {
+        /* Keep stored IDs for the next successful refresh. */
+      }
     };
     void load();
     return () => controller.abort();
   }, []);
   useEffect(() => {
-    if (compareReady.current) writeStoredArray(COMPARE_STORAGE_KEY, compareList.map(product => product.id));
+    if (compareReady.current)
+      writeStoredArray(
+        COMPARE_STORAGE_KEY,
+        compareList.map((product) => product.id)
+      );
   }, [compareList]);
 
-  const toggleFavorite = useCallback((productId: string) => {
-    setFavorites(previous => previous.includes(productId) ? previous.filter(id => id !== productId) : [...previous, productId]);
-  }, [setFavorites]);
-  const isFavorite = useCallback((productId: string) => favorites.includes(productId), [favorites]);
+  const toggleFavorite = useCallback(
+    (productId: string) => {
+      const removing = favorites.includes(productId);
+      setFavorites((previous) =>
+        previous.includes(productId)
+          ? previous.filter((id) => id !== productId)
+          : [...previous, productId]
+      );
+      if (removing)
+        toast.success('Favorite removed', {
+          action: {
+            label: 'Undo',
+            onClick: () =>
+              setFavorites((previous) =>
+                previous.includes(productId)
+                  ? previous
+                  : [...previous, productId]
+              ),
+          },
+        });
+    },
+    [setFavorites, favorites]
+  );
+  const isFavorite = useCallback(
+    (productId: string) => favorites.includes(productId),
+    [favorites]
+  );
 
   // Check if product has price alert
-  const hasPriceAlert = useCallback((productId: string) => {
-    return priceAlerts.includes(productId);
-  }, [priceAlerts]);
-
-
+  const hasPriceAlert = useCallback(
+    (productId: string) => {
+      return priceAlerts.includes(productId);
+    },
+    [priceAlerts]
+  );
 
   // Add product to compare
   const addToCompare = useCallback((product: Product) => {
-    compareReady.current = true; compareTouched.current = true;
+    compareReady.current = true;
+    compareTouched.current = true;
     setShowCompareBar(true);
-    setCompareList(prev => {
-      if (prev.find(p => p.id === product.id)) return prev;
+    setCompareList((prev) => {
+      if (prev.find((p) => p.id === product.id)) return prev;
       if (prev.length >= MAX_COMPARE_ITEMS) {
-        // Remove first item if at max
-        return [...prev.slice(1), product];
+        toast.info('Compare up to 3 products. Remove one to add another.');
+        return prev;
       }
       return [...prev, product];
     });
@@ -455,13 +756,16 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   // Remove product from compare
   const removeFromCompare = useCallback((productId: string) => {
     compareTouched.current = true;
-    setCompareList(prev => prev.filter(p => p.id !== productId));
+    setCompareList((prev) => prev.filter((p) => p.id !== productId));
   }, []);
 
   // Check if product is in compare list
-  const isInCompareList = useCallback((productId: string) => {
-    return compareList.some(p => p.id === productId);
-  }, [compareList]);
+  const isInCompareList = useCallback(
+    (productId: string) => {
+      return compareList.some((p) => p.id === productId);
+    },
+    [compareList]
+  );
 
   // Clear all compare items
   const clearCompare = useCallback(() => {
@@ -472,14 +776,24 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   const saveCurrentFilter = useCallback(() => {
     if (!newFilterName.trim()) return;
 
-    const hasActiveFilters = filters.productTypes.length > 0 ||
-                             filters.thcRanges.length > 0 ||
-                             filters.priceRanges.length > 0 ||
-                             searchQuery ||
-                             sortBy !== 'default' || filters.recentlyAdded || filters.trending;
+    const hasActiveFilters =
+      filters.productTypes.length > 0 ||
+      filters.thcRanges.length > 0 ||
+      filters.priceRanges.length > 0 ||
+      searchQuery ||
+      sortBy !== 'default' ||
+      filters.recentlyAdded ||
+      filters.trending ||
+      filters.inStock ||
+      filters.hasLabs ||
+      filters.strainType ||
+      filters.growerId ||
+      filters.priceUnit;
 
     if (!hasActiveFilters) {
-      setSavedFilterError('Apply at least one filter, search term, or sort option before saving.');
+      setSavedFilterError(
+        'Apply at least one filter, search term, or sort option before saving.'
+      );
       return;
     }
 
@@ -492,7 +806,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
       createdAt: new Date().toISOString(),
     };
 
-    setSavedFilters(prev => {
+    setSavedFilters((prev) => {
       const updated = [newFilter, ...prev].slice(0, MAX_SAVED_FILTERS);
       return updated;
     });
@@ -510,16 +824,17 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   }, []);
 
   // Delete a saved filter
-  const deleteSavedFilter = useCallback((filterId: string) => {
-    setSavedFilters(prev => prev.filter(f => f.id !== filterId));
-  }, [setSavedFilters]);
+  const deleteSavedFilter = useCallback(
+    (filterId: string) => {
+      setSavedFilters((prev) => prev.filter((f) => f.id !== filterId));
+    },
+    [setSavedFilters]
+  );
 
   const openSaveFilterModal = () => {
     setSavedFilterError('');
     setShowSaveFilterModal(true);
   };
-
-
 
   // Load recent searches from localStorage on mount
   useEffect(() => {
@@ -531,8 +846,6 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
     } catch (e) {
       console.error('Failed to load recent searches:', e);
     }
-
-
   }, []);
 
   // Save recent searches to localStorage
@@ -544,7 +857,9 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
       let searches: string[] = stored ? JSON.parse(stored) : [];
 
       // Remove duplicates and add to front
-      searches = searches.filter(s => s.toLowerCase() !== query.toLowerCase());
+      searches = searches.filter(
+        (s) => s.toLowerCase() !== query.toLowerCase()
+      );
       searches.unshift(query);
       searches = searches.slice(0, MAX_RECENT_SEARCHES);
 
@@ -558,27 +873,70 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   useEffect(() => {
     suggestionsController.current?.abort();
     const sequence = ++suggestionsSequence.current;
-    const controller = new AbortController(); suggestionsController.current = controller;
+    const controller = new AbortController();
+    suggestionsController.current = controller;
     setHighlightedIndex(-1);
-    if (searchQuery.length < 2) { setSuggestions([]); setIsSearching(false); return () => controller.abort(); }
+    if (searchQuery.length < 2) {
+      setSuggestions([]);
+      setIsSearching(false);
+      return () => controller.abort();
+    }
     const timer = setTimeout(async () => {
       setIsSearching(true);
       try {
-        const response = await fetch(`/api/dispensary/search-suggestions?q=${encodeURIComponent(searchQuery)}&limit=8`, { signal: controller.signal });
+        const response = await fetch(
+          `/api/dispensary/search-suggestions?q=${encodeURIComponent(searchQuery)}&limit=8`,
+          { signal: controller.signal }
+        );
         const data = await response.json();
         if (!response.ok) throw new Error('Unable to load suggestions');
-        if (sequence === suggestionsSequence.current && !controller.signal.aborted) setSuggestions(Array.isArray(data.suggestions) ? data.suggestions : []);
-      } catch { /* Search itself remains available if suggestions fail. */ }
-      finally { if (sequence === suggestionsSequence.current && !controller.signal.aborted) setIsSearching(false); }
+        if (
+          sequence === suggestionsSequence.current &&
+          !controller.signal.aborted
+        )
+          setSuggestions(
+            Array.isArray(data.suggestions) ? data.suggestions : []
+          );
+      } catch {
+        /* Search itself remains available if suggestions fail. */
+      } finally {
+        if (
+          sequence === suggestionsSequence.current &&
+          !controller.signal.aborted
+        )
+          setIsSearching(false);
+      }
     }, 300);
-    return () => { clearTimeout(timer); controller.abort(); };
+    return () => {
+      clearTimeout(timer);
+      controller.abort();
+    };
   }, [searchQuery]);
   const handleSearchInput = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(event.target.value); setShowSuggestions(true); setHighlightedIndex(-1);
+    setSearchQuery(event.target.value);
+    setShowSuggestions(true);
+    setHighlightedIndex(-1);
   };
-  const visibleSuggestions: SearchSuggestion[] = searchQuery.length >= 2 ? suggestions : recentSearches.map(text => ({ text, type: 'recent' }));
+  const visibleSuggestions: SearchSuggestion[] =
+    searchQuery.length >= 2
+      ? suggestions
+      : recentSearches.map((text) => ({ text, type: 'recent' }));
 
   // Handle search submission
+  const chooseSuggestion = (suggestion: SearchSuggestion) => {
+    setShowSuggestions(false);
+    if (suggestion.type === 'grower' && suggestion.id) {
+      router.push(`/dispensary/grower/${suggestion.id}`);
+      return;
+    }
+    if (suggestion.type === 'product' && suggestion.id) {
+      const params = new URLSearchParams(searchParams.toString());
+      params.set('product', suggestion.id);
+      router.push(`${pathname}?${params}`, { scroll: false });
+      return;
+    }
+    handleSearchSubmit(suggestion.text);
+  };
   const handleSearchSubmit = (query: string) => {
     setSearchQuery(query);
     setShowSuggestions(false);
@@ -599,16 +957,18 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
     switch (e.key) {
       case 'ArrowDown':
         e.preventDefault();
-        setHighlightedIndex(prev => (prev < allItems.length - 1 ? prev + 1 : prev));
+        setHighlightedIndex((prev) =>
+          prev < allItems.length - 1 ? prev + 1 : prev
+        );
         break;
       case 'ArrowUp':
         e.preventDefault();
-        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1));
+        setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : -1));
         break;
       case 'Enter':
         e.preventDefault();
         if (highlightedIndex >= 0 && allItems[highlightedIndex]) {
-          handleSearchSubmit(allItems[highlightedIndex].text);
+          chooseSuggestion(allItems[highlightedIndex]);
         } else if (searchQuery.trim()) {
           handleSearchSubmit(searchQuery);
         }
@@ -638,11 +998,14 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   }, []);
 
   // Toggle filter value (only for array-based filters, not recentlyAdded)
-  const toggleFilter = (category: 'productTypes' | 'thcRanges' | 'priceRanges', value: string) => {
-    setFilters(prev => {
+  const toggleFilter = (
+    category: 'productTypes' | 'thcRanges' | 'priceRanges',
+    value: string
+  ) => {
+    setFilters((prev) => {
       const current = prev[category];
       const updated = current.includes(value)
-        ? current.filter(v => v !== value)
+        ? current.filter((v) => v !== value)
         : [...current, value];
       return { ...prev, [category]: updated };
     });
@@ -650,7 +1013,13 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
   // Clear all filters
   const clearAllFilters = () => {
-    setFilters({ productTypes: [], thcRanges: [], priceRanges: [], recentlyAdded: false, trending: false })
+    setFilters({
+      productTypes: [],
+      thcRanges: [],
+      priceRanges: [],
+      recentlyAdded: false,
+      trending: false,
+    });
     setSearchQuery('');
     setSortBy('default');
     setShowSuggestions(false);
@@ -658,66 +1027,144 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   };
 
   const favoriteIdsKey = showFavoritesOnly ? favorites.join(',') : '';
-  const requestKey = JSON.stringify([debouncedSearch, filters, sortBy, showFavoritesOnly, favoriteIdsKey]);
-  const hydratedRequestKey = useRef<string | null>(initialData ? requestKey : null);
+  const requestKey = JSON.stringify([
+    debouncedSearch,
+    filters,
+    sortBy,
+    showFavoritesOnly,
+    favoriteIdsKey,
+    fixedGrowerId,
+  ]);
+  const hydratedRequestKey = useRef<string | null>(
+    initialData ? requestKey : null
+  );
 
   // Fetch products from API
-  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
-    const sequence = ++requestSequence.current;
-    fetchControllerRef.current?.abort();
-    const controller = new AbortController(); fetchControllerRef.current = controller;
-    setIsLoading(true);
-    setFetchError(null);
+  const fetchProducts = useCallback(
+    async (pageNum: number, append: boolean = false) => {
+      const sequence = ++requestSequence.current;
+      fetchControllerRef.current?.abort();
+      const controller = new AbortController();
+      fetchControllerRef.current = controller;
+      setIsLoading(true);
+      setFetchError(null);
 
-    try {
-      const params = new URLSearchParams();
-      params.set('page', pageNum.toString());
-      params.set('limit', ITEMS_PER_PAGE.toString());
+      try {
+        const params = new URLSearchParams();
+        params.set('page', pageNum.toString());
+        params.set('limit', ITEMS_PER_PAGE.toString());
 
-      if (debouncedSearch) params.set('search', debouncedSearch);
-      if (showFavoritesOnly) { params.set('favorites', 'true'); params.set('favoriteIds', favoriteIdsKey); }
-      if (filters.productTypes.length > 0) params.set('productTypes', filters.productTypes.join(','));
-      if (filters.thcRanges.length > 0) params.set('thcRanges', filters.thcRanges.join(','));
-      if (filters.priceRanges.length > 0) params.set('priceRanges', filters.priceRanges.join(','));
-      if (sortBy !== 'default') params.set('sortBy', sortBy);
-      if (filters.recentlyAdded) params.set('recentlyAdded', 'true');
-      if (filters.trending) params.set('trending', 'true');
+        if (debouncedSearch) params.set('search', debouncedSearch);
+        if (showFavoritesOnly) {
+          params.set('favorites', 'true');
+          params.set('favoriteIds', favoriteIdsKey);
+        }
+        if (filters.productTypes.length > 0)
+          params.set('productTypes', filters.productTypes.join(','));
+        if (filters.thcRanges.length > 0)
+          params.set('thcRanges', filters.thcRanges.join(','));
+        if (filters.priceRanges.length > 0)
+          params.set('priceRanges', filters.priceRanges.join(','));
+        if (sortBy !== 'default') params.set('sortBy', sortBy);
+        if (filters.recentlyAdded) params.set('recentlyAdded', 'true');
+        if (filters.trending) params.set('trending', 'true');
+        for (const key of ['strainType', 'growerId', 'priceUnit'] as const)
+          if (filters[key]) params.set(key, filters[key]!);
+        if (fixedGrowerId) params.set('growerId', fixedGrowerId);
+        if (filters.inStock) params.set('inStock', 'true');
+        if (filters.hasLabs) params.set('hasLabs', 'true');
 
-      const response = await fetch(`/api/dispensary/catalog?${params.toString()}`, {
-        signal: controller.signal,
-      });
+        const response = await fetch(
+          `/api/dispensary/catalog?${params.toString()}`,
+          {
+            signal: controller.signal,
+          }
+        );
 
-      if (!response.ok) {
-        throw new Error(`Failed to fetch products (${response.status})`);
+        if (!response.ok) {
+          throw new Error(
+            'Could not load products. Check your connection and retry.'
+          );
+        }
+
+        const data = await response.json();
+        const normalizedProducts = Array.isArray(data.products)
+          ? (data.products as unknown[])
+              .map(normalizeCatalogProduct)
+              .filter((item: Product | null): item is Product => item !== null)
+          : [];
+
+        if (controller.signal.aborted || sequence !== requestSequence.current)
+          return;
+        if (append) {
+          setProducts((prev) => [
+            ...new Map(
+              [...prev, ...normalizedProducts].map((product) => [
+                product.id,
+                product,
+              ])
+            ).values(),
+          ]);
+        } else {
+          setProducts(normalizedProducts);
+        }
+
+        setGrowerOptions(data.growers || []);
+        setHasMore(Boolean(data.hasMore));
+        setTotalProducts(toSafeNonNegativeInteger(data.total, 0));
+        setProductTypeCounts(
+          normalizeProductTypeCounts(data.productTypeCounts)
+        );
+        setPage(pageNum);
+      } catch (error) {
+        if (error instanceof Error && error.name === 'AbortError') {
+          return;
+        }
+        if (sequence === requestSequence.current)
+          setFetchError(
+            error instanceof Error ? error.message : 'Failed to fetch products.'
+          );
+      } finally {
+        if (
+          sequence === requestSequence.current &&
+          !controller.signal.aborted
+        ) {
+          setIsLoading(false);
+          setIsInitialLoading(false);
+        }
       }
+    },
+    [
+      debouncedSearch,
+      filters,
+      sortBy,
+      showFavoritesOnly,
+      favoriteIdsKey,
+      fixedGrowerId,
+    ]
+  );
 
-      const data = await response.json();
-      const normalizedProducts = Array.isArray(data.products)
-        ? (data.products as unknown[])
-            .map(normalizeCatalogProduct)
-            .filter((item: Product | null): item is Product => item !== null)
-        : [];
-
-      if (controller.signal.aborted || sequence !== requestSequence.current) return;
-      if (append) {
-        setProducts(prev => [...new Map([...prev, ...normalizedProducts].map(product => [product.id, product])).values()]);
-      } else {
-        setProducts(normalizedProducts);
-      }
-
-      setHasMore(Boolean(data.hasMore));
-      setTotalProducts(toSafeNonNegativeInteger(data.total, 0));
-      setProductTypeCounts(normalizeProductTypeCounts(data.productTypeCounts));
-      setPage(pageNum);
-    } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
-        return;
-      }
-      if (sequence === requestSequence.current) setFetchError(error instanceof Error ? error.message : 'Failed to fetch products.');
-    } finally {
-      if (sequence === requestSequence.current && !controller.signal.aborted) { setIsLoading(false); setIsInitialLoading(false); }
-    }
-  }, [debouncedSearch, filters, sortBy, showFavoritesOnly, favoriteIdsKey]);
+  useEffect(() => {
+    if (isLoading || isInitialLoading || products.length) return;
+    const controller = new AbortController();
+    void fetch('/api/dispensary/catalog?limit=4&sortBy=newest', {
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((data) => {
+        if (data?.products)
+          setAlternatives(
+            data.products
+              .map(normalizeCatalogProduct)
+              .filter(
+                (product: Product | null): product is Product =>
+                  product !== null
+              )
+          );
+      })
+      .catch(() => {});
+    return () => controller.abort();
+  }, [isLoading, isInitialLoading, products.length]);
 
   // Cancel in-flight catalog requests when leaving this page.
   useEffect(() => {
@@ -754,19 +1201,40 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   // Filter products by favorites if needed
   const filteredProducts = products;
   const visibleProductCount = totalProducts;
-  const highlightedProductLoaded = useMemo(() => (
-    Boolean(highlightedProductId && filteredProducts.some((product) => product.id === highlightedProductId))
-  ), [filteredProducts, highlightedProductId]);
+  const highlightedProductLoaded = useMemo(
+    () =>
+      Boolean(
+        highlightedProductId &&
+          filteredProducts.some(
+            (product) => product.id === highlightedProductId
+          )
+      ),
+    [filteredProducts, highlightedProductId]
+  );
 
-  // Group products by grower when not sorting
-  const groupedProducts = useMemo(() => (
-    sortBy === 'default'
-      ? groupByGrower(filteredProducts)
-      : [{ growerId: 'all', growerName: 'All Products', products: filteredProducts }]
-  ), [sortBy, filteredProducts]);
+  // Keep one ordered result list; an empty list renders the recovery state below.
+  const groupedProducts = useMemo(
+    () =>
+      filteredProducts.length
+        ? [
+            {
+              growerId: 'all',
+              growerName: 'Products',
+              products: filteredProducts,
+            },
+          ]
+        : [],
+    [filteredProducts]
+  );
 
   useEffect(() => {
-    if (!highlightedProductId || !highlightedProductLoaded || isInitialLoading || isLoading) return;
+    if (
+      !highlightedProductId ||
+      !highlightedProductLoaded ||
+      isInitialLoading ||
+      isLoading
+    )
+      return;
 
     const timeoutId = window.setTimeout(() => {
       document
@@ -775,22 +1243,33 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
     }, 150);
 
     return () => window.clearTimeout(timeoutId);
-  }, [highlightedProductId, highlightedProductLoaded, isInitialLoading, isLoading, viewMode]);
+  }, [
+    highlightedProductId,
+    highlightedProductLoaded,
+    isInitialLoading,
+    isLoading,
+    viewMode,
+  ]);
 
   // Get active filter count
-  const activeFilterCount = useMemo(() => (
-    filters.productTypes.length
-    + filters.thcRanges.length
-    + filters.priceRanges.length
-    + (filters.recentlyAdded ? 1 : 0)
-    + (filters.trending ? 1 : 0)
-    + (showFavoritesOnly ? 1 : 0)
-  ), [filters, showFavoritesOnly]);
+  const activeFilterCount = useMemo(
+    () =>
+      filters.productTypes.length +
+      filters.thcRanges.length +
+      filters.priceRanges.length +
+      (filters.recentlyAdded ? 1 : 0) +
+      (filters.trending ? 1 : 0) +
+      (showFavoritesOnly ? 1 : 0) +
+      Number(!!filters.inStock) +
+      Number(!!filters.hasLabs) +
+      Number(!!filters.strainType) +
+      Number(!!filters.growerId) +
+      Number(!!filters.priceUnit),
+    [filters, showFavoritesOnly]
+  );
 
   const hasActiveCatalogState = Boolean(
-    activeFilterCount > 0
-    || searchQuery.trim()
-    || sortBy !== 'default'
+    activeFilterCount > 0 || searchQuery.trim() || sortBy !== 'default'
   );
 
   const productTypeFilterOptions = useMemo(() => {
@@ -813,15 +1292,27 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
     const chips: FilterChip[] = [];
 
     if (showFavoritesOnly) {
-      chips.push({ label: `Favorites (${pluralize(favorites.length, 'item')})`, category: 'favorites', value: 'favorites' });
+      chips.push({
+        label: `Favorites (${pluralize(favorites.length, 'item')})`,
+        category: 'favorites',
+        value: 'favorites',
+      });
     }
 
     if (filters.recentlyAdded) {
-      chips.push({ label: 'Recently Added (7 days)', category: 'recentlyAdded', value: 'recentlyAdded' });
+      chips.push({
+        label: 'Recently Added (7 days)',
+        category: 'recentlyAdded',
+        value: 'recentlyAdded',
+      });
     }
 
     if (filters.trending) {
-      chips.push({ label: 'Trending', category: 'trending', value: 'trending' });
+      chips.push({
+        label: 'Trending',
+        category: 'trending',
+        value: 'trending',
+      });
     }
 
     filters.productTypes.forEach((type) => {
@@ -830,46 +1321,102 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
     filters.thcRanges.forEach((rangeId) => {
       const range = THC_RANGES.find((r) => r.id === rangeId);
-      if (range) chips.push({ label: `THC: ${range.label}`, category: 'thcRanges', value: rangeId });
+      if (range)
+        chips.push({
+          label: `THC: ${range.label}`,
+          category: 'thcRanges',
+          value: rangeId,
+        });
     });
 
     filters.priceRanges.forEach((rangeId) => {
-      const range = PRICE_RANGES.find((r) => r.id === rangeId);
-      if (range) chips.push({ label: `Price: ${range.label}`, category: 'priceRanges', value: rangeId });
+      const range = priceRangesForUnit(filters.priceUnit).find(
+        (r) => r.id === rangeId
+      );
+      if (range)
+        chips.push({
+          label: `Price: ${range.label}`,
+          category: 'priceRanges',
+          value: rangeId,
+        });
     });
 
+    if (filters.inStock)
+      chips.push({ label: 'In stock', category: 'inStock', value: 'true' });
+    if (filters.hasLabs)
+      chips.push({
+        label: 'Has lab results',
+        category: 'hasLabs',
+        value: 'true',
+      });
+    if (filters.strainType)
+      chips.push({
+        label: filters.strainType.replace(/_/g, ' ').toLowerCase(),
+        category: 'strainType',
+        value: filters.strainType,
+      });
+    if (filters.growerId)
+      chips.push({
+        label:
+          growerOptions.find((grower) => grower.id === filters.growerId)
+            ?.name || 'Selected grower',
+        category: 'growerId',
+        value: filters.growerId,
+      });
+    if (filters.priceUnit)
+      chips.push({
+        label: `Per ${displayUnit(filters.priceUnit)}`,
+        category: 'priceUnit',
+        value: filters.priceUnit,
+      });
     return chips;
-  }, [showFavoritesOnly, favorites.length, filters]);
+  }, [showFavoritesOnly, favorites.length, filters, growerOptions]);
 
   // Get icon for suggestion type
   const getSuggestionIcon = (type: string) => {
     switch (type) {
-      case 'product': return <Leaf size={16} className="text-pf-accent" />;
-      case 'strain': return <Dna size={16} className="text-pf-purple" />;
-      case 'grower': return <MapPin size={16} className="text-pf-info" />;
-      case 'category': return <LayoutGrid size={16} className="text-pf-warning" />;
-      case 'recent': return <Clock size={16} className="text-pf-muted" />;
-      case 'popular': return <TrendingUp size={16} className="text-pf-danger" />;
-      default: return <Search size={16} className="text-pf-muted" />;
+      case 'product':
+        return <Leaf size={16} className="text-pf-accent" />;
+      case 'strain':
+        return <Dna size={16} className="text-pf-purple" />;
+      case 'grower':
+        return <MapPin size={16} className="text-pf-info" />;
+      case 'category':
+        return <LayoutGrid size={16} className="text-pf-warning" />;
+      case 'recent':
+        return <Clock size={16} className="text-pf-muted" />;
+      case 'popular':
+        return <TrendingUp size={16} className="text-pf-danger" />;
+      default:
+        return <Search size={16} className="text-pf-muted" />;
     }
   };
 
   // Get label for suggestion type
   const getSuggestionLabel = (type: string) => {
     switch (type) {
-      case 'product': return 'Product';
-      case 'strain': return 'Strain';
-      case 'grower': return 'Grower';
-      case 'category': return 'Category';
-      case 'recent': return 'Recent';
-      case 'popular': return 'Popular';
-      default: return 'Search';
+      case 'product':
+        return 'Product';
+      case 'strain':
+        return 'Strain';
+      case 'grower':
+        return 'Grower';
+      case 'category':
+        return 'Category';
+      case 'recent':
+        return 'Recent';
+      case 'popular':
+        return 'Popular';
+      default:
+        return 'Search';
     }
   };
 
   // ============ PRICE ALERT FUNCTIONS ============
   const openPriceAlertModal = (product: Product) => {
-    const existingAlert = storedPriceAlerts.find((alert) => alert.productId === product.id);
+    const existingAlert = storedPriceAlerts.find(
+      (alert) => alert.productId === product.id
+    );
 
     setPriceAlertProduct(product);
     setTargetPrice(
@@ -884,21 +1431,27 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
   const savePriceAlert = () => {
     if (!priceAlertProduct) return;
 
-    const target = parseFloat(targetPrice);
+    const target = Number(targetPrice.replace(/[$,\s]/g, ''));
     if (isNaN(target) || target <= 0) {
       setAlertError('Enter a target price greater than $0.');
       return;
     }
 
     if (target >= priceAlertProduct.price) {
-      setAlertError(`Target must be below the current price of $${priceAlertProduct.price.toFixed(2)}.`);
+      setAlertError(
+        `Target must be below the current price of ${formatMoney(priceAlertProduct.price)}.`
+      );
       return;
     }
 
-    const existingAlert = storedPriceAlerts.find((alert) => alert.productId === priceAlertProduct.id);
+    const existingAlert = storedPriceAlerts.find(
+      (alert) => alert.productId === priceAlertProduct.id
+    );
 
     if (!existingAlert && storedPriceAlerts.length >= MAX_PRICE_ALERTS) {
-      setAlertError(`Maximum ${MAX_PRICE_ALERTS} alerts allowed. Remove some first.`);
+      setAlertError(
+        `Maximum ${MAX_PRICE_ALERTS} alerts allowed. Remove some first.`
+      );
       return;
     }
 
@@ -920,19 +1473,25 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
     };
 
     const updated = [
-      ...storedPriceAlerts.filter((alert) => alert.productId !== priceAlertProduct.id),
+      ...storedPriceAlerts.filter(
+        (alert) => alert.productId !== priceAlertProduct.id
+      ),
       newAlert,
     ];
     setStoredPriceAlerts(updated);
 
     setShowPriceAlertModal(false);
-    toast.success("Alert saved. Check Saved → Alerts for price updates.");
+    toast.success('Alert saved. Check Saved → Alerts for price updates.');
   };
 
-  const openPricingMessageModal = (product: Product, mode: 'REQUEST_PRICING' | 'QUESTION') => {
-    const defaultMessage = mode === 'REQUEST_PRICING'
-      ? MESSAGE_TEMPLATE_CHIPS[0].getMessage(product)
-      : `Hi ${product.grower.businessName}, I have a question about ${product.name}.`;
+  const openPricingMessageModal = (
+    product: Product,
+    mode: 'REQUEST_PRICING' | 'QUESTION'
+  ) => {
+    const defaultMessage =
+      mode === 'REQUEST_PRICING'
+        ? MESSAGE_TEMPLATE_CHIPS[0].getMessage(product)
+        : `Hi ${product.grower.businessName}, I have a question about ${product.name}.`;
 
     setRequestPricingMode(mode);
     setRequestPricingProduct(product);
@@ -959,7 +1518,10 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
         body: JSON.stringify({
           growerId: requestPricingProduct.grower.id,
           productId: requestPricingProduct.id,
-          messageType: requestPricingMode === 'REQUEST_PRICING' ? 'PRICING_REQUEST' : 'TEXT',
+          messageType:
+            requestPricingMode === 'REQUEST_PRICING'
+              ? 'PRICING_REQUEST'
+              : 'TEXT',
           body: message,
         }),
       });
@@ -967,7 +1529,9 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'We could not send message. Please try again.');
+        throw new Error(
+          data.error || 'We could not send message. Please try again.'
+        );
       }
 
       setRequestPricingMessage('');
@@ -981,7 +1545,11 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
       closeRequestPricingModal();
     } catch (err) {
-      setRequestPricingError(err instanceof Error ? err.message : 'We could not send message. Please try again.');
+      setRequestPricingError(
+        err instanceof Error
+          ? err.message
+          : 'We could not send message. Please try again.'
+      );
     } finally {
       setRequestPricingSending(false);
     }
@@ -989,23 +1557,70 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
   return (
     <div className="relative space-y-4">
-      <PageHeader
-        title="Catalog"
-        mobileInlineActions
-        actions={<CartBadge showLink />}
+      <LicenseOrderingNotice />
+      <ProductDetailSheet
+        productId={highlightedProductId}
+        onClose={() => {
+          const params = new URLSearchParams(searchParams.toString());
+          params.delete('product');
+          router.replace(`${pathname}?${params}`, { scroll: false });
+        }}
       />
+      {(savedSyncError || favoriteSyncError || alertSyncError) && (
+        <p
+          role="alert"
+          className="rounded-lg bg-pf-danger-bg p-3 text-pf-danger"
+        >
+          {savedSyncError || favoriteSyncError || alertSyncError}
+          <button
+            className="ml-3 min-h-11 underline"
+            onClick={() => {
+              retrySaved();
+              retryAlerts();
+              retryFavorites();
+            }}
+          >
+            Retry
+          </button>
+        </p>
+      )}
+      {fixedGrowerId ? (
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-xl font-semibold">Products</h2>
+          <CartBadge showLink />
+        </div>
+      ) : (
+        <PageHeader
+          title="Catalog"
+          mobileInlineActions
+          actions={<CartBadge showLink />}
+        />
+      )}
 
       {/* Search, Sort, and Controls Bar */}
       <div className="relative grid grid-cols-[minmax(0,1fr)_auto] gap-3 lg:flex">
         {/* Search with Autocomplete */}
-        <div className="relative col-span-2 min-w-0 flex-1" ref={suggestionsRef}>
+        <div
+          className="relative col-span-2 min-w-0 flex-1"
+          ref={suggestionsRef}
+        >
           <div className="relative">
-            <label htmlFor="catalog-search" className="sr-only">Search catalog</label>
+            <label htmlFor="catalog-search" className="sr-only">
+              Search catalog
+            </label>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pf-muted" />
             <input
               id="catalog-search"
               ref={searchInputRef}
-                role="combobox" aria-autocomplete="list" aria-expanded={showSuggestions} aria-controls="catalog-suggestions" aria-activedescendant={showSuggestions && highlightedIndex >= 0 ? `catalog-suggestion-${highlightedIndex}` : undefined}
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={showSuggestions}
+              aria-controls="catalog-suggestions"
+              aria-activedescendant={
+                showSuggestions && highlightedIndex >= 0
+                  ? `catalog-suggestion-${highlightedIndex}`
+                  : undefined
+              }
               type="text"
               placeholder="Search products or growers"
               value={searchQuery}
@@ -1031,17 +1646,49 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
           {showSuggestions && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-pf-surface rounded-lg shadow-xl border border-pf-line z-50 max-h-96 overflow-y-auto">
-              {!searchQuery && recentSearches.length > 0 && <button type="button" onClick={clearRecentSearches} className="px-4 py-2 text-xs text-pf-danger">Clear recent searches</button>}
-              <div id="catalog-suggestions" role="listbox" aria-label="Search suggestions">
+              {!searchQuery && recentSearches.length > 0 && (
+                <button
+                  type="button"
+                  onClick={clearRecentSearches}
+                  className="px-4 py-2 text-xs text-pf-danger"
+                >
+                  Clear recent searches
+                </button>
+              )}
+              <div
+                id="catalog-suggestions"
+                role="listbox"
+                aria-label="Search suggestions"
+              >
                 {visibleSuggestions.map((suggestion, index) => (
-                  <button key={`${suggestion.type}-${suggestion.text}-${index}`} id={`catalog-suggestion-${index}`} type="button" role="option" aria-selected={highlightedIndex === index} tabIndex={-1}
-                    onMouseDown={event => event.preventDefault()} onClick={() => handleSearchSubmit(suggestion.text)}
-                    className={`w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-pf-canvas ${highlightedIndex === index ? 'bg-pf-accent-bg' : ''}`}>
-                    {getSuggestionIcon(suggestion.type)}<span className="flex-1 text-sm">{suggestion.text}</span><span className="text-xs text-pf-muted">{getSuggestionLabel(suggestion.type)}</span>
+                  <button
+                    key={`${suggestion.type}-${suggestion.text}-${index}`}
+                    id={`catalog-suggestion-${index}`}
+                    type="button"
+                    role="option"
+                    aria-selected={highlightedIndex === index}
+                    tabIndex={-1}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => chooseSuggestion(suggestion)}
+                    className={`w-full px-4 py-2.5 flex items-center gap-3 text-left hover:bg-pf-canvas ${highlightedIndex === index ? 'bg-pf-accent-bg' : ''}`}
+                  >
+                    {getSuggestionIcon(suggestion.type)}
+                    <span className="flex-1 text-sm">{suggestion.text}</span>
+                    <span className="text-xs text-pf-muted">
+                      {getSuggestionLabel(suggestion.type)}
+                    </span>
                   </button>
                 ))}
               </div>
-              {isSearching ? <p className="px-4 py-3 text-sm text-pf-muted">Searching...</p> : visibleSuggestions.length === 0 ? <p className="px-4 py-3 text-sm text-pf-muted">{searchQuery ? 'Press Enter to search.' : 'Type to search products, strains, and growers.'}</p> : null}
+              {isSearching ? (
+                <p className="px-4 py-3 text-sm text-pf-muted">Searching...</p>
+              ) : visibleSuggestions.length === 0 ? (
+                <p className="px-4 py-3 text-sm text-pf-muted">
+                  {searchQuery
+                    ? 'No suggestions. Results update as you type.'
+                    : 'Type to search products, strains, and growers.'}
+                </p>
+              ) : null}
             </div>
           )}
         </div>
@@ -1054,7 +1701,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
             aria-label="Sort catalog results"
             className="w-full appearance-none bg-pf-surface border border-pf-line-strong rounded-lg px-3 py-2.5 pr-10 focus:ring-2 focus:ring-emerald-400 focus:border-transparent cursor-pointer text-base sm:text-sm"
           >
-            {SORT_OPTIONS.map(option => (
+            {SORT_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
@@ -1074,9 +1721,9 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
               }
             }}
             aria-label="Toggle filters"
-            aria-expanded={showFilters || showMobileFilters}
+            aria-expanded={(desktopFilters && showFilters) || showMobileFilters}
             className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-colors ${
-              showFilters || showMobileFilters
+              (desktopFilters && showFilters) || showMobileFilters
                 ? 'bg-emerald-500 text-[#032116] border-emerald-500'
                 : 'bg-pf-surface text-pf-secondary border-pf-line-strong hover:bg-pf-canvas'
             }`}
@@ -1101,6 +1748,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
                   : 'bg-pf-surface text-pf-muted hover:bg-pf-canvas'
               }`}
               aria-label="Grid view"
+              aria-pressed={viewMode === 'grid'}
               title="Grid view"
             >
               <LayoutGrid size={18} />
@@ -1115,6 +1763,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
                   : 'bg-pf-surface text-pf-muted hover:bg-pf-canvas'
               }`}
               aria-label="List view"
+              aria-pressed={viewMode === 'list'}
               title="List view"
             >
               <ListIcon size={18} />
@@ -1127,10 +1776,9 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
       {/* Active Filter Chips */}
       {hasActiveCatalogState && (
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-sm text-pf-muted mr-2">Active:</span>
           {sortBy !== 'default' && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-pf-purple-bg text-pf-purple text-sm rounded-full">
-              {SORT_OPTIONS.find(o => o.value === sortBy)?.label}
+              {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
               <button
                 type="button"
                 onClick={() => setSortBy('default')}
@@ -1163,14 +1811,40 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
               <button
                 type="button"
                 onClick={() => {
-                  if (chip.category === "favorites") {
+                  if (chip.category === 'favorites') {
                     setShowFavoritesOnly(false);
-                  } else if (chip.category === "recentlyAdded") {
-                    setFilters(prev => ({ ...prev, recentlyAdded: false }));
-                  } else if (chip.category === "trending") {
-                    setFilters(prev => ({ ...prev, trending: false }));
+                  } else if (chip.category === 'recentlyAdded') {
+                    setFilters((prev) => ({ ...prev, recentlyAdded: false }));
+                  } else if (chip.category === 'trending') {
+                    setFilters((prev) => ({ ...prev, trending: false }));
+                  } else if (
+                    chip.category === 'inStock' ||
+                    chip.category === 'hasLabs'
+                  ) {
+                    setFilters((previous) => ({
+                      ...previous,
+                      [chip.category]: false,
+                    }));
+                  } else if (
+                    chip.category === 'strainType' ||
+                    chip.category === 'growerId' ||
+                    chip.category === 'priceUnit'
+                  ) {
+                    setFilters((previous) => ({
+                      ...previous,
+                      [chip.category]: '',
+                      ...(chip.category === 'priceUnit'
+                        ? { priceRanges: [] }
+                        : {}),
+                    }));
                   } else {
-                    toggleFilter(chip.category as 'productTypes' | 'thcRanges' | 'priceRanges', chip.value);
+                    toggleFilter(
+                      chip.category as
+                        | 'productTypes'
+                        | 'thcRanges'
+                        | 'priceRanges',
+                      chip.value
+                    );
                   }
                 }}
                 aria-label={`Remove ${chip.label} filter`}
@@ -1185,13 +1859,16 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
             onClick={clearAllFilters}
             className="ml-2 rounded text-sm text-pf-muted underline hover:text-pf-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           >
-            Clear all filters
+            Clear filters
           </button>
         </div>
       )}
 
       {/* Results count */}
-      <div className="flex items-center justify-between text-sm text-pf-muted" aria-live="polite">
+      <div
+        className="flex items-center justify-between text-sm text-pf-muted"
+        aria-live="polite"
+      >
         <span>
           {isInitialLoading
             ? 'Loading...'
@@ -1217,19 +1894,24 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
                 </h3>
                 <div className="space-y-2">
                   {savedFilters.map((savedFilter) => (
-                    <div key={savedFilter.id} className="group flex items-center gap-2 rounded-lg bg-pf-accent-bg px-2 py-2 text-pf-accent">
+                    <div
+                      key={savedFilter.id}
+                      className="group flex items-center gap-2 rounded-lg bg-pf-accent-bg px-2 py-2 text-pf-accent"
+                    >
                       <button
                         type="button"
                         onClick={() => applySavedFilter(savedFilter)}
                         className="min-w-0 flex-1 text-left px-2 py-1 text-sm rounded-md hover:bg-pf-accent-bg transition-colors"
                       >
-                        <span className="font-medium truncate block">{savedFilter.name}</span>
+                        <span className="font-medium truncate block">
+                          {savedFilter.name}
+                        </span>
                       </button>
                       <button
                         type="button"
                         onClick={() => deleteSavedFilter(savedFilter.id)}
                         aria-label={`Delete saved filter ${savedFilter.name}`}
-                        className="text-pf-accent hover:text-pf-danger opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                        className="text-pf-accent hover:text-pf-danger min-h-11 min-w-11 p-1"
                       >
                         <X size={14} />
                       </button>
@@ -1240,8 +1922,11 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
             )}
 
             {/* Save Filter Button */}
-            {(filters.productTypes.length > 0 || filters.thcRanges.length > 0 || filters.priceRanges.length > 0 || filters.recentlyAdded || filters.trending || searchQuery || sortBy !== 'default') && (
-              <button type="button"
+            {(activeFilterCount > Number(showFavoritesOnly) ||
+              searchQuery ||
+              sortBy !== 'default') && (
+              <button
+                type="button"
                 onClick={openSaveFilterModal}
                 className="w-full py-2 px-4 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
               >
@@ -1251,42 +1936,75 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
             )}
 
             <div className="space-y-2 rounded-lg border border-pf-line bg-pf-surface p-3">
-              <label className="flex min-h-10 cursor-pointer items-center gap-2 text-sm"><input type="checkbox" checked={showFavoritesOnly} onChange={e => setShowFavoritesOnly(e.target.checked)} className="h-4 w-4 accent-emerald-500" />Favorites ({favorites.length})</label>
-              <label className="flex min-h-10 cursor-pointer items-center gap-2 text-sm"><input type="checkbox" checked={filters.recentlyAdded} onChange={e => setFilters(prev => ({ ...prev, recentlyAdded: e.target.checked }))} className="h-4 w-4 accent-emerald-500" />Added in 7 days</label>
+              <label className="flex min-h-10 cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={showFavoritesOnly}
+                  onChange={(e) => setShowFavoritesOnly(e.target.checked)}
+                  className="h-4 w-4 accent-emerald-500"
+                />
+                Favorites ({favorites.length})
+              </label>
+              <label className="flex min-h-10 cursor-pointer items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={filters.recentlyAdded}
+                  onChange={(e) =>
+                    setFilters((prev) => ({
+                      ...prev,
+                      recentlyAdded: e.target.checked,
+                    }))
+                  }
+                  className="h-4 w-4 accent-emerald-500"
+                />
+                Added in 7 days
+              </label>
             </div>
 
+            <WholesaleFilters
+              filters={filters}
+              onChange={setFilters}
+              growers={growerOptions}
+              hideGrower={!!fixedGrowerId}
+            />
             {/* Product Type Filter */}
             <div className="bg-pf-surface rounded-lg border border-pf-line p-4">
-              <h3 className="font-semibold text-pf-text mb-3">Product Type</h3>
+              <h3 className="font-semibold text-pf-text mb-3">Product type</h3>
               <div className="space-y-2">
                 {productTypeFilterOptions.length > 0 ? (
-                  productTypeFilterOptions.map(({ type, count, isSelected }) => (
-                    <label
-                      key={type}
-                      className={`flex items-center gap-2 rounded p-1 ${
-                        count > 0 || isSelected
-                          ? 'cursor-pointer hover:bg-pf-canvas'
-                          : 'cursor-not-allowed text-pf-muted'
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={() => toggleFilter('productTypes', type)}
-                        className="w-4 h-4 text-pf-accent border-pf-line-strong rounded focus:ring-emerald-400"
-                      />
-                      <span className={`min-w-0 flex-1 text-sm ${count > 0 ? 'text-pf-secondary' : 'text-pf-muted'}`}>
-                        {type}
-                      </span>
-                      <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${
-                        isSelected
-                          ? 'bg-pf-accent-bg text-pf-accent'
-                          : 'bg-pf-surface text-pf-muted'
-                      }`}>
-                        {count}
-                      </span>
-                    </label>
-                  ))
+                  productTypeFilterOptions.map(
+                    ({ type, count, isSelected }) => (
+                      <label
+                        key={type}
+                        className={`flex items-center gap-2 rounded p-1 ${
+                          count > 0 || isSelected
+                            ? 'cursor-pointer hover:bg-pf-canvas'
+                            : 'cursor-not-allowed text-pf-muted'
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => toggleFilter('productTypes', type)}
+                          className="w-4 h-4 text-pf-accent border-pf-line-strong rounded focus:ring-emerald-400"
+                        />
+                        <span
+                          className={`min-w-0 flex-1 text-sm ${count > 0 ? 'text-pf-secondary' : 'text-pf-muted'}`}
+                        >
+                          {type}
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-xs font-medium ${
+                            isSelected
+                              ? 'bg-pf-accent-bg text-pf-accent'
+                              : 'bg-pf-surface text-pf-muted'
+                          }`}
+                        >
+                          {count}
+                        </span>
+                      </label>
+                    )
+                  )
                 ) : (
                   <p className="rounded-lg bg-pf-canvas px-3 py-2 text-sm text-pf-muted">
                     No product types match the current results.
@@ -1299,15 +2017,20 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
             <div className="bg-pf-surface rounded-lg border border-pf-line p-4">
               <h3 className="font-semibold text-pf-text mb-3">THC level</h3>
               <div className="space-y-2">
-                {THC_RANGES.map(range => (
-                  <label key={range.id} className="flex items-center gap-2 cursor-pointer hover:bg-pf-canvas p-1 rounded">
+                {THC_RANGES.map((range) => (
+                  <label
+                    key={range.id}
+                    className="flex items-center gap-2 cursor-pointer hover:bg-pf-canvas p-1 rounded"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.thcRanges.includes(range.id)}
                       onChange={() => toggleFilter('thcRanges', range.id)}
                       className="w-4 h-4 text-pf-accent border-pf-line-strong rounded focus:ring-emerald-400"
                     />
-                    <span className="text-sm text-pf-secondary">{range.label.replace(/ per unit/g, '')}</span>
+                    <span className="text-sm text-pf-secondary">
+                      {range.label.replace(/ per unit/g, '')}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -1315,18 +2038,34 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
             {/* Price Range Filter */}
             <div className="bg-pf-surface rounded-lg border border-pf-line p-4">
-              <h3 className="font-semibold text-pf-text mb-1">Price per unit</h3>
+              <h3 className="font-semibold text-pf-text mb-1">
+                Price{' '}
+                {filters.priceUnit
+                  ? `per ${displayUnit(filters.priceUnit)}`
+                  : ''}
+              </h3>
+              {!filters.priceUnit && (
+                <p className="mb-2 text-sm text-pf-muted">
+                  Choose a price unit above.
+                </p>
+              )}
 
               <div className="space-y-2">
-                {PRICE_RANGES.map(range => (
-                  <label key={range.id} className="flex items-center gap-2 cursor-pointer hover:bg-pf-canvas p-1 rounded">
+                {priceRangesForUnit(filters.priceUnit).map((range) => (
+                  <label
+                    key={range.id}
+                    className="flex items-center gap-2 cursor-pointer hover:bg-pf-canvas p-1 rounded"
+                  >
                     <input
                       type="checkbox"
                       checked={filters.priceRanges.includes(range.id)}
+                      disabled={!filters.priceUnit}
                       onChange={() => toggleFilter('priceRanges', range.id)}
                       className="w-4 h-4 text-pf-accent border-pf-line-strong rounded focus:ring-emerald-400"
                     />
-                    <span className="text-sm text-pf-secondary">{range.label.replace(/ per unit/g, '')}</span>
+                    <span className="text-sm text-pf-secondary">
+                      {range.label.replace(/ per unit/g, '')}
+                    </span>
                   </label>
                 ))}
               </div>
@@ -1334,7 +2073,8 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
             {/* Clear All Button */}
             {hasActiveCatalogState && (
-              <button type="button"
+              <button
+                type="button"
                 onClick={clearAllFilters}
                 className="w-full py-2 text-sm text-pf-muted border border-pf-line-strong rounded-lg hover:bg-pf-canvas transition-colors"
               >
@@ -1356,49 +2096,44 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
             />
           ) : groupedProducts.length > 0 ? (
             <div className="space-y-4">
-              {groupedProducts.map(group => (
-                <div key={group.growerId} className={`bg-pf-surface rounded-xl shadow-sm border border-pf-line overflow-hidden ${sortBy !== 'default' ? 'border-pf-accent-line ring-1 ring-pf-accent-line' : ''}`}>
-                  <div className={`px-4 py-3 border-b border-pf-line ${sortBy !== 'default' ? 'bg-pf-accent-bg' : 'bg-pf-canvas'}`}>
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <h2 className="break-words text-base font-semibold text-pf-text sm:text-lg">
-                          {group.growerName}
-                          {sortBy !== 'default' && (
-                            <span className="ml-2 text-sm font-normal text-pf-accent">
-                              (sorted by {SORT_OPTIONS.find(o => o.value === sortBy)?.label.toLowerCase()})
-                            </span>
-                          )}
-                        </h2>
-
-                      </div>
-                      {group.growerId !== 'all' && (
-                        <Link
-                          href={`/dispensary/grower/${group.growerId}`}
-                          className="inline-flex min-h-10 shrink-0 items-center text-sm text-pf-accent hover:text-pf-accent font-medium"
-                        >
-                          <span className="hidden sm:mr-1 sm:inline">View</span>Shop →
-                        </Link>
-                      )}
-                    </div>
-                  </div>
+              {groupedProducts.map((group) => (
+                <div
+                  key={group.growerId}
+                  className={`bg-pf-surface rounded-xl shadow-sm border border-pf-line overflow-hidden ${sortBy !== 'default' ? 'border-pf-accent-line ring-1 ring-pf-accent-line' : ''}`}
+                >
+                  <h2 className="sr-only">Products</h2>
 
                   <div className="p-3 sm:p-4">
                     {viewMode === 'grid' ? (
                       /* Grid View */
                       <div className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-4">
-                        {group.products.map(product => (
+                        {group.products.map((product) => (
                           <ProductCard
                             key={product.id}
                             product={product}
                             isInCompare={isInCompareList(product.id)}
-                            onCompareToggle={() => isInCompareList(product.id) ? removeFromCompare(product.id) : addToCompare(product)}
-                            compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
+                            onCompareToggle={() =>
+                              isInCompareList(product.id)
+                                ? removeFromCompare(product.id)
+                                : addToCompare(product)
+                            }
+                            compareDisabled={
+                              !isInCompareList(product.id) &&
+                              compareList.length >= MAX_COMPARE_ITEMS
+                            }
                             isFav={isFavorite(product.id)}
                             onFavoriteToggle={() => toggleFavorite(product.id)}
                             hasAlert={hasPriceAlert(product.id)}
                             onAlertToggle={() => openPriceAlertModal(product)}
-                            onRequestPricing={() => openPricingMessageModal(product, 'REQUEST_PRICING')}
-                            onMessageGrower={() => openPricingMessageModal(product, 'QUESTION')}
+                            onRequestPricing={() =>
+                              openPricingMessageModal(
+                                product,
+                                'REQUEST_PRICING'
+                              )
+                            }
+                            onMessageGrower={() =>
+                              openPricingMessageModal(product, 'QUESTION')
+                            }
                             isHighlighted={highlightedProductId === product.id}
                           />
                         ))}
@@ -1406,19 +2141,33 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
                     ) : (
                       /* List View */
                       <div className="space-y-2">
-                        {group.products.map(product => (
+                        {group.products.map((product) => (
                           <ProductListItem
                             key={product.id}
                             product={product}
                             isInCompare={isInCompareList(product.id)}
-                            onCompareToggle={() => isInCompareList(product.id) ? removeFromCompare(product.id) : addToCompare(product)}
-                            compareDisabled={!isInCompareList(product.id) && compareList.length >= MAX_COMPARE_ITEMS}
+                            onCompareToggle={() =>
+                              isInCompareList(product.id)
+                                ? removeFromCompare(product.id)
+                                : addToCompare(product)
+                            }
+                            compareDisabled={
+                              !isInCompareList(product.id) &&
+                              compareList.length >= MAX_COMPARE_ITEMS
+                            }
                             isFav={isFavorite(product.id)}
                             onFavoriteToggle={() => toggleFavorite(product.id)}
                             hasAlert={hasPriceAlert(product.id)}
                             onAlertToggle={() => openPriceAlertModal(product)}
-                            onRequestPricing={() => openPricingMessageModal(product, 'REQUEST_PRICING')}
-                            onMessageGrower={() => openPricingMessageModal(product, 'QUESTION')}
+                            onRequestPricing={() =>
+                              openPricingMessageModal(
+                                product,
+                                'REQUEST_PRICING'
+                              )
+                            }
+                            onMessageGrower={() =>
+                              openPricingMessageModal(product, 'QUESTION')
+                            }
                             isHighlighted={highlightedProductId === product.id}
                           />
                         ))}
@@ -1433,26 +2182,65 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
                 {isLoading && hasMore && (
                   <div className="flex flex-col items-center justify-center">
                     <Loader2 className="w-8 h-8 text-pf-accent animate-spin mb-2" />
-                    <p className="text-sm text-pf-muted">Loading more products...</p>
-                  </div>
-                )}
-                {!hasMore && products.length > 0 && (
-                  <div className="text-center py-4">
-                    <p className="text-sm text-pf-muted">End of results</p>
+                    <p className="text-sm text-pf-muted">
+                      Loading more products...
+                    </p>
                   </div>
                 )}
               </div>
             </div>
           ) : (
             <div className="rounded-xl border border-dashed border-pf-line-strong bg-pf-surface px-4 py-8 text-center sm:py-10">
-              <h3 className="text-lg font-semibold text-pf-text mb-2">No matching products</h3>
-              <p className="text-pf-muted mb-4">Try a different search or clear your filters.</p>
-              <button type="button"
+              <h2 className="text-lg font-semibold text-pf-text mb-2">
+                No matching products
+              </h2>
+              {suggestions.some((item) => item.type === 'product') && (
+                <p className="mb-2 text-sm">
+                  Did you mean{' '}
+                  {suggestions
+                    .filter((item) => item.type === 'product')
+                    .slice(0, 2)
+                    .map((item) => (
+                      <button
+                        key={item.id}
+                        className="min-h-11 px-2 text-pf-accent underline"
+                        onClick={() => chooseSuggestion(item)}
+                      >
+                        {item.text}
+                      </button>
+                    ))}
+                  ?
+                </p>
+              )}
+              <p className="text-pf-muted mb-4">
+                Try a shorter name or fewer filters. Browse newest products for
+                more options.
+              </p>
+              <button
+                type="button"
                 onClick={clearAllFilters}
                 className="px-4 py-2 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 transition-colors"
               >
                 Clear filters
               </button>
+              {alternatives.length > 0 && (
+                <div className="mt-4">
+                  <p className="text-sm text-pf-muted">
+                    Explore newest products
+                  </p>
+                  <div className="mt-2 flex flex-wrap justify-center gap-2">
+                    {alternatives.map((item) => (
+                      <Link
+                        key={item.id}
+                        href={`${pathname}?product=${item.id}`}
+                        className="inline-flex min-h-11 items-center rounded-lg border border-pf-line-strong px-3 text-sm text-pf-accent"
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -1460,7 +2248,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
       {/* Compare Bar - Floating at bottom */}
       {compareList.length > 0 && showCompareBar && (
-        <div className="fixed bottom-24 left-1/2 z-40 w-full max-w-4xl -translate-x-1/2 px-4 sm:bottom-6">
+        <div className="sticky bottom-20 z-30 w-full sm:bottom-4">
           <div className="flex flex-col gap-3 rounded-xl border border-pf-line bg-pf-surface p-4 shadow-2xl sm:flex-row sm:items-center sm:gap-4">
             <div className="flex items-center gap-2 whitespace-nowrap">
               <Scale className="w-5 h-5 text-pf-accent" />
@@ -1470,7 +2258,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
             </div>
 
             <div className="flex-1 flex gap-2 overflow-x-auto">
-              {compareList.map(product => (
+              {compareList.map((product) => (
                 <div
                   key={product.id}
                   className="flex items-center gap-2 bg-pf-canvas rounded-lg px-3 py-2 min-w-fit"
@@ -1543,18 +2331,31 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
             clearCompare();
             setShowCompareModal(false);
           }}
-          onRequestPricing={(product) => { setShowCompareModal(false); openPricingMessageModal(product, 'REQUEST_PRICING'); }}
-          onMessageGrower={(product) => { setShowCompareModal(false); openPricingMessageModal(product, 'QUESTION'); }}
+          onRequestPricing={(product) => {
+            setShowCompareModal(false);
+            openPricingMessageModal(product, 'REQUEST_PRICING');
+          }}
+          onMessageGrower={(product) => {
+            setShowCompareModal(false);
+            openPricingMessageModal(product, 'QUESTION');
+          }}
         />
       )}
-      {(savedSyncError || favoriteSyncError || alertSyncError) && <p role="alert" className="rounded-lg bg-pf-danger-bg p-3 text-pf-danger">{savedSyncError || favoriteSyncError || alertSyncError}</p>}
+
       {/* Save Filter Modal */}
       {showSaveFilterModal && (
-        <Modal open onClose={() => setShowSaveFilterModal(false)} title="Save filter">
+        <Modal
+          open
+          onClose={() => setShowSaveFilterModal(false)}
+          title="Save filter"
+        >
           <div className="w-full">
             <div className="space-y-3 sm:space-y-4">
               <div>
-                <label htmlFor="saved-filter-name" className="block text-sm font-medium text-pf-secondary mb-2">
+                <label
+                  htmlFor="saved-filter-name"
+                  className="block text-sm font-medium text-pf-secondary mb-2"
+                >
                   Name
                 </label>
                 <input
@@ -1583,31 +2384,48 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
               {/* Preview of what will be saved */}
               <div className="bg-pf-canvas rounded-lg p-4">
-                <p className="text-sm font-medium text-pf-secondary mb-2">Includes</p>
+                <p className="text-sm font-medium text-pf-secondary mb-2">
+                  Includes
+                </p>
                 <div className="flex flex-wrap gap-2">
-                  {filters.productTypes.map(type => (
-                    <span key={type} className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line">
+                  {filters.productTypes.map((type) => (
+                    <span
+                      key={type}
+                      className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line"
+                    >
                       {type}
                     </span>
                   ))}
-                  {filters.thcRanges.map(rangeId => {
-                    const range = THC_RANGES.find(r => r.id === rangeId);
+                  {filters.thcRanges.map((rangeId) => {
+                    const range = THC_RANGES.find((r) => r.id === rangeId);
                     return range ? (
-                      <span key={rangeId} className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line">
+                      <span
+                        key={rangeId}
+                        className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line"
+                      >
                         THC {range.label}
                       </span>
                     ) : null;
                   })}
-                  {filters.priceRanges.map(rangeId => {
-                    const range = PRICE_RANGES.find(r => r.id === rangeId);
+                  {filters.priceRanges.map((rangeId) => {
+                    const range = priceRangesForUnit(filters.priceUnit).find(
+                      (r) => r.id === rangeId
+                    );
                     return range ? (
-                      <span key={rangeId} className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line">
+                      <span
+                        key={rangeId}
+                        className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line"
+                      >
                         Price {range.label}
                       </span>
                     ) : null;
                   })}
-                  {filters.recentlyAdded && <span className="px-2 py-1 text-xs">Recently added</span>}
-                  {filters.trending && <span className="px-2 py-1 text-xs">Trending</span>}
+                  {filters.recentlyAdded && (
+                    <span className="px-2 py-1 text-xs">Recently added</span>
+                  )}
+                  {filters.trending && (
+                    <span className="px-2 py-1 text-xs">Trending</span>
+                  )}
                   {searchQuery && (
                     <span className="px-2 py-1 bg-pf-info-bg text-pf-info text-xs rounded border border-pf-info-line">
                       Search: &quot;{searchQuery}&quot;
@@ -1615,27 +2433,31 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
                   )}
                   {sortBy !== 'default' && (
                     <span className="px-2 py-1 bg-pf-purple-bg text-pf-purple text-xs rounded border border-pf-purple-line">
-                      Sort: {SORT_OPTIONS.find(o => o.value === sortBy)?.label}
+                      Sort:{' '}
+                      {SORT_OPTIONS.find((o) => o.value === sortBy)?.label}
                     </span>
                   )}
                 </div>
               </div>
 
-              <p className="text-xs text-pf-muted">
-                {savedFilters.length >= MAX_SAVED_FILTERS
-                  ? `You have reached the maximum of ${MAX_SAVED_FILTERS} saved filters. Saving will remove the oldest filter.`
-                  : `You can save up to ${MAX_SAVED_FILTERS} filters (${MAX_SAVED_FILTERS - savedFilters.length} remaining).`}
-              </p>
+              {savedFilters.length >= MAX_SAVED_FILTERS && (
+                <p className="text-sm text-pf-muted">
+                  All {MAX_SAVED_FILTERS} filter slots are used. Saving replaces
+                  the oldest.
+                </p>
+              )}
             </div>
 
             <div className="mt-4 border-t border-pf-line pt-3 flex justify-end gap-3">
-              <button type="button"
+              <button
+                type="button"
                 onClick={() => setShowSaveFilterModal(false)}
                 className="px-4 py-2 text-pf-secondary hover:bg-pf-surface rounded-lg transition-colors"
               >
                 Cancel
               </button>
-              <button type="button"
+              <button
+                type="button"
                 onClick={saveCurrentFilter}
                 disabled={!newFilterName.trim()}
                 className="px-4 py-2 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1648,37 +2470,61 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
       )}
 
       {showPriceAlertModal && priceAlertProduct && (
-        <Modal open onClose={() => setShowPriceAlertModal(false)} title="Track a target price">
+        <Modal
+          open
+          onClose={() => setShowPriceAlertModal(false)}
+          title="Track a target price"
+        >
           <div className="w-full">
             <div className="space-y-3 sm:space-y-4">
               <p className="text-sm text-pf-muted">
-                <span className="block font-semibold">{priceAlertProduct.name}</span>Prices are checked when you open Saved or refresh your alerts.
+                <span className="block font-semibold">
+                  {priceAlertProduct.name}
+                </span>
+                We’ll notify you when its price reaches your target.
               </p>
               <div>
-                <label htmlFor="target-price-alert" className="block text-sm font-medium text-pf-secondary mb-2">Target price ($/{displayUnit(priceAlertProduct.unit)})</label>
+                <label
+                  htmlFor="target-price-alert"
+                  className="block text-sm font-medium text-pf-secondary mb-2"
+                >
+                  Target price ($/{displayUnit(priceAlertProduct.unit)})
+                </label>
                 <input
                   id="target-price-alert"
-                  type="number"
-                  min="0.01"
-                  max={Math.max(0.01, priceAlertProduct.price - 0.01)}
-                  step="0.01"
+                  type="text"
+                  inputMode="decimal"
                   value={targetPrice}
                   onChange={(e) => {
                     setTargetPrice(e.target.value);
                     if (alertError) setAlertError('');
                   }}
                   aria-invalid={Boolean(alertError)}
-                  aria-describedby={alertError ? 'target-price-alert-error' : 'target-price-alert-help'}
+                  aria-describedby={
+                    alertError
+                      ? 'target-price-alert-error'
+                      : 'target-price-alert-help'
+                  }
                   className={`w-full rounded-lg border px-4 py-2.5 focus:ring-2 focus:ring-emerald-400 focus:border-transparent ${
-                    alertError ? 'border-pf-danger-line bg-pf-danger-bg' : 'border-pf-line-strong'
+                    alertError
+                      ? 'border-pf-danger-line bg-pf-danger-bg'
+                      : 'border-pf-line-strong'
                   }`}
                 />
-                <p id="target-price-alert-help" className="text-xs text-pf-muted mt-1">
-                  Current: ${priceAlertProduct.price.toFixed(2)}/{displayUnit(priceAlertProduct.unit)}. Choose a lower target above $0.
+                <p
+                  id="target-price-alert-help"
+                  className="text-xs text-pf-muted mt-1"
+                >
+                  Current: {formatMoney(priceAlertProduct.price)}/
+                  {displayUnit(priceAlertProduct.unit)}. Choose a lower target
+                  above $0.
                 </p>
               </div>
               {alertError && (
-                <p id="target-price-alert-error" className="rounded-lg border border-pf-danger-line bg-pf-danger-bg px-3 py-2 text-sm text-pf-danger">
+                <p
+                  id="target-price-alert-error"
+                  className="rounded-lg border border-pf-danger-line bg-pf-danger-bg px-3 py-2 text-sm text-pf-danger"
+                >
                   {alertError}
                 </p>
               )}
@@ -1704,122 +2550,159 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
         </Modal>
       )}
 
-      {requestPricingProduct && createPortal(
-        <div
-          className="pf-dialog-backdrop-in fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) closeRequestPricingModal();
-          }}
-        >
+      {requestPricingProduct &&
+        createPortal(
           <div
-            ref={requestPricingModalRef}
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="catalog-message-title"
-            tabIndex={-1}
-            className="pf-dialog-panel-in flex max-h-[calc(100dvh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-pf-line bg-pf-surface shadow-2xl"
+            className="pf-dialog-backdrop-in fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+            onMouseDown={(event) => {
+              if (event.target === event.currentTarget)
+                closeRequestPricingModal();
+            }}
           >
-            <div className="shrink-0 px-4 py-3 border-b border-pf-line flex items-center justify-between bg-pf-canvas">
-              <div>
-                <h2 id="catalog-message-title" className="text-lg font-bold text-pf-text">
-                  {requestPricingMode === 'REQUEST_PRICING' ? 'Request pricing' : 'Message grower'}
-                </h2>
-              </div>
-              <button
-                type="button"
-                onClick={closeRequestPricingModal}
-                className="p-2 text-pf-muted hover:text-pf-text hover:bg-pf-raised rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-                aria-label="Close message dialog"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="min-h-0 flex-1 overflow-y-auto p-4 space-y-3">
-              <div className="space-y-1 text-sm text-pf-secondary">
-                <span className="block break-words font-semibold">{requestPricingProduct.name}</span>
-                <span className="block break-words text-pf-accent">To: {requestPricingProduct.grower.businessName}</span>
-              </div>
-
-              <div>
-                <p className="sr-only">Message templates</p>
-                <div className="flex flex-wrap gap-2">
-                  {MESSAGE_TEMPLATE_CHIPS.map((template) => (
-                    <button
-                      key={template.label}
-                      aria-label={template.label}
-                      type="button"
-                      onClick={() => {
-                        setRequestPricingMessage(template.getMessage(requestPricingProduct));
-                        setRequestPricingError('');
-                        requestPricingTextareaRef.current?.focus();
-                      }}
-                      className="min-h-10 rounded-full border border-pf-line px-3 py-2 text-xs font-semibold text-pf-secondary transition-colors hover:border-pf-accent-line hover:bg-pf-accent-bg hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-                    >
-                      {template.label === 'Price & minimum order' ? 'Pricing' : template.label === 'Introduction' ? 'Intro' : template.label}
-                    </button>
-                  ))}
+            <div
+              ref={requestPricingModalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="catalog-message-title"
+              tabIndex={-1}
+              className="pf-dialog-panel-in flex max-h-[calc(100dvh-2rem)] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-pf-line bg-pf-surface shadow-2xl"
+            >
+              <div className="shrink-0 px-4 py-3 border-b border-pf-line flex items-center justify-between bg-pf-canvas">
+                <div>
+                  <h2
+                    id="catalog-message-title"
+                    className="text-lg font-bold text-pf-text"
+                  >
+                    {requestPricingMode === 'REQUEST_PRICING'
+                      ? 'Request pricing'
+                      : 'Message grower'}
+                  </h2>
                 </div>
+                <button
+                  type="button"
+                  onClick={closeRequestPricingModal}
+                  className="p-2 text-pf-muted hover:text-pf-text hover:bg-pf-raised rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
+                  aria-label="Close message dialog"
+                >
+                  <X size={20} />
+                </button>
               </div>
 
-              <div className="space-y-2">
-                <div className="flex items-center justify-between gap-3">
-                  <label htmlFor="catalog-message-body" className="block text-sm font-medium text-pf-secondary">
-                    Message
-                  </label>
-                  <span className={`text-xs ${requestPricingMessage.length > PRICING_MESSAGE_MAX_LENGTH - 60 ? 'text-pf-warning' : 'text-pf-muted'}`}>
-                    {requestPricingMessage.length}/{PRICING_MESSAGE_MAX_LENGTH}
+              <div className="min-h-0 flex-1 overflow-y-auto p-4 space-y-3">
+                <div className="space-y-1 text-sm text-pf-secondary">
+                  <span className="block break-words font-semibold">
+                    {requestPricingProduct.name}
+                  </span>
+                  <span className="block break-words text-pf-accent">
+                    To: {requestPricingProduct.grower.businessName}
                   </span>
                 </div>
-                <textarea
-                  id="catalog-message-body"
-                  ref={requestPricingTextareaRef}
-                  value={requestPricingMessage}
-                  onChange={(e) => {
-                    setRequestPricingMessage(e.target.value);
-                    setRequestPricingError('');
-                  }}
-                  rows={5}
-                  maxLength={PRICING_MESSAGE_MAX_LENGTH}
-                  className="w-full rounded-lg border border-pf-line-strong px-4 py-3 text-base focus:border-transparent focus:ring-2 focus:ring-emerald-400"
-                  placeholder="Write your message..."
-                />
+
+                <div>
+                  <p className="sr-only">Message templates</p>
+                  <div className="flex flex-wrap gap-2">
+                    {MESSAGE_TEMPLATE_CHIPS.map((template) => (
+                      <button
+                        key={template.label}
+                        aria-label={template.label}
+                        type="button"
+                        onClick={() => {
+                          setRequestPricingMessage(
+                            template.getMessage(requestPricingProduct)
+                          );
+                          setRequestPricingError('');
+                          requestPricingTextareaRef.current?.focus();
+                        }}
+                        className="min-h-10 rounded-full border border-pf-line px-3 py-2 text-xs font-semibold text-pf-secondary transition-colors hover:border-pf-accent-line hover:bg-pf-accent-bg hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
+                      >
+                        {template.label === 'Price & minimum order'
+                          ? 'Pricing'
+                          : template.label === 'Introduction'
+                            ? 'Intro'
+                            : template.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between gap-3">
+                    <label
+                      htmlFor="catalog-message-body"
+                      className="block text-sm font-medium text-pf-secondary"
+                    >
+                      Message
+                    </label>
+                    <span
+                      className={`text-xs ${requestPricingMessage.length > PRICING_MESSAGE_MAX_LENGTH - 60 ? 'text-pf-warning' : 'text-pf-muted'}`}
+                    >
+                      {requestPricingMessage.length}/
+                      {PRICING_MESSAGE_MAX_LENGTH}
+                    </span>
+                  </div>
+                  <textarea
+                    id="catalog-message-body"
+                    ref={requestPricingTextareaRef}
+                    value={requestPricingMessage}
+                    onChange={(e) => {
+                      setRequestPricingMessage(e.target.value);
+                      setRequestPricingError('');
+                    }}
+                    rows={5}
+                    maxLength={PRICING_MESSAGE_MAX_LENGTH}
+                    className="w-full rounded-lg border border-pf-line-strong px-4 py-3 text-base focus:border-transparent focus:ring-2 focus:ring-emerald-400"
+                    placeholder="Write your message..."
+                  />
+                </div>
+
+                <div className="flex gap-2 text-xs text-pf-muted">
+                  <MessageSquare
+                    className="mt-0.5 h-4 w-4 shrink-0"
+                    aria-hidden="true"
+                  />
+                </div>
+
+                {requestPricingError && (
+                  <p className="text-sm text-pf-danger">
+                    {requestPricingError}
+                  </p>
+                )}
               </div>
 
-              <div className="flex gap-2 text-xs text-pf-muted">
-                <MessageSquare className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                <p>Find replies in Messages.</p>
+              <div className="shrink-0 px-4 py-3 border-t border-pf-line flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={closeRequestPricingModal}
+                  className="px-4 py-2 text-pf-secondary hover:bg-pf-surface rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={sendPricingMessage}
+                  disabled={
+                    requestPricingSending || !requestPricingMessage.trim()
+                  }
+                  className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-[#032116] transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
+                >
+                  {requestPricingSending && (
+                    <Loader2
+                      className="h-4 w-4 animate-spin"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {requestPricingSending ? 'Sending...' : 'Send message'}
+                </button>
               </div>
-
-              {requestPricingError && (
-                <p className="text-sm text-pf-danger">{requestPricingError}</p>
-              )}
             </div>
-
-            <div className="shrink-0 px-4 py-3 border-t border-pf-line flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={closeRequestPricingModal}
-                className="px-4 py-2 text-pf-secondary hover:bg-pf-surface rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={sendPricingMessage}
-                disabled={requestPricingSending || !requestPricingMessage.trim()}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-[#032116] transition-colors hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-              >
-                {requestPricingSending && <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />}
-                {requestPricingSending ? 'Sending...' : 'Send message'}
-              </button>
-            </div>
-          </div>
-        </div>
-      , document.body)}
+          </div>,
+          document.body
+        )}
 
       {/* Mobile Filter Sheet */}
       <MobileFilterSheet
+        growers={growerOptions}
+        hideGrower={!!fixedGrowerId}
         isOpen={showMobileFilters}
         onClose={() => setShowMobileFilters(false)}
         filters={filters}
@@ -1832,7 +2715,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
         onFavoritesOnlyChange={setShowFavoritesOnly}
         savedFilters={savedFilters}
         onApplySavedFilter={(id) => {
-          const saved = savedFilters.find(filter => filter.id === id);
+          const saved = savedFilters.find((filter) => filter.id === id);
           if (saved) applySavedFilter(saved);
           setShowMobileFilters(false);
         }}
@@ -1849,7 +2732,10 @@ function CatalogSkeletonGrid({ viewMode }: { viewMode: 'grid' | 'list' }) {
     return (
       <div className="space-y-3" aria-label="Loading catalog products">
         {Array.from({ length: 6 }).map((_, index) => (
-          <div key={index} className="animate-pulse rounded-lg border border-pf-line bg-pf-surface p-4">
+          <div
+            key={index}
+            className="animate-pulse rounded-lg border border-pf-line bg-pf-surface p-4"
+          >
             <div className="flex min-w-0 items-center gap-3">
               <div className="hidden h-8 w-8 shrink-0 rounded-lg bg-pf-raised sm:block" />
               <div className="hidden h-8 w-8 shrink-0 rounded-lg bg-pf-raised sm:block" />
@@ -1880,7 +2766,10 @@ function CatalogSkeletonGrid({ viewMode }: { viewMode: 'grid' | 'list' }) {
         </div>
         <div className="grid grid-cols-1 gap-4 p-3 sm:p-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
-            <div key={index} className="animate-pulse overflow-hidden rounded-xl border border-pf-line bg-pf-surface">
+            <div
+              key={index}
+              className="animate-pulse overflow-hidden rounded-xl border border-pf-line bg-pf-surface"
+            >
               <div className="h-24 bg-pf-raised sm:h-40" />
               <div className="space-y-3 p-4">
                 <div className="h-4 w-3/4 rounded bg-pf-raised" />
@@ -1920,7 +2809,8 @@ function CompareModal({
   const modalRef = useRef<HTMLDivElement | null>(null);
   const closeButtonRef = useRef<HTMLButtonElement | null>(null);
   const unitsInComparison = useMemo(
-    () => Array.from(new Set(products.map((product) => displayUnit(product.unit)))),
+    () =>
+      Array.from(new Set(products.map((product) => displayUnit(product.unit)))),
     [products]
   );
   const hasDifferentUnits = unitsInComparison.length > 1;
@@ -1934,96 +2824,243 @@ function CompareModal({
     onEscape: onClose,
   });
 
-
   const comparisonAttributes = [
-    { label: 'Price', key: 'price', format: (p: Product) => p.isPriceVisible ? `\$${p.price.toFixed(2)} / ${displayUnit(p.unit)}` : 'Request pricing' },
-    { label: 'THC', key: 'thc', format: (p: Product) => p.thc !== null ? `${p.thc}%` : 'N/A' },
-    { label: 'CBD', key: 'cbd', format: (p: Product) => p.cbd !== null ? `${p.cbd}%` : 'N/A' },
-    { label: 'Strain Type', key: 'strainType', format: (p: Product) => getDisplayStrainType(p) || 'N/A' },
-    { label: 'Strain', key: 'strain', format: (p: Product) => p.strain || 'N/A' },
-    { label: 'Product Type', key: 'productType', format: (p: Product) => p.productType || 'N/A' },
+    {
+      label: 'Price',
+      key: 'price',
+      format: (p: Product) =>
+        p.isPriceVisible
+          ? `${formatMoney(p.price)} / ${displayUnit(p.unit)}`
+          : 'Request pricing',
+    },
+    {
+      label: 'THC',
+      key: 'thc',
+      format: (p: Product) => (p.thc !== null ? `${p.thc}%` : 'N/A'),
+    },
+    {
+      label: 'CBD',
+      key: 'cbd',
+      format: (p: Product) => (p.cbd !== null ? `${p.cbd}%` : 'N/A'),
+    },
+    {
+      label: 'Strain Type',
+      key: 'strainType',
+      format: (p: Product) => getDisplayStrainType(p) || 'N/A',
+    },
+    {
+      label: 'Strain',
+      key: 'strain',
+      format: (p: Product) => p.strain || 'N/A',
+    },
+    {
+      label: 'Product Type',
+      key: 'productType',
+      format: (p: Product) => p.productType || 'N/A',
+    },
     { label: 'Unit', key: 'unit', format: (p: Product) => displayUnit(p.unit) },
-    { label: 'Stock', key: 'inventoryQty', format: (p: Product) => `${p.inventoryQty} ${displayUnit(p.unit)}` },
-    { label: 'Grower', key: 'grower', format: (p: Product) => p.grower.businessName },
+    {
+      label: 'Stock',
+      key: 'inventoryQty',
+      format: (p: Product) => `${p.inventoryQty} ${displayUnit(p.unit)}`,
+    },
+    {
+      label: 'Grower',
+      key: 'grower',
+      format: (p: Product) => p.grower.businessName,
+    },
   ];
 
   return createPortal(
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4" onMouseDown={event => { if (event.target === event.currentTarget) onClose(); }}>
-      <div ref={modalRef} role="dialog" aria-modal="true" aria-labelledby="catalog-compare-title" tabIndex={-1} className="flex max-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-pf-line bg-pf-surface shadow-xl">
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
+    >
+      <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="catalog-compare-title"
+        tabIndex={-1}
+        className="flex max-h-[calc(100dvh-2rem)] w-full max-w-4xl flex-col overflow-hidden rounded-xl border border-pf-line bg-pf-surface shadow-xl"
+      >
         <div className="flex shrink-0 items-center justify-between gap-2 border-b border-pf-line px-4 py-3">
-          <h2 id="catalog-compare-title" className="text-lg font-semibold">Compare ({products.length})</h2>
+          <h2 id="catalog-compare-title" className="text-lg font-semibold">
+            Compare ({products.length})
+          </h2>
           <div className="flex items-center gap-1">
-            <button type="button" onClick={onClear} className="min-h-10 px-3 text-sm text-pf-danger">Clear</button>
-            <button ref={closeButtonRef} type="button" onClick={onClose} aria-label="Close product comparison" className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-pf-surface"><X size={20} /></button>
+            <button
+              type="button"
+              onClick={onClear}
+              className="min-h-10 px-3 text-sm text-pf-danger"
+            >
+              Clear
+            </button>
+            <button
+              ref={closeButtonRef}
+              type="button"
+              onClick={onClose}
+              aria-label="Close product comparison"
+              className="flex h-10 w-10 items-center justify-center rounded-lg hover:bg-pf-surface"
+            >
+              <X size={20} />
+            </button>
           </div>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
-          {hasDifferentUnits && <p className="mb-3 rounded-lg bg-pf-warning-bg p-2 text-xs text-pf-warning sm:text-sm">Products may use different units. Check the unit before comparing prices.</p>}
-          <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))` }}>
-            {products.map(product => <div key={product.id} className="min-w-0">
-              <div className="mb-2 flex items-center justify-between gap-1">
-                <div className="h-12 w-12 overflow-hidden rounded-lg"><ProductImage src={product.images?.[0]} alt={product.name} productType={product.productType} className="h-full w-full" /></div>
-                <button type="button" onClick={() => onRemove(product.id)} aria-label={`Remove ${product.name} from comparison`} className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-pf-muted hover:bg-pf-surface"><X size={18} /></button>
+          {hasDifferentUnits && (
+            <p className="mb-3 rounded-lg bg-pf-warning-bg p-2 text-xs text-pf-warning sm:text-sm">
+              Products may use different units. Check the unit before comparing
+              prices.
+            </p>
+          )}
+          <div
+            className="grid gap-3"
+            style={{
+              gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))`,
+            }}
+          >
+            {products.map((product) => (
+              <div key={product.id} className="min-w-0">
+                <div className="mb-2 flex items-center justify-between gap-1">
+                  <div className="h-12 w-12 overflow-hidden rounded-lg">
+                    <ProductImage
+                      src={product.images?.[0]}
+                      alt={product.name}
+                      productType={product.productType}
+                      className="h-full w-full"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => onRemove(product.id)}
+                    aria-label={`Remove ${product.name} from comparison`}
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-pf-muted hover:bg-pf-surface"
+                  >
+                    <X size={18} />
+                  </button>
+                </div>
+                <h3 className="break-words text-sm font-semibold sm:text-base">
+                  {product.name}
+                </h3>
+                <Link
+                  href={`/dispensary/grower/${product.grower.id}`}
+                  className="mt-1 inline-block text-xs text-pf-accent hover:underline"
+                >
+                  {product.grower.businessName}
+                </Link>
+                <LabReportDownloads
+                  productId={product.id}
+                  productName={product.name}
+                  reports={product.labReports}
+                  className="mt-2"
+                />
               </div>
-              <h3 className="break-words text-sm font-semibold sm:text-base">{product.name}</h3>
-              <Link href={`/dispensary/grower/${product.grower.id}`} className="mt-1 inline-block text-xs text-pf-accent hover:underline">{product.grower.businessName}</Link>
-              <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mt-2" />
-            </div>)}
+            ))}
           </div>
           <div className="mt-4 divide-y divide-pf-line border-t border-pf-line">
-            {comparisonAttributes.filter(attribute => attribute.key !== 'grower').map(attribute => <div key={attribute.key} className="py-2 sm:py-3">
-              <p className="mb-1 text-xs font-medium text-pf-muted">{attribute.label}</p>
-              <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))` }}>
-                {products.map(product => <p key={product.id} className={`break-words text-sm font-medium ${attribute.key === 'price' ? 'text-pf-accent' : 'text-pf-text'}`}>{attribute.format(product)}</p>)}
-              </div>
-            </div>)}
+            {comparisonAttributes
+              .filter((attribute) => attribute.key !== 'grower')
+              .map((attribute) => (
+                <div key={attribute.key} className="py-2 sm:py-3">
+                  <p className="mb-1 text-xs font-medium text-pf-muted">
+                    {attribute.label}
+                  </p>
+                  <div
+                    className="grid gap-3"
+                    style={{
+                      gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))`,
+                    }}
+                  >
+                    {products.map((product) => (
+                      <p
+                        key={product.id}
+                        className={`break-words text-sm font-medium ${attribute.key === 'price' ? 'text-pf-accent' : 'text-pf-text'}`}
+                      >
+                        {attribute.format(product)}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+              ))}
           </div>
           <div className="mt-4 space-y-2 border-t border-pf-line pt-3">
-            {products.map(product => <div key={product.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-pf-canvas px-3 py-2">
-              <p className="min-w-0 flex-1 break-words text-sm font-medium">{product.name}</p>
-              <div className="flex shrink-0 items-center gap-2">
-                {product.isPriceVisible ? <AddToCartButton product={product} growerName={product.grower.businessName} growerId={product.grower.id} compact compactLabel="Add" /> : <button type="button" onClick={() => onRequestPricing(product)} className="min-h-10 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-2 text-sm text-pf-accent">Request pricing</button>}
-                <button type="button" onClick={() => onMessageGrower(product)} className="min-h-10 px-1 text-sm text-pf-accent">Message</button>
+            {products.map((product) => (
+              <div
+                key={product.id}
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-pf-canvas px-3 py-2"
+              >
+                <p className="min-w-0 flex-1 break-words text-sm font-medium">
+                  {product.name}
+                </p>
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
+                  {product.isPriceVisible ? (
+                    <AddToCartButton
+                      product={product}
+                      growerName={product.grower.businessName}
+                      growerId={product.grower.id}
+                      compact
+                      compactLabel="Add"
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => onRequestPricing(product)}
+                      className="min-h-10 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-2 text-sm text-pf-accent"
+                    >
+                      Request pricing
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => onMessageGrower(product)}
+                    className="min-h-10 px-1 text-sm text-pf-accent"
+                  >
+                    Message
+                  </button>
+                </div>
               </div>
-            </div>)}
+            ))}
           </div>
-          {products.some(product => product.isPriceVisible) && <details className="mt-4 rounded-lg border border-pf-line p-3">
-            <summary className="min-h-10 cursor-pointer content-center text-sm font-medium text-pf-accent">Choose quantities</summary>
-            <div className="mt-3 grid gap-4 sm:grid-cols-2">
-              {products.filter(product => product.isPriceVisible).map(product => <div key={product.id} className="min-w-0 rounded-lg bg-pf-canvas p-3"><h3 className="mb-3 text-sm font-semibold">{product.name}</h3><AddToCartButton product={product} growerName={product.grower.businessName} growerId={product.grower.id} /></div>)}
-            </div>
-          </details>}
-          {!hasDifferentUnits && products.filter(product => product.isPriceVisible).length >= 2 && <details className="mt-3 rounded-lg border border-pf-line p-3">
-            <summary className="min-h-10 cursor-pointer content-center text-sm font-medium text-pf-accent">Price chart</summary>
-            <div className="mt-3 space-y-3">{products.filter(product => product.isPriceVisible).map(product => <div key={product.id}>
-              <p className="mb-1 flex justify-between gap-3 text-sm"><span>{product.name}</span><span>${product.price.toFixed(2)}/{displayUnit(product.unit)}</span></p>
-              <div className="h-3 overflow-hidden rounded bg-pf-surface"><div className="h-full bg-emerald-500" style={{ width: `${Math.max(...products.filter(item => item.isPriceVisible).map(item => item.price)) > 0 ? product.price / Math.max(...products.filter(item => item.isPriceVisible).map(item => item.price)) * 100 : 0}%` }} /></div>
-            </div>)}</div>
-          </details>}
+          {!hasDifferentUnits &&
+            products.filter((product) => product.isPriceVisible).length >=
+              2 && (
+              <details className="mt-3 rounded-lg border border-pf-line p-3">
+                <summary className="min-h-10 cursor-pointer content-center text-sm font-medium text-pf-accent">
+                  Price chart
+                </summary>
+                <div className="mt-3 space-y-3">
+                  {products
+                    .filter((product) => product.isPriceVisible)
+                    .map((product) => (
+                      <div key={product.id}>
+                        <p className="mb-1 flex justify-between gap-3 text-sm">
+                          <span>{product.name}</span>
+                          <span>
+                            {formatMoney(product.price)}/
+                            {displayUnit(product.unit)}
+                          </span>
+                        </p>
+                        <div className="h-3 overflow-hidden rounded bg-pf-surface">
+                          <div
+                            className="h-full bg-emerald-500"
+                            style={{
+                              width: `${Math.max(...products.filter((item) => item.isPriceVisible).map((item) => item.price)) > 0 ? (product.price / Math.max(...products.filter((item) => item.isPriceVisible).map((item) => item.price))) * 100 : 0}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </details>
+            )}
         </div>
       </div>
-    </div>, document.body
+    </div>,
+    document.body
   );
-}
-
-function groupByGrower(products: Product[]) {
-  const groupsMap = new Map<string, { growerId: string; growerName: string; products: Product[] }>();
-
-  products.forEach((product) => {
-    const existingGroup = groupsMap.get(product.grower.id);
-    if (existingGroup) {
-      existingGroup.products.push(product);
-      return;
-    }
-
-    groupsMap.set(product.grower.id, {
-      growerId: product.grower.id,
-      growerName: product.grower.businessName,
-      products: [product],
-    });
-  });
-
-  return Array.from(groupsMap.values());
 }
 
 // ============== END PRICE ALERT FUNCTIONS ==================
@@ -2065,16 +3102,23 @@ function ProductCard({
     setImagePosition({ x, y });
   };
 
-  const strainType = product.strainType || (product.strain ?
-    (product.strain.toLowerCase().includes('indica') ? 'Indica' :
-     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
-
+  const strainType =
+    product.strainType ||
+    (product.strain
+      ? product.strain.toLowerCase().includes('indica')
+        ? 'Indica'
+        : product.strain.toLowerCase().includes('sativa')
+          ? 'Sativa'
+          : 'Hybrid'
+      : null);
 
   return (
     <div
       id={`catalog-product-${product.id}`}
       className={`scroll-mt-24 grid grid-cols-[64px_minmax(0,1fr)] gap-x-3 p-3 sm:block sm:p-0 border border-pf-line rounded-xl overflow-hidden hover:border-pf-line-strong transition-colors bg-pf-surface group ${
-        isHighlighted ? 'ring-2 ring-emerald-400 ring-offset-2 ring-offset-pf-canvas shadow-lg' : ''
+        isHighlighted
+          ? 'ring-2 ring-emerald-400 ring-offset-2 ring-offset-pf-canvas shadow-lg'
+          : ''
       }`}
     >
       {/* Product Image with Zoom */}
@@ -2084,22 +3128,34 @@ function ProductCard({
         onMouseLeave={() => setImageHovered(false)}
         onMouseMove={handleMouseMove}
       >
+        <ProductDetailLink
+          productId={product.id}
+          aria-label={`View ${product.name}`}
+          className="absolute inset-0 z-[1]"
+        />
         {/* Favorite Button */}
-        <div className={`absolute top-2 z-10 hidden sm:block ${product.isPriceVisible ? 'right-12' : 'right-2'}`}>
+        <div
+          className={`absolute top-2 z-10 hidden sm:block ${product.isPriceVisible ? 'right-12' : 'right-2'}`}
+        >
           <button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
               onFavoriteToggle();
             }}
-                className={`min-h-10 min-w-10 p-2 rounded-lg transition-all ${
+            className={`min-h-10 min-w-10 p-2 rounded-lg transition-all ${
               isFav
-                ? "bg-pf-danger-bg text-pf-danger shadow-md"
-                : "bg-pf-surface/95 backdrop-blur-sm text-pf-muted hover:text-pf-danger hover:bg-pf-surface shadow-sm"
+                ? 'bg-pf-danger-bg text-pf-danger shadow-md'
+                : 'bg-pf-surface/95 backdrop-blur-sm text-pf-muted hover:text-pf-danger hover:bg-pf-surface shadow-sm'
             }`}
-            title={isFav ? "Remove from favorites" : "Add to favorites"}
+            aria-label={
+              isFav
+                ? `Remove ${product.name} from favorites`
+                : `Favorite ${product.name}`
+            }
+            title={isFav ? 'Remove from favorites' : 'Add to favorites'}
           >
-            <Heart size={16} fill={isFav ? "currentColor" : "none"} />
+            <Heart size={16} fill={isFav ? 'currentColor' : 'none'} />
           </button>
         </div>
 
@@ -2112,11 +3168,12 @@ function ProductCard({
                 e.stopPropagation();
                 onAlertToggle?.();
               }}
-                  className={`min-h-10 min-w-10 p-2 rounded-lg transition-all ${
+              className={`min-h-10 min-w-10 p-2 rounded-lg transition-all ${
                 hasAlert
                   ? 'bg-pf-warning-bg text-pf-warning shadow-md'
                   : 'bg-pf-surface/95 backdrop-blur-sm text-pf-muted hover:text-pf-warning hover:bg-pf-surface shadow-sm'
               }`}
+              aria-label={`Price alert for ${product.name}`}
               title={hasAlert ? 'Price alert set' : 'Set price alert'}
             >
               {hasAlert ? <BellRing size={16} /> : <Bell size={16} />}
@@ -2138,73 +3195,115 @@ function ProductCard({
         />
 
         {/* Magnify Overlay on Hover */}
-        <div className={`absolute inset-0 bg-black/10 flex items-center justify-center transition-all duration-300 ${imageHovered ? 'opacity-100' : 'opacity-0'}`}>
+        <div
+          className={`absolute inset-0 bg-black/10 flex items-center justify-center transition-all duration-300 ${imageHovered ? 'opacity-100' : 'opacity-0'}`}
+        >
           <div className="bg-pf-surface/95 backdrop-blur-sm rounded-full p-2 shadow-lg transform scale-110">
             <ZoomIn className="h-5 w-5 text-pf-secondary" aria-hidden="true" />
           </div>
         </div>
-
-
       </div>
 
       <div className="contents sm:block sm:p-4">
         <div className="min-w-0">
-        {/* Product Name */}
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="break-words text-sm font-semibold text-pf-text flex-1 sm:text-base">{product.name}</h3>
-          {product.grower.isVerified && (
-            <span className="text-pf-accent" title="Verified Grower">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
-              </svg>
-            </span>
-          )}
-        </div>
+          {/* Product Name */}
+          <div className="flex items-start justify-between gap-2 mb-2">
+            <h3 className="break-words text-sm font-semibold text-pf-text flex-1 sm:text-base">
+              <ProductDetailLink
+                productId={product.id}
+                className="hover:underline"
+              >
+                {product.name}
+              </ProductDetailLink>
+            </h3>
+          </div>
 
-        {/* Product facts share a wrapping row. */}
-        <div className="flex flex-wrap gap-1.5 mb-2 sm:gap-2 sm:mb-3">
-          {strainType && <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(strainType, 'card', product.strain)}`}>{strainType}</span>}
-          {product.thc != null && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)} flex items-center gap-1`}>
-              <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.616a1 1 0 01.894-1.79l1.599.8L9 4.323V3a1 1 0 011-1z"/>
-              </svg>
-              THC {product.thc}%
-            </span>
-          )}
-          {product.cbd != null && (
-            <span className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getCbdBadgeColor(product.cbd)} flex items-center gap-1`}>
-              <svg className="w-3 h-3" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M7 2a1 1 0 00-.707 1.707L7 4.414v3.758a1 1 0 01-.293.707l-2 2A1 1 0 004 11v5a1 1 0 001 1h10a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0013 8.171V4.414l.707-.707A1 1 0 0013 2H7zm2 6.172V4h2v4.172a3 3 0 00.879 2.12l1.027 1.028a4 4 0 00-2.171.102l-.47.156a4 4 0 01-2.53 0l-.563-.187a4 4 0 00-2.17-.102l1.027-1.028A3 3 0 009 8.172z" clipRule="evenodd"/>
-              </svg>
-              CBD {product.cbd}%
-            </span>
-          )}
-          {product.productType && (
-            <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pf-surface text-pf-secondary border border-pf-line">
-              {product.productType}
-            </span>
-          )}
-        </div>
+          <Link
+            href={`/dispensary/grower/${product.grower.id}`}
+            className="mb-1 inline-flex min-h-11 items-center text-sm text-pf-accent"
+          >
+            {product.grower.businessName}
+          </Link>
+          {/* Product facts share a wrapping row. */}
+          <div className="flex flex-wrap gap-1.5 mb-2 sm:gap-2 sm:mb-3">
+            {strainType && (
+              <span
+                className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(strainType, 'card', product.strain)}`}
+              >
+                {strainType}
+              </span>
+            )}
+            {product.thc != null && (
+              <span
+                className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)} flex items-center gap-1`}
+              >
+                <svg
+                  className="w-3 h-3"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.616a1 1 0 01.894-1.79l1.599.8L9 4.323V3a1 1 0 011-1z" />
+                </svg>
+                THC {product.thc}%
+              </span>
+            )}
+            {product.cbd != null && (
+              <span
+                className={`px-2 py-0.5 rounded-full text-xs font-semibold border ${getCbdBadgeColor(product.cbd)} flex items-center gap-1`}
+              >
+                <svg
+                  className="w-3 h-3"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M7 2a1 1 0 00-.707 1.707L7 4.414v3.758a1 1 0 01-.293.707l-2 2A1 1 0 004 11v5a1 1 0 001 1h10a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0013 8.171V4.414l.707-.707A1 1 0 0013 2H7zm2 6.172V4h2v4.172a3 3 0 00.879 2.12l1.027 1.028a4 4 0 00-2.171.102l-.47.156a4 4 0 01-2.53 0l-.563-.187a4 4 0 00-2.17-.102l1.027-1.028A3 3 0 009 8.172z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                CBD {product.cbd}%
+              </span>
+            )}
+            {product.productType && (
+              <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pf-surface text-pf-secondary border border-pf-line">
+                {product.productType}
+              </span>
+            )}
+          </div>
 
-        {/* Strain & Unit Info */}
-        <div className="mb-3 text-sm text-pf-muted">
-          {product.strain && !product.strain.toLowerCase().includes('indica') && !product.strain.toLowerCase().includes('sativa') && !product.strain.toLowerCase().includes('hybrid') && (
-            <p className="mb-1">
-              <span className="text-pf-muted">Strain:</span> {product.strain}
-            </p>
-          )}
-          {!product.isPriceVisible && <p className="text-xs text-pf-muted">{product.inventoryQty} available</p>}
-        </div>
-
+          {/* Strain & Unit Info */}
+          <div className="mb-3 text-sm text-pf-muted">
+            {product.strain &&
+              !product.name
+                .toLowerCase()
+                .includes(product.strain.toLowerCase()) &&
+              !product.strain.toLowerCase().includes('indica') &&
+              !product.strain.toLowerCase().includes('sativa') &&
+              !product.strain.toLowerCase().includes('hybrid') && (
+                <p className="mb-1">
+                  <span className="text-pf-muted">Strain:</span>{' '}
+                  {product.strain}
+                </p>
+              )}
+            {!product.isPriceVisible && (
+              <p className="text-xs text-pf-muted">
+                {product.inventoryQty} available
+              </p>
+            )}
+          </div>
         </div>
         {/* Price & Action */}
         <div className="col-span-2 pt-2 border-t border-pf-line space-y-2 sm:pt-3">
           {product.isPriceVisible ? (
             <div className="space-y-3">
               <div>
-                <span className="text-xl font-bold text-pf-accent">${product.price.toFixed(2)}</span>
-                <span className="text-sm text-pf-muted ml-1">/ {displayUnit(product.unit)}</span>
+                <span className="text-xl font-bold text-pf-accent">
+                  {formatMoney(product.price)}
+                </span>
+                <span className="text-sm text-pf-muted ml-1">
+                  / {displayUnit(product.unit)}
+                </span>
               </div>
               <AddToCartButton
                 product={product}
@@ -2223,21 +3322,51 @@ function ProductCard({
           )}
 
           <div className="flex flex-wrap items-center justify-center gap-2 text-sm sm:gap-3">
-            <button type="button" aria-label={isFav ? `Remove ${product.name} from favorites` : `Favorite ${product.name}`} onClick={onFavoriteToggle} className={`flex h-10 w-10 items-center justify-center rounded-lg sm:hidden ${isFav ? 'bg-pf-danger-bg text-pf-danger' : 'text-pf-muted'}`}><Heart size={18} fill={isFav ? 'currentColor' : 'none'} /></button>
-            {product.isPriceVisible && <button type="button" aria-label={`Price alert for ${product.name}`} onClick={onAlertToggle} className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-warning sm:hidden">{hasAlert ? <BellRing size={18} /> : <Bell size={18} />}</button>}
+            <button
+              type="button"
+              aria-label={
+                isFav
+                  ? `Remove ${product.name} from favorites`
+                  : `Favorite ${product.name}`
+              }
+              onClick={onFavoriteToggle}
+              className={`flex h-10 w-10 items-center justify-center rounded-lg sm:hidden ${isFav ? 'bg-pf-danger-bg text-pf-danger' : 'text-pf-muted'}`}
+            >
+              <Heart size={18} fill={isFav ? 'currentColor' : 'none'} />
+            </button>
+            {product.isPriceVisible && (
+              <button
+                type="button"
+                aria-label={`Price alert for ${product.name}`}
+                onClick={onAlertToggle}
+                className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-warning sm:hidden"
+              >
+                {hasAlert ? <BellRing size={18} /> : <Bell size={18} />}
+              </button>
+            )}
             <button
               type="button"
               onClick={onMessageGrower}
               aria-label="Message grower"
               className="inline-flex min-h-10 items-center font-medium text-pf-accent hover:text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
             >
-              <span className="sm:hidden">Message</span><span className="hidden sm:inline">Message grower</span>
+              <span className="sm:hidden">Message</span>
+              <span className="hidden sm:inline">Message grower</span>
             </button>
-            <span className="hidden text-pf-secondary sm:inline" aria-hidden="true">•</span>
+            <span
+              className="hidden text-pf-secondary sm:inline"
+              aria-hidden="true"
+            >
+              •
+            </span>
             <button
               type="button"
-              aria-label={isInCompare ? `Remove ${product.name} from comparison` : `Compare ${product.name}`}
-            onClick={onCompareToggle}
+              aria-label={
+                isInCompare
+                  ? `Remove ${product.name} from comparison`
+                  : `Compare ${product.name}`
+              }
+              onClick={onCompareToggle}
               disabled={compareDisabled && !isInCompare}
               className="min-h-10 font-medium text-pf-muted hover:text-pf-text hover:underline disabled:cursor-not-allowed disabled:text-pf-secondary disabled:no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
             >
@@ -2246,7 +3375,12 @@ function ProductCard({
           </div>
         </div>
 
-        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="col-span-2 mt-2" />
+        <LabReportDownloads
+          productId={product.id}
+          productName={product.name}
+          reports={product.labReports}
+          className="col-span-2 mt-2"
+        />
       </div>
     </div>
   );
@@ -2281,32 +3415,160 @@ function ProductListItem({
 }) {
   const strainType = getDisplayStrainType(product);
   return (
-    <article id={`catalog-product-${product.id}`} data-product-row className={`scroll-mt-24 grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-xl border border-pf-line bg-pf-surface p-3 sm:p-4 lg:flex lg:items-center lg:gap-4 ${isHighlighted ? 'ring-2 ring-emerald-400 ring-offset-2 ring-offset-pf-canvas' : ''}`}>
-      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-pf-raised">
-        <ProductImage src={product.images?.[0]} alt={product.name} productType={product.productType} className="h-full w-full" />
-      </div>
+    <article
+      id={`catalog-product-${product.id}`}
+      data-product-row
+      className={`scroll-mt-24 grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-xl border border-pf-line bg-pf-surface p-3 sm:p-4 lg:flex lg:items-center lg:gap-4 ${isHighlighted ? 'ring-2 ring-emerald-400 ring-offset-2 ring-offset-pf-canvas' : ''}`}
+    >
+      <ProductDetailLink
+        productId={product.id}
+        aria-label={`View ${product.name}`}
+        className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-pf-raised"
+      >
+        <ProductImage
+          src={product.images?.[0]}
+          alt={product.name}
+          productType={product.productType}
+          className="h-full w-full"
+        />
+      </ProductDetailLink>
       <div className="min-w-0 flex-1">
-        <h3 className="flex items-start gap-2 font-semibold text-pf-text">{product.name}{product.grower.isVerified && <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-pf-accent" aria-label="Verified grower" />}</h3>
-        <p className="mt-1 text-sm text-pf-muted">{[product.strain, product.productType, product.subType].filter(Boolean).join(' · ')}</p>
+        <h3 className="flex items-start gap-2 font-semibold text-pf-text">
+          <ProductDetailLink productId={product.id} className="hover:underline">
+            {product.name}
+          </ProductDetailLink>
+        </h3>
+        <Link
+          href={`/dispensary/grower/${product.grower.id}`}
+          className="inline-flex min-h-11 items-center text-sm text-pf-accent"
+        >
+          {product.grower.businessName}
+        </Link>
+        <p className="mt-1 text-sm text-pf-muted">
+          {[product.strain, product.productType, product.subType]
+            .filter(Boolean)
+            .join(' · ')}
+        </p>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          {strainType && <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStrainTypeColor(strainType, 'row')}`}>{strainType}</span>}
-          {product.thc != null && <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${getThcBadgeColor(product.thc, 'compact')}`}>THC {product.thc}%</span>}
-          <span className="text-xs text-pf-muted">{product.inventoryQty} available</span>
+          {strainType && (
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${getStrainTypeColor(strainType, 'row')}`}
+            >
+              {strainType}
+            </span>
+          )}
+          {product.thc != null && (
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs font-medium ${getThcBadgeColor(product.thc, 'compact')}`}
+            >
+              THC {product.thc}%
+            </span>
+          )}
+          <span className="text-xs text-pf-muted">
+            {product.inventoryQty} available
+          </span>
         </div>
-        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mt-2" />
+        <LabReportDownloads
+          productId={product.id}
+          productName={product.name}
+          reports={product.labReports}
+          className="mt-2"
+        />
       </div>
       <div className="col-span-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-pf-line pt-3 lg:w-56 lg:shrink-0 lg:border-0 lg:pt-0">
-        {product.isPriceVisible ? <>
-          <span data-product-price className="whitespace-nowrap text-lg font-bold text-pf-accent">${product.price.toFixed(2)}<span className="ml-1 text-sm font-normal text-pf-muted">/{displayUnit(product.unit)}</span></span>
-          <AddToCartButton product={product} growerName={product.grower.businessName} growerId={product.grower.id} compact compactLabel="Add" />
-        </> : <button type="button" onClick={onRequestPricing} className="min-h-10 w-full rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg">Request pricing</button>}
+        {product.isPriceVisible ? (
+          <>
+            <span
+              data-product-price
+              className="whitespace-nowrap text-lg font-bold text-pf-accent"
+            >
+              {formatMoney(product.price)}
+              <span className="ml-1 text-sm font-normal text-pf-muted">
+                /{displayUnit(product.unit)}
+              </span>
+            </span>
+            <AddToCartButton
+              product={product}
+              growerName={product.grower.businessName}
+              growerId={product.grower.id}
+              compact
+              compactLabel="Add"
+            />
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={onRequestPricing}
+            className="min-h-10 w-full rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg"
+          >
+            Request pricing
+          </button>
+        )}
         <div className="flex w-full flex-wrap items-center gap-2 text-sm">
-          <button type="button" aria-label={isFav ? `Remove ${product.name} from favorites` : `Favorite ${product.name}`} onClick={onFavoriteToggle} className={`flex h-10 w-10 items-center justify-center rounded-lg ${isFav ? 'bg-pf-danger-bg text-pf-danger' : 'text-pf-muted hover:bg-pf-surface'}`}><Heart size={18} fill={isFav ? 'currentColor' : 'none'} /></button>
-          {product.isPriceVisible && <button type="button" aria-label={`Price alert for ${product.name}`} onClick={onAlertToggle} className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-warning hover:bg-pf-warning-bg">{hasAlert ? <BellRing size={18} /> : <Bell size={18} />}</button>}
-          <button type="button" onClick={onMessageGrower} className="min-h-10 font-medium text-pf-accent hover:underline">Message</button>
-          <button type="button" aria-label={isInCompare ? `Remove ${product.name} from comparison` : `Compare ${product.name}`} onClick={onCompareToggle} disabled={compareDisabled && !isInCompare} className="min-h-10 font-medium text-pf-muted hover:underline disabled:opacity-40">{isInCompare ? 'Remove compare' : 'Compare'}</button>
+          <button
+            type="button"
+            aria-label={
+              isFav
+                ? `Remove ${product.name} from favorites`
+                : `Favorite ${product.name}`
+            }
+            onClick={onFavoriteToggle}
+            className={`flex h-10 w-10 items-center justify-center rounded-lg ${isFav ? 'bg-pf-danger-bg text-pf-danger' : 'text-pf-muted hover:bg-pf-surface'}`}
+          >
+            <Heart size={18} fill={isFav ? 'currentColor' : 'none'} />
+          </button>
+          {product.isPriceVisible && (
+            <button
+              type="button"
+              aria-label={`Price alert for ${product.name}`}
+              onClick={onAlertToggle}
+              className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-warning hover:bg-pf-warning-bg"
+            >
+              {hasAlert ? <BellRing size={18} /> : <Bell size={18} />}
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onMessageGrower}
+            className="min-h-10 font-medium text-pf-accent hover:underline"
+          >
+            Message
+          </button>
+          <button
+            type="button"
+            aria-label={
+              isInCompare
+                ? `Remove ${product.name} from comparison`
+                : `Compare ${product.name}`
+            }
+            onClick={onCompareToggle}
+            disabled={compareDisabled && !isInCompare}
+            className="min-h-10 font-medium text-pf-muted hover:underline disabled:opacity-40"
+          >
+            {isInCompare ? 'Remove compare' : 'Compare'}
+          </button>
         </div>
       </div>
     </article>
+  );
+}
+
+function ProductDetailLink({
+  productId,
+  children,
+  ...props
+}: {
+  productId: string;
+  children?: React.ReactNode;
+  className?: string;
+  'aria-label'?: string;
+}) {
+  const params = new URLSearchParams(useSearchParams().toString());
+  const pathname = usePathname();
+  params.set('product', productId);
+  return (
+    <Link href={`${pathname}?${params}`} scroll={false} {...props}>
+      {children}
+    </Link>
   );
 }

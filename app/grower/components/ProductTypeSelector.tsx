@@ -1,7 +1,10 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { canonicalizeProductType, mergeProductTypeOptions } from '@/lib/product-types';
+import {
+  canonicalizeProductType,
+  mergeProductTypeOptions,
+} from '@/lib/product-types';
 
 interface ProductTypeConfig {
   id: string;
@@ -18,13 +21,14 @@ interface ProductTypeSelectorProps {
 }
 
 // Consistent input/select styles - h-10 matches text inputs
-const INPUT_CLASSES = "w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
+const INPUT_CLASSES =
+  'w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent';
 
 export function ProductTypeSelector({
   productType,
   subType,
   onProductTypeChange,
-  onSubTypeChange
+  onSubTypeChange,
 }: ProductTypeSelectorProps) {
   const [configs, setConfigs] = useState<ProductTypeConfig[]>([]);
   const [loading, setLoading] = useState(true);
@@ -37,7 +41,9 @@ export function ProductTypeSelector({
 
     const fetchConfigs = async () => {
       try {
-        const response = await fetch('/api/product-type-config', { signal: controller.signal });
+        const response = await fetch('/api/product-type-config', {
+          signal: controller.signal,
+        });
         if (!isActive) return;
 
         if (response.ok) {
@@ -63,9 +69,15 @@ export function ProductTypeSelector({
     };
   }, []);
 
-  const mergedConfigs = useMemo(() => mergeProductTypeOptions(configs), [configs]);
+  const mergedConfigs = useMemo(
+    () => mergeProductTypeOptions(configs),
+    [configs]
+  );
 
-  const normalizedProductType = useMemo(() => canonicalizeProductType(productType) || '', [productType]);
+  const normalizedProductType = useMemo(
+    () => canonicalizeProductType(productType) || '',
+    [productType]
+  );
 
   const typeOptions = useMemo(() => {
     const mergedTypes = mergedConfigs.map((config) => config.type);
@@ -78,7 +90,9 @@ export function ProductTypeSelector({
   }, [mergedConfigs, normalizedProductType]);
 
   const subTypes = useMemo(() => {
-    const selected = mergedConfigs.find((config) => config.type === normalizedProductType);
+    const selected = mergedConfigs.find(
+      (config) => config.type === normalizedProductType
+    );
     const mergedSubTypes = selected?.subTypes || [];
 
     // Preserve older/custom existing product records even if subtype is no longer in config.
@@ -93,7 +107,13 @@ export function ProductTypeSelector({
 
   useEffect(() => {
     // Check if current subType is not in the list (custom)
-    if (normalizedProductType && subType && !subTypes.includes(subType) && subType !== 'Other' && subType !== '') {
+    if (
+      normalizedProductType &&
+      subType &&
+      !subTypes.includes(subType) &&
+      subType !== 'Other' &&
+      subType !== ''
+    ) {
       setShowOtherInput(true);
       setCustomSubType(subType);
     }
@@ -122,9 +142,7 @@ export function ProductTypeSelector({
   };
 
   if (loading) {
-    return (
-      <div className="h-10 bg-pf-surface animate-pulse rounded-lg"></div>
-    );
+    return <div className="h-10 bg-pf-surface animate-pulse rounded-lg"></div>;
   }
 
   return (
@@ -132,18 +150,24 @@ export function ProductTypeSelector({
       <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
         {/* Type */}
         <div className="space-y-1.5 sm:space-y-2">
-          <label htmlFor="productType" className="block text-sm font-medium text-pf-secondary">
+          <label
+            htmlFor="productType"
+            className="block text-sm font-medium text-pf-secondary"
+          >
             Type *
           </label>
           <select
             id="productType"
+            aria-describedby="productType-error"
             value={normalizedProductType}
             onChange={(e) => handleProductTypeChange(e.target.value)}
             className={INPUT_CLASSES}
           >
             <option value="">Choose type</option>
             {typeOptions.map((type) => (
-              <option key={type} value={type}>{type}</option>
+              <option key={type} value={type}>
+                {type}
+              </option>
             ))}
           </select>
         </div>
@@ -151,7 +175,10 @@ export function ProductTypeSelector({
         {/* Subtype - Only show if product type has subtypes */}
         {normalizedProductType && hasSubTypes && (
           <div className="space-y-1.5 sm:space-y-2">
-            <label htmlFor="subType" className="block text-sm font-medium text-pf-secondary">
+            <label
+              htmlFor="subType"
+              className="block text-sm font-medium text-pf-secondary"
+            >
               Subtype
             </label>
             <select
@@ -161,14 +188,18 @@ export function ProductTypeSelector({
               className={INPUT_CLASSES}
             >
               <option value="">Choose subtype</option>
-              {subTypes.map(sub => (
-                <option key={sub} value={sub}>{sub}</option>
+              {subTypes.map((sub) => (
+                <option key={sub} value={sub}>
+                  {sub}
+                </option>
               ))}
               <option value="Other">Other (custom)</option>
             </select>
-            
+
             {showOtherInput && (
               <input
+                id="custom-subtype"
+                aria-label="Custom subtype"
                 type="text"
                 value={customSubType}
                 onChange={(e) => handleCustomSubTypeChange(e.target.value)}
@@ -176,37 +207,6 @@ export function ProductTypeSelector({
                 placeholder="Enter custom sub-type"
               />
             )}
-          </div>
-        )}
-
-        {/* Show placeholder when product type selected but no subtypes */}
-        {normalizedProductType && !hasSubTypes && (
-          <div className="hidden space-y-2 sm:block">
-            <label className="block text-sm font-medium text-pf-muted">
-              Subtype
-            </label>
-            <input
-              type="text"
-              disabled
-              value="N/A"
-              className="w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line rounded-lg bg-pf-canvas text-pf-muted"
-            />
-          </div>
-        )}
-
-        {/* Placeholder when no product type selected */}
-        {!normalizedProductType && (
-          <div className="hidden space-y-2 sm:block">
-            <label htmlFor="subType" className="block text-sm font-medium text-pf-secondary">
-              Subtype
-            </label>
-            <input
-              type="text"
-              disabled
-              value=""
-              className="w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line rounded-lg bg-pf-canvas text-pf-muted"
-              placeholder="Choose type first"
-            />
           </div>
         )}
       </div>

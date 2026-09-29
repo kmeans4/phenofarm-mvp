@@ -1,25 +1,25 @@
-
 import { BrandLogo } from '@/app/components/ui/BrandLogo';
 import Link from 'next/link';
 
 const footerLinks = {
   Growers: [
-    { label: 'Create an account', href: '/auth/sign_up' },
+    { label: 'Sign in', href: '/auth/sign_in' },
+    { label: 'Create an account', href: '/auth/sign_up?type=grower' },
     { label: 'See grower features', href: '#workflow' },
     { label: 'Getting started', href: '#getting-started' },
   ],
   Dispensaries: [
-    { label: 'Create an account', href: '/auth/sign_up' },
+    { label: 'Create an account', href: '/auth/sign_up?type=dispensary' },
     { label: 'Sign in', href: '/auth/sign_in' },
     { label: 'Getting started', href: '#getting-started' },
   ],
   Company: [
-    { label: 'Contact', href: 'mailto:support@phenoshop.app' },
+    { label: 'Contact', href: '/contact' },
     { label: 'Help center', href: '/help' },
   ],
 };
 
-export function Footer() {
+export function Footer({ signedIn = false }: { signedIn?: boolean }) {
   return (
     <footer className="relative border-t border-white/[0.06]">
       <div className="mx-auto max-w-6xl px-6 py-12 md:py-16">
@@ -29,13 +29,13 @@ export function Footer() {
             <div className="flex items-center gap-2.5">
               <BrandLogo className="w-40" />
             </div>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500">
-              A place for licensed cannabis growers and dispensaries to share product details,
-              request prices, and track wholesale orders.
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-400">
+              A place for licensed cannabis growers and dispensaries to share
+              product details, request prices, and track wholesale orders.
             </p>
             <a
               href="mailto:support@phenoshop.app"
-              className="mt-5 inline-flex min-h-10 items-center text-sm text-gray-400 transition-colors hover:text-emerald-400"
+              className="mt-5 inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-emerald-400"
             >
               support@phenoshop.app
             </a>
@@ -44,32 +44,58 @@ export function Footer() {
           {/* Link columns */}
           {Object.entries(footerLinks).map(([heading, links]) => (
             <nav key={heading} aria-label={heading}>
-              <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-gray-500">{heading}</h3>
+              <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.16em] text-gray-400">
+                {heading}
+              </h3>
               <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link href={link.href} className="inline-flex min-h-10 items-center text-sm text-gray-400 transition-colors hover:text-white">
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                {links
+                  .filter(
+                    (link) =>
+                      !signedIn || !link.href.startsWith('/auth/sign_up')
+                  )
+                  .map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        href={
+                          signedIn && link.href === '/auth/sign_in'
+                            ? '/dashboard'
+                            : link.href
+                        }
+                        className="inline-flex min-h-11 items-center text-sm text-gray-400 transition-colors hover:text-white"
+                      >
+                        {signedIn && link.href === '/auth/sign_in'
+                          ? 'Open dashboard'
+                          : link.label}
+                      </Link>
+                    </li>
+                  ))}
               </ul>
             </nav>
           ))}
         </div>
 
         <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center md:mt-14">
-          <p className="text-xs text-gray-600">
-            © {new Date().getFullYear()} PhenoShop. For licensed businesses only.
+          <p className="text-xs text-gray-400">
+            © {new Date().getFullYear()} PhenoShop. For licensed businesses
+            only.
           </p>
           <div className="flex gap-6">
-            <Link href="/legal/privacy" className="inline-flex min-h-10 items-center text-xs text-gray-600 transition-colors hover:text-gray-300">
+            <Link
+              href="/legal/privacy"
+              className="inline-flex min-h-11 items-center text-xs text-gray-400 transition-colors hover:text-gray-300"
+            >
               Privacy
             </Link>
-            <Link href="/legal/terms" className="inline-flex min-h-10 items-center text-xs text-gray-600 transition-colors hover:text-gray-300">
+            <Link
+              href="/legal/terms"
+              className="inline-flex min-h-11 items-center text-xs text-gray-400 transition-colors hover:text-gray-300"
+            >
               Terms
             </Link>
-            <Link href="/legal/cookies" className="inline-flex min-h-10 items-center text-xs text-gray-600 transition-colors hover:text-gray-300">
+            <Link
+              href="/legal/cookies"
+              className="inline-flex min-h-11 items-center text-xs text-gray-400 transition-colors hover:text-gray-300"
+            >
               Cookies
             </Link>
           </div>

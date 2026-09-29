@@ -14,7 +14,13 @@ import {
 import { ArrowRight } from 'lucide-react';
 import { StaggeredWords } from './motion';
 
-const STATUS_FLOW = ['Submitted', 'Accepted', 'Preparing', 'Ready', 'Delivered'] as const;
+const STATUS_FLOW = [
+  'Submitted',
+  'Accepted',
+  'Preparing',
+  'Ready',
+  'Delivered',
+] as const;
 type Status = (typeof STATUS_FLOW)[number];
 
 const STATUS_STYLES: Record<Status, string> = {
@@ -48,14 +54,16 @@ function LiveWorkspace() {
   const tickRef = useRef(0);
 
   useEffect(() => {
-    if (reduced) return;
+    if (reduced || window.matchMedia('(hover: none)').matches) return;
     const interval = setInterval(() => {
       if (paused || document.hidden) return;
       tickRef.current += 1;
       const target = tickRef.current % INITIAL_ROWS.length;
       setRows((prev) =>
         prev.map((row, i) =>
-          i === target ? { ...row, step: (row.step + 1) % STATUS_FLOW.length } : row
+          i === target
+            ? { ...row, step: (row.step + 1) % STATUS_FLOW.length }
+            : row
         )
       );
     }, 2200);
@@ -77,7 +85,7 @@ function LiveWorkspace() {
           <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
           <span className="h-2.5 w-2.5 rounded-full bg-white/10" />
         </div>
-        <div className="mx-auto flex h-7 w-full max-w-sm items-center justify-center rounded-md bg-white/[0.04] text-xs tracking-wide text-gray-500">
+        <div className="mx-auto flex h-7 w-full max-w-sm items-center justify-center rounded-md bg-white/[0.04] text-xs tracking-wide text-gray-400">
           phenoshop.app/grower/orders
         </div>
         <span className="hidden items-center gap-1.5 text-xs uppercase tracking-wider text-emerald-400/80 sm:flex">
@@ -85,7 +93,7 @@ function LiveWorkspace() {
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
           </span>
-          Example
+          Sample data
         </span>
       </div>
 
@@ -94,40 +102,44 @@ function LiveWorkspace() {
         <div className="hidden w-44 shrink-0 border-r border-white/[0.06] p-4 sm:block">
           <div className="mb-5 flex items-center gap-2">
             <BrandMark className="h-6 w-6" />
-            <span className="text-xs font-semibold text-gray-200">Grower Portal</span>
+            <span className="text-xs font-semibold text-gray-200">Grower</span>
           </div>
-          {['Dashboard', 'Catalog', 'Orders', 'Customers', 'Reports'].map((item) => (
-            <div
-              key={item}
-              className={`mb-1 rounded-md px-2.5 py-1.5 text-xs ${
-                item === 'Orders' ? 'bg-emerald-500/10 font-medium text-emerald-300' : 'text-gray-500'
-              }`}
-            >
-              {item}
-            </div>
-          ))}
+          {['Overview', 'Products', 'Orders', 'Customers', 'Reports'].map(
+            (item) => (
+              <div
+                key={item}
+                className={`mb-1 rounded-md px-2.5 py-1.5 text-xs ${
+                  item === 'Orders'
+                    ? 'bg-emerald-500/10 font-medium text-emerald-300'
+                    : 'text-gray-400'
+                }`}
+              >
+                {item}
+              </div>
+            )
+          )}
         </div>
 
         {/* Main panel */}
         <div className="min-w-0 flex-1 p-5">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <div className="text-sm font-semibold text-gray-100">Order Requests</div>
-              <div className="text-xs text-gray-500">
-                {inFlight} open requests in this example
+              <div className="text-sm font-semibold text-gray-100">Orders</div>
+              <div className="text-xs text-gray-400">
+                {inFlight} open orders
               </div>
             </div>
-            <div className="rounded-md bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white">
-              Record Request
+            <div className="rounded-md border border-white/10 px-3 py-1.5 text-xs text-gray-400">
+              Sample order
             </div>
           </div>
 
           {/* Request table with animating status pills */}
           <div className="overflow-hidden rounded-lg border border-white/[0.06]">
-            <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-white/[0.06] bg-white/[0.02] px-4 py-2 text-xs uppercase tracking-wider text-gray-500 sm:grid-cols-[auto_1fr_auto_auto]">
-              <span className="hidden sm:block">Request</span>
+            <div className="grid grid-cols-[1fr_auto_auto] gap-4 border-b border-white/[0.06] bg-white/[0.02] px-4 py-2 text-xs uppercase tracking-wider text-gray-400 sm:grid-cols-[auto_1fr_auto_auto]">
+              <span className="hidden sm:block">Order</span>
               <span>Buyer</span>
-              <span className="text-right">Est. value</span>
+              <span className="text-right">Total</span>
               <span className="text-right">Status</span>
             </div>
             {rows.map((row) => {
@@ -137,9 +149,13 @@ function LiveWorkspace() {
                   key={row.id}
                   className="grid grid-cols-[1fr_auto_auto] items-center gap-4 border-b border-white/[0.04] px-4 py-2.5 text-xs last:border-0 sm:grid-cols-[auto_1fr_auto_auto]"
                 >
-                  <span className="hidden font-mono text-xs text-gray-500 sm:block">{row.id}</span>
+                  <span className="hidden font-mono text-xs text-gray-400 sm:block">
+                    {row.id}
+                  </span>
                   <span className="truncate text-gray-300">{row.buyer}</span>
-                  <span className="text-right font-medium text-gray-200">{row.value}</span>
+                  <span className="text-right font-medium text-gray-200">
+                    {row.value}
+                  </span>
                   <span className="flex justify-end">
                     <AnimatePresence mode="popLayout" initial={false}>
                       <motion.span
@@ -165,10 +181,12 @@ function LiveWorkspace() {
               <div key={step} className="flex items-center gap-2">
                 <span
                   className={`h-1.5 w-1.5 rounded-full transition-colors duration-500 ${
-                    rows.some((r) => r.step >= i) ? 'bg-emerald-400' : 'bg-white/15'
+                    rows.some((r) => r.step >= i)
+                      ? 'bg-emerald-400'
+                      : 'bg-white/15'
                   }`}
                 />
-                <span className="text-xs text-gray-600">{step}</span>
+                <span className="text-xs text-gray-400">{step}</span>
               </div>
             ))}
           </div>
@@ -201,15 +219,21 @@ function TiltFrame({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <div style={{ perspective: 1200 }} onPointerMove={onPointerMove} onPointerLeave={reset}>
-      <motion.div style={{ rotateX: srx, rotateY: sry, transformStyle: 'preserve-3d' }}>
+    <div
+      style={{ perspective: 1200 }}
+      onPointerMove={onPointerMove}
+      onPointerLeave={reset}
+    >
+      <motion.div
+        style={{ rotateX: srx, rotateY: sry, transformStyle: 'preserve-3d' }}
+      >
         {children}
       </motion.div>
     </div>
   );
 }
 
-export function Hero() {
+export function Hero({ signedIn = false }: { signedIn?: boolean }) {
   return (
     <section className="relative overflow-hidden">
       {/* Static glow (page-wide grid + cursor light live in AmbientBackground) */}
@@ -223,14 +247,24 @@ export function Hero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] py-1.5 pl-1.5 pr-4 text-xs text-gray-300"
+            className="mb-7 inline-flex items-center gap-2 rounded-full border border-pf-line-strong bg-white/[0.03] py-1.5 pl-1.5 pr-4 text-xs text-gray-300"
           >
-            <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 font-medium text-emerald-300">PhenoShop</span>
+            <span className="rounded-full bg-emerald-500/15 px-2.5 py-0.5 font-medium text-emerald-300">
+              PhenoShop
+            </span>
             For licensed growers and dispensaries
           </motion.div>
 
           <h1 className="text-balance text-[2.6rem] font-semibold leading-[1.05] tracking-[-0.03em] text-white sm:text-5xl md:text-[4.25rem]">
-            <StaggeredWords text="Cannabis wholesale, easier to manage" accentFrom={2} />
+            <span className="sr-only">
+              Cannabis wholesale, easier to manage
+            </span>
+            <span aria-hidden="true">
+              <StaggeredWords
+                text="Cannabis wholesale, easier to manage"
+                accentFrom={2}
+              />
+            </span>
           </h1>
 
           <motion.p
@@ -239,8 +273,9 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 0.55 }}
             className="mx-auto mt-6 max-w-xl text-pretty text-lg leading-relaxed text-gray-400"
           >
-            Growers can list products and manage orders. Dispensaries can browse, ask for prices,
-            and track requests. Both sides see the same order details.
+            Growers can list products and manage orders. Dispensaries can
+            browse, ask for prices, and track requests. Both sides see the same
+            order details.
           </motion.p>
 
           <motion.div
@@ -250,28 +285,19 @@ export function Hero() {
             className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row"
           >
             <Link
-              href="/auth/sign_up"
-              className="group inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-7 py-3.5 text-sm font-semibold text-white shadow-[0_0_40px_rgba(16,185,129,0.25)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_56px_rgba(16,185,129,0.4)]"
+              href={signedIn ? '/dashboard' : '/auth/sign_up'}
+              className="group inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-7 py-3.5 text-sm font-semibold text-[#032116] shadow-[0_0_40px_rgba(16,185,129,0.25)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_56px_rgba(16,185,129,0.4)]"
             >
-              Create a free account
+              {signedIn ? 'Open dashboard' : 'Create a free account'}
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#product"
-              className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-gray-200 transition-colors hover:border-white/20 hover:bg-white/[0.06]"
+              className="inline-flex items-center gap-2 rounded-xl border border-pf-line-strong bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-gray-200 transition-colors hover:border-pf-accent hover:bg-white/[0.06]"
             >
               See how it works
             </a>
           </motion.div>
-
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.9 }}
-            className="mt-5 text-xs text-gray-600"
-          >
-            Business licenses are reviewed before buyers can place requests.
-          </motion.p>
         </div>
 
         {/* Live product demo */}
@@ -279,19 +305,22 @@ export function Hero() {
           id="product"
           initial={{ opacity: 0, y: 48 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.9, delay: 0.35, ease: [0.21, 0.47, 0.32, 0.98] }}
+          transition={{
+            duration: 0.9,
+            delay: 0.35,
+            ease: [0.21, 0.47, 0.32, 0.98],
+          }}
           className="relative mx-auto mt-16 max-w-4xl scroll-mt-28 md:mt-20"
         >
-          <div aria-hidden className="absolute -inset-x-16 -top-16 -bottom-8 bg-[radial-gradient(60%_60%_at_50%_30%,rgba(16,185,129,0.14),transparent_70%)]" />
+          <div
+            aria-hidden
+            className="absolute -inset-x-16 -top-16 -bottom-8 bg-[radial-gradient(60%_60%_at_50%_30%,rgba(16,185,129,0.14),transparent_70%)]"
+          />
           <TiltFrame>
             <LiveWorkspace />
           </TiltFrame>
-          <p className="mt-4 text-center text-xs text-gray-600">
-            Example order screen with sample buyers and amounts. Status changes are shown for illustration.
-          </p>
         </motion.div>
       </div>
-
     </section>
   );
 }

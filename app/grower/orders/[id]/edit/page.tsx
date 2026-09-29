@@ -1,3 +1,4 @@
+import { signInDestination } from '@/lib/auth-navigation';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect, notFound } from 'next/navigation';
 import { db } from '@/lib/db';
@@ -7,19 +8,36 @@ async function fetchOrder(id: string, growerId: string) {
   const order = await db.order.findUnique({
     where: { id, growerId },
     include: {
-      dispensary: { select: { id: true, businessName: true, phone: true, address: true, city: true, state: true, zip: true, isOffPlatform: true } },
+      dispensary: {
+        select: {
+          id: true,
+          businessName: true,
+          phone: true,
+          address: true,
+          city: true,
+          state: true,
+          zip: true,
+          isOffPlatform: true,
+        },
+      },
       items: {
         include: {
           product: {
-            select: { id: true, name: true, unit: true, inventoryQty: true, strain: { select: { name: true } } }
+            select: {
+              id: true,
+              name: true,
+              unit: true,
+              inventoryQty: true,
+              strain: { select: { name: true } },
+            },
           },
         },
       },
     },
   });
-  
+
   if (!order) return null;
-  
+
   return {
     id: order.id,
     orderId: order.orderId,
@@ -30,6 +48,7 @@ async function fetchOrder(id: string, growerId: string) {
     shippingFee: Number(order.shippingFee),
     notes: order.notes,
     dispensary: {
+      id: order.dispensary.id,
       businessName: order.dispensary.businessName,
       phone: order.dispensary.phone,
       address: order.dispensary.address,
@@ -41,8 +60,13 @@ async function fetchOrder(id: string, growerId: string) {
       productId: item.productId,
       quantity: item.quantity,
       unitPrice: Number(item.unitPrice),
+      acceptedQuoteId: item.acceptedQuoteId,
       totalPrice: Number(item.totalPrice),
-      maxQuantity: item.quantity + Number(item.product.inventoryQty || 0),
+      maxQuantity:
+        order.items
+          .filter((other) => other.productId === item.productId)
+          .reduce((sum, other) => sum + other.quantity, 0) +
+        Number(item.product.inventoryQty || 0),
       product: {
         id: item.product.id,
         name: item.product.name,
@@ -66,7 +90,7 @@ export default async function EditOrderPage({ params }: PageProps) {
   const session = await getAuthSession();
 
   if (!session) {
-    redirect('/auth/sign_in');
+    redirect(await signInDestination());
   }
 
   const user = session.user as ExtendedUser;

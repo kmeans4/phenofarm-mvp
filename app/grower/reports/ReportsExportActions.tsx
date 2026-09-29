@@ -1,4 +1,5 @@
 'use client';
+import { parse } from 'csv-parse/browser/esm/sync';
 
 interface ReportSummary {
   totalRevenue: number;
@@ -36,6 +37,7 @@ interface RecentOrderRow {
 interface ReportsExportActionsProps {
   summary: ReportSummary;
   rangeLabel: string;
+  exportHref?: string;
   monthlyRevenue: MonthlyRevenueRow[];
   topProducts: TopProductRow[];
   topCustomers: TopCustomerRow[];
@@ -44,7 +46,8 @@ interface ReportsExportActionsProps {
 
 function csvEscape(value: string | number) {
   const raw = String(value ?? '');
-  const text = typeof value === 'string' && /^[\s]*[=+@-]/.test(raw) ? `'${raw}` : raw;
+  const text =
+    typeof value === 'string' && /^[\s]*[=+@-]/.test(raw) ? `'${raw}` : raw;
   return /[",\n\r]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
 }
 
@@ -79,7 +82,7 @@ function wrapPdfLine(value: string, maxLength = 92) {
   return lines.length > 0 ? lines : [''];
 }
 
-function buildPdfBlob(lines: string[]) {
+export function buildPdfBlob(lines: string[]) {
   const pageLineLimit = 48;
   const pages: string[][] = [];
 
@@ -115,8 +118,10 @@ function buildPdfBlob(lines: string[]) {
       'ET',
     ].join('\n');
 
-    objects[contentObjectId - 1] = `<< /Length ${text.length} >>\nstream\n${text}\nendstream`;
-    objects[pageObjectId - 1] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontObjectId} 0 R >> >> /Contents ${contentObjectId} 0 R >>`;
+    objects[contentObjectId - 1] =
+      `<< /Length ${text.length} >>\nstream\n${text}\nendstream`;
+    objects[pageObjectId - 1] =
+      `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${fontObjectId} 0 R >> >> /Contents ${contentObjectId} 0 R >>`;
   });
 
   objects[1] = `<< /Type /Pages /Kids [${pageObjectIds.map((id) => `${id} 0 R`).join(' ')}] /Count ${pageObjectIds.length} >>`;
@@ -151,12 +156,18 @@ function downloadBlob(blob: Blob, filename: string) {
 }
 
 function safeRangeSlug(rangeLabel: string) {
-  return rangeLabel.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'range';
+  return (
+    rangeLabel
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '') || 'range'
+  );
 }
 
 export function ReportsExportActions({
   summary,
   rangeLabel,
+  exportHref,
   monthlyRevenue,
   topProducts,
   topCustomers,
@@ -166,6 +177,10 @@ export function ReportsExportActions({
   const filenameRange = safeRangeSlug(rangeLabel);
 
   const exportCsv = () => {
+    if (exportHref) {
+      window.location.assign(exportHref);
+      return;
+    }
     const rows: Array<Array<string | number>> = [
       ['PhenoShop Grower Report'],
       ['Generated At', new Date().toISOString()],
@@ -173,26 +188,34 @@ export function ReportsExportActions({
       [],
       ['Summary'],
       ['Metric', 'Value'],
-      ['Delivered Request Value', summary.totalRevenue.toFixed(2)],
-      ['Total Requests', summary.totalOrders],
-      ['Active Requests', summary.activeOrders],
+      ['Delivered Order Value', summary.totalRevenue.toFixed(2)],
+      ['Total Orders', summary.totalOrders],
+      ['Active Orders', summary.activeOrders],
       ['Active Customers', summary.activeCustomers],
       ['Average Delivered Value', summary.avgOrderValue.toFixed(2)],
       [],
-      ['Monthly Delivered Request Value'],
+      ['Monthly Delivered Order Value'],
       ['Month', 'Estimated Value'],
       ...monthlyRevenue.map((row) => [row.month, row.revenue.toFixed(2)]),
       [],
       ['Top Products'],
       ['Product', 'Quantity', 'Estimated Value'],
-      ...topProducts.map((row) => [row.productName, row.quantity, row.revenue.toFixed(2)]),
+      ...topProducts.map((row) => [
+        row.productName,
+        row.quantity,
+        row.revenue.toFixed(2),
+      ]),
       [],
       ['Top Customers'],
-      ['Customer', 'Requests', 'Estimated Value'],
-      ...topCustomers.map((row) => [row.dispensaryName, row.orderCount, row.revenue.toFixed(2)]),
+      ['Customer', 'Orders', 'Estimated Value'],
+      ...topCustomers.map((row) => [
+        row.dispensaryName,
+        row.orderCount,
+        row.revenue.toFixed(2),
+      ]),
       [],
-      ['Recent Requests'],
-      ['Request ID', 'Customer', 'Status', 'Date', 'Estimated Value'],
+      ['Recent Orders'],
+      ['Order ID', 'Customer', 'Status', 'Date', 'Estimated Value'],
       ...recentOrders.map((row) => [
         row.orderId,
         row.customer,
@@ -202,45 +225,82 @@ export function ReportsExportActions({
       ]),
     ];
 
-    const blob = new Blob([rowsToCsv(rows)], { type: 'text/csv;charset=utf-8;' });
-    downloadBlob(blob, `phenoshop-grower-report-${filenameRange}-${filenameDate}.csv`);
+    const blob = new Blob([rowsToCsv(rows)], {
+      type: 'text/csv;charset=utf-8;',
+    });
+    downloadBlob(
+      blob,
+      `phenoshop-grower-report-${filenameRange}-${filenameDate}.csv`
+    );
   };
 
-  const exportPdf = () => {
+  const exportPdf = async () => {
+    if (exportHref) {
+      try {
+        const response = await fetch(exportHref);
+        if (!response.ok) throw new Error('Could not load the full report.');
+        const csv = await response.text();
+        const rows = parse(csv, { relax_column_count: true }) as string[][];
+        downloadBlob(
+          buildPdfBlob(rows.map((row) => row.join(' | '))),
+          `phenoshop-grower-report-${filenameRange}-${filenameDate}.pdf`
+        );
+      } catch (error) {
+        const { toast } = await import('sonner');
+        toast.error(
+          error instanceof Error ? error.message : 'Could not export report.'
+        );
+      }
+      return;
+    }
     const lines = [
       'PhenoShop Grower Report',
       `Generated At: ${new Date().toLocaleString()}`,
       `Date Range: ${rangeLabel}`,
       '',
       'Summary',
-      `Delivered Request Value: $${summary.totalRevenue.toFixed(2)}`,
-      `Total Requests: ${summary.totalOrders}`,
-      `Active Requests: ${summary.activeOrders}`,
+      `Delivered Order Value: $${summary.totalRevenue.toFixed(2)}`,
+      `Total Orders: ${summary.totalOrders}`,
+      `Active Orders: ${summary.activeOrders}`,
       `Active Customers: ${summary.activeCustomers}`,
       `Average Delivered Value: $${summary.avgOrderValue.toFixed(2)}`,
       '',
-      'Monthly Delivered Request Value',
+      'Monthly Delivered Order Value',
       ...(monthlyRevenue.length > 0
-        ? monthlyRevenue.map((row) => `${row.month}: $${row.revenue.toFixed(2)}`)
-        : ['No delivered request value in this range.']),
+        ? monthlyRevenue.map(
+            (row) => `${row.month}: $${row.revenue.toFixed(2)}`
+          )
+        : ['No delivered order value in this range.']),
       '',
       'Top Products',
       ...(topProducts.length > 0
-        ? topProducts.map((row, index) => `${index + 1}. ${row.productName} - ${row.quantity} units - $${row.revenue.toFixed(2)}`)
+        ? topProducts.map(
+            (row, index) =>
+              `${index + 1}. ${row.productName} - ${row.quantity} units - $${row.revenue.toFixed(2)}`
+          )
         : ['No delivered product value in this range.']),
       '',
       'Top Customers',
       ...(topCustomers.length > 0
-        ? topCustomers.map((row, index) => `${index + 1}. ${row.dispensaryName} - ${row.orderCount} requests - $${row.revenue.toFixed(2)}`)
+        ? topCustomers.map(
+            (row, index) =>
+              `${index + 1}. ${row.dispensaryName} - ${row.orderCount} orders - $${row.revenue.toFixed(2)}`
+          )
         : ['No delivered customer value in this range.']),
       '',
-      'Recent Requests',
+      'Recent Orders',
       ...(recentOrders.length > 0
-        ? recentOrders.map((row) => `${row.orderId} - ${row.customer} - ${row.status} - ${row.date} - $${row.totalAmount.toFixed(2)}`)
-        : ['No requests in this range.']),
+        ? recentOrders.map(
+            (row) =>
+              `${row.orderId} - ${row.customer} - ${row.status} - ${row.date} - $${row.totalAmount.toFixed(2)}`
+          )
+        : ['No orders in this range.']),
     ];
 
-    downloadBlob(buildPdfBlob(lines), `phenoshop-grower-report-${filenameRange}-${filenameDate}.pdf`);
+    downloadBlob(
+      buildPdfBlob(lines),
+      `phenoshop-grower-report-${filenameRange}-${filenameDate}.pdf`
+    );
   };
 
   return (
@@ -250,17 +310,17 @@ export function ReportsExportActions({
           type="button"
           onClick={exportPdf}
           aria-label="Export PDF"
-          className="min-h-10 rounded-lg bg-pf-raised px-3 py-2 text-xs font-medium text-pf-text transition-colors hover:bg-pf-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
+          className="min-h-10 rounded-lg bg-pf-raised px-3 py-2 text-sm font-medium text-pf-text transition-colors hover:bg-pf-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
         >
-          PDF
+          Export PDF
         </button>
         <button
           type="button"
           onClick={exportCsv}
           aria-label="Export CSV"
-          className="min-h-10 rounded-lg bg-pf-raised px-3 py-2 text-xs font-medium text-pf-text transition-colors hover:bg-pf-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
+          className="min-h-10 rounded-lg bg-pf-raised px-3 py-2 text-sm font-medium text-pf-text transition-colors hover:bg-pf-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:px-4 sm:text-sm"
         >
-          CSV
+          Export CSV
         </button>
       </div>
     </div>

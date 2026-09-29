@@ -5,16 +5,15 @@ import type { Order, UserRole } from '@prisma/client';
 import {
   canTransitionOrderStatus,
   getOrderStatusLabel,
-  getInvalidOrderStatusTransitionMessage,
   isOrderStatus,
 } from '@/lib/order-workflow';
-import { claimOrder, restoreInventory, OrderConflictError } from '@/lib/order-mutations';
+import {
+  claimOrder,
+  restoreInventory,
+  OrderConflictError,
+} from '@/lib/order-mutations';
+import { orderUndoToken, readOrderUndoToken } from '@/lib/order-undo';
 import { createNotification } from '@/lib/notifications';
-
-// Dispensaries may only withdraw their own not-yet-accepted requests;
-// growers own the rest of the fulfillment lifecycle.
-const DISPENSARY_ALLOWED_TARGETS = new Set(['CANCELLED']);
-const DISPENSARY_CANCELLABLE_FROM = new Set(['PENDING']);
 
 export async function PATCH(
   request: NextRequest,
@@ -22,127 +21,211 @@ export async function PATCH(
 ) {
   try {
     const session = await getAuthSession();
-
-    if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
-    }
-
+    if (!session)
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     const user = session.user;
     const { id: orderId } = await params;
-    const { status: newStatus } = await request.json().catch(() => ({})) as { status: string };
-
-    if (!isOrderStatus(newStatus)) {
-      return NextResponse.json({ error: 'Invalid status' }, { status: 400 });
-    }
-
+    const body = await request.json().catch(() => ({}));
+    const undo =
+      typeof body.undoEventId === 'string'
+        ? readOrderUndoToken(body.undoEventId)
+        : null;
+    if (body.undoEventId && !undo)
+      return NextResponse.json(
+        { error: 'The undo window ended. Refresh this order.' },
+        { status: 409 }
+      );
+    const undoEventId = undo?.eventId || null;
     const order = await db.order.findUnique({
       where: { id: orderId },
       include: {
-        grower: { select: { userId: true, businessName: true } },
-        dispensary: { select: { userId: true, businessName: true } },
+        grower: { select: { userId: true } },
+        dispensary: { select: { userId: true } },
+        statusEvents: {
+          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          take: 1,
+        },
       },
     });
-
-    if (!order) {
-      return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+    if (
+      !order ||
+      (user.role === 'GROWER' && order.growerId !== user.growerId) ||
+      (user.role === 'DISPENSARY' && order.dispensaryId !== user.dispensaryId)
+    ) {
+      return NextResponse.json(
+        { error: 'This order is unavailable to your account.' },
+        { status: 404 }
+      );
     }
-
-    if (user.role === 'GROWER') {
-      if (!user.growerId || order.growerId !== user.growerId) {
-        return NextResponse.json({ error: 'Not your order' }, { status: 403 });
-      }
-    } else if (user.role === 'DISPENSARY') {
-      if (!user.dispensaryId || order.dispensaryId !== user.dispensaryId) {
-        return NextResponse.json({ error: 'Not your order' }, { status: 403 });
-      }
-      if (!DISPENSARY_ALLOWED_TARGETS.has(newStatus)) {
-        return NextResponse.json({ error: 'Buyers can only cancel their own requests' }, { status: 403 });
-      }
-      if (!DISPENSARY_CANCELLABLE_FROM.has(order.status)) {
-        return NextResponse.json(
-          { error: 'This request was already accepted. Message the grower to coordinate a cancellation.' },
-          { status: 409 }
-        );
-      }
-    } else if (user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+    if (!['GROWER', 'DISPENSARY', 'ADMIN'].includes(user.role))
+      return NextResponse.json(
+        { error: 'Your account cannot update orders.' },
+        { status: 403 }
+      );
+    const previousEvent = order.statusEvents[0];
+    // Undo can reverse only this actor's latest unchanged action, once, during the toast window.
+    if (
+      undoEventId &&
+      (user.role === 'DISPENSARY' ||
+        !previousEvent ||
+        previousEvent.id !== undoEventId ||
+        previousEvent.actorUserId !== user.id ||
+        !previousEvent.fromStatus ||
+        previousEvent.undoOfEventId ||
+        Date.now() - previousEvent.createdAt.getTime() > 15000 ||
+        previousEvent.toStatus !== order.status ||
+        order.updatedAt.toISOString() !== undo?.version)
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'This order has changed or the undo window ended. Refresh to see its current status.',
+        },
+        { status: 409 }
+      );
     }
-
-    if (order.status === newStatus) return NextResponse.json({ success: true, order: { id: order.id, status: order.status, shippedAt: order.shippedAt, deliveredAt: order.deliveredAt } });
-    const currentStatus = order.status;
-    if (!canTransitionOrderStatus(currentStatus, newStatus)) {
+    const newStatus = undoEventId ? previousEvent!.fromStatus! : body.status;
+    if (!isOrderStatus(newStatus))
+      return NextResponse.json(
+        { error: 'Choose a valid order status.' },
+        { status: 400 }
+      );
+    if (
+      user.role === 'DISPENSARY' &&
+      (newStatus !== 'CANCELLED' || order.status !== 'PENDING')
+    )
+      return NextResponse.json(
+        {
+          error:
+            'This order was already accepted. Message the grower to arrange cancellation.',
+        },
+        { status: 409 }
+      );
+    if (
+      !undoEventId &&
+      body.expectedStatus &&
+      body.expectedStatus !== order.status
+    )
+      return NextResponse.json(
+        {
+          error: `This order was already moved to ${getOrderStatusLabel(order.status)} — refresh to see it.`,
+        },
+        { status: 409 }
+      );
+    if (!undoEventId && order.status === newStatus)
       return NextResponse.json({
-        error: getInvalidOrderStatusTransitionMessage(currentStatus, newStatus)
-      }, { status: 400 });
-    }
-
-    const updateData: Partial<Order> = { status: newStatus as Order['status'] };
-
-    if (newStatus === 'SHIPPED' && !order.shippedAt) {
-      updateData.shippedAt = new Date();
-    }
-    if (newStatus === 'DELIVERED' && !order.deliveredAt) {
-      updateData.deliveredAt = new Date();
-    }
-
-    const isCancellation = newStatus === 'CANCELLED' && currentStatus !== 'CANCELLED';
-
-    const updatedOrder = await db.$transaction(async (tx) => {
+        success: true,
+        order: { id: order.id, status: order.status },
+      });
+    if (!undoEventId && !canTransitionOrderStatus(order.status, newStatus))
+      return NextResponse.json(
+        {
+          error: `This order is ${getOrderStatusLabel(order.status)} — refresh to see its next step.`,
+        },
+        { status: 409 }
+      );
+    const reason = typeof body.reason === 'string' ? body.reason.trim() : '';
+    if (
+      !undoEventId &&
+      newStatus === 'CANCELLED' &&
+      user.role !== 'DISPENSARY' &&
+      (!reason || reason.length > 500)
+    )
+      return NextResponse.json(
+        { error: 'Choose a cancellation reason (up to 500 characters).' },
+        { status: 400 }
+      );
+    const update: Partial<Order> = { status: newStatus };
+    if (newStatus === 'SHIPPED' && !order.shippedAt)
+      update.shippedAt = new Date();
+    if (newStatus === 'DELIVERED' && !order.deliveredAt)
+      update.deliveredAt = new Date();
+    if (undoEventId && order.status === 'DELIVERED') update.deliveredAt = null;
+    if (undoEventId && order.status === 'SHIPPED') update.shippedAt = null;
+    const result = await db.$transaction(async (tx) => {
       await claimOrder(tx, order);
-      if (isCancellation) {
-        // Return the inventory that was reserved when the request was created
+      if (
+        newStatus === 'CANCELLED' ||
+        (undoEventId && order.status === 'CANCELLED')
+      ) {
         const items = await tx.orderItem.findMany({
           where: { orderId },
-          select: { productId: true, quantity: true },
+          orderBy: { productId: 'asc' },
         });
-
         for (const item of items) {
-          await restoreInventory(tx, item.productId, item.quantity);
+          if (newStatus === 'CANCELLED')
+            await restoreInventory(tx, item.productId, item.quantity);
+          else {
+            const reserved = await tx.product.updateMany({
+              where: {
+                id: item.productId,
+                growerId: order.growerId,
+                isDeleted: false,
+                inventoryQty: { gte: item.quantity },
+              },
+              data: { inventoryQty: { decrement: item.quantity } },
+            });
+            if (!reserved.count) throw new OrderConflictError();
+            await tx.product.updateMany({
+              where: { id: item.productId, inventoryQty: 0 },
+              data: { isAvailable: false },
+            });
+          }
         }
       }
-
       const updated = await tx.order.update({
         where: { id: orderId },
-        data: updateData,
+        data: update,
       });
-
-      await tx.orderStatusEvent.create({
+      const event = await tx.orderStatusEvent.create({
         data: {
           orderId,
-          fromStatus: currentStatus,
+          fromStatus: order.status,
           toStatus: newStatus,
           actorUserId: user.id,
           actorRole: user.role as UserRole,
+          note: undoEventId ? 'Previous action undone' : reason || null,
+          undoOfEventId: undoEventId,
         },
       });
-
-      const recipientUserId = user.role === 'GROWER'
-        ? order.dispensary.userId
-        : order.grower.userId;
       await createNotification(tx, {
-        userId: recipientUserId,
+        userId:
+          user.role === 'GROWER'
+            ? order.dispensary.userId
+            : order.grower.userId,
         type: 'ORDER_STATUS_CHANGED',
-        title: `Request ${getOrderStatusLabel(newStatus).toLowerCase()}`,
-        body: `Request #${order.orderId} is now ${getOrderStatusLabel(newStatus)}.`,
-        href: user.role === 'GROWER' ? `/dispensary/orders/${order.id}` : `/grower/orders/${order.id}`,
+        title: `Order ${getOrderStatusLabel(newStatus).toLowerCase()}`,
+        body: `Order #${order.orderId} is now ${getOrderStatusLabel(newStatus)}.${reason ? ` Reason: ${reason}` : ''}${undoEventId ? ' The previous update was undone.' : ''}`,
+        href:
+          user.role === 'GROWER'
+            ? `/dispensary/orders/${order.id}`
+            : `/grower/orders/${order.id}`,
       });
-
-      return updated;
+      return { updated, event };
     });
-
     return NextResponse.json({
       success: true,
-      order: {
-        id: updatedOrder.id,
-        status: updatedOrder.status,
-        shippedAt: updatedOrder.shippedAt,
-        deliveredAt: updatedOrder.deliveredAt,
-      }
+      order: { id: result.updated.id, status: result.updated.status },
+      undoEventId: undoEventId
+        ? null
+        : orderUndoToken(result.event.id, result.updated.updatedAt),
     });
-
   } catch (error) {
-    if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
+    if (error instanceof OrderConflictError)
+      return NextResponse.json(
+        {
+          error:
+            'This order or its stock changed. Refresh before trying again.',
+        },
+        { status: 409 }
+      );
     console.error('Status update error:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Could not update the order. Try again.' },
+      { status: 500 }
+    );
   }
 }
