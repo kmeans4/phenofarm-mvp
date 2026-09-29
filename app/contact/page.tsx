@@ -115,11 +115,10 @@ export default function ContactPage() {
               Contact PhenoShop
             </p>
             <h1 className="max-w-3xl text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Wholesale workflow help.
+              How can we help?
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-gray-400 sm:text-lg">
-              Tell us whether you are a grower, dispensary, or partner and include the details the
-              PhenoShop support team should know.
+              Tell us what you need help with. Include your business name and any product or order details that will help us understand.
             </p>
 
             <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
@@ -157,8 +156,7 @@ export default function ContactPage() {
               <div className="flex items-start gap-3">
                 <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
                 <p className="text-sm leading-6 text-gray-400">
-                  PhenoShop coordinates marketplace workflows and cultivator subscriptions. Wholesale payment
-                  settlement stays directly between licensed businesses.
+                  For questions about a product, delivery, or wholesale payment, message the grower directly in PhenoShop. For account or app help, contact our support team.
                 </p>
               </div>
             </div>
@@ -174,7 +172,7 @@ export default function ContactPage() {
             <div className="mb-8">
               <h2 className="text-2xl font-semibold text-white">Email us</h2>
               <p className="mt-2 text-sm leading-6 text-gray-400">
-                These details help support route your request.
+                Fill in the details below to open a message in your email app. Review and send it from there.
               </p>
             </div>
 
@@ -271,7 +269,7 @@ export default function ContactPage() {
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 py-4 text-sm font-semibold text-white shadow-[0_0_40px_rgba(16,185,129,0.25)] transition-all hover:bg-emerald-400 hover:shadow-[0_0_56px_rgba(16,185,129,0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]"
               >
                 <Send className="h-5 w-5" />
-                Open email draft
+                Open in email app
               </button>
             </div>
           </motion.form>

@@ -16,7 +16,7 @@ export const getAuthSession = cache(async (): Promise<Session | null> => {
 
 export async function requireGrower() {
   const session = await getAuthSession();
-  if (!session) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  if (!session) return { error: NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 }) };
   if (session.user.role !== 'GROWER' || !session.user.growerId) {
     return { error: NextResponse.json({ error: 'Grower profile required' }, { status: 403 }) };
   }

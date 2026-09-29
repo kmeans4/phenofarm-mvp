@@ -10,14 +10,14 @@ import { canCreateListings, FREE_LISTING_LIMIT_MESSAGE } from '@/lib/plans';
 export async function GET(request: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session) return apiError(401, 'UNAUTHORIZED', 'Unauthorized');
+    if (!session) return apiError(401, 'UNAUTHORIZED', 'Please sign in to continue.');
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) return apiError(403, 'FORBIDDEN', 'Forbidden');
+    if (user.role !== 'GROWER' || !user.growerId) return apiError(403, 'FORBIDDEN', 'Your account does not have access to this action.');
 
     return NextResponse.json(await getGrowerProductPage(user.growerId, new URL(request.url).searchParams));
   } catch (error) {
     logApiError('products.GET', error, { route: '/api/products' });
-    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Internal server error');
+    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Something went wrong. Please try again.');
   }
 }
 
@@ -25,11 +25,11 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
 
-    if (!session) return apiError(401, 'UNAUTHORIZED', 'Unauthorized');
+    if (!session) return apiError(401, 'UNAUTHORIZED', 'Please sign in to continue.');
 
     const user = session.user;
     if (user.role !== 'GROWER' || !user.growerId) {
-      return apiError(403, 'FORBIDDEN', 'Forbidden');
+      return apiError(403, 'FORBIDDEN', 'Your account does not have access to this action.');
     }
 
     const body = await request.json();
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
     const [growerPlan, listingCount] = await Promise.all([
       db.grower.findUnique({
         where: { id: user.growerId },
-        select: { subscriptionPlan: true, subscriptionStatus: true },
+        select: { businessName: true, subscriptionPlan: true, subscriptionStatus: true },
       }),
       db.product.count({ where: { growerId: user.growerId, isDeleted: false } }),
     ]);
@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
         isAvailable: data.isAvailable,
         isPriceVisible: data.isPriceVisible,
         sku: data.sku,
-        brand: data.brand,
+        brand: data.brand || growerPlan?.businessName || null,
         ingredients: data.ingredients,
         ingredientsDocumentUrl: data.ingredientsDocumentUrl,
         isFeatured: data.isFeatured,
@@ -111,6 +111,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(serializeProduct(product), { status: 201 });
   } catch (error) {
     logApiError('products.POST', error, { route: '/api/products' });
-    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Internal server error');
+    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Something went wrong. Please try again.');
   }
 }

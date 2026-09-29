@@ -196,9 +196,9 @@ export default function DispensaryCartPage() {
         const quote = quotes.get(item.id);
         return !product || !product.isAvailable || item.quantity > product.inventoryQty || item.price !== (quote?.unitPrice ?? product.price ?? 0);
       });
-      setInventoryAdjustmentNotice(changed ? 'Prices or availability changed. Review the updated draft.' : '');
+      setInventoryAdjustmentNotice(changed ? 'Prices or availability changed. Review the updated cart.' : '');
     } catch {
-      if (!signal.aborted) setInventoryAdjustmentNotice('Inventory could not be refreshed. Your saved draft has been kept.');
+      if (!signal.aborted) setInventoryAdjustmentNotice('Inventory could not be refreshed. Your saved cart has been kept.');
     } finally { if (!signal.aborted) setInventorySyncing(false); }
   }, []);
 
@@ -222,7 +222,7 @@ export default function DispensaryCartPage() {
   }, [submissionStorageKey, syncCartWithLiveInventory]);
 
   useEffect(() => {
-    if (mounted && !writeCart(cart)) setInventoryAdjustmentNotice('This browser could not save the latest draft. Please free up storage before leaving.');
+    if (mounted && !writeCart(cart)) setInventoryAdjustmentNotice('This browser could not save the latest cart. Please free up storage before leaving.');
   }, [cart, mounted]);
 
   useEffect(() => {
@@ -434,7 +434,7 @@ export default function DispensaryCartPage() {
         maxQty: Math.max(0, issue.available), unavailable: issue.available < 1 };
     });
     setCart({ items, ...calculateTotals(items) });
-    setInventoryAdjustmentNotice('Inventory quantities updated. Unavailable items remain in your draft until you remove them.');
+    setInventoryAdjustmentNotice('Inventory quantities updated. Unavailable items remain in your cart until you remove them.');
   };
 
   const applySingleInventoryAdjustment = (issue: CheckoutIssue) => {
@@ -459,7 +459,7 @@ export default function DispensaryCartPage() {
   const handleSubmitRequest = async () => {
     if (submittingRef.current || inventorySyncing || !submissionStorageKey || submissionStorageError) return;
     if (!pendingSubmission && (!cart.items.length || cart.items.some(item => item.unavailable || item.requiresQuote))) {
-      setRequestError('Remove unavailable items or obtain pricing for items that require a quote before submitting.'); return;
+      setRequestError('Remove unavailable items and request pricing for quote-only products before sending your request.'); return;
     }
     submittingRef.current = true;
     setSubmittingRequest(true);
@@ -504,13 +504,13 @@ export default function DispensaryCartPage() {
         }
         setCheckoutIssues(issues);
         if (issues.length > 0) {
-          setInventoryAdjustmentNotice('Review each inventory conflict and adjust the draft before submitting again.');
+          setInventoryAdjustmentNotice('Review the stock changes and update your quantities before sending again.');
         }
         throw new Error(data.error || 'Request submission failed');
       }
 
       if (!Array.isArray(data.orders) || !data.orders.length || data.orders.some((order: { orderedProductIds?: unknown }) => !Array.isArray(order.orderedProductIds))) {
-        throw new Error('Confirmation was interrupted. Check the request again to recover it safely.');
+        throw new Error('We could not confirm whether your request was received. Choose Check request before trying again.');
       }
       const remaining = removeOrderedItems(readCart(), data.orders);
       // Save the remaining draft before forgetting the receipt; a crash between
@@ -523,7 +523,7 @@ export default function DispensaryCartPage() {
       setCart(remaining);
       writeCart(remaining);
       if (remaining.items.length) {
-        setRequestError('Some requests were submitted. Items that were not ordered remain in your draft; review the issues before retrying.');
+        setRequestError('Some requests were submitted. Items that were not ordered remain in your cart; review the issues before retrying.');
         setShowRequestReview(false);
         return;
       }
@@ -537,7 +537,7 @@ export default function DispensaryCartPage() {
       setSuccessRedirectPaused(false);
       setRequestSuccess(true);
     } catch (err) {
-      const message = err instanceof Error && err.name !== 'TypeError' ? err.message : 'Confirmation was interrupted. Check the request again to recover it safely.';
+      const message = err instanceof Error && err.name !== 'TypeError' ? err.message : 'We could not confirm whether your request was received. Choose Check request before trying again.';
       setRequestError(message);
     } finally {
       submittingRef.current = false;
@@ -548,7 +548,7 @@ export default function DispensaryCartPage() {
   if (!mounted) {
     return (
       <div className="max-w-5xl mx-auto">
-        <PageHeader title="Order Request Draft" description="Loading your request draft..." className="mb-4" />
+        <PageHeader title="Cart" description="Loading your cart..." className="mb-4" />
       </div>
     );
   }
@@ -563,7 +563,7 @@ export default function DispensaryCartPage() {
           onTouchStart={() => setSuccessRedirectPaused(true)}
         >
           <CheckCircle2 className="mx-auto mb-3 h-10 w-10 text-pf-accent" />
-          <h1 className="text-xl font-semibold text-pf-text">Request submitted</h1>
+          <h1 className="text-xl font-semibold text-pf-text">Order request sent</h1>
           <p className="mt-2 text-sm text-pf-muted">
             The grower will review your request. Arrange payment directly with them.
           </p>
@@ -572,10 +572,10 @@ export default function DispensaryCartPage() {
               href="/dispensary/orders"
               className="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
             >
-              View requests
+              View orders
             </Link>
             <span className="inline-flex h-10 items-center justify-center text-sm text-pf-muted">
-              {successRedirectPaused ? 'Redirect paused' : 'Redirecting in 5 seconds'}
+              {successRedirectPaused ? 'Staying on this page' : 'Opening your orders in 5 seconds'}
             </span>
           </div>
         </div>
@@ -589,14 +589,14 @@ export default function DispensaryCartPage() {
         <Card>
           <CardHeader><CardTitle>{submittingRequest ? 'Sending request…' : 'Confirm your request'}</CardTitle></CardHeader>
           <CardContent className="space-y-4">
-            <p className="text-sm text-pf-muted">{submittingRequest ? 'Keep this page open while we confirm your request.' : 'Check this saved request to retrieve its confirmation. It will not be submitted twice.'}</p>
+            <p className="text-sm text-pf-muted">{submittingRequest ? 'Keep this page open while we confirm your request.' : 'Choose Check request to find out whether it was received. This will not create a duplicate request.'}</p>
             {pendingSubmission && <ul className="divide-y divide-pf-line text-sm text-pf-text">{pendingSubmission.cart.items.map(item => (
               <li key={item.id} className="flex justify-between gap-3 py-2"><span className="min-w-0 break-words">{item.name}</span><span className="shrink-0">{item.quantity} {formatProductUnit(item.unit)}</span></li>
             ))}</ul>}
             {(requestError || submissionStorageError) && <p role="alert" className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-sm text-amber-200">{submissionStorageError || requestError}</p>}
             <div className="flex flex-wrap gap-3">
               {pendingSubmission && !submissionStorageError && <button type="button" disabled={submittingRequest} onClick={handleSubmitRequest} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] disabled:opacity-60">{submittingRequest ? <><Loader2 className="h-4 w-4 animate-spin" />Confirming…</> : 'Check request'}</button>}
-              <Link href="/dispensary/orders" className="inline-flex min-h-11 items-center text-sm text-pf-accent">View requests</Link>
+              <Link href="/dispensary/orders" className="inline-flex min-h-11 items-center text-sm text-pf-accent">View orders</Link>
             </div>
           </CardContent>
         </Card>
@@ -616,7 +616,7 @@ export default function DispensaryCartPage() {
 
   const builderSteps: Array<{ key: BuilderStep; label: string; complete: boolean }> = [
     { key: 'items', label: 'Items', complete: cart.items.length > 0 },
-    { key: 'logistics', label: 'Logistics', complete: Boolean(fulfillmentMethod.trim()) },
+    { key: 'logistics', label: 'Pickup & delivery', complete: Boolean(fulfillmentMethod.trim()) },
     { key: 'terms', label: 'Terms', complete: Boolean(paymentTerms.trim()) },
     { key: 'review', label: 'Review', complete: false },
   ];
@@ -632,15 +632,15 @@ export default function DispensaryCartPage() {
   return (
     <div className="max-w-5xl mx-auto">
       <PageHeader
-        title="Request draft"
-        description={isEmpty ? "Build a request for your grower." : undefined}
+        title="Cart"
+        description="Growers confirm availability and terms. No payment is collected here."
         className="mb-4"
       />
 
       {!isEmpty && (
         <div className="mb-4 space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-1">
-          <nav aria-label="Draft sections" className="flex gap-2 text-sm">
+          <nav aria-label="Cart sections" className="flex gap-2 text-sm">
             {builderSteps.filter(step => step.key !== 'review').map(step => <button key={step.key} type="button" onClick={() => { setBuilderStep(step.key); document.getElementById(`draft-${step.key}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }} aria-pressed={builderStep === step.key} className={`min-h-10 rounded-lg px-3 ${builderStep === step.key ? 'bg-pf-accent-bg font-semibold text-pf-accent' : 'text-pf-muted hover:bg-pf-surface'}`}>{step.label}</button>)}
           </nav>
           <details className="relative">
@@ -654,7 +654,7 @@ export default function DispensaryCartPage() {
 
           <DraftAutosaveStatus
             savedAt={requestDraft.savedAt}
-            label="Request browser draft"
+            label="Cart details"
             onClear={requestDraft.clearDraft}
           />
         </div>
@@ -672,7 +672,7 @@ export default function DispensaryCartPage() {
           )}
           {checkoutIssues.length > 0 && (
             <div className="p-4 bg-pf-warning-bg border border-pf-warning-line rounded-lg">
-              <p className="text-sm font-semibold text-pf-warning mb-2">Inventory conflicts</p>
+              <p className="text-sm font-semibold text-pf-warning mb-2">Stock changes to review</p>
               <ul className="space-y-2 text-sm text-pf-warning">
                 {checkoutIssues.map((issue) => {
                   const currentItem = cart.items.find((item) => item.id === issue.productId);
@@ -708,7 +708,7 @@ export default function DispensaryCartPage() {
 
       {isEmpty ? (
         <Card className="px-4 py-6 text-center">
-          <h2 className="text-xl font-semibold text-pf-text">Your draft is empty</h2>
+          <h2 className="text-xl font-semibold text-pf-text">Your cart is empty</h2>
           <p className="mx-auto mt-2 max-w-md text-sm text-pf-muted">
             Add products to get started.
           </p>
@@ -795,7 +795,7 @@ export default function DispensaryCartPage() {
                         >+</button>
                       </div>
                       <p className="font-bold">${getLineTotal(item).toFixed(2)}</p>
-                      <button aria-label={`Remove ${item.name} from draft`}
+                      <button aria-label={`Remove ${item.name} from cart`}
                       onClick={() => removeItem(item.id)} className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-danger hover:bg-pf-danger-bg">
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -807,12 +807,12 @@ export default function DispensaryCartPage() {
 
             <section id="draft-logistics" className="scroll-mt-24"><Card className={builderStep === 'logistics' ? 'ring-2 ring-emerald-400' : ''}>
               <CardHeader className="pb-2">
-                <CardTitle>Logistics</CardTitle>
+                <CardTitle>Pickup &amp; delivery</CardTitle>
               </CardHeader>
               <CardContent className="grid gap-4 pt-0 sm:grid-cols-2">
                 <div>
                   <label htmlFor="fulfillment-method-page" className="block text-sm font-medium text-pf-secondary">
-                    Fulfillment
+                    Pickup or delivery
                   </label>
                   <select
                     id="fulfillment-method-page"
@@ -832,7 +832,7 @@ export default function DispensaryCartPage() {
 
                 <div>
                   <label htmlFor="requested-window-page" className="block text-sm font-medium text-pf-secondary">
-                    Requested window <span className="text-xs font-normal text-pf-muted">(optional)</span>
+                    Preferred date or time <span className="text-xs font-normal text-pf-muted">(optional)</span>
                   </label>
                   <input
                     id="requested-window-page"
@@ -917,11 +917,11 @@ export default function DispensaryCartPage() {
                 disabled={submittingRequest || !requestDetailsReady}
                 className="hidden w-full bg-emerald-500 text-[#032116] py-3 rounded-lg sm:block hover:bg-emerald-400 disabled:opacity-50"
               >
-                Review Request
+                Review request
               </button>
               {!requestDetailsReady && (
                 <p className="text-xs text-pf-danger">
-                  Add at least one item and confirm fulfillment and direct payment terms before review.
+                  Add a product, then review pickup or delivery and payment terms.
                 </p>
               )}
             </CardContent>
@@ -954,7 +954,7 @@ export default function DispensaryCartPage() {
                   {[
                     { label: 'Items', value: `${cart.items.length} item${cart.items.length === 1 ? '' : 's'}`, step: 'items' as BuilderStep },
                     { label: 'Growers', value: `${Object.keys(growerGroups).length}`, step: 'items' as BuilderStep },
-                    { label: 'Fulfillment', value: fulfillmentMethod || 'Not set', step: 'logistics' as BuilderStep },
+                    { label: 'Pickup or delivery', value: fulfillmentMethod || 'Not set', step: 'logistics' as BuilderStep },
                     { label: 'Terms', value: paymentTerms || 'Not set', step: 'terms' as BuilderStep },
                   ].map((item) => (
                     <div key={item.label} className="rounded-lg bg-pf-surface px-2 py-2 ring-1 ring-pf-line sm:px-3">
@@ -1011,14 +1011,14 @@ export default function DispensaryCartPage() {
               </div>
 
               <div className="rounded-lg bg-pf-warning-bg p-3 text-xs text-pf-warning sm:p-4 sm:text-sm">
-                Stock is checked before submission. Any changes return to your draft.
+                We check stock when you send your request. If anything changes, you can review it in your cart.
               </div>
             </div>
 
             <div className="shrink-0 border-t border-pf-line bg-pf-surface px-4 py-3">
               <div className="mb-3 space-y-1 text-sm">
                 <div className="flex justify-between text-base font-bold"><span>Total</span><span>${cart.subtotal.toFixed(2)}</span></div>
-                <p className="text-xs text-pf-muted">Payment arranged with the grower.</p>
+                <p className="text-xs text-pf-muted">Growers confirm availability and terms. No payment is collected here.</p>
               </div>
               <div className="flex items-stretch justify-end gap-2">
                 <button
@@ -1035,7 +1035,7 @@ export default function DispensaryCartPage() {
                   disabled={submittingRequest || inventorySyncing}
                   className="rounded-lg bg-emerald-500 px-4 py-2 font-medium text-[#032116] hover:bg-emerald-400 disabled:opacity-50"
                 >
-                  {submittingRequest ? 'Submitting Request...' : 'Submit request'}
+                  {submittingRequest ? 'Sending order request...' : 'Send order request'}
                 </button>
               </div>
             </div>
@@ -1054,7 +1054,7 @@ export default function DispensaryCartPage() {
           helperText={
             requestDetailsReady
               ? undefined
-              : 'Confirm fulfillment and direct payment terms first.'
+              : 'Review pickup or delivery and payment terms first.'
           }
           secondary={
             <Link

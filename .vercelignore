@@ -1,0 +1,10 @@
+.env*
+!.env.example
+node_modules
+.git
+.next
+.codex/tmp
+docs/reviews
+public/uploads
+test-results
+playwright-report

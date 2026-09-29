@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { MessageCircle, X, Send, BadgeDollarSign, Check, XCircle, Repeat2, Loader2, ArrowLeft } from 'lucide-react';
 import { useFocusTrap } from '@/app/hooks/useFocusTrap';
 import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
@@ -174,6 +175,7 @@ function getConversationPurpose(conversation: ConversationSummary, currentRole: 
 }
 
 export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loadingConversations, setLoadingConversations] = useState(false);
   const [conversations, setConversations] = useState<ConversationSummary[]>([]);
@@ -322,14 +324,14 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     if (!hasConversationsRef.current) setLoadingConversations(true);
     try {
       const response = await fetch('/api/messages/conversations', { signal: controller.signal });
-      if (!response.ok) throw new Error('Failed to load conversations');
+      if (!response.ok) throw new Error('We could not load conversations. Please try again.');
       const data = await response.json();
       if (!controller.signal.aborted) {
         setConversations(Array.isArray(data.conversations) ? data.conversations : []);
         hasConversationsRef.current = true;
       }
     } catch (err) {
-      if (!controller.signal.aborted) setError(err instanceof Error ? err.message : 'Failed to load conversations');
+      if (!controller.signal.aborted) setError(err instanceof Error ? err.message : 'We could not load conversations. Please try again.');
     } finally {
       if (conversationsRequestRef.current === controller) conversationsRequestRef.current = null;
       if (!controller.signal.aborted) setLoadingConversations(false);
@@ -346,7 +348,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
       const cursor = cursorRef.current;
       const query = cursor ? `?${new URLSearchParams({ after: cursor.createdAt, afterId: cursor.id })}` : '';
       const response = await fetch(`/api/messages/conversations/${conversationId}/messages${query}`, { signal: controller.signal });
-      if (!response.ok) throw new Error('Failed to load messages');
+      if (!response.ok) throw new Error('We could not load messages. Please try again.');
       const data = await response.json();
       if (controller.signal.aborted || activeIdRef.current !== conversationId || !visibleRef.current) return;
       const incoming: ConversationMessage[] = Array.isArray(data.messages) ? data.messages : [];
@@ -387,7 +389,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
       }
 
     } catch (err) {
-      if (!controller.signal.aborted && activeIdRef.current === conversationId) setError(err instanceof Error ? err.message : 'Failed to load messages');
+      if (!controller.signal.aborted && activeIdRef.current === conversationId) setError(err instanceof Error ? err.message : 'We could not load messages. Please try again.');
     } finally {
       if (messageRequestRef.current === controller) messageRequestRef.current = null;
       if (!controller.signal.aborted && activeIdRef.current === conversationId) setLoadingMessages(false);
@@ -499,12 +501,12 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
         body: JSON.stringify({ ...payload, productId: activeConversation?.productId || undefined }),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'Failed to send message');
+      if (!response.ok) throw new Error(data.error || 'We could not send message. Please try again.');
       appendSentMessage(activeConversationId, data);
       if (draftFields.length) clearSubmittedDraft(activeConversationId, submittedDraft, draftFields);
       return true;
     } catch (err) {
-      if (activeIdRef.current === activeConversationId) setError(err instanceof Error ? err.message : 'Failed to send message');
+      if (activeIdRef.current === activeConversationId) setError(err instanceof Error ? err.message : 'We could not send message. Please try again.');
       return false;
     } finally { sendingRef.current = false; setSending(false); }
   }, [activeConversationId, activeConversation?.productId, appendSentMessage, clearSubmittedDraft, draftValue]);
@@ -537,14 +539,14 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload),
       });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'Quote action failed');
+      if (!response.ok) throw new Error(data.error || 'We could not update this quote. Please try again.');
       if (activeConversationId && activeIdRef.current === activeConversationId) {
         const status = payload.action === 'ACCEPT' ? 'ACCEPTED' : payload.action === 'REJECT' ? 'REJECTED' : 'COUNTERED';
         setMessages(current => current.map(message => message.id === messageId ? { ...message, offerStatus: status } : message));
         await fetchMessages(activeConversationId, false);
       }
       return true;
-    } catch (err) { setError(err instanceof Error ? err.message : 'Quote action failed'); return false; }
+    } catch (err) { setError(err instanceof Error ? err.message : 'We could not update this quote. Please try again.'); return false; }
     finally { actionRef.current = false; setActionLoadingId(null); }
   }, [activeConversationId, fetchMessages]);
   const handleOfferAction = useCallback((messageId: string, action: 'ACCEPT' | 'REJECT') => offerAction(messageId, { action }), [offerAction]);
@@ -563,7 +565,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     const base = 'px-2 py-0.5 rounded text-xs font-medium';
     if (status === 'PENDING') return <span className={`${base} bg-pf-warning-bg text-pf-warning`}>Pending</span>;
     if (status === 'ACCEPTED') return <span className={`${base} bg-pf-accent-bg text-pf-accent`}>Accepted</span>;
-    if (status === 'REJECTED') return <span className={`${base} bg-pf-danger-bg text-pf-danger`}>Rejected</span>;
+    if (status === 'REJECTED') return <span className={`${base} bg-pf-danger-bg text-pf-danger`}>Declined</span>;
     if (status === 'COUNTERED') return <span className={`${base} bg-pf-info-bg text-pf-info`}>Countered</span>;
     return <span className={`${base} bg-pf-surface text-pf-secondary`}>{status}</span>;
   };
@@ -612,8 +614,10 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
         acceptedQuoteId: message.acceptedQuote.id, quotedQuantity: message.offerQuantity, quotedUnitPrice: message.offerUnitPrice,
         listPrice: existing?.listPrice ?? existing?.price ?? message.offerUnitPrice };
       const items = existing ? cart.items.map(item => item.id === quoted.id ? quoted : item) : [...cart.items, quoted];
-      if (!writeCart({ items, ...calculateTotals(items) })) { setError('Your browser could not save the request draft.'); return; }
+      if (!writeCart({ items, ...calculateTotals(items) })) { setError('Your browser could not save the cart.'); return; }
       setError('');
+      closeDrawer();
+      router.push('/dispensary/cart');
     };
 
     if (isOffer) {
@@ -636,7 +640,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
           </div>
 
           {message.offerStatus === 'ACCEPTED' && (
-            <div className="space-y-2"><p className={`text-xs ${isMine ? 'text-pf-text' : 'text-pf-accent'}`}>Quote terms accepted. Create or review an order request to coordinate fulfillment; payment is handled directly.</p>{currentRole === 'DISPENSARY' && message.acceptedQuote && !message.acceptedQuote.consumedByOrderId ? <button type="button" onClick={addAcceptedQuoteToDraft} className="inline-flex h-8 items-center rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-[#032116] hover:bg-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400">Add to request draft</button> : null}</div>
+            <div className="space-y-2"><p className={`text-xs ${isMine ? 'text-pf-text' : 'text-pf-accent'}`}>{currentRole === 'DISPENSARY' ? 'Quote accepted. Use the agreed price in your order request. Arrange payment directly with the grower.' : 'The buyer accepted this quote and can use it in an order request. Arrange payment directly with the buyer.'}</p>{currentRole === 'DISPENSARY' && message.acceptedQuote && !message.acceptedQuote.consumedByOrderId ? <button type="button" onClick={addAcceptedQuoteToDraft} className="inline-flex h-8 items-center rounded-lg bg-emerald-500 px-3 text-xs font-semibold text-[#032116] hover:bg-emerald-400 focus-visible:ring-2 focus-visible:ring-emerald-400">Add to cart</button> : null}</div>
           )}
 
           {canRespondToOffer && (
@@ -662,7 +666,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-pf-line-strong bg-pf-surface px-3 text-xs font-semibold text-pf-secondary hover:bg-pf-canvas disabled:cursor-wait disabled:opacity-60"
               >
                 {isOfferActionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Repeat2 className="h-3.5 w-3.5" />}
-                Counter
+                Suggest a price
               </button>
               <button
                 type="button"
@@ -671,7 +675,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                 className="inline-flex h-8 items-center gap-1.5 rounded-lg px-2 text-xs font-semibold text-pf-danger hover:bg-pf-danger-bg hover:text-pf-danger disabled:cursor-wait disabled:opacity-60"
               >
                 {isOfferActionLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <XCircle className="h-3.5 w-3.5" />}
-                Reject
+                Decline
               </button>
             </div>
           )}
@@ -679,6 +683,8 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
           {counterTargetId === message.id && (
             <div className="mt-2 space-y-2 rounded-lg border border-pf-line bg-pf-surface p-2">
               <div className="grid grid-cols-2 gap-2">
+                <label className="space-y-1 text-xs text-pf-secondary">
+                  <span>Unit price ($)</span>
                 <input
                   type="number"
                   min="0"
@@ -689,6 +695,9 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                   disabled={isOfferActionLoading}
                   className="w-full rounded border border-pf-line-strong px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-pf-canvas"
                 />
+                </label>
+                <label className="space-y-1 text-xs text-pf-secondary">
+                  <span>Quantity (optional)</span>
                 <input
                   type="number"
                   min="1"
@@ -698,15 +707,19 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                   disabled={isOfferActionLoading}
                   className="w-full rounded border border-pf-line-strong px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-pf-canvas"
                 />
+                </label>
               </div>
+              <label className="block space-y-1 text-xs text-pf-secondary">
+                <span>Notes for your offer (optional)</span>
               <input
                 type="text"
                 value={counterNote}
                 onChange={(e) => setCounterNote(e.target.value)}
-                placeholder="Counter terms note (optional)"
+                placeholder="Notes for your offer (optional)"
                 disabled={isOfferActionLoading}
                 className="w-full rounded border border-pf-line-strong px-2 py-1 text-xs disabled:cursor-not-allowed disabled:bg-pf-canvas"
               />
+              </label>
               <div className="flex justify-end gap-2">
                 <button
                   type="button"
@@ -724,7 +737,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                   data-testid="send-counter"
                 >
                   {isOfferActionLoading && <Loader2 className="h-3 w-3 animate-spin" />}
-                  Send counter
+                  Send counteroffer
                 </button>
               </div>
             </div>
@@ -739,7 +752,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
           <div className="flex items-center gap-2">
             <BadgeDollarSign className={`h-4 w-4 ${isMine ? 'text-pf-purple' : 'text-pf-purple'}`} />
             <p className={`text-sm font-semibold ${isMine ? 'text-white' : 'text-pf-purple'}`}>
-              Pricing Request
+              Price request
             </p>
           </div>
           <p className={`mt-1 text-sm ${isMine ? 'text-pf-purple' : 'text-pf-purple'}`}>
@@ -804,9 +817,9 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                 ) : conversations.length === 0 ? (
                   <div className="p-4 text-sm text-pf-muted">
                     <p className="font-medium text-pf-text">No conversations yet</p>
-                    <p className="mt-1">Conversations start from a product&apos;s Message Grower button.</p>
+                    <p className="mt-1">Choose Message grower on a product to start a conversation.</p>
                     <p className="mt-2 text-xs text-pf-muted">
-                      Once a buyer or grower opens a thread, quote terms and order context stay here.
+                      Keep messages, quotes, and order details together here.
                     </p>
                   </div>
                 ) : (
@@ -827,13 +840,13 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                           {conversation.product?.name && (
                             <p className="text-xs text-pf-muted break-words">{conversation.product.name}</p>
                           )}
-                          <span className="mt-1 inline-flex rounded-full bg-pf-surface px-2 py-0.5 text-[11px] font-medium text-pf-muted">
+                          <span className="mt-1 inline-flex rounded-full bg-pf-surface px-2 py-0.5 text-xs font-medium text-pf-muted">
                             {getConversationPurpose(conversation, currentRole)}
                           </span>
                           <p className="text-xs text-pf-muted truncate mt-1">{conversation.lastMessagePreview}</p>
                         </div>
                         {conversation.unreadCount > 0 && (
-                          <span data-testid="conversation-unread-badge" className="min-w-[18px] h-[18px] px-1 rounded-full bg-pf-accent-bg text-pf-accent text-[11px] flex items-center justify-center">
+                          <span data-testid="conversation-unread-badge" className="min-w-[18px] h-[18px] px-1 rounded-full bg-pf-accent-bg text-pf-accent text-xs flex items-center justify-center">
                             {conversation.unreadCount}
                           </span>
                         )}
@@ -878,7 +891,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                     {contextChips.map((chip) => (
                       <span
                         key={`${chip.label}-${chip.value}`}
-                        className="inline-flex max-w-full items-center overflow-hidden rounded-full border border-pf-line bg-pf-surface text-[11px] shadow-sm"
+                        className="inline-flex max-w-full items-center overflow-hidden rounded-full border border-pf-line bg-pf-surface text-xs shadow-sm"
                       >
                         <span className="shrink-0 border-r border-pf-line bg-pf-canvas px-2 py-1 font-semibold uppercase tracking-wide text-pf-muted">
                           {chip.label}
@@ -909,7 +922,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                       return (
                         <div key={item.id} className="flex items-center gap-3 py-1">
                           <div className="h-px flex-1 bg-pf-raised" />
-                          <span className="rounded-full bg-pf-surface px-3 py-1 text-[11px] font-semibold uppercase tracking-wide text-pf-muted shadow-sm ring-1 ring-pf-line">
+                          <span className="rounded-full bg-pf-surface px-3 py-1 text-xs font-semibold uppercase tracking-wide text-pf-muted shadow-sm ring-1 ring-pf-line">
                             {item.label}
                           </span>
                           <div className="h-px flex-1 bg-pf-raised" />
@@ -920,7 +933,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                     return (
                       <div key={item.id} className={`flex min-w-0 ${item.isMine ? 'justify-end' : 'justify-start'}`}>
                         <div className={`flex min-w-0 max-w-[85%] flex-col gap-1.5 ${item.isMine ? 'items-end' : 'items-start'}`}>
-                          <p className={`px-1 text-[11px] ${item.isMine ? 'text-pf-accent' : 'text-pf-muted'}`}>
+                          <p className={`px-1 text-xs ${item.isMine ? 'text-pf-accent' : 'text-pf-muted'}`}>
                             {item.senderLabel} • {formatMessageTime(item.createdAt)}
                             {item.lastCreatedAt !== item.createdAt ? ` - ${formatMessageTime(item.lastCreatedAt)}` : ''}
                           </p>
@@ -991,7 +1004,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                       if (template) setMessageInput(current => current.trim() ? `${current}\n${template.body}` : template.body);
                     }} className="min-h-10 max-w-[55%] rounded-lg border border-pf-line-strong bg-pf-surface px-2 text-base sm:text-sm">
                       <option value="" disabled>Templates</option>
-                      {messageTemplates.map((template, index) => <option key={template.label} value={index}>{template.label.replace('Quote follow-up', 'Follow up').replace('Delivery timing', 'Delivery').replace('Commercial terms', 'Terms')}</option>)}
+                      {messageTemplates.map((template, index) => <option key={template.label} value={index}>{template.label.replace('Quote follow-up', 'Follow up').replace('Delivery timing', 'Delivery').replace('Order terms', 'Terms')}</option>)}
                     </select>
                     <details className="rounded-lg border border-pf-line-strong text-sm">
                       <summary className="min-h-10 cursor-pointer px-3 py-2 font-medium">Quote</summary>

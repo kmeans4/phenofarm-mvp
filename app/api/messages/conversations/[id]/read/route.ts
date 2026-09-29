@@ -5,14 +5,14 @@ import { getAuthSession } from '@/lib/auth-helpers';
 export async function POST(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     const user = session.user;
     const { id } = await context.params;
     const conversation = await db.conversation.findUnique({ where: { id }, select: { growerId: true, dispensaryId: true } });
     if (!conversation) return NextResponse.json({ error: 'Conversation not found' }, { status: 404 });
     const isGrower = user.role === 'GROWER' && Boolean(user.growerId) && conversation.growerId === user.growerId;
     const isDispensary = user.role === 'DISPENSARY' && Boolean(user.dispensaryId) && conversation.dispensaryId === user.dispensaryId;
-    if (!isGrower && !isDispensary) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (!isGrower && !isDispensary) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     const body = await request.json().catch(() => null);
     const throughMessageId = body?.throughMessageId;
     if (typeof throughMessageId !== 'string' || !throughMessageId || throughMessageId.length > 100) {

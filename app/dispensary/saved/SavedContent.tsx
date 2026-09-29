@@ -81,7 +81,7 @@ export default function SavedContent({ initialTab, counts, recentProducts }: Sav
       />
 
       <div className="rounded-xl border border-pf-line bg-pf-surface p-2 shadow-sm">
-        <div role="tablist" aria-label="Saved workspace" className="grid grid-cols-3 gap-1">
+        <div role="tablist" aria-label="Saved products" className="grid grid-cols-3 gap-1">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -148,7 +148,7 @@ export default function SavedContent({ initialTab, counts, recentProducts }: Sav
                       href={`/dispensary/catalog?search=${encodeURIComponent(product.name)}&product=${encodeURIComponent(product.productId)}`}
                       className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                     >
-                      Find again
+                      Find product
                     </Link>
                     <Link
                       href={`/dispensary/grower/${product.growerId}`}

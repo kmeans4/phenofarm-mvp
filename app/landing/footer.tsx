@@ -4,14 +4,14 @@ import Link from 'next/link';
 
 const footerLinks = {
   Growers: [
-    { label: 'Sell your products', href: '/auth/sign_up' },
-    { label: 'Grower dashboard', href: '/auth/sign_up' },
-    { label: 'Pricing', href: '#pricing' },
+    { label: 'Create an account', href: '/auth/sign_up' },
+    { label: 'See grower features', href: '#workflow' },
+    { label: 'Getting started', href: '#getting-started' },
   ],
   Dispensaries: [
-    { label: 'Browse products', href: '/auth/sign_in' },
-    { label: 'Dispensary dashboard', href: '/dispensary/dashboard' },
-    { label: 'Pricing', href: '#pricing' },
+    { label: 'Create an account', href: '/auth/sign_up' },
+    { label: 'Sign in', href: '/auth/sign_in' },
+    { label: 'Getting started', href: '#getting-started' },
   ],
   Company: [
     { label: 'Contact', href: 'mailto:support@phenoshop.app' },
@@ -30,8 +30,8 @@ export function Footer() {
               <BrandLogo className="w-40" />
             </div>
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-gray-500">
-              The B2B workspace connecting licensed cannabis growers and dispensaries for
-              requests, fulfillment, and direct settlement.
+              A place for licensed cannabis growers and dispensaries to share product details,
+              request prices, and track wholesale orders.
             </p>
             <a
               href="mailto:support@phenoshop.app"
@@ -60,8 +60,7 @@ export function Footer() {
 
         <div className="mt-10 flex flex-col items-start justify-between gap-4 border-t border-white/[0.06] pt-8 sm:flex-row sm:items-center md:mt-14">
           <p className="text-xs text-gray-600">
-            © {new Date().getFullYear()} PhenoShop. For licensed operators only. Wholesale settlement stays
-            direct between businesses.
+            © {new Date().getFullYear()} PhenoShop. For licensed businesses only.
           </p>
           <div className="flex gap-6">
             <Link href="/legal/privacy" className="inline-flex min-h-10 items-center text-xs text-gray-600 transition-colors hover:text-gray-300">

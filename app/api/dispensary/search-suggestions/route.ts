@@ -7,8 +7,8 @@ import { marketplaceGrowerWhere } from '@/lib/license';
 
 export async function GET(request: NextRequest) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
   const query = request.nextUrl.searchParams.get('q')?.trim().slice(0, 160) || '';
   const limit = parsePage(request.nextUrl.searchParams.get('limit'), 8, 10);
   if (query.length < 2) return NextResponse.json({ suggestions: [], query });

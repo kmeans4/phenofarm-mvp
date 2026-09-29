@@ -19,23 +19,23 @@ const flows = {
     label: 'For growers',
     steps: [
       {
-        title: 'Publish your catalog',
-        description: 'Strains, batches, COAs, stock. Show prices openly or quote on request.',
+        title: 'Add your products',
+        description: 'List products with batch details, stock, and lab files. Choose whether to show a price.',
         icon: Package,
       },
       {
-        title: 'Field requests & quotes',
-        description: 'Verified dispensaries submit requests; negotiate terms in a recorded thread.',
+        title: 'Answer price requests',
+        description: 'Reply to buyers, discuss a price, and keep the conversation in one place.',
         icon: MessagesSquare,
       },
       {
-        title: 'Fulfill with shared status',
-        description: 'Accept, prepare, deliver — the buyer watches the same timeline you update.',
+        title: 'Manage order requests',
+        description: 'Review requests and update their status as you prepare and deliver each order.',
         icon: Truck,
       },
       {
-        title: 'Invoice on your terms',
-        description: 'Settle directly with the buyer. PhenoShop keeps the record, never the money.',
+        title: 'Review delivered orders',
+        description: 'See delivered request totals, top products, and your customers.',
         icon: Handshake,
       },
     ],
@@ -44,23 +44,23 @@ const flows = {
     label: 'For dispensaries',
     steps: [
       {
-        title: 'Browse verified growers',
-        description: 'One catalog across licensed cultivators — filter by strain, type, potency, stock.',
+        title: 'Find products',
+        description: 'Search listings from approved growers and filter by product details.',
         icon: Search,
       },
       {
-        title: 'Build a request draft',
-        description: 'Assemble quantities across growers, set logistics and terms, submit once.',
+        title: 'Ask for a price',
+        description: 'Request pricing for a product and review the grower’s offer before ordering.',
         icon: Store,
       },
       {
-        title: 'Track every request',
-        description: 'Saved products, price alerts, and a live status board for everything in flight.',
+        title: 'Send an order request',
+        description: 'Add products to your cart, review quantities and delivery details, then send the request.',
         icon: ClipboardList,
       },
       {
-        title: 'Reorder in two clicks',
-        description: 'Delivered requests become templates — rebuild a proven order from history.',
+        title: 'Follow and reorder',
+        description: 'Check request status and add priced, in-stock items from a delivered order back to your cart.',
         icon: FileCheck2,
       },
     ],
@@ -77,9 +77,9 @@ export function Personas() {
     <section className="relative border-t border-white/[0.06] py-28 md:py-36">
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
-          eyebrow="Two sides, one workflow"
-          title="Built for both ends of the deal"
-          lede="Growers and dispensaries work from the same shared record — no forwarded PDFs, no version drift."
+          eyebrow="For your business"
+          title="What growers and dispensaries can do"
+          lede="Each business can see the same order details and status."
         />
 
         <div className="mt-9 flex justify-center">

@@ -167,7 +167,7 @@ export function NotificationBell({ compact = false }: { compact?: boolean }) {
         <Bell className="h-4 w-4" />
         {!compact ? <span>Notifications</span> : null}
         {unreadCount > 0 ? (
-          <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-pf-warning-bg px-1 text-[11px] font-bold text-pf-warning">
+          <span className="ml-auto inline-flex min-w-5 items-center justify-center rounded-full bg-pf-warning-bg px-1 text-xs font-bold text-pf-warning">
             {unreadCount > 99 ? '99+' : unreadCount}
           </span>
         ) : null}

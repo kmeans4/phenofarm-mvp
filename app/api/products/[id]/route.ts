@@ -59,10 +59,10 @@ export async function GET(
 ) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
 
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
 
     const productId = (await context.params).id;
     const product = await db.product.findFirst({
@@ -77,7 +77,7 @@ export async function GET(
     return NextResponse.json(serializeProduct(product), { status: 200 });
   } catch (error) {
     console.error('Error fetching product:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -87,10 +87,10 @@ export async function PUT(
 ) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
 
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
 
     const productId = (await context.params).id;
     const existingProduct = await db.product.findFirst({ where: { id: productId, growerId: user.growerId } });
@@ -177,7 +177,7 @@ export async function PUT(
     return NextResponse.json(serializeProduct(updatedProduct), { status: 200 });
   } catch (error) {
     console.error('Error updating product:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -187,10 +187,10 @@ export async function DELETE(
 ) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
 
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
 
     const productId = (await context.params).id;
     const existingProduct = await db.product.findFirst({ where: { id: productId, growerId: user.growerId } });
@@ -204,6 +204,6 @@ export async function DELETE(
     return NextResponse.json({ message: 'Product deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error deleting product:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

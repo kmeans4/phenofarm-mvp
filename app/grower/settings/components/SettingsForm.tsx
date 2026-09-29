@@ -57,7 +57,7 @@ const validatePhone = (phone: string): string | undefined => {
 const validateWebsite = (website: string): string | undefined => {
   if (!website) return undefined;
   const urlRegex = /^https?:\/\/.+/;
-  if (!urlRegex.test(website)) return 'URL must start with http:// or https://';
+  if (!urlRegex.test(website)) return 'Start the website address with http:// or https://.';
   try {
     new URL(website);
     return undefined;
@@ -81,10 +81,10 @@ const validateLicenseNumber = (license: string): string | undefined => {
 };
 
 const validateLicenseExpiry = (expiry: string): string | undefined => {
-  if (!expiry) return 'License expiry date is required';
+  if (!expiry) return 'License expiration date is required';
   const expiryDate = new Date(expiry);
-  if (isNaN(expiryDate.getTime())) return 'Invalid date format';
-  if (isLicenseExpired(expiryDate)) return 'License expiry must be today or later';
+  if (isNaN(expiryDate.getTime())) return 'Enter a valid date.';
+  if (isLicenseExpired(expiryDate)) return 'License expiration must be today or later';
   return undefined;
 };
 
@@ -224,7 +224,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
       } catch (err) {
         if (controller.signal.aborted) return;
         console.error('Failed to load settings:', err);
-        showToast('error', 'Failed to load settings');
+        showToast('error', 'We could not load settings. Please try again.');
       } finally {
         if (isMounted && !controller.signal.aborted) {
           setLoading(false);
@@ -295,7 +295,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
     if (pendingRef.current) return;
     if (!validateForm()) {
       setTouched({ businessName: true, email: true, phone: true, website: true, licenseNumber: true, licenseExpiry: true });
-      setError('Please fix the errors above before saving.');
+      setError('Check the highlighted fields before saving.');
       return;
     }
     pendingRef.current = true;
@@ -338,7 +338,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
     <div className="space-y-4 sm:space-y-6">
       {isDirty && <DraftAutosaveStatus
         savedAt={settingsDraft.savedAt}
-        label="Settings browser draft"
+        label="Settings details"
         onClear={settingsDraft.clearDraft}
       />}
 
@@ -356,7 +356,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
-          <span>Settings saved successfully!</span>
+          <span>Settings saved.</span>
         </div>
       )}
 
@@ -364,6 +364,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
         <div id="business-profile" className="scroll-mt-36 lg:scroll-mt-20 bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
           <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-pf-line bg-pf-canvas">
             <h2 className="text-base sm:text-lg font-semibold text-pf-text">Business profile</h2>
+            <p role="status" className="mt-1 text-sm text-pf-muted">{isDirty ? 'Unsaved profile changes — choose Save profile.' : 'Profile saved.'} Logo changes save immediately. Use Save terms to save your order terms.</p>
           </div>
           <div className="grid gap-3 p-4 sm:gap-4 sm:p-6 md:grid-cols-2">
             <p className="text-xs text-pf-muted md:col-span-2">* Required</p>
@@ -438,7 +439,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
 
             <div>
               <label htmlFor="profile-licenseExpiry" className="block text-sm font-medium text-pf-secondary mb-1">
-                License expiry <span className="text-pf-danger">*</span>
+                License expiration <span className="text-pf-danger">*</span>
               </label>
               <input 
                 type="date" 
@@ -480,7 +481,7 @@ export function SettingsForm({ initialSettings }: { initialSettings?: SettingsDa
                 placeholder="business@example.com"
               />
               <p id="account-email-help" className="mt-1 text-sm text-pf-muted">
-                Login address. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-pf-accent underline">Change email</Link>
+                Used to sign in. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-pf-accent underline">Change email</Link>
               </p>
               {touched.email && fieldErrors.email && (
                 <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">

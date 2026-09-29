@@ -21,8 +21,8 @@ const severityClasses = {
 };
 
 export function GuidedFixPanel({
-  title = 'Fix blocked workflows',
-  description = 'Resolve the highest-friction setup gaps first.',
+  title = 'Next steps',
+  description = 'Finish these steps to get started.',
   fixes,
 }: GuidedFixPanelProps) {
   if (fixes.length === 0) return null;
@@ -31,7 +31,7 @@ export function GuidedFixPanel({
     <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg/70 p-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-pf-warning">Guided fixes</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-pf-warning">Setup help</p>
           <h2 className="mt-1 text-lg font-semibold text-pf-warning">{title}</h2>
           <p className="mt-1 text-sm text-pf-warning">{description}</p>
         </div>

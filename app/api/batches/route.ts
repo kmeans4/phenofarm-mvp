@@ -96,11 +96,11 @@ async function normalizeLabDocuments(value: unknown, growerId: string) {
 export async function GET(request: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
 
     const user = session.user;
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const growerId = user.growerId;
@@ -138,7 +138,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(batches, { status: 200 });
   } catch (error) {
     console.error('Error fetching batches:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -146,11 +146,11 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
 
     const user = session.user;
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const growerId = user.growerId;
@@ -236,6 +236,6 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     console.error('Error creating batch:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

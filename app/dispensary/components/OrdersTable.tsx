@@ -192,8 +192,8 @@ export function OrdersTable({
       {showWorkflowViews && (
         <div className="mb-4 rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
           <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-semibold text-pf-text">Saved workflow views</p>
-            <p className="text-xs text-pf-muted">Jump to the requests most likely to need your next action.</p>
+            <p className="text-sm font-semibold text-pf-text">Filter orders</p>
+            <p className="text-xs text-pf-muted">Choose a status to find the orders you need.</p>
           </div>
           <div className="flex flex-wrap gap-2">
             {orderViews.map((view) => (
@@ -232,7 +232,7 @@ export function OrdersTable({
             </svg>
             <input
               type="text"
-              placeholder="Search requests..."
+              placeholder="Search orders..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-10 pr-4 py-2 rounded-lg border border-pf-line-strong focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
@@ -349,7 +349,7 @@ export function OrdersTable({
                         <span className="h-2 w-2 rounded-full bg-emerald-500" title="Unread grower message" aria-label="Unread grower message" />
                       ) : null}
                     </div>
-                    {order.createdBy === 'GROWER' ? <span className="mt-1 inline-flex rounded-full bg-pf-info-bg px-2 py-0.5 text-[11px] font-semibold text-pf-info">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</span> : null}
+                    {order.createdBy === 'GROWER' ? <span className="mt-1 inline-flex rounded-full bg-pf-info-bg px-2 py-0.5 text-xs font-semibold text-pf-info">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</span> : null}
                   </td>
                   <td className={`${cellClass} text-pf-muted`}>
                     {order.grower?.businessName || 'Unknown'}

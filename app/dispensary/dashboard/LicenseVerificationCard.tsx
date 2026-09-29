@@ -28,7 +28,7 @@ export function LicenseVerificationCard() {
   }
 
   if (submitted) {
-    return <section className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-4"><p className="flex items-center gap-2 font-semibold text-pf-accent"><BadgeCheck className="h-5 w-5" /> Submitted for review</p><p className="mt-1 text-sm text-pf-accent">PhenoShop verifies license details within 1 business day.</p></section>;
+    return <section className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-4"><p className="flex items-center gap-2 font-semibold text-pf-accent"><BadgeCheck className="h-5 w-5" /> Submitted for review</p><p className="mt-1 text-sm text-pf-accent">We will review your license details. You can browse products while you wait.</p></section>;
   }
 
   return (
@@ -37,8 +37,8 @@ export function LicenseVerificationCard() {
       <p className="mt-1 text-sm text-pf-warning">Requests unlock after we verify your Vermont license.</p>
       <form onSubmit={submit} className="mt-4 grid gap-3 sm:grid-cols-[1fr_12rem_auto] sm:items-end">
         <label className="text-sm font-medium text-pf-secondary">License number<input value={licenseNumber} onChange={(e) => setLicenseNumber(e.target.value)} required className="mt-1 h-10 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400" /></label>
-        <label className="text-sm font-medium text-pf-secondary">Expiry<input type="date" min={startOfLicenseDay().toISOString().slice(0, 10)} value={licenseExpiry} onChange={(e) => setLicenseExpiry(e.target.value)} required className="mt-1 h-10 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400" /></label>
-        <button disabled={submitting} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:opacity-60">{submitting && <Loader2 className="h-4 w-4 animate-spin" />}Submit</button>
+        <label className="text-sm font-medium text-pf-secondary">Expiration date<input type="date" min={startOfLicenseDay().toISOString().slice(0, 10)} value={licenseExpiry} onChange={(e) => setLicenseExpiry(e.target.value)} required className="mt-1 h-10 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400" /></label>
+        <button disabled={submitting} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 disabled:opacity-60">{submitting && <Loader2 className="h-4 w-4 animate-spin" />}Send for review</button>
       </form>
       {error ? <p role="alert" className="mt-3 text-sm font-medium text-pf-danger">{error}</p> : null}
       <Link href="/dispensary/settings#license" className="mt-3 inline-flex text-sm font-semibold text-pf-warning underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400">License settings</Link>

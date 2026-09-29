@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export async function GET(request: Request) {
   const headers = { 'Cache-Control': 'no-store' };
-  if (!monitorAuthorized(request)) return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers });
+  if (!monitorAuthorized(request)) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401, headers });
   try {
     await db.$queryRaw`SELECT 1`;
     const signal = await db.operationalSignal.findUnique({ where: { id: 'server-error' } });

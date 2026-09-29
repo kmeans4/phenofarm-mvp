@@ -264,7 +264,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
     setTouched(allTouched);
     
     if (!validateForm()) {
-      showToast('error', 'Please fix the errors below before saving');
+      showToast('error', 'Check the highlighted fields before saving.');
       return false;
     }
     
@@ -306,7 +306,7 @@ export default function EditOrderForm({ order }: { order: Order }) {
         router.push(`/grower/orders/${order.id}`);
       } else {
         const data = await response.json().catch(() => ({}));
-        showToast('error', data.error || 'Failed to update request');
+        showToast('error', data.error || 'We could not update request. Please try again.');
       }
     } catch {
       showToast('error', 'An error occurred while updating');

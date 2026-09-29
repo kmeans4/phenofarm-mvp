@@ -283,7 +283,7 @@ export default async function GrowerReportsPage({
               <p className="mt-1 max-w-sm text-pf-muted">
                 {totalOrders > 0
                   ? `The trend uses delivered requests in ${rangeSentence}; submitted, ready, and cancelled requests are excluded.`
-                  : 'Delivered requests will appear here after buyers submit requests and fulfillment is complete.'}
+                  : 'Completed deliveries will appear here.'}
               </p>
               <Link href={totalOrders > 0 ? '/grower/orders' : '/grower/products/add'} className="mt-3 text-sm font-medium text-pf-accent hover:text-pf-accent">
                 {totalOrders > 0 ? 'Review requests' : 'Add product'}
@@ -330,7 +330,7 @@ export default async function GrowerReportsPage({
           </div>
           {Object.values(ordersByStatus).some((count) => count === 0) && (
             <details className="mt-3 text-sm">
-              <summary className="min-h-10 cursor-pointer py-2 text-pf-muted">Empty statuses</summary>
+              <summary className="min-h-10 cursor-pointer py-2 text-pf-muted">Statuses with no requests</summary>
               <div className="flex flex-wrap gap-2 py-2">
                 {Object.entries(ordersByStatus).filter(([, count]) => count === 0).map(([status]) => (
                   <Link key={status} href={getStatusHref(status)} className="rounded-lg border border-pf-line px-3 py-2 text-pf-muted hover:bg-pf-hover">{getOrderStatusLabel(status)} · 0</Link>
@@ -372,7 +372,7 @@ export default async function GrowerReportsPage({
                 Product rankings include only line items from delivered requests in {rangeSentence}.
               </p>
               <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-pf-accent hover:text-pf-accent">
-                Open catalog workspace
+                View catalog
               </Link>
             </div>
           )}
@@ -429,7 +429,7 @@ export default async function GrowerReportsPage({
               Requests created in {rangeSentence} will appear here before they count toward delivered request value.
             </p>
             <Link href="/grower/catalog" className="mt-3 inline-flex text-sm font-medium text-pf-accent hover:text-pf-accent">
-              Open catalog workspace
+              View catalog
             </Link>
           </div>
         ) : (
@@ -437,11 +437,11 @@ export default async function GrowerReportsPage({
             <table className="min-w-full divide-y divide-pf-line">
               <thead className="bg-pf-canvas">
                 <tr>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase">Request</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase hidden sm:table-cell">Customer</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase">Status</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase hidden md:table-cell">Date</th>
-                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-medium text-pf-muted uppercase">Est. value</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase">Request</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase hidden sm:table-cell">Customer</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase">Status</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase hidden md:table-cell">Date</th>
+                  <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-medium text-pf-muted uppercase">Est. value</th>
                 </tr>
               </thead>
               <tbody className="bg-pf-surface divide-y divide-pf-line">
@@ -458,7 +458,7 @@ export default async function GrowerReportsPage({
                       {order.dispensary?.businessName || 'Unknown'}
                     </td>
                     <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-0.5 text-[11px] sm:text-xs font-medium rounded-full ${
+                      <span className={`inline-flex px-2 py-0.5 text-xs font-medium rounded-full ${
                         order.status === 'DELIVERED' ? 'bg-pf-accent-bg text-pf-accent' :
                         order.status === 'PENDING' ? 'bg-pf-warning-bg text-pf-warning' :
                         order.status === 'CANCELLED' ? 'bg-pf-danger-bg text-pf-danger' :

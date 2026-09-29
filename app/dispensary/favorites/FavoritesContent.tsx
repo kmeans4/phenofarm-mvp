@@ -131,7 +131,7 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok || !data.conversationId) {
-        throw new Error(data.error || 'Failed to open conversation');
+        throw new Error(data.error || 'We could not open conversation. Please try again.');
       }
 
       window.dispatchEvent(

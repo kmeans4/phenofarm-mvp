@@ -1,13 +1,12 @@
-import { BadgeCheck, FileCheck2, Handshake, MessagesSquare, ShieldCheck, Timer, Wallet } from 'lucide-react';
+import { FileCheck2, Heart, MessagesSquare, Package, Search, Timer } from 'lucide-react';
 
 const ITEMS = [
-  { icon: ShieldCheck, label: 'License-gated ordering' },
-  { icon: Wallet, label: '0% take rate' },
-  { icon: MessagesSquare, label: 'Recorded quote terms' },
-  { icon: Handshake, label: 'Direct settlement' },
-  { icon: FileCheck2, label: 'COA & lab docs on file' },
-  { icon: Timer, label: 'Live fulfillment status' },
-  { icon: BadgeCheck, label: 'Verified growers & buyers' },
+  { icon: Package, label: 'List products and stock' },
+  { icon: Search, label: 'Browse wholesale products' },
+  { icon: MessagesSquare, label: 'Ask for a price' },
+  { icon: Timer, label: 'Track order requests' },
+  { icon: FileCheck2, label: 'Keep lab files with listings' },
+  { icon: Heart, label: 'Save products for later' },
 ];
 
 /** Infinite principle marquee — CSS-driven, pauses on hover, masked edges. */

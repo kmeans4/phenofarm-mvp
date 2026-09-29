@@ -18,18 +18,18 @@ export async function POST(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (!['GROWER', 'DISPENSARY'].includes(user.role) || (user.role === 'GROWER' ? !user.growerId : !user.dispensaryId)) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const formData = await request.formData();
     const kind = formData.get('kind');
-    if (user.role !== 'GROWER' && kind !== 'logo') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    if (user.role !== 'GROWER' && kind !== 'logo') return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     const singleFile = formData.get('file');
     const files = formData.getAll('files').filter((value): value is File => value instanceof File);
     if (singleFile instanceof File) files.push(singleFile);
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
     const fileType = formData.get('fileType') as string || 'image'; // 'image' or 'document'
 
     if (!files || files.length === 0) {
-      return NextResponse.json({ error: 'No files provided' }, { status: 400 });
+      return NextResponse.json({ error: 'Choose a file to upload.' }, { status: 400 });
     }
 
     if (!['image', 'document'].includes(fileType) || (kind === 'logo' && fileType !== 'image')) {
@@ -159,7 +159,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof Error && error.message.includes('storage is not configured')) return NextResponse.json({ error: error.message }, { status: 503 });
     console.error('Error uploading file:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -169,13 +169,13 @@ export async function DELETE(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const { productId, imageIndex } = await request.json() as { productId: string; imageIndex: number };
@@ -205,6 +205,6 @@ export async function DELETE(request: NextRequest) {
     }, { status: 200 });
   } catch (error) {
     console.error('Error deleting image:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

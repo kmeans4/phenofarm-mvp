@@ -31,7 +31,7 @@ export default function MessageBuyerButton({
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to open buyer chat');
+        throw new Error(data.error || 'We could not open buyer chat. Please try again.');
       }
 
       window.dispatchEvent(
@@ -47,9 +47,9 @@ export default function MessageBuyerButton({
           },
         }),
       );
-      toast.success('Draft ready in messages');
+      toast.success('Message ready. Review it in Messages, then send.');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to open buyer chat');
+      toast.error(error instanceof Error ? error.message : 'We could not open buyer chat. Please try again.');
     } finally {
       setIsOpening(false);
     }

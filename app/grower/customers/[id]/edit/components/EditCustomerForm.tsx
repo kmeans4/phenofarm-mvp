@@ -78,7 +78,7 @@ const validatePhone = (phone: string): string | undefined => {
 const validateWebsite = (website: string): string | undefined => {
   if (!website) return undefined;
   const urlRegex = /^https?:\/\/.+/;
-  if (!urlRegex.test(website)) return 'URL must start with http:// or https://';
+  if (!urlRegex.test(website)) return 'Start the website address with http:// or https://.';
   try {
     new URL(website);
     return undefined;
@@ -238,7 +238,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
     setTouched(allTouched);
     
     if (!validateForm()) {
-      showToast('error', 'Validation Error', { description: 'Please fix the errors below before saving' });
+      showToast('error', 'Check these fields', { description: 'Check the highlighted fields before saving.' });
       return;
     }
     
@@ -253,12 +253,12 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
       });
 
       if (response.ok) {
-        showToast('success', 'Customer updated successfully!');
+        showToast('success', 'Customer saved.');
         resetDirtyState();
         router.push('/grower/customers');
       } else {
         const data = await response.json().catch(() => ({}));
-        showToast('error', data.error || 'Failed to update customer');
+        showToast('error', data.error || 'We could not update customer. Please try again.');
       }
     } catch {
       showToast('error', 'An error occurred while updating');
@@ -288,12 +288,12 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
       });
 
       if (response.ok) {
-        showToast('success', 'Customer has been deleted');
+        showToast('success', 'Customer removed.');
         resetDirtyState();
         router.push('/grower/customers');
       } else {
         const data = await response.json().catch(() => ({}));
-        showToast('error', data.error || 'Failed to delete customer');
+        showToast('error', data.error || 'We could not delete customer. Please try again.');
       }
     } catch {
       showToast('error', 'An error occurred while deleting');
@@ -619,7 +619,7 @@ export default function EditCustomerForm({ customer }: { customer: Customer }) {
         loading={isDeleting}
         open={deleteConfirmOpen}
         title="Delete customer?"
-        description="This removes the customer relationship from your grower workspace. This action cannot be undone from this screen."
+        description="This removes the customer from your list. You cannot undo this here."
         confirmLabel="Delete customer"
         intent="danger"
         onCancel={() => setDeleteConfirmOpen(false)}

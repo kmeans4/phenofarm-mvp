@@ -58,7 +58,7 @@ export default async function DispensaryLayout({ children }: { children: React.R
   const navLinks = [
     { name: 'Overview', href: '/dispensary/dashboard', group: 'Home', badge: null },
     { name: 'Catalog', href: '/dispensary/catalog', group: 'Shop', badge: null },
-    { name: 'Request Draft', href: '/dispensary/cart', group: 'Shop', badge: null, badgeComponent: <CartBadge /> },
+    { name: 'Cart', href: '/dispensary/cart', group: 'Shop', badge: null, badgeComponent: <CartBadge /> },
     { name: 'Orders', href: '/dispensary/orders', group: 'Orders', badge: pendingOrdersCount > 0 ? pendingOrdersCount : null },
     { name: 'Saved', href: '/dispensary/saved', group: 'Saved', badge: null },
     { name: 'Settings', href: '/dispensary/settings', group: 'Account', badge: null },
@@ -99,7 +99,7 @@ export default async function DispensaryLayout({ children }: { children: React.R
           <div className="scrollbar-hide min-h-0 flex-1 overflow-y-auto py-2">
             <ClientNav links={navLinks} />
           </div>
-          <PortalAccount accountName={accountName} roleLabel="Verified buyer" />
+          <PortalAccount accountName={accountName} roleLabel="Buyer account" />
         </aside>
 
         {/* Main Content */}

@@ -57,7 +57,7 @@ export function LicenseExpiryBadge({ expiresAt }: LicenseExpiryBadgeProps) {
   }
 
   return (
-    <time dateTime={formatDateTime(expiresAt)} className="text-sm text-pf-secondary" title="License expiry is current">
+    <time dateTime={formatDateTime(expiresAt)} className="text-sm text-pf-secondary" title="License expiration is current">
       {formattedDate}
     </time>
   );

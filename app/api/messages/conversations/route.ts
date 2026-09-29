@@ -4,11 +4,11 @@ import { getAuthSession } from '@/lib/auth-helpers';
 import { ConversationMessageType, Prisma } from '@prisma/client';
 
 function requireMessagingUser(session: Awaited<ReturnType<typeof getAuthSession>>) {
-  if (!session) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  if (!session) return { error: NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 }) };
 
   const user = session.user;
   if (user.role !== 'GROWER' && user.role !== 'DISPENSARY') {
-    return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+    return { error: NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 }) };
   }
 
   if (user.role === 'GROWER' && !user.growerId) {
@@ -130,7 +130,7 @@ export async function GET() {
     return NextResponse.json({ conversations: payload }, { status: 200 });
   } catch (error) {
     console.error('Error fetching conversations:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -262,6 +262,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     console.error('Error creating conversation:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

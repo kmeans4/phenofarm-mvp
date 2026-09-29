@@ -17,7 +17,7 @@ export async function PATCH(req: NextRequest) {
 
     if (!session) {
       return NextResponse.json(
-        { error: 'Unauthorized' },
+        { error: 'Please sign in to continue.' },
         { status: 401 }
       );
     }
@@ -151,7 +151,7 @@ export async function PATCH(req: NextRequest) {
     if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Batch status update error:', error);
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Something went wrong. Please try again.' },
       { status: 500 }
     );
   }

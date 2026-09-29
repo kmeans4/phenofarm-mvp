@@ -63,7 +63,7 @@ for (const width of [1440, 390]) test(`grower profile saves, reloads, and protec
   await page.getByRole('button', { name: 'Save profile', exact: true }).filter({ visible: true }).first().click();
   const saved = await response;
   expect(saved.status(), await saved.text()).toBe(200);
-  await expect(page.getByText('Settings saved successfully!', { exact: true })).toBeVisible();
+  await expect(page.getByText('Settings saved.', { exact: true })).toBeVisible();
   await capture(page, `profile-saved-${width}`);
   await page.reload();
   await expect(page.locator('#profile-businessName')).toHaveValue('QA updated grower');
@@ -143,7 +143,7 @@ for (const width of [1440, 390]) test(`lost response is recovered after reload w
   }, { times: 1 });
   await page.goto('/dispensary/cart');
   await page.getByRole('button', { name: /^Review request$/i }).filter({ visible: true }).first().click();
-  await page.getByRole('button', { name: 'Submit request', exact: true }).click();
+  await page.getByRole('button', { name: 'Send order request', exact: true }).click();
   await expect(page.getByRole('button', { name: 'Check request', exact: true })).toBeVisible();
   expect(responseDropped).toBe(true); await capture(page, `request-recovery-${width}`);
   const keyBefore = await page.evaluate(id => JSON.parse(localStorage.getItem(`phenofarm:pending-request:${id}`)!).key, buyer.id);

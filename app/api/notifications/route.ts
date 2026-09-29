@@ -4,7 +4,7 @@ import { db } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
 
   const params = new URL(request.url).searchParams;
   if (params.get('countOnly') === 'true') {
@@ -45,7 +45,7 @@ export async function GET(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
   const body = await request.json().catch(() => ({})) as { id?: string; markAllRead?: boolean };
   const readAt = new Date();
 

@@ -7,12 +7,12 @@ export async function POST() {
   const session = await getAuthSession();
 
   if (!session) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
   }
 
   const user = session.user;
   if (user.role !== 'GROWER' || !user.growerId) {
-    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
   }
 
   if (!process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_TEST_SECRET_KEY) {

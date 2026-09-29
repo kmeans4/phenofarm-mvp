@@ -17,22 +17,22 @@ function VerificationVignette() {
               <ShieldCheck className="h-4 w-4" />
             </div>
             <div>
-              <div className="text-sm font-medium text-gray-100">Green Mountain Dispensary</div>
-              <div className="text-[11px] text-gray-500">VT-RTL-2024-001 · expires 12/2027</div>
+              <div className="text-sm font-medium text-gray-100">Example dispensary</div>
+              <div className="text-xs text-gray-500">Sample business license</div>
             </div>
           </div>
           <motion.span
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5, type: 'spring', bounce: 0.4 }}
-            className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2.5 py-1 text-[11px] font-medium text-emerald-300 ring-1 ring-emerald-400/20"
+            className="inline-flex items-center gap-1 rounded-full bg-emerald-400/10 px-2.5 py-1 text-xs font-medium text-emerald-300 ring-1 ring-emerald-400/20"
           >
             <BadgeCheck className="h-3 w-3" />
-            License verified
+            Approved to order
           </motion.span>
         </div>
         <div className="mt-3 grid grid-cols-3 gap-2 border-t border-white/[0.05] pt-3 text-center">
-          {['Identity', 'License', 'Ordering'].map((step, i) => (
+          {['Profile', 'License', 'Ordering'].map((step, i) => (
             <motion.div
               key={step}
               initial={{ opacity: 0, y: 8 }}
@@ -40,14 +40,14 @@ function VerificationVignette() {
               transition={{ delay: 0.15 + i * 0.15 }}
               className="rounded-md bg-white/[0.03] px-2 py-1.5"
             >
-              <div className="text-[10px] uppercase tracking-wider text-emerald-400/80">{step}</div>
-              <div className="text-[11px] font-medium text-gray-300">Cleared</div>
+              <div className="text-xs uppercase tracking-wider text-emerald-400/80">{step}</div>
+              <div className="text-xs font-medium text-gray-300">{['Reviewed', 'Approved', 'Enabled'][i]}</div>
             </motion.div>
           ))}
         </div>
       </div>
       <p className="text-xs text-gray-500">
-        Unverified buyers physically cannot submit a request — the gate is enforced in the order pipeline, not on a badge.
+        Buyers can browse while their license is reviewed. They can send an order request after approval.
       </p>
     </div>
   );
@@ -55,9 +55,9 @@ function VerificationVignette() {
 
 function QuoteVignette() {
   const bubbles = [
-    { side: 'right', text: 'Quote: 50 × $60.00/g · Net 30', style: 'bg-emerald-500/90 text-white rounded-br-sm ml-auto' },
-    { side: 'left', text: 'Counter: 50 × $55.00/g · ACH', style: 'border border-white/[0.07] bg-[#0c0f0d] text-gray-300 rounded-bl-sm' },
-    { side: 'right', text: 'Accepted — terms locked to the record', style: 'bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/20 ml-auto' },
+    { side: 'right', text: 'Buyer asks for a price', style: 'bg-emerald-500/90 text-white rounded-br-sm ml-auto' },
+    { side: 'left', text: 'Grower offers $4.50 per gram', style: 'border border-white/[0.07] bg-[#0c0f0d] text-gray-300 rounded-bl-sm' },
+    { side: 'right', text: 'Buyer suggests $4.00 per gram', style: 'bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/20 ml-auto' },
   ];
   return (
     <div className="space-y-3">
@@ -75,7 +75,7 @@ function QuoteVignette() {
         ))}
       </div>
       <p className="text-xs text-gray-500">
-        Hide list pricing per product, field quote requests, counter, accept — every term stays on the record.
+        Buyers and growers can discuss a price and accept an offer in the same conversation.
       </p>
     </div>
   );
@@ -103,13 +103,13 @@ function TimelineVignette() {
                 animate={{ backgroundColor: 'rgb(52,211,153)' }}
                 transition={{ delay: 0.3 + i * 0.55 }}
               />
-              <span className="text-[10px] text-gray-400">{step}</span>
+              <span className="text-xs text-gray-400">{step}</span>
             </div>
           ))}
         </div>
       </div>
       <p className="text-xs text-gray-500">
-        Both sides watch the same timeline. Cancel a request and the reserved stock returns automatically.
+        Both sides can see the request status. If a buyer withdraws before acceptance, reserved stock returns to inventory.
       </p>
     </div>
   );
@@ -136,7 +136,7 @@ function CoaVignette() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.5 + i * 0.2 }}
-              className="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-medium text-emerald-300 ring-1 ring-emerald-400/20"
+              className="rounded-full bg-emerald-400/10 px-2 py-0.5 text-xs font-medium text-emerald-300 ring-1 ring-emerald-400/20"
             >
               On file
             </motion.span>
@@ -144,7 +144,7 @@ function CoaVignette() {
         ))}
       </div>
       <p className="text-xs text-gray-500">
-        Strain-aware listings with batches, THC/CBD ranges, per-product price visibility, and lab documents buyers can trust.
+        Growers can add batch details and lab reports. Buyers can download available reports from listings.
       </p>
     </div>
   );
@@ -166,13 +166,12 @@ function AnalyticsVignette() {
             />
           ))}
         </div>
-        <div className="mt-2 flex justify-between text-[10px] text-gray-600">
-          <span>Delivered request value</span>
-          <span className="text-emerald-400">+38% QoQ</span>
+        <div className="mt-2 flex justify-between text-xs text-gray-600">
+          <span>Example delivered request values</span>
         </div>
       </div>
       <p className="text-xs text-gray-500">
-        Rankings and trends computed from delivered fulfillment — not vanity counts.
+        Growers can see delivered request totals, top products, and top customers. These are order values, not payments.
       </p>
     </div>
   );
@@ -184,36 +183,36 @@ const FEATURES = [
   {
     id: 'verification',
     icon: ShieldCheck,
-    title: 'License verification that gates ordering',
-    blurb: 'Admins review every license before a buyer can order. Trust is enforced, not implied.',
+    title: 'Review buyer licenses',
+    blurb: 'A dispensary needs an approved license before it can send an order request.',
     Vignette: VerificationVignette,
   },
   {
     id: 'quotes',
     icon: MessagesSquare,
-    title: 'Native quote negotiation',
-    blurb: 'Request pricing, counter, accept — the whole negotiation lives in one recorded thread.',
+    title: 'Agree on prices',
+    blurb: 'Buyers can ask for a price, growers can reply, and both sides can see the conversation.',
     Vignette: QuoteVignette,
   },
   {
     id: 'lifecycle',
     icon: Timer,
-    title: 'Live request lifecycle',
-    blurb: 'One shared status from submission to delivery, with automatic stock reconciliation.',
+    title: 'Track each order request',
+    blurb: 'Both sides can see the status as the grower prepares and delivers an order.',
     Vignette: TimelineVignette,
   },
   {
     id: 'catalog',
     icon: FileCheck2,
-    title: 'Compliance-grade catalog',
-    blurb: 'Strains, batches, COAs, and price-visibility control on every listing.',
+    title: 'Keep product details together',
+    blurb: 'Growers can add batch details, stock, prices, and lab files to their listings.',
     Vignette: CoaVignette,
   },
   {
     id: 'analytics',
     icon: BarChart3,
-    title: 'Operational analytics',
-    blurb: 'Delivered value trends, top products, and top customers from real fulfillment data.',
+    title: 'Review delivered orders',
+    blurb: 'Growers can see order totals, top products, and customers for delivered requests.',
     Vignette: AnalyticsVignette,
   },
 ] as const;
@@ -238,9 +237,9 @@ export function FeatureTour() {
       <div aria-hidden className="absolute inset-x-0 top-0 mx-auto h-px max-w-3xl bg-gradient-to-r from-transparent via-emerald-500/40 to-transparent" />
       <div className="mx-auto max-w-6xl px-6">
         <SectionHeading
-          eyebrow="Platform tour"
-          title="Everything between discovery and delivery"
-          lede="Five systems working as one workspace. The tour plays itself — or click any step."
+          eyebrow="What you can do"
+          title="Tools for each step of a wholesale order"
+          lede="Choose a feature to see how it works."
         />
 
         <div
@@ -249,7 +248,7 @@ export function FeatureTour() {
           onMouseLeave={() => setPaused(false)}
         >
           {/* Step list */}
-          <div className="space-y-2" role="tablist" aria-label="Platform features">
+          <div className="space-y-2" role="tablist" aria-label="PhenoShop features">
             {FEATURES.map((feature, i) => {
               const isActive = i === index;
               return (

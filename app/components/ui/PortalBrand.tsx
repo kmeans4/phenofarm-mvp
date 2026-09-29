@@ -35,7 +35,7 @@ export function PortalAccount({ accountName, roleLabel }: PortalAccountProps) {
         </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-xs font-semibold text-pf-text">{accountName}</span>
-          <span className="block text-[11px] text-pf-muted">{roleLabel}</span>
+          <span className="block text-xs text-pf-muted">{roleLabel}</span>
         </span>
       </div>
       <div className="[&_button]:!rounded-lg [&_button]:!text-pf-secondary [&_button]:hover:!bg-white/[0.06] [&_button]:hover:!text-white">

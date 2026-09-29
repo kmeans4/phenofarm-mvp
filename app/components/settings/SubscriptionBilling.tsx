@@ -62,12 +62,12 @@ export function SubscriptionBilling({ initialData }: { initialData?: Subscriptio
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data.url) {
-        throw new Error(data.error || 'Could not start subscription checkout');
+        throw new Error(data.error || 'We could not open checkout. Please try again.');
       }
 
       navigateToStripe(data.url);
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Could not start subscription checkout');
+      setActionError(err instanceof Error ? err.message : 'We could not open checkout. Please try again.');
       pendingRef.current = false;
       setActionLoading(null);
     }
@@ -84,12 +84,12 @@ export function SubscriptionBilling({ initialData }: { initialData?: Subscriptio
       const data = await res.json().catch(() => ({}));
 
       if (!res.ok || !data.url) {
-        throw new Error(data.error || 'Could not open subscription portal');
+        throw new Error(data.error || 'We could not open billing. Please try again.');
       }
 
       navigateToStripe(data.url);
     } catch (err) {
-      setActionError(err instanceof Error ? err.message : 'Could not open subscription portal');
+      setActionError(err instanceof Error ? err.message : 'We could not open billing. Please try again.');
       pendingRef.current = false;
       setActionLoading(null);
     }
@@ -130,9 +130,9 @@ export function SubscriptionBilling({ initialData }: { initialData?: Subscriptio
   }
 
   const planFeatureRows = [
-    { label: 'Expanded catalog listings', included: subscription.plan !== 'free' },
+    { label: 'More product listings', included: subscription.plan !== 'free' },
     { label: 'Priority grower support', included: subscription.plan !== 'free' },
-    { label: 'Estimated request value reports', included: true },
+    { label: 'Order value reports', included: true },
     { label: 'Advanced integrations', included: subscription.plan === 'business' },
   ];
 
@@ -145,7 +145,7 @@ export function SubscriptionBilling({ initialData }: { initialData?: Subscriptio
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <p className="text-sm text-pf-muted">Software subscription only. Wholesale payment stays directly between businesses.</p>
+        <p className="text-sm text-pf-muted">Your plan covers PhenoShop software. Arrange wholesale payments directly with buyers.</p>
 
         {actionError && (
           <div className="rounded-lg border border-pf-danger-line bg-pf-danger-bg p-3 text-sm text-pf-danger">
@@ -164,8 +164,8 @@ export function SubscriptionBilling({ initialData }: { initialData?: Subscriptio
               <p className="text-sm text-pf-muted">
                 {subscription?.plan === 'free' 
                   ? subscription.checkoutConfigured
-                    ? 'Starter access'
-                    : 'Starter access'
+                    ? 'Free plan'
+                    : 'Free plan'
                   : subscription?.status === 'active' ? 'Active' : 'Inactive'}
               </p>
             </div>
@@ -222,7 +222,7 @@ export function SubscriptionBilling({ initialData }: { initialData?: Subscriptio
           )}
           {subscription.portalAvailable && (
             <Button variant="outline" disabled={actionLoading !== null} onClick={openPortal}>
-              {actionLoading === 'portal' ? 'Opening billing...' : 'Manage Subscription'}
+              {actionLoading === 'portal' ? 'Opening billing...' : 'Manage billing'}
             </Button>
           )}
         </div>

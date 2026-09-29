@@ -5,8 +5,8 @@ import { buyerProductWhere, normalizeProductIds } from '@/lib/buyer-products';
 
 export async function POST(request: Request) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
   const body = await request.json().catch(() => null);
   if (!body || !Array.isArray(body.productIds) || body.productIds.length > 200) return NextResponse.json({ error: 'Provide at most 200 product IDs.' }, { status: 400 });
   const ids = normalizeProductIds(body.productIds);

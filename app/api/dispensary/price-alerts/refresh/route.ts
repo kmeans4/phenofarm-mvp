@@ -8,8 +8,8 @@ import { buyerAlertInclude, serializeBuyerAlerts } from '@/lib/buyer-alerts';
 
 export async function POST() {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
   const dispensaryId = session.user.dispensaryId;
   try {
     await db.$transaction(async tx => {

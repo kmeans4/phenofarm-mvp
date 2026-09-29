@@ -133,7 +133,7 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
                 return (
                   <div key={link.href}>
                     {showGroup && (
-                      <div className="font-metadata px-2 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-pf-muted">
+                      <div className="font-metadata px-2 pb-1 pt-2 text-[13px] font-semibold tracking-normal text-pf-muted">
                         {group}
                       </div>
                     )}

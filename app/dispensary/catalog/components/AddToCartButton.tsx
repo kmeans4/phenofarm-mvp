@@ -54,7 +54,7 @@ export default function AddToCartButton({
       grower: growerName, growerId, quantity: qty, maxQty: product.inventoryQty,
       strain: product.strain ?? undefined, unit: product.unit ?? 'unit',
       image: product.images?.[0], productType: product.productType ?? undefined }]);
-    if (!writeCart(next)) { toast.warning('Unable to save your request draft. Free up browser storage and try again.'); setLoading(false); return; }
+    if (!writeCart(next)) { toast.warning('Unable to save your cart. Free up browser storage and try again.'); setLoading(false); return; }
     setAdded(true); setLoading(false); setQuantity(1);
     if (resetTimer.current) clearTimeout(resetTimer.current);
     resetTimer.current = setTimeout(() => setAdded(false), 2000);
@@ -67,7 +67,7 @@ export default function AddToCartButton({
   if (compact) {
     return (
       <button type="button"
-        aria-label={`Add ${product.name} to request draft`}
+        aria-label={`Add ${product.name} to cart`}
         onClick={() => addToCart(1)}
         disabled={loading || isOutOfStock || added}
         className={`
@@ -82,7 +82,7 @@ export default function AddToCartButton({
                 : 'bg-emerald-500 text-[#032116] hover:bg-emerald-400'
           }
         `}
-        title={isOutOfStock ? 'Out of stock' : `Add 1 unit to request draft • ${product.inventoryQty} in stock`}
+        title={isOutOfStock ? 'Out of stock' : `Add 1 unit to cart • ${product.inventoryQty} in stock`}
       >
         {loading ? (
           <Loader2 size={20} className="animate-spin" />
@@ -136,7 +136,7 @@ export default function AddToCartButton({
       </div>
 
       <button type="button"
-        aria-label={loading ? 'Adding to draft' : added ? 'Added to draft' : isOutOfStock ? 'Out of stock' : 'Add to draft'}
+        aria-label={loading ? 'Adding to cart' : added ? 'Added to cart' : isOutOfStock ? 'Out of stock' : 'Add to cart'}
         onClick={() => addToCart()}
         disabled={loading || isOutOfStock}
         className={`
@@ -159,7 +159,7 @@ export default function AddToCartButton({
         ) : added ? (
           <>
             <Check size={18} />
-            <span>Added<span className="hidden sm:inline"> to draft</span></span>
+            <span>Added to cart</span>
           </>
         ) : isOutOfStock ? (
           <>
@@ -169,7 +169,7 @@ export default function AddToCartButton({
         ) : (
           <>
             <Plus size={18} />
-            <span>Add<span className="hidden sm:inline"> to draft</span></span>
+            <span>Add to cart</span>
           </>
         )}
       </button>

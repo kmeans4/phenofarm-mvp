@@ -48,3 +48,9 @@ tsconfig.tsbuildinfo
 .env.*
 !.env.example
 public/uploads/
+
+# Local QA evidence (production fixtures, exports, screenshots, and logs)
+docs/reviews/grower-manual-seed-2026-09-24/
+docs/reviews/final-production-2026-09-24/
+docs/reviews/copy-review-2026-09-29/
+docs/reviews/typography-review-2026-09-29/

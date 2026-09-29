@@ -70,7 +70,7 @@ export default function CustomersList({ customers }: CustomersListProps) {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to open customer conversation');
+        throw new Error(data.error || 'We could not open customer conversation. Please try again.');
       }
 
       window.dispatchEvent(
@@ -86,9 +86,9 @@ export default function CustomersList({ customers }: CustomersListProps) {
           },
         }),
       );
-      toast.success('Draft ready in messages');
+      toast.success('Message ready. Review it in Messages, then send.');
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to open customer conversation');
+      toast.error(error instanceof Error ? error.message : 'We could not open customer conversation. Please try again.');
     } finally {
       setOpeningMessageFor(null);
     }

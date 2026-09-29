@@ -5,7 +5,7 @@ import { encode, type JWT } from 'next-auth/jwt';
 import bcrypt from 'bcryptjs';
 import { createHash } from 'node:crypto';
 import { mkdirSync } from 'node:fs';
-import { accountMailConfigured, accountOrigin } from '../lib/account-mail';
+import { accountMailConfigured, accountOrigin, sendAccountMail } from '../lib/account-mail';
 import { requestAccountLink } from '../lib/account-security';
 
 const db = new PrismaClient();
@@ -59,7 +59,8 @@ async function messages(email: string) {
 async function delivered(email: string, subject: string) {
   await expect.poll(async () => (await messages(email)).filter(row => row.subject.startsWith(subject)).length, { timeout: 15_000 }).toBeGreaterThan(0);
   const found = (await messages(email)).filter(row => row.subject.startsWith(subject)).at(-1)!;
-  const url = new URL(found.text.match(/http:\/\/localhost:3150\/\S+/)![0]);
+  const url = new URL(found.text.match(/http:\/\/[^\s]+/)![0]);
+  expect(url.origin).toBe(baseURL);
   const token = new URLSearchParams(url.hash.slice(1)).get('token')!;
   expect(token).toHaveLength(43);
   return { url: url.href, token };
@@ -243,7 +244,7 @@ test('two users confirming the same new address cannot steal or corrupt accounts
   const [first, second] = await Promise.all([account(), account()]); const target = `${prefix}-collision@example.test`;
   for (const user of [first, second]) expect((await user.api.post('/api/auth/change-email', { data: { email: target, currentPassword: password } })).status()).toBe(200);
   await expect.poll(async () => (await messages(target)).length).toBe(2);
-  const tokens = (await messages(target)).map(mail => new URLSearchParams(new URL(mail.text.match(/http:\/\/localhost:3150\/\S+/)![0]).hash.slice(1)).get('token')!);
+  const tokens = (await messages(target)).map(mail => new URLSearchParams(new URL(mail.text.match(/http:\/\/[^\s]+/)![0]).hash.slice(1)).get('token')!);
   const context = await api();
   const results = await Promise.all(tokens.map(token => context.post('/api/auth/confirm-email-change', { data: { token } })));
   expect(results.map(value => value.status()).sort()).toEqual([200, 400]);
@@ -315,6 +316,38 @@ test('mail adapter fails closed outside isolated development and failures log no
   expect(await db.accountActionToken.count({where:{userId:user.id}})).toBe(0);
 });
 
+test('provider acceptance logs only safe receipt metadata, not account mail content', async () => {
+  const originalFetch = global.fetch, originalInfo = console.info;
+  const logged: unknown[][] = [];
+  try {
+    global.fetch = async () => new Response(JSON.stringify({ id: 'receipt-test-123', extra: 'must-not-log' }), { status: 200 });
+    console.info = (...values) => { logged.push(values); };
+    await sendAccountMail({ to: 'private@example.test', subject: 'Private subject', text: 'Secret token in body' });
+  } finally { global.fetch = originalFetch; console.info = originalInfo; }
+  expect(logged).toEqual([['[account-mail]', { code: 'PROVIDER_ACCEPTED', provider: 'local-test', durationMs: expect.any(Number), messageId: 'receipt-test-123' }]]);
+  expect(JSON.stringify(logged)).not.toMatch(/private@example|Private subject|Secret token|must-not-log/);
+});
+
+test('support recipients do not reply to themselves; other recipients retain support reply routing', async () => {
+  const keys = ['AUTH_MAIL_PROVIDER', 'AUTH_MAIL_FROM', 'AUTH_MAIL_REPLY_TO', 'RESEND_API_KEY'] as const;
+  const saved = Object.fromEntries(keys.map(key => [key, process.env[key]]));
+  const originalFetch = global.fetch, originalInfo = console.info;
+  const payloads: Record<string, unknown>[] = [];
+  try {
+    Object.assign(process.env, { AUTH_MAIL_PROVIDER: 'resend', AUTH_MAIL_FROM: 'PhenoShop <accounts@phenoshop.app>', AUTH_MAIL_REPLY_TO: 'Support <support@phenoshop.app>', RESEND_API_KEY: 'local-mocked-key' });
+    global.fetch = async (_url, options) => { payloads.push(JSON.parse(String(options?.body))); return Response.json({ id: 'safe-test-receipt' }); };
+    console.info = () => {};
+    for (const to of ['support@phenoshop.app', 'SUPPORT+buyer1@phenoshop.app', 'buyer@example.test', 'support@different.example']) {
+      await sendAccountMail({ to, subject: 'Test', text: 'Synthetic test' });
+    }
+    expect(payloads.slice(0, 2).map(value => value.reply_to)).toEqual([undefined, undefined]);
+    expect(payloads.slice(2).map(value => value.reply_to)).toEqual(['Support <support@phenoshop.app>', 'Support <support@phenoshop.app>']);
+  } finally {
+    global.fetch = originalFetch; console.info = originalInfo;
+    for (const key of keys) { if (saved[key] === undefined) delete process.env[key]; else process.env[key] = saved[key]; }
+  }
+});
+
 for(const width of [360,1440]) test(`signup, verification and recovery work in the ${width}px UI`,async({page})=>{
   const email=`${prefix}-ui-${width}@example.test`;
   await page.setViewportSize({width,height:900});await page.setExtraHTTPHeaders({'x-forwarded-for':`198.19.0.${width===360?1:2}`});
@@ -346,7 +379,7 @@ for(const width of [360,1440]) test(`signup, verification and recovery work in t
   await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page).toHaveURL(/\/grower\/dashboard/);
   await page.goto('/auth/forgot-password');await page.locator('#account-email').fill(changedEmail);
   await page.screenshot({path:`${evidence}/request-reset-${width}.png`,fullPage:true});
-  await page.getByRole('button',{name:'Send reset link',exact:true}).click();await expect(page.getByRole('status')).toContainText('If this address is eligible');
+  await page.getByRole('button',{name:'Send reset link',exact:true}).click();await expect(page.getByRole('status')).toContainText('If we can send a link to this address');
   const reset=await delivered(changedEmail,'Reset your password');await page.goto(reset.url);
   await page.locator('#account-password').fill(newPassword);await page.locator('#confirm-password').fill(newPassword);
   await page.screenshot({path:`${evidence}/reset-${width}.png`,fullPage:true});

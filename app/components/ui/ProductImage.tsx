@@ -33,7 +33,7 @@ export function ProductImage({ src, alt, productType, className = '', imageClass
           <span className="flex h-11 w-11 items-center justify-center rounded-full border border-pf-line bg-pf-surface text-pf-muted shadow-sm">
             <Leaf className="h-5 w-5" aria-hidden="true" />
           </span>
-          {productType && showPlaceholderLabel ? <span className="text-[11px] font-semibold uppercase text-pf-muted">{productType}</span> : null}
+          {productType && showPlaceholderLabel ? <span className="text-xs font-semibold uppercase text-pf-muted">{productType}</span> : null}
         </div>
       ) : (
         // eslint-disable-next-line @next/next/no-img-element

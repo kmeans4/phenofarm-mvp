@@ -35,7 +35,7 @@ const labelByPath: Array<[string, string]> = [
   ['/grower/settings', 'Settings'],
   ['/dispensary/dashboard', 'Overview'],
   ['/dispensary/catalog', 'Catalog'],
-  ['/dispensary/cart', 'Request draft'],
+  ['/dispensary/cart', 'Cart'],
   ['/dispensary/orders', 'Orders'],
   ['/dispensary/saved', 'Saved'],
   ['/dispensary/favorites', 'Favorites'],
@@ -248,7 +248,7 @@ export function RecentActivityDrawer({ role }: RecentActivityDrawerProps) {
               })
             ) : (
               <p className="rounded-lg border border-dashed border-pf-line px-3 py-3 text-sm text-pf-muted">
-                Recent pages will appear here as you move through the portal.
+                Pages you visit will appear here so you can find them again.
               </p>
             )}
           </div>

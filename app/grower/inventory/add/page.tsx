@@ -60,7 +60,7 @@ export default function UpdateStockPage() {
         router.push('/grower/inventory');
       } else {
         const data = await response.json().catch(() => ({}));
-        setError(data.error || 'Failed to update stock');
+        setError(data.error || 'We could not update stock. Please try again.');
       }
     } catch {
       setError('An error occurred');

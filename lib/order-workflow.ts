@@ -32,7 +32,7 @@ export const ORDER_STATUS_HELP: Record<string, string> = {
   CONFIRMED: 'Grower accepted the request',
   PROCESSING: 'Grower is preparing the order',
   SHIPPED: 'Ready, picked up, or in transit',
-  DELIVERED: 'Fulfillment is complete',
+  DELIVERED: 'Order delivered',
   CANCELLED: 'Request was cancelled',
 };
 

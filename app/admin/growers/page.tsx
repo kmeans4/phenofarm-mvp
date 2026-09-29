@@ -188,7 +188,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                 </div>
                 <dl className="grid grid-cols-2 gap-x-3 gap-y-2 text-sm">
                   <div><dt className="text-xs font-medium uppercase text-pf-muted">License</dt><dd className="mt-1 break-all text-pf-secondary">{g.licenseNumber || 'Not provided'}</dd></div>
-                  <div><dt className="text-xs font-medium uppercase text-pf-muted">Expiry</dt><dd className="mt-1"><LicenseExpiryBadge expiresAt={g.licenseExpiry} /></dd></div>
+                  <div><dt className="text-xs font-medium uppercase text-pf-muted">Expiration</dt><dd className="mt-1"><LicenseExpiryBadge expiresAt={g.licenseExpiry} /></dd></div>
                 </dl>
                 <ConfirmActionButton
                   actionUrl={`/admin/growers/${g.id}/verify`}
@@ -199,7 +199,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                   confirmLabel={g.isVerified ? 'Remove verification' : 'Verify'}
                   className={`inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${g.isVerified ? 'border border-pf-line bg-pf-raised text-pf-secondary hover:bg-pf-hover' : 'bg-emerald-500 text-pf-canvas hover:bg-emerald-400'}`}
                 >
-                  {g.isVerified ? 'Unverify' : 'Verify grower'}
+                  {g.isVerified ? 'Remove verification' : 'Verify grower'}
                 </ConfirmActionButton>
               </article>
             ))}
@@ -211,7 +211,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Business</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Email</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">License</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Expiry</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Expiration</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Status</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Subscription</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Joined</th>
@@ -273,7 +273,7 @@ export default async function AdminGrowersPage({ searchParams }: { searchParams?
                             : 'bg-emerald-500 text-pf-canvas hover:bg-emerald-400'
                         )}
                       >
-                        {g.isVerified ? 'Unverify' : 'Verify'}
+                        {g.isVerified ? 'Remove verification' : 'Verify'}
                       </ConfirmActionButton>
                     </td>
                   </tr>

@@ -93,7 +93,7 @@ export default function QuickStatusUpdate({ orderId, currentStatus }: QuickStatu
       
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to update status');
+        throw new Error(data.error || 'We could not update status. Please try again.');
       }
       
       toast.success(SUCCESS_MESSAGES[newStatus] || `Request moved to ${getOrderStatusLabel(newStatus)}`);

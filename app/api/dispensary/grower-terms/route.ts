@@ -13,12 +13,12 @@ export async function GET(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const { searchParams } = new URL(request.url);

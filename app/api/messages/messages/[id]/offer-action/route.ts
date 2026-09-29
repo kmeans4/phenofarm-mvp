@@ -14,11 +14,11 @@ export async function POST(
 ) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
 
     const user = session.user;
     if (user.role !== 'GROWER' && user.role !== 'DISPENSARY') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const { id } = await context.params;
@@ -50,11 +50,11 @@ export async function POST(
 
     if (user.role === 'GROWER') {
       if (!user.growerId || conversation.growerId !== user.growerId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
       }
     } else {
       if (!user.dispensaryId || conversation.dispensaryId !== user.dispensaryId) {
-        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
       }
     }
 
@@ -121,7 +121,7 @@ export async function POST(
           type: status === OfferStatus.ACCEPTED ? 'QUOTE_ACCEPTED' : 'QUOTE_REJECTED',
           title: status === OfferStatus.ACCEPTED ? 'Quote accepted' : 'Quote declined',
           body: status === OfferStatus.ACCEPTED
-            ? 'Your quote terms were accepted and can now be used in a request draft.'
+            ? 'Your quote terms were accepted and can now be used in a cart.'
             : 'The other party declined your quote terms.',
           href: user.role === 'GROWER' ? '/dispensary/dashboard' : '/grower/dashboard',
         });
@@ -216,6 +216,6 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: 409 });
     }
     console.error('Error handling quote action:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

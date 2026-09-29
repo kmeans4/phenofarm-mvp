@@ -67,7 +67,7 @@ class CheckoutConflictError extends Error {
 /**
  * POST /api/checkout
  *
- * Submits an order request from a dispensary's request draft.
+ * Submits an order request from a dispensary's cart.
  * Creates one order request per grower when the draft contains items from multiple growers.
  *
  * Request Body:
@@ -102,7 +102,7 @@ export async function POST(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     const submissionKey = request.headers.get('Idempotency-Key');
     if (!submissionKey || !/^[a-zA-Z0-9_-]{16,128}$/.test(submissionKey)) {
-      return NextResponse.json({ error: 'Refresh your request draft before submitting again.' }, { status: 400 });
+      return NextResponse.json({ error: 'Refresh your cart before submitting again.' }, { status: 400 });
     }
 
     const body = await request.json().catch(() => null);
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
     if (!Array.isArray(items) || items.length > 100 || items.some(item => !item || typeof item !== 'object')) return NextResponse.json({ error: 'Choose up to 100 valid items' }, { status: 400 });
 
     if (!items?.length) {
-      return NextResponse.json({ error: 'Order request draft is empty' }, { status: 400 });
+      return NextResponse.json({ error: 'Your cart is empty' }, { status: 400 });
     }
 
     const normalizedItems: CartItem[] = (Array.isArray(items) ? items : []).map((item: Partial<CartItem>) => ({
@@ -460,6 +460,6 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Order request error:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

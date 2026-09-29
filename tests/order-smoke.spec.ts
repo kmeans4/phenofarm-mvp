@@ -24,8 +24,8 @@ test.describe('Order smoke test', () => {
 
     await page.evaluate(() => window.localStorage.removeItem('phenofarm-cart'));
 
-    const productCard = page.locator('[class*="group"]').filter({ has: page.getByRole('button', { name: /^add to draft$/i }) }).first();
-    await productCard.getByRole('button', { name: /^add to draft$/i }).click();
+    const productCard = page.locator('[class*="group"]').filter({ has: page.getByRole('button', { name: /^add to cart$/i }) }).first();
+    await productCard.getByRole('button', { name: /^add to cart$/i }).click();
 
     await expect
       .poll(async () => {
@@ -43,7 +43,7 @@ test.describe('Order smoke test', () => {
       .toBeGreaterThan(0);
 
     await page.goto('/dispensary/cart');
-    await expect(page.getByRole('heading', { name: /request draft/i })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /^cart$/i })).toBeVisible();
 
     const initialOrderCount = await page.context().newPage();
     await login(initialOrderCount);
@@ -53,7 +53,7 @@ test.describe('Order smoke test', () => {
     await initialOrderCount.close();
 
     await page.getByRole('button', { name: /review request/i }).first().click();
-    await page.getByRole('button', { name: /^submit request$/i }).click();
+    await page.getByRole('button', { name: /^send order request$/i }).click();
     await expect(page.getByRole('heading', { name: /order request submitted/i })).toBeVisible({ timeout: 20000 });
     await page.waitForURL(/\/dispensary\/orders/, { timeout: 20000 });
     await page.waitForLoadState('networkidle').catch(() => {});

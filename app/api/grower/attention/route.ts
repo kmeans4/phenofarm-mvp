@@ -7,13 +7,13 @@ export async function GET() {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
 
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const summary = await getGrowerAttentionSummary({
@@ -24,6 +24,6 @@ export async function GET() {
     return NextResponse.json(summary);
   } catch (error) {
     console.error('Error loading grower attention summary:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

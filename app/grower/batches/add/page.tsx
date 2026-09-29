@@ -133,7 +133,7 @@ export default function AddBatchPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to create batch');
+        throw new Error(data.error || 'We could not create batch. Please try again.');
       }
 
       const newBatch = await response.json();
@@ -223,7 +223,7 @@ export default function AddBatchPage() {
                   value={formData.lotNumber}
                   onChange={(e) => handleChange('lotNumber', e.target.value)}
                   className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
-                  placeholder="Internal or lab lot"
+                  placeholder="Your lot number or the lab’s lot number"
                 />
               </div>
             </div>
@@ -305,7 +305,7 @@ export default function AddBatchPage() {
 
                 <div className="min-w-0 space-y-1.5 sm:space-y-2">
                   <label htmlFor="totalCannabinoids" className="block text-sm font-medium text-pf-secondary">
-                    Total (%)
+                    Total cannabinoids (%)
                   </label>
                   <input
                     id="totalCannabinoids"

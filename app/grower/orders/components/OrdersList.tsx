@@ -247,7 +247,7 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
       if (!response.ok && updatedCount === 0) {
         setMessage({
           type: 'error',
-          title: skippedCount > 0 ? `0 updated, ${skippedCount} skipped` : 'Batch update failed',
+          title: skippedCount > 0 ? `0 updated, ${skippedCount} skipped` : 'Some requests could not be updated',
           text: result.error || 'Failed to update selected requests.',
           skippedOrders,
         });
@@ -260,7 +260,7 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
 
       const context = [
         noOpCount > 0 ? `${noOpCount} already ${STATUS_LABELS[newStatus]}` : '',
-        skippedCount > 0 ? 'Review the skipped reasons below.' : '',
+        skippedCount > 0 ? 'See below for requests that could not be updated.' : '',
       ].filter(Boolean).join(' ');
 
       setMessage({
@@ -273,7 +273,7 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
     } catch (err) {
       setMessage({
         type: 'error',
-        title: 'Batch update failed',
+        title: 'Some requests could not be updated',
         text: err instanceof Error ? err.message : 'Update failed'
       });
     } finally {
@@ -390,7 +390,7 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
                   ? customerFilterLabel
                     ? 'Active requests for this customer appear here; closed requests stay in history.'
                     : 'Buyer requests and your direct records will appear here.'
-                  : 'Switch workflow views to see other request states.'}
+                  : 'Choose another status to see more requests.'}
               </p>
               {orders.length === 0 ? (
                 <>
@@ -520,7 +520,7 @@ export default function OrdersList({ initialOrders, customerFilterLabel }: Order
                 ))
               ) : (
                 <span className="rounded-lg bg-pf-hover px-3 py-1.5 text-sm text-pf-secondary">
-                  No bulk transitions available
+                  No shared status change available
                 </span>
               )}
               <button

@@ -7,8 +7,8 @@ import { Prisma } from '@prisma/client';
 
 async function requireDispensary() {
   const session = await getAuthSession();
-  if (!session) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
-  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+  if (!session) return { error: NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 }) };
+  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) return { error: NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 }) };
   return { user: session.user, dispensaryId: session.user.dispensaryId };
 }
 export async function GET() {

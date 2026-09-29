@@ -13,9 +13,9 @@ const SUPPORT_EMAIL = 'support@phenoshop.app';
 type SignInResult = Awaited<ReturnType<typeof signIn>>;
 
 function getSignInErrorMessage(result?: SignInResult) {
-  if (result?.error === 'EmailNotVerified') return 'Verify your email before signing in. Use Resend verification below to get a new link.';
+  if (result?.error === 'EmailNotVerified') return 'Verify your email before signing in. Use Resend verification email below to get a new link.';
   if (result?.status === 401 || result?.error === 'CredentialsSignin') {
-    return 'Email or password is incorrect. Check the credentials and try again.';
+    return 'Email or password is incorrect. Check your email and password, then try again.';
   }
 
   return 'We could not sign you in right now. Try again, or contact support if the problem continues.';
@@ -81,17 +81,17 @@ export default function SignInSection() {
 
         <div className="relative max-w-xl">
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-pf-accent">
-            Licensed marketplace operations
+            For growers and dispensaries
           </p>
           <h1 className="text-5xl font-semibold tracking-tight text-white xl:text-6xl">
-            Wholesale workflows, without payment confusion.
+            Your wholesale business, in one place.
           </h1>
           <p className="mt-6 max-w-lg text-base leading-7 text-pf-muted">
-            Manage catalog listings, buyer requests, order status, and subscription access. Settlement stays direct.
+            List products, connect with buyers and growers, and keep track of your orders.
           </p>
 
           <div className="mt-10 grid gap-3">
-            {['Direct grower to dispensary requests', 'Friendly order status tracking', 'Cultivator subscription billing only'].map((item) => (
+            {['Browse and list products', 'Track order requests', 'Message buyers and growers'].map((item) => (
               <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
                 <ShieldCheck className="h-5 w-5 shrink-0 text-pf-accent" />
                 <span className="text-sm text-pf-secondary">{item}</span>
@@ -101,7 +101,7 @@ export default function SignInSection() {
         </div>
 
         <p className="relative text-sm text-pf-muted">
-          Need access help?{' '}
+          Need help signing in?{' '}
           <a href={`mailto:${SUPPORT_EMAIL}`} className="text-pf-accent transition-colors hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
             {SUPPORT_EMAIL}
           </a>
@@ -193,7 +193,7 @@ export default function SignInSection() {
 
               <div className="flex flex-wrap justify-between gap-x-4 text-sm font-medium text-pf-accent">
                 <Link href="/auth/forgot-password" className="inline-flex min-h-10 items-center underline">Forgot password?</Link>
-                <Link href="/auth/verify-email" className="inline-flex min-h-10 items-center underline">Resend verification</Link>
+                <Link href="/auth/verify-email" className="inline-flex min-h-10 items-center underline">Resend verification email</Link>
               </div>
 
               <button

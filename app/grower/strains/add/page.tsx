@@ -76,7 +76,7 @@ export default function AddStrainPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to create strain');
+        throw new Error(data.error || 'We could not create strain. Please try again.');
       }
 
       const newStrain = await response.json();

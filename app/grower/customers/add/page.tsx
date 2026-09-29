@@ -84,7 +84,7 @@ export default function AddCustomerPage() {
         router.push('/grower/customers');
       } else {
         const data = await response.json().catch(() => ({}));
-        setError(data.error || 'Failed to add customer');
+        setError(data.error || 'We could not add customer. Please try again.');
       }
     } catch {
       setError('An error occurred');

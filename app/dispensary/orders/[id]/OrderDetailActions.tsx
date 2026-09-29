@@ -43,7 +43,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
   const sendGrowerMessage = async (kind: 'update' | 'cancel' | 'message') => {
     const bodyByKind = {
       update: `Hi ${growerName}, can you share an update on order #${orderId}?`,
-      cancel: `Hi ${growerName}, please review whether order #${orderId} can be cancelled before fulfillment.`,
+      cancel: `Hi ${growerName}, please review whether order #${orderId} can be cancelled before pickup or delivery.`,
       message: `Hi ${growerName}, I have a question about order #${orderId}.`,
     };
 
@@ -61,10 +61,10 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to open grower chat');
+        throw new Error(data.error || 'We could not open grower chat. Please try again.');
       }
 
-      setMessageStatus('Draft ready — review and send it in the chat panel.');
+      setMessageStatus('Message ready. Review it in Messages, then send.');
       window.dispatchEvent(
         new CustomEvent('phenofarm-open-chat', {
           detail: {
@@ -130,7 +130,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
       }));
 
     if (!writeCart(mergeCartItems(readCart(), reorderItems))) {
-      setMessageStatus('Unable to save the request draft. Please free up browser storage and try again.'); return;
+      setMessageStatus('Unable to save the cart. Please free up browser storage and try again.'); return;
     }
     router.push('/dispensary/cart');
   };
@@ -146,7 +146,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
   return (
     <div className="rounded-xl border border-pf-line bg-pf-surface p-4 shadow-sm">
       <h2 className="sr-only">Buyer actions</h2>
-      {createdBy === 'GROWER' ? <p className="mt-2 inline-flex rounded-full bg-pf-info-bg px-3 py-1 text-xs font-semibold text-pf-info">{isOffPlatform ? 'Off-platform record' : buyerAcknowledgedAt ? 'Recorded by grower · Confirmed' : 'Recorded by grower'}</p> : null}
+      {createdBy === 'GROWER' ? <p className="mt-2 inline-flex rounded-full bg-pf-info-bg px-3 py-1 text-xs font-semibold text-pf-info">{isOffPlatform ? 'Recorded outside PhenoShop' : buyerAcknowledgedAt ? 'Recorded by grower · Confirmed' : 'Recorded by grower'}</p> : null}
 
 
       <div className="flex flex-wrap gap-2 [&>button]:min-h-10">
@@ -203,7 +203,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
       <ConfirmDialog
         open={showWithdrawConfirm}
         title="Withdraw this request?"
-        description="This cancels the request before acceptance and returns reserved stock to the grower."
+        description="The grower has not accepted this request yet. Withdrawing it cancels the request and releases the reserved stock."
         confirmLabel={sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw request'}
         intent="danger"
         onConfirm={withdrawRequest}

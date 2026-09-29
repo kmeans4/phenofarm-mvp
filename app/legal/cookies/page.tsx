@@ -18,7 +18,7 @@ const sections: LegalSection[] = [
     "id": "preferences-and-work-in-progress",
     "title": "Preferences and work in progress",
     "paragraphs": [
-      "Local storage remembers information such as request drafts, pending-submission recovery details, saved searches, cached favorites, recent activity, table density, view preferences, and form defaults or drafts. Session storage supports temporary navigation and refresh state. These records can include business information. Local storage may persist after sign-out, so clear PhenoShop site data when you finish on a shared device. Clearing it can remove unsent drafts or recovery information; save or resolve important work first. Server-side business records are not deleted by clearing browser storage."
+      "Local storage remembers information such as carts and request details, pending-submission recovery details, saved searches, cached favorites, recent activity, table density, view preferences, and form defaults or drafts. Session storage supports temporary navigation and refresh state. These records can include business information. Local storage may persist after sign-out, so clear PhenoShop site data when you finish on a shared device. Clearing it can remove unsent drafts or recovery information; save or resolve important work first. Server-side business records are not deleted by clearing browser storage."
     ]
   },
   {

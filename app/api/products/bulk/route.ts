@@ -10,13 +10,13 @@ export async function POST(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const formData = await request.formData();
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     const dryRun = formData.get('dryRun') === 'true';
 
     if (!(csvFile instanceof File)) {
-      return NextResponse.json({ error: 'No CSV file provided' }, { status: 400 });
+      return NextResponse.json({ error: 'Choose a CSV file to import.' }, { status: 400 });
     }
 
     const fileValidation = validateCsvImportFile(csvFile);
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     if (validation.errors.length > 0) {
       return NextResponse.json({
         success: false,
-        error: 'Product import has row errors. Fix the CSV and upload again.',
+        error: 'Some rows need attention. Fix the listed errors, then upload the CSV again.',
         totalRows: validation.totalRows,
         validRows: validation.records.length,
         errorRows: new Set(validation.errors.map((item) => item.row)).size,
@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
     }, { status: 200 });
   } catch (error) {
     console.error('Error uploading CSV:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -137,7 +137,7 @@ export async function GET(request: NextRequest) {
     const template = searchParams.get('template');
 
     if (!session && !template) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     if (template === 'true') {
@@ -152,6 +152,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Template not specified' }, { status: 400 });
   } catch (error) {
     console.error('Error generating template:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

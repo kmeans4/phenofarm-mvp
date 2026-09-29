@@ -9,20 +9,20 @@ export async function GET() {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
 
     if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const settings = await getDispensarySettings(user.dispensaryId);
     return settings ? NextResponse.json(settings) : NextResponse.json({ error: 'Dispensary not found' }, { status: 404 });
   } catch (error) {
     console.error('Error fetching dispensary settings:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 

@@ -64,7 +64,7 @@ const validatePhone = (phone: string): string | undefined => {
 const validateWebsite = (website: string): string | undefined => {
   if (!website) return undefined;
   const urlRegex = /^https?:\/\/.+/;
-  if (!urlRegex.test(website)) return 'URL must start with http:// or https://';
+  if (!urlRegex.test(website)) return 'Start the website address with http:// or https://.';
   try {
     new URL(website);
     return undefined;
@@ -89,14 +89,14 @@ const validateLicenseNumber = (license: string): string | undefined => {
 
 const validateLicenseExpiry = (expiry: string): string | undefined => {
   if (!expiry) return undefined;
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(expiry) || Number.isNaN(new Date(`${expiry}T12:00:00`).getTime())) return 'Invalid date format';
-  if (isLicenseExpired(expiry)) return 'License expiry cannot be in the past';
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(expiry) || Number.isNaN(new Date(`${expiry}T12:00:00`).getTime())) return 'Enter a valid date.';
+  if (isLicenseExpired(expiry)) return 'License expiration cannot be in the past';
   return undefined;
 };
 
 const validateLicenseState = (state: string): string | undefined => {
   if (!state.trim()) return 'License state is required';
-  if (state.trim() !== 'VT') return 'Currently only VT licenses are supported';
+  if (state.trim() !== 'VT') return 'Use a Vermont (VT) license. Other states are not supported yet.';
   return undefined;
 };
 
@@ -307,8 +307,8 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           licenseExpiry: true,
           licenseState: true,
         });
-        setError('Please fix the errors above before saving.');
-        showToast('error', 'Please fix validation errors before saving');
+        setError('Check the highlighted fields before saving.');
+        showToast('error', 'Check the highlighted fields before saving.');
         return;
       }
     }
@@ -354,7 +354,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
       if (savedTimer.current) clearTimeout(savedTimer.current);
       savedTimer.current = setTimeout(() => setSaved(false), 3000);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : 'Failed to save settings';
+      const msg = err instanceof Error ? err.message : 'We could not save settings. Please try again.';
       setError(msg);
       showToast('error', 'Failed to save', { description: msg });
     } finally {
@@ -381,7 +381,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
     <div onKeyDown={handleKeyDown} tabIndex={-1} className="space-y-4 sm:space-y-6">
       {isDirty && <DraftAutosaveStatus
         savedAt={settingsDraft.savedAt}
-        label="Settings browser draft"
+        label="Settings details"
         onClear={settingsDraft.clearDraft}
       />}
 
@@ -399,7 +399,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
           <svg className="w-5 h-5 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
           </svg>
-          <span>Settings saved successfully!</span>
+          <span>Settings saved.</span>
         </div>
       )}
 
@@ -516,7 +516,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
 
             <div>
               <label htmlFor="licenseExpiry" className="block text-sm font-medium text-pf-secondary mb-1">
-                Expiry date <span className="text-pf-muted text-xs">(recommended)</span>
+                Expiration date <span className="text-pf-muted text-xs">(recommended)</span>
               </label>
               <input
                 id="licenseExpiry"
@@ -610,7 +610,7 @@ export function SettingsForm({ initialSettings }: SettingsFormProps) {
                 placeholder="your@email.com"
               />
               <p id="account-email-help" className="mt-1 text-sm text-pf-muted">
-                Login address. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-pf-accent underline">Change email</Link>
+                Used to sign in. <Link href="/auth/change-email" className="inline-flex min-h-10 items-center font-medium text-pf-accent underline">Change email</Link>
               </p>
               {touched.email && fieldErrors.email && (
                 <p className="mt-1 text-sm text-pf-danger flex items-center gap-1">

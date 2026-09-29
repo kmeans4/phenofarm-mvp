@@ -1,24 +1,23 @@
 import type { Metadata, Viewport } from 'next'
-import { Hanken_Grotesk, IBM_Plex_Mono } from 'next/font/google'
+import { Hanken_Grotesk, Roboto } from 'next/font/google'
 import './globals.css'
 
 const hankenGrotesk = Hanken_Grotesk({ subsets: ['latin'], variable: '--font-hanken-grotesk', display: 'swap' })
-const ibmPlexMono = IBM_Plex_Mono({
+const roboto = Roboto({
   subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-ibm-plex-mono',
+  variable: '--font-roboto',
   display: 'swap',
 })
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://phenoshop.app'),
   title: 'PhenoShop - B2B Cannabis Marketplace',
-  description: 'Connect licensed growers and dispensaries for wholesale requests, fulfillment coordination, and direct settlement',
+  description: 'Find wholesale cannabis products, connect with licensed growers and dispensaries, and track order requests.',
   applicationName: 'PhenoShop',
   openGraph: {
     siteName: 'PhenoShop',
     title: 'PhenoShop - B2B Cannabis Marketplace',
-    description: 'Connect licensed growers and dispensaries for wholesale requests, fulfillment coordination, and direct settlement',
+    description: 'Find wholesale cannabis products, connect with licensed growers and dispensaries, and track order requests.',
     type: 'website',
   },
   twitter: { card: 'summary_large_image', title: 'PhenoShop - B2B Cannabis Marketplace' },
@@ -45,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${hankenGrotesk.variable} ${ibmPlexMono.variable}`}>
+    <html lang="en" className={`${hankenGrotesk.variable} ${roboto.variable}`}>
       <body>
         {children}
       </body>

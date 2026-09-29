@@ -18,10 +18,10 @@ function text(body: Record<string, unknown>, key: string, required = false, max 
 
 export async function saveProfileSettings(request: NextRequest, role: 'GROWER' | 'DISPENSARY', partial = false) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
   const user = session.user;
   const profileId = role === 'GROWER' ? user.growerId : user.dispensaryId;
-  if (user.role !== role || !profileId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (user.role !== role || !profileId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
   try {
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== 'object' || Array.isArray(body)) fail('Invalid settings');

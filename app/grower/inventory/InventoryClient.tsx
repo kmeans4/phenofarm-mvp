@@ -35,7 +35,7 @@ function getProductTypeLabel(product: InventoryProduct) {
 
 function InventoryStatusBadge({ isAvailable, quantity }: { isAvailable?: boolean; quantity?: number }) {
   if ((quantity || 0) <= 0) {
-    return <span className="rounded-full bg-pf-danger-bg px-2 py-1 text-xs font-medium text-pf-danger">Out of Stock</span>;
+    return <span className="rounded-full bg-pf-danger-bg px-2 py-1 text-xs font-medium text-pf-danger">Out of stock</span>;
   }
   if (!isAvailable) {
     return <span className="rounded-full bg-pf-surface px-2 py-1 text-xs font-medium text-pf-secondary">Unavailable</span>;
@@ -100,7 +100,7 @@ export function InventoryClient({ initialProducts, view, counts, inventoryValue 
 
     if (!Number.isInteger(nextQuantity) || nextQuantity < 0) {
       setQuantityDrafts((prev) => ({ ...prev, [productId]: String(product.inventoryQty) }));
-      toast.error('Enter a non-negative whole number');
+      toast.error('Enter a whole number of 0 or more.');
       return;
     }
 
@@ -127,7 +127,7 @@ export function InventoryClient({ initialProducts, view, counts, inventoryValue 
       if (!response.ok) {
         const message = data && typeof data === 'object' && 'error' in data
           ? String((data as { error?: unknown }).error)
-          : 'Failed to update stock';
+          : 'We could not update stock. Please try again.';
         throw new Error(message);
       }
 
@@ -158,7 +158,7 @@ export function InventoryClient({ initialProducts, view, counts, inventoryValue 
         item.id === productId ? { ...item, inventoryQty: previousQuantity } : item
       )));
       setQuantityDrafts((prev) => ({ ...prev, [productId]: String(previousQuantity) }));
-      toast.error(error instanceof Error ? error.message : 'Failed to update stock');
+      toast.error(error instanceof Error ? error.message : 'We could not update stock. Please try again.');
     } finally {
       setPending(productId, false);
     }
@@ -334,12 +334,12 @@ export function InventoryClient({ initialProducts, view, counts, inventoryValue 
               <table className="min-w-full divide-y divide-pf-line">
                 <thead className="bg-pf-canvas">
                   <tr>
-                    <th className="px-3 py-3 text-left text-[11px] font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Product</th>
-                    <th className="px-3 py-3 text-left text-[11px] font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Type</th>
-                    <th className="px-3 py-3 text-left text-[11px] font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Price</th>
-                    <th className="px-3 py-3 text-left text-[11px] font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Inventory</th>
-                    <th className="px-3 py-3 text-left text-[11px] font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Status</th>
-                    <th className="px-3 py-3 text-right text-[11px] font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Actions</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Product</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Type</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Price</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Inventory</th>
+                    <th className="px-3 py-3 text-left text-xs font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Status</th>
+                    <th className="px-3 py-3 text-right text-xs font-medium uppercase text-pf-muted sm:px-6 sm:text-xs">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-pf-line bg-pf-surface">

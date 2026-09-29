@@ -89,7 +89,7 @@ export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps
         setNewStrainGenetics('');
       } else {
         const err = await response.json().catch(() => ({}));
-        toast.error(err.error || 'Failed to create strain');
+        toast.error(err.error || 'We could not create strain. Please try again.');
       }
     } catch (err) {
       console.error('Error creating strain:', err);

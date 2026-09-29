@@ -4,7 +4,7 @@ import { AccountActionPurpose } from '@prisma/client';
 import { db } from '@/lib/db';
 import { accountOrigin, sendAccountMail } from '@/lib/account-mail';
 
-export const ACCOUNT_REQUEST_MESSAGE = 'If this address is eligible, an email will arrive shortly. Check your spam folder or try again later.';
+export const ACCOUNT_REQUEST_MESSAGE = 'If we can send a link to this address, it should arrive in a few minutes. Check your spam folder too.';
 export const INVALID_ACCOUNT_LINK = 'This link is invalid or has expired. Request a new email and try again.';
 export const passwordRequirement = (value: unknown) => typeof value === 'string' && Buffer.byteLength(value, 'utf8') > 72
   ? 'Password is too long. Use fewer characters.' : 'Use at least 12 characters.';

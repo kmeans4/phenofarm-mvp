@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'PhenoShop',
     short_name: 'PhenoShop',
-    description: 'The workspace for licensed growers and dispensaries.',
+    description: 'List products, connect with growers and dispensaries, and track wholesale orders.',
     start_url: '/',
     display: 'standalone',
     background_color: '#070b09',

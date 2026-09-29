@@ -24,7 +24,7 @@ export async function PATCH(
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
@@ -65,7 +65,7 @@ export async function PATCH(
         );
       }
     } else if (user.role !== 'ADMIN') {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     if (order.status === newStatus) return NextResponse.json({ success: true, order: { id: order.id, status: order.status, shippedAt: order.shippedAt, deliveredAt: order.deliveredAt } });
@@ -143,6 +143,6 @@ export async function PATCH(
   } catch (error) {
     if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Status update error:', error);
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

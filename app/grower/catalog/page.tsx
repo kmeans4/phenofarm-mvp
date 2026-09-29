@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { isLicenseExpired } from '@/lib/license';
+import { MarketplaceVisibilityNotice } from '../components/MarketplaceVisibilityNotice';
 import { redirect } from 'next/navigation';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
@@ -25,6 +27,7 @@ export default async function GrowerCatalogWorkspacePage() {
   const catalogWhere = { growerId: user.growerId, isDeleted: false };
 
   const [
+    grower,
     inventoryTotals,
     totalProducts,
     availableProducts,
@@ -33,9 +36,10 @@ export default async function GrowerCatalogWorkspacePage() {
     missingImageProducts,
     missingTypeProducts,
   ] = await Promise.all([
+    db.grower.findUnique({ where: { id: user.growerId }, select: { isVerified: true, licenseExpiry: true } }),
     db.$queryRaw<Array<{ value: number }>>`SELECT COALESCE(SUM(price * "inventoryQty"), 0)::float AS value FROM products WHERE "growerId" = ${user.growerId} AND "isDeleted" = false`,
     db.product.count({ where: catalogWhere }),
-    db.product.count({ where: { ...catalogWhere, isAvailable: true } }),
+    db.product.count({ where: { ...catalogWhere, isAvailable: true, status: 'PUBLISHED', inventoryQty: { gt: 0 } } }),
     db.product.count({ where: { ...catalogWhere, inventoryQty: { gt: 0, lte: 10 } } }),
     db.product.count({ where: { ...catalogWhere, isPriceVisible: false } }),
     db.product.count({ where: { ...catalogWhere, images: { isEmpty: true } } }),
@@ -50,6 +54,7 @@ export default async function GrowerCatalogWorkspacePage() {
     }),
   ]);
 
+  const marketplaceVisible = Boolean(grower?.isVerified && !isLicenseExpired(grower.licenseExpiry));
   const inventoryValue = Number(inventoryTotals[0]?.value || 0);
 
   const primaryNextAction = totalProducts === 0
@@ -74,8 +79,8 @@ export default async function GrowerCatalogWorkspacePage() {
     {
       title: 'Buyer preview',
       href: '/grower/marketplace',
-      description: 'See your public listings.',
-      metric: `${availableProducts} live`,
+      description: 'Preview your published listings.',
+      metric: marketplaceVisible ? `${availableProducts} live` : `${availableProducts} awaiting review`,
     },
     {
       title: 'Pricing',
@@ -90,14 +95,14 @@ export default async function GrowerCatalogWorkspacePage() {
       title: 'Missing images',
       count: missingImageProducts,
       href: '/grower/products?view=missing-images',
-      helper: 'Add photos so verified buyers can inspect listings faster.',
+      helper: 'Add photos to help buyers see what you offer.',
       accent: 'bg-pf-warning-bg text-pf-warning ring-pf-warning-line',
     },
     {
       title: 'Missing type',
       count: missingTypeProducts,
       href: '/grower/products?view=missing-type',
-      helper: 'Assign product types so filters and buyer preview stay clean.',
+      helper: 'Choose a product type so buyers can find it using filters.',
       accent: 'bg-pf-warning-bg text-pf-warning ring-pf-warning-line',
     },
     {
@@ -120,7 +125,7 @@ export default async function GrowerCatalogWorkspacePage() {
     {
       title: 'Strains',
       href: '/grower/strains',
-      description: 'Maintain strain records used by product listings and batches.',
+      description: 'Save strain details to reuse in products and batches.',
     },
     {
       title: 'Batches',
@@ -141,6 +146,7 @@ export default async function GrowerCatalogWorkspacePage() {
         <p className="font-medium text-pf-accent">{primaryNextAction.label}</p>
         <Link href={primaryNextAction.href} className="font-semibold text-pf-accent underline">{primaryNextAction.actionLabel} →</Link>
       </div>
+      <MarketplaceVisibilityNotice grower={grower} />
       <OperationsSummary items={[
         {label: 'Products', value: totalProducts}, {label: 'Available', value: availableProducts},
         {label: 'Stock value', value: formatMoney(inventoryValue)}, {label: 'Quote only', value: hiddenPriceProducts},
@@ -152,11 +158,11 @@ export default async function GrowerCatalogWorkspacePage() {
         </Link>)}
       </div>
       <section className="rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm sm:p-4">
-        <h2 className="text-base font-semibold">Catalog health</h2>
+        <h2 className="text-base font-semibold">Listing checklist</h2>
         <div className="mt-1 divide-y divide-pf-line sm:mt-3">
           {healthSummaryItems.filter(item => item.count > 0).map(item => <Link key={item.title} href={item.href} className="flex items-center justify-between gap-3 py-3 text-sm hover:text-pf-accent"><span>{item.title}</span><span className="font-semibold">{item.count} →</span></Link>)}
         </div>
-        {healthSummaryItems.every(item => item.count === 0) && <p className="mt-3 text-sm text-pf-muted">{totalProducts ? 'No catalog issues.' : 'Add a product to see catalog health.'}</p>}
+        {healthSummaryItems.every(item => item.count === 0) && <p className="mt-3 text-sm text-pf-muted">{totalProducts ? marketplaceVisible ? 'No catalog issues.' : 'Listing details are complete. Marketplace visibility is awaiting license review.' : 'Add a product to see catalog health.'}</p>}
         {healthSummaryItems.some(item => item.count === 0) && <details className="text-sm text-pf-muted sm:mt-3"><summary className="min-h-10 cursor-pointer py-2.5">All checks</summary><ul className="mt-2 space-y-2">{healthSummaryItems.map(item => <li key={item.title}>{item.title}: {item.count}</li>)}</ul></details>}
       </section>
       <details className="rounded-xl border border-pf-line bg-pf-surface px-3 py-1 shadow-sm sm:p-4">

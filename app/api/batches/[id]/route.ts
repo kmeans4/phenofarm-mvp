@@ -100,13 +100,13 @@ export async function GET(
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const { id } = await params;
@@ -132,7 +132,7 @@ export async function GET(
     return NextResponse.json(batch, { status: 200 });
   } catch (error) {
     console.error('Error fetching batch:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -145,13 +145,13 @@ export async function PUT(
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const { id } = await params;
@@ -264,7 +264,7 @@ export async function PUT(
     }
   } catch (error) {
     console.error('Error updating batch:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -277,13 +277,13 @@ export async function DELETE(
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const { id } = await params;
@@ -304,7 +304,7 @@ export async function DELETE(
     // Check if batch has products
     if (existing._count.products > 0) {
       return NextResponse.json({ 
-        error: 'Cannot delete batch with associated products' 
+        error: 'Remove this batch from its products before deleting it.'
       }, { status: 409 });
     }
 
@@ -315,6 +315,6 @@ export async function DELETE(
     return NextResponse.json({ message: 'Batch deleted successfully' }, { status: 200 });
   } catch (error) {
     console.error('Error deleting batch:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

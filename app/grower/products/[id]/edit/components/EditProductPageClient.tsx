@@ -10,6 +10,7 @@ import { PageHeader } from '@/app/components/ui/PageHeader';
 
 interface ProductFormData {
   id?: string;
+  status?: 'DRAFT' | 'PUBLISHED';
   name: string;
   productType: string;
   subType: string;
@@ -37,12 +38,12 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (formData: ProductFormData) => {
+  const saveProduct = async (formData: ProductFormData, status: 'DRAFT' | 'PUBLISHED') => {
     try {
       setIsSubmitting(true);
       const payload = buildProductRequestPayload(
         formData as unknown as Record<string, unknown>,
-        PRODUCT_STATUS.PUBLISHED
+        status
       );
 
       const response = await fetch(`/api/products/${productId}`, {
@@ -53,10 +54,10 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to update product');
+        throw new Error(data.error || 'We could not update product. Please try again.');
       }
 
-      toast.success('Product updated');
+      toast.success(status === PRODUCT_STATUS.DRAFT ? 'Draft saved' : initialData.status === 'DRAFT' ? 'Product published' : 'Product updated');
       router.push('/grower/products');
     } catch (err: unknown) {
       throw err;
@@ -82,7 +83,8 @@ export default function EditProductPageClient({ productId, initialData }: EditPr
       </div>
 
       <ProductForm
-        onSubmit={handleSubmit}
+        onSubmit={(data) => saveProduct(data, PRODUCT_STATUS.PUBLISHED)}
+        onSaveDraft={initialData.status === 'DRAFT' ? (data) => saveProduct(data, PRODUCT_STATUS.DRAFT) : undefined}
         onCancel={() => router.push('/grower/products')}
         initialData={initialData}
         isSubmitting={isSubmitting}

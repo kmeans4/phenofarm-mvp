@@ -6,6 +6,8 @@ import { getGrowerCustomerPage } from '../lib/grower-customers';
 import { deliveredValueByDay } from '../lib/dashboard-metrics';
 import { safeInternalPath } from '../app/components/ui/safeNavigation';
 import { isDateInRange } from '../app/components/ui/DateRangeFilter';
+import { CURRENT_POLICIES } from '../lib/policies/current';
+import { getGrowerPlan } from '../lib/plans';
 
 const baseURL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3144';
 function isLocalTestTarget(value: string, database = false) {
@@ -29,8 +31,10 @@ test.setTimeout(90000);
 test.beforeAll(async () => {
   const user = await db.user.create({ data: { emailVerifiedAt: new Date(), sessionVersion: 0, email: `${prefix}@example.test`, role: 'GROWER', name: 'Review grower', grower: { create: { businessName: 'Review Farm', licenseNumber: prefix, licenseExpiry: new Date('2030-12-31'), isVerified: true, subscriptionPlan: 'pro', subscriptionStatus: 'active' } } }, include: { grower: true } });
   userId = user.id; growerId = user.grower!.id;
+  await db.policyAcceptance.create({ data: { userId, ...CURRENT_POLICIES, source: 'signup' } });
   const other = await db.user.create({ data: { emailVerifiedAt: new Date(), sessionVersion: 0, email: `${prefix}-other@example.test`, role: 'GROWER', grower: { create: { businessName: 'Other Farm', licenseNumber: `${prefix}-other` } } } });
   otherUserId = other.id;
+  await db.policyAcceptance.create({ data: { userId: otherUserId, ...CURRENT_POLICIES, source: 'signup' } });
   const customer = await db.dispensary.create({ data: { businessName: 'Review Buyer', createdByGrowerId: growerId, offPlatformEmail: 'buyer@example.test', contactName: 'Review contact' } }); buyerId = customer.id;
   const strain = await db.strain.create({ data: { growerId, name: 'Review Strain', strainType: 'HYBRID' } }); strainId = strain.id;
   const batch = await db.batch.create({ data: { growerId, strainId, batchNumber: `${prefix}-batch`, harvestDate: new Date('2026-08-01'), lotNumber: 'LOT-KEEP', testResults: { retained: 'keep this value', labDocuments: {} } } }); batchId = batch.id;
@@ -71,8 +75,8 @@ test('paged catalog keeps focus, avoids session refetch and applies bulk changes
   await first.focus(); await page.keyboard.press('Space'); await expect(first).toBeFocused();
   const requestsBefore = listRequests;
   await page.evaluate(() => window.dispatchEvent(new Event('focus')));
-  await page.getByRole('button', { name: 'Disable', exact: true }).click();
-  await expect(page.getByText('Disabled for 1 product.')).toBeVisible();
+  await page.getByRole('button', { name: 'Hide', exact: true }).click();
+  await expect(page.getByText('Hidden for 1 product.')).toBeVisible();
   expect(listRequests).toBe(requestsBefore);
   const active = await db.product.count({ where: { growerId, isAvailable: true } }); expect(active).toBe(54);
   await page.getByRole('link', { name: 'Next', exact: true }).click();
@@ -413,15 +417,15 @@ test('logo preview follows a newer saved prop after a delayed upload', async ({ 
   await expect.poll(() => page.locator('img[alt="Company logo"]').getAttribute('src')).toBe('/uploads/newer-logo.png');
 });
 
-test('subscription readiness rejects canceled and unpaid plans and permits trialing', async ({ page }) => {
+test('inactive paid plans fall back to free listing readiness while trialing retains pro', async ({ page }) => {
   await authenticate(page);
   for (const status of ['canceled', 'unpaid', 'trialing']) {
-    await db.grower.update({ where: { id: growerId }, data: { subscriptionPlan: 'pro', subscriptionStatus: status } });
+    const profile = await db.grower.update({ where: { id: growerId }, data: { subscriptionPlan: 'pro', subscriptionStatus: status } });
+    expect(getGrowerPlan(profile)).toBe(status === 'trialing' ? 'pro' : 'free');
     await page.goto('/grower/dashboard');
     const setup = page.locator('details').filter({ has: page.locator('summary').filter({ hasText: /^Setup ·/ }) });
     await setup.locator('summary').click();
-    if (status === 'trialing') await expect(setup).toContainText(/Complete:.*Subscription/);
-    else await expect(setup.getByRole('link', { name: 'Review subscription', exact: true })).toBeVisible();
+    await expect(setup).toContainText(/Complete:.*Subscription/);
   }
   await db.grower.update({ where: { id: growerId }, data: { subscriptionStatus: 'active' } });
 });
@@ -468,10 +472,10 @@ test('batch PDFs upload separately and editing preserves existing batch metadata
   await page.route('**/api/products/upload-document', async route => { uploads++; await uploadGate; await route.fulfill({ json: { url: '/uploads/review-lab.pdf' } }); });
   await page.getByLabel('Potency', { exact: true }).setInputFiles({ name: 'review-lab.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.7\nlocal test fixture\n%%EOF') });
   await expect.poll(() => uploads).toBe(1);
-  await expect(page.getByRole('button', { name: 'Save Changes', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Save changes', exact: true })).toBeDisabled();
   releaseUpload();
   await expect(page.getByText('review-lab.pdf', { exact: true })).toBeVisible();
-  await page.getByRole('button', { name: 'Save Changes', exact: true }).click();
+  await page.getByRole('button', { name: 'Save changes', exact: true }).click();
   await expect(page).toHaveURL(/\/grower\/batches$/);
   const batch = await db.batch.findUniqueOrThrow({ where: { id: batchId } });
   const results = batch.testResults as { retained: string; labDocuments: { cannabinoids: { dataUrl: string } } };

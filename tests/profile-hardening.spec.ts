@@ -194,7 +194,7 @@ test.describe('Profile hardening + license verification', () => {
 
     // Exercise submission from a populated draft, then surface the API denial.
     await page.getByRole('button', { name: /^Review request$/i }).first().click();
-    await page.getByRole('dialog', { name: 'Review request' }).getByRole('button', { name: 'Submit request', exact: true }).click();
+    await page.getByRole('dialog', { name: 'Review request' }).getByRole('button', { name: 'Send order request', exact: true }).click();
 
     // Verify order was blocked
     await expect

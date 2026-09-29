@@ -11,6 +11,8 @@ const FIELD_CLASS = 'mt-1 w-full rounded-lg border border-pf-line-strong bg-pf-s
 
 export function CommercialTermsPanel({ initialData }: { initialData?: { terms: CommercialTermsDefaults; savedAt: string | null } }) {
   const [terms, setTerms] = useState<CommercialTermsDefaults>(initialData?.terms || DEFAULT_COMMERCIAL_TERMS);
+  const [savedTerms, setSavedTerms] = useState<CommercialTermsDefaults>(initialData?.terms || DEFAULT_COMMERCIAL_TERMS);
+  const termsDirty = JSON.stringify(terms) !== JSON.stringify(savedTerms);
   const [savedAt, setSavedAt] = useState<string | null>(initialData?.savedAt || null);
   const [statusMessage, setStatusMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -30,14 +32,15 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
         if (!active) return;
 
         if (!response.ok) {
-          throw new Error(data.error || 'Unable to load commercial terms');
+          throw new Error(data.error || 'Unable to load order terms');
         }
 
         setTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || {}) });
+        setSavedTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || {}) });
         setSavedAt(data.savedAt || null);
       } catch (error) {
         if (!active) return;
-        setErrorMessage(error instanceof Error ? error.message : 'Unable to load commercial terms');
+        setErrorMessage(error instanceof Error ? error.message : 'Unable to load order terms');
       } finally {
         if (active) setIsLoading(false);
       }
@@ -70,14 +73,15 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Unable to save commercial terms');
+        throw new Error(data.error || 'Unable to save order terms');
       }
 
       setTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || nextTerms) });
+      setSavedTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || nextTerms) });
       setSavedAt(data.savedAt || new Date().toISOString());
       setStatusMessage('Terms saved.');
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to save commercial terms');
+      setErrorMessage(error instanceof Error ? error.message : 'Unable to save order terms');
     } finally {
       setIsSaving(false);
     }
@@ -92,9 +96,9 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
     <section className="rounded-xl border border-pf-line bg-pf-surface p-4 shadow-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
-          <h2 className="text-base sm:text-lg font-semibold text-pf-text">Commercial terms</h2>
+          <h2 className="text-base sm:text-lg font-semibold text-pf-text">Order terms</h2>
           <p className="mt-1 text-sm text-pf-muted">
-            Shown to buyers on your shop.
+            Buyers see these details in your shop. Choose Save terms to save changes to this section.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -108,6 +112,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
       </div>
 
       <div className="mt-4 space-y-3">
+        {!isLoading && <p role="status" className="text-sm text-pf-muted">{termsDirty ? 'Unsaved order terms' : savedAt ? 'Order terms saved' : 'Default terms — choose Save terms to confirm'}</p>}
         {savedAt && (
           <p className="rounded-lg bg-pf-canvas px-3 py-2 text-sm text-pf-muted">
             Last saved {new Date(savedAt).toLocaleString()}
@@ -119,7 +124,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
 
       <div className={`mt-3 grid gap-3 sm:mt-4 sm:gap-4 md:grid-cols-2 ${isLoading ? 'opacity-60' : ''}`}>
         <label className="block text-sm font-medium text-pf-secondary">
-          Default MOQ
+          Minimum order
           <input
             value={terms.minimumOrder}
             onChange={(event) => updateTerm('minimumOrder', event.target.value)}
@@ -130,7 +135,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
         </label>
 
         <label className="block text-sm font-medium text-pf-secondary">
-          Fulfillment
+          Pickup or delivery
           <input
             value={terms.fulfillmentMethods}
             onChange={(event) => updateTerm('fulfillmentMethods', event.target.value)}
@@ -141,7 +146,7 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
         </label>
 
         <label className="block text-sm font-medium text-pf-secondary">
-          Region
+          Delivery area
           <input
             value={terms.fulfillmentRegion}
             onChange={(event) => updateTerm('fulfillmentRegion', event.target.value)}
@@ -181,13 +186,13 @@ export function CommercialTermsPanel({ initialData }: { initialData?: { terms: C
             onChange={(event) => updateTerm('contactNote', event.target.value)}
             disabled={isLoading || isSaving}
             className={FIELD_CLASS}
-            placeholder="Message before fulfillment"
+            placeholder="Message before pickup or delivery"
           />
         </label>
       </div>
 
       <p className="mt-4 rounded-lg bg-pf-info-bg px-3 py-2 text-xs text-pf-info">
-        Defaults only; confirm final terms with each buyer.
+        These are your usual terms. Confirm the details with each buyer.
       </p>
     </section>
   );

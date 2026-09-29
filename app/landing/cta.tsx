@@ -1,13 +1,6 @@
 import Link from 'next/link';
 import { Reveal } from './motion';
 import { MagneticButton } from './magnetic-button';
-import { CheckCircle2 } from 'lucide-react';
-
-const assurances = [
-  'No wholesale payment processing',
-  'Cultivator subscriptions only',
-  'Demo access available',
-];
 
 export function Cta() {
   return (
@@ -31,30 +24,20 @@ export function Cta() {
 
         <div className="relative">
           <h2 className="mx-auto max-w-2xl text-balance text-3xl font-semibold tracking-tight text-white md:text-5xl md:leading-[1.1]">
-            Run wholesale like the rest of your business
+            Ready to manage wholesale orders in one place?
           </h2>
           <p className="mx-auto mt-5 max-w-xl text-pretty text-lg leading-relaxed text-gray-400">
-            Catalog, verification, quotes, and fulfillment in one workspace — with settlement
-            exactly where it belongs: between you and your partners.
+            List products, agree on prices, and follow requests through delivery.
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <MagneticButton href="/auth/sign_up">Create your account</MagneticButton>
+            <MagneticButton href="/auth/sign_up">Create a free account</MagneticButton>
             <Link
               href="/contact"
               className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.03] px-7 py-3.5 text-sm font-semibold text-gray-200 transition-colors hover:border-white/20 hover:bg-white/[0.06]"
             >
-              Talk to us
+              Ask a question
             </Link>
-          </div>
-
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-            {assurances.map((item) => (
-              <span key={item} className="flex items-center gap-2 text-xs text-gray-500">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400/80" aria-hidden />
-                {item}
-              </span>
-            ))}
           </div>
         </div>
       </Reveal>

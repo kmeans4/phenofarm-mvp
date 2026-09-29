@@ -12,6 +12,6 @@ export function normalizeLabReports(value: unknown): LabReportKey[] {
   return Array.isArray(value) ? LAB_REPORT_KEYS.filter(key => value.includes(key)) : [];
 }
 
-export function labReportDownloadPath(productId: string, report: LabReportKey) {
-  return `/api/dispensary/products/${encodeURIComponent(productId)}/labs/${report}`;
+export function labReportDownloadPath(productId: string, report: LabReportKey, audience: 'dispensary' | 'grower' = 'dispensary') {
+  return `/api/${audience}/products/${encodeURIComponent(productId)}/labs/${report}`;
 }

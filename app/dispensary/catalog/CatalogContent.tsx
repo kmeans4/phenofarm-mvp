@@ -120,7 +120,7 @@ const PRICING_MESSAGE_MAX_LENGTH = 600;
 
 const MESSAGE_TEMPLATE_CHIPS = [
   {
-    label: 'Pricing & MOQ',
+    label: 'Price & minimum order',
     getMessage: (product: Product) =>
       `Hi ${product.grower.businessName}, can you share current pricing, MOQ, and availability for ${product.name}${product.unit ? ` (${product.unit})` : ''}?`,
   },
@@ -926,7 +926,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
     setStoredPriceAlerts(updated);
 
     setShowPriceAlertModal(false);
-    toast.success("Alert set — we'll flag it in Saved → Price Alerts when the price drops");
+    toast.success("Alert saved. Check Saved → Alerts for price updates.");
   };
 
   const openPricingMessageModal = (product: Product, mode: 'REQUEST_PRICING' | 'QUESTION') => {
@@ -967,7 +967,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
+        throw new Error(data.error || 'We could not send message. Please try again.');
       }
 
       setRequestPricingMessage('');
@@ -981,7 +981,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
       closeRequestPricingModal();
     } catch (err) {
-      setRequestPricingError(err instanceof Error ? err.message : 'Failed to send message');
+      setRequestPricingError(err instanceof Error ? err.message : 'We could not send message. Please try again.');
     } finally {
       setRequestPricingSending(false);
     }
@@ -1208,12 +1208,12 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
         {/* Filters Sidebar */}
         {showFilters && (
           <div className="hidden w-64 flex-shrink-0 space-y-6 lg:block">
-            {/* Saved Filters Section */}
+            {/* Saved filters Section */}
             {savedFilters.length > 0 && (
               <div className="bg-pf-surface rounded-lg border border-pf-line p-4">
                 <h3 className="font-semibold text-pf-text mb-3 flex items-center gap-2">
                   <BookmarkCheck size={18} className="text-pf-accent" />
-                  Saved Filters
+                  Saved filters
                 </h3>
                 <div className="space-y-2">
                   {savedFilters.map((savedFilter) => (
@@ -1246,7 +1246,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
                 className="w-full py-2 px-4 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 text-sm font-medium"
               >
                 <Bookmark size={16} />
-                Save Current Filter
+                Save these filters
               </button>
             )}
 
@@ -1297,7 +1297,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
             {/* THC Range Filter */}
             <div className="bg-pf-surface rounded-lg border border-pf-line p-4">
-              <h3 className="font-semibold text-pf-text mb-3">THC Potency</h3>
+              <h3 className="font-semibold text-pf-text mb-3">THC level</h3>
               <div className="space-y-2">
                 {THC_RANGES.map(range => (
                   <label key={range.id} className="flex items-center gap-2 cursor-pointer hover:bg-pf-canvas p-1 rounded">
@@ -1554,11 +1554,12 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
           <div className="w-full">
             <div className="space-y-3 sm:space-y-4">
               <div>
-                <label className="block text-sm font-medium text-pf-secondary mb-2">
+                <label htmlFor="saved-filter-name" className="block text-sm font-medium text-pf-secondary mb-2">
                   Name
                 </label>
                 <input
                   type="text"
+                  id="saved-filter-name"
                   value={newFilterName}
                   onChange={(e) => setNewFilterName(e.target.value)}
                   placeholder="e.g., Flower under $20"
@@ -1651,7 +1652,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
           <div className="w-full">
             <div className="space-y-3 sm:space-y-4">
               <p className="text-sm text-pf-muted">
-                <span className="block font-semibold">{priceAlertProduct.name}</span>Checked when you visit Saved or refresh.
+                <span className="block font-semibold">{priceAlertProduct.name}</span>Prices are checked when you open Saved or refresh your alerts.
               </p>
               <div>
                 <label htmlFor="target-price-alert" className="block text-sm font-medium text-pf-secondary mb-2">Target price ($/{displayUnit(priceAlertProduct.unit)})</label>
@@ -1755,7 +1756,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
                       }}
                       className="min-h-10 rounded-full border border-pf-line px-3 py-2 text-xs font-semibold text-pf-secondary transition-colors hover:border-pf-accent-line hover:bg-pf-accent-bg hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                     >
-                      {template.label === 'Pricing & MOQ' ? 'Pricing' : template.label === 'Introduction' ? 'Intro' : template.label}
+                      {template.label === 'Price & minimum order' ? 'Pricing' : template.label === 'Introduction' ? 'Intro' : template.label}
                     </button>
                   ))}
                 </div>
@@ -1787,7 +1788,7 @@ export default function CatalogContent({ initialData }: { initialData?: BuyerCat
 
               <div className="flex gap-2 text-xs text-pf-muted">
                 <MessageSquare className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
-                <p>Replies in Messages.</p>
+                <p>Find replies in Messages.</p>
               </div>
 
               {requestPricingError && (
@@ -1957,7 +1958,7 @@ function CompareModal({
           </div>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto p-4">
-          {hasDifferentUnits && <p className="mb-3 rounded-lg bg-pf-warning-bg p-2 text-xs text-pf-warning sm:text-sm">Units differ; confirm with the grower.</p>}
+          {hasDifferentUnits && <p className="mb-3 rounded-lg bg-pf-warning-bg p-2 text-xs text-pf-warning sm:text-sm">Products may use different units. Check the unit before comparing prices.</p>}
           <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${products.length}, minmax(0, 1fr))` }}>
             {products.map(product => <div key={product.id} className="min-w-0">
               <div className="mb-2 flex items-center justify-between gap-1">

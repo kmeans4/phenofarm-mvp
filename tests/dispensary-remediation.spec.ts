@@ -398,7 +398,7 @@ test('partial checkout keeps rejected items and submits once', async ({ page, co
   await expect(page.getByText('Ordered fixture', { exact: true }).first()).toBeVisible();
   await expect(page.getByRole('button', { name: /^Review request$/i }).first()).toBeEnabled();
   await page.getByRole('button', { name: /^Review request$/i }).first().click();
-  await page.getByRole('button', { name: 'Submit request', exact: true }).dblclick({ delay: 20 });
+  await page.getByRole('button', { name: 'Send order request', exact: true }).dblclick({ delay: 20 });
   await expect(page.getByText('Some requests were submitted.', { exact: false })).toBeVisible();
   expect(submits).toBe(1);
   expect(await page.evaluate(() => JSON.parse(localStorage.getItem('phenofarm-cart') || '{}').items.map((item: { name: string }) => item.name))).toEqual(['Retained fixture']);

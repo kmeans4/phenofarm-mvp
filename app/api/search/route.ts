@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const session = await getAuthSession();
     
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
@@ -225,6 +225,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ results });
   } catch (error) {
     console.error('Search error:', error);
-    return NextResponse.json({ error: 'Search failed' }, { status: 500 });
+    return NextResponse.json({ error: 'We could not search right now. Please try again.' }, { status: 500 });
   }
 }

@@ -191,12 +191,12 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
       <details className="rounded-xl border border-pf-line bg-pf-surface px-4 py-1">
         <summary className="min-h-10 cursor-pointer content-center text-sm font-semibold text-pf-text">Shop details</summary>
         <dl className="my-3 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
-          <div><dt className="text-pf-muted">Region</dt><dd>{commercialTerms.fulfillmentRegion}</dd></div>
-          <div><dt className="text-pf-muted">Fulfillment</dt><dd>{commercialTerms.fulfillmentMethods}</dd></div>
+          <div><dt className="text-pf-muted">Delivery area</dt><dd>{commercialTerms.fulfillmentRegion}</dd></div>
+          <div><dt className="text-pf-muted">Pickup or delivery</dt><dd>{commercialTerms.fulfillmentMethods}</dd></div>
           <div><dt className="text-pf-muted">Minimum</dt><dd>{commercialTerms.minimumOrder}</dd></div>
-          <div><dt className="text-pf-muted">Replies</dt><dd>{commercialTerms.responseWindow === DEFAULT_COMMERCIAL_TERMS.responseWindow ? '1 business day' : commercialTerms.responseWindow}</dd></div>
+          <div><dt className="text-pf-muted">Replies</dt><dd>{commercialTerms.responseWindow === DEFAULT_COMMERCIAL_TERMS.responseWindow ? 'Ask the grower' : commercialTerms.responseWindow}</dd></div>
           <div><dt className="text-pf-muted">Payment terms</dt><dd>{commercialTerms.paymentTerms === DEFAULT_COMMERCIAL_TERMS.paymentTerms ? 'Direct with grower' : commercialTerms.paymentTerms}</dd></div>
-          <div><dt className="text-pf-muted">Requests fulfilled</dt><dd>{fulfilledRequests}</dd></div>
+          <div><dt className="text-pf-muted">Completed orders</dt><dd>{fulfilledRequests}</dd></div>
           {commercialTerms.contactNote !== DEFAULT_COMMERCIAL_TERMS.contactNote && <div className="sm:col-span-2"><dt className="text-pf-muted">Contact note</dt><dd>{commercialTerms.contactNote}</dd></div>}
         </dl>
       </details>

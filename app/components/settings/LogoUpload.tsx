@@ -103,7 +103,7 @@ export function LogoUpload({ currentLogo, onUpload, disabled = false }: LogoUplo
               variant="outline"
               size="sm"
             >
-              {uploading ? 'Uploading...' : preview ? 'Change Logo' : 'Upload Logo'}
+              {uploading ? 'Uploading...' : preview ? 'Change logo' : 'Upload logo'}
             </Button>
             
             {preview && (

@@ -68,7 +68,7 @@ export default function EditStrainPage() {
           setError('Strain not found');
         }
       } catch {
-        setError('Failed to load strain');
+        setError('We could not load strain. Please try again.');
       } finally {
         setFetching(false);
       }
@@ -116,7 +116,7 @@ export default function EditStrainPage() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to update strain');
+        throw new Error(data.error || 'We could not update strain. Please try again.');
       }
 
       toast.success('Strain updated');
@@ -141,7 +141,7 @@ export default function EditStrainPage() {
       <div className="text-center py-8 sm:py-12">
         <h2 className="text-2xl font-bold text-pf-text">Strain not found</h2>
         <Button variant="primary" className="mt-4" onClick={() => router.push('/grower/strains')}>
-          Back to Strains
+          Back to strains
         </Button>
       </div>
     );

@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return apiError(401, 'UNAUTHORIZED', 'Unauthorized');
+      return apiError(401, 'UNAUTHORIZED', 'Please sign in to continue.');
     }
 
     const user = session.user;
@@ -40,6 +40,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(await getBuyerCatalog(user.dispensaryId, new URL(request.url).searchParams));
   } catch (error) {
     logApiError('dispensary.catalog.GET', error, { route: '/api/dispensary/catalog' });
-    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Internal server error');
+    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Something went wrong. Please try again.');
   }
 }

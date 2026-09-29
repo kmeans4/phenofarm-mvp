@@ -181,8 +181,8 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                 </div>
                 <dl className="grid grid-cols-2 gap-3 text-sm">
                   <div><dt className="text-xs font-medium uppercase text-pf-muted">License</dt><dd className="mt-1 break-all text-pf-secondary">{d.licenseNumber || 'Not provided'}</dd></div>
-                  <div><dt className="text-xs font-medium uppercase text-pf-muted">Expiry</dt><dd className="mt-1"><LicenseExpiryBadge expiresAt={d.licenseExpiry} /></dd></div>
-                  <div className="col-span-2"><dt className="text-xs font-medium uppercase text-pf-muted">Ordering</dt><dd className="mt-1 text-pf-secondary">{d.licenseStatus === 'verified' ? 'Can order' : 'License review'}</dd></div>
+                  <div><dt className="text-xs font-medium uppercase text-pf-muted">Expiration</dt><dd className="mt-1"><LicenseExpiryBadge expiresAt={d.licenseExpiry} /></dd></div>
+                  <div className="col-span-2"><dt className="text-xs font-medium uppercase text-pf-muted">Ordering</dt><dd className="mt-1 text-pf-secondary">{d.licenseStatus === 'verified' ? 'Can send requests' : 'License review'}</dd></div>
                 </dl>
                 {d.licenseReviewNotes ? (
                   <details className="rounded-lg bg-pf-warning-bg px-3 py-2 text-sm text-pf-warning">
@@ -199,7 +199,7 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                   confirmLabel={d.isVerified ? 'Remove verification' : 'Verify'}
                   className={`inline-flex h-10 w-full items-center justify-center rounded-md px-4 text-sm font-semibold focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${d.isVerified ? 'border border-pf-line bg-pf-raised text-pf-secondary hover:bg-pf-hover' : 'bg-emerald-500 text-pf-canvas hover:bg-emerald-400'}`}
                 >
-                  {d.isVerified ? 'Unverify' : 'Verify dispensary'}
+                  {d.isVerified ? 'Remove verification' : 'Verify dispensary'}
                 </ConfirmActionButton>
               </article>
             ))}
@@ -211,7 +211,7 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Business</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Email</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">License</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Expiry</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Expiration</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Status</th>
                   <th className="whitespace-nowrap px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-pf-muted">Ordering</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wide">Joined</th>
@@ -268,7 +268,7 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                           ? 'bg-pf-accent-bg text-pf-accent'
                           : 'bg-pf-warning-bg text-pf-warning'
                       )}>
-                        {d.licenseStatus === 'verified' ? 'Can order' : 'License review'}
+                        {d.licenseStatus === 'verified' ? 'Can send requests' : 'License review'}
                       </span>
                     </td>
                     <td className="whitespace-nowrap px-4 py-3 text-sm text-pf-muted">
@@ -288,7 +288,7 @@ export default async function AdminDispensariesPage({ searchParams }: { searchPa
                             : 'bg-emerald-500 text-pf-canvas hover:bg-emerald-400'
                         )}
                       >
-                        {d.isVerified ? 'Unverify' : 'Verify'}
+                        {d.isVerified ? 'Remove verification' : 'Verify'}
                       </ConfirmActionButton>
                     </td>
                   </tr>

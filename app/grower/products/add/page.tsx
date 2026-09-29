@@ -2,29 +2,11 @@
 
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState, useMemo } from 'react';
-import { ProductForm } from '../components/ProductForm';
+import { productCopyFields } from '@/lib/product-copy';
+import { ProductForm, type ProductFormData } from '../components/ProductForm';
 import { buildProductRequestPayload, PRODUCT_STATUS } from '@/lib/product-payload';
 import { toast } from '@/app/hooks/useToast';
 import { PageHeader } from '@/app/components/ui/PageHeader';
-
-interface ProductFormData {
-  name: string;
-  productType: string;
-  subType: string;
-  strainId: string;
-  batchId: string;
-  price: string;
-  inventoryQty: string;
-  unit: string;
-  description: string;
-  isAvailable: boolean;
-  isPriceVisible: boolean;
-  images: string[];
-  sku: string;
-  brand: string;
-  ingredients: string;
-  isFeatured: boolean;
-}
 
 interface GrowerInfo {
   businessName: string;
@@ -33,6 +15,10 @@ interface GrowerInfo {
 export default function AddProductPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const duplicateId = searchParams?.get('duplicate');
+  const [copyFields, setCopyFields] = useState<Partial<ProductFormData> | null>(null);
+  const [loadError, setLoadError] = useState('');
+  const [formVersion, setFormVersion] = useState(0);
   const prefillStrainId = searchParams?.get('strainId');
   const prefillBatchId = searchParams?.get('batchId');
   const [growerInfo, setGrowerInfo] = useState<GrowerInfo | null>(null);
@@ -41,26 +27,34 @@ export default function AddProductPage() {
   const initialData = useMemo<Partial<ProductFormData>>(() => ({
     strainId: prefillStrainId || undefined,
     batchId: prefillBatchId || undefined,
-  }), [prefillStrainId, prefillBatchId]);
+    ...copyFields,
+  }), [prefillStrainId, prefillBatchId, copyFields]);
 
   useEffect(() => {
+    const controller = new AbortController();
     const fetchGrowerInfo = async () => {
+      setLoading(true);
+      setLoadError('');
       try {
-        const response = await fetch('/api/growers/me');
-        if (response.ok) {
-          const data = await response.json();
-          setGrowerInfo(data);
-        }
-
+        const [profileResponse, sourceResponse] = await Promise.all([
+          fetch('/api/growers/me', { signal: controller.signal }),
+          duplicateId ? fetch(`/api/products/${encodeURIComponent(duplicateId)}`, { signal: controller.signal }) : Promise.resolve(null),
+        ]);
+        if (!profileResponse.ok) throw new Error('Could not load your business profile. Return to Products and try again.');
+        if (sourceResponse && !sourceResponse.ok) throw new Error('Could not load the listing to copy. Return to Products and try again.');
+        const [profile, source] = await Promise.all([profileResponse.json(), sourceResponse?.json()]);
+        if (controller.signal.aborted) return;
+        setGrowerInfo(profile);
+        setCopyFields(source ? productCopyFields(source) : null);
       } catch (error) {
-        console.error('Error fetching grower info:', error);
+        if (!controller.signal.aborted) setLoadError(error instanceof Error ? error.message : 'Could not load your business profile.');
       } finally {
-        setLoading(false);
+        if (!controller.signal.aborted) setLoading(false);
       }
     };
-
-    fetchGrowerInfo();
-  }, []);
+    void fetchGrowerInfo();
+    return () => controller.abort();
+  }, [duplicateId]);
 
   const saveProduct = async (formData: ProductFormData, status: 'DRAFT' | 'PUBLISHED') => {
     const payload = buildProductRequestPayload(formData as unknown as Record<string, unknown>, status);
@@ -73,18 +67,22 @@ export default function AddProductPage() {
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      throw new Error(data.error || 'Failed to save product');
+      throw new Error(data.error || 'We could not save product. Please try again.');
     }
 
     return response.json();
   };
 
-  const handleSubmit = async (formData: ProductFormData) => {
+  const handleSubmit = async (formData: ProductFormData, addAnother = false) => {
     try {
       setIsSubmitting(true);
       await saveProduct(formData, PRODUCT_STATUS.PUBLISHED);
       toast.success('Product published');
-      router.push('/grower/products');
+      if (addAnother) {
+        setCopyFields({ productType: formData.productType, subType: formData.subType, unit: formData.unit, price: formData.price, brand: formData.brand, isPriceVisible: formData.isPriceVisible, strainId: '', batchId: '' });
+        setFormVersion(version => version + 1);
+        window.scrollTo({ top: 0 });
+      } else router.push('/grower/products');
     } catch (err: unknown) {
       throw err;
     } finally {
@@ -115,11 +113,14 @@ export default function AddProductPage() {
     );
   }
 
+  if (loadError) return <div role="alert" className="p-4">{loadError} <button onClick={() => router.push('/grower/products')}>Back to products</button></div>;
+
   return (
     <div className="mx-auto w-full max-w-5xl space-y-3 sm:space-y-6">
       <PageHeader title="Add product" />
-      <ProductForm 
-        key={`${prefillStrainId || ''}:${prefillBatchId || ''}`}
+      {duplicateId && formVersion === 0 && <p className="rounded-lg border border-pf-info-line bg-pf-info-bg p-3 text-sm">Unsaved copy. Photos and product details were copied. Enter this listing’s stock and SKU, review its batch, then publish or save a draft.</p>}
+      <ProductForm allowAddAnother
+        key={`${duplicateId || ''}:${prefillStrainId || ''}:${prefillBatchId || ''}:${formVersion}`}
         onSubmit={handleSubmit}
         onSaveDraft={handleSaveDraft}
         onCancel={() => router.push('/grower/products')}

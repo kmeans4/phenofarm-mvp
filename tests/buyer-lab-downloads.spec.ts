@@ -1,3 +1,4 @@
+import { CURRENT_POLICIES } from '../lib/policies/current';
 import { test, expect, type Page } from '@playwright/test';
 import { PrismaClient, type UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -22,6 +23,7 @@ test.setTimeout(90_000);
 async function account(role: UserRole) {
   const password = `QA-${randomUUID()}`;
   const user = await db.user.create({ data: {
+    policyAcceptances: { create: { ...CURRENT_POLICIES, source: 'signup' } },
     email: `${prefix}-${randomUUID()}@example.test`, name: 'QA Labs', role, emailVerifiedAt: new Date(), passwordHash: await bcrypt.hash(password, 10),
     ...(role === 'GROWER' ? { grower: { create: { businessName: `${prefix} Grower`, isVerified: true, licenseNumber: prefix, licenseExpiry: new Date('2030-12-31') } } }
       : { dispensary: { create: { businessName: `${prefix} Buyer`, isVerified: true, licenseStatus: 'verified', licenseNumber: prefix, licenseExpiry: new Date('2030-12-31') } } }),

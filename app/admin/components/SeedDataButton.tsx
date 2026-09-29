@@ -65,7 +65,7 @@ export function SeedDataButton() {
         ) : (
           <>
             <Database className="h-4 w-4" />
-            Seed demo data
+            Create demo accounts
           </>
         )}
       </button>

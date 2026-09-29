@@ -136,7 +136,7 @@ export default async function AdminPage() {
     },
     {
       label: 'Marketplace activity',
-      description: stats.growers > 0 && stats.dispensaries > 0 ? 'Marketplace has growers and dispensaries.' : 'Seed or invite both sides of the marketplace.',
+      description: stats.growers > 0 && stats.dispensaries > 0 ? 'Marketplace has growers and dispensaries.' : 'Invite growers and dispensaries to get started.',
       href: needsSeeding ? '#developer-tools' : '/admin/users',
       complete: stats.growers > 0 && stats.dispensaries > 0,
       cta: needsSeeding ? 'Open developer tools' : 'Review users',
@@ -145,7 +145,7 @@ export default async function AdminPage() {
   const primaryAction: AdminPrimaryAction = stats.growersToReview > 0
     ? {
         title: 'Review grower verification queue',
-        description: 'Grower access and subscription readiness are the highest-impact admin checks.',
+        description: 'Review grower licenses and account access.',
         href: '/admin/growers',
         cta: 'Review growers',
         secondaryHref: '/admin/settings',
@@ -154,7 +154,7 @@ export default async function AdminPage() {
     : stats.dispensariesToReview > 0
       ? {
           title: 'Review dispensary verification queue',
-          description: 'Clear dispensary verification issues before they submit requests.',
+          description: 'Review dispensary licenses so approved buyers can send requests.',
           href: '/admin/dispensaries',
           cta: 'Review dispensaries',
           secondaryHref: '/admin/growers',
@@ -332,7 +332,7 @@ export default async function AdminPage() {
         ) : null}
       </section>
 
-      <Link href="/help" className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent underline underline-offset-2 hover:text-pf-accent">Settlement & billing policy</Link>
+      <Link href="/help" className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent underline underline-offset-2 hover:text-pf-accent">Payments and subscriptions</Link>
 
       {seedEnabled ? <section id="developer-tools" className="scroll-mt-24 rounded-xl border border-pf-warning-line bg-pf-warning-bg p-3 shadow-sm sm:p-4">
         <details>

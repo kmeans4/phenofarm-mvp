@@ -40,7 +40,7 @@ test('desktop filter sidebar preserves quantity and add controls inside product 
   await page.getByRole('button', { name: 'Toggle filters', exact: true }).click();
   const card = page.locator(`#catalog-product-${fixtureProductId}`);
   await expectReachable(card.getByRole('button', { name: /Increase quantity/ }));
-  await expectReachable(card.getByRole('button', { name: 'Add to draft', exact: true }));
+  await expectReachable(card.getByRole('button', { name: 'Add to cart', exact: true }));
   const input = card.getByRole('spinbutton');
   await card.getByRole('button', { name: /Increase quantity/ }).click();
   await expect(input).toHaveValue('2');
@@ -53,7 +53,7 @@ test('mobile catalog list keeps price, identity and Add in separate visible area
     await page.getByRole('button', { name: 'List view', exact: true }).click();
     const card = page.locator(`#catalog-product-${fixtureProductId}`);
     await expectReachable(card.locator('[data-product-price]'));
-    await expectReachable(card.getByRole('button', { name: /Add .* to request draft/ }));
+    await expectReachable(card.getByRole('button', { name: /Add .* to cart/ }));
     const geometry = await card.evaluate(element => {
       const title = element.querySelector('h3')!.getBoundingClientRect();
       const price = element.querySelector('[data-product-price]')!.getBoundingClientRect();
@@ -111,7 +111,7 @@ test('request review keeps both footer actions visible above navigation', async 
     await review.click();
     const dialog = page.getByRole('dialog', { name: 'Review request', exact: true });
     await expectReachable(dialog.getByRole('heading', { name: 'Review request', exact: true }));
-    await expectReachable(dialog.getByRole('button', { name: 'Submit request', exact: true }));
+    await expectReachable(dialog.getByRole('button', { name: 'Send order request', exact: true }));
     await expectReachable(dialog.getByRole('button', { name: 'Back', exact: true }));
     await dialog.getByRole('button', { name: 'Back', exact: true }).click();
     await expect(dialog).toHaveCount(0);

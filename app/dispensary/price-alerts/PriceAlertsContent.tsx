@@ -125,7 +125,7 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
   const totalSavings = alerts
     .filter(a => a.isTriggered && a.originalPrice)
     .reduce((sum, a) => sum + ((a.originalPrice || 0) - (a.currentPrice ?? a.originalPrice ?? 0)), 0);
-  const explainerText = 'Checks when you visit or refresh.';
+  const explainerText = 'Prices are checked when you open this page or choose Refresh.';
 
   if (isLoading) {
     return (
@@ -177,7 +177,7 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
         </div>
       </div>
       {tabs}
-      {totalSavings > 0 && <p className="mt-2 text-xs text-pf-accent">Tracked price decrease: ${totalSavings.toFixed(2)}</p>}
+      {totalSavings > 0 && <p className="mt-2 text-xs text-pf-accent">Price drop since saved: ${totalSavings.toFixed(2)}</p>}
     </div>
   );
 
@@ -226,7 +226,7 @@ export default function PriceAlertsContent({ embedded = false }: PriceAlertsCont
                 onClick={clearAllAlerts}
                 className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
-                Clear All
+                Clear alerts
               </button>
             </div>
         </Modal>
@@ -339,7 +339,7 @@ function AlertCard({
                     growerName={alert.growerName}
                     growerId={alert.growerId}
                     compact
-                    compactLabel="Add to draft"
+                    compactLabel="Add to cart"
                   />
                 )}
 
@@ -393,7 +393,7 @@ function EmptyState({ type, onBrowse }: { type: AlertTab; onBrowse: () => void }
     triggered: {
       icon: Bell,
       title: 'No price drops yet',
-      description: 'Targets are checked when you visit or refresh.',
+      description: 'Check back here or choose Refresh to update prices.',
       action: 'View active alerts'
     },
     history: {

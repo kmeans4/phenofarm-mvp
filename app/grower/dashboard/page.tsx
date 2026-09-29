@@ -235,7 +235,7 @@ export default async function GrowerDashboardPage() {
   const setupItems = [
     {
       label: 'Profile',
-      description: hasProfile ? 'Business profile has the basics buyers need.' : 'Add contact and address details buyers can trust.',
+      description: hasProfile ? 'Your business details are ready.' : 'Add your contact details and business address.',
       href: '/grower/settings',
       complete: hasProfile,
       cta: 'Complete profile',
@@ -249,28 +249,28 @@ export default async function GrowerDashboardPage() {
     },
     {
       label: 'Subscription',
-      description: hasSubscription ? 'Cultivator subscription is active.' : 'Choose a plan for your business.',
+      description: hasSubscription ? 'Your paid plan is active.' : 'Free plan is ready. You can list products now.',
       href: '/grower/settings',
-      complete: hasSubscription,
+      complete: true,
       cta: 'Review subscription',
     },
     {
       label: 'Catalog',
-      description: stats.activeProducts > 0 ? 'Products are available for buyer discovery.' : 'Add at least one product listing.',
+      description: stats.activeProducts > 0 ? 'You have products ready for buyers.' : 'Add at least one product listing.',
       href: '/grower/products/add',
       complete: stats.activeProducts > 0,
       cta: 'Add product',
     },
     {
-      label: 'Commercial terms',
+      label: 'Order terms',
       description: hasCommercialTerms ? 'Your order and payment terms are saved.' : 'Set minimum order, delivery and payment terms.',
       href: '/grower/settings',
       complete: hasCommercialTerms,
       cta: 'Set terms',
     },
     {
-      label: 'Request readiness',
-      description: stats.pendingOrders > 0 ? 'Buyer requests are waiting for review.' : 'Ready for the first buyer request.',
+      label: 'Buyer requests',
+      description: stats.pendingOrders > 0 ? 'Buyer requests are waiting for review.' : 'New buyer requests will appear here.',
       href: '/grower/orders',
       complete: stats.pendingOrders > 0 || stats.totalOrders > 0,
       cta: 'Review requests',
@@ -310,7 +310,7 @@ export default async function GrowerDashboardPage() {
           { label: 'Active requests', value: activeRequestCount, href: '/grower/orders', tone: 'text-pf-accent', note: 'Submitted to in transit' },
           { label: 'Delivered value', value: `$${delivered30DayValue.toLocaleString()}`, href: '/grower/reports', tone: 'text-pf-text', note: 'Last 30 days' },
           { label: 'Low stock', value: stats.lowStockProducts, href: '/grower/inventory', tone: 'text-pf-warning', note: '10 units or fewer' },
-        ].map(item => <Link key={item.label} href={item.href} className="min-w-0 px-3 py-4 transition-colors hover:bg-pf-raised sm:px-6 sm:py-5"><p className="text-[11px] text-pf-secondary sm:text-sm">{item.label}</p><p className={`mt-1 break-words text-xl font-semibold tracking-tight tabular-nums sm:text-3xl ${item.tone}`}>{item.value}</p><p className="mt-1 text-[10px] text-pf-muted sm:text-xs">{item.note}</p></Link>)}
+        ].map(item => <Link key={item.label} href={item.href} className="min-w-0 px-3 py-4 transition-colors hover:bg-pf-raised sm:px-6 sm:py-5"><p className="text-xs text-pf-secondary sm:text-sm">{item.label}</p><p className={`mt-1 break-words text-xl font-semibold tracking-tight tabular-nums sm:text-3xl ${item.tone}`}>{item.value}</p><p className="mt-1 text-xs text-pf-muted sm:text-xs">{item.note}</p></Link>)}
       </section>
 
       <div className="grid items-stretch gap-4 xl:grid-cols-[minmax(0,2fr)_minmax(260px,1fr)]">

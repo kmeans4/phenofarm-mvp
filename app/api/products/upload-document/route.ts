@@ -10,13 +10,13 @@ export async function POST(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const formData = await request.formData();
@@ -75,6 +75,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     if (error instanceof Error && error.message.includes('storage is not configured')) return NextResponse.json({ error: error.message }, { status: 503 });
     console.error('Error uploading document:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

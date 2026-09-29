@@ -251,8 +251,8 @@ export default function AddOrderPage() {
   const hasProductsAvailableToAdd = products.some((product) => !getSelectedProductIds().has(product.id));
   const submitHint = (() => {
     if (!formData.dispensaryId) return 'Select a dispensary before recording the request.';
-    if (formData.items.length === 0) return 'Add at least one product line item.';
-    if (hasInvalidQuantities) return 'Each line item needs a quantity of at least 1.';
+    if (formData.items.length === 0) return 'Add at least one product.';
+    if (hasInvalidQuantities) return 'Enter a quantity of at least 1 for each product.';
     if (hasInvalidPrice) return 'Add a reason for each custom price.';
     if (firstInventoryIssue) {
       return `Adjust ${firstInventoryIssue.productName}; requested ${firstInventoryIssue.requested}, available ${firstInventoryIssue.available}.`;
@@ -317,11 +317,11 @@ export default function AddOrderPage() {
           const first = errorData.issues[0];
           setError(`Inventory changed for ${first.productName} (requested ${first.requested}, available ${first.available}). Please review quantities.`);
         } else {
-          setError(errorData.error || errorData.message || 'Failed to create order');
+          setError(errorData.error || errorData.message || 'We could not create order. Please try again.');
         }
       }
     } catch {
-      setError('Failed to create order');
+      setError('We could not create order. Please try again.');
     } finally {
       submitRef.current = false;
       setIsSubmitting(false);
@@ -348,7 +348,7 @@ export default function AddOrderPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-pf-text mb-2">Direct Request Recorded</h2>
+          <h2 className="text-2xl font-bold text-pf-text mb-2">Request recorded</h2>
           <p className="text-pf-muted">Redirecting...</p>
         </div>
       </div>
@@ -357,7 +357,7 @@ export default function AddOrderPage() {
 
   return (
     <div className="space-y-3 sm:space-y-6">
-      <PageHeader title="Record request" description="Record an agreement made directly with a buyer." />
+      <PageHeader title="Record request" description="Save an order you agreed on with a buyer outside the catalog." />
 
       {error && (
         <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg">

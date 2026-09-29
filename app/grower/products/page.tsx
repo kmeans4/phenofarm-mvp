@@ -81,6 +81,7 @@ interface Product {
   isPriceVisible: boolean;
   images: string[];
   imageCount: number;
+  status: 'DRAFT' | 'PUBLISHED';
   createdAt: string;
 }
 
@@ -105,7 +106,7 @@ const formatInventoryUnit = (unit: string | null | undefined, qty: number): stri
 function QuoteOnlyBadge({ compact = false }: { compact?: boolean }) {
   return (
     <span title="Price hidden from buyers" className={`inline-flex items-center rounded-full border border-pf-warning-line bg-pf-warning-bg font-semibold text-pf-warning ${
-      compact ? 'px-2 py-0.5 text-[11px]' : 'px-2.5 py-1 text-xs'
+      compact ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs'
     }`}>
       Quote only
     </span>
@@ -172,6 +173,7 @@ function normalizeFetchedProduct(raw: unknown): Product | null {
 
   return {
     id,
+    status: record.status === 'DRAFT' ? 'DRAFT' : 'PUBLISHED',
     name: toSafeProductName(record.name),
     strain,
     category: toSafeOptionalString(record.category),
@@ -261,7 +263,7 @@ interface ProductControls {
                 <div className="flex items-center gap-2 min-w-0">
                   <p className="text-sm text-pf-muted truncate">{strainName}</p>
                   {strainTypeLabel && (
-                    <span className="text-[11px] uppercase tracking-wide text-pf-muted">{strainTypeLabel}</span>
+                    <span className="text-xs uppercase tracking-wide text-pf-muted">{strainTypeLabel}</span>
                   )}
                 </div>
               )}
@@ -276,7 +278,7 @@ interface ProductControls {
                     : 'bg-pf-surface text-pf-secondary border border-pf-line'
               )}
             >
-              {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Hidden'}
+              {product.status === 'DRAFT' ? 'Draft' : (product?.inventoryQty || 0) <= 0 ? 'Out of stock' : product?.isAvailable ? 'Published' : 'Hidden'}
             </span>
           </div>
         </div>
@@ -316,7 +318,7 @@ interface ProductControls {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
             </svg>
             <span className={(product?.inventoryQty || 0) <= 5 ? 'text-pf-danger font-medium' : ''}>
-              {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} In Stock`}
+              {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : `${product?.inventoryQty || 0} In Stock`}
             </span>
           </div>
 
@@ -335,10 +337,10 @@ interface ProductControls {
               size="sm"
               onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
               className="flex-1"
-              disabled={pendingProductIds.has(product.id) || (product?.inventoryQty || 0) <= 0 && !product?.isAvailable}
+              disabled={pendingProductIds.has(product.id) || (product?.inventoryQty || 0) <= 0 && !product?.isAvailable && product.status !== 'DRAFT'}
               aria-pressed={product?.isAvailable}
             >
-              {(product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of stock' : product?.isAvailable ? 'Disable' : 'Enable'}
+              {product.status === 'DRAFT' ? 'Review draft' : (product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of stock' : product?.isAvailable ? 'Hide' : 'Make available'}
             </Button>
 
             <div className="relative">
@@ -390,12 +392,12 @@ interface ProductControls {
       <div className="flex items-start gap-3">
         <label className="-ml-2 -mt-1 flex h-10 w-10 shrink-0 items-center justify-center"><input type="checkbox" checked={controls.selectedProductIds.has(product.id)} onChange={() => controls.toggleProductSelection(product.id)} aria-label={`Select ${product.name}`} className="h-4 w-4" /></label>
         <div className="min-w-0 flex-1"><h3 className="text-sm font-semibold break-words">{product.name}</h3><p className="mt-1 text-xs text-pf-muted">{[product.productType, getStrainName(product)].filter(Boolean).join(' · ')}</p></div>
-        <span className="shrink-0 text-xs text-pf-muted">{product.inventoryQty <= 0 ? 'No stock' : product.isAvailable ? 'Live' : 'Hidden'}</span>
+        <span className="shrink-0 text-xs text-pf-muted">{product.status === 'DRAFT' ? 'Draft' : product.inventoryQty <= 0 ? 'No stock' : product.isAvailable ? 'Published' : 'Hidden'}</span>
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm"><p className="font-semibold">{formatProductMoney(product.price)}/{formatProductUnit(product.unit)}{!product.isPriceVisible && <span className="ml-2 text-xs font-normal text-pf-info">Quote only</span>}</p><p>Stock: {product.inventoryQty.toLocaleString()} {formatProductUnit(product.unit)}</p></div>
       <div className="mt-2 flex items-center gap-2 border-t border-pf-line pt-2">
         <Button asChild size="sm" variant="outline"><Link href={`/grower/products/${product.id}/edit`}>Edit</Link></Button>
-        <Button size="sm" variant="outline" disabled={pending || product.inventoryQty <= 0 && !product.isAvailable} aria-pressed={product.isAvailable} onClick={() => controls.toggleAvailability(product.id, product.isAvailable)}>{product.isAvailable ? 'Hide' : 'Enable'}</Button>
+        <Button size="sm" variant="outline" disabled={pending || product.inventoryQty <= 0 && !product.isAvailable && product.status !== 'DRAFT'} aria-pressed={product.isAvailable} onClick={() => controls.toggleAvailability(product.id, product.isAvailable)}>{product.status === 'DRAFT' ? 'Review draft' : product.isAvailable ? 'Hide' : 'Make available'}</Button>
         <RecordActions name={product.name} actions={[{label: 'Duplicate', onSelect: () => { if (!controls.duplicatingProductId) void controls.duplicateProduct(product); }}, {label: 'Delete', destructive: true, onSelect: () => controls.setDeleteCandidate(product)}]} />
       </div>
     </article>;
@@ -422,7 +424,7 @@ interface ProductControls {
           {strainName && (
             <div className="flex items-center gap-2">
               <div className="text-xs sm:text-sm text-pf-muted">{strainName}</div>
-              {strainTypeLabel && <span className="text-[10px] sm:text-[11px] uppercase tracking-wide text-pf-muted">{strainTypeLabel}</span>}
+              {strainTypeLabel && <span className="text-xs uppercase tracking-wide text-pf-muted">{strainTypeLabel}</span>}
             </div>
           )}
         </td>
@@ -430,14 +432,14 @@ interface ProductControls {
           {product?.productType || '-'}
         </td>
         <td className={tableCellClass}>
-          <span className={`px-2 py-0.5 rounded-full text-[11px] sm:text-xs font-medium ${
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
             (product?.inventoryQty || 0) <= 0
               ? 'bg-pf-danger-bg text-pf-danger'
               : product?.isAvailable
                 ? 'bg-pf-accent-bg text-pf-accent'
                 : 'bg-pf-surface text-pf-secondary'
           }`}>
-            {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : product?.isAvailable ? 'Available' : 'Hidden'}
+            {product.status === 'DRAFT' ? 'Draft' : (product?.inventoryQty || 0) <= 0 ? 'Out of stock' : product?.isAvailable ? 'Published' : 'Hidden'}
           </span>
         </td>
         <td className={`${tableCellClass} text-pf-text font-medium`}>
@@ -448,7 +450,7 @@ interface ProductControls {
         </td>
         <td className={`${tableCellClass} text-pf-muted`}>
           <span className={(product?.inventoryQty || 0) <= 5 ? 'text-pf-danger font-medium' : ''}>
-            {(product?.inventoryQty || 0) <= 0 ? 'Out of Stock' : `${product?.inventoryQty || 0} ${formatInventoryUnit(product?.unit, product?.inventoryQty || 0)}`}
+            {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : `${product?.inventoryQty || 0} ${formatInventoryUnit(product?.unit, product?.inventoryQty || 0)}`}
           </span>
         </td>
         <td className={tableCellClass}>
@@ -479,10 +481,10 @@ interface ProductControls {
                         setOpenActionMenuId(null);
                         toggleAvailability(product.id, product.isAvailable);
                       }}
-                      disabled={pendingProductIds.has(product.id) || (product.inventoryQty || 0) <= 0 && !product.isAvailable}
+                      disabled={pendingProductIds.has(product.id) || (product.inventoryQty || 0) <= 0 && !product.isAvailable && product.status !== 'DRAFT'}
                       className="flex min-h-10 w-full items-center rounded-lg border border-pf-line px-3 text-left text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent disabled:opacity-50"
                     >
-                      {product.isAvailable ? 'Disable listing' : 'Enable listing'}
+                      {product.status === 'DRAFT' ? 'Review draft' : product.isAvailable ? 'Hide listing' : 'Make listing available'}
                     </button>
                     <button
                       type="button"
@@ -531,12 +533,12 @@ interface ProductControls {
                   aria-label="Select all visible products"
                 />
               </th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Product</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Type</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Status</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Price</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Inventory</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-medium text-pf-muted uppercase tracking-wider">Actions</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Product</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Type</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Status</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Price</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Inventory</th>
+              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-pf-line">
@@ -580,11 +582,11 @@ export default function GrowerProductsPage() {
   const [deleteCandidate, setDeleteCandidate] = useState<Product | null>(null);
   const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
   const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
-  const [duplicatingProductId, setDuplicatingProductId] = useState<string | null>(null);
+  const [duplicatingProductId] = useState<string | null>(null);
   const defaultsKey = session?.user?.id ? `${PRODUCT_DEFAULTS_STORAGE_KEY}:${session.user.id}` : null;
   const [savedProductDefaults, setSavedProductDefaults] = useState<ProductDefaults | null>(null);
   const [quickDraftRestored, setQuickDraftRestored] = useState(false);
-  const [growerAccess, setGrowerAccess] = useState<{ isVerified: boolean; licenseExpiry: string | null; subscriptionPlan: string | null; subscriptionStatus: string | null } | null>(null);
+  const [growerAccess, setGrowerAccess] = useState<{ businessName?: string; isVerified: boolean; licenseExpiry: string | null; subscriptionPlan: string | null; subscriptionStatus: string | null } | null>(null);
   const [quickProduct, setQuickProduct] = useState<QuickProductDraft>({
     name: '',
     productType: 'Flower',
@@ -656,7 +658,7 @@ export default function GrowerProductsPage() {
       if (batchFilterId) params.set('batchId', batchFilterId);
       const response = await fetch(`/api/products?${params}`, { signal: controller.signal });
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'Failed to fetch products');
+      if (!response.ok) throw new Error(data.error || 'We could not load products. Please try again.');
       if (!Array.isArray(data.products)) throw new Error('Product response was incomplete');
       const next = data.products.map(normalizeFetchedProduct).filter((item: Product | null): item is Product => item !== null);
       setProducts(next);
@@ -664,7 +666,7 @@ export default function GrowerProductsPage() {
       setPagination({ page: data.page, pageSize: data.pageSize, counts: data.counts, inventoryValue: data.inventoryValue });
       setSelectedProductIds(new Set());
     } catch (err) {
-      if (!controller.signal.aborted) setError(err instanceof Error ? err.message : 'Network error - please check your connection');
+      if (!controller.signal.aborted) setError(err instanceof Error ? err.message : 'Check your connection, then try again.');
     } finally {
       if (!controller.signal.aborted) setLoading(false);
     }
@@ -679,7 +681,7 @@ export default function GrowerProductsPage() {
     pendingIds.current.add(productId);
     setPendingProductIds(new Set(pendingIds.current));
     try {
-      await deleteRecord('/api/products/' + productId, 'Failed to delete product');
+      await deleteRecord('/api/products/' + productId, 'We could not delete product. Please try again.');
       setProducts((current) => current.filter(item => item.id !== productId));
       toast.success('Product deleted');
     } catch (error) {
@@ -695,9 +697,11 @@ export default function GrowerProductsPage() {
     if (pendingIds.current.has(productId)) return;
     const product = products.find((item) => item.id === productId);
 
+    if (product?.status === 'DRAFT') { router.push(`/grower/products/${productId}/edit`); return; }
+
     if (product && product.inventoryQty <= 0 && !currentStatus) {
-      toast.warning('Add inventory before enabling this product', {
-        description: 'Zero-inventory products stay unavailable.',
+      toast.warning('Add stock before making this product available', {
+        description: 'Products with no stock cannot be requested by buyers.',
       });
       return;
     }
@@ -730,7 +734,7 @@ export default function GrowerProductsPage() {
           : p));
       } else {
         const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'Failed to update product');
+        throw new Error(errData.error || 'We could not update product. Please try again.');
       }
     } catch (error) {
       setProducts((current) => current.map((item) => item.id === productId ? { ...item, isAvailable: currentStatus } : item));
@@ -819,74 +823,9 @@ export default function GrowerProductsPage() {
     setShowQuickCreate(true);
   };
 
-  const scrollProductIntoView = (productId: string) => {
-    if (typeof window === 'undefined') return;
-    window.setTimeout(() => {
-      document.getElementById(`product-card-${productId}`)?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center',
-      });
-    }, 120);
-  };
-
   const duplicateProduct = async (product: Product) => {
-    if (duplicatingProductId) return;
-
-    setDuplicatingProductId(product.id);
     setOpenActionMenuId(null);
-
-    try {
-      const response = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: `${product.name} Copy`,
-          productType: product.productType || 'Flower',
-          subType: product.subType,
-          strainId: product.strain?.id,
-          batchId: product.batchId,
-          price: product.price,
-          inventoryQty: product.inventoryQty,
-          unit: product.unit,
-          isAvailable: product.inventoryQty > 0 ? product.isAvailable : false,
-          isPriceVisible: product.isPriceVisible,
-          images: [],
-        }),
-      });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        const message = data && typeof data === 'object' && 'error' in data
-          ? String((data as { error?: unknown }).error)
-          : 'Failed to duplicate product.';
-        throw new Error(message);
-      }
-
-      const created = normalizeFetchedProduct(data);
-      if (!created) {
-        await fetchProducts();
-        toast.success('Product duplicated');
-        return;
-      }
-
-      handleWorkflowViewChange('all');
-      setActiveFilter('all');
-      handleViewModeChange('card');
-      setProducts((prev) => [created, ...prev]);
-      scrollProductIntoView(created.id);
-      toast.success('Product duplicated', {
-        description: `${created.name} was added to your catalog.`,
-        action: {
-          label: 'Edit copy',
-          onClick: () => router.push(`/grower/products/${created.id}/edit`),
-        },
-      });
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Failed to duplicate product.');
-    } finally {
-      setDuplicatingProductId(null);
-    }
+    router.push(`/grower/products/add?duplicate=${encodeURIComponent(product.id)}`);
   };
 
   const submitQuickProduct = async (event: FormEvent<HTMLFormElement>) => {
@@ -906,16 +845,17 @@ export default function GrowerProductsPage() {
       return;
     }
 
-    if (!Number.isFinite(price) || price < 0) {
+    if (!quickProduct.price.trim() || !Number.isFinite(price) || price < 0) {
       setQuickError('Enter a valid price.');
       return;
     }
 
     if (!Number.isInteger(inventoryQty) || inventoryQty < 0) {
-      setQuickError('Inventory must be a non-negative whole number.');
+      setQuickError('Enter a stock quantity of 0 or more, using whole numbers.');
       return;
     }
 
+    const addDetails = (event.nativeEvent as SubmitEvent).submitter?.getAttribute('value') === 'details';
     setQuickSaving(true);
 
     try {
@@ -924,11 +864,13 @@ export default function GrowerProductsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: quickProduct.name.trim(),
+          brand: growerAccess?.businessName || '',
+          ...(addDetails ? { status: 'DRAFT', isAvailable: false } : {}),
           productType: quickProduct.productType.trim(),
           price,
           inventoryQty,
           unit: quickProduct.unit,
-          isAvailable: inventoryQty > 0,
+          isAvailable: !addDetails && inventoryQty > 0,
           isPriceVisible: quickProduct.isPriceVisible,
           images: [],
         }),
@@ -957,6 +899,7 @@ export default function GrowerProductsPage() {
       });
       resetQuickProduct();
       setShowQuickCreate(false);
+      if (addDetails && created) router.push(`/grower/products/${created.id}/edit`);
     } catch (err) {
       setQuickError(err instanceof Error ? err.message : 'Failed to create product.');
     } finally {
@@ -1037,7 +980,7 @@ export default function GrowerProductsPage() {
 
     try {
       const results = await Promise.allSettled(idsToDelete.map(async productId => {
-        await deleteRecord('/api/products/' + productId, 'Failed to delete product');
+        await deleteRecord('/api/products/' + productId, 'We could not delete product. Please try again.');
         return productId;
       }));
       const deletedIds = new Set(results.flatMap(result => result.status === 'fulfilled' ? [result.value] : []));
@@ -1125,9 +1068,9 @@ export default function GrowerProductsPage() {
   }, [pagination, originalPageProducts, catalogProducts]);
   const workflowViewOptions = [
     { key: 'all' as const, label: 'All' }, { key: 'active' as const, label: 'Active' },
-    { key: 'low-stock' as const, label: 'Low inventory' }, { key: 'quote-only' as const, label: 'Quote only' },
+    { key: 'low-stock' as const, label: 'Low stock' }, { key: 'quote-only' as const, label: 'Quote only' },
     { key: 'missing-images' as const, label: 'Missing images' }, { key: 'missing-type' as const, label: 'Missing type' },
-    { key: 'hidden' as const, label: 'Hidden/out' },
+    { key: 'hidden' as const, label: 'Unavailable' },
   ].map(view => ({ ...view, count: catalogStats.counts[view.key] || 0 }));
   const selectedCount = selectedProductIds.size;
   const allVisibleSelected = workflowProducts.length > 0 && workflowProducts.every((product) => selectedProductIds.has(product.id));
@@ -1246,7 +1189,7 @@ export default function GrowerProductsPage() {
               onClick={() => applyQuickDefaults(catalogDefaults)}
               className="rounded-full border border-pf-accent-line bg-pf-surface px-3 py-1 text-xs font-semibold text-pf-accent hover:bg-pf-accent-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
             >
-              Catalog defaults
+              Standard settings
             </button>
             {savedProductDefaults && (
               <button
@@ -1257,7 +1200,7 @@ export default function GrowerProductsPage() {
                 }}
                 className="rounded-full border border-pf-line-strong bg-pf-surface px-3 py-1 text-xs font-semibold text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
               >
-                Last listing
+                Last listing settings
               </button>
             )}
             {quickDraftRestored ? (
@@ -1307,7 +1250,7 @@ export default function GrowerProductsPage() {
               </select>
             </label>
             <label className="text-sm font-medium text-pf-secondary">
-              Price
+              {quickProduct.isPriceVisible ? 'Price' : 'Internal reference price'}
               <input
                 type="number"
                 min="0"
@@ -1332,6 +1275,7 @@ export default function GrowerProductsPage() {
             </label>
           </div>
 
+          {!quickProduct.isPriceVisible && <p className="mt-2 text-xs text-pf-muted">Reference price is used for stock value only. Buyers request pricing.</p>}
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
               <label className="flex min-h-10 items-center gap-2 rounded-lg border border-pf-accent-line bg-pf-surface px-3 py-2 text-sm font-medium text-pf-accent">
@@ -1347,6 +1291,7 @@ export default function GrowerProductsPage() {
             <Button type="submit" variant="primary" disabled={quickSaving} className="shrink-0">
               {quickSaving ? 'Creating...' : 'Create listing'}
             </Button>
+            <Button type="submit" name="next" value="details" variant="outline" disabled={quickSaving}>Create draft and add details</Button>
           </div>
         </form>
       )}
@@ -1452,7 +1397,7 @@ export default function GrowerProductsPage() {
             >
               <span>Display</span>
               <span className="text-xs font-normal text-pf-muted">
-                {viewMode === 'card' ? 'Cards' : 'List'} · {compactMode ? 'Compact' : 'Comfort'}
+                {viewMode === 'card' ? 'Cards' : 'List'} · {compactMode ? 'Compact' : 'Comfortable'}
               </span>
             </Button>
             {showDisplayMenu && (
@@ -1466,7 +1411,7 @@ export default function GrowerProductsPage() {
                 <div className="absolute right-0 top-full z-20 mt-2 w-full rounded-xl border border-pf-line bg-pf-surface p-3 shadow-lg sm:w-72">
                   <div className="space-y-4">
                     <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-pf-muted">Density</p>
+                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-pf-muted">Row spacing</p>
                       <TableDensityControl value={tableDensity} onChange={handleDensityChange} label="Rows" />
                     </div>
                     <div>
@@ -1552,11 +1497,11 @@ export default function GrowerProductsPage() {
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              <Button type="button" variant="secondary" size="sm" disabled={bulkUpdating} onClick={() => runBulkUpdate({ isAvailable: false }, 'Disabled')}>
-                Disable
+              <Button type="button" variant="secondary" size="sm" disabled={bulkUpdating} onClick={() => runBulkUpdate({ isAvailable: false }, 'Hidden')}>
+                Hide
               </Button>
-              <Button type="button" variant="secondary" size="sm" disabled={bulkUpdating} onClick={() => runBulkUpdate({ isAvailable: true }, 'Enabled')}>
-                Enable
+              <Button type="button" variant="secondary" size="sm" disabled={bulkUpdating} onClick={() => runBulkUpdate({ isAvailable: true }, 'Made available')}>
+                Make available
               </Button>
               <Button type="button" variant="destructive" size="sm" disabled={bulkUpdating} onClick={() => setBulkDeleteOpen(true)}>
                 Delete
@@ -1573,8 +1518,8 @@ export default function GrowerProductsPage() {
       {/* Products Display */}
       {loading ? (
         <LoadingState
-          title="Loading product catalog"
-          description="Pulling your latest products, inventory, and availability status."
+          title="Loading your products"
+          description="Getting the latest product details and stock levels."
         />
       ) : error ? (
         <ErrorState

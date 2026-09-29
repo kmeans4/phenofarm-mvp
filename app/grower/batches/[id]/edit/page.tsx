@@ -114,7 +114,7 @@ export default function EditBatchPage() {
           setError('Batch not found');
         }
       } catch {
-        setError('Failed to load data');
+        setError('We could not load data. Please try again.');
       } finally {
         setFetching(false);
       }
@@ -178,7 +178,7 @@ export default function EditBatchPage() {
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to update batch');
+        throw new Error(data.error || 'We could not update batch. Please try again.');
       }
 
       toast.success('Batch updated');
@@ -215,7 +215,7 @@ export default function EditBatchPage() {
       <div className="text-center py-8 sm:py-12">
         <h2 className="text-2xl font-bold text-pf-text">Batch not found</h2>
         <Button variant="primary" className="mt-4" onClick={() => router.push('/grower/batches')}>
-          Back to Batches
+          Back to batches
         </Button>
       </div>
     );
@@ -265,7 +265,7 @@ export default function EditBatchPage() {
                   value={formData.lotNumber}
                   onChange={(e) => handleChange('lotNumber', e.target.value)}
                   className="min-h-10 min-w-0 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:px-4 focus:ring-2 focus:ring-pf-accent focus:border-transparent"
-                  placeholder="Internal or lab lot"
+                  placeholder="Your lot number or the lab’s lot number"
                 />
               </div>
             </div>
@@ -347,7 +347,7 @@ export default function EditBatchPage() {
 
                 <div className="min-w-0 space-y-1.5 sm:space-y-2">
                   <label htmlFor="totalCannabinoids" className="block text-sm font-medium text-pf-secondary">
-                    Total (%)
+                    Total cannabinoids (%)
                   </label>
                   <input
                     id="totalCannabinoids"
@@ -410,7 +410,7 @@ export default function EditBatchPage() {
 
             <div className="flex flex-wrap gap-3 pt-4 border-t border-pf-line">
               <Button type="submit" variant="primary" className="flex-1 sm:flex-none" disabled={!canSubmit}>
-                {loading ? 'Saving...' : 'Save Changes'}
+                {loading ? 'Saving...' : 'Save changes'}
               </Button>
               <Button
                 type="button"

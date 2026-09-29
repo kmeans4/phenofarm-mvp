@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     const session = await getAuthSession();
     
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
@@ -321,7 +321,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.error('Error creating order:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -349,7 +349,7 @@ export async function GET(request: NextRequest) {
     const session = await getAuthSession();
     
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
@@ -391,6 +391,6 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error('Error fetching orders:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

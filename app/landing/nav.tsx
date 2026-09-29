@@ -8,10 +8,9 @@ import { AnimatePresence, m as motion } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 
 const NAV_LINKS = [
-  { label: 'Product', href: '#product' },
-  { label: 'Why PhenoShop', href: '#money-flow' },
-  { label: 'Workflow', href: '#workflow' },
-  { label: 'Pricing', href: '#pricing' },
+  { label: 'App preview', href: '#product' },
+  { label: 'Features', href: '#workflow' },
+  { label: 'Get started', href: '#getting-started' },
   { label: 'FAQ', href: '#faq' },
 ];
 

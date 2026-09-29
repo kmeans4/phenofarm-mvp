@@ -1,3 +1,7 @@
+import { productLabReportsById } from '@/lib/buyer-lab-reports';
+import { type LabReportKey } from '@/lib/lab-reports';
+import { LabReportDownloads } from '@/app/dispensary/components/LabReportDownloads';
+import { MarketplaceVisibilityNotice } from '../components/MarketplaceVisibilityNotice';
 import { Pagination } from '@/app/components/ui/Pagination';
 import { parsePage } from '@/lib/buyer-products';
 import { productImagesById } from '@/lib/product-images';
@@ -25,6 +29,7 @@ type MarketplaceProduct = {
   thc: number | null;
   cbd: number | null;
   images: string[];
+  labReports: LabReportKey[];
   inventoryQty: number;
   grower: {
     id: string;
@@ -134,7 +139,7 @@ function BuyerPreviewCard({ product }: { product: MarketplaceProduct }) {
                 className="inline-flex min-h-10 flex-1 cursor-default items-center justify-center gap-1.5 rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-[#032116] sm:w-full"
               >
                 <Plus size={16} />
-                <span className="sm:hidden">Add</span><span className="hidden sm:inline">Add to draft</span>
+                <span>Add to cart</span>
               </div>
             </div>
           ) : (
@@ -155,10 +160,10 @@ function BuyerPreviewCard({ product }: { product: MarketplaceProduct }) {
         </div>
 
         <div className="mt-2 flex items-center justify-between gap-2 border-t border-pf-line pt-2 sm:mt-3 sm:block sm:pt-3">
-          <p className="flex items-center gap-1.5 py-1 text-xs font-medium text-pf-muted sm:justify-center">
+          <div className="flex flex-wrap items-center gap-2 py-1 text-xs font-medium text-pf-muted sm:justify-center">
             <FileText size={14} />
-            Lab results on request
-          </p>
+            {product.labReports.length ? <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} audience="grower" /> : 'Ask for lab reports'}
+          </div>
           <div className="shrink-0 text-right sm:mt-3 sm:border-t sm:border-pf-line sm:pt-3">
           <Link
             href={`/grower/products/${product.id}/edit`}
@@ -191,6 +196,7 @@ export default async function GrowerMarketplacePage({ searchParams }: { searchPa
     select: {
       businessName: true,
       isVerified: true,
+      licenseExpiry: true,
       commercialMinimumOrder: true,
     },
   });
@@ -209,7 +215,8 @@ export default async function GrowerMarketplacePage({ searchParams }: { searchPa
     orderBy: [{ createdAt: 'desc' }, { id: 'asc' }],
   });
 
-  const productImages = await productImagesById(rawProducts.map(product => product.id));
+  const ids = rawProducts.map(product => product.id);
+  const [productImages, labReports] = await Promise.all([productImagesById(ids), productLabReportsById(ids)]);
 
   const growerProfile = {
     id: user.growerId,
@@ -221,6 +228,7 @@ export default async function GrowerMarketplacePage({ searchParams }: { searchPa
   const products: MarketplaceProduct[] = rawProducts.map((p) => ({
     ...p,
     images: productImages.get(p.id) || [],
+    labReports: labReports.get(p.id) || [],
     price: Number(p.price) || 0,
     thc: p.batch?.thc != null ? Number(p.batch.thc) : p.thcMax != null ? Number(p.thcMax) : p.thcMin != null ? Number(p.thcMin) : null,
     cbd: p.batch?.cbd != null ? Number(p.batch.cbd) : p.cbdMax != null ? Number(p.cbdMax) : p.cbdMin != null ? Number(p.cbdMin) : null,
@@ -236,7 +244,7 @@ export default async function GrowerMarketplacePage({ searchParams }: { searchPa
     <div className="space-y-5 sm:space-y-6">
       <PageHeader
         title={<>Marketplace<span className="sr-only sm:not-sr-only"> preview</span></>}
-        description="How buyers see your listings."
+        description="Preview how your published products appear to buyers."
         mobileInlineActions
         actions={
           <Link href="/grower/products/add" className="inline-flex min-h-10 items-center rounded-lg bg-emerald-500 px-3 py-2 text-sm font-medium text-[#032116] hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 sm:px-4">
@@ -245,10 +253,11 @@ export default async function GrowerMarketplacePage({ searchParams }: { searchPa
         }
       />
 
+      <MarketplaceVisibilityNotice grower={grower} />
       <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm">
-        <span><strong>{activeListings}</strong> active</span>
+        <span><strong>{activeListings}</strong> published</span>
         <span><strong>{hiddenPriceListings}</strong> quote required</span>
-        <Link href="/grower/settings#commercial-terms" className="text-pf-accent underline">Terms{savedMinimumOrder ? ` · MOQ ${savedMinimumOrder}` : ''}</Link>
+        <Link href="/grower/settings#commercial-terms" className="text-pf-accent underline">Terms{savedMinimumOrder ? ` · Minimum ${savedMinimumOrder}` : ''}</Link>
       </div>
       <div>
         <div>

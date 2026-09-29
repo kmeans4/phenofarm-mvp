@@ -10,7 +10,7 @@ function isOfferPayload(value: unknown): value is { quantity?: number; unitPrice
 
 async function getAuthorizedConversation(conversationId: string) {
   const session = await getAuthSession();
-  if (!session) return { error: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) };
+  if (!session) return { error: NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 }) };
 
   const user = session.user;
   const conversation = await db.conversation.findUnique({ where: { id: conversationId } });
@@ -21,14 +21,14 @@ async function getAuthorizedConversation(conversationId: string) {
 
   if (user.role === 'GROWER') {
     if (!user.growerId || conversation.growerId !== user.growerId) {
-      return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+      return { error: NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 }) };
     }
   } else if (user.role === 'DISPENSARY') {
     if (!user.dispensaryId || conversation.dispensaryId !== user.dispensaryId) {
-      return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+      return { error: NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 }) };
     }
   } else {
-    return { error: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) };
+    return { error: NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 }) };
   }
 
   return { user, conversation };
@@ -113,7 +113,7 @@ export async function GET(
     return NextResponse.json({ messages: payload, offerUpdates }, { status: 200 });
   } catch (error) {
     console.error('Error fetching messages:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -151,7 +151,7 @@ export async function POST(
 
     if (messageType === ConversationMessageType.OFFER) {
       if (!isOfferPayload(body.offer)) {
-        return NextResponse.json({ error: 'Quote payload is required for quote messages' }, { status: 400 });
+        return NextResponse.json({ error: 'Enter the quote price and quantity before sending.' }, { status: 400 });
       }
 
       const offer = body.offer as { quantity?: number; unitPrice?: number; note?: string };
@@ -177,7 +177,7 @@ export async function POST(
     }
 
     if (!messageBody) {
-      return NextResponse.json({ error: 'Message body is required' }, { status: 400 });
+      return NextResponse.json({ error: 'Enter a message before sending.' }, { status: 400 });
     }
 
     const message = await db.$transaction(async (tx) => {
@@ -238,6 +238,6 @@ export async function POST(
     );
   } catch (error) {
     console.error('Error sending message:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }

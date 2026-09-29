@@ -112,6 +112,7 @@ export default function SignUpPage() {
         return;
       }
 
+      try { window.sessionStorage.setItem('phenoshop:verification-email', formData.email.trim().toLowerCase()); } catch { /* Email can still be entered manually. */ }
       router.push('/auth/verify-email?sent=1');
     } catch {
       setError('Failed to create account. Please try again.');
@@ -136,17 +137,17 @@ export default function SignUpPage() {
 
         <div className="relative max-w-xl">
           <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-pf-accent">
-            Join the licensed network
+            For licensed businesses
           </p>
           <h1 className="text-5xl font-semibold tracking-tight text-white xl:text-6xl">
-            Build your verified profile.
+            Create your business account.
           </h1>
           <p className="mt-6 max-w-lg text-base leading-7 text-pf-muted">
-            One account covers grower catalog or dispensary buying workflows.
+            Choose a grower account to list products or a dispensary account to shop.
           </p>
 
           <div className="mt-10 grid gap-3">
-            {['Marketplace identity from your business profile', 'License-aware dispensary ordering gates', 'Cultivator subscription billing only'].map((item) => (
+            {['Create your business profile', 'License approval before selling or ordering', 'Start listing with a free grower plan'].map((item) => (
               <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
                 <ShieldCheck className="h-5 w-5 shrink-0 text-pf-accent" />
                 <span className="text-sm text-pf-secondary">{item}</span>
@@ -193,12 +194,12 @@ export default function SignUpPage() {
 
               <fieldset className="min-w-0 border-t border-pf-line pt-3">
                 <legend className="px-1 text-sm font-semibold text-pf-text">
-                  Personal contact
+                  Your contact details
                 </legend>
                 <div className="mt-2 grid grid-cols-2 gap-3">
                   <div>
                     <label htmlFor="firstName" className="mb-1.5 block text-sm font-medium text-pf-secondary">
-                      First Name *
+                      First name *
                     </label>
                     <input
                       id="firstName"
@@ -218,7 +219,7 @@ export default function SignUpPage() {
 
                   <div>
                     <label htmlFor="lastName" className="mb-1.5 block text-sm font-medium text-pf-secondary">
-                      Last Name *
+                      Last name *
                     </label>
                     <input
                       id="lastName"
@@ -240,12 +241,12 @@ export default function SignUpPage() {
 
               <fieldset className="min-w-0 border-t border-pf-line pt-3">
                 <legend className="px-1 text-sm font-semibold text-pf-text">
-                  Business profile
+                  Your business
                 </legend>
                 <div className="mt-2 grid gap-3">
                   <div>
                     <label htmlFor="businessName" className="mb-1.5 block text-sm font-medium text-pf-secondary">
-                      Business Name
+                      Business name
                     </label>
                     <input
                       id="businessName"
@@ -260,13 +261,13 @@ export default function SignUpPage() {
                       placeholder="Business name"
                     />
                     <p id="businessName-helper" className="mt-2 text-xs leading-5 text-pf-muted">
-                      Partners see this name. Leave blank to use your name.
+                      Buyers and growers see this name. Leave it blank to use your name.
                     </p>
                   </div>
 
                   <div>
                     <label htmlFor="businessType" className="mb-1.5 block text-sm font-medium text-pf-secondary">
-                      Business Type *
+                      Account type *
                     </label>
                     <select
                       id="businessType"
@@ -277,12 +278,12 @@ export default function SignUpPage() {
                       aria-describedby={formData.businessType === 'dispensary' ? 'dispensary-license-note' : undefined}
                       className="relative block w-full rounded-xl border border-pf-line-strong bg-pf-surface px-3 py-2.5 text-base text-pf-text transition-colors focus:border-pf-accent focus:outline-none focus:ring-2 focus:ring-pf-accent disabled:cursor-not-allowed disabled:bg-pf-surface disabled:text-pf-muted"
                     >
-                      <option value="grower">Cannabis Grower</option>
-                      <option value="dispensary">Dispensary/Retailer</option>
+                      <option value="grower">Grower / cultivator</option>
+                      <option value="dispensary">Dispensary / retailer</option>
                     </select>
                     {formData.businessType === 'dispensary' && (
                       <p id="dispensary-license-note" className="mt-2 rounded-xl border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-xs leading-5 text-pf-accent">
-                        Dispensaries submit license details after signup; ordering unlocks once PhenoShop verifies the license.
+                        After signup, add your license details in Settings. We review licenses before growers appear in the catalog or dispensaries can send order requests.
                       </p>
                     )}
                   </div>
@@ -291,7 +292,7 @@ export default function SignUpPage() {
 
               <fieldset className="min-w-0 border-t border-pf-line pt-3">
                 <legend className="px-1 text-sm font-semibold text-pf-text">
-                  Account security
+                  Your sign-in details
                 </legend>
                 <div className="mt-2 grid gap-3">
                   <div>
@@ -366,7 +367,7 @@ export default function SignUpPage() {
 
                     <div>
                       <label htmlFor="confirmPassword" className="mb-1.5 block text-sm font-medium text-pf-secondary">
-                        Confirm Password *
+                        Confirm password *
                       </label>
                       <div className="relative">
                         <input

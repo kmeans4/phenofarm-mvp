@@ -11,7 +11,7 @@ interface TableDensityControlProps {
 export function TableDensityControl({
   value,
   onChange,
-  label = 'Density',
+  label = 'Row spacing',
 }: TableDensityControlProps) {
   return (
     <div className="flex items-center gap-2">
@@ -29,7 +29,7 @@ export function TableDensityControl({
                 : 'text-pf-muted hover:bg-pf-surface'
             } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 ring-offset-pf-canvas`}
           >
-            {mode === 'comfortable' ? 'Comfort' : 'Compact'}
+            {mode === 'comfortable' ? 'Comfortable' : 'Compact'}
           </button>
         ))}
       </div>

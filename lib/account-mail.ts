@@ -4,6 +4,18 @@ type AccountMail = { to: string; subject: string; text: string };
 
 const loopback = (hostname: string) => ['localhost', '127.0.0.1', '[::1]', '::1'].includes(hostname);
 
+// Avoid sending the support mailbox a Reply-To that resolves back to itself.
+// In particular, support+test aliases can otherwise trigger recipient spam rules.
+function accountReplyTo(recipient: string) {
+  const replyTo = process.env.AUTH_MAIL_REPLY_TO?.trim();
+  if (!replyTo) return undefined;
+  const mailbox = (value: string) => {
+    const address = (value.match(/<([^<>]+)>/)?.[1] || value).trim().toLowerCase();
+    return address.replace(/\+[^@]*@/, '@');
+  };
+  return mailbox(recipient) === mailbox(replyTo) ? undefined : replyTo;
+}
+
 export function accountOrigin() {
   const url = new URL(process.env.NEXTAUTH_URL || '');
   if (url.username || url.password || (url.protocol !== 'https:' && !(url.protocol === 'http:' && loopback(url.hostname)))) {
@@ -38,12 +50,14 @@ export function accountMailConfigured() {
 
 export async function sendAccountMail(mail: AccountMail) {
   const config = mailConfiguration();
+  const replyTo = accountReplyTo(mail.to);
+  const startedAt = Date.now();
   const response = await fetch(config.endpoint, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.key}`, 'Idempotency-Key': randomUUID() },
     body: JSON.stringify(config.provider === 'local-test' ? mail : {
       from: process.env.AUTH_MAIL_FROM, to: [mail.to], subject: mail.subject, text: mail.text,
-      ...(process.env.AUTH_MAIL_REPLY_TO ? { reply_to: process.env.AUTH_MAIL_REPLY_TO } : {}),
+      ...(replyTo ? { reply_to: replyTo } : {}),
     }),
     signal: AbortSignal.timeout(12_000),
     redirect: 'error',
@@ -51,4 +65,9 @@ export async function sendAccountMail(mail: AccountMail) {
   });
   // Do not include provider responses, recipients, request bodies or token links in errors.
   if (!response.ok) throw new Error('Account email delivery failed');
+  const receipt = await response.json().catch(() => null);
+  // Provider acceptance is not inbox delivery. Log no recipient, body, token, or credential.
+  console.info('[account-mail]', { code: 'PROVIDER_ACCEPTED', provider: config.provider, durationMs: Date.now() - startedAt,
+    ...(typeof receipt?.id === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(receipt.id) ? { messageId: receipt.id } : {}),
+  });
 }

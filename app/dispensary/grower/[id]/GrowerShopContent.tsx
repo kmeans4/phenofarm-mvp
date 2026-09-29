@@ -157,7 +157,7 @@ export default function GrowerShopContent({
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to send message');
+        throw new Error(data.error || 'We could not send message. Please try again.');
       }
 
       setMessageSuccess(
@@ -179,7 +179,7 @@ export default function GrowerShopContent({
       }, 600);
     } catch (err) {
       setMessageSuccess('');
-      setMessageError(err instanceof Error ? err.message : 'Failed to send message');
+      setMessageError(err instanceof Error ? err.message : 'We could not send message. Please try again.');
     } finally {
       setMessageSending(false);
     }
@@ -299,7 +299,7 @@ export default function GrowerShopContent({
           {searchQuery && (
             <span className="inline-flex items-center gap-1 px-3 py-1 bg-pf-info-bg text-pf-info text-sm rounded-full">
               Search: &quot;{searchQuery}&quot;
-              <button onClick={() => setSearchQuery('')} className="hover:text-pf-info">
+              <button aria-label="Clear product search" onClick={() => setSearchQuery('')} className="hover:text-pf-info">
                 <X size={14} />
               </button>
             </span>

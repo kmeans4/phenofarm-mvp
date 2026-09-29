@@ -13,7 +13,7 @@ const STATUS_FLOW: StatusStep[] = [
   { status: 'CONFIRMED', label: getOrderStatusLabel('CONFIRMED'), description: 'Request accepted by grower', icon: CheckCircle2 },
   { status: 'PROCESSING', label: getOrderStatusLabel('PROCESSING'), description: 'Preparing requested items', icon: Package },
   { status: 'SHIPPED', label: getOrderStatusLabel('SHIPPED'), description: 'Ready, picked up, or in transit', icon: Truck },
-  { status: 'DELIVERED', label: getOrderStatusLabel('DELIVERED'), description: 'Fulfillment complete', icon: Flag },
+  { status: 'DELIVERED', label: getOrderStatusLabel('DELIVERED'), description: 'Order delivered', icon: Flag },
 ];
 
 interface OrderStatusTimelineProps {
@@ -49,7 +49,7 @@ export default function OrderStatusTimeline({
         <div className="flex items-center gap-3">
           <XCircle className="h-10 w-10 text-pf-danger" />
           <div>
-            <h3 className="text-lg font-semibold text-pf-danger">Request Cancelled</h3>
+            <h3 className="text-lg font-semibold text-pf-danger">Request cancelled</h3>
             <p className="text-pf-danger">This order request has been cancelled and cannot be modified.</p>
           </div>
         </div>
@@ -60,7 +60,7 @@ export default function OrderStatusTimeline({
   return (
     <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-6">
       <div className="mb-6">
-        <h2 className="text-lg font-semibold text-pf-text">Fulfillment Progress</h2>
+        <h2 className="text-lg font-semibold text-pf-text">Order progress</h2>
         <p className="text-sm text-pf-muted">Order request #{orderId}</p>
       </div>
 
@@ -93,7 +93,7 @@ export default function OrderStatusTimeline({
                   <StepIcon className="h-5 w-5" aria-hidden="true" />
                 </div>
                 <div className="mt-2 sm:mt-3 text-center w-12 sm:w-16">
-                  <p className={`text-[10px] sm:text-xs font-medium leading-tight ${getStatusTextColor(index)}`}>
+                  <p className={`text-xs font-medium leading-tight ${getStatusTextColor(index)}`}>
                     {step.label}
                   </p>
                 </div>
@@ -130,9 +130,9 @@ export default function OrderStatusTimeline({
         </div>
       </div>
 
-      {/* Status History */}
+      {/* Status history */}
       <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-pf-line">
-        <h3 className="text-xs sm:text-sm font-medium text-pf-text mb-2 sm:mb-3">Status History</h3>
+        <h3 className="text-xs sm:text-sm font-medium text-pf-text mb-2 sm:mb-3">Status history</h3>
         <div className="space-y-2">
           {STATUS_FLOW.slice(0, effectiveIndex + 1).reverse().map((step, idx) => (
             <div key={step.status} className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">

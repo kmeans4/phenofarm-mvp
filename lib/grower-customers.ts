@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { customerWhere } from '@/lib/customers';
-import { parsePage } from '@/lib/buyer-products';
+import { parsePage } from '@/lib/pagination';
 import type { Prisma } from '@prisma/client';
 
 export async function getGrowerCustomerPage(growerId: string, params: { page?: string; search?: string }) {

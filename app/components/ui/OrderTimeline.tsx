@@ -27,7 +27,7 @@ const STATUS_FLOW: TimelineStep[] = [
   { status: 'CONFIRMED', label: getOrderStatusLabel('CONFIRMED'), description: 'Request accepted by grower', icon: CheckCircle2 },
   { status: 'PROCESSING', label: getOrderStatusLabel('PROCESSING'), description: 'Preparing requested items', icon: Package },
   { status: 'SHIPPED', label: 'Ready', description: 'Ready, picked up, or in transit', icon: Truck },
-  { status: 'DELIVERED', label: getOrderStatusLabel('DELIVERED'), description: 'Fulfillment complete', icon: Flag },
+  { status: 'DELIVERED', label: getOrderStatusLabel('DELIVERED'), description: 'Order delivered', icon: Flag },
 ];
 
 function toDate(value: Date | string | null | undefined) {
@@ -77,7 +77,7 @@ export function OrderTimeline({
   shippedAt,
   deliveredAt,
   title = 'Timeline',
-  cancelledDescription = 'This request was cancelled. Message the other party if you need more detail.',
+  cancelledDescription = 'This request was cancelled. Open Messages if you need more details.',
   className = '',
 }: OrderTimelineProps) {
   const currentIndex = STATUS_FLOW.findIndex((step) => step.status === currentStatus);
@@ -137,7 +137,7 @@ export function OrderTimeline({
                     <span className={`block text-sm font-semibold leading-tight sm:text-xs ${getLabelClasses(state)}`}>
                       {step.label}
                     </span>
-                    {(date || state === 'current') && <span className="mt-1 block break-words text-[11px] text-pf-muted">
+                    {(date || state === 'current') && <span className="mt-1 block break-words text-xs text-pf-muted">
                       {formatStepDate(date, state)}
                     </span>}
                   </span>

@@ -52,7 +52,7 @@ const PLAN_CONFIGS: PlanConfig[] = [
       'Everything in Free',
       'Unlimited product listings',
       'Higher usage limits',
-      'CSV bulk upload',
+      'Import products from CSV',
       'Priority support',
     ],
     highlighted: true,
@@ -157,12 +157,12 @@ export function PricingPlans() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok || !data.url) {
-        throw new Error(data.error || 'Could not start subscription checkout');
+        throw new Error(data.error || 'We could not open checkout. Please try again.');
       }
 
       window.location.href = data.url;
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Could not start subscription checkout');
+      setActionError(error instanceof Error ? error.message : 'We could not open checkout. Please try again.');
       setActionLoading(null);
     }
   };
@@ -176,12 +176,12 @@ export function PricingPlans() {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok || !data.url) {
-        throw new Error(data.error || 'Could not open subscription portal');
+        throw new Error(data.error || 'We could not open billing. Please try again.');
       }
 
       window.location.href = data.url;
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Could not open subscription portal');
+      setActionError(error instanceof Error ? error.message : 'We could not open billing. Please try again.');
       setActionLoading(null);
     }
   };
@@ -230,7 +230,7 @@ export function PricingPlans() {
               <div className="flex min-h-full w-full flex-col">
                 {plan.highlighted ? (
                   <span className="absolute -top-3 left-6 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-[#032116]">
-                    Most popular
+                    Pro plan
                   </span>
                 ) : null}
 
@@ -283,7 +283,7 @@ export function PricingPlans() {
                       className="w-full"
                       onClick={openPortal}
                       disabled={!currentSubscription.portalAvailable || actionLoading !== null}
-                      title={currentSubscription.portalAvailable ? 'Open Stripe customer portal' : 'Manage plan changes after checkout'}
+                      title={currentSubscription.portalAvailable ? 'Open billing settings' : 'Subscribe before managing a paid plan'}
                     >
                       Manage billing
                     </Button>
@@ -294,7 +294,7 @@ export function PricingPlans() {
                       className="w-full"
                       onClick={() => startCheckout('pro')}
                       disabled={!canCheckout || actionLoading !== null}
-                      title={canCheckout ? 'Start Stripe subscription checkout' : 'Paid upgrades are currently unavailable'}
+                      title={canCheckout ? 'Subscribe to Pro through Stripe' : 'Paid upgrades are currently unavailable'}
                     >
                       {planLoading ? (
                         <span className="inline-flex items-center gap-2">

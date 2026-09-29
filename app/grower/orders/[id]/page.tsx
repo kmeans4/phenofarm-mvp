@@ -1,3 +1,4 @@
+import { formatMarketplaceDateTime } from '@/lib/marketplace-date';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
@@ -175,7 +176,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Requests
+            Back to requests
           </Link>
         </div>
       </div>
@@ -200,7 +201,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Back to Requests
+            Back to requests
           </Link>
         </div>
       </div>
@@ -223,7 +224,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
           <p className="text-sm font-semibold uppercase tracking-wide text-pf-muted">PhenoShop request summary</p>
           <h1 className="mt-1 text-2xl font-bold text-pf-text">Order Request #{order.orderId}</h1>
           <p className="mt-1 text-sm text-pf-muted">
-            Submitted {format(new Date(order.createdAt), 'MMMM d, yyyy \'at\' h:mm a')} - Status: {statusLabel}
+            Submitted {formatMarketplaceDateTime(order.createdAt)} - Status: {statusLabel}
           </p>
         </header>
 
@@ -332,7 +333,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
 
       <div className="space-y-1 text-sm text-pf-muted">
         <div className="flex flex-wrap items-center justify-between gap-2"><p className="break-all font-medium">#{order.orderId}</p><span className="sm:hidden"><StatusBadge status={order.status} /></span></div>
-        <p>Submitted {format(new Date(order.createdAt), 'MMM d, yyyy · h:mm a')}</p>
+        <p>Submitted {formatMarketplaceDateTime(order.createdAt)}</p>
       </div>
       <QuickStatusUpdate orderId={order.id} currentStatus={order.status} />
       <div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
@@ -357,10 +358,10 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                 <table className="w-full">
                   <thead className="bg-pf-canvas border-b border-pf-line">
                     <tr>
-                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-[11px] sm:text-xs font-semibold text-pf-muted uppercase tracking-wider">Product</th>
-                      <th className="px-3 sm:px-4 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-pf-muted uppercase tracking-wider">Price</th>
-                      <th className="px-3 sm:px-4 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-pf-muted uppercase tracking-wider">Qty</th>
-                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-[11px] sm:text-xs font-semibold text-pf-muted uppercase tracking-wider">Line value</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-left text-xs font-semibold text-pf-muted uppercase tracking-wider">Product</th>
+                      <th className="px-3 sm:px-4 py-2 sm:py-3 text-right text-xs font-semibold text-pf-muted uppercase tracking-wider">Price</th>
+                      <th className="px-3 sm:px-4 py-2 sm:py-3 text-right text-xs font-semibold text-pf-muted uppercase tracking-wider">Qty</th>
+                      <th className="px-3 sm:px-6 py-2 sm:py-3 text-right text-xs font-semibold text-pf-muted uppercase tracking-wider">Line value</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-pf-line">
@@ -375,7 +376,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
                               <p className="text-xs sm:text-sm text-pf-muted">{item.product.strain}</p>
                             )}
                             {item.product?.productType && (
-                              <p className="text-[11px] text-pf-muted mt-0.5">
+                              <p className="text-xs text-pf-muted mt-0.5">
                                 {item.product.productType}
                                 {item.product.subType && ` - ${item.product.subType}`}
                               </p>
@@ -465,7 +466,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
               <CardContent className="space-y-3">
                 <div className="grid gap-2 sm:gap-3 sm:grid-cols-3">
                   <div>
-                    <p className="text-xs font-medium text-pf-muted">Fulfillment</p>
+                    <p className="text-xs font-medium text-pf-muted">Pickup or delivery</p>
                     <p className="text-sm text-pf-text">{requestNotes.details.fulfillmentMethod || 'Coordinate with buyer'}</p>
                   </div>
                   <div>
@@ -504,7 +505,7 @@ export default async function OrderDetailPage({ params }: { params: Promise<{ id
             </div>
           </details>
           <details className="rounded-xl border border-pf-line bg-pf-surface px-3 py-1 sm:p-4"><summary className="min-h-10 cursor-pointer py-2.5 text-sm font-semibold sm:py-0">Request history</summary><div className="mt-3"><OrderHistory events={order.statusEvents} /></div></details>
-          {order.createdBy === 'GROWER' ? <div className="rounded-xl border border-pf-info-line bg-pf-info-bg p-4 text-sm text-pf-info">{order.dispensary.isOffPlatform ? 'Off-platform record — no buyer account confirmation is required.' : order.buyerAcknowledgedAt ? `Buyer confirmed ${format(order.buyerAcknowledgedAt, 'MMM d, yyyy h:mm a')}.` : 'Awaiting buyer confirmation.'}</div> : null}
+          {order.createdBy === 'GROWER' ? <div className="rounded-xl border border-pf-info-line bg-pf-info-bg p-4 text-sm text-pf-info">{order.dispensary.isOffPlatform ? 'Recorded outside PhenoShop. The buyer does not need to confirm it in the app.' : order.buyerAcknowledgedAt ? `Buyer confirmed ${formatMarketplaceDateTime(order.buyerAcknowledgedAt)}.` : 'Awaiting buyer confirmation.'}</div> : null}
 
           {/* Customer Info */}
           <Card>

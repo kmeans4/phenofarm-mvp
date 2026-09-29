@@ -8,83 +8,83 @@ const SUPPORT_EMAIL = 'support@phenoshop.app';
 const faqGroups = [
   {
     title: 'For growers',
-    description: 'Catalog, quote, request, and subscription basics for cultivator teams.',
+    description: 'List products, respond to buyers, and manage your account.',
     items: [
       {
         question: 'How do I publish products for buyers?',
         answer:
-          'Growers manage strains, batches, inventory, product records, documents, and availability from the grower workspace. Listings can show catalog pricing or use quote messaging when terms need to be confirmed first.',
+          'Go to Products and choose Add product. Enter the product details, price, and stock, then choose Publish product. Choose Save draft to finish later. To keep a price private, select Quote only so buyers can ask for pricing. Your account and license must be approved before listings appear to buyers.',
       },
       {
         question: 'What happens when a dispensary submits a request?',
         answer:
-          'PhenoShop creates a wholesale request for the grower to review. Requests move through the friendly status flow: Submitted, Accepted, Preparing, Ready / In transit, Delivered, or Cancelled.',
+          'PhenoShop creates a wholesale request for the grower to review. You can track each request as it moves through: Submitted, Accepted, Preparing, Ready / In transit, Delivered, or Cancelled.',
       },
       {
         question: 'Can growers send quote terms before accepting a request?',
         answer:
-          'Yes. The messaging workflow supports structured quote terms such as quantity, unit price, and notes. Quote terms are recorded for coordination, but the buyer and grower still handle payment directly.',
+          'Yes. Open a product conversation in Messages and send a quote with a unit price, quantity, and any notes. The buyer can accept, decline, or suggest another price. Payment is arranged directly between you and the buyer.',
       },
       {
         question: 'What payments does PhenoShop process for growers?',
         answer:
-          'Only the cultivator software subscription is paid through PhenoShop using Stripe Billing. Wholesale invoices, ACH, checks, cash-on-delivery, and other settlement terms stay directly between the licensed businesses.',
+          'PhenoShop uses Stripe for paid grower subscriptions. Buyers and growers arrange payment for wholesale orders directly with each other.',
       },
     ],
   },
   {
     title: 'For dispensaries',
-    description: 'How verified buyers browse, draft requests, and coordinate fulfillment.',
+    description: 'Find products, send order requests, and track deliveries.',
     items: [
       {
         question: 'Why can I browse but not submit an order request?',
         answer:
-          'Dispensary ordering is gated by license verification. New dispensary accounts can submit license details after signup, and ordering unlocks after PhenoShop verifies the license.',
+          'Add your license details in Settings after signup. You can browse while we review them. Once your license is approved, you can send order requests.',
       },
       {
         question: 'How do I request products from growers?',
         answer:
-          'Use the catalog or grower shop pages to add products to a request draft. During review, confirm quantities, fulfillment details, requested timing, and direct payment terms. If the draft includes multiple growers, PhenoShop creates one request per grower.',
+          'Choose Add to cart in the catalog or a grower’s shop. Open Cart to review quantities, pickup or delivery, timing, and payment terms. Choose Review request, then Send order request. If you have products from multiple growers, each grower receives a separate request.',
       },
       {
         question: 'How do quote requests work?',
         answer:
-          'If pricing or availability needs confirmation, use messaging to request a quote. Growers can send structured terms, and buyers can accept, reject, or counter. Accepted quote terms help both sides coordinate the order request.',
+          'Choose Request pricing on a product to message the grower. You can accept a quote, decline it, or suggest another price. Once you accept, choose Add to cart to use the agreed price in an order request.',
       },
       {
         question: 'Does PhenoShop collect wholesale payment from dispensaries?',
         answer:
-          'No. PhenoShop tracks request value and fulfillment status for marketplace operations, but it does not collect, remit, escrow, or pay out wholesale order funds.',
+          'No. PhenoShop shows order amounts and progress. Arrange invoices and payment directly with the grower.',
       },
     ],
   },
   {
     title: 'Account & billing',
-    description: 'Access, verification, billing, and support expectations for the MVP.',
+    description: 'Sign-in, license review, plans, and support.',
     items: [
       {
         question: 'How do password resets work?',
         answer:
-          'Choose Forgot password on the sign-in page. A single-use link expires after 30 minutes. Resetting confirms ownership of your email and signs out all previous sessions.',
+          'Choose Forgot password on the sign-in page. A single-use link expires after 30 minutes. Resetting confirms ownership of your email and signs you out on other devices.',
       },
       {
         question: 'Why do I need to verify my email?',
-        answer: 'Every account, including existing accounts, needs mailbox verification before sign-in. Choose Resend verification on the sign-in page, open the link within an hour, and enter your account password. Email verification does not replace business license review. To change your login email, choose Change email in settings and confirm the new mailbox.',
+        answer: 'Verify your email before signing in. Choose Resend verification email on the sign-in page, open the link within an hour, and enter your account password. Your business license is reviewed separately. To update your sign-in address, choose Change email in Settings.',
       },
       {
         question: 'Where do I update business or license details?',
         answer:
-          'Growers and dispensaries can update profile details in their settings. Dispensary license changes may require admin review before ordering access is considered verified.',
+          'Growers and dispensaries can update profile details in their settings. Changes to a dispensary license may need review before you can send order requests again.',
       },
       {
         question: 'How does the cultivator subscription work?',
         answer:
-          'Grower accounts can manage Free, Pro, or Business subscription access from grower settings. Stripe checkout starts paid subscriptions, and the Stripe customer portal becomes available after checkout.',
+          'Open Settings to see your grower plan. When paid upgrades are available, choose Upgrade to Pro to subscribe through Stripe. After subscribing, choose Manage billing to update or cancel your plan.',
       },
       {
         question: 'How do I reach PhenoShop support?',
         answer:
-          `Email ${SUPPORT_EMAIL} for account access, license verification, order workflow, quote, catalog, or subscription questions.`,
+          `Email ${SUPPORT_EMAIL} for account access, license verification, orders, quotes, products, or subscriptions.`,
       },
     ],
   },
@@ -115,7 +115,7 @@ export default function HelpPage() {
                 Marketplace help
               </h1>
               <p className="mt-6 max-w-2xl text-base leading-7 text-gray-400">
-                Verification, requests, quotes, settlement, and subscriptions.
+                Find answers about accounts, products, orders, and billing.
               </p>
             </div>
 
@@ -166,9 +166,9 @@ export default function HelpPage() {
           </div>
 
           <div className="mt-10 rounded-2xl border border-emerald-300/20 bg-emerald-400/[0.06] p-5 text-sm leading-6 text-emerald-50">
-            <p className="font-semibold">Payment model reminder</p>
+            <p className="font-semibold">Payments</p>
             <p className="mt-1 text-emerald-100/80">
-              PhenoShop never processes wholesale payments. Buyers and growers settle directly; the only in-app payment flow is the cultivator subscription.
+              Arrange wholesale payments directly with your buyer or grower. Only paid grower subscriptions are billed through PhenoShop.
             </p>
           </div>
         </div>

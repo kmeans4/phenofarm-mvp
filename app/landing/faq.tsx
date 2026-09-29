@@ -3,28 +3,32 @@ import { SectionHeading } from './motion';
 
 const FAQS = [
   {
-    q: 'Does PhenoShop process our wholesale payments?',
-    a: 'No — deliberately. Order value is tracked for your records only; invoicing and settlement happen directly between buyer and grower on whatever terms you agree. PhenoShop charges cultivators a flat software subscription and takes 0% of wholesale value.',
+    q: 'Who can send an order request?',
+    a: 'Dispensaries can browse products while their license is being reviewed. They can send order requests after our team approves their license.',
   },
   {
-    q: 'How does license verification work?',
-    a: 'Dispensaries submit license details in settings; the PhenoShop team reviews them. Until a license is verified, a buyer account can browse but cannot submit order requests — verification is enforced by the order pipeline itself, not just shown as a badge.',
+    q: 'Can growers hide their prices?',
+    a: 'Yes. A grower can show a price on a product or ask buyers to request a quote. Buyers and growers can discuss an offer before it is accepted.',
   },
   {
-    q: 'What happens when a request is cancelled?',
-    a: 'The reserved inventory returns to the grower\'s stock automatically, and the request moves to history with its full record intact — items, terms, and timeline.',
+    q: 'What happens if I withdraw a request?',
+    a: 'A buyer can withdraw a request before the grower accepts it. The reserved products return to the grower\'s available stock, and the request stays in order history.',
   },
   {
-    q: 'Can we keep our prices private?',
-    a: 'Yes. Every listing has per-product price visibility: show a list price openly, or mark it quote-only so buyers request pricing and negotiate terms in a recorded thread.',
+    q: 'Can I reorder something I bought before?',
+    a: 'From a delivered order, you can add priced products that are still in stock back to your cart. Review current details before sending a new request.',
   },
   {
-    q: 'What product records can we keep?',
-    a: 'Listings carry strain, batch, THC/CBD, and COA lab documents (potency, pesticide, microbial).',
+    q: 'Can growers add lab reports?',
+    a: 'Yes. Growers can attach lab reports to batches. Buyers can download available reports from listings or ask the grower for more information.',
   },
   {
-    q: 'How do we evaluate it?',
-    a: 'Create a free account — the Free tier includes the full catalog and request workflow. Cultivators upgrade to Pro when they\'re ready to run live volume.',
+    q: 'How much does it cost to get started?',
+    a: 'You can create a free account. Growers on the free plan can list up to 50 products. Contact us if you need a larger catalog.',
+  },
+  {
+    q: 'Can I pay for a wholesale order in PhenoShop?',
+    a: 'No. The buyer and grower arrange invoicing and payment directly. PhenoShop shows the order value and status, but does not track whether payment was made.',
   },
 ];
 
@@ -32,7 +36,7 @@ export function Faq() {
   return (
     <section id="faq" className="relative scroll-mt-20 border-t border-white/[0.06] py-28 md:py-36">
       <div className="mx-auto max-w-3xl px-6">
-        <SectionHeading eyebrow="FAQ" title="Straight answers" />
+        <SectionHeading eyebrow="Common questions" title="Good to know before you start" />
 
         <div className="mt-14 divide-y divide-white/[0.06] rounded-2xl border border-white/[0.06] bg-white/[0.015]">
           {FAQS.map((faq, i) => (

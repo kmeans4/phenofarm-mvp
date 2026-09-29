@@ -47,10 +47,10 @@ export default function StrainsPage() {
         }
       } else {
         const errData = await response.json().catch(() => ({}));
-        setError(errData.error || 'Failed to fetch strains');
+        setError(errData.error || 'We could not load strains. Please try again.');
       }
     } catch {
-      setError('Network error - please check your connection');
+      setError('Check your connection, then try again.');
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export default function StrainsPage() {
     deleteRef.current = true;
     setDeleting(true);
     try {
-      await deleteRecord('/api/strains/' + strainId, 'Failed to delete strain');
+      await deleteRecord('/api/strains/' + strainId, 'We could not delete strain. Please try again.');
       setStrains((current) => current.filter(item => item.id !== strainId));
       toast.success('Strain deleted');
     } catch (error) {

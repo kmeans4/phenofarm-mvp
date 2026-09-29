@@ -4,9 +4,9 @@ import { db } from '@/lib/db';
 
 export async function GET() {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
   const user = session.user;
-  if (user.role !== 'DISPENSARY' || !user.dispensaryId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (user.role !== 'DISPENSARY' || !user.dispensaryId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
   const quotes = await db.acceptedQuote.findMany({
     where: { dispensaryId: user.dispensaryId, consumedByOrderId: null, expiresAt: { gt: new Date() } },
     orderBy: { acceptedAt: 'desc' },

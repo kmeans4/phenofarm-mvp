@@ -118,13 +118,13 @@ export async function GET(
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const orderId = (await context.params).id;
@@ -152,7 +152,7 @@ export async function GET(
   } catch (error) {
     if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Error fetching order:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
@@ -165,13 +165,13 @@ export async function PUT(
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
     }
 
     const user = session.user;
     
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
     }
 
     const orderId = (await context.params).id;
@@ -474,14 +474,14 @@ export async function PUT(
     }
 
     console.error('Error updating order:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
   }
 }
 
 // Keep the legacy DELETE route compatible while retaining the order and its audit trail.
 export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  if (session.user.role !== 'GROWER' || !session.user.growerId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+  if (session.user.role !== 'GROWER' || !session.user.growerId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
   return changeStatus(new NextRequest(request.url, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status: 'CANCELLED' }) }), context);
 }

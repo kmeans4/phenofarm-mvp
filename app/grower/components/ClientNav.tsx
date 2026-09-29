@@ -78,7 +78,7 @@ export function ClientNav({ links }: { links: NavLink[] }) {
         return (
           <div key={link.href}>
             {showGroup ? (
-              <div className="font-metadata px-3 pb-1 pt-2.5 text-[10px] font-semibold uppercase tracking-[0.15em] text-pf-muted first:pt-0">
+              <div className="font-metadata px-3 pb-1 pt-2.5 text-[13px] font-semibold tracking-normal text-pf-muted first:pt-0">
                 {link.group}
               </div>
             ) : null}
@@ -96,7 +96,7 @@ export function ClientNav({ links }: { links: NavLink[] }) {
                 <span className="truncate">{link.name}</span>
               </span>
               {(link.badge && link.badge > 0) ? (
-                <Badge variant="warning" className="ml-2 shrink-0 border-0 bg-pf-accent-bg px-2 py-0 text-[10px] text-pf-accent">
+                <Badge variant="warning" className="ml-2 shrink-0 border-0 bg-pf-accent-bg px-2 py-0 text-xs text-pf-accent">
                   {link.badge}
                 </Badge>
               ) : link.badgeComponent ? (

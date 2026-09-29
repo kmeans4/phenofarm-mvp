@@ -41,7 +41,7 @@ test.describe('shared controls on a populated portal', () => {
     });
     await save.locator('visible=true').click();
     await expect(save).toHaveCount(0);
-    await expect(page.getByText('Settings saved successfully!')).toBeVisible();
+    await expect(page.getByText('Settings saved.')).toBeVisible();
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 

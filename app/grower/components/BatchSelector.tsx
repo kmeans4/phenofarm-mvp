@@ -5,6 +5,7 @@ import { createPortal } from 'react-dom';
 import { Button } from '@/app/components/ui/Button';
 import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
 import { useFocusTrap } from '@/app/hooks/useFocusTrap';
+import { getTodayDateInputValue } from '@/lib/batch-utils';
 import {
   BatchLabDocumentUploaders,
   BatchLabDocuments,
@@ -25,6 +26,7 @@ interface Batch {
   strain: Strain;
   thc: number | null;
   cbd: number | null;
+  harvestDate: string;
 }
 
 interface BatchSelectorProps {
@@ -50,6 +52,8 @@ const TEXTAREA_CLASSES = "w-full rounded-lg border border-pf-line-strong px-3 py
 
 export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelectorProps) {
   const [batches, setBatches] = useState<Batch[]>([]);
+  const [terpenes, setTerpenes] = useState<Array<{ id: string; name: string; percentage: string }>>([]);
+  const selectedBatch = batches.find(batch => batch.id === batchId);
   const [uploadingDocuments, setUploadingDocuments] = useState(false);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -59,7 +63,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
   const [formData, setFormData] = useState<BatchFormData>({
     batchNumber: '',
     lotNumber: '',
-    harvestDate: new Date().toISOString().split('T')[0],
+    harvestDate: getTodayDateInputValue(),
     strainId: strainId || '',
     thc: '',
     cbd: '',
@@ -142,6 +146,10 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
       return;
     }
 
+    if (terpenes.some(row => !row.name.trim() || !row.percentage.trim() || !Number.isFinite(Number(row.percentage)) || Number(row.percentage) < 0 || Number(row.percentage) > 100)
+      || new Set(terpenes.map(row => row.name.trim().toLowerCase())).size !== terpenes.length) {
+      setError('Enter unique terpene names and percentages from 0 to 100.'); return;
+    }
     try {
       createRef.current = true;
       setCreating(true);
@@ -158,6 +166,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
           thc: formData.thc.trim() || null,
           cbd: formData.cbd.trim() || null,
           totalCannabinoids: formData.totalCannabinoids.trim() || null,
+          terpenes: terpenes.length ? Object.fromEntries(terpenes.map(row => [row.name.trim(), Number(row.percentage)])) : null,
           testResults: hasBatchLabDocuments(formData.labDocuments)
             ? { labDocuments: formData.labDocuments }
             : null,
@@ -167,17 +176,18 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
 
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || 'Failed to create batch');
+        throw new Error(data.error || 'We could not create batch. Please try again.');
       }
 
       const newBatch = await response.json();
       setBatches((current) => [...current, newBatch]);
       onBatchChange(newBatch.id);
       closeCreateForm();
+      setTerpenes([]);
       setFormData({
         batchNumber: '',
         lotNumber: '',
-        harvestDate: new Date().toISOString().split('T')[0],
+        harvestDate: getTodayDateInputValue(),
         strainId: strainId || '',
         thc: '',
         cbd: '',
@@ -186,7 +196,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
         notes: ''
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create batch');
+      setError(err instanceof Error ? err.message : 'We could not create batch. Please try again.');
     } finally {
       createRef.current = false;
       setCreating(false);
@@ -266,20 +276,20 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
 
               <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-sm font-medium text-pf-secondary">Batch # *</label>
+                  <label htmlFor="inline-batch-batchNumber" className="block text-sm font-medium text-pf-secondary">Batch # *</label>
                   <input
                     type="text"
-                    value={formData.batchNumber}
+                    id="inline-batch-batchNumber" value={formData.batchNumber}
                     onChange={(e) => setFormData(prev => ({ ...prev, batchNumber: e.target.value }))}
                     className={INPUT_CLASSES}
                     placeholder="OGK-2026-001"
                   />
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-sm font-medium text-pf-secondary">Lot #</label>
+                  <label htmlFor="inline-batch-lotNumber" className="block text-sm font-medium text-pf-secondary">Lot #</label>
                   <input
                     type="text"
-                    value={formData.lotNumber}
+                    id="inline-batch-lotNumber" value={formData.lotNumber}
                     onChange={(e) => setFormData(prev => ({ ...prev, lotNumber: e.target.value }))}
                     className={INPUT_CLASSES}
                     placeholder="Optional lot number"
@@ -289,16 +299,18 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
 
               <div className="grid grid-cols-1 gap-3 sm:gap-6 md:grid-cols-2">
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-sm font-medium text-pf-secondary">Harvest date *</label>
+                  <label htmlFor="inline-batch-harvest-date" className="block text-sm font-medium text-pf-secondary">Harvest date *</label>
                   <input
+                    id="inline-batch-harvest-date"
                     type="date"
+                    max={getTodayDateInputValue()}
                     value={formData.harvestDate}
                     onChange={(e) => setFormData(prev => ({ ...prev, harvestDate: e.target.value }))}
                     className={INPUT_CLASSES}
                   />
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
-                  <label className="block text-sm font-medium text-pf-secondary">Strain *</label>
+                  <label htmlFor={strainId ? undefined : "inline-batch-strain"} className="block text-sm font-medium text-pf-secondary">Strain *</label>
                   {strainId ? (
                     <div className="space-y-1.5 sm:space-y-2">
                       <div className="min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line rounded-lg bg-pf-canvas text-pf-secondary flex items-center">
@@ -312,6 +324,7 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
                     </div>
                   ) : (
                     <select
+                      id="inline-batch-strain"
                       value={formData.strainId}
                       onChange={(e) => setFormData(prev => ({ ...prev, strainId: e.target.value }))}
                       className={INPUT_CLASSES}
@@ -328,23 +341,32 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
               </div>
 
               <div className="border-t border-pf-line pt-3 sm:pt-6">
-                <h4 className="text-base font-semibold text-pf-text mb-3 sm:text-lg sm:mb-4">Lab Results</h4>
+                <h4 className="text-base font-semibold text-pf-text mb-3 sm:text-lg sm:mb-4">Lab results</h4>
                 <div className="grid grid-cols-3 gap-2 sm:gap-6">
                   <div className="space-y-1.5 sm:space-y-2">
-                    <label className="block text-sm font-medium text-pf-secondary">THC (%)</label>
-                    <input type="number" step="0.01" min="0" max="100" value={formData.thc} onChange={(e) => setFormData(prev => ({ ...prev, thc: e.target.value }))} className={INPUT_CLASSES} placeholder="18.5" />
+                    <label htmlFor="inline-batch-thc" className="block text-sm font-medium text-pf-secondary">THC (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" id="inline-batch-thc" value={formData.thc} onChange={(e) => setFormData(prev => ({ ...prev, thc: e.target.value }))} className={INPUT_CLASSES} placeholder="18.5" />
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
-                    <label className="block text-sm font-medium text-pf-secondary">CBD (%)</label>
-                    <input type="number" step="0.01" min="0" max="100" value={formData.cbd} onChange={(e) => setFormData(prev => ({ ...prev, cbd: e.target.value }))} className={INPUT_CLASSES} placeholder="0.5" />
+                    <label htmlFor="inline-batch-cbd" className="block text-sm font-medium text-pf-secondary">CBD (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" id="inline-batch-cbd" value={formData.cbd} onChange={(e) => setFormData(prev => ({ ...prev, cbd: e.target.value }))} className={INPUT_CLASSES} placeholder="0.5" />
                   </div>
                   <div className="space-y-1.5 sm:space-y-2">
-                    <label className="block text-sm font-medium text-pf-secondary">Total (%)</label>
-                    <input type="number" step="0.01" min="0" max="100" value={formData.totalCannabinoids} onChange={(e) => setFormData(prev => ({ ...prev, totalCannabinoids: e.target.value }))} className={INPUT_CLASSES} placeholder="22.0" />
+                    <label htmlFor="inline-batch-totalCannabinoids" className="block text-sm font-medium text-pf-secondary">Total cannabinoids (%)</label>
+                    <input type="number" step="0.01" min="0" max="100" id="inline-batch-totalCannabinoids" value={formData.totalCannabinoids} onChange={(e) => setFormData(prev => ({ ...prev, totalCannabinoids: e.target.value }))} className={INPUT_CLASSES} placeholder="22.0" />
                   </div>
                 </div>
               </div>
 
+              <details className="rounded-lg border border-pf-line p-3">
+                <summary className="cursor-pointer py-2 text-sm font-medium">Terpenes (optional)</summary>
+                {terpenes.map((row, index) => <div key={row.id} className="my-2 grid grid-cols-[1fr_1fr_auto] gap-2">
+                  <label className="min-w-0 text-sm">Terpene {index + 1}<input className={INPUT_CLASSES} value={row.name} onChange={event => setTerpenes(rows => rows.map(item => item.id === row.id ? { ...item, name: event.target.value } : item))} /></label>
+                  <label className="min-w-0 text-sm">Percentage {index + 1}<input type="number" min="0" max="100" step="0.01" className={INPUT_CLASSES} value={row.percentage} onChange={event => setTerpenes(rows => rows.map(item => item.id === row.id ? { ...item, percentage: event.target.value } : item))} /></label>
+                  <Button type="button" variant="ghost" aria-label={`Remove terpene ${index + 1}`} onClick={() => setTerpenes(rows => rows.filter(item => item.id !== row.id))}>×</Button>
+                </div>)}
+                <Button type="button" variant="outline" onClick={() => setTerpenes(rows => [...rows, { id: crypto.randomUUID(), name: '', percentage: '' }])}>Add terpene</Button>
+              </details>
               <BatchLabDocumentUploaders
                 onUploadingChange={setUploadingDocuments}
                 value={formData.labDocuments}
@@ -353,8 +375,8 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
               />
 
               <div className="space-y-1.5 sm:space-y-2">
-                <label className="block text-sm font-medium text-pf-secondary">Notes</label>
-                <textarea value={formData.notes} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} className={TEXTAREA_CLASSES} rows={3} placeholder="Batch notes" />
+                <label htmlFor="inline-batch-notes" className="block text-sm font-medium text-pf-secondary">Notes</label>
+                <textarea id="inline-batch-notes" value={formData.notes} onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))} className={TEXTAREA_CLASSES} rows={3} placeholder="Batch notes" />
               </div>
             </div>
 
@@ -371,6 +393,11 @@ export function BatchSelector({ strainId, batchId, onBatchChange }: BatchSelecto
         document.body
       )}
 
+      {selectedBatch && <div className="rounded-lg bg-pf-canvas p-3 text-sm" role="status">
+        <p className="font-medium">From batch {selectedBatch.batchNumber}</p>
+        <p>Harvest: {selectedBatch.harvestDate?.slice(0, 10) || 'Not entered'} · THC: {selectedBatch.thc == null ? 'Not entered' : `${Number(selectedBatch.thc)}%`} · CBD: {selectedBatch.cbd == null ? 'Not entered' : `${Number(selectedBatch.cbd)}%`}</p>
+        <p className="mt-1 text-xs text-pf-muted">Buyers see this batch’s lab results when available. Otherwise, they see the product’s THC and CBD ranges. Update lab results in Batch details. The product’s harvest date is entered separately.</p>
+      </div>}
       {batchId && batches.some(batch => batch.id === batchId) && (
         <a 
           href={`/grower/batches/${batchId}/edit`} 

@@ -4,11 +4,12 @@ import { useRef, useState } from 'react';
 import { Download, Loader2 } from 'lucide-react';
 import { LAB_REPORT_LABELS, labReportDownloadPath, normalizeLabReports, type LabReportKey } from '@/lib/lab-reports';
 
-export function LabReportDownloads({ productId, productName, reports, className = '' }: {
-  productId: string; productName: string; reports?: LabReportKey[]; className?: string;
+export function LabReportDownloads({ productId, productName, reports, audience = 'dispensary', className = '' }: {
+  productId: string; productName: string; reports?: LabReportKey[]; audience?: 'dispensary' | 'grower'; className?: string;
 }) {
   const [pending, setPending] = useState<LabReportKey | null>(null);
   const [error, setError] = useState('');
+  const [started, setStarted] = useState<LabReportKey | null>(null);
   const busy = useRef(false);
   const available = normalizeLabReports(reports);
   if (!available.length) return null;
@@ -18,11 +19,15 @@ export function LabReportDownloads({ productId, productName, reports, className 
     busy.current = true;
     setPending(report);
     setError('');
+    setStarted(null);
     try {
-      const response = await fetch(labReportDownloadPath(productId, report));
+      const response = await fetch(labReportDownloadPath(productId, report, audience), { signal: AbortSignal.timeout(20_000) });
       if (!response.ok) {
         const data = await response.json().catch(() => null);
         throw new Error(data?.error || 'Could not download this report. Please try again.');
+      }
+      if (!response.headers.get('content-type')?.toLowerCase().startsWith('application/pdf')) {
+        throw new Error('This report could not be downloaded. Please sign in again and retry.');
       }
       const url = URL.createObjectURL(await response.blob());
       const link = document.createElement('a');
@@ -31,10 +36,13 @@ export function LabReportDownloads({ productId, productName, reports, className 
       document.body.appendChild(link);
       link.click();
       link.remove();
+      setStarted(report);
       // Allow the browser to start the save before releasing the temporary URL.
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
     } catch (failure) {
-      setError(failure instanceof Error ? failure.message : 'Could not download this report. Please try again.');
+      setError(failure instanceof Error && failure.name === 'TimeoutError'
+        ? 'This report is taking too long to download. Please try again.'
+        : failure instanceof Error ? failure.message : 'Could not download this report. Please try again.');
     } finally { busy.current = false; setPending(null); }
   }
 
@@ -48,5 +56,6 @@ export function LabReportDownloads({ productId, productName, reports, className 
       </button>)}
     </div>
     {error && <p role="alert" className="mt-1 text-xs text-pf-danger">{error}</p>}
+    {started && <p role="status" className="mt-1 text-xs text-pf-muted">{LAB_REPORT_LABELS[started]} PDF sent to your browser. Check Downloads for its status.</p>}
   </div>;
 }

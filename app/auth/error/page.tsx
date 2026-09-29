@@ -6,15 +6,15 @@ import { AlertTriangle, ArrowLeft, ShieldCheck } from 'lucide-react';
 const errorMessages: Record<string, { title: string; message: string }> = {
   CredentialsSignin: {
     title: 'Sign-in failed',
-    message: 'Email or password is incorrect. Check your credentials and try again.',
+    message: 'Email or password is incorrect. Check your email and password, then try again.',
   },
   AccessDenied: {
     title: 'Access denied',
-    message: 'This account does not have access to the requested PhenoShop workspace.',
+    message: 'This page is not available to your account. Sign in with the account you want to use.',
   },
   Configuration: {
-    title: 'Authentication is not configured',
-    message: 'The sign-in service is not configured correctly. Contact support if this continues.',
+    title: 'Sign-in is unavailable',
+    message: 'We cannot sign you in right now. Please try again later or contact support.',
   },
   Verification: {
     title: 'Verification link issue',
@@ -28,7 +28,7 @@ function getErrorMessage(errorCode: string | undefined) {
   }
 
   return {
-    title: 'Authentication error',
+    title: 'Unable to sign in',
     message: 'Something went wrong while signing in. Try again, or contact support if the problem continues.',
   };
 }
@@ -71,7 +71,7 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
           </p>
 
           <div className="mt-10 grid gap-3">
-            {['Role-based grower and dispensary access', 'License-aware buyer ordering gates', 'Support-assisted password recovery'].map((item) => (
+            {['Help with grower and dispensary accounts', 'Help with license verification', 'Help resetting your password'].map((item) => (
               <div key={item} className="flex items-center gap-3 rounded-2xl border border-white/[0.06] bg-white/[0.03] px-4 py-3">
                 <ShieldCheck className="h-5 w-5 shrink-0 text-pf-accent" />
                 <span className="text-sm text-pf-secondary">{item}</span>
@@ -107,7 +107,7 @@ export default async function AuthErrorPage({ searchParams }: AuthErrorPageProps
               {error.message}
             </div>
             <p className="mt-3 text-sm leading-5 text-pf-muted">
-              If this keeps happening, email support from the account owner address and include your business name.
+              If this keeps happening, email support from the address you use to sign in and include your business name.
             </p>
 
             <div className="mt-5 grid gap-2">

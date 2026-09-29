@@ -206,31 +206,31 @@ export default async function DispensaryDashboardPage() {
   const setupItems = [
     {
       label: 'Profile',
-      description: hasProfile ? 'Buyer profile has the basics growers expect.' : 'Add contact and address details for grower trust.',
+      description: hasProfile ? 'Your business details are ready.' : 'Add your contact details and business address.',
       href: '/dispensary/settings',
       complete: hasProfile,
       cta: 'Complete profile',
     },
     {
       label: 'License',
-      description: hasLicense ? 'Retail license is verified.' : 'Keep license details current for ordering readiness.',
+      description: hasLicense ? 'Retail license is verified.' : 'Add a current license so you can send order requests.',
       href: '/dispensary/settings',
       complete: hasLicense,
       cta: 'Review license',
     },
     {
       label: 'Suppliers',
-      description: hasSavedProducts ? 'You have supplier history or saved product context.' : 'Browse growers and save useful products.',
+      description: hasSavedProducts ? 'You have saved products or ordered from a grower.' : 'Browse growers and save useful products.',
       href: '/dispensary/catalog',
       complete: hasSavedProducts,
       cta: 'Browse catalog',
     },
     {
-      label: 'Request draft',
-      description: data.activeOrders > 0 ? 'You have active requests to track.' : 'Start a request draft when products are ready.',
+      label: 'Cart',
+      description: data.activeOrders > 0 ? 'You have active requests to track.' : 'Add products to your cart when you are ready.',
       href: '/dispensary/cart',
       complete: data.activeOrders > 0,
-      cta: 'Open draft',
+      cta: 'View cart',
     },
     {
       label: 'Request tracking',
@@ -244,16 +244,16 @@ export default async function DispensaryDashboardPage() {
   const primaryAction = data.pendingOrders > 0
     ? {
         title: 'Track requests waiting on growers',
-        description: 'Follow up on pending requests before starting another draft.',
+        description: 'Check requests that are waiting for a grower’s response.',
         href: '/dispensary/orders',
         cta: 'Track requests',
         secondaryHref: '/dispensary/cart',
-        secondaryCta: 'Open draft',
+        secondaryCta: 'View cart',
       }
     : data.activeOrders > 0
       ? {
           title: 'Review active request progress',
-          description: 'Check active grower responses, fulfillment status, and direct terms.',
+          description: 'Check grower responses and pickup or delivery progress.',
           href: '/dispensary/orders',
           cta: 'Review requests',
           secondaryHref: '/dispensary/catalog',
@@ -261,11 +261,11 @@ export default async function DispensaryDashboardPage() {
         }
       : {
           title: 'Build a request from the catalog',
-          description: 'Start with products, then confirm logistics and direct payment terms in review.',
+          description: 'Add products to your cart, then review quantities, pickup or delivery, and payment terms.',
           href: '/dispensary/catalog',
           cta: 'Browse products',
           secondaryHref: '/dispensary/saved',
-          secondaryCta: 'Open saved',
+          secondaryCta: 'View saved products',
         };
 
   // Serialize orders for client component
@@ -351,7 +351,7 @@ export default async function DispensaryDashboardPage() {
         <SetupNextStepsCard items={setupItems} primaryAction={primaryAction} complete={setupComplete} />
         <details className="text-xs text-pf-muted">
           <summary className="w-fit cursor-pointer py-2">About these totals</summary>
-          <p className="mt-1 max-w-2xl">Request value excludes cancelled requests. Awaiting response means the grower has not accepted yet. In progress includes accepted requests through fulfillment.</p>
+          <p className="mt-1 max-w-2xl">Request value excludes cancelled requests. Awaiting response means the grower has not accepted yet. In progress includes accepted requests through delivery.</p>
         </details>
       </div>
 

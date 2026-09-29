@@ -64,10 +64,10 @@ export default function BatchesPage() {
         }
       } else {
         const errData = await response.json().catch(() => ({}));
-        setError(errData.error || 'Failed to fetch batches');
+        setError(errData.error || 'We could not load batches. Please try again.');
       }
     } catch {
-      setError('Network error - please check your connection');
+      setError('Check your connection, then try again.');
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export default function BatchesPage() {
     deleteRef.current = true;
     setDeleting(true);
     try {
-      await deleteRecord('/api/batches/' + batchId, 'Failed to delete batch');
+      await deleteRecord('/api/batches/' + batchId, 'We could not delete batch. Please try again.');
       setBatches((current) => current.filter(item => item.id !== batchId));
       toast.success('Batch deleted');
     } catch (error) {
@@ -233,7 +233,7 @@ export default function BatchesPage() {
                         >
                           {pluralize(batch._count.products, 'product')}
                         </Link>
-                        <div className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold ${
+                        <div className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${
                           (batch.labDocumentCount || 0) === 3
                             ? 'border-pf-accent-line bg-pf-accent-bg text-pf-accent'
                             : 'border-pf-warning-line bg-pf-warning-bg text-pf-warning'

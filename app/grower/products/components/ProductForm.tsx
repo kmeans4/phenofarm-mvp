@@ -25,8 +25,9 @@ import {
 } from '@/lib/ux-workflow';
 import { FILE_UPLOAD_LIMITS, IMAGE_MIME_TYPES, formatBytes, validateProductImageFile } from '@/lib/upload-validation';
 
-interface ProductFormData {
+export interface ProductFormData {
   id?: string;
+  status?: 'DRAFT' | 'PUBLISHED';
   name: string;
   productType: string;
   subType: string;
@@ -163,13 +164,13 @@ const validateThcRange = (min: string, max: string): { minError?: string; maxErr
   const maxNum = parseFloat(max);
   
   if (min && (isNaN(minNum) || minNum < 0 || minNum > 100)) {
-    errors.minError = 'THC min must be 0-100';
+    errors.minError = 'Enter a minimum THC percentage from 0 to 100.';
   }
   if (max && (isNaN(maxNum) || maxNum < 0 || maxNum > 100)) {
-    errors.maxError = 'THC max must be 0-100';
+    errors.maxError = 'Enter a maximum THC percentage from 0 to 100.';
   }
   if (min && max && !isNaN(minNum) && !isNaN(maxNum) && minNum > maxNum) {
-    errors.maxError = 'THC max must be >= min';
+    errors.maxError = 'Maximum THC must be at least the minimum.';
   }
   return errors;
 };
@@ -180,13 +181,13 @@ const validateCbdRange = (min: string, max: string): { minError?: string; maxErr
   const maxNum = parseFloat(max);
   
   if (min && (isNaN(minNum) || minNum < 0 || minNum > 100)) {
-    errors.minError = 'CBD min must be 0-100';
+    errors.minError = 'Enter a minimum CBD percentage from 0 to 100.';
   }
   if (max && (isNaN(maxNum) || maxNum < 0 || maxNum > 100)) {
-    errors.maxError = 'CBD max must be 0-100';
+    errors.maxError = 'Enter a maximum CBD percentage from 0 to 100.';
   }
   if (min && max && !isNaN(minNum) && !isNaN(maxNum) && minNum > maxNum) {
-    errors.maxError = 'CBD max must be >= min';
+    errors.maxError = 'Maximum CBD must be at least the minimum.';
   }
   return errors;
 };
@@ -195,7 +196,7 @@ const validateHarvestDate = (date: string): string | undefined => {
   if (!date) return undefined;
   const harvestDate = new Date(date);
   const now = new Date();
-  if (isNaN(harvestDate.getTime())) return 'Invalid date format';
+  if (isNaN(harvestDate.getTime())) return 'Enter a valid date.';
   if (harvestDate > now) return 'Harvest date cannot be in the future';
   return undefined;
 };
@@ -213,7 +214,8 @@ const INPUT_ERROR_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 bor
 interface ProductFormProps {
   growerBrand?: string;
   initialData?: Partial<ProductFormData>;
-  onSubmit: (data: ProductFormData) => Promise<void>;
+  onSubmit: (data: ProductFormData, addAnother?: boolean) => Promise<void>;
+  allowAddAnother?: boolean;
   onSaveDraft?: (data: ProductFormData) => Promise<void>;
   onCancel: () => void;
   isSubmitting?: boolean;
@@ -223,6 +225,7 @@ export function ProductForm({
   initialData = {}, 
   onSubmit,
   onSaveDraft,
+  allowAddAnother = false,
   onCancel,
   growerBrand,
   isSubmitting = false 
@@ -252,6 +255,7 @@ export function ProductForm({
     harvestDate: initialData.harvestDate || '',
   });
 
+  const [addAnother, setAddAnother] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [imagePreviews, setImagePreviews] = useState<string[]>(initialData.images || []);
@@ -502,7 +506,7 @@ export function ProductForm({
     
     const validationErrors = validateForm();
     if (Object.keys(validationErrors).length > 0) {
-      showToast('error', 'Please fix the errors below before saving');
+      showToast('error', 'Check the highlighted fields before saving.');
       focusFirstInvalidField(validationErrors);
       return;
     }
@@ -514,7 +518,7 @@ export function ProductForm({
       await onSubmit({
         ...formData,
         images: imagePreviews,
-      });
+      }, addAnother);
       persistProductDefaults(formData);
       browserDraft.clearDraft();
       setDirtyBaseline({ ...formData, id: formData.id ?? undefined });
@@ -623,7 +627,7 @@ export function ProductForm({
     { label: 'Stock', value: `${formData.inventoryQty || '0'} ${formatProductUnit(formData.unit)}` },
     {
       label: 'Visibility',
-      value: `${formData.isAvailable ? 'Available' : 'Hidden'} · ${formData.isPriceVisible ? 'price visible' : 'quote only'}`,
+      value: `${initialData.status === 'DRAFT' ? 'Draft' : formData.isAvailable ? 'Available' : 'Hidden'} · ${formData.isPriceVisible ? 'price visible' : 'quote only'}`,
     },
   ];
 
@@ -631,7 +635,7 @@ export function ProductForm({
     <div className="mx-auto w-full max-w-5xl">
       {browserDraft.availableDraft && (
         <div className="mb-4 rounded-lg border border-pf-warning-line bg-pf-warning-bg p-4">
-          <p className="text-sm text-pf-warning">Unsaved product draft found. Images are not stored in browser drafts.</p>
+          <p className="text-sm text-pf-warning">You have unfinished product details saved on this device. Restore them to continue. Photos will need to be added again.</p>
           <div className="mt-3 flex gap-3">
             <Button type="button" onClick={browserDraft.restoreDraft}>Restore draft</Button>
             <Button type="button" variant="outline" onClick={browserDraft.clearDraft}>Discard draft</Button>
@@ -651,7 +655,7 @@ export function ProductForm({
 
           <DraftAutosaveStatus
             savedAt={browserDraft.savedAt}
-            label="Draft on this device"
+            label="Product details"
             onClear={browserDraft.clearDraft}
           />
 
@@ -669,7 +673,7 @@ export function ProductForm({
           {!initialData.id && (
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <div className="flex w-full flex-wrap items-center justify-between gap-2">
-                <p className="text-xs text-pf-muted">Defaults</p>
+                <p className="text-xs text-pf-muted">Reuse the type, price, unit, and price visibility from your last listing.</p>
                 <div className="flex flex-wrap gap-2">
                   {savedDefaults && (
                     <button
@@ -677,7 +681,7 @@ export function ProductForm({
                       onClick={() => applyProductDefaults(savedDefaults)}
                       className="rounded-lg border border-pf-line-strong bg-pf-surface min-h-10 px-3 py-2 text-sm font-semibold text-pf-secondary hover:bg-pf-canvas"
                     >
-                      Use last listing
+                      Use last listing settings
                     </button>
                   )}
                   <button
@@ -685,7 +689,7 @@ export function ProductForm({
                     onClick={() => applyProductDefaults(DEFAULT_PRODUCT_DEFAULTS)}
                     className="rounded-lg border border-pf-accent-line bg-pf-surface min-h-10 px-3 py-2 text-sm font-semibold text-pf-accent hover:bg-pf-accent-bg"
                   >
-                    Reset defaults
+                    Use standard settings
                   </button>
                 </div>
               </div>
@@ -783,7 +787,7 @@ export function ProductForm({
             <div className="grid grid-cols-2 gap-3 sm:gap-4">
               <div className="space-y-1.5 sm:space-y-2">
                 <label htmlFor="price" className="block text-sm font-medium text-pf-secondary">
-                  Price ($) *
+                  {formData.isPriceVisible ? 'Price ($) *' : 'Internal reference price ($) *'}
                 </label>
                 <input
                   id="price"
@@ -796,6 +800,7 @@ export function ProductForm({
                   className={errors.price && touched.price ? INPUT_ERROR_CLASSES : INPUT_CLASSES}
                   placeholder="45.00"
                 />
+                {!formData.isPriceVisible && <p className="text-xs text-pf-muted">Used to calculate your stock value. Buyers see “Request pricing” instead of this amount.</p>}
                 {errors.price && touched.price && (
                   <p className="text-sm text-pf-danger mt-1">{errors.price}</p>
                 )}
@@ -832,7 +837,7 @@ export function ProductForm({
             <div className="p-3 border border-pf-line rounded-lg bg-pf-canvas space-y-2 sm:p-4 sm:space-y-3">
               <div>
                 <label className="block text-sm font-medium text-pf-secondary">Price visibility</label>
-                <p className="text-xs text-pf-muted mt-1">Quote only hides the price.</p>
+                <p className="text-xs text-pf-muted mt-1">Choose whether buyers see a price or ask you for a quote.</p>
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -956,7 +961,7 @@ export function ProductForm({
               <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="thcMin" className="block text-xs font-medium text-pf-muted">
-                    THC Min (%)
+                    Minimum THC (%)
                   </label>
                   <input
                     id="thcMin"
@@ -976,7 +981,7 @@ export function ProductForm({
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="thcMax" className="block text-xs font-medium text-pf-muted">
-                    THC Max (%)
+                    Maximum THC (%)
                   </label>
                   <input
                     id="thcMax"
@@ -996,7 +1001,7 @@ export function ProductForm({
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="cbdMin" className="block text-xs font-medium text-pf-muted">
-                    CBD Min (%)
+                    Minimum CBD (%)
                   </label>
                   <input
                     id="cbdMin"
@@ -1016,7 +1021,7 @@ export function ProductForm({
                 </div>
                 <div className="space-y-1.5 sm:space-y-2">
                   <label htmlFor="cbdMax" className="block text-xs font-medium text-pf-muted">
-                    CBD Max (%)
+                    Maximum CBD (%)
                   </label>
                   <input
                     id="cbdMax"
@@ -1039,7 +1044,7 @@ export function ProductForm({
 
             <div className="space-y-1.5 sm:space-y-2">
               <label htmlFor="harvestDate" className="block text-sm font-medium text-pf-secondary">
-                Harvest Date
+                Harvest date
               </label>
               <input
                 id="harvestDate"
@@ -1080,7 +1085,7 @@ export function ProductForm({
 
             <div id="productImages" tabIndex={-1} className="space-y-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-pf-accent focus:ring-offset-2">
               <label className="block text-sm font-medium text-pf-secondary">
-                Product Images
+                Product photos
               </label>
               <p className="text-xs text-pf-muted">
                 Up to {FILE_UPLOAD_LIMITS.productImagesMaxCount} photos · JPG, PNG, WebP · {formatBytes(FILE_UPLOAD_LIMITS.productImageMaxBytes)} each
@@ -1160,7 +1165,7 @@ export function ProductForm({
                   <h3 className="text-sm font-semibold text-pf-text">Summary</h3>
                 </div>
                 <span className="rounded-full bg-pf-surface px-2 py-1 text-xs font-medium text-pf-muted ring-1 ring-pf-line">
-                  {formData.isAvailable ? 'Available' : 'Hidden'}
+                  {initialData.status === 'DRAFT' ? 'Draft' : formData.isAvailable ? 'Available' : 'Hidden'}
                 </span>
               </div>
               <dl className="mt-2 space-y-1.5 sm:mt-3 sm:space-y-2">
@@ -1173,6 +1178,8 @@ export function ProductForm({
               </dl>
             </div>
 
+            {allowAddAnother && <label className="mb-3 flex min-h-10 items-center gap-2 text-sm"><input type="checkbox" checked={addAnother} onChange={event => setAddAnother(event.target.checked)} />Add another after publishing</label>}
+            {initialData.status === 'DRAFT' && <p className="mb-3 text-sm text-pf-muted">This draft is hidden from buyers. Save it to finish later, or publish when you are ready.</p>}
             <div className="flex flex-wrap gap-2">
               <div className="hidden sm:block"><Button
                 type="submit"
@@ -1180,9 +1187,9 @@ export function ProductForm({
                 className="hidden sm:inline-flex"
                 disabled={imageUploadProgress !== null || isSubmitting || (hasErrors && Object.keys(touched).length > 0)}
               >
-                {isSubmitting ? 'Saving...' : (initialData.id ? 'Save changes' : 'Publish product')}
+                {isSubmitting ? 'Saving...' : addAnother ? 'Publish and add another' : (initialData.status === 'DRAFT' ? 'Publish draft' : initialData.id ? 'Save changes' : 'Publish product')}
               </Button></div>
-              {!initialData.id && onSaveDraft && (
+              {onSaveDraft && (
                 <div className="w-full sm:w-auto">
                   <Button
                     type="button"
@@ -1212,7 +1219,7 @@ export function ProductForm({
       </form>
 
       <StickyMobileActionBar
-        primaryLabel={isSubmitting ? 'Saving...' : initialData.id ? 'Save changes' : 'Publish product'}
+        primaryLabel={isSubmitting ? 'Saving...' : addAnother ? 'Publish and add another' : initialData.status === 'DRAFT' ? 'Publish draft' : initialData.id ? 'Save changes' : 'Publish product'}
         primaryType="submit"
         form="product-form"
         disabled={imageUploadProgress !== null || isSubmitting || hasErrors}

@@ -314,11 +314,11 @@ export default async function DispensaryOrderDetailPage({ params }: { params: Pr
           <CardContent className="space-y-3 text-sm text-pf-text">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-pf-muted">Fulfillment</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-pf-muted">Pickup or delivery</p>
                 <p>{requestNotes.details.fulfillmentMethod || 'Coordinate with grower'}</p>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-pf-muted">Requested window</p>
+                <p className="text-xs font-semibold uppercase tracking-wide text-pf-muted">Preferred date or time</p>
                 <p>{requestNotes.details.requestedWindow || 'Coordinate after acceptance'}</p>
               </div>
               <div>
