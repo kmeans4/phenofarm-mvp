@@ -1,7 +1,7 @@
 import { format } from 'date-fns';
 import { CheckCircle2, ClipboardList, Flag, Package, Truck, XCircle, type LucideIcon } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/Card';
-import { getOrderStatusLabel } from '@/lib/order-workflow';
+import { getOrderStatusHelp, getOrderStatusLabel } from '@/lib/order-workflow';
 
 type TimelineState = 'complete' | 'current' | 'upcoming' | 'cancelled';
 
@@ -26,7 +26,7 @@ const STATUS_FLOW: TimelineStep[] = [
   { status: 'PENDING', label: getOrderStatusLabel('PENDING'), description: 'Buyer request received', icon: ClipboardList },
   { status: 'CONFIRMED', label: getOrderStatusLabel('CONFIRMED'), description: 'Request accepted by grower', icon: CheckCircle2 },
   { status: 'PROCESSING', label: getOrderStatusLabel('PROCESSING'), description: 'Preparing requested items', icon: Package },
-  { status: 'SHIPPED', label: 'Ready', description: 'Ready, picked up, or in transit', icon: Truck },
+  { status: 'SHIPPED', label: getOrderStatusLabel('SHIPPED'), description: getOrderStatusHelp('SHIPPED'), icon: Truck },
   { status: 'DELIVERED', label: getOrderStatusLabel('DELIVERED'), description: 'Order delivered', icon: Flag },
 ];
 

@@ -57,4 +57,27 @@ Additional review fixes included stale admin-decision protection, quote-product 
 
 Production migration `20260929100000_ux_workflows` was applied successfully after a second fresh backup and a rehearsal of the exact atomic SQL. Readback confirmed the source checksum, all 12 new columns, and unchanged business-table record counts. The migration changes are additive; the existing live application remains compatible during the code rollout.
 
-Git publication, deployment, alias verification and live workflow results are recorded separately below when completed. Local success alone is not production proof.
+The main implementation was published and merged through [PR #10](https://github.com/kmeans4/phenofarm-mvp/pull/10), commit `9cc32edfbf268d521886779b96fbac1b6fcbb305`. GitHub verification and the Vercel preview passed. Vercel's production build log confirms that exact commit, and the canonical [phenoshop.app](https://phenoshop.app) alias was verified against the Ready production deployment `dpl_FvhDyqzWwLenvBBWLhzXyhTpK6uU`.
+
+### Live production workflow
+
+The complete live check passed on September 29, 2026, from **21:03:21 to 21:04:15 UTC**, using three temporary, clearly labeled accounts:
+
+- Real signup, current policy-acceptance readback, Resend verification links, same-browser automatic sign-in, and a fresh admin session.
+- License submission and admin approval for a grower and buyer.
+- Real Blob image and **3,000,000-byte PDF** uploads, product/batch persistence, and byte-for-byte readback.
+- Buyer COA download through the rendered button, saved download/hash verification, hidden missing-lab controls, anonymous-download rejection and buyer-write rejection.
+- Quote acceptance, account-backed cart persistence and restoration in a fresh browser.
+- Order submission/retry returning the same receipt, exactly one order, quoted pricing, stock reservation, and the visible Accept/Undo controls.
+- Fulfillment through delivery, settlement notes on both detail pages and CSV export, cancellation reason history and restored stock.
+- **32 desktop/mobile screenshots** covering the affected admin, grower and buyer surfaces; no page/console errors or horizontal overflow. Representative screenshots were inspected visually, including product detail, cart, delivered orders, reports and settings.
+
+Cleanup removed all accounts, records, notifications and Blob objects created by that run. Database row fingerprints confirmed that all pre-existing business records and retained `TEST` fixtures were unchanged. Shared security counters retain their normal expiry and were deliberately excluded from cleanup. The independent production smoke suite also passed both checks.
+
+Earlier attempts exposed test-harness errors, not application failures: a native response-method mismatch, an unscoped modal selector, and a receipt comparison sensitive to JSON property order. These were corrected, each run's test data was cleaned up, and the complete workflow was repeated successfully. Private evidence is retained at `/tmp/phenoshop-ux-20260929/live-release-mun5yb7ld3689d/proof.json`; it is excluded from Git/deployment.
+
+The final visual review also corrected the timeline's remaining `Ready` label to the shared `On the way` vocabulary, aligned its help text with the shared status description, and removed uppercase styling from the remaining portal/dialog field labels. The nine buyer checks passed again, and the actual order timeline and label layout were checked at 390 and 1280px with no overflow or browser errors. These presentation changes leave the verified API, account, inventory and database behavior unchanged; the aggregate build check and final alias smoke accompany the follow-up release.
+
+### Verification limits
+
+Resend's labeled test recipients prove provider delivery events and working account links, not placement in a human inbox. Synthetic licenses test the review workflow, not real-world license validity. No real payment or subscription charge was attempted. Concurrent-order and injected-failure coverage comes from the isolated local regression suite rather than deliberately interrupting production.

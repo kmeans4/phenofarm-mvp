@@ -34,7 +34,7 @@ export const ORDER_STATUS_HELP: Record<string, string> = {
   PENDING: 'Waiting for grower review',
   CONFIRMED: 'Grower accepted the order',
   PROCESSING: 'Grower is preparing the order',
-  SHIPPED: 'Ready, picked up, or in transit',
+  SHIPPED: 'Picked up or in transit',
   DELIVERED: 'Order delivered',
   CANCELLED: 'Order was cancelled',
 };
