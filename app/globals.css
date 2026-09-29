@@ -446,7 +446,9 @@ body:has([data-notifications-panel]) .pf-portal-fab-trigger {
   font-size: 0.875rem;
   line-height: 1.4;
 }
-.pf-portal :where(label, th) {
+.pf-portal :where(label, th, .uppercase),
+[role='dialog'] .uppercase,
+[role='alertdialog'] .uppercase {
   text-transform: none;
   letter-spacing: normal;
 }
