@@ -1,18 +1,9 @@
 'use client';
-
-import { useState, useMemo, useSyncExternalStore } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { Badge } from '@/app/components/ui/Badge';
-import {
-  readDensityPreference,
-  saveDensityPreference,
-  TableDensity,
-  TableDensityControl,
-} from '@/app/components/ux/TableDensityControl';
-import { format } from 'date-fns';
 import { getOrderStatusLabel } from '@/lib/order-workflow';
-
+import { formatMoney, formatDate } from '@/lib/format';
+import { BuyAgainButton } from './BuyAgainButton';
 interface Order {
   id: string;
   orderId: string;
@@ -23,370 +14,88 @@ interface Order {
   createdBy?: string;
   buyerAcknowledgedAt?: string | Date | null;
   grower: { businessName: string } | null;
+  items?: {
+    productId: string;
+    quantity: number;
+    product: { name: string; unit: string | null } | null;
+  }[];
 }
-
-interface StatusLabelMap {
-  [key: string]: string;
-}
-
-type BadgeVariant = 'info' | 'error' | 'default' | 'success' | 'secondary' | 'warning' | 'danger' | null;
-
-interface OrdersTableProps {
+export function OrdersTable({
+  orders,
+  maxRows,
+  compact = false,
+}: {
   orders: Order[];
-  compact?: boolean;
   maxRows?: number;
+  compact?: boolean;
   showFilters?: boolean;
   showWorkflowViews?: boolean;
   showResultCount?: boolean;
-}
-
-const statusLabels: StatusLabelMap = {
-  PENDING: getOrderStatusLabel('PENDING'),
-  CONFIRMED: getOrderStatusLabel('CONFIRMED'),
-  PROCESSING: getOrderStatusLabel('PROCESSING'),
-  SHIPPED: getOrderStatusLabel('SHIPPED'),
-  DELIVERED: getOrderStatusLabel('DELIVERED'),
-  CANCELLED: getOrderStatusLabel('CANCELLED'),
-};
-
-const getBadgeVariant = (status: string): BadgeVariant => {
-  if (status === 'DELIVERED') return 'success';
-  if (status === 'CANCELLED') return 'error';
-  if (status === 'SHIPPED') return 'warning';
-  if (status === 'PENDING') return 'warning';
-  if (status === 'CONFIRMED') return 'info';
-  return 'default';
-};
-
-type SortField = 'date' | 'status' | 'total' | 'orderId';
-type SortDirection = 'asc' | 'desc';
-type OrderView = 'all' | 'waiting-grower' | 'active' | 'delivered' | 'cancelled';
-
-function shortOrderId(orderId: string) {
-  const suffix = orderId.split('-').at(-1) || orderId;
-  return suffix.length >= 4 ? suffix : orderId.slice(-8);
-}
-
-function subscribeDensity(callback: () => void) {
-  window.addEventListener('storage', callback); window.addEventListener('dispensary-density', callback);
-  return () => { window.removeEventListener('storage', callback); window.removeEventListener('dispensary-density', callback); };
-}
-function densitySnapshot() {
-  try { return readDensityPreference('phenofarm:density:dispensary-orders'); } catch { return 'comfortable' as const; }
-}
-
-export function OrdersTable({
-  orders: initialOrders,
-  compact = false,
-  maxRows,
-  showFilters = true,
-  showWorkflowViews = true,
-  showResultCount = true,
-}: OrdersTableProps) {
-  const router = useRouter();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [orderView, setOrderView] = useState<OrderView>('all');
-  const [sortField, setSortField] = useState<SortField>('date');
-  const [sortDirection, setSortDirection] = useState<SortDirection>('desc');
-  const storedDensity = useSyncExternalStore(subscribeDensity, densitySnapshot, () => 'comfortable' as const);
-  const tableDensity = compact ? 'compact' : storedDensity;
-  const handleDensityChange = (mode: TableDensity) => {
-    if (compact) return;
-    try { saveDensityPreference('phenofarm:density:dispensary-orders', mode); window.dispatchEvent(new Event('dispensary-density')); } catch { /* Optional preference. */ }
-  };
-
-  const orderViews = useMemo(
-    () => [
-      { key: 'all' as const, label: 'All', count: initialOrders.length },
-      { key: 'waiting-grower' as const, label: 'Waiting on grower', count: initialOrders.filter((order) => order.status === 'PENDING').length },
-      { key: 'active' as const, label: 'Active', count: initialOrders.filter((order) => ['CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(order.status)).length },
-      { key: 'delivered' as const, label: 'Delivered', count: initialOrders.filter((order) => order.status === 'DELIVERED').length },
-      { key: 'cancelled' as const, label: 'Cancelled', count: initialOrders.filter((order) => order.status === 'CANCELLED').length },
-    ],
-    [initialOrders],
-  );
-
-  // Filter orders based on search and status
-  const filteredOrders = useMemo(() => {
-    let result = [...initialOrders];
-
-    if (orderView === 'waiting-grower') {
-      result = result.filter((order) => order.status === 'PENDING');
-    } else if (orderView === 'active') {
-      result = result.filter((order) => ['CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(order.status));
-    } else if (orderView === 'delivered') {
-      result = result.filter((order) => order.status === 'DELIVERED');
-    } else if (orderView === 'cancelled') {
-      result = result.filter((order) => order.status === 'CANCELLED');
-    }
-
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      result = result.filter(order => 
-        order.orderId.toLowerCase().includes(query) ||
-        order.grower?.businessName?.toLowerCase().includes(query)
-      );
-    }
-
-    // Sort orders
-    result.sort((a, b) => {
-      let comparison = 0;
-      switch (sortField) {
-        case 'date':
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-          break;
-        case 'status':
-          comparison = a.status.localeCompare(b.status);
-          break;
-        case 'total':
-          comparison = Number(a.totalAmount) - Number(b.totalAmount);
-          break;
-        case 'orderId':
-          comparison = a.orderId.localeCompare(b.orderId);
-          break;
-      }
-      return sortDirection === 'asc' ? comparison : -comparison;
-    });
-
-    return result;
-  }, [initialOrders, orderView, searchQuery, sortField, sortDirection]);
-  const visibleOrders = typeof maxRows === 'number' ? filteredOrders.slice(0, maxRows) : filteredOrders;
-  const navigateToOrder = (orderId: string) => {
-    router.push(`/dispensary/orders/${orderId}`);
-  };
-
-  const handleSort = (field: SortField) => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
-    } else {
-      setSortField(field);
-      setSortDirection('desc');
-    }
-  };
-
-  const getSortIcon = (field: SortField) => {
-    if (sortField !== field) {
-      return (
-        <svg className="w-4 h-4 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-        </svg>
-      );
-    }
-    return sortDirection === 'asc' ? (
-      <svg className="w-4 h-4 text-pf-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
-      </svg>
-    ) : (
-      <svg className="w-4 h-4 text-pf-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-      </svg>
-    );
-  };
-  const compactMode = compact || tableDensity === 'compact';
-  const cellClass = compactMode ? 'px-4 py-1.5 text-xs' : 'px-4 py-3 text-sm';
-  const mobileCardClass = 'rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm';
-
-  return (
-    <>
-      {showWorkflowViews && (
-        <div className="mb-4 rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
-          <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-sm font-semibold text-pf-text">Filter orders</p>
-            <p className="text-xs text-pf-muted">Choose a status to find the orders you need.</p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {orderViews.map((view) => (
-              <button
-                key={view.key}
-                type="button"
-                onClick={() => {
-                  setOrderView(view.key);
-                }}
-                aria-pressed={orderView === view.key}
-                aria-label={`${view.label}: ${view.count} requests`}
-                className={`rounded-lg px-3 py-2 text-sm font-medium ${
-                  orderView === view.key
-                    ? 'bg-emerald-500 text-[#032116]'
-                    : 'bg-pf-canvas text-pf-secondary hover:bg-pf-surface'
-                }`}
+}) {
+  const visible = maxRows ? orders.slice(0, maxRows) : orders;
+  return visible.length ? (
+    <div className="divide-y divide-pf-line">
+      {visible.map((order) => (
+        <article
+          key={order.id}
+          className="flex flex-wrap items-center gap-2 py-3 sm:gap-4"
+        >
+          <Link
+            href={`/dispensary/orders/${order.id}`}
+            className="min-w-0 flex-1 rounded-lg p-1 hover:bg-pf-raised focus-visible:ring-2 focus-visible:ring-pf-accent"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <strong className="break-all text-sm">{order.orderId}</strong>
+              <Badge
+                variant={
+                  order.status === 'DELIVERED'
+                    ? 'success'
+                    : order.status === 'CANCELLED'
+                      ? 'error'
+                      : 'info'
+                }
               >
-                {view.label}
-                <span className={`ml-2 rounded-full px-2 py-0.5 text-xs ${
-                  orderView === view.key ? 'bg-black/10 text-[#032116]' : 'bg-pf-surface text-pf-muted ring-1 ring-pf-line'
-                }`}>
-                  {view.count}
+                {getOrderStatusLabel(order.status)}
+              </Badge>
+              {order.hasUnreadMessages && (
+                <span className="inline-flex items-center gap-1 text-sm text-pf-accent">
+                  <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                  New message
                 </span>
-              </button>
-            ))}
+              )}
+            </div>
+            <p className="mt-1 text-sm text-pf-secondary">
+              {order.grower?.businessName || 'Grower'} ·{' '}
+              {formatDate(order.createdAt)}
+            </p>
+            {order.items?.length ? (
+              <p className="mt-1 text-sm text-pf-muted">
+                {order.items[0].product?.name || 'Product'} ×{' '}
+                {order.items[0].quantity}{' '}
+                {order.items[0].product?.unit?.toLowerCase() || 'units'}
+                {order.items.length > 1
+                  ? ` + ${order.items.length - 1} more`
+                  : ''}
+              </p>
+            ) : null}
+          </Link>
+          <div className="flex flex-wrap items-center gap-2">
+            <strong className="text-sm">
+              {formatMoney(order.totalAmount)}
+            </strong>
+            {!compact && order.items?.length ? (
+              <BuyAgainButton
+                items={order.items.map((item) => ({
+                  productId: item.productId,
+                  quantity: item.quantity,
+                }))}
+              />
+            ) : null}
           </div>
-        </div>
-      )}
-
-      {/* Filters */}
-      {showFilters && (
-        <div className="flex flex-col sm:flex-row gap-3 mb-4">
-          <div className="relative flex-1">
-            <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search orders..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 rounded-lg border border-pf-line-strong focus:ring-2 focus:ring-emerald-400 focus:border-transparent"
-            />
-          </div>
-          <div className="sm:self-center">
-            <TableDensityControl value={tableDensity} onChange={handleDensityChange} />
-          </div>
-        </div>
-      )}
-
-      {/* Mobile order cards */}
-      <div className="space-y-2 md:hidden">
-        {filteredOrders.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-pf-line-strong bg-pf-canvas px-4 py-8 text-center text-pf-muted">
-            {searchQuery
-              ? 'No requests match your filters'
-              : 'No requests yet'}
-          </div>
-        ) : (
-          visibleOrders.slice(0, compact ? 3 : visibleOrders.length).map((order) => (
-            <Link key={order.id} href={`/dispensary/orders/${order.id}`} aria-label={`View request ${order.orderId}`}
-              className={`${mobileCardClass} block transition-colors hover:border-pf-accent-line hover:bg-pf-accent-bg/40 focus-visible:ring-2 focus-visible:ring-emerald-400`}>
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex min-w-0 items-center gap-2 text-sm font-semibold text-pf-text" title={order.orderId}>
-                  #{shortOrderId(order.orderId)}
-                  <time dateTime={new Date(order.createdAt).toISOString()} title={format(new Date(order.createdAt), 'MMM d, yyyy')} className="text-xs font-normal text-pf-muted">{format(new Date(order.createdAt), 'MMM d, yy')}</time>
-                  {order.hasUnreadMessages ? <span className="h-2 w-2 shrink-0 rounded-full bg-emerald-500" aria-label="Unread grower message" /> : null}
-                </span>
-                <Badge variant={getBadgeVariant(order.status)}>{statusLabels[order.status] || order.status}</Badge>
-              </div>
-              <div className="mt-1 flex items-start justify-between gap-3 text-sm">
-                <div className="min-w-0">
-                  <p className="break-words text-pf-secondary">{order.grower?.businessName || 'Unknown grower'}</p>
-                </div>
-                <span className="shrink-0 font-semibold text-pf-text">${Number(order.totalAmount).toFixed(2)}</span>
-              </div>
-              {order.createdBy === 'GROWER' ? <p className="mt-1 text-xs text-pf-info">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</p> : null}
-            </Link>
-          ))
-        )}
-      </div>
-
-      {/* Desktop orders table */}
-      <div className="hidden overflow-x-auto md:block">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="border-b border-pf-line">
-              <th 
-                className={`${cellClass} font-medium text-pf-secondary cursor-pointer hover:bg-pf-canvas`}
-                aria-sort={sortField === 'orderId' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              >
-                <button type="button" onClick={() => handleSort('orderId')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-emerald-400">
-                  Request # {getSortIcon('orderId')}
-                </button>
-              </th>
-              <th className={`${cellClass} font-medium text-pf-secondary`}>Grower</th>
-              <th 
-                className={`${cellClass} font-medium text-pf-secondary cursor-pointer hover:bg-pf-canvas`}
-                aria-sort={sortField === 'date' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              >
-                <button type="button" onClick={() => handleSort('date')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-emerald-400">
-                  Date {getSortIcon('date')}
-                </button>
-              </th>
-              <th 
-                className={`${cellClass} font-medium text-pf-secondary cursor-pointer hover:bg-pf-canvas`}
-                aria-sort={sortField === 'total' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              >
-                <button type="button" onClick={() => handleSort('total')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-emerald-400">
-                  Est. value {getSortIcon('total')}
-                </button>
-              </th>
-              <th 
-                className={`${cellClass} font-medium text-pf-secondary cursor-pointer hover:bg-pf-canvas`}
-                aria-sort={sortField === 'status' ? (sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
-              >
-                <button type="button" onClick={() => handleSort('status')} className="flex w-full items-center gap-1 text-left focus-visible:ring-2 focus-visible:ring-emerald-400">
-                  Status {getSortIcon('status')}
-                </button>
-              </th>
-              <th className={`${cellClass} font-medium text-pf-secondary`}>Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-pf-line">
-            {visibleOrders.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-pf-muted">
-                  {searchQuery
-                    ? 'No requests match your filters' 
-                    : 'No requests yet'}
-                </td>
-              </tr>
-            ) : (
-              visibleOrders.map((order) => (
-                <tr
-                  key={order.id}
-                  role="link"
-                  tabIndex={0}
-                  aria-label={`View request ${order.orderId}`}
-                  onClick={() => navigateToOrder(order.id)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      navigateToOrder(order.id);
-                    }
-                  }}
-                  className="cursor-pointer transition-colors hover:bg-pf-accent-bg/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-emerald-400"
-                >
-                  <td className={cellClass}>
-                    <div className="flex items-center gap-2 font-medium text-pf-text">
-                      #{order.orderId}
-                      {order.hasUnreadMessages ? (
-                        <span className="h-2 w-2 rounded-full bg-emerald-500" title="Unread grower message" aria-label="Unread grower message" />
-                      ) : null}
-                    </div>
-                    {order.createdBy === 'GROWER' ? <span className="mt-1 inline-flex rounded-full bg-pf-info-bg px-2 py-0.5 text-xs font-semibold text-pf-info">Recorded by grower{order.buyerAcknowledgedAt ? ' · Confirmed' : ''}</span> : null}
-                  </td>
-                  <td className={`${cellClass} text-pf-muted`}>
-                    {order.grower?.businessName || 'Unknown'}
-                  </td>
-                  <td className={`${cellClass} text-pf-muted`}>
-                    {format(new Date(order.createdAt), 'MMM d, yyyy')}
-                  </td>
-                  <td className={`${cellClass} font-bold text-pf-text`}>
-                    ${Number(order.totalAmount).toFixed(2)}
-                  </td>
-                  <td className={cellClass}>
-                    <Badge variant={getBadgeVariant(order.status)}>
-                      {statusLabels[order.status] || order.status}
-                    </Badge>
-                  </td>
-                  <td className={cellClass}>
-                    <Link 
-                      href={'/dispensary/orders/' + order.id}
-                      onClick={(event) => event.stopPropagation()}
-                      className="text-pf-info hover:text-pf-info font-medium text-sm"
-                    >
-                      View
-                    </Link>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      {/* Results count */}
-      {showResultCount && filteredOrders.length > 0 && (
-        <div className="mt-4 text-sm text-pf-muted">
-          Showing {visibleOrders.length} of {initialOrders.length} requests
-        </div>
-      )}
-    </>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p className="py-6 text-center text-sm text-pf-muted">No orders yet.</p>
   );
 }

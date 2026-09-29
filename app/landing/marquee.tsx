@@ -1,4 +1,11 @@
-import { FileCheck2, Heart, MessagesSquare, Package, Search, Timer } from 'lucide-react';
+import {
+  FileCheck2,
+  Heart,
+  MessagesSquare,
+  Package,
+  Search,
+  Timer,
+} from 'lucide-react';
 
 const ITEMS = [
   { icon: Package, label: 'List products and stock' },
@@ -13,15 +20,20 @@ const ITEMS = [
 export function Marquee() {
   const track = [...ITEMS, ...ITEMS];
   return (
-    <section aria-label="PhenoShop principles" className="relative border-t border-white/[0.06] py-6">
+    <section
+      aria-label="PhenoShop principles"
+      className="relative border-t border-white/[0.06] py-6"
+    >
       <div
         className="group overflow-hidden"
         style={{
-          maskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
-          WebkitMaskImage: 'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
+          maskImage:
+            'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
+          WebkitMaskImage:
+            'linear-gradient(to right, transparent, black 12%, black 88%, transparent)',
         }}
       >
-        <div className="flex w-max animate-[pf-marquee_36s_linear_infinite] gap-3 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
+        <div className="pf-landing-marquee flex w-max animate-[pf-marquee_36s_linear_infinite] gap-3 group-hover:[animation-play-state:paused] motion-reduce:animate-none">
           {track.map((item, i) => (
             <span
               key={`${item.label}-${i}`}

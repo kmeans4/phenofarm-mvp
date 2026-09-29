@@ -23,7 +23,9 @@ interface GrowerPlanSource {
   subscriptionStatus?: string | null;
 }
 
-export function getGrowerPlan(grower: GrowerPlanSource | null | undefined): GrowerPlanId {
+export function getGrowerPlan(
+  grower: GrowerPlanSource | null | undefined
+): GrowerPlanId {
   const plan = grower?.subscriptionPlan?.toLowerCase();
   const status = grower?.subscriptionStatus?.toLowerCase();
 
@@ -35,12 +37,15 @@ export function getGrowerPlan(grower: GrowerPlanSource | null | undefined): Grow
   return 'free';
 }
 
-export function getGrowerPlanLimits(grower: GrowerPlanSource | null | undefined) {
+export function getGrowerPlanLimits(
+  grower: GrowerPlanSource | null | undefined
+) {
   const plan = getGrowerPlan(grower);
   return { plan, ...PLAN_LIMITS[plan] };
 }
 
-export const FREE_LISTING_LIMIT_MESSAGE = 'Free plan includes 50 listings - upgrade to Pro';
+export const FREE_LISTING_LIMIT_MESSAGE =
+  'Free plan includes 50 listings - upgrade to Pro';
 
 export function canCreateListings(
   grower: GrowerPlanSource | null | undefined,
@@ -48,5 +53,48 @@ export function canCreateListings(
   requestedCount = 1
 ) {
   const limits = getGrowerPlanLimits(grower);
-  return limits.maxActiveListings === null || currentListingCount + requestedCount <= limits.maxActiveListings;
+  return (
+    limits.maxActiveListings === null ||
+    currentListingCount + requestedCount <= limits.maxActiveListings
+  );
 }
+
+/** Public plan descriptions cover the features actually available in this app. */
+export const PLAN_PRESENTATION = [
+  {
+    id: 'free',
+    name: 'Free',
+    price: '$0',
+    priceDetail: '/month',
+    description: 'List products and manage orders.',
+    features: [
+      'Up to 50 listings',
+      'Orders, messages and delivered-value reports',
+      'Import up to 25 rows at a time',
+    ],
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: '$249',
+    priceDetail: '/month',
+    description: 'For larger catalogs.',
+    features: [
+      'Unlimited listings',
+      'Orders, messages and delivered-value reports',
+      'Larger spreadsheet imports',
+    ],
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    price: 'Custom',
+    priceDetail: '',
+    description: 'Discuss your team’s requirements.',
+    features: [
+      'Unlimited listings',
+      'Orders, messages and delivered-value reports',
+      'Larger spreadsheet imports',
+    ],
+  },
+] as const;

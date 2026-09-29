@@ -14,17 +14,27 @@ export async function POST(
 ) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+    if (!session)
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
 
     const user = session.user;
     if (user.role !== 'GROWER' && user.role !== 'DISPENSARY') {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const { id } = await context.params;
     const body = await request.json().catch(() => ({}));
 
-    const action = typeof body.action === 'string' ? (body.action.toUpperCase() as OfferAction) : null;
+    const action =
+      typeof body.action === 'string'
+        ? (body.action.toUpperCase() as OfferAction)
+        : null;
 
     if (!action || !['ACCEPT', 'REJECT', 'COUNTER'].includes(action)) {
       return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
@@ -42,25 +52,41 @@ export async function POST(
       },
     });
 
-    if (!message) return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
+    if (!message)
+      return NextResponse.json({ error: 'Quote not found' }, { status: 404 });
     if (message.messageType !== ConversationMessageType.OFFER) {
-      return NextResponse.json({ error: 'Message is not a quote' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Message is not a quote' },
+        { status: 400 }
+      );
     }
     const conversation = message.conversation;
 
     if (user.role === 'GROWER') {
       if (!user.growerId || conversation.growerId !== user.growerId) {
-        return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+        return NextResponse.json(
+          { error: 'Your account does not have access to this action.' },
+          { status: 403 }
+        );
       }
     } else {
-      if (!user.dispensaryId || conversation.dispensaryId !== user.dispensaryId) {
-        return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      if (
+        !user.dispensaryId ||
+        conversation.dispensaryId !== user.dispensaryId
+      ) {
+        return NextResponse.json(
+          { error: 'Your account does not have access to this action.' },
+          { status: 403 }
+        );
       }
     }
 
     const now = new Date();
     const quoteCutoff = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
-    if (message.offerStatus === OfferStatus.PENDING && message.createdAt < quoteCutoff) {
+    if (
+      message.offerStatus === OfferStatus.PENDING &&
+      message.createdAt < quoteCutoff
+    ) {
       await db.conversationMessage.updateMany({
         where: { id: message.id, offerStatus: OfferStatus.PENDING },
         data: { offerStatus: OfferStatus.EXPIRED },
@@ -69,27 +95,37 @@ export async function POST(
     }
 
     if (message.offerStatus !== OfferStatus.PENDING) {
-      return NextResponse.json({ error: 'Quote is no longer pending' }, { status: 409 });
+      return NextResponse.json(
+        { error: 'Quote is no longer pending' },
+        { status: 409 }
+      );
     }
 
     if (message.senderUserId === user.id) {
-      return NextResponse.json({ error: 'You cannot respond to your own quote' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'You cannot respond to your own quote' },
+        { status: 400 }
+      );
     }
 
     if (action === 'ACCEPT' || action === 'REJECT') {
-      const status = action === 'ACCEPT' ? OfferStatus.ACCEPTED : OfferStatus.REJECTED;
+      const status =
+        action === 'ACCEPT' ? OfferStatus.ACCEPTED : OfferStatus.REJECTED;
 
       const updatedOffer = await db.$transaction(async (tx) => {
         const claim = await tx.conversationMessage.updateMany({
           where: { id: message.id, offerStatus: OfferStatus.PENDING },
           data: { offerStatus: status },
         });
-        if (claim.count !== 1) throw new OfferConflictError('Quote is no longer pending');
+        if (claim.count !== 1)
+          throw new OfferConflictError('Quote is no longer pending');
         await tx.conversation.update({
           where: { id: conversation.id },
           data: {
             lastMessageAt: now,
-            ...(user.role === 'GROWER' ? { growerLastReadAt: now } : { dispensaryLastReadAt: now }),
+            ...(user.role === 'GROWER'
+              ? { growerLastReadAt: now }
+              : { dispensaryLastReadAt: now }),
           },
         });
 
@@ -117,16 +153,29 @@ export async function POST(
 
         await createNotification(tx, {
           userId: message.senderUserId,
-          conversationId: conversation.id, productId: message.productId,
-          type: status === OfferStatus.ACCEPTED ? 'QUOTE_ACCEPTED' : 'QUOTE_REJECTED',
-          title: status === OfferStatus.ACCEPTED ? 'Quote accepted' : 'Quote declined',
-          body: status === OfferStatus.ACCEPTED
-            ? 'Your quote terms were accepted and can now be used in a cart.'
-            : 'The other party declined your quote terms.',
-          href: user.role === 'GROWER' ? '/dispensary/dashboard' : '/grower/dashboard',
+          conversationId: conversation.id,
+          productId: message.productId,
+          type:
+            status === OfferStatus.ACCEPTED
+              ? 'QUOTE_ACCEPTED'
+              : 'QUOTE_REJECTED',
+          title:
+            status === OfferStatus.ACCEPTED
+              ? 'Quote accepted'
+              : 'Quote declined',
+          body:
+            status === OfferStatus.ACCEPTED
+              ? 'Your quote terms were accepted and can now be used in a cart.'
+              : 'The other party declined your quote terms.',
+          href:
+            user.role === 'GROWER'
+              ? '/dispensary/dashboard'
+              : '/grower/dashboard',
         });
 
-        return tx.conversationMessage.findUniqueOrThrow({ where: { id: message.id } });
+        return tx.conversationMessage.findUniqueOrThrow({
+          where: { id: message.id },
+        });
       });
 
       return NextResponse.json(
@@ -135,6 +184,18 @@ export async function POST(
           action,
           messageId: updatedOffer.id,
           offerStatus: updatedOffer.offerStatus,
+          acceptedQuote:
+            action === 'ACCEPT'
+              ? await db.acceptedQuote.findUnique({
+                  where: { messageId: message.id },
+                  select: {
+                    id: true,
+                    acceptedAt: true,
+                    expiresAt: true,
+                    consumedByOrderId: true,
+                  },
+                })
+              : null,
         },
         { status: 200 }
       );
@@ -144,15 +205,20 @@ export async function POST(
     const counter = body.counter || {};
     const counterUnitPrice = Number(counter.unitPrice);
     const counterQuantity = Number(counter.quantity);
-    const counterNote = typeof counter.note === 'string' ? counter.note.trim() : '';
+    const counterNote =
+      typeof counter.note === 'string' ? counter.note.trim() : '';
 
     if (!Number.isFinite(counterUnitPrice) || counterUnitPrice <= 0) {
-      return NextResponse.json({ error: 'Counter quote unit price must be greater than zero' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Counter quote unit price must be greater than zero' },
+        { status: 400 }
+      );
     }
 
-    const normalizedQuantity = Number.isFinite(counterQuantity) && counterQuantity > 0
-      ? Math.floor(counterQuantity)
-      : message.offerQuantity || null;
+    const normalizedQuantity =
+      Number.isFinite(counterQuantity) && counterQuantity > 0
+        ? Math.floor(counterQuantity)
+        : message.offerQuantity || null;
 
     const counterMessageBody = counterNote || 'Counter quote';
 
@@ -161,8 +227,11 @@ export async function POST(
         where: { id: message.id, offerStatus: OfferStatus.PENDING },
         data: { offerStatus: OfferStatus.COUNTERED },
       });
-      if (counterClaim.count !== 1) throw new OfferConflictError('Quote is no longer pending');
-      const updatedOriginal = await tx.conversationMessage.findUniqueOrThrow({ where: { id: message.id } });
+      if (counterClaim.count !== 1)
+        throw new OfferConflictError('Quote is no longer pending');
+      const updatedOriginal = await tx.conversationMessage.findUniqueOrThrow({
+        where: { id: message.id },
+      });
 
       const newOffer = await tx.conversationMessage.create({
         data: {
@@ -191,11 +260,15 @@ export async function POST(
 
       await createNotification(tx, {
         userId: message.senderUserId,
-        conversationId: conversation.id, productId: message.productId,
+        conversationId: conversation.id,
+        productId: message.productId,
         type: 'QUOTE_COUNTERED',
         title: 'Revised quote',
         body: 'The other party sent revised quote terms for your review.',
-        href: user.role === 'GROWER' ? '/dispensary/dashboard' : '/grower/dashboard',
+        href:
+          user.role === 'GROWER'
+            ? '/dispensary/dashboard'
+            : '/grower/dashboard',
       });
 
       return { updatedOriginal, newOffer };
@@ -216,6 +289,9 @@ export async function POST(
       return NextResponse.json({ error: error.message }, { status: 409 });
     }
     console.error('Error handling quote action:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }

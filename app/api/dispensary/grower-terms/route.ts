@@ -5,7 +5,14 @@ import { DEFAULT_COMMERCIAL_TERMS } from '@/lib/ux-workflow';
 
 function normalizeIds(value: string | null) {
   if (!value) return [];
-  return Array.from(new Set(value.split(',').map((id) => id.trim()).filter(Boolean))).slice(0, 25);
+  return Array.from(
+    new Set(
+      value
+        .split(',')
+        .map((id) => id.trim())
+        .filter(Boolean)
+    )
+  ).slice(0, 25);
 }
 
 export async function GET(request: NextRequest) {
@@ -13,12 +20,18 @@ export async function GET(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     const user = session.user;
     if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const { searchParams } = new URL(request.url);
@@ -32,6 +45,8 @@ export async function GET(request: NextRequest) {
       where: { id: { in: growerIds } },
       select: {
         id: true,
+        commercialMinimumOrder: true,
+        commercialFulfillmentMethods: true,
         commercialFulfillmentRegion: true,
         commercialPaymentTerms: true,
       },
@@ -40,12 +55,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({
       terms: growers.map((grower) => ({
         growerId: grower.id,
-        fulfillmentRegion: grower.commercialFulfillmentRegion || DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion,
-        paymentTerms: grower.commercialPaymentTerms || DEFAULT_COMMERCIAL_TERMS.paymentTerms,
+        minimumOrder:
+          grower.commercialMinimumOrder ||
+          DEFAULT_COMMERCIAL_TERMS.minimumOrder,
+        fulfillmentMethods:
+          grower.commercialFulfillmentMethods ||
+          DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods,
+        fulfillmentRegion:
+          grower.commercialFulfillmentRegion ||
+          DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion,
+        paymentTerms:
+          grower.commercialPaymentTerms ||
+          DEFAULT_COMMERCIAL_TERMS.paymentTerms,
       })),
     });
   } catch (error) {
     console.error('Error loading grower commercial terms:', error);
-    return NextResponse.json({ error: 'Failed to load grower terms' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to load grower terms' },
+      { status: 500 }
+    );
   }
 }

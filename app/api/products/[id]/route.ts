@@ -1,3 +1,5 @@
+import { canCreateListings, FREE_LISTING_LIMIT_MESSAGE } from '@/lib/plans';
+import { refreshProductPriceAlerts } from '@/lib/buyer-alerts';
 import { persistMediaReference } from '@/lib/blob-storage';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
@@ -18,8 +20,14 @@ import {
 
 // Product consumers need batch identity/metrics; full lab JSON belongs to batch detail.
 const productBatchSelect = {
-  id: true, batchNumber: true, lotNumber: true, strainId: true, harvestDate: true,
-  thc: true, cbd: true, totalCannabinoids: true,
+  id: true,
+  batchNumber: true,
+  lotNumber: true,
+  strainId: true,
+  harvestDate: true,
+  thc: true,
+  cbd: true,
+  totalCannabinoids: true,
 } satisfies Prisma.BatchSelect;
 
 type ProductLike = {
@@ -59,10 +67,18 @@ export async function GET(
 ) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+    if (!session)
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
 
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId)
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
 
     const productId = (await context.params).id;
     const product = await db.product.findFirst({
@@ -73,11 +89,15 @@ export async function GET(
       },
     });
 
-    if (!product) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    if (!product)
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     return NextResponse.json(serializeProduct(product), { status: 200 });
   } catch (error) {
     console.error('Error fetching product:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }
 
@@ -87,82 +107,174 @@ export async function PUT(
 ) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+    if (!session)
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
 
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId)
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
 
     const productId = (await context.params).id;
-    const existingProduct = await db.product.findFirst({ where: { id: productId, growerId: user.growerId } });
-    if (!existingProduct) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    const existingProduct = await db.product.findFirst({
+      where: { id: productId, growerId: user.growerId },
+    });
+    if (!existingProduct)
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
 
     const body = await request.json().catch(() => null);
-    if (!body || typeof body !== 'object' || Array.isArray(body)) return NextResponse.json({ error: 'Invalid product' }, { status: 400 });
+    if (!body || typeof body !== 'object' || Array.isArray(body))
+      return NextResponse.json({ error: 'Invalid product' }, { status: 400 });
+    if (body.restore === true) {
+      if (!existingProduct.isDeleted)
+        return NextResponse.json(serializeProduct(existingProduct));
+      const [plan, count] = await Promise.all([
+        db.grower.findUnique({
+          where: { id: user.growerId },
+          select: { subscriptionPlan: true, subscriptionStatus: true },
+        }),
+        db.product.count({
+          where: { growerId: user.growerId, isDeleted: false },
+        }),
+      ]);
+      if (!canCreateListings(plan, count))
+        return NextResponse.json(
+          { error: FREE_LISTING_LIMIT_MESSAGE },
+          { status: 402 }
+        );
+      const restored = await db.product.update({
+        where: { id: productId },
+        data: { isDeleted: false, deletedAt: null, isAvailable: false },
+      });
+      return NextResponse.json(serializeProduct(restored));
+    }
+    if (existingProduct.isDeleted)
+      return NextResponse.json(
+        { error: 'Restore this product before editing.' },
+        { status: 409 }
+      );
     const parsed = parseProductPayload(body, {
       partial: true,
       defaultStatus: PRODUCT_STATUS.PUBLISHED,
     });
 
     if (!parsed.ok) {
-      return NextResponse.json({ error: parsed.errors.join(', ') }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: 'Please check the highlighted fields.',
+          errors: parsed.errors,
+        },
+        { status: 400 }
+      );
     }
 
     const data = parsed.data;
-    if (data.images) data.images = await Promise.all(data.images.map(async (value) => (await persistMediaReference(value, `products/${user.growerId}/images`))!));
-    if (data.ingredientsDocumentUrl) data.ingredientsDocumentUrl = await persistMediaReference(data.ingredientsDocumentUrl, `products/${user.growerId}/documents`) || null;
+    if (data.images)
+      data.images = await Promise.all(
+        data.images.map(
+          async (value) =>
+            (await persistMediaReference(
+              value,
+              `products/${user.growerId}/images`
+            ))!
+        )
+      );
+    if (data.ingredientsDocumentUrl)
+      data.ingredientsDocumentUrl =
+        (await persistMediaReference(
+          data.ingredientsDocumentUrl,
+          `products/${user.growerId}/documents`
+        )) || null;
 
     if (data.strainId) {
       const strain = await db.strain.findFirst({
         where: { id: data.strainId, growerId: user.growerId },
         select: { id: true },
       });
-      if (!strain) return NextResponse.json({ error: 'Strain not found' }, { status: 404 });
+      if (!strain)
+        return NextResponse.json(
+          { error: 'Strain not found' },
+          { status: 404 }
+        );
     }
 
     if (data.batchId) {
-      const batch = await db.batch.findFirst({ where: { id: data.batchId, growerId: user.growerId } });
-      if (!batch) return NextResponse.json({ error: 'Batch not found' }, { status: 404 });
+      const batch = await db.batch.findFirst({
+        where: { id: data.batchId, growerId: user.growerId },
+      });
+      if (!batch)
+        return NextResponse.json({ error: 'Batch not found' }, { status: 404 });
+      data.strainId = batch.strainId;
     }
 
     const updateData: Prisma.ProductUncheckedUpdateInput = {};
 
-    if (body.name !== undefined) updateData.name = data.name || 'Untitled Draft Product';
-    if (body.productType !== undefined) updateData.productType = data.productType;
+    if (body.name !== undefined)
+      updateData.name = data.name || 'Untitled Draft Product';
+    if (body.productType !== undefined)
+      updateData.productType = data.productType;
     if (body.subType !== undefined) updateData.subType = data.subType;
-    if (body.strainId !== undefined) updateData.strainId = data.strainId;
+    if (body.strainId !== undefined || data.batchId)
+      updateData.strainId = data.strainId;
     if (body.batchId !== undefined) updateData.batchId = data.batchId;
-    if (body.price !== undefined && data.price !== null) updateData.price = data.price;
-    const requestedInventory = body.inventoryQty !== undefined && data.inventoryQty !== null ? data.inventoryQty : null;
-    if (requestedInventory !== null) updateData.inventoryQty = requestedInventory;
+    if (body.price !== undefined && data.price !== null)
+      updateData.price = data.price;
+    const requestedInventory =
+      body.inventoryQty !== undefined && data.inventoryQty !== null
+        ? data.inventoryQty
+        : null;
+    if (requestedInventory !== null)
+      updateData.inventoryQty = requestedInventory;
     if (body.unit !== undefined && data.unit) updateData.unit = data.unit;
-    if (body.description !== undefined) updateData.description = data.description;
+    if (body.description !== undefined)
+      updateData.description = data.description;
     if (body.images !== undefined) updateData.images = data.images || [];
     if (body.sku !== undefined) updateData.sku = data.sku;
     if (body.brand !== undefined) updateData.brand = data.brand;
-    if (body.ingredients !== undefined) updateData.ingredients = data.ingredients;
-    if (body.ingredientsDocumentUrl !== undefined) updateData.ingredientsDocumentUrl = data.ingredientsDocumentUrl;
+    if (body.ingredients !== undefined)
+      updateData.ingredients = data.ingredients;
+    if (body.ingredientsDocumentUrl !== undefined)
+      updateData.ingredientsDocumentUrl = data.ingredientsDocumentUrl;
     if (body.isFeatured !== undefined) updateData.isFeatured = data.isFeatured;
-    if (body.isPriceVisible !== undefined) updateData.isPriceVisible = data.isPriceVisible;
+    if (body.isPriceVisible !== undefined)
+      updateData.isPriceVisible = data.isPriceVisible;
     if (body.status !== undefined) updateData.status = data.status;
     if (body.thcMin !== undefined) updateData.thcMin = data.thcMin;
     if (body.thcMax !== undefined) updateData.thcMax = data.thcMax;
     if (body.cbdMin !== undefined) updateData.cbdMin = data.cbdMin;
     if (body.cbdMax !== undefined) updateData.cbdMax = data.cbdMax;
-    if (body.harvestDate !== undefined) updateData.harvestDate = data.harvestDate ? new Date(data.harvestDate) : null;
+    if (body.harvestDate !== undefined)
+      updateData.harvestDate = data.harvestDate
+        ? new Date(data.harvestDate)
+        : null;
 
-    const effectiveInventory = requestedInventory ?? existingProduct.inventoryQty;
-    const effectiveStatus = body.status !== undefined ? data.status : existingProduct.status;
+    const effectiveInventory =
+      requestedInventory ?? existingProduct.inventoryQty;
+    const effectiveStatus =
+      body.status !== undefined ? data.status : existingProduct.status;
 
     if (body.isAvailable !== undefined) {
-      updateData.isAvailable = effectiveInventory > 0 ? Boolean(body.isAvailable) : false;
+      updateData.isAvailable =
+        effectiveInventory > 0 ? Boolean(body.isAvailable) : false;
     } else if (requestedInventory !== null) {
-      updateData.isAvailable = effectiveInventory > 0 && effectiveStatus === 'PUBLISHED' ? (existingProduct.inventoryQty === 0 || existingProduct.isAvailable) : false;
+      updateData.isAvailable =
+        effectiveInventory > 0 && effectiveStatus === 'PUBLISHED'
+          ? existingProduct.inventoryQty === 0 || existingProduct.isAvailable
+          : false;
     }
 
     if (effectiveStatus === 'DRAFT') updateData.isAvailable = false;
 
     if (Object.keys(updateData).length === 0) {
-      return NextResponse.json({ error: 'No fields to update' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'No fields to update' },
+        { status: 400 }
+      );
     }
 
     const updatedProduct = await db.product.update({
@@ -174,10 +286,17 @@ export async function PUT(
       },
     });
 
+    if (body.price !== undefined)
+      await refreshProductPriceAlerts(productId).catch((error) =>
+        console.error('Price alert refresh failed:', error)
+      );
     return NextResponse.json(serializeProduct(updatedProduct), { status: 200 });
   } catch (error) {
     console.error('Error updating product:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }
 
@@ -187,23 +306,40 @@ export async function DELETE(
 ) {
   try {
     const session = await getAuthSession();
-    if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+    if (!session)
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
 
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+    if (user.role !== 'GROWER' || !user.growerId)
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
 
     const productId = (await context.params).id;
-    const existingProduct = await db.product.findFirst({ where: { id: productId, growerId: user.growerId } });
-    if (!existingProduct) return NextResponse.json({ error: 'Product not found' }, { status: 404 });
+    const existingProduct = await db.product.findFirst({
+      where: { id: productId, growerId: user.growerId },
+    });
+    if (!existingProduct)
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
 
     await db.product.update({
       where: { id: productId },
       data: { isDeleted: true, deletedAt: new Date(), isAvailable: false },
     });
 
-    return NextResponse.json({ message: 'Product deleted successfully' }, { status: 200 });
+    return NextResponse.json(
+      { message: 'Product deleted successfully' },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error deleting product:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }

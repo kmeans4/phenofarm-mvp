@@ -1,19 +1,25 @@
+import { signInDestination } from '@/lib/auth-navigation';
 import { getAuthSession } from '@/lib/auth-helpers';
-import { redirect } from "next/navigation";
-import { getGrowerCustomerPage } from "@/lib/grower-customers";
-import { Pagination } from "@/app/components/ui/Pagination";
-import { PageHeader } from "@/app/components/ui/PageHeader";
-import { OperationsSummary } from "../components/OperationsSummary";
-import Link from "next/link";
+import { redirect } from 'next/navigation';
+import { getGrowerCustomerPage } from '@/lib/grower-customers';
+import { Pagination } from '@/app/components/ui/Pagination';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { OperationsSummary } from '../components/OperationsSummary';
+import Link from 'next/link';
 import { format } from 'date-fns';
 import { ExtendedUser } from '@/types';
+import { CustomerSearch } from './components/CustomerSearch';
 import CustomersList, { CustomerListItem } from './components/CustomersList';
 
-export default async function GrowerCustomersPage({ searchParams }: { searchParams: Promise<{ page?: string; search?: string }> }) {
+export default async function GrowerCustomersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string; search?: string }>;
+}) {
   const session = await getAuthSession();
-  
+
   if (!session) {
-    redirect('/auth/sign_in');
+    redirect(await signInDestination());
   }
 
   const user = session.user as ExtendedUser;
@@ -23,18 +29,44 @@ export default async function GrowerCustomersPage({ searchParams }: { searchPara
   }
 
   const growerId = user.growerId;
-  const { customers, stats, deliveredStats, page, pageSize, total, search, customerCount, totalCustomerOrders, orderedInLast90Days } = await getGrowerCustomerPage(growerId, await searchParams);
-  const statsByCustomer = new Map(stats.map((group) => [group.dispensaryId, group]));
-  const deliveredByCustomer = new Map(deliveredStats.map((group) => [group.dispensaryId, Number(group._sum.totalAmount || 0)]));
+  const {
+    customers,
+    stats,
+    deliveredStats,
+    page,
+    pageSize,
+    total,
+    search,
+    customerCount,
+    totalCustomerOrders,
+    orderedInLast90Days,
+  } = await getGrowerCustomerPage(growerId, await searchParams);
+  const statsByCustomer = new Map(
+    stats.map((group) => [group.dispensaryId, group])
+  );
+  const deliveredByCustomer = new Map(
+    deliveredStats.map((group) => [
+      group.dispensaryId,
+      Number(group._sum.totalAmount || 0),
+    ])
+  );
   const customerRows: CustomerListItem[] = customers.map((customer) => {
     const summary = statsByCustomer.get(customer.id);
     return {
-      id: customer.id, businessName: customer.businessName, licenseNumber: customer.licenseNumber,
+      id: customer.id,
+      businessName: customer.businessName,
+      licenseNumber: customer.licenseNumber,
       contactName: customer.user?.name || customer.contactName || null,
       email: customer.user?.email || customer.offPlatformEmail || null,
-      phone: customer.phone, city: customer.city, state: customer.state,
-      orderCount: summary?._count._all || 0, isPlatformMember: Boolean(customer.userId), canEdit: !customer.userId && customer.createdByGrowerId === growerId,
-      lastOrderDateLabel: summary?._max.createdAt ? format(summary._max.createdAt, 'MMM d, yyyy') : '—',
+      phone: customer.phone,
+      city: customer.city,
+      state: customer.state,
+      orderCount: summary?._count._all || 0,
+      isPlatformMember: Boolean(customer.userId),
+      canEdit: !customer.userId && customer.createdByGrowerId === growerId,
+      lastOrderDateLabel: summary?._max.createdAt
+        ? format(summary._max.createdAt, 'MMM d, yyyy')
+        : '—',
       totalDeliveredValueLabel: `$${(deliveredByCustomer.get(customer.id) || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
     };
   });
@@ -44,35 +76,73 @@ export default async function GrowerCustomersPage({ searchParams }: { searchPara
       <PageHeader
         title="Customers"
         mobileInlineActions
-        actions={<Link href="/grower/customers/add" className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-[#032116] hover:bg-emerald-400" aria-label="Add customer"><span className="sm:hidden">Add</span><span className="hidden sm:inline">Add customer</span></Link>}
+        actions={
+          <Link
+            href="/grower/customers/add"
+            className="rounded-lg bg-emerald-500 px-3 py-2 text-sm font-semibold text-[#032116] hover:bg-emerald-400"
+            aria-label="Add customer"
+          >
+            <span className="sm:hidden">Add</span>
+            <span className="hidden sm:inline">Add customer</span>
+          </Link>
+        }
       />
 
-      <OperationsSummary items={[{label: 'Customers', value: customerCount}, {label: 'Active · 90 days', value: orderedInLast90Days}, {label: 'Requests', value: totalCustomerOrders}]} />
+      <OperationsSummary
+        items={[
+          { label: 'Customers', value: customerCount },
+          { label: 'Active · 90 days', value: orderedInLast90Days },
+          { label: 'Orders', value: totalCustomerOrders },
+        ]}
+      />
 
-      <form action="/grower/customers" className="flex gap-2">
-        <input name="search" defaultValue={search} aria-label="Search customers" placeholder="Search customers" className="min-h-10 min-w-0 flex-1 rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm" />
-        <button type="submit" className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#032116]">Search</button>
-        {search && <Link href="/grower/customers" className="rounded-lg border border-pf-line px-3 py-2 text-sm">Clear</Link>}
-      </form>
+      <CustomerSearch initial={search} />
 
       <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line">
         {customers.length === 0 ? (
           <div className="px-4 py-8 text-center sm:py-10">
             <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pf-surface flex items-center justify-center">
-              <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              <svg
+                className="w-8 h-8 text-pf-muted"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-pf-text mb-2">{search ? 'No matching customers' : 'No customers yet'}</h3>
+            <h3 className="text-lg font-semibold text-pf-text mb-2">
+              {search ? 'No matching customers' : 'No customers yet'}
+            </h3>
             <p className="text-sm text-pf-muted mb-2 max-w-sm mx-auto">
-              {search ? 'Try another name, email, or city.' : 'Add a contact or receive a buyer request to get started.'}
+              {search
+                ? 'Try another name, email, or city.'
+                : 'Add a contact or receive a buyer request to get started.'}
             </p>
+            <Link
+              href="/grower/customers/add"
+              className="inline-flex min-h-11 items-center rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116]"
+            >
+              Add customer
+            </Link>
           </div>
         ) : (
           <CustomersList customers={customerRows} />
         )}
       </div>
-      <Pagination page={page} pageSize={pageSize} total={total} basePath="/grower/customers" query={search ? { search } : {}} label="customers" />
+      <Pagination
+        page={page}
+        pageSize={pageSize}
+        total={total}
+        basePath="/grower/customers"
+        query={search ? { search } : {}}
+        label="customers"
+      />
     </div>
   );
 }

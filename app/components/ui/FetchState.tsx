@@ -14,7 +14,7 @@ interface ErrorStateProps {
 
 export function LoadingState({
   title = 'Loading',
-  description = 'Please wait while we load this page.',
+  description = '',
 }: LoadingStateProps) {
   return (
     <div className="rounded-xl border border-pf-line bg-pf-surface p-10 text-center shadow-sm">
@@ -35,8 +35,10 @@ export function LoadingState({
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-pf-text">{title}</h3>
-      <p className="mx-auto mt-2 max-w-md text-sm text-pf-muted">{description}</p>
+      <h2 className="text-lg font-semibold text-pf-text">{title}</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm text-pf-muted">
+        {description}
+      </p>
     </div>
   );
 }
@@ -50,7 +52,12 @@ export function ErrorState({
   return (
     <div className="rounded-xl border border-pf-danger-line bg-pf-danger-bg p-6 text-center">
       <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-pf-danger-bg text-pf-danger">
-        <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg
+          className="h-6 w-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -59,8 +66,10 @@ export function ErrorState({
           />
         </svg>
       </div>
-      <h3 className="text-lg font-semibold text-pf-danger">{title}</h3>
-      <p className="mx-auto mt-2 max-w-md text-sm text-pf-danger">{description}</p>
+      <h2 className="text-lg font-semibold text-pf-danger">{title}</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm text-pf-danger">
+        {description}
+      </p>
       <Button variant="secondary" onClick={onRetry} className="mt-4">
         {retryLabel}
       </Button>

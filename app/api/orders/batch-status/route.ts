@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
-import { claimOrder, restoreInventory, OrderConflictError } from '@/lib/order-mutations';
+import {
+  claimOrder,
+  restoreInventory,
+  OrderConflictError,
+} from '@/lib/order-mutations';
 import {
   canTransitionOrderStatus,
   getInvalidOrderStatusTransitionMessage,
@@ -34,7 +38,14 @@ export async function PATCH(req: NextRequest) {
     const body = await req.json().catch(() => ({}));
     const { orderIds, status } = body;
 
-    if (!orderIds || !Array.isArray(orderIds) || orderIds.length === 0 || orderIds.length > 100 || orderIds.some((id: unknown) => typeof id !== 'string') || new Set(orderIds).size !== orderIds.length) {
+    if (
+      !orderIds ||
+      !Array.isArray(orderIds) ||
+      orderIds.length === 0 ||
+      orderIds.length > 100 ||
+      orderIds.some((id: unknown) => typeof id !== 'string') ||
+      new Set(orderIds).size !== orderIds.length
+    ) {
       return NextResponse.json(
         { error: 'orderIds array is required' },
         { status: 400 }
@@ -50,7 +61,9 @@ export async function PATCH(req: NextRequest) {
 
     if (!isOrderStatus(status)) {
       return NextResponse.json(
-        { error: `Invalid status. Must be one of: ${ORDER_STATUS_VALUES.join(', ')}` },
+        {
+          error: `Invalid status. Must be one of: ${ORDER_STATUS_VALUES.join(', ')}`,
+        },
         { status: 400 }
       );
     }
@@ -88,25 +101,37 @@ export async function PATCH(req: NextRequest) {
     }
 
     const targetStatus = status;
-    const transitionableOrders = orders.filter((order) =>
-      order.status !== targetStatus && canTransitionOrderStatus(order.status, targetStatus)
+    const transitionableOrders = orders.filter(
+      (order) =>
+        order.status !== targetStatus &&
+        canTransitionOrderStatus(order.status, targetStatus)
     );
-    const noOpCount = orders.filter((order) => order.status === targetStatus).length;
+    const noOpCount = orders.filter(
+      (order) => order.status === targetStatus
+    ).length;
     const skippedOrders = orders
-      .filter((order) => order.status !== targetStatus && !canTransitionOrderStatus(order.status, targetStatus))
+      .filter(
+        (order) =>
+          order.status !== targetStatus &&
+          !canTransitionOrderStatus(order.status, targetStatus)
+      )
       .map((order) => ({
         id: order.id,
         status: order.status,
         statusLabel: getOrderStatusLabel(order.status),
-        reason: getInvalidOrderStatusTransitionMessage(order.status, targetStatus),
+        reason: getInvalidOrderStatusTransitionMessage(
+          order.status,
+          targetStatus
+        ),
       }));
 
     if (transitionableOrders.length === 0) {
       return NextResponse.json(
         {
-          error: skippedOrders.length > 0
-            ? `No selected requests can move to ${getOrderStatusLabel(targetStatus)}.`
-            : `Selected requests are already ${getOrderStatusLabel(targetStatus)}.`,
+          error:
+            skippedOrders.length > 0
+              ? `No selected requests can move to ${getOrderStatusLabel(targetStatus)}.`
+              : `Selected requests are already ${getOrderStatusLabel(targetStatus)}.`,
           updatedCount: 0,
           skippedCount: skippedOrders.length,
           noOpCount,
@@ -120,19 +145,46 @@ export async function PATCH(req: NextRequest) {
 
     const result = await db.$transaction(async (tx) => {
       // Stable locking order prevents opposing batch requests from deadlocking.
-      for (const order of [...transitionableOrders].sort((a, b) => a.id.localeCompare(b.id))) {
+      for (const order of [...transitionableOrders].sort((a, b) =>
+        a.id.localeCompare(b.id)
+      )) {
         await claimOrder(tx, order);
         if (targetStatus === 'CANCELLED') {
-          const items = await tx.orderItem.findMany({ where: { orderId: order.id }, select: { productId: true, quantity: true } });
-          for (const item of items) await restoreInventory(tx, item.productId, item.quantity);
+          const items = await tx.orderItem.findMany({
+            where: { orderId: order.id },
+            select: { productId: true, quantity: true },
+          });
+          for (const item of items)
+            await restoreInventory(tx, item.productId, item.quantity);
         }
-        await tx.order.update({ where: { id: order.id }, data: {
-          status: targetStatus,
-          ...(targetStatus === 'SHIPPED' && !order.shippedAt ? { shippedAt: new Date() } : {}),
-          ...(targetStatus === 'DELIVERED' && !order.deliveredAt ? { deliveredAt: new Date() } : {}),
-        } });
-        await tx.orderStatusEvent.create({ data: { orderId: order.id, fromStatus: order.status, toStatus: targetStatus, actorUserId: user.id, actorRole: 'GROWER' } });
-        await createNotification(tx, { userId: order.dispensary.userId, type: 'ORDER_STATUS_CHANGED', title: `Request ${getOrderStatusLabel(targetStatus).toLowerCase()}`, body: `Request #${order.orderId} is now ${getOrderStatusLabel(targetStatus)}.`, href: `/dispensary/orders/${order.id}` });
+        await tx.order.update({
+          where: { id: order.id },
+          data: {
+            status: targetStatus,
+            ...(targetStatus === 'SHIPPED' && !order.shippedAt
+              ? { shippedAt: new Date() }
+              : {}),
+            ...(targetStatus === 'DELIVERED' && !order.deliveredAt
+              ? { deliveredAt: new Date() }
+              : {}),
+          },
+        });
+        await tx.orderStatusEvent.create({
+          data: {
+            orderId: order.id,
+            fromStatus: order.status,
+            toStatus: targetStatus,
+            actorUserId: user.id,
+            actorRole: 'GROWER',
+          },
+        });
+        await createNotification(tx, {
+          userId: order.dispensary.userId,
+          type: 'ORDER_STATUS_CHANGED',
+          title: `Request ${getOrderStatusLabel(targetStatus).toLowerCase()}`,
+          body: `Request #${order.orderId} is now ${getOrderStatusLabel(targetStatus)}.`,
+          href: `/dispensary/orders/${order.id}`,
+        });
       }
       return { count: transitionableOrders.length };
     });
@@ -146,9 +198,9 @@ export async function PATCH(req: NextRequest) {
       skippedOrders,
       status: status,
     });
-
   } catch (error) {
-    if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
+    if (error instanceof OrderConflictError)
+      return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Batch status update error:', error);
     return NextResponse.json(
       { error: 'Something went wrong. Please try again.' },

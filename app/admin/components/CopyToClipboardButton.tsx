@@ -8,7 +8,10 @@ interface CopyToClipboardButtonProps {
   label: string;
 }
 
-export function CopyToClipboardButton({ value, label }: CopyToClipboardButtonProps) {
+export function CopyToClipboardButton({
+  value,
+  label,
+}: CopyToClipboardButtonProps) {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<number | null>(null);
 
@@ -45,8 +48,12 @@ export function CopyToClipboardButton({ value, label }: CopyToClipboardButtonPro
       className="inline-flex min-h-10 items-center gap-1.5 rounded-md border border-pf-line bg-pf-raised px-2.5 py-1.5 text-xs font-semibold text-pf-secondary hover:bg-pf-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
       aria-label={label}
     >
-      {copied ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
-      {copied ? 'Copied' : 'Copy'}
+      {copied ? (
+        <Check className="h-3.5 w-3.5" aria-hidden="true" />
+      ) : (
+        <Copy className="h-3.5 w-3.5" aria-hidden="true" />
+      )}
+      {copied ? 'Copied' : label}
     </button>
   );
 }

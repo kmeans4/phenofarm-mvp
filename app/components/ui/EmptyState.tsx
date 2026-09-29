@@ -4,7 +4,8 @@ import Link from 'next/link';
 interface EmptyStateProps {
   icon?: ReactNode;
   title: string;
-  description: string;
+  description?: string;
+  actionButton?: ReactNode;
   action?: {
     label: string;
     href: string;
@@ -12,18 +13,28 @@ interface EmptyStateProps {
   className?: string;
 }
 
-export function EmptyState({ icon, title, description, action, className = '' }: EmptyStateProps) {
+export function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+  actionButton,
+  className = '',
+}: EmptyStateProps) {
   return (
-    <div className={`flex flex-col items-center justify-center py-7 px-4 sm:py-9 text-center ${className}`}>
+    <div
+      className={`flex flex-col items-center justify-center py-7 px-4 sm:py-9 text-center ${className}`}
+    >
       {icon && (
         <div className="w-12 h-12 rounded-full bg-pf-surface flex items-center justify-center mb-3">
-          <div className="text-pf-muted">
-            {icon}
-          </div>
+          <div className="text-pf-muted">{icon}</div>
         </div>
       )}
-      <h3 className="text-base font-semibold text-pf-text mb-2">{title}</h3>
-      <p className="text-sm text-pf-muted max-w-sm mb-3">{description}</p>
+      <h2 className="text-base font-semibold text-pf-text mb-2">{title}</h2>
+      {description && (
+        <p className="text-sm text-pf-muted max-w-sm mb-3">{description}</p>
+      )}
+      {actionButton}
       {action && (
         <Link
           href={action.href}

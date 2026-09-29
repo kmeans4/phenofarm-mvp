@@ -11,14 +11,14 @@ interface KeyboardShortcutsOptions {
 
 /**
  * Custom hook for keyboard shortcuts in forms
- * 
+ *
  * Features:
  * - Ctrl+S / Cmd+S: Trigger save action (prevents default browser save)
- * - Esc: Trigger cancel/back action
- * 
+ * - Escape is reserved for closing dialogs, never leaving a full page.
+ *
  * Usage:
  * const { isDirty, resetDirtyState } = useUnsavedChanges({ enabled: true });
- * 
+ *
  * useKeyboardShortcuts({
  *   onSave: handleSubmit,
  *   onCancel: () => router.push('/grower/products'),
@@ -27,11 +27,16 @@ interface KeyboardShortcutsOptions {
  * });
  */
 export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
-  const { onSave, onCancel, isDirty = true, enabled = true } = options;
+  const { onSave, isDirty = true, enabled = true } = options;
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!enabled || e.defaultPrevented || document.querySelector('[aria-modal="true"]')) return;
+      if (
+        !enabled ||
+        e.defaultPrevented ||
+        document.querySelector('[aria-modal="true"]')
+      )
+        return;
 
       // Ctrl+S or Cmd+S to save
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -41,16 +46,8 @@ export function useKeyboardShortcuts(options: KeyboardShortcutsOptions) {
           onSave();
         }
       }
-
-      // Esc to cancel/go back
-      if (e.key === 'Escape' && !(e.target instanceof HTMLElement && (e.target.isContentEditable || e.target.closest('input, textarea, select, [role=combobox]')))) {
-        e.preventDefault();
-        if (onCancel) {
-          onCancel();
-        }
-      }
     },
-    [onSave, onCancel, isDirty, enabled]
+    [onSave, isDirty, enabled]
   );
 
   useEffect(() => {

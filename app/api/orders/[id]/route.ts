@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import {
@@ -8,7 +9,11 @@ import {
   getInvalidOrderStatusTransitionMessage,
   isOrderStatus,
 } from '@/lib/order-workflow';
-import { claimOrder, restoreInventory, OrderConflictError } from '@/lib/order-mutations';
+import {
+  claimOrder,
+  restoreInventory,
+  OrderConflictError,
+} from '@/lib/order-mutations';
 import { PATCH as changeStatus } from './status/route';
 import { createNotification } from '@/lib/notifications';
 
@@ -16,6 +21,7 @@ interface OrderItemUpdateInput {
   id?: string;
   productId?: string;
   quantity: number;
+  unitPrice?: number;
 }
 
 interface InventoryIssue {
@@ -29,7 +35,11 @@ class OrderEditError extends Error {
   status: number;
   details?: Record<string, unknown>;
 
-  constructor(message: string, status = 400, details?: Record<string, unknown>) {
+  constructor(
+    message: string,
+    status = 400,
+    details?: Record<string, unknown>
+  ) {
     super(message);
     this.status = status;
     this.details = details;
@@ -56,7 +66,9 @@ function parseMoney(value: unknown, field: string) {
 function parsePositiveQuantity(value: unknown) {
   const quantity = Number(value);
   if (!Number.isInteger(quantity) || quantity < 1 || quantity > 9999) {
-    throw new OrderEditError('Each item quantity must be a whole number between 1 and 9999');
+    throw new OrderEditError(
+      'Each item quantity must be a whole number between 1 and 9999'
+    );
   }
   return quantity;
 }
@@ -78,13 +90,19 @@ function normalizeItems(value: unknown): OrderItemUpdateInput[] | null {
     }
 
     const record = raw as Record<string, unknown>;
-    const id = typeof record.id === 'string' && record.id.trim() ? record.id.trim() : undefined;
-    const productId = typeof record.productId === 'string' && record.productId.trim()
-      ? record.productId.trim()
-      : undefined;
+    const id =
+      typeof record.id === 'string' && record.id.trim()
+        ? record.id.trim()
+        : undefined;
+    const productId =
+      typeof record.productId === 'string' && record.productId.trim()
+        ? record.productId.trim()
+        : undefined;
 
     if (!id && !productId) {
-      throw new OrderEditError('Each item must include an existing item id or productId');
+      throw new OrderEditError(
+        'Each item must include an existing item id or productId'
+      );
     }
 
     if (id) {
@@ -98,6 +116,9 @@ function normalizeItems(value: unknown): OrderItemUpdateInput[] | null {
       id,
       productId,
       quantity: parsePositiveQuantity(record.quantity),
+      ...(record.unitPrice !== undefined
+        ? { unitPrice: parseMoney(record.unitPrice, 'Price') }
+        : {}),
     };
   });
 }
@@ -118,13 +139,19 @@ export async function GET(
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     const user = session.user;
-    
+
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const orderId = (await context.params).id;
@@ -135,10 +162,31 @@ export async function GET(
         growerId: user.growerId,
       },
       include: {
-        dispensary: { select: { id: true, businessName: true, contactName: true, phone: true, address: true, city: true, state: true, zip: true } },
+        dispensary: {
+          select: {
+            id: true,
+            businessName: true,
+            contactName: true,
+            phone: true,
+            address: true,
+            city: true,
+            state: true,
+            zip: true,
+          },
+        },
         items: {
           include: {
-            product: { select: { id: true, name: true, unit: true, productType: true, inventoryQty: true, isAvailable: true, isDeleted: true } },
+            product: {
+              select: {
+                id: true,
+                name: true,
+                unit: true,
+                productType: true,
+                inventoryQty: true,
+                isAvailable: true,
+                isDeleted: true,
+              },
+            },
           },
         },
       },
@@ -150,9 +198,13 @@ export async function GET(
 
     return NextResponse.json(order, { status: 200 });
   } catch (error) {
-    if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
+    if (error instanceof OrderConflictError)
+      return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Error fetching order:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }
 
@@ -165,13 +217,19 @@ export async function PUT(
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     const user = session.user;
-    
+
     if (user.role !== 'GROWER' || !user.growerId) {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const orderId = (await context.params).id;
@@ -185,7 +243,16 @@ export async function PUT(
         dispensary: { select: { userId: true } },
         items: {
           include: {
-            product: { select: { id: true, name: true, inventoryQty: true, isAvailable: true, isDeleted: true } },
+            acceptedQuote: { select: { id: true, quantity: true } },
+            product: {
+              select: {
+                id: true,
+                name: true,
+                inventoryQty: true,
+                isAvailable: true,
+                isDeleted: true,
+              },
+            },
           },
         },
       },
@@ -198,14 +265,19 @@ export async function PUT(
     const body = await request.json();
     const { status, notes, shippedAt } = body;
     const requestedItems = normalizeItems(body.items);
-    const requestedShippingFee = body.shippingFee !== undefined
-      ? parseMoney(body.shippingFee, 'shippingFee')
-      : Number(existingOrder.shippingFee);
-    const requestedTax = body.tax !== undefined
-      ? parseMoney(body.tax, 'tax')
-      : Number(existingOrder.tax);
+    const requestedShippingFee =
+      body.shippingFee !== undefined
+        ? parseMoney(body.shippingFee, 'shippingFee')
+        : Number(existingOrder.shippingFee);
+    const requestedTax =
+      body.tax !== undefined
+        ? parseMoney(body.tax, 'tax')
+        : Number(existingOrder.tax);
 
-    if (notes !== undefined && (typeof notes !== 'string' || notes.length > 1000)) {
+    if (
+      notes !== undefined &&
+      (typeof notes !== 'string' || notes.length > 1000)
+    ) {
       throw new OrderEditError('Notes must be less than 1000 characters');
     }
 
@@ -214,29 +286,75 @@ export async function PUT(
     }
 
     if (status && !canTransitionOrderStatus(existingOrder.status, status)) {
-      return NextResponse.json({
-        error: getInvalidOrderStatusTransitionMessage(existingOrder.status, status),
-      }, { status: 400 });
+      return NextResponse.json(
+        {
+          error: getInvalidOrderStatusTransitionMessage(
+            existingOrder.status,
+            status
+          ),
+        },
+        { status: 400 }
+      );
     }
 
-    const isCancellation = status === 'CANCELLED' && existingOrder.status !== 'CANCELLED';
-    const existingItemsById = new Map(existingOrder.items.map((item) => [item.id, item]));
+    if (status && status !== existingOrder.status)
+      throw new OrderEditError(
+        'Use the order status action to change status.',
+        400
+      );
+    const isCancellation = false;
+    const existingItemsById = new Map(
+      existingOrder.items.map((item) => [item.id, item])
+    );
     const existingIds = new Set(existingItemsById.keys());
-    const requestedExistingIds = new Set(requestedItems?.filter((item) => item.id).map((item) => item.id as string) || []);
+    const requestedExistingIds = new Set(
+      requestedItems
+        ?.filter((item) => item.id)
+        .map((item) => item.id as string) || []
+    );
     const removedItems = requestedItems
       ? existingOrder.items.filter((item) => !requestedExistingIds.has(item.id))
       : [];
 
     if (requestedItems) {
+      const quotedQuantities = new Map<
+        string,
+        { quantity: number; cap: number | null }
+      >();
       for (const item of requestedItems) {
         if (item.id && !existingItemsById.has(item.id)) {
-          throw new OrderEditError('One or more edited items do not belong to this order', 403);
+          throw new OrderEditError(
+            'One or more edited items do not belong to this order',
+            403
+          );
         }
 
         const existingItem = item.id ? existingItemsById.get(item.id) : null;
-        if (existingItem && item.productId && item.productId !== existingItem.productId) {
-          throw new OrderEditError('Changing the product on an existing request line is not supported. Remove the line and add a new one instead.');
+        if (existingItem?.acceptedQuote) {
+          const quote = existingItem.acceptedQuote;
+          quotedQuantities.set(quote.id, {
+            quantity:
+              (quotedQuantities.get(quote.id)?.quantity || 0) + item.quantity,
+            cap: quote.quantity,
+          });
         }
+        if (
+          existingItem &&
+          item.productId &&
+          item.productId !== existingItem.productId
+        ) {
+          throw new OrderEditError(
+            'Changing the product on an existing request line is not supported. Remove the line and add a new one instead.'
+          );
+        }
+      }
+      // An accepted offer covers the combined quantity, including split lines for one product.
+      for (const { quantity, cap } of quotedQuantities.values()) {
+        if (cap !== null && quantity > cap)
+          throw new OrderEditError(
+            `This accepted quote covers up to ${cap} units. Send a new quote for a larger quantity.`,
+            409
+          );
       }
     }
 
@@ -245,8 +363,12 @@ export async function PUT(
         requestedItems.some((item) => {
           if (!item.id || !existingIds.has(item.id)) return true;
           const existingItem = existingItemsById.get(item.id);
-          return !existingItem ||
-            existingItem.quantity !== item.quantity;
+          return (
+            !existingItem ||
+            existingItem.quantity !== item.quantity ||
+            (item.unitPrice !== undefined &&
+              item.unitPrice !== Number(existingItem.unitPrice))
+          );
         }) ||
         removedItems.length > 0
       : false;
@@ -255,7 +377,10 @@ export async function PUT(
       requestedShippingFee !== Number(existingOrder.shippingFee) ||
       requestedTax !== Number(existingOrder.tax);
 
-    if ((hasLineChanges || hasPricingChanges) && !canEditOrderItems(existingOrder.status)) {
+    if (
+      (hasLineChanges || hasPricingChanges) &&
+      !canEditOrderItems(existingOrder.status)
+    ) {
       throw new OrderEditError(
         'Items, shipping, and tax can only be edited before a request is ready, delivered, or cancelled.',
         409
@@ -263,11 +388,31 @@ export async function PUT(
     }
 
     if (isCancellation && (hasLineChanges || hasPricingChanges)) {
-      throw new OrderEditError('Cancel the request separately before making item or pricing edits.', 409);
+      throw new OrderEditError(
+        'Cancel the request separately before making item or pricing edits.',
+        409
+      );
     }
 
     const updatedOrder = await db.$transaction(async (tx) => {
       await claimOrder(tx, existingOrder);
+      if (requestedItems) {
+        // Match create/cancel lock order even if the two editors arrange their lines differently.
+        const productIds = [
+          ...new Set([
+            ...existingOrder.items.map((item) => item.productId),
+            ...requestedItems
+              .map((item) => item.productId)
+              .filter((id): id is string => Boolean(id)),
+          ]),
+        ].sort();
+        if (productIds.length)
+          await tx.$queryRaw(Prisma.sql`
+          SELECT id FROM products
+          WHERE "growerId" = ${user.growerId} AND id IN (${Prisma.join(productIds)})
+          ORDER BY id FOR UPDATE
+        `);
+      }
       if (isCancellation) {
         // Return the inventory that was reserved when the request was created
         const items = await tx.orderItem.findMany({
@@ -280,7 +425,10 @@ export async function PUT(
         }
       }
 
-      let subtotal = existingOrder.items.reduce((sum, item) => sum + Number(item.totalPrice), 0);
+      let subtotal = existingOrder.items.reduce(
+        (sum, item) => sum + Number(item.totalPrice),
+        0
+      );
 
       if (requestedItems && !isCancellation) {
         for (const item of removedItems) {
@@ -292,7 +440,15 @@ export async function PUT(
           if (item.id) {
             const existingItem = existingItemsById.get(item.id)!;
             // Existing agreed prices are immutable snapshots; quantity edits cannot reprice a line.
-            const unitPrice = Number(existingItem.unitPrice);
+            const unitPrice = item.unitPrice ?? Number(existingItem.unitPrice);
+            if (
+              existingItem.acceptedQuoteId &&
+              unitPrice !== Number(existingItem.unitPrice)
+            )
+              throw new OrderEditError(
+                'An accepted quote price cannot be changed. Send a new quote instead.',
+                409
+              );
             const quantityDelta = item.quantity - existingItem.quantity;
 
             if (quantityDelta > 0) {
@@ -309,19 +465,38 @@ export async function PUT(
 
               if (updateResult.count === 0) {
                 const latest = await tx.product.findFirst({
-                  where: { id: existingItem.productId, growerId: user.growerId },
+                  where: {
+                    id: existingItem.productId,
+                    growerId: user.growerId,
+                  },
                   select: { id: true, name: true, inventoryQty: true },
                 });
-                throw new InventoryConflictError([{
-                  productId: existingItem.productId,
-                  productName: latest?.name || existingItem.product?.name || 'Unknown product',
-                  requested: quantityDelta,
-                  available: Number(latest?.inventoryQty || 0),
-                }]);
+                throw new InventoryConflictError([
+                  {
+                    productId: existingItem.productId,
+                    productName:
+                      latest?.name ||
+                      existingItem.product?.name ||
+                      'Unknown product',
+                    requested: quantityDelta,
+                    available: Number(latest?.inventoryQty || 0),
+                  },
+                ]);
               }
-              await tx.product.updateMany({ where: { id: existingItem.productId, growerId: user.growerId, inventoryQty: 0 }, data: { isAvailable: false } });
+              await tx.product.updateMany({
+                where: {
+                  id: existingItem.productId,
+                  growerId: user.growerId,
+                  inventoryQty: 0,
+                },
+                data: { isAvailable: false },
+              });
             } else if (quantityDelta < 0) {
-              await restoreInventory(tx, existingItem.productId, Math.abs(quantityDelta));
+              await restoreInventory(
+                tx,
+                existingItem.productId,
+                Math.abs(quantityDelta)
+              );
             }
 
             await tx.orderItem.update({
@@ -329,23 +504,45 @@ export async function PUT(
               data: {
                 quantity: item.quantity,
                 unitPrice,
+                ...(unitPrice !== Number(existingItem.unitPrice)
+                  ? {
+                      catalogUnitPrice:
+                        existingItem.catalogUnitPrice ?? existingItem.unitPrice,
+                      priceOverrideReason: 'Agreed price updated by grower',
+                    }
+                  : {}),
                 totalPrice: Math.round(item.quantity * unitPrice * 100) / 100,
               },
             });
           } else {
             const productId = item.productId!;
             const product = await tx.product.findFirst({
-              where: { id: productId, growerId: user.growerId, isDeleted: false },
-              select: { id: true, name: true, inventoryQty: true, isAvailable: true },
+              where: {
+                id: productId,
+                growerId: user.growerId,
+                isDeleted: false,
+              },
+              select: {
+                id: true,
+                name: true,
+                inventoryQty: true,
+                isAvailable: true,
+              },
             });
 
-            if (!product || !product.isAvailable || product.inventoryQty < item.quantity) {
-              throw new InventoryConflictError([{
-                productId,
-                productName: product?.name || 'Unknown product',
-                requested: item.quantity,
-                available: Number(product?.inventoryQty || 0),
-              }]);
+            if (
+              !product ||
+              !product.isAvailable ||
+              product.inventoryQty < item.quantity
+            ) {
+              throw new InventoryConflictError([
+                {
+                  productId,
+                  productName: product?.name || 'Unknown product',
+                  requested: item.quantity,
+                  available: Number(product?.inventoryQty || 0),
+                },
+              ]);
             }
 
             const updateResult = await tx.product.updateMany({
@@ -364,18 +561,30 @@ export async function PUT(
                 where: { id: productId, growerId: user.growerId },
                 select: { id: true, name: true, inventoryQty: true },
               });
-              throw new InventoryConflictError([{
-                productId,
-                productName: latest?.name || product.name,
-                requested: item.quantity,
-                available: Number(latest?.inventoryQty || 0),
-              }]);
+              throw new InventoryConflictError([
+                {
+                  productId,
+                  productName: latest?.name || product.name,
+                  requested: item.quantity,
+                  available: Number(latest?.inventoryQty || 0),
+                },
+              ]);
             }
 
-            await tx.product.updateMany({ where: { id: productId, growerId: user.growerId, inventoryQty: 0 }, data: { isAvailable: false } });
+            await tx.product.updateMany({
+              where: {
+                id: productId,
+                growerId: user.growerId,
+                inventoryQty: 0,
+              },
+              data: { isAvailable: false },
+            });
             // Read the price after acquiring the inventory row lock.
-            const pricedProduct = await tx.product.findUniqueOrThrow({ where: { id: productId }, select: { price: true } });
-            const unitPrice = Number(pricedProduct.price);
+            const pricedProduct = await tx.product.findUniqueOrThrow({
+              where: { id: productId },
+              select: { price: true },
+            });
+            const unitPrice = item.unitPrice ?? Number(pricedProduct.price);
             await tx.orderItem.create({
               data: {
                 orderId,
@@ -383,7 +592,11 @@ export async function PUT(
                 growerId: user.growerId!,
                 quantity: item.quantity,
                 unitPrice,
-                catalogUnitPrice: unitPrice,
+                catalogUnitPrice: Number(pricedProduct.price),
+                priceOverrideReason:
+                  unitPrice !== Number(pricedProduct.price)
+                    ? 'Agreed price set by grower'
+                    : null,
                 totalPrice: Math.round(item.quantity * unitPrice * 100) / 100,
               },
             });
@@ -395,7 +608,9 @@ export async function PUT(
           select: { quantity: true, unitPrice: true },
         });
         subtotal = refreshedItems.reduce((sum, item) => {
-          return sum + Math.round(item.quantity * Number(item.unitPrice) * 100) / 100;
+          return (
+            sum + Math.round(item.quantity * Number(item.unitPrice) * 100) / 100
+          );
         }, 0);
       }
 
@@ -425,13 +640,36 @@ export async function PUT(
           shippingFee: requestedShippingFee,
           tax: requestedTax,
           subtotal,
-          totalAmount: Math.round((subtotal + requestedShippingFee + requestedTax) * 100) / 100,
+          totalAmount:
+            Math.round((subtotal + requestedShippingFee + requestedTax) * 100) /
+            100,
         },
         include: {
-          dispensary: { select: { id: true, businessName: true, contactName: true, phone: true, address: true, city: true, state: true, zip: true } },
+          dispensary: {
+            select: {
+              id: true,
+              businessName: true,
+              contactName: true,
+              phone: true,
+              address: true,
+              city: true,
+              state: true,
+              zip: true,
+            },
+          },
           items: {
             include: {
-              product: { select: { id: true, name: true, unit: true, productType: true, inventoryQty: true, isAvailable: true, isDeleted: true } },
+              product: {
+                select: {
+                  id: true,
+                  name: true,
+                  unit: true,
+                  productType: true,
+                  inventoryQty: true,
+                  isAvailable: true,
+                  isDeleted: true,
+                },
+              },
             },
           },
         },
@@ -461,7 +699,8 @@ export async function PUT(
 
     return NextResponse.json(updatedOrder, { status: 200 });
   } catch (error) {
-    if (error instanceof OrderConflictError) return NextResponse.json({ error: error.message }, { status: 409 });
+    if (error instanceof OrderConflictError)
+      return NextResponse.json({ error: error.message }, { status: 409 });
     if (error instanceof OrderEditError) {
       return buildEditResponse(error);
     }
@@ -474,14 +713,38 @@ export async function PUT(
     }
 
     console.error('Error updating order:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }
 
 // Keep the legacy DELETE route compatible while retaining the order and its audit trail.
-export async function DELETE(request: NextRequest, context: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  context: { params: Promise<{ id: string }> }
+) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
-  if (session.user.role !== 'GROWER' || !session.user.growerId) return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
-  return changeStatus(new NextRequest(request.url, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status: 'CANCELLED' }) }), context);
+  if (!session)
+    return NextResponse.json(
+      { error: 'Please sign in to continue.' },
+      { status: 401 }
+    );
+  if (session.user.role !== 'GROWER' || !session.user.growerId)
+    return NextResponse.json(
+      { error: 'Your account does not have access to this action.' },
+      { status: 403 }
+    );
+  return changeStatus(
+    new NextRequest(request.url, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        status: 'CANCELLED',
+        reason: 'Cancelled by grower',
+      }),
+    }),
+    context
+  );
 }

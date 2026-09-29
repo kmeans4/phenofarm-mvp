@@ -23,6 +23,7 @@ interface MobileNavProps {
   portalLabel: string;
   accountName?: string | null;
   roleLabel?: string;
+  tab?: boolean;
 }
 
 function normalizePath(pathname: string) {
@@ -36,13 +37,23 @@ function isActiveRoute(pathname: string, href: string) {
 
   if (target.endsWith('/dashboard')) {
     const portalRoot = target.replace(/\/dashboard$/, '');
-    return current === target || current === portalRoot || current.startsWith(`${target}/`);
+    return (
+      current === target ||
+      current === portalRoot ||
+      current.startsWith(`${target}/`)
+    );
   }
 
   return current === target || current.startsWith(`${target}/`);
 }
 
-export function MobileNav({ links, portalLabel, accountName, roleLabel = portalLabel }: MobileNavProps) {
+export function MobileNav({
+  links,
+  portalLabel,
+  accountName,
+  roleLabel = portalLabel,
+  tab = false,
+}: MobileNavProps) {
   const pathname = usePathname() || '';
   const titleId = useId();
   const drawerId = useId();
@@ -51,7 +62,8 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLDivElement>(null);
-  const hasGroups = links.length > 7 && links.some((link) => Boolean(link.group));
+  const hasGroups =
+    links.length > 7 && links.some((link) => Boolean(link.group));
   const isOpen = openState && openedPathname === pathname;
 
   const closeMenu = useCallback(() => {
@@ -80,12 +92,17 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
         ref={menuButtonRef}
         type="button"
         onClick={openMenu}
-        className="flex h-10 w-10 items-center justify-center rounded-[10px] border border-white/10 bg-white/5 text-pf-secondary transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#34d9a2]"
+        className={
+          tab
+            ? 'flex min-h-16 flex-col items-center justify-center gap-1 text-sm text-pf-secondary'
+            : 'flex min-h-11 items-center justify-center gap-1 rounded-lg border border-pf-line-strong px-2 text-sm text-pf-secondary'
+        }
         aria-label={`Open ${portalLabel} navigation menu`}
         aria-expanded={isOpen}
         aria-controls={drawerId}
       >
-        <Menu className="h-6 w-6" />
+        <Menu className="h-5 w-5" aria-hidden />
+        <span>{tab ? 'More' : 'Menu'}</span>
       </button>
 
       {isOpen && (
@@ -122,7 +139,10 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
               </button>
             </div>
 
-            <nav className="min-h-0 flex-1 overflow-y-auto px-3 py-2" aria-label={`${portalLabel} navigation`}>
+            <nav
+              className="min-h-0 flex-1 overflow-y-auto px-3 py-2"
+              aria-label={`${portalLabel} navigation`}
+            >
               {links.map((link, index) => {
                 const active = isActiveRoute(pathname, link.href);
                 const previousLink = links[index - 1];
@@ -133,7 +153,7 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
                 return (
                   <div key={link.href}>
                     {showGroup && (
-                      <div className="font-metadata px-2 pb-1 pt-2 text-[13px] font-semibold tracking-normal text-pf-muted">
+                      <div className="font-metadata px-2 pb-1 pt-2 text-sm font-semibold tracking-normal text-pf-muted">
                         {group}
                       </div>
                     )}
@@ -149,7 +169,10 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
                     >
                       <span className="min-w-0 truncate">{link.name}</span>
                       {link.badge && link.badge > 0 ? (
-                        <Badge variant="warning" className="shrink-0 px-1.5 py-0 text-xs">
+                        <Badge
+                          variant="warning"
+                          className="shrink-0 px-1.5 py-0 text-xs"
+                        >
                           {link.badge}
                         </Badge>
                       ) : link.badgeComponent ? (
@@ -163,7 +186,9 @@ export function MobileNav({ links, portalLabel, accountName, roleLabel = portalL
 
             <div className="mt-auto border-t border-white/[0.07] px-4 pt-2 pb-[calc(0.5rem+env(safe-area-inset-bottom))]">
               <div className="mb-1 rounded-lg bg-white/[0.05] px-3 py-2">
-                <p className="truncate text-sm font-semibold text-[#e3ebe3]">{accountName || 'PhenoShop account'}</p>
+                <p className="truncate text-sm font-semibold text-[#e3ebe3]">
+                  {accountName || 'PhenoShop account'}
+                </p>
                 <p className="text-xs font-medium text-pf-muted">{roleLabel}</p>
               </div>
               <button

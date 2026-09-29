@@ -10,14 +10,29 @@ import { canCreateListings, FREE_LISTING_LIMIT_MESSAGE } from '@/lib/plans';
 export async function GET(request: NextRequest) {
   try {
     const session = await getAuthSession();
-    if (!session) return apiError(401, 'UNAUTHORIZED', 'Please sign in to continue.');
+    if (!session)
+      return apiError(401, 'UNAUTHORIZED', 'Please sign in to continue.');
     const user = session.user;
-    if (user.role !== 'GROWER' || !user.growerId) return apiError(403, 'FORBIDDEN', 'Your account does not have access to this action.');
+    if (user.role !== 'GROWER' || !user.growerId)
+      return apiError(
+        403,
+        'FORBIDDEN',
+        'Your account does not have access to this action.'
+      );
 
-    return NextResponse.json(await getGrowerProductPage(user.growerId, new URL(request.url).searchParams));
+    return NextResponse.json(
+      await getGrowerProductPage(
+        user.growerId,
+        new URL(request.url).searchParams
+      )
+    );
   } catch (error) {
     logApiError('products.GET', error, { route: '/api/products' });
-    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Something went wrong. Please try again.');
+    return apiError(
+      500,
+      'INTERNAL_SERVER_ERROR',
+      'Something went wrong. Please try again.'
+    );
   }
 }
 
@@ -25,11 +40,16 @@ export async function POST(request: NextRequest) {
   try {
     const session = await getAuthSession();
 
-    if (!session) return apiError(401, 'UNAUTHORIZED', 'Please sign in to continue.');
+    if (!session)
+      return apiError(401, 'UNAUTHORIZED', 'Please sign in to continue.');
 
     const user = session.user;
     if (user.role !== 'GROWER' || !user.growerId) {
-      return apiError(403, 'FORBIDDEN', 'Your account does not have access to this action.');
+      return apiError(
+        403,
+        'FORBIDDEN',
+        'Your account does not have access to this action.'
+      );
     }
 
     const body = await request.json();
@@ -45,15 +65,35 @@ export async function POST(request: NextRequest) {
     }
 
     const data = parsed.data;
-    if (data.images) data.images = await Promise.all(data.images.map(async (value) => (await persistMediaReference(value, `products/${user.growerId}/images`))!));
-    if (data.ingredientsDocumentUrl) data.ingredientsDocumentUrl = await persistMediaReference(data.ingredientsDocumentUrl, `products/${user.growerId}/documents`) || null;
+    if (data.images)
+      data.images = await Promise.all(
+        data.images.map(
+          async (value) =>
+            (await persistMediaReference(
+              value,
+              `products/${user.growerId}/images`
+            ))!
+        )
+      );
+    if (data.ingredientsDocumentUrl)
+      data.ingredientsDocumentUrl =
+        (await persistMediaReference(
+          data.ingredientsDocumentUrl,
+          `products/${user.growerId}/documents`
+        )) || null;
 
     const [growerPlan, listingCount] = await Promise.all([
       db.grower.findUnique({
         where: { id: user.growerId },
-        select: { businessName: true, subscriptionPlan: true, subscriptionStatus: true },
+        select: {
+          businessName: true,
+          subscriptionPlan: true,
+          subscriptionStatus: true,
+        },
       }),
-      db.product.count({ where: { growerId: user.growerId, isDeleted: false } }),
+      db.product.count({
+        where: { growerId: user.growerId, isDeleted: false },
+      }),
     ]);
     if (!canCreateListings(growerPlan, listingCount)) {
       return apiError(402, 'PLAN_LIMIT_REACHED', FREE_LISTING_LIMIT_MESSAGE, {
@@ -70,8 +110,11 @@ export async function POST(request: NextRequest) {
     }
 
     if (data.batchId) {
-      const batch = await db.batch.findFirst({ where: { id: data.batchId, growerId: user.growerId } });
+      const batch = await db.batch.findFirst({
+        where: { id: data.batchId, growerId: user.growerId },
+      });
       if (!batch) return apiError(404, 'BATCH_NOT_FOUND', 'Batch not found');
+      data.strainId = batch.strainId;
     }
 
     const product = await db.product.create({
@@ -104,13 +147,26 @@ export async function POST(request: NextRequest) {
       },
       include: {
         strain: { select: { id: true, name: true, genetics: true } },
-        batch: { select: { id: true, batchNumber: true, harvestDate: true, thc: true, cbd: true, totalCannabinoids: true } },
+        batch: {
+          select: {
+            id: true,
+            batchNumber: true,
+            harvestDate: true,
+            thc: true,
+            cbd: true,
+            totalCannabinoids: true,
+          },
+        },
       },
     });
 
     return NextResponse.json(serializeProduct(product), { status: 201 });
   } catch (error) {
     logApiError('products.POST', error, { route: '/api/products' });
-    return apiError(500, 'INTERNAL_SERVER_ERROR', 'Something went wrong. Please try again.');
+    return apiError(
+      500,
+      'INTERNAL_SERVER_ERROR',
+      'Something went wrong. Please try again.'
+    );
   }
 }

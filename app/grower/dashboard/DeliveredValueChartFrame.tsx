@@ -7,7 +7,9 @@ interface DeliveredValueChartFrameProps {
   children: ReactNode;
 }
 
-export function DeliveredValueChartFrame({ children }: DeliveredValueChartFrameProps) {
+export function DeliveredValueChartFrame({
+  children,
+}: DeliveredValueChartFrameProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hasOverflow, setHasOverflow] = useState(false);
 

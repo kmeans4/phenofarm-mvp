@@ -1,3 +1,4 @@
+import { signInDestination } from '@/lib/auth-navigation';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect, notFound } from 'next/navigation';
 import { db } from '@/lib/db';
@@ -11,7 +12,7 @@ export default async function EditProductPage({ params }: PageProps) {
   const session = await getAuthSession();
 
   if (!session) {
-    redirect('/auth/sign_in');
+    redirect(await signInDestination());
   }
 
   const user = session.user;
@@ -38,20 +39,28 @@ export default async function EditProductPage({ params }: PageProps) {
     strainId: product.strainId || '',
     batchId: product.batchId || '',
     price: String(Number(product.price)),
-    inventoryQty: product.inventoryQty !== null && product.inventoryQty !== undefined ? String(product.inventoryQty) : '0',
+    inventoryQty:
+      product.inventoryQty !== null && product.inventoryQty !== undefined
+        ? String(product.inventoryQty)
+        : '0',
     unit: product.unit || 'Gram',
     description: product.description || '',
-    isAvailable: product.status === 'DRAFT' ? true : product.isAvailable ?? true,
+    isAvailable:
+      product.status === 'DRAFT' ? true : (product.isAvailable ?? true),
     isPriceVisible: product.isPriceVisible ?? true,
     images: product.images || [],
     sku: product.sku || '',
     brand: product.brand || '',
     ingredients: product.ingredients || '',
     isFeatured: product.isFeatured || false,
-    thcMin: product.thcMin?.toString() || '', thcMax: product.thcMax?.toString() || '',
-    cbdMin: product.cbdMin?.toString() || '', cbdMax: product.cbdMax?.toString() || '',
+    thcMin: product.thcMin?.toString() || '',
+    thcMax: product.thcMax?.toString() || '',
+    cbdMin: product.cbdMin?.toString() || '',
+    cbdMax: product.cbdMax?.toString() || '',
     harvestDate: product.harvestDate?.toISOString().slice(0, 10) || '',
   };
 
-  return <EditProductPageClient productId={product.id} initialData={initialData} />;
+  return (
+    <EditProductPageClient productId={product.id} initialData={initialData} />
+  );
 }

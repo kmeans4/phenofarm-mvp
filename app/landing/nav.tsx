@@ -12,9 +12,10 @@ const NAV_LINKS = [
   { label: 'Features', href: '#workflow' },
   { label: 'Get started', href: '#getting-started' },
   { label: 'FAQ', href: '#faq' },
+  { label: 'Help', href: '/help' },
 ];
 
-export function Nav() {
+export function Nav({ signedIn = false }: { signedIn?: boolean }) {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('');
@@ -57,20 +58,26 @@ export function Nav() {
   return (
     <nav
       className={`fixed inset-x-0 top-0 z-50 transition-all duration-300 ${
-        scrolled || open ? 'border-b border-white/[0.06] bg-[#070908]/85 backdrop-blur-xl' : 'bg-transparent'
+        scrolled || open
+          ? 'border-b border-white/[0.06] bg-[#070908]/85 backdrop-blur-xl'
+          : 'bg-transparent'
       }`}
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5" onClick={() => setOpen(false)}>
-          <BrandLogo className="w-32 sm:w-40" />
+        <Link
+          href="/"
+          className="flex min-h-11 shrink-0 items-center gap-2.5"
+          onClick={() => setOpen(false)}
+        >
+          <BrandLogo className="w-24 min-[380px]:w-32 sm:w-40" />
         </Link>
 
-        <div className="hidden items-center gap-7 md:flex">
+        <div className="hidden items-center gap-7 lg:flex">
           {NAV_LINKS.map((item) => (
             <a
               key={item.href}
               href={item.href}
-              className={`relative text-sm transition-colors hover:text-white ${
+              className={`relative inline-flex min-h-11 items-center text-sm transition-colors hover:text-white ${
                 active === item.href ? 'text-white' : 'text-gray-400'
               }`}
             >
@@ -87,24 +94,33 @@ export function Nav() {
         </div>
 
         <div className="flex items-center gap-1 sm:gap-2">
+          {!signedIn && (
+            <Link
+              href="/auth/sign_in"
+              className="inline-flex min-h-11 items-center whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-white sm:px-4"
+            >
+              Sign in
+            </Link>
+          )}
           <Link
-            href="/auth/sign_in"
-            className="hidden whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-gray-300 transition-colors hover:text-white sm:block sm:px-4"
+            href={signedIn ? '/dashboard' : '/auth/sign_up'}
+            className="inline-flex min-h-11 items-center whitespace-nowrap rounded-lg bg-white px-3 py-2 text-sm font-semibold text-gray-950 transition-colors hover:bg-gray-200 sm:px-4"
           >
-            Sign in
-          </Link>
-          <Link
-            href="/auth/sign_up"
-            className="whitespace-nowrap rounded-lg bg-white px-3 py-2 text-sm font-semibold text-gray-950 transition-colors hover:bg-gray-200 sm:px-4"
-          >
-            <span className="sm:hidden">Sign up</span><span className="hidden sm:inline">Create account</span>
+            {signedIn ? (
+              'Open dashboard'
+            ) : (
+              <>
+                <span className="sm:hidden">Sign up</span>
+                <span className="hidden sm:inline">Create account</span>
+              </>
+            )}
           </Link>
           <button
             type="button"
             aria-label={open ? 'Close menu' : 'Open menu'}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="ml-1 flex h-9 w-9 items-center justify-center rounded-lg text-gray-300 transition-colors hover:text-white md:hidden"
+            className="ml-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-gray-300 transition-colors hover:text-white lg:hidden"
           >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -119,7 +135,7 @@ export function Nav() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="overflow-hidden border-t border-white/[0.06] md:hidden"
+            className="overflow-hidden border-t border-white/[0.06] lg:hidden"
           >
             <div className="space-y-1 px-6 py-4">
               {NAV_LINKS.map((item) => (
@@ -127,18 +143,11 @@ export function Nav() {
                   key={item.href}
                   href={item.href}
                   onClick={() => setOpen(false)}
-                  className="block rounded-lg px-3 py-2.5 text-[15px] text-gray-300 transition-colors hover:bg-white/[0.04] hover:text-white"
+                  className="flex min-h-11 items-center rounded-lg px-3 py-2.5 text-[15px] text-gray-300 transition-colors hover:bg-white/[0.04] hover:text-white"
                 >
                   {item.label}
                 </a>
               ))}
-              <Link
-                href="/auth/sign_in"
-                onClick={() => setOpen(false)}
-                className="block rounded-lg px-3 py-2.5 text-[15px] text-gray-300 transition-colors hover:bg-white/[0.04] hover:text-white sm:hidden"
-              >
-                Sign in
-              </Link>
             </div>
           </motion.div>
         )}

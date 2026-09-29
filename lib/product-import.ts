@@ -1,16 +1,27 @@
-import { parseProductPayload, PRODUCT_STATUS } from '@/lib/product-payload';
+import {
+  parseProductPayload,
+  parseProductNumber,
+  PRODUCT_STATUS,
+  type ProductStatusValue,
+} from '@/lib/product-payload';
+import {
+  defaultUnitForProductType,
+  isKnownProductType,
+  PRODUCT_TYPE_NAMES,
+} from '@/lib/product-types';
 
 export interface ProductImportError {
   row: number;
   field: string;
   message: string;
 }
-
 export interface ProductImportRecord {
+  row: number;
   name: string;
   productType: string | null;
   subType: string | null;
   strainName: string | null;
+  batchNumber: string | null;
   price: number;
   inventoryQty: number;
   unit: string;
@@ -24,33 +35,46 @@ export interface ProductImportRecord {
   thcMax: number | null;
   cbdMin: number | null;
   cbdMax: number | null;
+  harvestDate: string | null;
+  status: ProductStatusValue;
+  requestedAvailability: boolean;
+  fields: string[];
 }
-
 export interface ProductImportValidationResult {
   totalRows: number;
   records: ProductImportRecord[];
   errors: ProductImportError[];
+  rows: string[][];
 }
-
-type ProductImportField = keyof ProductImportRecord | 'strain' | 'category' | 'subcategory' | 'thc' | 'cbd';
-
-const HEADER_ALIASES: Record<string, ProductImportField> = {
+const HEADER_ALIASES: Record<string, string> = {
   name: 'name',
   productname: 'name',
   product: 'name',
+  item: 'name',
+  itemname: 'name',
   producttype: 'productType',
   type: 'productType',
-  category: 'category',
+  category: 'productType',
   subtype: 'subType',
-  subcategory: 'subcategory',
-  strain: 'strain',
+  subcategory: 'subType',
+  strain: 'strainName',
+  strainname: 'strainName',
+  batch: 'batchNumber',
+  batchnumber: 'batchNumber',
   price: 'price',
   unitprice: 'price',
+  wholesaleprice: 'price',
+  wholesale: 'price',
+  cost: 'price',
   inventoryqty: 'inventoryQty',
   inventory: 'inventoryQty',
   quantity: 'inventoryQty',
   stock: 'inventoryQty',
+  stockonhand: 'inventoryQty',
+  qty: 'inventoryQty',
   unit: 'unit',
+  units: 'unit',
+  sellingunit: 'unit',
   description: 'description',
   images: 'images',
   imageurls: 'images',
@@ -58,224 +82,264 @@ const HEADER_ALIASES: Record<string, ProductImportField> = {
   brand: 'brand',
   isavailable: 'isAvailable',
   available: 'isAvailable',
+  live: 'isAvailable',
   ispricevisible: 'isPriceVisible',
   pricevisible: 'isPriceVisible',
   showprice: 'isPriceVisible',
+  showpriceyesno: 'isPriceVisible',
   thc: 'thc',
   thclegacy: 'thc',
   cbd: 'cbd',
   cbdlegacy: 'cbd',
+  thcmin: 'thcMin',
+  thcmax: 'thcMax',
+  cbdmin: 'cbdMin',
+  cbdmax: 'cbdMax',
+  harvestdate: 'harvestDate',
+  status: 'status',
+  listingstatus: 'status',
 };
-
-const REQUIRED_FIELDS = ['name', 'productType', 'price', 'inventoryQty', 'unit'] as const;
-
-function normalizeHeader(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]/g, '');
-}
-
-function toOptionalString(value: string | undefined) {
-  const trimmed = value?.trim();
-  return trimmed || null;
-}
-
+const normalizeHeader = (value: string) =>
+  value.toLowerCase().replace(/[^a-z0-9]/g, '');
 function parseBoolean(value: string | undefined, fallback: boolean) {
-  const trimmed = value?.trim().toLowerCase();
-  if (!trimmed) return fallback;
-  if (['true', 'yes', 'y', '1'].includes(trimmed)) return true;
-  if (['false', 'no', 'n', '0'].includes(trimmed)) return false;
+  if (!value?.trim()) return fallback;
+  if (['true', 'yes', 'y', '1'].includes(value.trim().toLowerCase()))
+    return true;
+  if (['false', 'no', 'n', '0'].includes(value.trim().toLowerCase()))
+    return false;
   return null;
 }
-
-function parseOptionalPercent(value: string | undefined) {
-  if (!value?.trim()) return { value: null, valid: true };
-  const parsed = Number.parseFloat(value);
-  return {
-    value: parsed,
-    valid: Number.isFinite(parsed) && parsed >= 0 && parsed <= 100,
-  };
+export function csvCell(value: unknown) {
+  return `"${String(value ?? '').replace(/"/g, '""')}"`;
 }
-
-function splitImageList(value: string | undefined) {
-  return value
-    ? value.split(';').map((item) => item.trim()).filter(Boolean)
-    : [];
+export function rowsToCsv(rows: unknown[][]) {
+  return rows.map((row) => row.map(csvCell).join(',')).join('\r\n');
 }
-
-function hasRequiredField(
-  presentFields: Set<ProductImportField>,
-  requiredField: typeof REQUIRED_FIELDS[number]
-) {
-  if (requiredField === 'productType') {
-    return presentFields.has('productType') || presentFields.has('category');
-  }
-
-  return presentFields.has(requiredField);
-}
-
 export function parseCsv(content: string): string[][] {
+  const firstLine = content.replace(/^\uFEFF/, '').split(/\r?\n/, 1)[0] || '';
+  let quoted = false;
+  const counts: Record<string, number> = { ',': 0, ';': 0, '\t': 0 };
+  for (const char of firstLine) {
+    if (char === '"') quoted = !quoted;
+    else if (!quoted && char in counts) counts[char]++;
+  }
+  const delimiter = Object.keys(counts).sort(
+    (a, b) => counts[b] - counts[a]
+  )[0];
   const rows: string[][] = [];
   let row: string[] = [];
   let field = '';
   let inQuotes = false;
-
-  for (let index = 0; index < content.length; index += 1) {
-    const char = content[index];
-    const next = content[index + 1];
-
+  for (let index = 0; index < content.length; index++) {
+    const char = content[index],
+      next = content[index + 1];
     if (char === '"') {
       if (inQuotes && next === '"') {
         field += '"';
-        index += 1;
-      } else {
-        inQuotes = !inQuotes;
-      }
+        index++;
+      } else inQuotes = !inQuotes;
       continue;
     }
-
-    if (char === ',' && !inQuotes) {
+    if (char === delimiter && !inQuotes) {
       row.push(field);
       field = '';
       continue;
     }
-
     if ((char === '\n' || char === '\r') && !inQuotes) {
-      if (char === '\r' && next === '\n') index += 1;
+      if (char === '\r' && next === '\n') index++;
       row.push(field);
-      if (row.some((value) => value.trim())) rows.push(row);
+      rows.push(row);
       row = [];
       field = '';
       continue;
     }
-
     field += char;
   }
-
+  if (inQuotes)
+    throw new Error(
+      'A quoted cell is not closed. Save the spreadsheet again and retry.'
+    );
   row.push(field);
   if (row.some((value) => value.trim())) rows.push(row);
-
   return rows;
 }
-
-export function validateProductImport(content: string): ProductImportValidationResult {
-  const csvRows = parseCsv(content);
-  const [headerRow, ...dataRows] = csvRows;
-  const errors: ProductImportError[] = [];
-  const records: ProductImportRecord[] = [];
-
-  if (!headerRow || dataRows.length === 0) {
-    return {
-      totalRows: 0,
-      records,
-      errors: [{ row: 1, field: 'file', message: 'CSV file is empty or has no data rows.' }],
-    };
+export function validateProductImport(
+  content: string
+): ProductImportValidationResult {
+  const rows = parseCsv(content),
+    [header, ...dataRows] = rows;
+  const records: ProductImportRecord[] = [],
+    errors: ProductImportError[] = [];
+  const totalRows = dataRows.filter((row) =>
+    row.some((value) => value.trim())
+  ).length;
+  const result = () => ({ totalRows, records, errors, rows });
+  if (!header || !totalRows) {
+    errors.push({
+      row: 1,
+      field: 'file',
+      message: 'The spreadsheet has no product rows.',
+    });
+    return result();
   }
-
-  const headers = headerRow.map((header): ProductImportField | null => HEADER_ALIASES[normalizeHeader(header)] || null);
-  const presentFields = new Set(headers.filter((field): field is ProductImportField => Boolean(field)));
-
-  for (const requiredField of REQUIRED_FIELDS) {
-    if (!hasRequiredField(presentFields, requiredField)) {
+  const headers = header.map(
+    (value) => HEADER_ALIASES[normalizeHeader(value)] || ''
+  );
+  for (const key of ['name', 'productType', 'price'])
+    if (!headers.includes(key))
       errors.push({
         row: 1,
-        field: requiredField,
-        message: `Missing required column: ${requiredField}.`,
+        field: key,
+        message: `Missing column: ${{ name: 'Name', productType: 'Type', price: 'Price' }[key]}.`,
       });
-    }
-  }
-
-  if (errors.length > 0) {
-    return { totalRows: dataRows.length, records, errors };
-  }
-
+  if (errors.length) return result();
+  const seen = new Set<string>();
   dataRows.forEach((values, index) => {
-    const rowNumber = index + 2;
-    const raw: Record<string, string> = {};
-
-    headers.forEach((fieldName, fieldIndex) => {
-      if (fieldName) raw[fieldName] = values[fieldIndex] || '';
+    if (!values.some((value) => value.trim())) return;
+    const row = index + 2,
+      raw: Record<string, string> = {};
+    headers.forEach((key, i) => {
+      if (key) raw[key] = (values[i] || '').trim();
     });
-
-    const productType = raw.productType || raw.category || '';
-    const subType = raw.subType || raw.subcategory || '';
-    const images = splitImageList(raw.images);
-    const isAvailable = parseBoolean(raw.isAvailable, true);
-    const isPriceVisible = parseBoolean(raw.isPriceVisible, true);
-    const thc = parseOptionalPercent(raw.thc);
-    const cbd = parseOptionalPercent(raw.cbd);
-
-    if (isAvailable === null) {
-      errors.push({ row: rowNumber, field: 'isAvailable', message: 'Use true/false, yes/no, or 1/0.' });
+    const fail = (field: string, message: string) =>
+      errors.push({ row, field, message });
+    if (!isKnownProductType(raw.productType))
+      fail('Type', `Choose a type: ${PRODUCT_TYPE_NAMES.join(', ')}.`);
+    const available = parseBoolean(raw.isAvailable, true),
+      showPrice = parseBoolean(raw.isPriceVisible, true);
+    if (available === null) fail('Available', 'Use yes or no.');
+    if (showPrice === null) fail('Show price', 'Use yes or no.');
+    const statusText = raw.status?.toLowerCase();
+    if (
+      statusText &&
+      !['draft', 'published', 'live', 'hidden'].includes(statusText)
+    )
+      fail('Status', 'Use Draft, Live or Hidden.');
+    const percentages: Record<string, number | null> = {};
+    for (const key of ['thcMin', 'thcMax', 'cbdMin', 'cbdMax']) {
+      const value = raw[key] || raw[key.startsWith('thc') ? 'thc' : 'cbd'];
+      percentages[key] = value ? parseProductNumber(value) : null;
+      if (
+        value &&
+        (percentages[key] === null ||
+          percentages[key]! < 0 ||
+          percentages[key]! > 100)
+      )
+        fail(key, 'Use a percentage from 0 to 100.');
     }
-
-    if (isPriceVisible === null) {
-      errors.push({ row: rowNumber, field: 'isPriceVisible', message: 'Use true/false, yes/no, or 1/0.' });
-    }
-
-    if (!thc.valid) {
-      errors.push({ row: rowNumber, field: 'thc', message: 'THC must be a number between 0 and 100.' });
-    }
-
-    if (!cbd.valid) {
-      errors.push({ row: rowNumber, field: 'cbd', message: 'CBD must be a number between 0 and 100.' });
-    }
-
     const parsed = parseProductPayload({
-      name: raw.name,
-      productType,
-      subType,
-      price: raw.price,
-      inventoryQty: raw.inventoryQty,
-      unit: raw.unit,
-      description: raw.description,
-      images,
-      isAvailable: isAvailable ?? true,
-      isPriceVisible: isPriceVisible ?? true,
-      sku: raw.sku,
-      brand: raw.brand,
-      thcMin: thc.value,
-      thcMax: thc.value,
-      cbdMin: cbd.value,
-      cbdMax: cbd.value,
-    }, {
-      partial: false,
-      defaultStatus: PRODUCT_STATUS.PUBLISHED,
+      ...raw,
+      ...percentages,
+      status:
+        statusText === 'draft'
+          ? PRODUCT_STATUS.DRAFT
+          : PRODUCT_STATUS.PUBLISHED,
+      unit: raw.unit || defaultUnitForProductType(raw.productType),
+      inventoryQty: raw.inventoryQty || '0',
+      images: raw.images
+        ? raw.images
+            .split(';')
+            .map((value) => value.trim())
+            .filter(Boolean)
+        : [],
+      isAvailable: statusText === 'hidden' ? false : (available ?? true),
+      isPriceVisible: showPrice ?? true,
     });
-
-    if (!parsed.ok) {
-      for (const message of parsed.errors) {
-        const field = message.split(' ')[0] || 'row';
-        errors.push({ row: rowNumber, field, message });
-      }
-      return;
-    }
-
+    if (!parsed.ok) parsed.errors.forEach((message) => fail('', message));
+    const identity = (
+      raw.sku ? `sku:${raw.sku}` : `name:${raw.name}`
+    ).toLowerCase();
+    if (seen.has(identity))
+      fail(
+        'Name / SKU',
+        'This product is repeated in the spreadsheet. Keep one row per product.'
+      );
+    seen.add(identity);
+    if (!parsed.ok || errors.some((error) => error.row === row)) return;
+    const data = parsed.data;
     records.push({
-      name: parsed.data.name || '',
-      productType: parsed.data.productType,
-      subType: parsed.data.subType,
-      strainName: toOptionalString(raw.strain),
-      price: parsed.data.price ?? 0,
-      inventoryQty: parsed.data.inventoryQty ?? 0,
-      unit: parsed.data.unit || 'Gram',
-      description: parsed.data.description,
-      images: parsed.data.images || [],
-      isAvailable: parsed.data.isAvailable,
-      isPriceVisible: parsed.data.isPriceVisible,
-      sku: parsed.data.sku,
-      brand: parsed.data.brand,
-      thcMin: thc.value,
-      thcMax: thc.value,
-      cbdMin: cbd.value,
-      cbdMax: cbd.value,
+      row,
+      name: data.name || '',
+      productType: data.productType,
+      subType: data.subType,
+      strainName: raw.strainName || null,
+      batchNumber: raw.batchNumber || null,
+      price: data.price ?? 0,
+      inventoryQty: data.inventoryQty ?? 0,
+      unit: data.unit || defaultUnitForProductType(raw.productType),
+      description: data.description,
+      images: data.images || [],
+      isAvailable: data.isAvailable,
+      isPriceVisible: data.isPriceVisible,
+      sku: data.sku,
+      brand: data.brand,
+      thcMin: data.thcMin,
+      thcMax: data.thcMax,
+      cbdMin: data.cbdMin,
+      cbdMax: data.cbdMax,
+      harvestDate: data.harvestDate,
+      status: data.status,
+      requestedAvailability:
+        !['draft', 'hidden'].includes(statusText || '') && (available ?? true),
+      fields: headers.filter(Boolean),
     });
   });
-
-  return { totalRows: dataRows.length, records, errors };
+  return result();
 }
-
+export function failedProductImportCsv(
+  validation: ProductImportValidationResult
+) {
+  const failed = new Set(validation.errors.map((error) => error.row));
+  return rowsToCsv([
+    [...(validation.rows[0] || []), 'Error'],
+    ...validation.rows.slice(1).flatMap((row, index) =>
+      failed.has(index + 2)
+        ? [
+            [
+              ...row,
+              validation.errors
+                .filter((error) => error.row === index + 2)
+                .map((error) => error.message)
+                .join(' '),
+            ],
+          ]
+        : []
+    ),
+  ]);
+}
 export function productImportTemplateCsv() {
-  return [
-    ['name', 'productType', 'subType', 'strain', 'price', 'inventoryQty', 'unit', 'description', 'isAvailable', 'isPriceVisible', 'images', 'sku', 'brand', 'thc', 'cbd'].join(','),
-    ['Blue Dream - 3.5g Jar', 'Flower', '3.5g Jar', 'Blue Dream', '45.00', '100', 'Gram', 'Premium sativa flower with berry aroma', 'true', 'true', 'https://example.com/image1.jpg', 'BD-001', 'PhenoShop', '22', '1'].map((value) => `"${value}"`).join(','),
-  ].join('\n');
+  return rowsToCsv([
+    [
+      'Name',
+      'Type',
+      'Price',
+      'Stock',
+      'Unit',
+      'Show price yes/no',
+      'SKU',
+      'Strain',
+      'Batch',
+      'THC min',
+      'THC max',
+      'CBD min',
+      'CBD max',
+      'Status',
+    ],
+    [
+      'Blue Dream',
+      'Flower',
+      '1200.00',
+      '8',
+      'lb',
+      'yes',
+      'BD-001',
+      'Blue Dream',
+      '',
+      '20',
+      '24',
+      '',
+      '',
+      'Live',
+    ],
+  ]);
 }

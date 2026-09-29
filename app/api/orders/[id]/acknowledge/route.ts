@@ -8,9 +8,16 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await getAuthSession();
-  if (!session) return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+  if (!session)
+    return NextResponse.json(
+      { error: 'Please sign in to continue.' },
+      { status: 401 }
+    );
   if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) {
-    return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+    return NextResponse.json(
+      { error: 'Your account does not have access to this action.' },
+      { status: 403 }
+    );
   }
 
   const { id } = await params;
@@ -21,15 +28,25 @@ export async function PATCH(
       dispensary: { select: { isOffPlatform: true } },
     },
   });
-  if (!order) return NextResponse.json({ error: 'Order not found' }, { status: 404 });
+  if (!order)
+    return NextResponse.json({ error: 'Order not found' }, { status: 404 });
   if (order.createdBy !== 'GROWER' || order.dispensary.isOffPlatform) {
-    return NextResponse.json({ error: 'This request does not require buyer confirmation' }, { status: 409 });
+    return NextResponse.json(
+      { error: 'This request does not require buyer confirmation' },
+      { status: 409 }
+    );
   }
   if (order.status !== 'PENDING') {
-    return NextResponse.json({ error: 'Only submitted requests can be confirmed' }, { status: 409 });
+    return NextResponse.json(
+      { error: 'Only submitted requests can be confirmed' },
+      { status: 409 }
+    );
   }
   if (order.buyerAcknowledgedAt) {
-    return NextResponse.json({ success: true, buyerAcknowledgedAt: order.buyerAcknowledgedAt });
+    return NextResponse.json({
+      success: true,
+      buyerAcknowledgedAt: order.buyerAcknowledgedAt,
+    });
   }
 
   const acknowledgedAt = new Date();
@@ -47,5 +64,8 @@ export async function PATCH(
     });
   });
 
-  return NextResponse.json({ success: true, buyerAcknowledgedAt: acknowledgedAt });
+  return NextResponse.json({
+    success: true,
+    buyerAcknowledgedAt: acknowledgedAt,
+  });
 }

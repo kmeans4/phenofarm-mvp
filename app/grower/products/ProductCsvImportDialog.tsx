@@ -1,46 +1,218 @@
 'use client';
-
 import { useState } from 'react';
 import Link from 'next/link';
-import { FileUp, Loader2, LockKeyhole } from 'lucide-react';
+import { FileUp } from 'lucide-react';
 import { Modal } from '@/app/components/ui/Modal';
+import { formatProductMoney } from '@/lib/product-display';
+import { validateCsvImportFile } from '@/lib/upload-validation';
 
-type Preview = { totalRows: number; validRows: number; errorRows: number; records?: Array<{ row: number; name: string; productType: string | null; price: number }>; errors?: Array<{ row: number; field: string; message: string }> };
-
-export function ProductCsvImportDialog({ enabled, onImported }: { enabled: boolean; onImported: () => void }) {
-  const [open, setOpen] = useState(false);
-  const [file, setFile] = useState<File | null>(null);
-  const [preview, setPreview] = useState<Preview | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState('');
-
+type Preview = {
+  totalRows: number;
+  validRows: number;
+  errorRows: number;
+  createCount: number;
+  updateCount: number;
+  failedRowsCsv?: string;
+  records?: Array<{
+    row: number;
+    action: string;
+    name: string;
+    productType: string | null;
+    price: number;
+  }>;
+  errors?: Array<{ row: number; field: string; message: string }>;
+};
+export function ProductCsvImportDialog({
+  enabled,
+  onImported,
+}: {
+  enabled: boolean;
+  onImported: () => void;
+}) {
+  const [open, setOpen] = useState(false),
+    [file, setFile] = useState<File | null>(null),
+    [preview, setPreview] = useState<Preview | null>(null);
+  const [busy, setBusy] = useState<'preview' | 'import' | null>(null),
+    [message, setMessage] = useState(''),
+    [version, setVersion] = useState(0);
   async function upload(dryRun: boolean) {
-    if (!file) return;
-    setBusy(true); setMessage('');
-    const body = new FormData(); body.set('file', file); if (dryRun) body.set('dryRun', 'true');
-    const response = await fetch('/api/products/bulk', { method: 'POST', body });
-    const data = await response.json().catch(() => ({}));
-    setBusy(false);
-    if (dryRun) { setPreview(data); if (!response.ok && !data.errors) setMessage(data.error || 'We could not check this CSV file. Check the format and try again.'); return; }
-    if (!response.ok) return setMessage(data.error || 'Import failed');
-    setMessage(`${data.successCount} products imported`); onImported();
+    if (!file) {
+      setMessage('Choose a spreadsheet first.');
+      return;
+    }
+    if (busy) return;
+    setBusy(dryRun ? 'preview' : 'import');
+    setMessage('');
+    try {
+      const body = new FormData();
+      body.set('file', file);
+      if (dryRun) body.set('dryRun', 'true');
+      const response = await fetch('/api/products/bulk', {
+        method: 'POST',
+        body,
+      });
+      const data = await response.json().catch(() => ({}));
+      if (Number.isFinite(data.validRows) && Number.isFinite(data.errorRows))
+        setPreview(data);
+      if (!response.ok)
+        throw new Error(
+          data.error ||
+            'Could not read this spreadsheet. Check the format and retry.'
+        );
+      if (!dryRun) {
+        setMessage(
+          `Created ${data.createCount} · Updated ${data.updateCount}${data.errorRows ? ` · Skipped ${data.errorRows}` : ''}`
+        );
+        setFile(null);
+        setVersion((value) => value + 1);
+        onImported();
+      }
+    } catch (error) {
+      setMessage(
+        error instanceof Error ? error.message : 'Connection lost. Try again.'
+      );
+    } finally {
+      setBusy(null);
+    }
   }
-
-  return <>
-    <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-pf-line-strong bg-pf-surface px-4 text-sm font-semibold text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent sm:w-auto"><FileUp className="h-4 w-4" />Import CSV{!enabled && <LockKeyhole className="h-3.5 w-3.5" />}</button>
-    <Modal open={open} onClose={() => setOpen(false)} title="Import products from CSV" className="max-w-2xl">
-        <p className="text-sm text-pf-muted">Upload a CSV file, check the preview, and fix any errors before importing.</p>
-        {!enabled ? <div className="mt-5 rounded-lg border border-pf-warning-line bg-pf-warning-bg p-4 text-sm text-pf-warning"><p className="font-semibold">CSV import is available on Pro and Business.</p><Link href="/grower/pricing" className="mt-2 inline-flex font-semibold underline">Compare plans</Link></div> : <>
+  function downloadFailed() {
+    if (!preview?.failedRowsCsv) return;
+    const url = URL.createObjectURL(
+      new Blob([preview.failedRowsCsv], { type: 'text/csv;charset=utf-8' })
+    );
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'products-needing-attention.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+  return (
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        title={!enabled ? 'Free includes up to 25 rows per import' : undefined}
+        className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-pf-line-strong px-3 text-sm font-medium"
+      >
+        <FileUp className="h-4 w-4" />
+        Import spreadsheet
+      </button>
+      <Modal
+        open={open}
+        onClose={() => {
+          if (!busy) setOpen(false);
+        }}
+        dismissible={!file && !busy}
+        title="Import products"
+        className="max-w-2xl"
+      >
+        <p className="text-sm text-pf-secondary">
+          CSV, TSV or Excel · Up to 4MB. Matching SKU or name updates an
+          existing product.
+        </p>
+        {!enabled && (
+          <p className="mt-2 text-sm text-pf-muted">
+            Free includes 25 rows per import.{' '}
+            <Link className="underline" href="/grower/pricing">
+              Compare plans
+            </Link>
+          </p>
+        )}
+        <Link
+          href="/api/products/bulk?template=true"
+          className="inline-flex min-h-11 items-center text-sm text-pf-accent underline"
+        >
+          Download template
+        </Link>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <input
+            key={version}
+            aria-label="Product spreadsheet"
+            type="file"
+            accept=".csv,.tsv,.xlsx"
+            disabled={Boolean(busy)}
+            onChange={(event) => {
+              const next = event.target.files?.[0] || null;
+              const checked = next ? validateCsvImportFile(next) : null;
+              setFile(checked?.ok ? next : null);
+              setPreview(null);
+              setMessage(checked && !checked.ok ? checked.error : '');
+            }}
+            className="min-w-0 flex-1 rounded-lg border border-pf-line-strong p-2 text-sm file:min-h-11"
+          />
+          <button
+            disabled={Boolean(busy)}
+            onClick={() => upload(true)}
+            className="min-h-11 rounded-lg bg-pf-accent px-4 text-sm font-semibold text-pf-canvas"
+          >
+            {busy === 'preview' ? 'Checking…' : 'Preview'}
+          </button>
+        </div>
+        {preview && (
           <div className="mt-4 space-y-3">
-            <Link href="/api/products/bulk?template=true" className="inline-flex min-h-10 items-center text-sm font-semibold text-pf-accent underline">Download CSV template</Link>
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-              <input aria-label="CSV file" type="file" accept=".csv,text/csv" onChange={(e) => { setFile(e.target.files?.[0] || null); setPreview(null); }} className="min-w-0 w-full flex-1 rounded-lg border border-pf-line bg-pf-canvas p-2 text-sm text-pf-secondary file:mr-3 file:rounded-md file:border-0 file:bg-pf-raised file:px-3 file:py-2 file:text-sm file:font-medium file:text-pf-text" />
-              <button disabled={!file || busy} onClick={() => upload(true)} className="h-10 shrink-0 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] hover:bg-emerald-400 disabled:opacity-50">{busy ? <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />Validating…</span> : 'Preview rows'}</button>
+            <p className="text-sm font-medium">
+              Create {preview.createCount} · Update {preview.updateCount} · Skip{' '}
+              {preview.errorRows}
+            </p>
+            <div className="max-h-64 overflow-auto rounded-lg border border-pf-line">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr>
+                    <th className="p-2 text-left">Row</th>
+                    <th className="p-2 text-left">Action</th>
+                    <th className="p-2 text-left">Product</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {preview.records?.map((row) => (
+                    <tr key={row.row} className="border-t border-pf-line">
+                      <td className="p-2">{row.row}</td>
+                      <td className="p-2 capitalize">{row.action}</td>
+                      <td className="p-2">
+                        {row.name} · {formatProductMoney(row.price)}
+                      </td>
+                    </tr>
+                  ))}
+                  {preview.errors?.map((error, index) => (
+                    <tr
+                      key={`error-${index}`}
+                      className="border-t border-pf-line text-pf-danger"
+                    >
+                      <td className="p-2">{error.row}</td>
+                      <td className="p-2">Skip</td>
+                      <td className="p-2">{error.message}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+            {preview.failedRowsCsv && (
+              <button
+                onClick={downloadFailed}
+                className="min-h-11 text-sm text-pf-accent underline"
+              >
+                Download skipped rows
+              </button>
+            )}
+            {file && preview.validRows > 0 && (
+              <button
+                disabled={Boolean(busy)}
+                onClick={() => upload(false)}
+                className="block min-h-11 rounded-lg bg-pf-accent px-4 text-sm font-semibold text-pf-canvas"
+              >
+                {busy === 'import'
+                  ? 'Importing…'
+                  : `Import ${preview.validRows} good ${preview.validRows === 1 ? 'row' : 'rows'}${preview.errorRows ? `, skip ${preview.errorRows}` : ''}`}
+              </button>
+            )}
           </div>
-          {preview ? <div className="mt-4"><p className="text-sm font-semibold text-pf-text">{preview.validRows} ready · {preview.errorRows} errors · {preview.totalRows} total</p><div className="mt-3 max-h-64 overflow-auto rounded-lg border border-pf-line"><table className="w-full text-sm"><thead className="bg-pf-canvas"><tr><th className="p-2 text-left">Row</th><th className="p-2 text-left">Result</th><th className="p-2 text-left">Details</th></tr></thead><tbody>{preview.records?.map((r) => <tr key={`r-${r.row}`} className="border-t border-pf-line"><td className="p-2">{r.row}</td><td className="p-2 text-pf-accent">Create</td><td className="p-2 break-words">{r.name} · {r.productType || 'No type'} · ${r.price}</td></tr>)}{preview.errors?.map((r, i) => <tr key={`e-${r.row}-${i}`} className="border-t border-pf-line bg-pf-danger-bg"><td className="p-2">{r.row}</td><td className="p-2 text-pf-danger">Error</td><td className="p-2 break-words">{r.field}: {r.message}</td></tr>)}</tbody></table></div>{preview.errorRows === 0 ? <button disabled={busy} onClick={() => upload(false)} className="mt-4 h-10 rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] hover:bg-emerald-400 disabled:opacity-50">Import products</button> : null}</div> : null}
-        </>}
-        {message ? <p role="status" className="mt-4 text-sm font-semibold text-pf-secondary">{message}</p> : null}
-    </Modal>
-  </>;
+        )}
+        {message && (
+          <p role="status" className="mt-4 text-sm">
+            {message}
+          </p>
+        )}
+      </Modal>
+    </>
+  );
 }

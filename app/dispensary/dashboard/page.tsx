@@ -1,3 +1,7 @@
+import { formatMoney } from '@/lib/format';
+import { signInDestination } from '@/lib/auth-navigation';
+import { isLicenseExpired } from '@/lib/license';
+import { BuyAgainButton } from '../components/BuyAgainButton';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
@@ -52,7 +56,10 @@ function SetupNextStepsCard({
   const completedItems = items.filter((item) => item.complete);
 
   return (
-    <details className="rounded-xl border border-pf-line bg-pf-surface px-4">
+    <details
+      open
+      className="rounded-xl border border-pf-line bg-pf-surface px-4"
+    >
       <summary className="min-h-11 cursor-pointer content-center text-sm font-semibold text-pf-text">
         {complete ? 'Setup complete' : `Setup · ${pendingItems.length} left`}
       </summary>
@@ -60,15 +67,26 @@ function SetupNextStepsCard({
         {pendingItems.length > 0 && (
           <div className="divide-y divide-pf-line">
             {pendingItems.map((item) => (
-              <div key={item.label} className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-2">
+              <div
+                key={item.label}
+                className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 py-2"
+              >
                 <p className="flex min-w-0 items-center gap-2 text-sm font-medium text-pf-text">
-                  <CircleAlert className="h-4 w-4 shrink-0 text-pf-warning" aria-hidden="true" />
+                  <CircleAlert
+                    className="h-4 w-4 shrink-0 text-pf-warning"
+                    aria-hidden="true"
+                  />
                   {item.label}
                 </p>
-                <Link href={item.href} className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg">
+                <Link
+                  href={item.href}
+                  className="inline-flex min-h-10 shrink-0 items-center rounded-lg px-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg"
+                >
                   {item.cta || 'Finish setup'}
                 </Link>
-                <p className="col-span-2 pl-6 text-xs text-pf-muted">{item.description}</p>
+                <p className="col-span-2 pl-6 text-xs text-pf-muted">
+                  {item.description}
+                </p>
               </div>
             ))}
           </div>
@@ -76,12 +94,26 @@ function SetupNextStepsCard({
 
         {completedItems.length > 0 && (
           <details className="rounded-lg border border-pf-line bg-pf-canvas px-3">
-            <summary className="min-h-10 cursor-pointer content-center text-xs font-medium text-pf-muted">Completed ({completedItems.length})</summary>
+            <summary className="min-h-10 cursor-pointer content-center text-xs font-medium text-pf-muted">
+              Completed ({completedItems.length})
+            </summary>
             <div className="divide-y divide-pf-line pb-2">
               {completedItems.map((item) => (
-                <Link key={item.label} href={item.href} className="flex min-h-10 items-start gap-2 py-2 text-sm hover:text-pf-accent">
-                  <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-pf-accent" aria-hidden="true" />
-                  <span className="min-w-0"><span className="block font-medium">{item.label}</span><span className="mt-0.5 block text-xs text-pf-muted">{item.description}</span></span>
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="flex min-h-10 items-start gap-2 py-2 text-sm hover:text-pf-accent"
+                >
+                  <CheckCircle2
+                    className="mt-0.5 h-4 w-4 shrink-0 text-pf-accent"
+                    aria-hidden="true"
+                  />
+                  <span className="min-w-0">
+                    <span className="block font-medium">{item.label}</span>
+                    <span className="mt-0.5 block text-xs text-pf-muted">
+                      {item.description}
+                    </span>
+                  </span>
                 </Link>
               ))}
             </div>
@@ -89,12 +121,27 @@ function SetupNextStepsCard({
         )}
 
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-lg bg-pf-accent-bg px-3 py-2">
-          <p className="min-w-0 text-xs text-pf-secondary" title={primaryAction.description}>{primaryAction.title}</p>
+          <p
+            className="min-w-0 text-xs text-pf-secondary"
+            title={primaryAction.description}
+          >
+            {primaryAction.title}
+          </p>
           <div className="flex flex-wrap items-center gap-2">
             {primaryAction.secondaryHref && primaryAction.secondaryCta && (
-              <Link href={primaryAction.secondaryHref} className="inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-medium text-pf-secondary hover:bg-pf-raised">{primaryAction.secondaryCta}</Link>
+              <Link
+                href={primaryAction.secondaryHref}
+                className="inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-medium text-pf-secondary hover:bg-pf-raised"
+              >
+                {primaryAction.secondaryCta}
+              </Link>
             )}
-            <Link href={primaryAction.href} className="inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-pf-accent hover:bg-pf-raised">{primaryAction.cta}</Link>
+            <Link
+              href={primaryAction.href}
+              className="inline-flex min-h-10 items-center rounded-lg px-2 text-xs font-semibold text-pf-accent hover:bg-pf-raised"
+            >
+              {primaryAction.cta}
+            </Link>
           </div>
         </div>
       </div>
@@ -114,25 +161,53 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     businessName: string;
     licenseNumber: string | null;
     licenseStatus: string;
+    licenseSubmittedAt: Date | null;
     licenseExpiry: Date | null;
     phone: string | null;
     address: string | null;
   } | null;
   last7Days: { day: string; revenue: number }[];
-  featuredProducts: { productId: string; name: string; category: string; pricePerUnit: number; quantity: number; grower: string }[];
+  featuredProducts: {
+    productId: string;
+    name: string;
+    category: string;
+    pricePerUnit: number;
+    quantity: number;
+    grower: string;
+  }[];
 }> {
   const since = startOfDay(subDays(new Date(), 6));
-  const [orders, profile, favoriteCount, priceAlertCount, statusTotals, growers, weekOrders, featuredItems] = await Promise.all([
-    db.order.findMany({ where: { dispensaryId }, select: {
-      id: true, orderId: true, status: true, createdAt: true, totalAmount: true, growerId: true,
-      grower: { select: { businessName: true } },
-    }, orderBy: { createdAt: 'desc' }, take: 10 }),
+  const [
+    orders,
+    profile,
+    favoriteCount,
+    priceAlertCount,
+    statusTotals,
+    growers,
+    weekOrders,
+    featuredItems,
+  ] = await Promise.all([
+    db.order.findMany({
+      where: { dispensaryId },
+      select: {
+        id: true,
+        orderId: true,
+        status: true,
+        createdAt: true,
+        totalAmount: true,
+        growerId: true,
+        grower: { select: { businessName: true } },
+      },
+      orderBy: { createdAt: 'desc' },
+      take: 10,
+    }),
     db.dispensary.findUnique({
       where: { id: dispensaryId },
       select: {
         businessName: true,
         licenseNumber: true,
         licenseStatus: true,
+        licenseSubmittedAt: true,
         licenseExpiry: true,
         phone: true,
         address: true,
@@ -140,17 +215,48 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     }),
     db.dispensaryFavoriteProduct.count({ where: { dispensaryId } }),
     db.dispensaryPriceAlert.count({ where: { dispensaryId } }),
-    db.order.groupBy({ by: ['status'], where: { dispensaryId }, _count: { _all: true }, _sum: { totalAmount: true } }),
-    db.order.groupBy({ by: ['growerId'], where: { dispensaryId, status: { not: 'CANCELLED' } } }),
-    db.order.findMany({ where: { dispensaryId, createdAt: { gte: since }, status: { not: 'CANCELLED' } }, select: { createdAt: true, totalAmount: true } }),
-    db.orderItem.findMany({ where: { order: { dispensaryId, status: { not: 'CANCELLED' } } }, distinct: ['productId'], orderBy: { createdAt: 'desc' }, take: 3,
-      select: { productId: true, unitPrice: true, quantity: true, product: { select: { name: true, productType: true } }, grower: { select: { businessName: true } } } }),
+    db.order.groupBy({
+      by: ['status'],
+      where: { dispensaryId },
+      _count: { _all: true },
+      _sum: { totalAmount: true },
+    }),
+    db.order.groupBy({
+      by: ['growerId'],
+      where: { dispensaryId, status: { not: 'CANCELLED' } },
+    }),
+    db.order.findMany({
+      where: {
+        dispensaryId,
+        createdAt: { gte: since },
+        status: { not: 'CANCELLED' },
+      },
+      select: { createdAt: true, totalAmount: true },
+    }),
+    db.orderItem.findMany({
+      where: { order: { dispensaryId, status: { not: 'CANCELLED' } } },
+      distinct: ['productId'],
+      orderBy: { createdAt: 'desc' },
+      take: 3,
+      select: {
+        productId: true,
+        unitPrice: true,
+        quantity: true,
+        product: { select: { name: true, productType: true } },
+        grower: { select: { businessName: true } },
+      },
+    }),
   ]);
 
   const activeGrowers = growers.length;
-  const trackedOrderValue = statusTotals.filter(row => row.status !== 'CANCELLED').reduce((sum, row) => sum + Number(row._sum.totalAmount ?? 0), 0);
-  const pendingOrders = statusTotals.find(row => row.status === 'PENDING')?._count._all ?? 0;
-  const activeOrders = statusTotals.filter(row => !['DELIVERED', 'CANCELLED'].includes(row.status)).reduce((sum, row) => sum + row._count._all, 0);
+  const trackedOrderValue = statusTotals
+    .filter((row) => row.status !== 'CANCELLED')
+    .reduce((sum, row) => sum + Number(row._sum.totalAmount ?? 0), 0);
+  const pendingOrders =
+    statusTotals.find((row) => row.status === 'PENDING')?._count._all ?? 0;
+  const activeOrders = statusTotals
+    .filter((row) => !['DELIVERED', 'CANCELLED'].includes(row.status))
+    .reduce((sum, row) => sum + row._count._all, 0);
 
   const last7Days = Array.from({ length: 7 }, (_, i) => {
     const date = subDays(new Date(), 6 - i);
@@ -158,7 +264,7 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     const dayEnd = new Date(dayStart);
     dayEnd.setHours(23, 59, 59, 999);
     const dayRevenue = weekOrders
-      .filter(o => {
+      .filter((o) => {
         const orderDate = new Date(o.createdAt);
         return orderDate >= dayStart && orderDate <= dayEnd;
       })
@@ -166,9 +272,13 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     return { day: format(date, 'MMM d'), revenue: dayRevenue };
   });
 
-  const featuredProducts = featuredItems.map(item => ({
-    productId: item.productId, name: item.product.name, category: item.product.productType || 'N/A',
-    pricePerUnit: Number(item.unitPrice), quantity: item.quantity, grower: item.grower.businessName,
+  const featuredProducts = featuredItems.map((item) => ({
+    productId: item.productId,
+    name: item.product.name,
+    category: item.product.productType || 'N/A',
+    pricePerUnit: Number(item.unitPrice),
+    quantity: item.quantity,
+    grower: item.grower.businessName,
   }));
 
   return {
@@ -187,89 +297,105 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
 
 export default async function DispensaryDashboardPage() {
   const session = await getAuthSession();
-  if (!session) redirect('/auth/sign_in');
-  const user = session.user as { role: string; growerId?: string; dispensaryId?: string };
+  if (!session) redirect(await signInDestination());
+  const user = session.user as {
+    role: string;
+    growerId?: string;
+    dispensaryId?: string;
+  };
   if (user.role !== 'DISPENSARY' || !user.dispensaryId) redirect('/dashboard');
 
   const data = await fetchDispensaryDashboardData(user.dispensaryId!);
   await ensureWeeklyLicenseExpiryNotification({
     userId: (session.user as { id: string }).id,
     expiry: data.profile?.licenseExpiry || null,
-    settingsHref: '/dispensary/settings#license',
+    settingsHref: '/dispensary/settings#license-verification',
   });
   const hasOrders = data.orders.length > 0;
   const hasSpending = data.last7Days.some((d) => d.revenue > 0);
   const maxDailySpend = Math.max(...data.last7Days.map((d) => d.revenue), 1);
-  const hasProfile = Boolean(data.profile?.businessName && data.profile.phone && data.profile.address);
-  const hasLicense = Boolean(data.profile?.licenseNumber && data.profile.licenseStatus === 'verified');
-  const hasSavedProducts = data.favoriteCount > 0 || data.priceAlertCount > 0 || data.featuredProducts.length > 0 || data.activeGrowers > 0;
+  const hasProfile = Boolean(data.profile?.businessName);
+  const hasLicense = Boolean(
+    data.profile?.licenseNumber &&
+      data.profile.licenseStatus === 'verified' &&
+      !isLicenseExpired(data.profile.licenseExpiry)
+  );
+  const hasSavedProducts =
+    data.favoriteCount > 0 ||
+    data.priceAlertCount > 0 ||
+    data.featuredProducts.length > 0 ||
+    data.activeGrowers > 0;
   const setupItems = [
     {
       label: 'Profile',
-      description: hasProfile ? 'Your business details are ready.' : 'Add your contact details and business address.',
-      href: '/dispensary/settings',
+      description: hasProfile
+        ? 'Your business details are ready.'
+        : 'Add your contact details and business address.',
+      href: '/dispensary/settings#business-profile',
       complete: hasProfile,
       cta: 'Complete profile',
     },
     {
       label: 'License',
-      description: hasLicense ? 'Retail license is verified.' : 'Add a current license so you can send order requests.',
-      href: '/dispensary/settings',
+      description: hasLicense
+        ? 'Retail license is verified.'
+        : 'Add a current license so you can send orders.',
+      href: '/dispensary/settings#license-verification',
       complete: hasLicense,
       cta: 'Review license',
     },
     {
       label: 'Suppliers',
-      description: hasSavedProducts ? 'You have saved products or ordered from a grower.' : 'Browse growers and save useful products.',
+      description: hasSavedProducts
+        ? 'You have saved products or ordered from a grower.'
+        : 'Browse growers and save useful products.',
       href: '/dispensary/catalog',
       complete: hasSavedProducts,
       cta: 'Browse catalog',
     },
     {
-      label: 'Cart',
-      description: data.activeOrders > 0 ? 'You have active requests to track.' : 'Add products to your cart when you are ready.',
-      href: '/dispensary/cart',
-      complete: data.activeOrders > 0,
-      cta: 'View cart',
-    },
-    {
-      label: 'Request tracking',
-      description: hasOrders ? 'Request history is available for follow-up.' : 'Submitted requests will appear in request tracking.',
+      label: 'First order',
+      description: hasOrders
+        ? 'Order history is available for follow-up.'
+        : 'Send an order when you are ready.',
       href: '/dispensary/orders',
       complete: hasOrders,
-      cta: 'View requests',
+      cta: 'View orders',
     },
   ];
   const setupComplete = setupItems.every((item) => item.complete);
-  const primaryAction = data.pendingOrders > 0
-    ? {
-        title: 'Track requests waiting on growers',
-        description: 'Check requests that are waiting for a grower’s response.',
-        href: '/dispensary/orders',
-        cta: 'Track requests',
-        secondaryHref: '/dispensary/cart',
-        secondaryCta: 'View cart',
-      }
-    : data.activeOrders > 0
+  const primaryAction =
+    data.pendingOrders > 0
       ? {
-          title: 'Review active request progress',
-          description: 'Check grower responses and pickup or delivery progress.',
+          title: 'Track orders waiting on growers',
+          description: 'Check orders that are waiting for a grower’s response.',
           href: '/dispensary/orders',
-          cta: 'Review requests',
-          secondaryHref: '/dispensary/catalog',
-          secondaryCta: 'Browse catalog',
+          cta: 'Track orders',
+          secondaryHref: '/dispensary/cart',
+          secondaryCta: 'View cart',
         }
-      : {
-          title: 'Build a request from the catalog',
-          description: 'Add products to your cart, then review quantities, pickup or delivery, and payment terms.',
-          href: '/dispensary/catalog',
-          cta: 'Browse products',
-          secondaryHref: '/dispensary/saved',
-          secondaryCta: 'View saved products',
-        };
+      : data.activeOrders > 0
+        ? {
+            title: 'Review active order progress',
+            description:
+              'Check grower responses and pickup or delivery progress.',
+            href: '/dispensary/orders',
+            cta: 'Review orders',
+            secondaryHref: '/dispensary/catalog',
+            secondaryCta: 'Browse catalog',
+          }
+        : {
+            title: 'Build an order from the catalog',
+            description:
+              'Add products to your cart, then review quantities, pickup or delivery, and payment terms.',
+            href: '/dispensary/catalog',
+            cta: 'Browse products',
+            secondaryHref: '/dispensary/saved',
+            secondaryCta: 'View saved products',
+          };
 
   // Serialize orders for client component
-  const serializedOrders = data.orders.map(order => ({
+  const serializedOrders = data.orders.map((order) => ({
     id: order.id,
     orderId: order.orderId,
     status: order.status,
@@ -285,52 +411,93 @@ export default async function DispensaryDashboardPage() {
         title="Overview"
         mobileInlineActions
         actions={
-          <Link href="/dispensary/catalog" className="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-3 text-sm font-medium text-[#032116] hover:bg-emerald-400">
+          <Link
+            href="/dispensary/catalog"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-emerald-500 px-3 text-sm font-medium text-[#032116] hover:bg-emerald-400"
+          >
             Browse catalog
           </Link>
         }
       />
 
-      {data.profile?.licenseStatus === 'pending_review' && !data.profile.licenseNumber ? <LicenseVerificationCard /> : !hasLicense ? (
-        <Link href="/dispensary/settings#license-verification" className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-pf-warning-line bg-pf-warning-bg px-3 py-2 text-sm text-pf-warning">
-          <span className="flex min-w-0 items-center gap-2"><CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />License verification needed</span>
+      {data.profile?.licenseStatus === 'pending_review' &&
+      !data.profile.licenseNumber ? (
+        <LicenseVerificationCard />
+      ) : data.profile?.licenseStatus === 'pending_review' &&
+        data.profile.licenseSubmittedAt ? (
+        <p className="rounded-lg bg-pf-info-bg p-3 text-sm text-pf-info">
+          Submitted — under review (usually 1–2 business days).
+        </p>
+      ) : !hasLicense ? (
+        <Link
+          href="/dispensary/settings#license-verification"
+          className="flex min-h-11 items-center justify-between gap-3 rounded-lg border border-pf-warning-line bg-pf-warning-bg px-3 py-2 text-sm text-pf-warning"
+        >
+          <span className="flex min-w-0 items-center gap-2">
+            <CircleAlert className="h-4 w-4 shrink-0" aria-hidden="true" />
+            License verification needed
+          </span>
           <span className="shrink-0 font-medium">Review →</span>
         </Link>
       ) : null}
 
+      {!setupComplete && (
+        <SetupNextStepsCard
+          items={setupItems}
+          primaryAction={primaryAction}
+          complete={setupComplete}
+        />
+      )}
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {hasOrders ? (
           <>
-            <StatCard title="Request value" value={`$${data.trackedOrderValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}`} />
-            <StatCard title="Awaiting response" value={data.pendingOrders} valueClassName="text-pf-info" />
-            <StatCard title="Growers" value={data.activeGrowers} valueClassName="text-pf-warning" />
-            <StatCard title="In progress" value={Math.max(0, data.activeOrders - data.pendingOrders)} valueClassName="text-pf-accent" />
+            <StatCard
+              title="Order value"
+              value={formatMoney(data.trackedOrderValue)}
+            />
+            <StatCard
+              title="Awaiting response"
+              value={data.pendingOrders}
+              valueClassName="text-pf-info"
+            />
+            <StatCard
+              title="Growers"
+              value={data.activeGrowers}
+              valueClassName="text-pf-warning"
+            />
+            <StatCard
+              title="In progress"
+              value={Math.max(0, data.activeOrders - data.pendingOrders)}
+              valueClassName="text-pf-accent"
+            />
           </>
-        ) : (
-          <>
-            <StatCard title="Request value" value="$0.00" helperText="No data yet" isEmpty valueClassName="text-pf-muted" />
-            <StatCard title="Awaiting response" value="0" helperText="No data yet" isEmpty valueClassName="text-pf-muted" />
-            <StatCard title="Growers" value="0" helperText="No data yet" isEmpty valueClassName="text-pf-muted" />
-            <StatCard title="In progress" value="0" helperText="No data yet" isEmpty valueClassName="text-pf-muted" />
-          </>
-        )}
+        ) : null}
       </div>
 
-
-      <Link href="/dispensary/saved" className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border border-pf-line bg-pf-surface px-4 py-3 text-sm shadow-sm hover:border-pf-accent-line focus-visible:ring-2 focus-visible:ring-emerald-400">
+      <Link
+        href="/dispensary/saved"
+        className="flex min-h-12 flex-wrap items-center justify-between gap-x-4 gap-y-1 rounded-xl border border-pf-line bg-pf-surface px-4 py-3 text-sm shadow-sm hover:border-pf-accent-line focus-visible:ring-2 focus-visible:ring-emerald-400"
+      >
         <span className="font-semibold text-pf-text">Saved</span>
-        <span className="text-pf-muted">Favorites {data.favoriteCount} · Alerts {data.priceAlertCount}</span>
+        <span className="text-pf-muted">
+          Favorites {data.favoriteCount} · Alerts {data.priceAlertCount}
+        </span>
       </Link>
 
-      {/* Recent requests with date filter */}
+      {/* Recent orders with date filter */}
       <Card className="bg-pf-surface shadow-sm border border-pf-line">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <h3 className="text-base font-semibold text-pf-text sm:text-lg">Recent requests</h3>
+              <h3 className="text-base font-semibold text-pf-text sm:text-lg">
+                Recent orders
+              </h3>
             </div>
-            <Link href="/dispensary/orders" className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent hover:text-pf-accent">
+            <Link
+              href="/dispensary/orders"
+              className="inline-flex min-h-10 items-center text-sm font-medium text-pf-accent hover:text-pf-accent"
+            >
               View all
             </Link>
           </div>
@@ -348,41 +515,78 @@ export default async function DispensaryDashboardPage() {
       </Card>
 
       <div className="space-y-1">
-        <SetupNextStepsCard items={setupItems} primaryAction={primaryAction} complete={setupComplete} />
         <details className="text-xs text-pf-muted">
-          <summary className="w-fit cursor-pointer py-2">About these totals</summary>
-          <p className="mt-1 max-w-2xl">Request value excludes cancelled requests. Awaiting response means the grower has not accepted yet. In progress includes accepted requests through delivery.</p>
+          <summary className="w-fit cursor-pointer py-2">
+            About these totals
+          </summary>
+          <p className="mt-1 max-w-2xl">
+            Order value excludes cancelled orders. Awaiting response means the
+            grower has not accepted yet. In progress includes accepted orders
+            through delivery.
+          </p>
         </details>
       </div>
-
 
       {/* Featured Products & 7-Day Order Value */}
       <div className="grid grid-cols-1 lg:grid-cols-2 items-start gap-3 sm:gap-4">
         <Card className="bg-pf-surface shadow-sm border border-pf-line">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-pf-text">Recently requested</h3>
+            <h3 className="text-lg font-semibold text-pf-text">
+              Recently ordered
+            </h3>
           </CardHeader>
           <CardContent>
             {data.featuredProducts.length === 0 ? (
               <EmptyState
                 icon={
-                  <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  <svg
+                    className="w-8 h-8"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={1.5}
+                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                    />
                   </svg>
                 }
                 title="No products yet"
-                description="Requested products appear here for easy reference."
-                action={{ label: 'Browse catalog', href: '/dispensary/catalog' }}
+                description="Ordered products appear here for easy reference."
+                action={{
+                  label: 'Browse catalog',
+                  href: '/dispensary/catalog',
+                }}
               />
             ) : (
               <div className="space-y-3">
                 {data.featuredProducts.map((product) => (
-                  <div key={product.productId} className="flex justify-between items-center gap-3 py-2 border-b border-pf-line last:border-0">
+                  <div
+                    key={product.productId}
+                    className="flex justify-between items-center gap-3 py-2 border-b border-pf-line last:border-0"
+                  >
                     <div>
-                      <p className="break-words text-sm font-medium text-pf-text">{product.name}</p>
-                      <p className="text-xs text-pf-muted">{product.category} • from {product.grower}</p>
+                      <Link
+                        href={`/dispensary/catalog?product=${product.productId}`}
+                        className="break-words text-sm font-medium text-pf-text hover:underline"
+                      >
+                        {product.name}
+                      </Link>
+                      <p className="text-xs text-pf-muted">
+                        {product.category} • from {product.grower}
+                      </p>
                     </div>
-                    <span className="text-sm font-bold text-pf-text">${product.pricePerUnit.toFixed(2)}</span>
+                    <BuyAgainButton
+                      items={[
+                        {
+                          productId: product.productId,
+                          quantity: product.quantity,
+                        },
+                      ]}
+                      label="Buy again"
+                    />
                   </div>
                 ))}
               </div>
@@ -392,20 +596,32 @@ export default async function DispensaryDashboardPage() {
 
         <Card className="bg-pf-surface shadow-sm border border-pf-line">
           <CardHeader>
-            <h3 className="text-lg font-semibold text-pf-text">7-day request value</h3>
+            <h3 className="text-lg font-semibold text-pf-text">
+              7-day order value
+            </h3>
           </CardHeader>
           <CardContent>
             {!hasSpending ? (
-              <p className="text-sm text-pf-muted">No requests this week.</p>
+              <p className="text-sm text-pf-muted">No orders this week.</p>
             ) : (
               <div className="h-40 sm:h-48 flex items-end justify-between gap-1 sm:gap-2 px-2 sm:px-0 overflow-x-auto pb-1">
                 {data.last7Days.map((day, index) => (
-                  <div key={index} className="flex h-full flex-1 flex-col items-center gap-1 sm:gap-2 min-w-[36px]">
+                  <div
+                    key={index}
+                    className="flex h-full flex-1 flex-col items-center gap-1 sm:gap-2 min-w-[36px]"
+                  >
                     <div className="flex min-h-0 w-full flex-1 items-end">
-                      <div className="w-full bg-emerald-500 rounded-t-sm" style={{ height: `${Math.min((day.revenue / maxDailySpend) * 100, 100)}%` }} />
+                      <div
+                        className="w-full bg-emerald-500 rounded-t-sm"
+                        style={{
+                          height: `${Math.min((day.revenue / maxDailySpend) * 100, 100)}%`,
+                        }}
+                      />
                     </div>
                     <span className="text-xs text-pf-muted">{day.day}</span>
-                    <span className="text-xs font-medium text-pf-accent">${Math.round(day.revenue)}</span>
+                    <span className="text-xs font-medium text-pf-accent">
+                      ${Math.round(day.revenue)}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -423,10 +639,12 @@ export default async function DispensaryDashboardPage() {
                 <Store className="h-5 w-5" />
                 Find your next grower
               </h3>
-              <p className="mt-1 text-sm text-pf-secondary">Browse grower catalogs to start a request.</p>
+              <p className="mt-1 text-sm text-pf-secondary">
+                Browse grower catalogs to start an order.
+              </p>
             </div>
-            <Link 
-              href="/dispensary/catalog" 
+            <Link
+              href="/dispensary/catalog"
               className="px-4 py-2 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 text-sm font-medium transition-colors whitespace-nowrap"
             >
               Browse catalog

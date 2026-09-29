@@ -1,192 +1,226 @@
 'use client';
-
-import { useState, useEffect, useRef } from 'react';
-import { Button } from '@/app/components/ui/Button';
-import { toast } from '@/app/hooks/useToast';
-import { STRAIN_TYPES, STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
-
-interface Strain {
+import { useCallback, useEffect, useId, useRef, useState } from 'react';
+import {
+  STRAIN_TYPES,
+  STRAIN_TYPE_LABELS,
+  type StrainTypeValue,
+} from '@/lib/strain-types';
+export interface StrainOption {
   id: string;
   name: string;
   strainType: StrainTypeValue | null;
   genetics: string | null;
 }
-
-interface StrainSelectorProps {
+const input =
+  'min-h-11 min-w-0 w-full rounded-lg border border-pf-line-strong bg-pf-raised px-3 text-sm';
+export function StrainSelector({
+  strainId,
+  onStrainChange,
+  inputId = 'strainId',
+}: {
   strainId: string;
-  onStrainChange: (strainId: string | null, strainName?: string) => void;
-}
-
-// Consistent input styles - h-10 matches text inputs
-const INPUT_CLASSES = "min-w-0 w-full h-10 px-3 py-2 text-base sm:px-4 border border-pf-line-strong rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent";
-const SMALL_INPUT_CLASSES = "min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:ring-2 focus:ring-green-500 focus:border-transparent";
-
-export function StrainSelector({ strainId, onStrainChange }: StrainSelectorProps) {
-  const [strains, setStrains] = useState<Strain[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showCreateForm, setShowCreateForm] = useState(false);
-  const [newStrainName, setNewStrainName] = useState('');
-  const [newStrainType, setNewStrainType] = useState<StrainTypeValue | ''>('');
-  const [newStrainGenetics, setNewStrainGenetics] = useState('');
-  const [creating, setCreating] = useState(false);
-
-  useEffect(() => {
-    const controller = new AbortController();
-    let isActive = true;
-
-    const fetchStrains = async () => {
-      try {
-        const response = await fetch('/api/strains?summary=true', { signal: controller.signal });
-        if (!isActive) return;
-
-        if (response.ok) {
-          const data = await response.json();
-          if (isActive) {
-            setStrains(data);
-          }
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name === 'AbortError') return;
-      } finally {
-        if (isActive) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchStrains();
-
-    return () => {
-      isActive = false;
-      controller.abort();
-    };
-  }, []);
-
-  const pendingRef = useRef(false);
-  const handleCreateStrain = async () => {
-    if (!newStrainName.trim() || !newStrainType || pendingRef.current) return;
-    pendingRef.current = true;
-    
+  onStrainChange: (id: string | null, name?: string) => void;
+  inputId?: string;
+}) {
+  const prefix = useId(),
+    [strains, setStrains] = useState<StrainOption[]>([]),
+    [search, setSearch] = useState(''),
+    [loading, setLoading] = useState(true),
+    [loadError, setLoadError] = useState('');
+  const [creating, setCreating] = useState(false),
+    [open, setOpen] = useState(false),
+    [error, setError] = useState('');
+  const [name, setName] = useState(''),
+    [type, setType] = useState(''),
+    [genetics, setGenetics] = useState('');
+  const nameRef = useRef<HTMLInputElement>(null);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setLoadError('');
     try {
-      setCreating(true);
+      const response = await fetch('/api/strains?summary=true');
+      if (!response.ok) throw new Error('Could not load strains.');
+      setStrains(await response.json());
+    } catch (error) {
+      setLoadError(error instanceof Error ? error.message : 'Connection lost.');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+  useEffect(() => {
+    void load();
+  }, [load]);
+  async function create() {
+    if (creating) return;
+    if (!name.trim()) {
+      setError('Enter a strain name.');
+      nameRef.current?.focus();
+      return;
+    }
+    setCreating(true);
+    setError('');
+    try {
       const response = await fetch('/api/strains', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: newStrainName.trim(),
-          strainType: newStrainType,
-          genetics: newStrainGenetics.trim() || null
-        })
+          name,
+          strainType: type || null,
+          genetics: genetics || null,
+        }),
       });
-
-      if (response.ok) {
-        const newStrain = await response.json();
-        setStrains((current) => [...current, newStrain]);
-        onStrainChange(newStrain.id, newStrain.name);
-        setShowCreateForm(false);
-        setNewStrainName('');
-        setNewStrainType('');
-        setNewStrainGenetics('');
-      } else {
-        const err = await response.json().catch(() => ({}));
-        toast.error(err.error || 'We could not create strain. Please try again.');
-      }
-    } catch (err) {
-      console.error('Error creating strain:', err);
-      toast.error('Network error creating strain');
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not save strain.');
+      setStrains((current) =>
+        [...current, data].sort((a, b) => a.name.localeCompare(b.name))
+      );
+      onStrainChange(data.id, data.name);
+      setOpen(false);
+      setName('');
+      setType('');
+      setGenetics('');
+      setSearch('');
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : 'Connection lost. Retry.'
+      );
     } finally {
-      pendingRef.current = false;
       setCreating(false);
     }
-  };
-
-  if (loading) {
-    return (
-      <div className="h-10 bg-pf-surface animate-pulse rounded-lg"></div>
-    );
   }
-
+  const options = strains.filter(
+    (strain) =>
+      strain.id === strainId ||
+      `${strain.name} ${strain.genetics || ''}`
+        .toLowerCase()
+        .includes(search.toLowerCase())
+  );
   return (
     <div className="space-y-2">
-      <div className="flex items-center gap-2">
+      {strains.length > 6 && (
+        <input
+          type="search"
+          aria-label="Search strains"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search strains"
+          className={input}
+        />
+      )}
+      <div className="flex gap-2">
         <select
-          id="strainId"
+          id={inputId}
+          aria-label="Strain"
           value={strainId}
-          onChange={(e) => {
-            const selectedValue = e.target.value || null;
-            onStrainChange(selectedValue);
-            if (selectedValue) {
-              setShowCreateForm(false);
-            }
+          onChange={(event) => {
+            const strain = strains.find(
+              (strain) => strain.id === event.target.value
+            );
+            onStrainChange(strain?.id || null, strain?.name);
           }}
-          className={INPUT_CLASSES}
+          className={input}
         >
-          <option value="">Choose strain</option>
-          {strains.map(strain => (
+          <option value="">{loading ? 'Loading strains…' : 'No strain'}</option>
+          {options.map((strain) => (
             <option key={strain.id} value={strain.id}>
               {strain.name}
-              {strain.strainType ? ` • ${STRAIN_TYPE_LABELS[strain.strainType]}` : ''}
-              {strain.genetics ? ` (${strain.genetics})` : ''}
+              {strain.strainType
+                ? ` · ${STRAIN_TYPE_LABELS[strain.strainType]}`
+                : ''}
             </option>
           ))}
         </select>
-        <Button 
-          type="button" 
-          variant="outline" 
-          size="sm"
-          onClick={() => setShowCreateForm(!showCreateForm)}
+        <button
+          type="button"
+          onClick={() => setOpen((current) => !current)}
+          className="min-h-11 shrink-0 rounded-lg border border-pf-line-strong px-3 text-sm"
         >
           + New
-        </Button>
+        </button>
       </div>
-
-      {showCreateForm && (
-        <div className="p-3 sm:p-4 bg-pf-canvas rounded-lg border border-pf-line space-y-3" onKeyDown={(event) => { if (event.key === 'Enter') { event.preventDefault(); event.stopPropagation(); void handleCreateStrain(); } }}>
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-pf-secondary">New strain</span>
-            <button 
-              type="button"
-              onClick={() => setShowCreateForm(false)}
-              aria-label="Close strain form"
-              className="flex h-10 w-10 items-center justify-center text-xl text-pf-muted hover:text-pf-secondary"
+      {loadError && (
+        <p role="alert" className="text-sm text-pf-danger">
+          {loadError}{' '}
+          <button type="button" onClick={load} className="min-h-11 underline">
+            Retry
+          </button>
+        </p>
+      )}
+      {!loading && !loadError && !strains.length && (
+        <p className="text-sm text-pf-muted">
+          No strains yet. Add one, or leave blank.
+        </p>
+      )}
+      {open && (
+        <fieldset
+          className="space-y-3 rounded-lg border border-pf-line p-3"
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') {
+              event.preventDefault();
+              void create();
+            }
+          }}
+        >
+          <legend className="px-1 text-sm font-semibold">New strain</legend>
+          <label htmlFor={`${prefix}-name`} className="block text-sm">
+            Name
+            <input
+              id={`${prefix}-name`}
+              ref={nameRef}
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              aria-invalid={Boolean(error)}
+              className={input}
+            />
+          </label>
+          <label htmlFor={`${prefix}-type`} className="block text-sm">
+            Type (optional)
+            <select
+              id={`${prefix}-type`}
+              value={type}
+              onChange={(event) => setType(event.target.value)}
+              className={input}
             >
-              ×
+              <option value="">Not specified</option>
+              {STRAIN_TYPES.map((type) => (
+                <option key={type} value={type}>
+                  {STRAIN_TYPE_LABELS[type]}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label htmlFor={`${prefix}-genetics`} className="block text-sm">
+            Genetics
+            <input
+              id={`${prefix}-genetics`}
+              value={genetics}
+              onChange={(event) => setGenetics(event.target.value)}
+              className={input}
+            />
+          </label>
+          {error && (
+            <p role="alert" className="text-sm text-pf-danger">
+              {error}
+            </p>
+          )}
+          <div className="flex gap-3">
+            <button
+              disabled={creating}
+              type="button"
+              onClick={create}
+              className="min-h-11 rounded-lg bg-pf-accent px-4 text-sm font-semibold text-pf-canvas"
+            >
+              {creating ? 'Saving…' : 'Add strain'}
+            </button>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              className="min-h-11 px-3 text-sm"
+            >
+              Cancel
             </button>
           </div>
-          <input
-            type="text"
-            value={newStrainName}
-            onChange={(e) => setNewStrainName(e.target.value)}
-            placeholder="Strain name *"
-            className={SMALL_INPUT_CLASSES}
-          />
-          <select
-            value={newStrainType}
-            onChange={(e) => setNewStrainType(e.target.value as StrainTypeValue)}
-            className={SMALL_INPUT_CLASSES}
-          >
-            <option value="">Select strain type *</option>
-            {STRAIN_TYPES.map((type) => (
-              <option key={type} value={type}>{STRAIN_TYPE_LABELS[type]}</option>
-            ))}
-          </select>
-          <input
-            type="text"
-            value={newStrainGenetics}
-            onChange={(e) => setNewStrainGenetics(e.target.value)}
-            placeholder="Genetics (optional)"
-            className={SMALL_INPUT_CLASSES}
-          />
-          <Button 
-            type="button"
-            variant="primary"
-            size="sm"
-            onClick={handleCreateStrain}
-            disabled={!newStrainName.trim() || !newStrainType || creating}
-          >
-            {creating ? 'Creating...' : 'Add strain'}
-          </Button>
-        </div>
+        </fieldset>
       )}
     </div>
   );

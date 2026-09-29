@@ -1,8 +1,59 @@
 'use client';
-
-import { Download } from 'lucide-react';
-
-export function StatementCsvExport({ name, rows }: { name: string; rows: string[][] }) {
-  const download = () => { const quote = (value: string) => /[",\n]/.test(value) ? `"${value.replaceAll('"', '""')}"` : value; const csv = rows.map((row) => row.map(quote).join(',')).join('\n'); const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' })); const link = document.createElement('a'); link.href = url; link.download = `${name.replace(/[^a-z0-9]+/gi, '-').toLowerCase()}-statement.csv`; link.click(); URL.revokeObjectURL(url); };
-  return <button type="button" onClick={download} className="inline-flex h-10 items-center gap-2 rounded-lg border border-pf-line-strong bg-pf-surface px-4 text-sm font-semibold text-pf-secondary hover:bg-pf-canvas focus-visible:ring-2 focus-visible:ring-pf-accent"><Download className="h-4 w-4" />Export CSV</button>;
+import { Button } from '@/app/components/ui/Button';
+import { buildPdfBlob } from '@/app/grower/reports/ReportsExportActions';
+function download(blob: Blob, name: string) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  a.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+export function StatementCsvExport({
+  name,
+  rows,
+}: {
+  name: string;
+  rows: string[][];
+}) {
+  const filename =
+    name.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '-statement';
+  const quote = (value: string) =>
+    `"${(/^[\s]*[=+@-]/.test(value) ? "'" : '') + value.replaceAll('"', '""')}"`;
+  return (
+    <div className="flex flex-wrap gap-2">
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() =>
+          download(
+            new Blob([rows.map((r) => r.map(quote).join(',')).join('\r\n')], {
+              type: 'text/csv;charset=utf-8',
+            }),
+            filename + '.csv'
+          )
+        }
+      >
+        Export CSV
+      </Button>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() =>
+          download(
+            buildPdfBlob([
+              `${name} statement`,
+              ...rows.map((r) => r.join(' | ')),
+            ]),
+            filename + '.pdf'
+          )
+        }
+      >
+        Export PDF
+      </Button>
+      <Button type="button" variant="outline" onClick={() => window.print()}>
+        Print
+      </Button>
+    </div>
+  );
 }

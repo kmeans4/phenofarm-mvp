@@ -2,7 +2,7 @@
 
 import { useId, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { AlertTriangle, X } from 'lucide-react';
+import { AlertTriangle, Check, X } from 'lucide-react';
 import { useFocusTrap } from '@/app/hooks/useFocusTrap';
 import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
 
@@ -34,21 +34,25 @@ export function ConfirmDialog({
   const dialogRef = useRef<HTMLDivElement | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement | null>(null);
   const confirmButtonRef = useRef<HTMLButtonElement | null>(null);
-  const initialFocusRef = intent === 'danger' ? cancelButtonRef : confirmButtonRef;
+  const initialFocusRef =
+    intent === 'danger' ? cancelButtonRef : confirmButtonRef;
 
   useFocusTrap({
     active: open,
     containerRef: dialogRef,
     initialFocusRef,
-    onEscape: () => { if (!loading) onCancel(); },
+    onEscape: () => {
+      if (!loading) onCancel();
+    },
   });
   useBodyOverlay(open);
 
   if (!open || typeof document === 'undefined') return null;
 
-  const confirmClasses = intent === 'danger'
-    ? 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600'
-    : 'bg-emerald-500 text-[#032116] hover:bg-emerald-400 focus-visible:ring-emerald-400';
+  const confirmClasses =
+    intent === 'danger'
+      ? 'bg-red-600 text-white hover:bg-red-700 focus-visible:ring-red-600'
+      : 'bg-emerald-500 text-[#032116] hover:bg-emerald-400 focus-visible:ring-emerald-400';
 
   return createPortal(
     <div
@@ -68,14 +72,25 @@ export function ConfirmDialog({
       >
         <div className="flex items-start justify-between gap-4 border-b border-pf-line p-5">
           <div className="flex min-w-0 items-start gap-3">
-            <span className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${intent === 'danger' ? 'bg-pf-danger-bg text-pf-danger' : 'bg-pf-accent-bg text-pf-accent'}`}>
-              <AlertTriangle className="h-5 w-5" />
+            <span
+              className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-full ${intent === 'danger' ? 'bg-pf-danger-bg text-pf-danger' : 'bg-pf-accent-bg text-pf-accent'}`}
+            >
+              {intent === 'danger' ? (
+                <AlertTriangle className="h-5 w-5" />
+              ) : (
+                <Check className="h-5 w-5" />
+              )}
             </span>
             <div>
               <h2 id={titleId} className="text-lg font-semibold text-pf-text">
                 {title}
               </h2>
-              <p id={descriptionId} className="mt-1 text-sm leading-6 text-pf-muted">{description}</p>
+              <p
+                id={descriptionId}
+                className="mt-1 text-sm leading-6 text-pf-muted"
+              >
+                {description}
+              </p>
             </div>
           </div>
           <button
@@ -110,6 +125,7 @@ export function ConfirmDialog({
           </button>
         </div>
       </div>
-    </div>, document.body
+    </div>,
+    document.body
   );
 }

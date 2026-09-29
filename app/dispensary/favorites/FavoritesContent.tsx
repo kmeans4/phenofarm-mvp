@@ -1,19 +1,29 @@
 'use client';
 
-import { Modal } from '@/app/components/ui/Modal';
+import { useSession } from 'next-auth/react';
 import { getThcBadgeColor, getStrainTypeColor } from '@/lib/product-badges';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useBuyerCollection } from '../hooks/useBuyerCollection';
-import Link from "next/link";
-import { LayoutGrid, List as ListIcon, Heart, HeartOff, ShoppingCart, Loader2, MessageCircle } from "lucide-react";
-import AddToCartButton from "../catalog/components/AddToCartButton";
-import { PageHeader } from "@/app/components/ui/PageHeader";
+import { formatProductUnit } from '@/lib/product-display';
+import { formatMoney } from '@/lib/format';
+import Link from 'next/link';
+import {
+  LayoutGrid,
+  List as ListIcon,
+  Heart,
+  HeartOff,
+  ShoppingCart,
+  Loader2,
+  MessageCircle,
+} from 'lucide-react';
+import AddToCartButton from '../catalog/components/AddToCartButton';
+import { PageHeader } from '@/app/components/ui/PageHeader';
 import { toast } from '@/app/hooks/useToast';
 import { ProductImage } from '@/app/components/ui/ProductImage';
 import type { LabReportKey } from '@/lib/lab-reports';
 import { LabReportDownloads } from '@/app/dispensary/components/LabReportDownloads';
 
-function displayUnit(unit: string | null | undefined) { return unit?.toLowerCase() === 'gram' ? 'g' : unit || 'unit'; }
+const displayUnit = formatProductUnit;
 
 interface Product {
   id: string;
@@ -39,10 +49,15 @@ interface Product {
   };
 }
 
-type SortOption = 'default' | 'price-asc' | 'price-desc' | 'thc-desc' | 'thc-asc' | 'name-asc' | 'name-desc';
+type SortOption =
+  | 'default'
+  | 'price-asc'
+  | 'price-desc'
+  | 'thc-desc'
+  | 'thc-asc'
+  | 'name-asc'
+  | 'name-desc';
 type MessageMode = 'REQUEST_PRICING' | 'QUESTION';
-
-
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
   { value: 'default', label: 'Newest' },
@@ -55,125 +70,241 @@ const SORT_OPTIONS: { value: SortOption; label: string }[] = [
 ];
 
 function normalizeFavoriteIds(value: unknown): string[] {
-  return Array.isArray(value) ? [...new Set(value.filter((id): id is string => typeof id === 'string' && !!id))] : [];
+  return Array.isArray(value)
+    ? [
+        ...new Set(
+          value.filter((id): id is string => typeof id === 'string' && !!id)
+        ),
+      ]
+    : [];
 }
 
 interface FavoritesContentProps {
   embedded?: boolean;
 }
 
-export default function FavoritesContent({ embedded = false }: FavoritesContentProps) {
-  const { items: favorites, setItems: setFavorites, ready, error: syncError } = useBuyerCollection('favorites', normalizeFavoriteIds);
+export default function FavoritesContent({
+  embedded = false,
+}: FavoritesContentProps) {
+  const {
+    items: favorites,
+    setItems: setFavorites,
+    ready,
+    error: syncError,
+    retry,
+  } = useBuyerCollection('favorites', normalizeFavoriteIds);
   const [favoriteProducts, setFavoriteProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<SortOption>('default');
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [openingConversationKey, setOpeningConversationKey] = useState<string | null>(null);
+  const userId = useSession().data?.user?.id;
+  const [loadError, setLoadError] = useState('');
+  const [reload, setReload] = useState(0);
+  useEffect(() => {
+    if (!userId) return;
+    try {
+      const preferences = JSON.parse(
+        localStorage.getItem(`phenoshop:${userId}:catalog`) || 'null'
+      );
+      if (preferences)
+        setViewMode(preferences.viewMode === 'list' ? 'list' : 'grid');
+    } catch {}
+  }, [userId]);
+  const [openingConversationKey, setOpeningConversationKey] = useState<
+    string | null
+  >(null);
   const productCache = useRef(new Map<string, Product>());
   useEffect(() => {
     if (!ready) return;
     const controller = new AbortController();
-    const missing = favorites.filter(id => !productCache.current.has(id));
-    const populate = () => setFavoriteProducts(favorites.map(id => productCache.current.get(id)).filter((product): product is Product => !!product));
-    if (!missing.length) { populate(); setIsLoading(false); return; }
+    const missing = favorites.filter((id) => !productCache.current.has(id));
+    const populate = () =>
+      setFavoriteProducts(
+        favorites
+          .map((id) => productCache.current.get(id))
+          .filter((product): product is Product => !!product)
+      );
+    if (!missing.length) {
+      populate();
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
+    setLoadError('');
     void (async () => {
       try {
-        const response = await fetch('/api/dispensary/favorites', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ productIds: missing }), signal: controller.signal });
+        const response = await fetch('/api/dispensary/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ productIds: missing }),
+          signal: controller.signal,
+        });
         const data = await response.json();
-        if (!response.ok || !Array.isArray(data.products)) throw new Error('Unable to load favorite products.');
+        if (!response.ok || !Array.isArray(data.products))
+          throw new Error('Unable to load favorite products.');
         if (controller.signal.aborted) return;
         for (const product of data.products) {
-          if (typeof product?.id === 'string' && product.grower?.id && Array.isArray(product.images)) productCache.current.set(product.id, { ...product, price: product.price == null ? 0 : Number(product.price) });
+          if (
+            typeof product?.id === 'string' &&
+            product.grower?.id &&
+            Array.isArray(product.images)
+          )
+            productCache.current.set(product.id, {
+              ...product,
+              price: product.price == null ? 0 : Number(product.price),
+            });
         }
         populate();
-      } catch { if (!controller.signal.aborted) toast.error('Unable to load favorite products. Your saved favorites are unchanged.'); }
-      finally { if (!controller.signal.aborted) setIsLoading(false); }
+      } catch {
+        if (!controller.signal.aborted)
+          setLoadError(
+            'Could not load favorite products. Your saved favorites are unchanged.'
+          );
+      } finally {
+        if (!controller.signal.aborted) setIsLoading(false);
+      }
     })();
     return () => controller.abort();
-  }, [favorites, ready]);
+  }, [favorites, ready, reload]);
 
   // Remove from favorites
-  const removeFromFavorites = useCallback((productId: string) => {
-    setFavorites(prev => {
-      const updated = prev.filter(id => id !== productId);
-      return updated;
-    });
-    setFavoriteProducts(prev => prev.filter(p => p.id !== productId));
-  }, [setFavorites]);
-
-  // Clear all favorites
-  const clearAllFavorites = useCallback(() => {
-    setFavorites([]);
-    setFavoriteProducts([]);
-    setShowClearConfirm(false);
-  }, [setFavorites]);
-
-  const openConversationDraft = useCallback(async (product: Product, mode: MessageMode) => {
-    const key = `${product.id}:${mode}`;
-    const draft = mode === 'REQUEST_PRICING'
-      ? `Hi ${product.grower.businessName}, can you send pricing for ${product.name}${product.unit ? ` (${product.unit})` : ''}?`
-      : `Hi ${product.grower.businessName}, I have a question about ${product.name}.`;
-
-    setOpeningConversationKey(key);
-
-    try {
-      const response = await fetch('/api/messages/conversations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          growerId: product.grower.id,
-          productId: product.id,
-        }),
+  const removeFromFavorites = useCallback(
+    (productId: string) => {
+      setFavorites((prev) => prev.filter((id) => id !== productId));
+      toast.success('Favorite removed', {
+        action: {
+          label: 'Undo',
+          onClick: () =>
+            setFavorites((prev) =>
+              prev.includes(productId) ? prev : [...prev, productId]
+            ),
+        },
       });
+    },
+    [setFavorites]
+  );
+  const clearAllFavorites = () => {
+    const removed = favorites;
+    setFavorites([]);
+    toast.success('Favorites cleared', {
+      action: {
+        label: 'Undo',
+        onClick: () =>
+          setFavorites((current) => [...new Set([...current, ...removed])]),
+      },
+    });
+  };
 
-      const data = await response.json().catch(() => ({}));
+  const openConversationDraft = useCallback(
+    async (product: Product, mode: MessageMode) => {
+      const key = `${product.id}:${mode}`;
+      const draft =
+        mode === 'REQUEST_PRICING'
+          ? `Hi ${product.grower.businessName}, can you send pricing for ${product.name}${product.unit ? ` (${product.unit})` : ''}?`
+          : `Hi ${product.grower.businessName}, I have a question about ${product.name}.`;
 
-      if (!response.ok || !data.conversationId) {
-        throw new Error(data.error || 'We could not open conversation. Please try again.');
+      setOpeningConversationKey(key);
+
+      try {
+        const response = await fetch('/api/messages/conversations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            growerId: product.grower.id,
+            productId: product.id,
+          }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || !data.conversationId) {
+          throw new Error(
+            data.error || 'We could not open conversation. Please try again.'
+          );
+        }
+
+        window.dispatchEvent(
+          new CustomEvent('phenofarm-open-chat', {
+            detail: {
+              conversationId: data.conversationId,
+              draft,
+              context: [
+                { label: 'Product', value: product.name },
+                { label: 'Grower', value: product.grower.businessName },
+              ],
+              flash: true,
+            },
+          })
+        );
+      } catch (error) {
+        console.error('Failed to open grower conversation:', error);
+        toast.error('Could not open the conversation. Please try again.');
+      } finally {
+        setOpeningConversationKey(null);
       }
-
-      window.dispatchEvent(
-        new CustomEvent('phenofarm-open-chat', {
-          detail: {
-            conversationId: data.conversationId,
-            draft,
-            context: [
-              { label: 'Product', value: product.name },
-              { label: 'Grower', value: product.grower.businessName },
-            ],
-            flash: true,
-          },
-        })
-      );
-    } catch (error) {
-      console.error('Failed to open grower conversation:', error);
-      toast.error('Could not open the conversation. Please try again.');
-    } finally {
-      setOpeningConversationKey(null);
-    }
-  }, []);
+    },
+    []
+  );
 
   // Sort products
   const sortedProducts = [...favoriteProducts].sort((a, b) => {
     switch (sortBy) {
-      case 'price-asc': return Number(!a.isPriceVisible) - Number(!b.isPriceVisible) || (a.isPriceVisible && b.isPriceVisible ? a.price - b.price : 0);
-      case 'price-desc': return Number(!a.isPriceVisible) - Number(!b.isPriceVisible) || (a.isPriceVisible && b.isPriceVisible ? b.price - a.price : 0);
-      case 'thc-desc': return (b.thc || 0) - (a.thc || 0);
-      case 'thc-asc': return (a.thc || 0) - (b.thc || 0);
-      case 'name-asc': return a.name.localeCompare(b.name);
-      case 'name-desc': return b.name.localeCompare(a.name);
-      default: return 0; // Keep original order (recently added)
+      case 'price-asc':
+        return (
+          Number(!a.isPriceVisible) - Number(!b.isPriceVisible) ||
+          (a.isPriceVisible && b.isPriceVisible ? a.price - b.price : 0)
+        );
+      case 'price-desc':
+        return (
+          Number(!a.isPriceVisible) - Number(!b.isPriceVisible) ||
+          (a.isPriceVisible && b.isPriceVisible ? b.price - a.price : 0)
+        );
+      case 'thc-desc':
+        return (b.thc || 0) - (a.thc || 0);
+      case 'thc-asc':
+        return (a.thc || 0) - (b.thc || 0);
+      case 'name-asc':
+        return a.name.localeCompare(b.name);
+      case 'name-desc':
+        return b.name.localeCompare(a.name);
+      default:
+        return 0; // Keep original order (recently added)
     }
   });
 
-
   return (
-    <div className={embedded ? "" : "pb-4"}>
-      {syncError && <p role="alert" className="rounded-lg bg-pf-danger-bg p-3 text-pf-danger">{syncError}</p>}
-      <div className={embedded ? "pb-4" : "space-y-4"}>
-        {!embedded && <PageHeader title="Favorites" actions={<Link href="/dispensary/catalog" className="min-h-10 text-pf-accent">Browse catalog</Link>} />}
+    <div className={embedded ? '' : 'pb-4'}>
+      {(syncError || loadError) && (
+        <p
+          role="alert"
+          className="rounded-lg bg-pf-danger-bg p-3 text-pf-danger"
+        >
+          {syncError || loadError}
+          <button
+            className="ml-3 min-h-11 underline"
+            onClick={() => {
+              retry();
+              setReload((value) => value + 1);
+            }}
+          >
+            Retry
+          </button>
+        </p>
+      )}
+      <div className={embedded ? 'pb-4' : 'space-y-4'}>
+        {!embedded && (
+          <PageHeader
+            title="Favorites"
+            actions={
+              <Link
+                href="/dispensary/catalog"
+                className="min-h-10 text-pf-accent"
+              >
+                Browse catalog
+              </Link>
+            }
+          />
+        )}
 
         {/* Controls */}
         {favoriteProducts.length > 0 && (
@@ -187,8 +318,10 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
                   onChange={(e) => setSortBy(e.target.value as SortOption)}
                   className="w-full text-base sm:text-sm border border-pf-line-strong rounded-lg px-3 py-2 focus:ring-2 focus:ring-emerald-400 focus:border-transparent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
                 >
-                  {SORT_OPTIONS.map(opt => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  {SORT_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>
+                      {opt.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -197,20 +330,26 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
             {/* View Mode Toggle */}
             <div className="flex items-center rounded-lg bg-pf-surface p-1">
               <button
-                aria-label="Grid view" aria-pressed={viewMode === 'grid'}
+                aria-label="Grid view"
+                aria-pressed={viewMode === 'grid'}
                 onClick={() => setViewMode('grid')}
                 className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${
-                  viewMode === 'grid' ? 'bg-pf-accent-bg text-pf-accent' : 'text-pf-muted hover:text-pf-text'
+                  viewMode === 'grid'
+                    ? 'bg-pf-accent-bg text-pf-accent'
+                    : 'text-pf-muted hover:text-pf-text'
                 }`}
               >
                 <LayoutGrid size={18} />
                 <span className="hidden sm:inline text-sm">Grid</span>
               </button>
               <button
-                aria-label="List view" aria-pressed={viewMode === 'list'}
+                aria-label="List view"
+                aria-pressed={viewMode === 'list'}
                 onClick={() => setViewMode('list')}
                 className={`px-3 py-2 flex items-center gap-2 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${
-                  viewMode === 'list' ? 'bg-pf-accent-bg text-pf-accent' : 'text-pf-muted hover:text-pf-text'
+                  viewMode === 'list'
+                    ? 'bg-pf-accent-bg text-pf-accent'
+                    : 'text-pf-muted hover:text-pf-text'
                 }`}
               >
                 <ListIcon size={18} />
@@ -218,25 +357,39 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
               </button>
             </div>
             <details className="relative ml-auto">
-              <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-pf-muted">More</summary>
-              <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-pf-line bg-pf-surface p-1 shadow-lg"><button type="button" onClick={() => setShowClearConfirm(true)} className="min-h-10 w-full rounded px-3 text-left text-sm text-pf-danger hover:bg-pf-danger-bg">Clear favorites</button></div>
+              <summary className="flex min-h-10 cursor-pointer items-center rounded-lg px-2 text-sm text-pf-muted">
+                More
+              </summary>
+              <div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-pf-line bg-pf-surface p-1 shadow-lg">
+                <button
+                  type="button"
+                  onClick={clearAllFavorites}
+                  className="min-h-10 w-full rounded px-3 text-left text-sm text-pf-danger hover:bg-pf-danger-bg"
+                >
+                  Clear favorites
+                </button>
+              </div>
             </details>
           </div>
         )}
 
         {/* Content */}
-        {(isLoading && !syncError) ? (
+        {isLoading && !syncError ? (
           <div className="flex flex-col items-center justify-center py-10">
             <Loader2 className="w-10 h-10 text-pf-accent animate-spin mb-4" />
             <p className="text-pf-muted">Loading your favorites...</p>
           </div>
-        ) : favoriteProducts.length === 0 ? (
+        ) : (syncError || loadError) &&
+          favoriteProducts.length === 0 ? null : favoriteProducts.length ===
+          0 ? (
           /* Empty State */
           <div className="rounded-xl border border-pf-line bg-pf-surface px-4 py-8 text-center sm:py-10">
             <div className="w-12 h-12 bg-pf-accent-bg rounded-full flex items-center justify-center mx-auto mb-3">
               <Heart className="w-6 h-6 text-pf-accent" />
             </div>
-            <h3 className="text-base font-semibold text-pf-text mb-2">No favorites yet</h3>
+            <h2 className="text-base font-semibold text-pf-text mb-2">
+              No favorites yet
+            </h2>
             <p className="mx-auto mb-4 max-w-sm text-sm text-pf-muted">
               Tap a product’s heart in the catalog to save it here.
             </p>
@@ -250,44 +403,54 @@ export default function FavoritesContent({ embedded = false }: FavoritesContentP
           </div>
         ) : (
           /* Products Grid/List */
-          <div className={viewMode === 'grid' 
-            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
-            : "space-y-2"
-          }>
-            {sortedProducts.map(product => (
+          <div
+            className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'
+                : 'space-y-2'
+            }
+          >
+            {sortedProducts.map((product) =>
               viewMode === 'grid' ? (
-                <FavoriteCard 
-                  key={product.id} 
+                <FavoriteCard
+                  key={product.id}
                   product={product}
                   onRemove={() => removeFromFavorites(product.id)}
-                  onRequestPricing={() => openConversationDraft(product, 'REQUEST_PRICING')}
-                  onMessageGrower={() => openConversationDraft(product, 'QUESTION')}
-                  isOpeningPricing={openingConversationKey === `${product.id}:REQUEST_PRICING`}
-                  isOpeningMessage={openingConversationKey === `${product.id}:QUESTION`}
+                  onRequestPricing={() =>
+                    openConversationDraft(product, 'REQUEST_PRICING')
+                  }
+                  onMessageGrower={() =>
+                    openConversationDraft(product, 'QUESTION')
+                  }
+                  isOpeningPricing={
+                    openingConversationKey === `${product.id}:REQUEST_PRICING`
+                  }
+                  isOpeningMessage={
+                    openingConversationKey === `${product.id}:QUESTION`
+                  }
                 />
               ) : (
-                <FavoriteListItem 
-                  key={product.id} 
+                <FavoriteListItem
+                  key={product.id}
                   product={product}
                   onRemove={() => removeFromFavorites(product.id)}
-                  onRequestPricing={() => openConversationDraft(product, 'REQUEST_PRICING')}
-                  onMessageGrower={() => openConversationDraft(product, 'QUESTION')}
-                  isOpeningPricing={openingConversationKey === `${product.id}:REQUEST_PRICING`}
-                  isOpeningMessage={openingConversationKey === `${product.id}:QUESTION`}
+                  onRequestPricing={() =>
+                    openConversationDraft(product, 'REQUEST_PRICING')
+                  }
+                  onMessageGrower={() =>
+                    openConversationDraft(product, 'QUESTION')
+                  }
+                  isOpeningPricing={
+                    openingConversationKey === `${product.id}:REQUEST_PRICING`
+                  }
+                  isOpeningMessage={
+                    openingConversationKey === `${product.id}:QUESTION`
+                  }
                 />
               )
-            ))}
+            )}
           </div>
         )}
-
-        {/* Clear All Confirmation Modal */}
-        <Modal open={showClearConfirm} onClose={() => setShowClearConfirm(false)} title="Clear favorites?" className="max-w-md">
-          <p className="mb-5 text-sm text-pf-muted">Remove your saved products? You can save them again from the catalog.</p>
-          <div className="flex justify-end gap-3">
-            <button type="button" onClick={() => setShowClearConfirm(false)} className="min-h-10 rounded-lg px-4 py-2 text-pf-secondary hover:bg-pf-surface">Cancel</button>
-            <button type="button" onClick={clearAllFavorites} className="min-h-10 rounded-lg bg-red-600 px-4 py-2 text-white hover:bg-red-700">Clear favorites</button>
-          </div>
-        </Modal>
       </div>
     </div>
   );
@@ -309,21 +472,27 @@ function FavoriteCard({
   isOpeningPricing: boolean;
   isOpeningMessage: boolean;
 }) {
-
-
-  const strainType = product.strainType || (product.strain ? 
-    (product.strain.toLowerCase().includes('indica') ? 'Indica' : 
-     product.strain.toLowerCase().includes('sativa') ? 'Sativa' : 'Hybrid') : null);
+  const strainType =
+    product.strainType ||
+    (product.strain
+      ? product.strain.toLowerCase().includes('indica')
+        ? 'Indica'
+        : product.strain.toLowerCase().includes('sativa')
+          ? 'Sativa'
+          : 'Hybrid'
+      : null);
 
   return (
     <div className="bg-pf-surface border border-pf-line rounded-xl overflow-hidden hover:border-pf-line-strong transition-colors group">
       {/* Image */}
-      <div className={`relative overflow-hidden bg-pf-accent-bg ${product.images?.[0] ? 'h-24 sm:h-40' : 'h-16 sm:h-20'}`}>
+      <div
+        className={`relative overflow-hidden bg-pf-accent-bg ${product.images?.[0] ? 'h-24 sm:h-40' : 'h-16 sm:h-20'}`}
+      >
         <button
           type="button"
           onClick={onRemove}
           aria-label={`Remove ${product.name} from favorites`}
-          className="absolute top-2 right-2 z-10 min-h-10 min-w-10 p-2 bg-pf-surface/95 backdrop-blur-sm rounded-lg text-pf-danger shadow-sm transition-all hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+          className="absolute top-2 right-2 z-10 min-h-10 min-w-10 p-2 bg-pf-surface/95 backdrop-blur-sm rounded-lg text-pf-danger shadow-sm transition-all hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           title="Remove from favorites"
         >
           <HeartOff size={16} />
@@ -341,11 +510,25 @@ function FavoriteCard({
       <div className="p-3 sm:p-4">
         {/* Name & Verified */}
         <div className="flex items-start justify-between gap-2 mb-2">
-          <h3 className="text-sm font-semibold text-pf-text line-clamp-2 sm:text-base">{product.name}</h3>
+          <h3 className="text-sm font-semibold text-pf-text line-clamp-2 sm:text-base">
+            <Link
+              href={`/dispensary/catalog?product=${product.id}`}
+              className="hover:underline"
+            >
+              {product.name}
+            </Link>
+          </h3>
           {product.grower.isVerified && (
-            <span className="text-pf-accent flex-shrink-0" title="Verified Grower">
+            <span
+              className="text-pf-accent flex-shrink-0"
+              title="Verified Grower"
+            >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd"/>
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
               </svg>
             </span>
           )}
@@ -353,14 +536,20 @@ function FavoriteCard({
 
         {/* Grower */}
         <p className="text-sm text-pf-muted mb-2">
-          by <Link href={`/dispensary/grower/${product.grower.id}`} className="inline-flex min-h-10 items-center text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
+          by{' '}
+          <Link
+            href={`/dispensary/grower/${product.grower.id}`}
+            className="inline-flex min-h-10 items-center text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
+          >
             {product.grower.businessName}
           </Link>
         </p>
 
         {/* Strain Type */}
         {strainType && (
-          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(strainType)} mb-2`}>
+          <span
+            className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getStrainTypeColor(strainType)} mb-2`}
+          >
             {strainType}
           </span>
         )}
@@ -368,21 +557,32 @@ function FavoriteCard({
         {/* THC Badge */}
         {product.thc != null && (
           <div className="mb-3">
-            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)}`}>
+            <span
+              className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold border ${getThcBadgeColor(product.thc)}`}
+            >
               THC {product.thc}%
             </span>
           </div>
         )}
 
-        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mb-3" />
+        <LabReportDownloads
+          productId={product.id}
+          productName={product.name}
+          reports={product.labReports}
+          className="mb-3"
+        />
 
         {/* Price & Actions */}
         <div className="pt-3 border-t border-pf-line">
           {product.isPriceVisible ? (
             <div className="space-y-3">
               <div>
-                <span className="text-xl font-bold text-pf-accent">${product.price.toFixed(2)}</span>
-                <span className="text-sm text-pf-muted ml-1">/ {displayUnit(product.unit)}</span>
+                <span className="text-xl font-bold text-pf-accent">
+                  {formatMoney(product.price)}
+                </span>
+                <span className="text-sm text-pf-muted ml-1">
+                  / {displayUnit(product.unit)}
+                </span>
               </div>
               <AddToCartButton
                 product={product}
@@ -398,7 +598,9 @@ function FavoriteCard({
                 disabled={isOpeningPricing}
                 className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
-                {isOpeningPricing && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isOpeningPricing && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
                 Request pricing
               </button>
               <button
@@ -407,7 +609,11 @@ function FavoriteCard({
                 disabled={isOpeningMessage}
                 className="inline-flex min-h-10 w-full items-center justify-center gap-2 rounded-lg px-3 py-1.5 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg hover:text-pf-accent disabled:cursor-not-allowed disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
               >
-                {isOpeningMessage ? <Loader2 className="h-4 w-4 animate-spin" /> : <MessageCircle className="h-4 w-4" />}
+                {isOpeningMessage ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <MessageCircle className="h-4 w-4" />
+                )}
                 Message grower
               </button>
             </div>
@@ -435,25 +641,91 @@ function FavoriteListItem({
   isOpeningMessage: boolean;
 }) {
   return (
-    <article data-product-row className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-xl border border-pf-line bg-pf-surface p-3 sm:p-4 sm:flex sm:items-center">
-      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-pf-accent-bg"><ProductImage src={product.images?.[0]} alt={product.name} productType={product.productType} className="h-full w-full" /></div>
+    <article
+      data-product-row
+      className="grid grid-cols-[64px_minmax(0,1fr)] gap-3 rounded-xl border border-pf-line bg-pf-surface p-3 sm:p-4 sm:flex sm:items-center"
+    >
+      <div className="h-16 w-16 shrink-0 overflow-hidden rounded-lg bg-pf-accent-bg">
+        <ProductImage
+          src={product.images?.[0]}
+          alt={product.name}
+          productType={product.productType}
+          className="h-full w-full"
+        />
+      </div>
       <div className="min-w-0 flex-1">
-        <h3 className="font-semibold text-pf-text">{product.name}</h3>
-        <Link href={`/dispensary/grower/${product.grower.id}`} className="mt-1 inline-block text-sm text-pf-accent hover:underline">{product.grower.businessName}</Link>
+        <h3 className="font-semibold text-pf-text">
+          <Link
+            href={`/dispensary/catalog?product=${product.id}`}
+            className="hover:underline"
+          >
+            {product.name}
+          </Link>
+        </h3>
+        <Link
+          href={`/dispensary/grower/${product.grower.id}`}
+          className="mt-1 inline-block text-sm text-pf-accent hover:underline"
+        >
+          {product.grower.businessName}
+        </Link>
         <div className="mt-2 flex flex-wrap gap-2 text-xs text-pf-muted">
           {product.productType && <span>{product.productType}</span>}
           {product.thc != null && <span>THC {product.thc}%</span>}
           <span>{product.inventoryQty} available</span>
         </div>
-        <LabReportDownloads productId={product.id} productName={product.name} reports={product.labReports} className="mt-2" />
+        <LabReportDownloads
+          productId={product.id}
+          productName={product.name}
+          reports={product.labReports}
+          className="mt-2"
+        />
       </div>
       <div className="col-span-2 flex min-w-0 flex-wrap items-center justify-between gap-3 border-t border-pf-line pt-3 sm:max-w-xs sm:border-0 sm:pt-0">
-        {product.isPriceVisible ? <>
-          <span data-product-price className="text-lg font-bold text-pf-accent">${product.price.toFixed(2)}<span className="text-sm font-normal text-pf-muted">/{displayUnit(product.unit)}</span></span>
-          <AddToCartButton product={product} growerName={product.grower.businessName} growerId={product.grower.id} compact compactLabel="Add" />
-        </> : <button type="button" onClick={onRequestPricing} disabled={isOpeningPricing} className="min-h-10 flex-1 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent disabled:opacity-60">{isOpeningPricing ? 'Opening…' : 'Request pricing'}</button>}
-        <button type="button" onClick={onMessageGrower} disabled={isOpeningMessage} className="min-h-10 px-2 text-sm font-medium text-pf-accent hover:underline disabled:opacity-60">{isOpeningMessage ? 'Opening…' : 'Message'}</button>
-        <button type="button" onClick={onRemove} aria-label={`Remove ${product.name} from favorites`} className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-muted hover:bg-pf-danger-bg hover:text-pf-danger"><HeartOff size={18} /></button>
+        {product.isPriceVisible ? (
+          <>
+            <span
+              data-product-price
+              className="text-lg font-bold text-pf-accent"
+            >
+              {formatMoney(product.price)}
+              <span className="text-sm font-normal text-pf-muted">
+                /{displayUnit(product.unit)}
+              </span>
+            </span>
+            <AddToCartButton
+              product={product}
+              growerName={product.grower.businessName}
+              growerId={product.grower.id}
+              compact
+              compactLabel="Add"
+            />
+          </>
+        ) : (
+          <button
+            type="button"
+            onClick={onRequestPricing}
+            disabled={isOpeningPricing}
+            className="min-h-10 flex-1 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-3 py-2 text-sm font-medium text-pf-accent disabled:opacity-60"
+          >
+            {isOpeningPricing ? 'Opening…' : 'Request pricing'}
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={onMessageGrower}
+          disabled={isOpeningMessage}
+          className="min-h-10 px-2 text-sm font-medium text-pf-accent hover:underline disabled:opacity-60"
+        >
+          {isOpeningMessage ? 'Opening…' : 'Message'}
+        </button>
+        <button
+          type="button"
+          onClick={onRemove}
+          aria-label={`Remove ${product.name} from favorites`}
+          className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-muted hover:bg-pf-danger-bg hover:text-pf-danger"
+        >
+          <HeartOff size={18} />
+        </button>
       </div>
     </article>
   );

@@ -1,25 +1,26 @@
+import { signInDestination } from '@/lib/auth-navigation';
 import { getBuyerCatalog } from '@/lib/buyer-catalog';
-import { notFound, redirect } from "next/navigation";
-import Link from "next/link";
-import { db } from "@/lib/db";
-import { getAuthSession } from "@/lib/auth-helpers";
-import { 
-  MapPin, 
-  Phone, 
-  Globe, 
-  CheckCircle, 
+import { notFound, redirect } from 'next/navigation';
+import Link from 'next/link';
+import { db } from '@/lib/db';
+import { getAuthSession } from '@/lib/auth-helpers';
+import {
+  MapPin,
+  Phone,
+  Globe,
+  CheckCircle,
   Package,
   ArrowLeft,
-  Shield
-} from "lucide-react";
-import { PageHeader } from "@/app/components/ui/PageHeader";
-import { DEFAULT_COMMERCIAL_TERMS } from "@/lib/ux-workflow";
-import GrowerShopContent from "./GrowerShopContent";
-import { marketplaceGrowerWhere } from "@/lib/license";
+  Shield,
+} from 'lucide-react';
+import { PageHeader } from '@/app/components/ui/PageHeader';
+import { DEFAULT_COMMERCIAL_TERMS } from '@/lib/ux-workflow';
+import GrowerShopContent from './GrowerShopContent';
+import { marketplaceGrowerWhere } from '@/lib/license';
 
 interface GrowerPageProps {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<Record<string, string | undefined>>;
 }
 
 async function getGrowerWithProducts(id: string) {
@@ -27,16 +28,28 @@ async function getGrowerWithProducts(id: string) {
     db.grower.findFirst({
       where: { id, ...marketplaceGrowerWhere() },
       select: {
-        id: true, businessName: true, description: true, logo: true, isVerified: true,
-        city: true, state: true, phone: true, website: true, licenseNumber: true,
-        commercialMinimumOrder: true, commercialFulfillmentMethods: true, commercialFulfillmentRegion: true,
-        commercialPaymentTerms: true, commercialResponseWindow: true, commercialContactNote: true,
+        id: true,
+        businessName: true,
+        description: true,
+        logo: true,
+        isVerified: true,
+        city: true,
+        state: true,
+        phone: true,
+        website: true,
+        licenseNumber: true,
+        commercialMinimumOrder: true,
+        commercialFulfillmentMethods: true,
+        commercialFulfillmentRegion: true,
+        commercialPaymentTerms: true,
+        commercialResponseWindow: true,
+        commercialContactNote: true,
       },
     }),
     db.order.count({
       where: {
         growerId: id,
-        status: "DELIVERED",
+        status: 'DELIVERED',
       },
     }),
   ]);
@@ -51,50 +64,90 @@ function getInitials(name: string) {
     .filter(Boolean)
     .slice(0, 2)
     .map((part) => part.charAt(0).toUpperCase())
-    .join("");
+    .join('');
 
-  return initials || "PS";
+  return initials || 'PS';
 }
 
 function displayTerm(value: string | null | undefined, fallback: string) {
   return value?.trim() || fallback;
 }
 
-export default async function GrowerPage({ params, searchParams }: GrowerPageProps) {
+export default async function GrowerPage({
+  params,
+  searchParams,
+}: GrowerPageProps) {
   const session = await getAuthSession();
-  if (!session) redirect('/auth/sign_in');
-  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId) redirect('/dashboard');
+  if (!session) redirect(await signInDestination());
+  if (session.user.role !== 'DISPENSARY' || !session.user.dispensaryId)
+    redirect('/dashboard');
   const { id } = await params;
   const query = await searchParams;
   const [grower, catalog] = await Promise.all([
     getGrowerWithProducts(id),
-    getBuyerCatalog(session.user.dispensaryId, new URLSearchParams({ growerId: id, limit: '24', search: query.search || '' })),
+    getBuyerCatalog(
+      session.user.dispensaryId,
+      new URLSearchParams({
+        ...Object.fromEntries(
+          Object.entries(query).filter(
+            (entry): entry is [string, string] => typeof entry[1] === 'string'
+          )
+        ),
+        growerId: id,
+        limit: '20',
+      })
+    ),
   ]);
 
   if (!grower) {
     notFound();
   }
 
-  const website = (() => { try { const url = new URL(grower.website || ''); return ['http:', 'https:'].includes(url.protocol) ? url.href : null; } catch { return null; } })();
+  const website = (() => {
+    try {
+      const url = new URL(grower.website || '');
+      return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
+    } catch {
+      return null;
+    }
+  })();
 
   // Calculate stats
   const fulfilledRequests = grower.fulfilledRequests;
 
   // Get unique product types
   const commercialTerms = {
-    minimumOrder: displayTerm(grower.commercialMinimumOrder, DEFAULT_COMMERCIAL_TERMS.minimumOrder),
-    fulfillmentMethods: displayTerm(grower.commercialFulfillmentMethods, DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods),
-    fulfillmentRegion: displayTerm(grower.commercialFulfillmentRegion, DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion),
-    paymentTerms: displayTerm(grower.commercialPaymentTerms, DEFAULT_COMMERCIAL_TERMS.paymentTerms),
-    responseWindow: displayTerm(grower.commercialResponseWindow, DEFAULT_COMMERCIAL_TERMS.responseWindow),
-    contactNote: displayTerm(grower.commercialContactNote, DEFAULT_COMMERCIAL_TERMS.contactNote),
+    minimumOrder: displayTerm(
+      grower.commercialMinimumOrder,
+      DEFAULT_COMMERCIAL_TERMS.minimumOrder
+    ),
+    fulfillmentMethods: displayTerm(
+      grower.commercialFulfillmentMethods,
+      DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods
+    ),
+    fulfillmentRegion: displayTerm(
+      grower.commercialFulfillmentRegion,
+      DEFAULT_COMMERCIAL_TERMS.fulfillmentRegion
+    ),
+    paymentTerms: displayTerm(
+      grower.commercialPaymentTerms,
+      DEFAULT_COMMERCIAL_TERMS.paymentTerms
+    ),
+    responseWindow: displayTerm(
+      grower.commercialResponseWindow,
+      DEFAULT_COMMERCIAL_TERMS.responseWindow
+    ),
+    contactNote: displayTerm(
+      grower.commercialContactNote,
+      DEFAULT_COMMERCIAL_TERMS.contactNote
+    ),
   };
 
   return (
     <div className="space-y-4">
       <PageHeader
         title={grower.businessName}
-        description={grower.description || "Browse products and discuss terms with the grower."}
+        description={grower.description || undefined}
         actions={
           <div className="flex w-full items-center gap-2 sm:w-auto">
             <Link
@@ -105,11 +158,11 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
               Catalog
             </Link>
             <Link
-              href="#shop-products"
+              href={`/messages?growerId=${grower.id}`}
               className="inline-flex items-center justify-center gap-2 rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#032116] transition-colors hover:bg-emerald-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
             >
               <Package className="h-4 w-4" />
-              Browse products
+              Message grower
             </Link>
           </div>
         }
@@ -140,7 +193,9 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
             {grower.isVerified && (
               <div className="mb-2 inline-flex items-center gap-1 rounded-full bg-pf-accent-bg px-3 py-1">
                 <CheckCircle className="h-5 w-5 text-pf-accent" />
-                <span className="text-sm font-medium text-pf-accent">Verified</span>
+                <span className="text-sm font-medium text-pf-accent">
+                  Verified
+                </span>
               </div>
             )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-pf-secondary">
@@ -151,10 +206,13 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
                 </span>
               )}
               {grower.phone && (
-                <span className="flex items-center gap-1">
+                <a
+                  href={`tel:${grower.phone}`}
+                  className="flex min-h-11 items-center gap-1"
+                >
                   <Phone className="h-4 w-4" />
                   {grower.phone}
-                </span>
+                </a>
               )}
               {website && (
                 <a
@@ -178,28 +236,63 @@ export default async function GrowerPage({ params, searchParams }: GrowerPagePro
         </div>
       </div>
 
-      <p className="text-sm text-pf-muted">
-        {commercialTerms.fulfillmentMethods === DEFAULT_COMMERCIAL_TERMS.fulfillmentMethods ? 'Pickup or delivery' : commercialTerms.fulfillmentMethods}
-        {' · '}{commercialTerms.minimumOrder}
-      </p>
-
-      <GrowerShopContent key={grower.id}
+      <details
+        open
+        className="rounded-xl border border-pf-line bg-pf-surface px-4 py-1"
+      >
+        <summary className="min-h-10 cursor-pointer content-center text-sm font-semibold text-pf-text">
+          Shop details
+        </summary>
+        <dl className="my-3 grid grid-cols-2 gap-3 text-sm lg:grid-cols-3">
+          <div>
+            <dt className="text-pf-muted">Delivery area</dt>
+            <dd>{commercialTerms.fulfillmentRegion}</dd>
+          </div>
+          <div>
+            <dt className="text-pf-muted">Pickup or delivery</dt>
+            <dd>{commercialTerms.fulfillmentMethods}</dd>
+          </div>
+          <div>
+            <dt className="text-pf-muted">Minimum</dt>
+            <dd>{commercialTerms.minimumOrder}</dd>
+          </div>
+          {commercialTerms.responseWindow !==
+            DEFAULT_COMMERCIAL_TERMS.responseWindow && (
+            <div>
+              <dt className="text-pf-muted">Replies</dt>
+              <dd>{commercialTerms.responseWindow}</dd>
+            </div>
+          )}
+          <div>
+            <dt className="text-pf-muted">Payment terms</dt>
+            <dd>
+              {commercialTerms.paymentTerms ===
+              DEFAULT_COMMERCIAL_TERMS.paymentTerms
+                ? 'Direct with grower'
+                : commercialTerms.paymentTerms}
+            </dd>
+          </div>
+          {fulfilledRequests > 0 && (
+            <div>
+              <dt className="text-pf-muted">Completed orders</dt>
+              <dd>{fulfilledRequests}</dd>
+            </div>
+          )}
+          {commercialTerms.contactNote !==
+            DEFAULT_COMMERCIAL_TERMS.contactNote && (
+            <div className="sm:col-span-2">
+              <dt className="text-pf-muted">Contact note</dt>
+              <dd>{commercialTerms.contactNote}</dd>
+            </div>
+          )}
+        </dl>
+      </details>
+      <GrowerShopContent
+        key={grower.id}
         initialData={catalog}
         growerName={grower.businessName}
         growerId={grower.id}
       />
-      <details className="rounded-xl border border-pf-line bg-pf-surface px-4 py-1">
-        <summary className="min-h-10 cursor-pointer content-center text-sm font-semibold text-pf-text">Shop details</summary>
-        <dl className="my-3 grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-3">
-          <div><dt className="text-pf-muted">Delivery area</dt><dd>{commercialTerms.fulfillmentRegion}</dd></div>
-          <div><dt className="text-pf-muted">Pickup or delivery</dt><dd>{commercialTerms.fulfillmentMethods}</dd></div>
-          <div><dt className="text-pf-muted">Minimum</dt><dd>{commercialTerms.minimumOrder}</dd></div>
-          <div><dt className="text-pf-muted">Replies</dt><dd>{commercialTerms.responseWindow === DEFAULT_COMMERCIAL_TERMS.responseWindow ? 'Ask the grower' : commercialTerms.responseWindow}</dd></div>
-          <div><dt className="text-pf-muted">Payment terms</dt><dd>{commercialTerms.paymentTerms === DEFAULT_COMMERCIAL_TERMS.paymentTerms ? 'Direct with grower' : commercialTerms.paymentTerms}</dd></div>
-          <div><dt className="text-pf-muted">Completed orders</dt><dd>{fulfilledRequests}</dd></div>
-          {commercialTerms.contactNote !== DEFAULT_COMMERCIAL_TERMS.contactNote && <div className="sm:col-span-2"><dt className="text-pf-muted">Contact note</dt><dd>{commercialTerms.contactNote}</dd></div>}
-        </dl>
-      </details>
     </div>
   );
 }

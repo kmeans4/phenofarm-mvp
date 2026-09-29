@@ -1,8 +1,15 @@
 import { randomUUID } from 'node:crypto';
 
-type AccountMail = { to: string; subject: string; text: string };
+type AccountMail = {
+  to: string;
+  subject: string;
+  text: string;
+  html?: string;
+  replyTo?: string;
+};
 
-const loopback = (hostname: string) => ['localhost', '127.0.0.1', '[::1]', '::1'].includes(hostname);
+const loopback = (hostname: string) =>
+  ['localhost', '127.0.0.1', '[::1]', '::1'].includes(hostname);
 
 // Avoid sending the support mailbox a Reply-To that resolves back to itself.
 // In particular, support+test aliases can otherwise trigger recipient spam rules.
@@ -10,7 +17,9 @@ function accountReplyTo(recipient: string) {
   const replyTo = process.env.AUTH_MAIL_REPLY_TO?.trim();
   if (!replyTo) return undefined;
   const mailbox = (value: string) => {
-    const address = (value.match(/<([^<>]+)>/)?.[1] || value).trim().toLowerCase();
+    const address = (value.match(/<([^<>]+)>/)?.[1] || value)
+      .trim()
+      .toLowerCase();
     return address.replace(/\+[^@]*@/, '@');
   };
   return mailbox(recipient) === mailbox(replyTo) ? undefined : replyTo;
@@ -18,7 +27,12 @@ function accountReplyTo(recipient: string) {
 
 export function accountOrigin() {
   const url = new URL(process.env.NEXTAUTH_URL || '');
-  if (url.username || url.password || (url.protocol !== 'https:' && !(url.protocol === 'http:' && loopback(url.hostname)))) {
+  if (
+    url.username ||
+    url.password ||
+    (url.protocol !== 'https:' &&
+      !(url.protocol === 'http:' && loopback(url.hostname)))
+  ) {
     throw new Error('Account origin is not configured securely');
   }
   return url.origin;
@@ -30,35 +44,73 @@ function mailConfiguration() {
     const target = new URL(process.env.AUTH_MAIL_TEST_URL || '');
     const database = new URL(process.env.DATABASE_URL || '');
     // A test sink must never be usable on Vercel, a remote DB, or a production build.
-    if (process.env.NODE_ENV === 'production' || process.env.VERCEL || !loopback(new URL(origin).hostname)
-      || !loopback(database.hostname) || !/^\/phenofarm_auth_/.test(database.pathname)
-      || !loopback(target.hostname) || target.protocol !== 'http:' || target.username || target.password
-      || !process.env.AUTH_MAIL_TEST_KEY || process.env.AUTH_MAIL_TEST_KEY.length < 32) {
+    if (
+      process.env.NODE_ENV === 'production' ||
+      process.env.VERCEL ||
+      !loopback(new URL(origin).hostname) ||
+      !loopback(database.hostname) ||
+      !/^\/phenofarm_auth_/.test(database.pathname) ||
+      !loopback(target.hostname) ||
+      target.protocol !== 'http:' ||
+      target.username ||
+      target.password ||
+      !process.env.AUTH_MAIL_TEST_KEY ||
+      process.env.AUTH_MAIL_TEST_KEY.length < 32
+    ) {
       throw new Error('Local account mail adapter is not permitted');
     }
-    return { provider: 'local-test' as const, endpoint: target.href, key: process.env.AUTH_MAIL_TEST_KEY };
+    return {
+      provider: 'local-test' as const,
+      endpoint: target.href,
+      key: process.env.AUTH_MAIL_TEST_KEY,
+    };
   }
-  if (process.env.AUTH_MAIL_PROVIDER !== 'resend' || !process.env.RESEND_API_KEY || !process.env.AUTH_MAIL_FROM) {
+  if (
+    process.env.AUTH_MAIL_PROVIDER !== 'resend' ||
+    !process.env.RESEND_API_KEY ||
+    !process.env.AUTH_MAIL_FROM
+  ) {
     throw new Error('Account email delivery is not configured');
   }
-  return { provider: 'resend' as const, endpoint: 'https://api.resend.com/emails', key: process.env.RESEND_API_KEY };
+  return {
+    provider: 'resend' as const,
+    endpoint: 'https://api.resend.com/emails',
+    key: process.env.RESEND_API_KEY,
+  };
 }
 
 export function accountMailConfigured() {
-  try { mailConfiguration(); return true; } catch { return false; }
+  try {
+    mailConfiguration();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function sendAccountMail(mail: AccountMail) {
   const config = mailConfiguration();
-  const replyTo = accountReplyTo(mail.to);
+  const replyTo = mail.replyTo || accountReplyTo(mail.to);
   const startedAt = Date.now();
   const response = await fetch(config.endpoint, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${config.key}`, 'Idempotency-Key': randomUUID() },
-    body: JSON.stringify(config.provider === 'local-test' ? mail : {
-      from: process.env.AUTH_MAIL_FROM, to: [mail.to], subject: mail.subject, text: mail.text,
-      ...(replyTo ? { reply_to: replyTo } : {}),
-    }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${config.key}`,
+      'Idempotency-Key': randomUUID(),
+    },
+    body: JSON.stringify(
+      config.provider === 'local-test'
+        ? mail
+        : {
+            from: process.env.AUTH_MAIL_FROM,
+            to: [mail.to],
+            subject: mail.subject,
+            text: mail.text,
+            ...(mail.html ? { html: mail.html } : {}),
+            ...(replyTo ? { reply_to: replyTo } : {}),
+          }
+    ),
     signal: AbortSignal.timeout(12_000),
     redirect: 'error',
     cache: 'no-store',
@@ -67,7 +119,13 @@ export async function sendAccountMail(mail: AccountMail) {
   if (!response.ok) throw new Error('Account email delivery failed');
   const receipt = await response.json().catch(() => null);
   // Provider acceptance is not inbox delivery. Log no recipient, body, token, or credential.
-  console.info('[account-mail]', { code: 'PROVIDER_ACCEPTED', provider: config.provider, durationMs: Date.now() - startedAt,
-    ...(typeof receipt?.id === 'string' && /^[a-zA-Z0-9-]{1,80}$/.test(receipt.id) ? { messageId: receipt.id } : {}),
+  console.info('[account-mail]', {
+    code: 'PROVIDER_ACCEPTED',
+    provider: config.provider,
+    durationMs: Date.now() - startedAt,
+    ...(typeof receipt?.id === 'string' &&
+    /^[a-zA-Z0-9-]{1,80}$/.test(receipt.id)
+      ? { messageId: receipt.id }
+      : {}),
   });
 }

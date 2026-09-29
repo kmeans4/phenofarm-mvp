@@ -1,1625 +1,903 @@
 'use client';
-
-import { isLicenseExpired } from '@/lib/license';
-import { type FormEvent, useState, useEffect, useMemo, useRef, useCallback, type Dispatch, type SetStateAction } from 'react';
-import { useSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/app/components/ui/Button';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { PRODUCT_DEFAULTS_STORAGE_KEY } from '@/lib/ux-workflow';
+import { EmptyState } from '@/app/components/ui/EmptyState';
+import { LoadingState, ErrorState } from '@/app/components/ui/FetchState';
 import { PageHeader } from '@/app/components/ui/PageHeader';
-import { OperationsSummary } from '../components/OperationsSummary';
-import { RecordActions } from '../components/RecordActions';
-import { formatProductMoney, formatProductUnit } from '@/lib/product-display';
-import { deleteRecord } from '@/app/components/ui/deleteRecord';
-import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
-import { Modal } from '@/app/components/ui/Modal';
-import { ErrorState, LoadingState } from '@/app/components/ui/FetchState';
-import { toast } from '@/app/hooks/useToast';
-import { useBodyOverlay } from '@/app/hooks/useBodyOverlay';
-import {
-  readDensityPreference,
-  saveDensityPreference,
-  TableDensity,
-  TableDensityControl,
-} from '@/app/components/ux/TableDensityControl';
-import { STRAIN_TYPE_LABELS, StrainTypeValue } from '@/lib/strain-types';
-import {
-  DEFAULT_PRODUCT_DEFAULTS,
-  PRODUCT_DEFAULTS_STORAGE_KEY,
-  ProductDefaults,
-} from '@/lib/ux-workflow';
-import {
-  toSafeAvailability,
-  toSafeNonNegativeInteger,
-  toSafeNonNegativeNumber,
-  toSafeOptionalString,
-  toSafeProductName,
-  toSafeProductType,
-  toSafeUnit,
-} from '@/lib/product-serializers';
-import { Copy, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { Pagination } from '@/app/components/ui/Pagination';
-import { getGrowerPlan } from '@/lib/plans';
+import { toast } from '@/app/hooks/useToast';
 import { ProductCsvImportDialog } from './ProductCsvImportDialog';
+import { ProductTypeSelector } from '../components/ProductTypeSelector';
+import { InlineStock } from './components/InlineStock';
+import { defaultUnitForProductType } from '@/lib/product-types';
+import { parseInventoryQty, parsePrice } from '@/lib/product-payload';
+import {
+  formatProductMoney,
+  formatProductUnit,
+  isLowStock,
+  productUnitOptions,
+  productVisibility,
+} from '@/lib/product-display';
+import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 
-type FilterType = 'all' | 'byProductType' | 'byStrain' | 'byBatch';
-type WorkflowView = 'all' | 'active' | 'low-stock' | 'quote-only' | 'missing-images' | 'missing-type' | 'hidden';
-
-interface QuickProductDraft {
-  name: string;
-  productType: string;
-  price: string;
-  inventoryQty: string;
-  unit: string;
-  isPriceVisible: boolean;
-}
-interface Strain {
+type Product = {
   id: string;
   name: string;
-  strainType: StrainTypeValue | null;
-  genetics: string | null;
-}
-
-interface Batch {
-  id: string;
-  batchNumber: string;
-}
-
-interface Product {
-  id: string;
-  name: string;
-  strain: Strain | null;
-  category: string | null;
   productType: string | null;
   subType: string | null;
-  batchId: string | null;
-  batch: Batch | null;
   price: number;
   inventoryQty: number;
   unit: string;
+  status: string;
   isAvailable: boolean;
   isPriceVisible: boolean;
-  images: string[];
-  imageCount: number;
-  status: 'DRAFT' | 'PUBLISHED';
-  createdAt: string;
-}
-
-type BulkProductUpdate = Partial<Pick<Product, 'isAvailable' | 'isPriceVisible' | 'unit' | 'productType'>>;
-
-interface GroupedProducts {
-  [key: string]: Product[];
-}
-
-const formatInventoryUnit = (unit: string | null | undefined, qty: number): string => {
-  const trimmed = (unit || '').trim();
-  if (!trimmed) return 'units';
-  if (qty === 1) return trimmed;
-
-  const lower = trimmed.toLowerCase();
-  if (lower === 'oz' || lower === 'ml') return trimmed;
-  if (lower.endsWith('s')) return trimmed;
-
-  return `${trimmed}s`;
+  strain?: { name: string } | null;
+  batch?: { batchNumber: string } | null;
 };
-
-function QuoteOnlyBadge({ compact = false }: { compact?: boolean }) {
-  return (
-    <span title="Price hidden from buyers" className={`inline-flex items-center rounded-full border border-pf-warning-line bg-pf-warning-bg font-semibold text-pf-warning ${
-      compact ? 'px-2 py-0.5 text-xs' : 'px-2.5 py-1 text-xs'
-    }`}>
-      Quote only
-    </span>
-  );
-}
-
-function normalizeWorkflowView(value: string | null | undefined): WorkflowView {
-  if (
-    value === 'active' ||
-    value === 'low-stock' ||
-    value === 'quote-only' ||
-    value === 'missing-images' ||
-    value === 'missing-type' ||
-    value === 'hidden'
-  ) {
-    return value;
-  }
-
-  return 'all';
-}
-
-function normalizeImageList(value: unknown): string[] {
-  if (!Array.isArray(value)) return [];
-  return value.filter((image): image is string => typeof image === 'string' && image.trim().length > 0);
-}
-
-function normalizeFetchedProduct(raw: unknown): Product | null {
-  if (!raw || typeof raw !== 'object') return null;
-
-  const record = raw as Record<string, unknown>;
-  const id = toSafeOptionalString(record.id);
-  if (!id) return null;
-
-  const inventoryQty = toSafeNonNegativeInteger(record.inventoryQty, 0);
-
-  const rawStrain = record.strain;
-  const strainRecord = rawStrain && typeof rawStrain === 'object'
-    ? (rawStrain as Record<string, unknown>)
-    : null;
-
-  const strainId = strainRecord ? toSafeOptionalString(strainRecord.id) : null;
-  const strainName = strainRecord ? toSafeOptionalString(strainRecord.name) : null;
-
-  const strain: Strain | null = strainId && strainName
-    ? {
-        id: strainId,
-        name: strainName,
-        strainType: (toSafeOptionalString(strainRecord?.strainType) as StrainTypeValue | null) || null,
-        genetics: toSafeOptionalString(strainRecord?.genetics),
-      }
-    : null;
-
-  const rawBatch = record.batch;
-  const batchRecord = rawBatch && typeof rawBatch === 'object'
-    ? (rawBatch as Record<string, unknown>)
-    : null;
-
-  const batchId = batchRecord ? toSafeOptionalString(batchRecord.id) : null;
-  const batchNumber = batchRecord ? toSafeOptionalString(batchRecord.batchNumber) : null;
-
-  const batch: Batch | null = batchId && batchNumber
-    ? { id: batchId, batchNumber }
-    : null;
-
-  return {
-    id,
-    status: record.status === 'DRAFT' ? 'DRAFT' : 'PUBLISHED',
-    name: toSafeProductName(record.name),
-    strain,
-    category: toSafeOptionalString(record.category),
-    productType: toSafeProductType(record.productType),
-    subType: toSafeOptionalString(record.subType),
-    batchId: toSafeOptionalString(record.batchId),
-    batch,
-    price: toSafeNonNegativeNumber(record.price, 0),
-    inventoryQty,
-    unit: toSafeUnit(record.unit),
-    isAvailable: toSafeAvailability(record.isAvailable, inventoryQty),
-    isPriceVisible: record.isPriceVisible === false ? false : true,
-    images: normalizeImageList(record.images),
-    imageCount: typeof record.imageCount === 'number' ? record.imageCount : Array.isArray(record.images) ? record.images.length : 0,
-    createdAt: toSafeOptionalString(record.createdAt) || new Date(0).toISOString(),
-  };
-}
-
-function getMostCommonValue(values: string[], fallback: string) {
-  const counts = new Map<string, number>();
-  values
-    .map((value) => value.trim())
-    .filter(Boolean)
-    .forEach((value) => counts.set(value, (counts.get(value) || 0) + 1));
-
-  let bestValue = fallback;
-  let bestCount = 0;
-  counts.forEach((count, value) => {
-    if (count > bestCount) {
-      bestValue = value;
-      bestCount = count;
-    }
-  });
-
-  return bestValue;
-}
-
-interface ProductControls {
-  selectedProductIds: Set<string>;
-  pendingProductIds: Set<string>;
-  toggleProductSelection: (id: string) => void;
-  toggleAvailability: (id: string, current: boolean) => Promise<void>;
-  cardPaddingClass: string;
-  compactMode: boolean;
-  tableCellClass: string;
-  setOpenActionMenuId: Dispatch<SetStateAction<string | null>>;
-  openActionMenuId: string | null;
-  duplicateProduct: (product: Product) => Promise<void>;
-  duplicatingProductId: string | null;
-  setDeleteCandidate: Dispatch<SetStateAction<Product | null>>;
-  allVisibleSelected: boolean;
-  toggleVisibleSelection: () => void;
-}
-
-  // Get strain name for display
-  const getStrainName = (product: Product): string => {
-    if (product.strain?.name) return product.strain.name;
-    return '';
-  };
-
-
-  const getStrainTypeLabel = (product: Product): string => {
-    if (!product.strain?.strainType) return '';
-    return STRAIN_TYPE_LABELS[product.strain.strainType] || '';
-  };
-
-  const ProductCard = ({ product, selectedProductIds, pendingProductIds, toggleProductSelection, toggleAvailability, cardPaddingClass, compactMode, setOpenActionMenuId, openActionMenuId, duplicateProduct, duplicatingProductId, setDeleteCandidate }: { product: Product } & ProductControls) => {
-    const strainName = getStrainName(product);
-    const strainTypeLabel = getStrainTypeLabel(product);
-
-    return (
-      <div id={`product-card-${product.id}`} className={`bg-pf-surface rounded-xl shadow-sm border border-pf-line overflow-hidden hover:shadow-md transition-all duration-200 scroll-mt-24 ${selectedProductIds.has(product.id) ? 'ring-2 ring-pf-accent' : ''}`}>
-        {/* Card Header */}
-        <div className={`${cardPaddingClass} border-b border-pf-line`}>
-          <div className="flex justify-between items-start gap-2">
-            <div className="flex min-w-0 flex-1 items-start gap-2">
-              <input
-                type="checkbox"
-                checked={selectedProductIds.has(product.id)}
-                onChange={() => toggleProductSelection(product.id)}
-                className="mt-1 h-4 w-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
-                aria-label={`Select ${product.name}`}
-              />
-              <div className="min-w-0 flex-1">
-              <p className="font-semibold text-pf-text truncate">{product?.name || 'Unnamed Product'}</p>
-              {strainName && (
-                <div className="flex items-center gap-2 min-w-0">
-                  <p className="text-sm text-pf-muted truncate">{strainName}</p>
-                  {strainTypeLabel && (
-                    <span className="text-xs uppercase tracking-wide text-pf-muted">{strainTypeLabel}</span>
-                  )}
-                </div>
-              )}
-              </div>
-            </div>
-            <span
-              className={'px-2.5 py-1 rounded-full text-xs font-medium flex-shrink-0 ' + (
-                (product?.inventoryQty || 0) <= 0
-                  ? 'bg-pf-danger-bg text-pf-danger border border-pf-danger-line'
-                  : product?.isAvailable
-                    ? 'bg-pf-accent-bg text-pf-accent border border-pf-accent-line'
-                    : 'bg-pf-surface text-pf-secondary border border-pf-line'
-              )}
-            >
-              {product.status === 'DRAFT' ? 'Draft' : (product?.inventoryQty || 0) <= 0 ? 'Out of stock' : product?.isAvailable ? 'Published' : 'Hidden'}
-            </span>
-          </div>
-        </div>
-
-        {/* Card Body */}
-        <div className={cardPaddingClass}>
-          <div className="flex justify-between items-baseline mb-3">
-            <div className="min-w-0">
-              <p className={`${compactMode ? 'text-xl' : 'text-2xl'} font-bold text-pf-text`}>
-                ${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}
-              </p>
-              {!product.isPriceVisible && (
-                <div className="mt-1">
-                  <QuoteOnlyBadge />
-                </div>
-              )}
-            </div>
-            <p className="text-sm text-pf-muted">per {product?.unit || 'unit'}</p>
-          </div>
-
-          {/* Additional Info */}
-          <div className="space-y-1 mb-3">
-            {product?.productType && (
-              <p className="text-xs text-pf-muted">
-                <span className="font-medium">Type:</span> {product.productType}
-              </p>
-            )}
-            {product?.batch?.batchNumber && (
-              <p className="text-xs text-pf-muted">
-                <span className="font-medium">Batch:</span> {product.batch.batchNumber}
-              </p>
-            )}
-          </div>
-
-          <div className="flex items-center gap-2 text-sm text-pf-muted mb-4">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-            <span className={(product?.inventoryQty || 0) <= 5 ? 'text-pf-danger font-medium' : ''}>
-              {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : `${product?.inventoryQty || 0} In Stock`}
-            </span>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="mt-4 flex items-center gap-2 border-t border-pf-line pt-4">
-            <Button variant="outline" size="sm" asChild className="flex-1">
-              <Link href={'/grower/products/' + product?.id + '/edit'}>
-                <Pencil className="mr-1.5 h-4 w-4" />
-                Edit
-              </Link>
-            </Button>
-
-            <Button
-              type="button"
-              variant="secondary"
-              size="sm"
-              onClick={() => toggleAvailability(product?.id, product?.isAvailable)}
-              className="flex-1"
-              disabled={pendingProductIds.has(product.id) || (product?.inventoryQty || 0) <= 0 && !product?.isAvailable && product.status !== 'DRAFT'}
-              aria-pressed={product?.isAvailable}
-            >
-              {product.status === 'DRAFT' ? 'Review draft' : (product?.inventoryQty || 0) <= 0 && !product?.isAvailable ? 'Out of stock' : product?.isAvailable ? 'Hide' : 'Make available'}
-            </Button>
-
-            <div className="relative">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => setOpenActionMenuId((current) => current === product.id ? null : product.id)}
-                aria-expanded={openActionMenuId === product.id}
-                aria-label={`More actions for ${product.name}`}
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-              <Modal open={openActionMenuId === product.id} onClose={() => setOpenActionMenuId(null)} title="More actions" className="max-w-sm">
-                  <p className="mb-3 break-words text-sm text-pf-muted">{product.name}</p>
-                  <div className="grid gap-2">
-                    <button
-                      type="button"
-                      onClick={() => duplicateProduct(product)}
-                      disabled={duplicatingProductId === product.id}
-                      className="flex min-h-10 w-full items-center gap-2 rounded-lg border border-pf-line px-3 py-2 text-left text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <Copy className="h-4 w-4" />
-                      {duplicatingProductId === product.id ? 'Duplicating...' : 'Duplicate'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenActionMenuId(null);
-                        setDeleteCandidate(product);
-                      }}
-                      className="flex min-h-10 w-full items-center gap-2 rounded-lg border border-pf-line px-3 py-2 text-left text-sm font-medium text-pf-danger hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete
-                    </button>
-                  </div>
-              </Modal>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  function MobileProduct({ product, controls }: { product: Product; controls: ProductControls }) {
-    const pending = controls.pendingProductIds.has(product.id);
-    return <article className="rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
-      <div className="flex items-start gap-3">
-        <label className="-ml-2 -mt-1 flex h-10 w-10 shrink-0 items-center justify-center"><input type="checkbox" checked={controls.selectedProductIds.has(product.id)} onChange={() => controls.toggleProductSelection(product.id)} aria-label={`Select ${product.name}`} className="h-4 w-4" /></label>
-        <div className="min-w-0 flex-1"><h3 className="text-sm font-semibold break-words">{product.name}</h3><p className="mt-1 text-xs text-pf-muted">{[product.productType, getStrainName(product)].filter(Boolean).join(' · ')}</p></div>
-        <span className="shrink-0 text-xs text-pf-muted">{product.status === 'DRAFT' ? 'Draft' : product.inventoryQty <= 0 ? 'No stock' : product.isAvailable ? 'Published' : 'Hidden'}</span>
-      </div>
-      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-sm"><p className="font-semibold">{formatProductMoney(product.price)}/{formatProductUnit(product.unit)}{!product.isPriceVisible && <span className="ml-2 text-xs font-normal text-pf-info">Quote only</span>}</p><p>Stock: {product.inventoryQty.toLocaleString()} {formatProductUnit(product.unit)}</p></div>
-      <div className="mt-2 flex items-center gap-2 border-t border-pf-line pt-2">
-        <Button asChild size="sm" variant="outline"><Link href={`/grower/products/${product.id}/edit`}>Edit</Link></Button>
-        <Button size="sm" variant="outline" disabled={pending || product.inventoryQty <= 0 && !product.isAvailable && product.status !== 'DRAFT'} aria-pressed={product.isAvailable} onClick={() => controls.toggleAvailability(product.id, product.isAvailable)}>{product.status === 'DRAFT' ? 'Review draft' : product.isAvailable ? 'Hide' : 'Make available'}</Button>
-        <RecordActions name={product.name} actions={[{label: 'Duplicate', onSelect: () => { if (!controls.duplicatingProductId) void controls.duplicateProduct(product); }}, {label: 'Delete', destructive: true, onSelect: () => controls.setDeleteCandidate(product)}]} />
-      </div>
-    </article>;
-  }
-
-  // Product Row component for list view
-  const ProductRow = ({ product, selectedProductIds, pendingProductIds, toggleProductSelection, toggleAvailability, tableCellClass, setOpenActionMenuId, openActionMenuId, duplicateProduct, duplicatingProductId, setDeleteCandidate }: { product: Product } & ProductControls) => {
-    const strainName = getStrainName(product);
-    const strainTypeLabel = getStrainTypeLabel(product);
-
-    return (
-      <tr id={`product-row-${product.id}`} className={`hover:bg-pf-canvas transition-colors ${selectedProductIds.has(product.id) ? 'bg-pf-accent-bg/60' : ''}`}>
-        <td className={tableCellClass}>
-          <input
-            type="checkbox"
-            checked={selectedProductIds.has(product.id)}
-            onChange={() => toggleProductSelection(product.id)}
-            className="h-4 w-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
-            aria-label={`Select ${product.name}`}
-          />
-        </td>
-        <td className={tableCellClass}>
-          <div className="font-medium text-sm sm:text-base text-pf-text">{product?.name || 'Unnamed'}</div>
-          {strainName && (
-            <div className="flex items-center gap-2">
-              <div className="text-xs sm:text-sm text-pf-muted">{strainName}</div>
-              {strainTypeLabel && <span className="text-xs uppercase tracking-wide text-pf-muted">{strainTypeLabel}</span>}
-            </div>
-          )}
-        </td>
-        <td className={`${tableCellClass} text-pf-muted`}>
-          {product?.productType || '-'}
-        </td>
-        <td className={tableCellClass}>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
-            (product?.inventoryQty || 0) <= 0
-              ? 'bg-pf-danger-bg text-pf-danger'
-              : product?.isAvailable
-                ? 'bg-pf-accent-bg text-pf-accent'
-                : 'bg-pf-surface text-pf-secondary'
-          }`}>
-            {product.status === 'DRAFT' ? 'Draft' : (product?.inventoryQty || 0) <= 0 ? 'Out of stock' : product?.isAvailable ? 'Published' : 'Hidden'}
-          </span>
-        </td>
-        <td className={`${tableCellClass} text-pf-text font-medium`}>
-          <div className="flex flex-col items-start gap-1">
-            <span>${typeof product?.price === 'number' ? product.price.toFixed(2) : '0.00'}</span>
-            {!product.isPriceVisible && <QuoteOnlyBadge compact />}
-          </div>
-        </td>
-        <td className={`${tableCellClass} text-pf-muted`}>
-          <span className={(product?.inventoryQty || 0) <= 5 ? 'text-pf-danger font-medium' : ''}>
-            {(product?.inventoryQty || 0) <= 0 ? 'Out of stock' : `${product?.inventoryQty || 0} ${formatInventoryUnit(product?.unit, product?.inventoryQty || 0)}`}
-          </span>
-        </td>
-        <td className={tableCellClass}>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href={'/grower/products/' + product?.id + '/edit'}>
-                <Pencil className="mr-1.5 h-4 w-4" />
-                Edit
-              </Link>
-            </Button>
-            <div className="relative">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => setOpenActionMenuId((current) => current === product.id ? null : product.id)}
-                aria-expanded={openActionMenuId === product.id}
-                aria-label={`More actions for ${product.name}`}
-              >
-                <MoreHorizontal className="h-4 w-4" />
-              </Button>
-              <Modal open={openActionMenuId === product.id} onClose={() => setOpenActionMenuId(null)} title="More actions" className="max-w-sm">
-                  <p className="mb-3 break-words text-sm text-pf-muted">{product.name}</p>
-                  <div className="grid gap-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenActionMenuId(null);
-                        toggleAvailability(product.id, product.isAvailable);
-                      }}
-                      disabled={pendingProductIds.has(product.id) || (product.inventoryQty || 0) <= 0 && !product.isAvailable && product.status !== 'DRAFT'}
-                      className="flex min-h-10 w-full items-center rounded-lg border border-pf-line px-3 text-left text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent disabled:opacity-50"
-                    >
-                      {product.status === 'DRAFT' ? 'Review draft' : product.isAvailable ? 'Hide listing' : 'Make listing available'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => duplicateProduct(product)}
-                      disabled={duplicatingProductId === product.id}
-                      className="flex min-h-10 w-full items-center gap-2 rounded-lg border border-pf-line px-3 text-left text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent disabled:opacity-50"
-                    >
-                      <Copy className="h-4 w-4" />
-                      {duplicatingProductId === product.id ? 'Duplicating...' : 'Duplicate'}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setOpenActionMenuId(null);
-                        setDeleteCandidate(product);
-                      }}
-                      className="flex min-h-10 w-full items-center gap-2 rounded-lg border border-pf-line px-3 text-left text-sm font-medium text-pf-danger hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-pf-accent"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                      Delete
-                    </button>
-                  </div>
-              </Modal>
-            </div>
-          </div>
-        </td>
-      </tr>
-    );
-  };
-
-  // Product Table component for list view
-  const ProductTable = ({ products, ...controls }: { products: Product[] } & ProductControls) => {
-    const { allVisibleSelected, toggleVisibleSelection } = controls;
-    return (
-    <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line overflow-hidden">
-      <div className="overflow-x-auto -mx-4 sm:mx-0 px-4 sm:px-0">
-        <table className="w-full min-w-[640px]">
-          <thead className="bg-pf-canvas border-b border-pf-line">
-            <tr>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left">
-                <input
-                  type="checkbox"
-                  checked={allVisibleSelected}
-                  onChange={toggleVisibleSelection}
-                  className="h-4 w-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
-                  aria-label="Select all visible products"
-                />
-              </th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Product</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Type</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Status</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Price</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Inventory</th>
-              <th className="px-3 sm:px-4 py-2 sm:py-3 text-left text-xs font-medium text-pf-muted uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-pf-line">
-            {products.map((product) => (
-              <ProductRow {...controls} key={product.id} product={product} />
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-  };
-
-export default function GrowerProductsPage() {
-  const { data: session } = useSession();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const strainFilterId = searchParams?.get('strain') || searchParams?.get('strainId') || '';
-  const batchFilterId = searchParams?.get('batch') || searchParams?.get('batchId') || '';
-  const workflowView = normalizeWorkflowView(searchParams?.get('view'));
-  const page = Math.max(1, Number(searchParams?.get('page')) || 1);
-  const [pagination, setPagination] = useState({ page: 1, pageSize: 50, counts: {} as Record<string, number>, inventoryValue: 0 });
-  const [originalPageProducts, setOriginalPageProducts] = useState<Product[]>([]);
-  const listRequest = useRef<AbortController | null>(null);
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [activeFilter, setActiveFilter] = useState<FilterType>('all');
-  const [viewMode, setViewMode] = useState<'card' | 'list'>('list');
-  const [showDisplayMenu, setShowDisplayMenu] = useState(false);
-  const [tableDensity, setTableDensity] = useState<TableDensity>('comfortable');
-  const [showQuickCreate, setShowQuickCreate] = useState(false);
-  const [quickSaving, setQuickSaving] = useState(false);
-  const [quickError, setQuickError] = useState('');
-  const [bulkUpdating, setBulkUpdating] = useState(false);
-  const [bulkMessage, setBulkMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [selectedProductIds, setSelectedProductIds] = useState<Set<string>>(new Set());
-  useBodyOverlay(selectedProductIds.size > 0);
-  const pendingIds = useRef(new Set<string>());
-  const [pendingProductIds, setPendingProductIds] = useState<Set<string>>(new Set());
-  const [deleteCandidate, setDeleteCandidate] = useState<Product | null>(null);
-  const [bulkDeleteOpen, setBulkDeleteOpen] = useState(false);
-  const [openActionMenuId, setOpenActionMenuId] = useState<string | null>(null);
-  const [duplicatingProductId] = useState<string | null>(null);
-  const defaultsKey = session?.user?.id ? `${PRODUCT_DEFAULTS_STORAGE_KEY}:${session.user.id}` : null;
-  const [savedProductDefaults, setSavedProductDefaults] = useState<ProductDefaults | null>(null);
-  const [quickDraftRestored, setQuickDraftRestored] = useState(false);
-  const [growerAccess, setGrowerAccess] = useState<{ businessName?: string; isVerified: boolean; licenseExpiry: string | null; subscriptionPlan: string | null; subscriptionStatus: string | null } | null>(null);
-  const [quickProduct, setQuickProduct] = useState<QuickProductDraft>({
-    name: '',
-    productType: 'Flower',
-    price: '',
-    inventoryQty: '0',
-    unit: 'Gram',
-    isPriceVisible: true,
-  });
-
-  // Load view mode from localStorage on mount
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const timer = window.setTimeout(() => {
-      let saved: string | null = null;
-      try { saved = window.localStorage.getItem('productViewMode'); } catch { /* Optional preference. */ }
-      if (saved === 'card' || saved === 'list') {
-        setViewMode(saved);
-      }
-      setTableDensity(readDensityPreference('phenofarm:density:products'));
-      try {
-        const parsed = JSON.parse((defaultsKey ? window.localStorage.getItem(defaultsKey) : null) || 'null') as ProductDefaults | null;
-        if (parsed) setSavedProductDefaults(parsed);
-      } catch {
-        setSavedProductDefaults(null);
-      }
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, [defaultsKey]);
-
-  // Save view mode to localStorage when changed
-  const handleViewModeChange = (mode: 'card' | 'list') => {
-    setViewMode(mode);
-    if (typeof window !== 'undefined') {
-      try { window.localStorage.setItem('productViewMode', mode); } catch { /* Optional preference. */ }
-    }
-  };
-
-  const handleDensityChange = (mode: TableDensity) => {
-    setTableDensity(mode);
-    saveDensityPreference('phenofarm:density:products', mode);
-  };
-
-  const handleWorkflowViewChange = (view: WorkflowView) => {
-    const params = new URLSearchParams(searchParams?.toString() || '');
-    if (view === 'all') {
-      params.delete('view');
-    } else {
-      params.set('view', view);
-    }
-    params.delete('page');
-    const queryString = params.toString();
-    router.replace(queryString ? `/grower/products?${queryString}` : '/grower/products');
-  };
-
-  useEffect(() => {
-    const controller = new AbortController();
-    fetch('/api/growers/me', { signal: controller.signal }).then((response) => response.ok ? response.json() : null).then(setGrowerAccess).catch(() => null);
-    return () => controller.abort();
-  }, []);
-
-  const fetchProducts = useCallback(async () => {
-    listRequest.current?.abort();
-    const controller = new AbortController();
-    listRequest.current = controller;
-    try {
-      setError(null);
-      const params = new URLSearchParams({ paged: 'true', page: String(page), pageSize: '50', view: workflowView });
-      if (strainFilterId) params.set('strainId', strainFilterId);
-      if (batchFilterId) params.set('batchId', batchFilterId);
-      const response = await fetch(`/api/products?${params}`, { signal: controller.signal });
-      const data = await response.json().catch(() => ({}));
-      if (!response.ok) throw new Error(data.error || 'We could not load products. Please try again.');
-      if (!Array.isArray(data.products)) throw new Error('Product response was incomplete');
-      const next = data.products.map(normalizeFetchedProduct).filter((item: Product | null): item is Product => item !== null);
-      setProducts(next);
-      setOriginalPageProducts(next);
-      setPagination({ page: data.page, pageSize: data.pageSize, counts: data.counts, inventoryValue: data.inventoryValue });
-      setSelectedProductIds(new Set());
-    } catch (err) {
-      if (!controller.signal.aborted) setError(err instanceof Error ? err.message : 'Check your connection, then try again.');
-    } finally {
-      if (!controller.signal.aborted) setLoading(false);
-    }
-  }, [page, workflowView, strainFilterId, batchFilterId]);
-  useEffect(() => {
-    void fetchProducts();
-    return () => listRequest.current?.abort();
-  }, [fetchProducts]);
-
-  const deleteProduct = async (productId: string) => {
-    if (pendingIds.current.has(productId)) return;
-    pendingIds.current.add(productId);
-    setPendingProductIds(new Set(pendingIds.current));
-    try {
-      await deleteRecord('/api/products/' + productId, 'We could not delete product. Please try again.');
-      setProducts((current) => current.filter(item => item.id !== productId));
-      toast.success('Product deleted');
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Network error deleting product');
-    } finally {
-      pendingIds.current.delete(productId);
-      setPendingProductIds(new Set(pendingIds.current));
-      setDeleteCandidate(null);
-    }
-  };
-
-  const toggleAvailability = async (productId: string, currentStatus: boolean) => {
-    if (pendingIds.current.has(productId)) return;
-    const product = products.find((item) => item.id === productId);
-
-    if (product?.status === 'DRAFT') { router.push(`/grower/products/${productId}/edit`); return; }
-
-    if (product && product.inventoryQty <= 0 && !currentStatus) {
-      toast.warning('Add stock before making this product available', {
-        description: 'Products with no stock cannot be requested by buyers.',
-      });
+type Page = {
+  products: Product[];
+  page: number;
+  pageSize: number;
+  total: number;
+  counts: Record<string, number>;
+};
+const views = [
+  ['all', 'All'],
+  ['active', 'Live'],
+  ['drafts', 'Drafts'],
+  ['unavailable', 'Hidden'],
+  ['low-stock', 'Low stock'],
+  ['out-of-stock', 'Sold out'],
+  ['quote-only', 'Price on request'],
+  ['missing-images', 'Missing photos'],
+  ['missing-type', 'Missing type'],
+  ['hidden', 'Not live'],
+  ['deleted', 'Recently deleted'],
+];
+const control =
+  'min-h-11 rounded-lg border border-pf-line-strong bg-pf-raised px-3 text-sm';
+function InlinePrice({
+  product,
+  onSaved,
+}: {
+  product: Product;
+  onSaved: (price: number) => void;
+}) {
+  const [value, setValue] = useState(product.price.toFixed(2)),
+    [error, setError] = useState(''),
+    [busy, setBusy] = useState(false);
+  useEffect(() => setValue(product.price.toFixed(2)), [product.price]);
+  async function save() {
+    const price = parsePrice(value);
+    if (price === null) {
+      setError('Enter a price such as 45.00.');
       return;
     }
-
-    pendingIds.current.add(productId);
-    setPendingProductIds(new Set(pendingIds.current));
-    setProducts((current) => current.map((item) => item.id === productId ? { ...item, isAvailable: !currentStatus } : item));
+    setValue(price.toFixed(2));
+    if (price === product.price || busy) return;
+    setBusy(true);
+    setError('');
     try {
-      const response = await fetch('/api/products/' + productId, {
+      const response = await fetch(`/api/products/${product.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ isAvailable: !currentStatus }),
+        body: JSON.stringify({ price }),
       });
-      if (response.ok) {
-        const updated = await response.json();
-        const updatedInventoryQty = toSafeNonNegativeInteger(
-          (updated as Record<string, unknown>)?.inventoryQty,
-          product?.inventoryQty ?? 0
-        );
-
-        setProducts((current) => current.map(p => p.id === productId
-          ? {
-              ...p,
-              inventoryQty: updatedInventoryQty,
-              isAvailable: toSafeAvailability(
-                (updated as Record<string, unknown>)?.isAvailable,
-                updatedInventoryQty
-              ),
-            }
-          : p));
-      } else {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || 'We could not update product. Please try again.');
-      }
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Could not save price.');
+      onSaved(price);
+      toast.success('Price saved', { id: `price-${product.id}` });
     } catch (error) {
-      setProducts((current) => current.map((item) => item.id === productId ? { ...item, isAvailable: currentStatus } : item));
-      toast.error(error instanceof Error ? error.message : 'Network error updating product');
+      setError(
+        error instanceof Error ? error.message : 'Connection lost. Retry.'
+      );
     } finally {
-      pendingIds.current.delete(productId);
-      setPendingProductIds(new Set(pendingIds.current));
+      setBusy(false);
     }
-  };
-
-  const catalogDefaults = useMemo<ProductDefaults>(() => {
-    if (products.length === 0) return savedProductDefaults || DEFAULT_PRODUCT_DEFAULTS;
-
-    const newestProduct = [...products].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    )[0];
-
-    return {
-      productType: getMostCommonValue(
-        products.map((product) => product.productType || ''),
-        savedProductDefaults?.productType || DEFAULT_PRODUCT_DEFAULTS.productType
-      ),
-      unit: getMostCommonValue(
-        products.map((product) => product.unit || ''),
-        savedProductDefaults?.unit || DEFAULT_PRODUCT_DEFAULTS.unit
-      ),
-      price: newestProduct?.price > 0 ? newestProduct.price.toFixed(2) : savedProductDefaults?.price || '',
-      isPriceVisible: newestProduct?.isPriceVisible ?? savedProductDefaults?.isPriceVisible ?? true,
-    };
-  }, [products, savedProductDefaults]);
-
+  }
+  return (
+    <div>
+      <div className="flex items-center gap-1">
+        <span aria-hidden="true">$</span>
+        <input
+          aria-label={`${product.name} price`}
+          aria-invalid={Boolean(error)}
+          disabled={busy}
+          inputMode="decimal"
+          value={value}
+          onChange={(event) => setValue(event.target.value)}
+          onBlur={() => void save()}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') event.currentTarget.blur();
+          }}
+          className={`${control} w-28 px-2`}
+        />
+        <span className="text-sm text-pf-muted">
+          / {formatProductUnit(product.unit)}
+        </span>
+      </div>
+      {!product.isPriceVisible && (
+        <p className="mt-1 text-sm text-pf-muted">Price on request</p>
+      )}
+      {error && (
+        <p role="alert" className="text-sm text-pf-danger">
+          {error}{' '}
+          <button onClick={() => void save()} className="underline">
+            Retry
+          </button>
+        </p>
+      )}
+    </div>
+  );
+}
+export default function ProductsPage() {
+  const params = useSearchParams(),
+    router = useRouter(),
+    query = params?.toString() || '';
+  const { data: session } = useSession();
+  const defaultsKey = session?.user?.id
+    ? `${PRODUCT_DEFAULTS_STORAGE_KEY}:${session.user.id}`
+    : null;
+  function unitForType(type: string) {
+    try {
+      return (
+        (defaultsKey &&
+          window.localStorage.getItem(`${defaultsKey}:unit:${type}`)) ||
+        defaultUnitForProductType(type)
+      );
+    } catch {
+      return defaultUnitForProductType(type);
+    }
+  }
+  const [page, setPage] = useState<Page | null>(null),
+    [error, setError] = useState(''),
+    [loading, setLoading] = useState(true),
+    [refresh, setRefresh] = useState(0);
+  const [search, setSearch] = useState(params?.get('search') || ''),
+    [selected, setSelected] = useState<string[]>([]),
+    [busy, setBusy] = useState(false),
+    [result, setResult] = useState('');
+  const [quick, setQuick] = useState(false),
+    [quickError, setQuickError] = useState<Record<string, string>>({});
+  const [draft, setDraft] = useState({
+    name: '',
+    productType: 'Flower',
+    subType: '',
+    price: '',
+    inventoryQty: '',
+    unit: 'Lb',
+    isPriceVisible: true,
+  });
+  const [bulkAction, setBulkAction] = useState('isAvailable:true'),
+    [bulkValue, setBulkValue] = useState('');
+  const [csvEnabled, setCsvEnabled] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
+  const view = params?.get('view') || 'all',
+    deleted = view === 'deleted';
+  const returnTo = `/grower/products${query ? `?${query}` : ''}`;
+  const { setIsDirty } = useUnsavedChanges({ enabled: !busy });
   useEffect(() => {
-    setSelectedProductIds((prev) => {
-      if (prev.size === 0) return prev;
-      const validIds = new Set(products.map((product) => product.id));
-      const next = new Set(Array.from(prev).filter((id) => validIds.has(id)));
-      return next.size === prev.size ? prev : next;
-    });
-  }, [products]);
-
-  const applyQuickDefaults = (defaults: ProductDefaults) => {
-    setQuickProduct((prev) => ({
-      ...prev,
-      productType: defaults.productType || prev.productType,
-      unit: defaults.unit || prev.unit,
-      price: defaults.price || prev.price,
-      isPriceVisible: defaults.isPriceVisible,
-    }));
-    setQuickError('');
-  };
-
-  const saveProductDefaults = (defaults: ProductDefaults) => {
-    setSavedProductDefaults(defaults);
-    if (typeof window !== 'undefined') {
-      try { if (defaultsKey) window.localStorage.setItem(defaultsKey, JSON.stringify(defaults)); } catch { /* Storage is optional. */ }
-    }
-  };
-
-  const resetQuickProduct = () => {
-    setQuickProduct({
-      name: '',
-      productType: catalogDefaults.productType || 'Flower',
-      price: catalogDefaults.price || '',
-      inventoryQty: '0',
-      unit: catalogDefaults.unit || 'Gram',
-      isPriceVisible: catalogDefaults.isPriceVisible,
-    });
-    setQuickError('');
-  };
-
-  const toggleQuickCreate = () => {
-    if (showQuickCreate) {
-      setShowQuickCreate(false);
-      return;
-    }
-
-    const hasRestorableDraft = Boolean(
-      quickProduct.name.trim() ||
-      quickProduct.productType !== (catalogDefaults.productType || 'Flower') ||
-      quickProduct.price !== (catalogDefaults.price || '') ||
-      quickProduct.inventoryQty !== '0' ||
-      quickProduct.unit !== (catalogDefaults.unit || 'Gram') ||
-      quickProduct.isPriceVisible !== catalogDefaults.isPriceVisible
+    setIsDirty(
+      quick && Boolean(draft.name || draft.price || draft.inventoryQty)
     );
-    setQuickDraftRestored(hasRestorableDraft);
-    setShowQuickCreate(true);
-  };
-
-  const duplicateProduct = async (product: Product) => {
-    setOpenActionMenuId(null);
-    router.push(`/grower/products/add?duplicate=${encodeURIComponent(product.id)}`);
-  };
-
-  const submitQuickProduct = async (event: FormEvent<HTMLFormElement>) => {
+  }, [quick, draft.name, draft.price, draft.inventoryQty, setIsDirty]);
+  const updateQuery = useCallback(
+    (updates: Record<string, string>) => {
+      const next = new URLSearchParams(query);
+      Object.entries(updates).forEach(([key, value]) => {
+        if (value) next.set(key, value);
+        else next.delete(key);
+      });
+      router.replace(`/grower/products?${next}`, { scroll: false });
+    },
+    [query, router]
+  );
+  useEffect(() => {
+    setSearch(params?.get('search') || '');
+  }, [params]);
+  useEffect(() => {
+    if (search === (params?.get('search') || '')) return;
+    const timer = setTimeout(() => updateQuery({ search, page: '1' }), 300);
+    return () => clearTimeout(timer);
+  }, [search, params, updateQuery]);
+  useEffect(() => {
+    const controller = new AbortController();
+    setLoading(true);
+    setError('');
+    fetch(`/api/products?${query}`, { signal: controller.signal })
+      .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok)
+          throw new Error(data.error || 'Could not load products.');
+        setPage(data);
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) setError(error.message);
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false);
+      });
+    return () => controller.abort();
+  }, [query, refresh]);
+  useEffect(() => {
+    fetch('/api/growers/me')
+      .then((response) => response.json())
+      .then((data) =>
+        setCsvEnabled(
+          ['PRO', 'BUSINESS'].includes(
+            String(data.subscriptionPlan).toUpperCase()
+          )
+        )
+      )
+      .catch(() => {});
+  }, []);
+  useEffect(() => {
+    setSelected([]);
+  }, [query]);
+  useEffect(() => {
+    if (page && location.hash)
+      document
+        .getElementById(location.hash.slice(1))
+        ?.scrollIntoView({ block: 'center' });
+  }, [page]);
+  function patch(id: string, updates: Partial<Product>) {
+    setPage((current) =>
+      current
+        ? {
+            ...current,
+            products: current.products.map((product) =>
+              product.id === id ? { ...product, ...updates } : product
+            ),
+          }
+        : current
+    );
+  }
+  async function change(product: Product, updates: Record<string, unknown>) {
+    const response = await fetch(`/api/products/${product.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || 'Could not save product.');
+    patch(product.id, data);
+    return data;
+  }
+  async function restore(product: Product, available = false) {
+    try {
+      await change(product, { restore: true });
+      if (available) await change(product, { isAvailable: true });
+      setRefresh((value) => value + 1);
+      toast.success('Product restored');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Restore failed.');
+    }
+  }
+  async function remove(product: Product) {
+    try {
+      const response = await fetch(`/api/products/${product.id}`, {
+        method: 'DELETE',
+      });
+      if (!response.ok) throw new Error('Could not delete product.');
+      setRefresh((value) => value + 1);
+      toast.success('Moved to Recently deleted', {
+        duration: 10000,
+        action: {
+          label: 'Undo',
+          onClick: () => void restore(product, product.isAvailable),
+        },
+      });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Delete failed.');
+    }
+  }
+  async function soldOut(product: Product) {
+    try {
+      await change(product, { inventoryQty: 0 });
+      toast.success('Marked sold out', {
+        duration: 10000,
+        action: {
+          label: 'Undo',
+          onClick: () => {
+            void change(product, {
+              inventoryQty: product.inventoryQty,
+              isAvailable: product.isAvailable,
+            }).catch((error) => toast.error(error.message));
+          },
+        },
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Could not update stock.'
+      );
+    }
+  }
+  async function toggle(product: Product) {
+    try {
+      const updated = await change(product, {
+        isAvailable: !product.isAvailable,
+      });
+      toast.success(
+        updated.isAvailable
+          ? 'Product is live'
+          : product.status === 'DRAFT'
+            ? 'Publish the draft to make it live'
+            : product.inventoryQty === 0
+              ? 'Add stock to make it live'
+              : 'Product hidden'
+      );
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Could not update visibility.'
+      );
+    }
+  }
+  async function quickSave(event: React.FormEvent) {
     event.preventDefault();
-    setQuickError('');
-
-    const price = Number(quickProduct.price);
-    const inventoryQty = Number(quickProduct.inventoryQty);
-
-    if (!quickProduct.name.trim()) {
-      setQuickError('Product name is required.');
+    const errors: Record<string, string> = {};
+    if (!draft.name.trim()) errors.name = 'Enter a product name.';
+    if (!draft.productType) errors.productType = 'Choose a type.';
+    if (parsePrice(draft.price) === null)
+      errors.price = 'Enter a price, such as 45.00.';
+    if (parseInventoryQty(draft.inventoryQty) === null)
+      errors.inventoryQty =
+        'Enter whole units. For partial weights, use a smaller unit.';
+    setQuickError(errors);
+    if (Object.keys(errors).length) {
+      formRef.current
+        ?.querySelector<HTMLInputElement>(`[name="${Object.keys(errors)[0]}"]`)
+        ?.focus();
       return;
     }
-
-    if (!quickProduct.productType.trim()) {
-      setQuickError('Product type is required.');
-      return;
-    }
-
-    if (!quickProduct.price.trim() || !Number.isFinite(price) || price < 0) {
-      setQuickError('Enter a valid price.');
-      return;
-    }
-
-    if (!Number.isInteger(inventoryQty) || inventoryQty < 0) {
-      setQuickError('Enter a stock quantity of 0 or more, using whole numbers.');
-      return;
-    }
-
-    const addDetails = (event.nativeEvent as SubmitEvent).submitter?.getAttribute('value') === 'details';
-    setQuickSaving(true);
-
+    setBusy(true);
     try {
       const response = await fetch('/api/products', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: quickProduct.name.trim(),
-          brand: growerAccess?.businessName || '',
-          ...(addDetails ? { status: 'DRAFT', isAvailable: false } : {}),
-          productType: quickProduct.productType.trim(),
-          price,
-          inventoryQty,
-          unit: quickProduct.unit,
-          isAvailable: !addDetails && inventoryQty > 0,
-          isPriceVisible: quickProduct.isPriceVisible,
-          images: [],
+          ...draft,
+          price: parsePrice(draft.price),
+          inventoryQty: parseInventoryQty(draft.inventoryQty),
         }),
       });
-
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        const message = data && typeof data === 'object' && 'error' in data
-          ? String((data as { error?: unknown }).error)
-          : 'Failed to create product.';
-        throw new Error(message);
-      }
-
-      const created = normalizeFetchedProduct(data);
-      if (created) {
-        setProducts((prev) => [created, ...prev]);
-      } else {
-        await fetchProducts();
-      }
-      saveProductDefaults({
-        productType: quickProduct.productType.trim(),
-        unit: quickProduct.unit,
-        price: quickProduct.price,
-        isPriceVisible: quickProduct.isPriceVisible,
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || 'Could not save product.');
+      try {
+        if (defaultsKey)
+          window.localStorage.setItem(
+            `${defaultsKey}:unit:${draft.productType}`,
+            draft.unit
+          );
+      } catch {}
+      toast.success(
+        data.isAvailable ? 'Product is live' : 'Saved but hidden: no stock'
+      );
+      setDraft((current) => ({ ...current, name: '', inventoryQty: '' }));
+      setQuick(false);
+      setRefresh((value) => value + 1);
+    } catch (error) {
+      setQuickError({
+        form:
+          error instanceof Error ? error.message : 'Connection lost. Retry.',
       });
-      resetQuickProduct();
-      setShowQuickCreate(false);
-      if (addDetails && created) router.push(`/grower/products/${created.id}/edit`);
-    } catch (err) {
-      setQuickError(err instanceof Error ? err.message : 'Failed to create product.');
     } finally {
-      setQuickSaving(false);
+      setBusy(false);
     }
-  };
-
-  const toggleProductSelection = (productId: string) => {
-    setSelectedProductIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(productId)) {
-        next.delete(productId);
-      } else {
-        next.add(productId);
-      }
-      return next;
-    });
-  };
-
-  const toggleVisibleSelection = () => {
-    const visibleIds = workflowProducts.map((product) => product.id);
-    const allVisibleSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedProductIds.has(id));
-
-    setSelectedProductIds((prev) => {
-      const next = new Set(prev);
-      if (allVisibleSelected) {
-        visibleIds.forEach((id) => next.delete(id));
-      } else {
-        visibleIds.forEach((id) => next.add(id));
-      }
-      return next;
-    });
-  };
-
-  const runBulkUpdate = async (updates: BulkProductUpdate, successLabel: string) => {
-    if (selectedProductIds.size === 0 || bulkUpdating) return;
-
-    setBulkUpdating(true);
-    setBulkMessage(null);
-
+  }
+  async function bulkSave() {
+    if (busy || !selected.length) return;
+    const [key, raw] = bulkAction.split(':');
+    const updates = {
+      [key]: ['price', 'pricePercent'].includes(key)
+        ? bulkValue
+        : raw === 'true',
+    };
+    setBusy(true);
+    setResult('');
     try {
       const response = await fetch('/api/products/bulk-update', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          productIds: Array.from(selectedProductIds),
-          updates,
-        }),
+        body: JSON.stringify({ productIds: selected, updates }),
       });
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Bulk update failed');
-      }
-
-      setBulkMessage({
-        type: 'success',
-        text: `${successLabel} for ${data.updatedCount ?? selectedProductIds.size} product${selectedProductIds.size === 1 ? '' : 's'}.`,
-      });
-      const updatedIds = new Set<string>(Array.isArray(data.updatedIds) ? data.updatedIds : Array.from(selectedProductIds));
-      setProducts((current) => current.map((product) => updatedIds.has(product.id)
-        ? { ...product, ...updates, isAvailable: updates.isAvailable === undefined ? product.isAvailable : updates.isAvailable && product.inventoryQty > 0 }
-        : product));
-      setSelectedProductIds(new Set());
-    } catch (err) {
-      setBulkMessage({ type: 'error', text: err instanceof Error ? err.message : 'Bulk update failed' });
+      const data = await response.json();
+      if (!response.ok)
+        throw new Error(data.error || 'Could not update products.');
+      const reasons = [
+        ...new Set(
+          (data.skipped || []).map((item: { reason: string }) => item.reason)
+        ),
+      ].join(', ');
+      setResult(
+        `${data.updatedCount} updated${data.skippedCount ? ` · ${data.skippedCount} skipped: ${reasons}` : ''}`
+      );
+      setSelected([]);
+      setRefresh((value) => value + 1);
+      if (key === 'soldOut')
+        toast.success('Marked sold out', {
+          duration: 10000,
+          action: {
+            label: 'Undo',
+            onClick: () => {
+              void Promise.all(
+                data.previous.map((product: Product) =>
+                  change(product, {
+                    inventoryQty: product.inventoryQty,
+                    isAvailable: product.isAvailable,
+                  })
+                )
+              )
+                .then(() => setRefresh((value) => value + 1))
+                .catch((error) => toast.error(error.message));
+            },
+          },
+        });
+    } catch (error) {
+      setResult(
+        error instanceof Error ? error.message : 'Connection lost. Retry.'
+      );
     } finally {
-      setBulkUpdating(false);
+      setBusy(false);
     }
-  };
-
-  const runBulkDelete = async () => {
-    if (selectedProductIds.size === 0 || bulkUpdating) return;
-
-    const idsToDelete = Array.from(selectedProductIds);
-    setBulkUpdating(true);
-    setBulkMessage(null);
-
-    try {
-      const results = await Promise.allSettled(idsToDelete.map(async productId => {
-        await deleteRecord('/api/products/' + productId, 'We could not delete product. Please try again.');
-        return productId;
-      }));
-      const deletedIds = new Set(results.flatMap(result => result.status === 'fulfilled' ? [result.value] : []));
-      const failedIds = idsToDelete.filter(id => !deletedIds.has(id));
-      setProducts(current => current.filter(product => !deletedIds.has(product.id)));
-      setSelectedProductIds(new Set(failedIds));
-      setBulkMessage({ type: failedIds.length ? 'error' : 'success',
-        text: `Deleted ${deletedIds.size} product${deletedIds.size === 1 ? '' : 's'}.${failedIds.length ? ` ${failedIds.length} could not be deleted and remain selected.` : ''}` });
-
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Bulk delete failed';
-      setBulkMessage({ type: 'error', text: message });
-      toast.error(message);
-    } finally {
-      setBulkUpdating(false);
-      setBulkDeleteOpen(false);
-    }
-  };
-
-  const catalogProducts = useMemo(() => {
-    return products.filter((product) => {
-      if (strainFilterId && product.strain?.id !== strainFilterId) return false;
-      if (batchFilterId && product.batchId !== batchFilterId) return false;
-      return true;
-    });
-  }, [products, strainFilterId, batchFilterId]);
-
-  const activeStrainFilterName = useMemo(() => {
-    if (!strainFilterId) return '';
-    return products.find((product) => product.strain?.id === strainFilterId)?.strain?.name || 'selected strain';
-  }, [products, strainFilterId]);
-
-  const activeBatchFilterName = useMemo(() => {
-    if (!batchFilterId) return '';
-    return products.find((product) => product.batchId === batchFilterId)?.batch?.batchNumber || 'selected batch';
-  }, [products, batchFilterId]);
-
-  const activeCatalogFilterLabel = [
-    strainFilterId ? activeStrainFilterName : '',
-    batchFilterId ? activeBatchFilterName : '',
-  ].filter(Boolean).join(' and ');
-
-  const workflowProducts = useMemo(() => {
-    if (workflowView === 'active') {
-      return catalogProducts.filter((product) => product.isAvailable && product.inventoryQty > 0);
-    }
-
-    if (workflowView === 'low-stock') {
-      return catalogProducts.filter((product) => product.inventoryQty > 0 && product.inventoryQty <= 10);
-    }
-
-    if (workflowView === 'quote-only') {
-      return catalogProducts.filter((product) => !product.isPriceVisible);
-    }
-
-    if (workflowView === 'missing-images') {
-      return catalogProducts.filter((product) => product.imageCount === 0);
-    }
-
-    if (workflowView === 'missing-type') {
-      return catalogProducts.filter((product) => !product.productType?.trim());
-    }
-
-    if (workflowView === 'hidden') {
-      return catalogProducts.filter((product) => !product.isAvailable || product.inventoryQty <= 0);
-    }
-
-    return catalogProducts;
-  }, [catalogProducts, workflowView]);
-
-  const catalogStats = useMemo(() => {
-    const counts = { ...pagination.counts };
-    let inventoryValue = pagination.inventoryValue;
-    const adjust = (product: Product, delta: number) => {
-      const matches = { all: true, active: product.isAvailable && product.inventoryQty > 0,
-        'low-stock': product.inventoryQty > 0 && product.inventoryQty <= 10, 'quote-only': !product.isPriceVisible,
-        'missing-images': product.imageCount === 0, 'missing-type': !product.productType?.trim(),
-        hidden: !product.isAvailable || product.inventoryQty <= 0 };
-      Object.entries(matches).forEach(([key, match]) => { if (match) counts[key] = (counts[key] || 0) + delta; });
-      inventoryValue += product.price * product.inventoryQty * delta;
-    };
-    originalPageProducts.forEach(product => adjust(product, -1));
-    catalogProducts.forEach(product => adjust(product, 1));
-    return { counts, inventoryValue };
-  }, [pagination, originalPageProducts, catalogProducts]);
-  const workflowViewOptions = [
-    { key: 'all' as const, label: 'All' }, { key: 'active' as const, label: 'Active' },
-    { key: 'low-stock' as const, label: 'Low stock' }, { key: 'quote-only' as const, label: 'Quote only' },
-    { key: 'missing-images' as const, label: 'Missing images' }, { key: 'missing-type' as const, label: 'Missing type' },
-    { key: 'hidden' as const, label: 'Unavailable' },
-  ].map(view => ({ ...view, count: catalogStats.counts[view.key] || 0 }));
-  const selectedCount = selectedProductIds.size;
-  const allVisibleSelected = workflowProducts.length > 0 && workflowProducts.every((product) => selectedProductIds.has(product.id));
-  const compactMode = tableDensity === 'compact';
-  const tableCellClass = compactMode ? 'px-3 sm:px-4 py-1.5 text-xs' : 'px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm';
-  const cardPaddingClass = compactMode ? 'p-3' : 'p-4';
-
-  // Group products based on active filter
-  const { groups, groupOrder } = useMemo((): { groups: GroupedProducts; groupOrder: string[] } => {
-    const groups: GroupedProducts = {};
-    const groupOrder: string[] = [];
-
-    if (activeFilter === 'all') {
-      groups['All Products'] = workflowProducts;
-      groupOrder.push('All Products');
-      return { groups, groupOrder };
-    }
-
-    if (activeFilter === 'byProductType') {
-      workflowProducts.forEach((product) => {
-        const type = product.productType || 'Uncategorized';
-        if (!groups[type]) {
-          groups[type] = [];
-          groupOrder.push(type);
-        }
-        groups[type].push(product);
-      });
-    } else if (activeFilter === 'byStrain') {
-      workflowProducts.forEach((product) => {
-        const strainName = getStrainName(product) || 'Unknown Strain';
-        if (!groups[strainName]) {
-          groups[strainName] = [];
-          groupOrder.push(strainName);
-        }
-        groups[strainName].push(product);
-      });
-    } else if (activeFilter === 'byBatch') {
-      workflowProducts.forEach((product) => {
-        const batchLabel = product.batch?.batchNumber
-          ? `Batch ${product.batch.batchNumber}`
-          : product.batchId
-            ? `Batch ${product.batchId.slice(0, 8)}...`
-            : 'No Batch';
-        if (!groups[batchLabel]) {
-          groups[batchLabel] = [];
-          groupOrder.push(batchLabel);
-        }
-        groups[batchLabel].push(product);
-      });
-    }
-
-    groupOrder.sort((a, b) => a.localeCompare(b));
-
-    return { groups, groupOrder };
-  }, [activeFilter, workflowProducts]);
-
-  const totalProducts = catalogStats.counts.all || 0;
-  const totalValue = catalogStats.inventoryValue;
-  const availableCount = catalogStats.counts.active || 0;
-
-  const filterTabs = [
-    { key: 'all', label: 'All', icon: 'M4 6h16M4 12h16M4 18h16' },
-    { key: 'byProductType', label: 'Product type', icon: 'M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z' },
-    { key: 'byStrain', label: 'Strain', icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
-    { key: 'byBatch', label: 'Batch', icon: 'M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4' },
-  ] as const;
-
-
-  const productControls: ProductControls = { selectedProductIds, pendingProductIds, toggleProductSelection, toggleAvailability, cardPaddingClass, compactMode, tableCellClass, setOpenActionMenuId, openActionMenuId, duplicateProduct, duplicatingProductId, setDeleteCandidate, allVisibleSelected, toggleVisibleSelection };
-
+  }
+  const pageQuery = Object.fromEntries(new URLSearchParams(query));
   return (
-    <div className="space-y-3 sm:space-y-6 pb-20 sm:pb-24">
-      <div className="grid grid-cols-[1fr_auto] items-center gap-2 sm:flex sm:gap-3">
-        <PageHeader title="Products" className="sm:mr-auto" />
-        <Button variant="primary" asChild className="justify-self-end sm:order-3">
-          <Link href="/grower/products/add">Add product</Link>
-        </Button>
-        <div className="col-span-2 flex items-center gap-2 sm:order-2">
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={toggleQuickCreate}
-            className="shrink-0"
-          >
-            Quick add
-          </Button>
-          <ProductCsvImportDialog enabled={getGrowerPlan(growerAccess) !== 'free'} onImported={fetchProducts} />
-        </div>
-      </div>
-
-      {growerAccess && (!growerAccess.isVerified || isLicenseExpired(growerAccess.licenseExpiry)) ? (
-        <section className="rounded-xl border border-pf-warning-line bg-pf-warning-bg p-4 text-sm text-pf-warning"><strong>Listings are hidden from buyers.</strong> PhenoShop must verify your account and current license before products appear in the marketplace. <Link href="/grower/settings#business-profile" className="font-semibold underline">Review license details</Link></section>
-      ) : null}
-
-      {showQuickCreate && (
-        <form onSubmit={submitQuickProduct} className="rounded-xl border border-pf-accent-line bg-pf-accent-bg p-3 shadow-sm sm:p-4">
-          <div className="flex items-center justify-between gap-2">
-            <div>
-              <h2 className="text-base font-semibold text-pf-text">Quick add</h2>
-            </div>
+    <div className="space-y-4">
+      <PageHeader
+        title="Products"
+        actions={
+          <>
             <button
-              type="button"
-              onClick={() => {
-                resetQuickProduct();
-                setShowQuickCreate(false);
-              }}
-              className="self-start rounded-lg border border-pf-accent-line bg-pf-surface px-3 py-2 text-sm font-medium text-pf-accent hover:bg-pf-accent-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
+              className="min-h-11 rounded-lg bg-pf-accent px-4 text-sm font-semibold text-pf-canvas"
+              onClick={() => setQuick((value) => !value)}
             >
-              Close
+              Add product
             </button>
-          </div>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => applyQuickDefaults(catalogDefaults)}
-              className="rounded-full border border-pf-accent-line bg-pf-surface px-3 py-1 text-xs font-semibold text-pf-accent hover:bg-pf-accent-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
-            >
-              Standard settings
-            </button>
-            {savedProductDefaults && (
-              <button
-                type="button"
-                onClick={() => {
-                  applyQuickDefaults(savedProductDefaults);
-                  setQuickDraftRestored(true);
-                }}
-                className="rounded-full border border-pf-line-strong bg-pf-surface px-3 py-1 text-xs font-semibold text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
-              >
-                Last listing settings
-              </button>
+            <ProductCsvImportDialog
+              enabled={csvEnabled}
+              onImported={() => setRefresh((value) => value + 1)}
+            />
+          </>
+        }
+      />
+      {quick && (
+        <form
+          ref={formRef}
+          onSubmit={quickSave}
+          noValidate
+          className="space-y-3 rounded-xl border border-pf-line bg-pf-surface p-4"
+        >
+          <h2 className="font-semibold">Add product</h2>
+          <label className="block text-sm">
+            Name
+            <input
+              name="name"
+              autoFocus
+              value={draft.name}
+              onChange={(event) =>
+                setDraft({ ...draft, name: event.target.value })
+              }
+              aria-invalid={Boolean(quickError.name)}
+              className={`${control} mt-1 w-full`}
+            />
+            {quickError.name && (
+              <span className="text-pf-danger">{quickError.name}</span>
             )}
-            {quickDraftRestored ? (
-              <span className="inline-flex items-center gap-1 text-xs font-medium text-pf-accent">
-                Draft restored
-                <button
-                  type="button"
-                  onClick={() => {
-                    resetQuickProduct();
-                    setQuickDraftRestored(false);
-                  }}
-                  className="min-h-10 rounded px-2 text-pf-accent underline underline-offset-2 hover:text-pf-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent"
-                >
-                  Clear
-                </button>
-              </span>
-            ) : null}
-          </div>
-
-          {quickError && (
-            <p className="mt-3 rounded-lg border border-pf-danger-line bg-pf-danger-bg px-3 py-2 text-sm text-pf-danger">{quickError}{/free plan|upgrade/i.test(quickError) ? <> <Link href="/grower/pricing" className="font-semibold underline">Compare plans</Link></> : null}</p>
-          )}
-
-          <div className="mt-4 grid grid-cols-2 gap-3 md:grid-cols-6">
-            <label className="col-span-2 text-sm font-medium text-pf-secondary">
-              Product name
-              <input
-                value={quickProduct.name}
-                onChange={(event) => setQuickProduct((prev) => ({ ...prev, name: event.target.value }))}
-                className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent"
-                placeholder="Blueberries NF"
-              />
-            </label>
-            <label className="text-sm font-medium text-pf-secondary">
-              Type
-              <input
-                value={quickProduct.productType}
-                onChange={(event) => setQuickProduct((prev) => ({ ...prev, productType: event.target.value }))}
-                className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent"
-                placeholder="Flower"
-              />
-            </label>
-            <label className="text-sm font-medium text-pf-secondary">
+          </label>
+          <ProductTypeSelector
+            productType={draft.productType}
+            subType={draft.subType}
+            onProductTypeChange={(productType) =>
+              setDraft((current) => ({
+                ...current,
+                productType,
+                unit: unitForType(productType),
+              }))
+            }
+            onSubTypeChange={(subType) =>
+              setDraft((current) => ({ ...current, subType }))
+            }
+          />
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            {(['price', 'inventoryQty'] as const).map((key) => (
+              <label key={key} className="text-sm">
+                {key === 'price' ? 'Price ($)' : 'Stock'}
+                <input
+                  name={key}
+                  inputMode={key === 'price' ? 'decimal' : 'numeric'}
+                  value={draft[key]}
+                  onChange={(event) =>
+                    setDraft({ ...draft, [key]: event.target.value })
+                  }
+                  aria-invalid={Boolean(quickError[key])}
+                  className={`${control} mt-1 w-full`}
+                />
+                {quickError[key] && (
+                  <span className="text-pf-danger">{quickError[key]}</span>
+                )}
+              </label>
+            ))}
+            <label className="text-sm">
               Unit
-              <select value={quickProduct.unit} onChange={(event) => setQuickProduct((prev) => ({ ...prev, unit: event.target.value }))} className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent sm:text-sm">
-                {['Gram', 'Half Ounce', 'Ounce', 'Eighth', 'Quarter', 'Unit', 'Pack', 'Each', 'Lb'].map((unit) => <option key={unit}>{unit}</option>)}
+              <select
+                value={draft.unit}
+                onChange={(event) =>
+                  setDraft({ ...draft, unit: event.target.value })
+                }
+                className={`${control} mt-1 w-full`}
+              >
+                {productUnitOptions().map((unit) => (
+                  <option key={unit} value={unit}>
+                    {formatProductUnit(unit)}
+                  </option>
+                ))}
               </select>
             </label>
-            <label className="text-sm font-medium text-pf-secondary">
-              {quickProduct.isPriceVisible ? 'Price' : 'Internal reference price'}
-              <input
-                type="number"
-                min="0"
-                step="0.01"
-                value={quickProduct.price}
-                onChange={(event) => setQuickProduct((prev) => ({ ...prev, price: event.target.value }))}
-                className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent"
-                placeholder="45.00"
-              />
-            </label>
-            <label className="text-sm font-medium text-pf-secondary">
-              Inventory
-              <input
-                type="number"
-                min="0"
-                step="1"
-                value={quickProduct.inventoryQty}
-                onChange={(event) => setQuickProduct((prev) => ({ ...prev, inventoryQty: event.target.value }))}
-                className="mt-1 min-h-10 w-full rounded-lg border border-pf-line-strong px-3 py-2 text-base sm:text-sm focus:border-pf-accent focus:outline-none focus:ring-1 focus:ring-pf-accent"
-                placeholder="0"
-              />
-            </label>
           </div>
-
-          {!quickProduct.isPriceVisible && <p className="mt-2 text-xs text-pf-muted">Reference price is used for stock value only. Buyers request pricing.</p>}
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-              <label className="flex min-h-10 items-center gap-2 rounded-lg border border-pf-accent-line bg-pf-surface px-3 py-2 text-sm font-medium text-pf-accent">
-                <input
-                  type="checkbox"
-                  checked={quickProduct.isPriceVisible}
-                  onChange={(event) => setQuickProduct((prev) => ({ ...prev, isPriceVisible: event.target.checked }))}
-                  className="h-4 w-4 rounded border-pf-line-strong text-pf-accent focus:ring-pf-accent"
-                />
-                Show price to buyers
-              </label>
-            </div>
-            <Button type="submit" variant="primary" disabled={quickSaving} className="shrink-0">
-              {quickSaving ? 'Creating...' : 'Create listing'}
-            </Button>
-            <Button type="submit" name="next" value="details" variant="outline" disabled={quickSaving}>Create draft and add details</Button>
+          <p className="text-sm text-pf-muted">
+            Stock counts whole selling units. Use oz or g for partial pounds.
+            {draft.inventoryQty === '0' ? ' Zero stock saves hidden.' : ''}
+          </p>
+          {quickError.form && (
+            <p role="alert" className="text-sm text-pf-danger">
+              {quickError.form}
+            </p>
+          )}
+          <div className="flex items-center gap-3">
+            <button
+              disabled={busy}
+              className="min-h-11 rounded-lg bg-pf-accent px-4 text-sm font-semibold text-pf-canvas"
+            >
+              {busy ? 'Saving…' : 'Save'}
+            </button>
+            <Link
+              href={`/grower/products/add?${new URLSearchParams({ returnTo, name: draft.name, productType: draft.productType, subType: draft.subType, price: draft.price, inventoryQty: draft.inventoryQty, unit: draft.unit })}`}
+              className="inline-flex min-h-11 items-center text-sm text-pf-accent"
+            >
+              More details
+            </Link>
           </div>
         </form>
       )}
-
-      {bulkMessage && (
-        <div className={`rounded-lg border px-4 py-3 text-sm ${
-          bulkMessage.type === 'success'
-            ? 'border-pf-accent-line bg-pf-accent-bg text-pf-accent'
-            : 'border-pf-danger-line bg-pf-danger-bg text-pf-danger'
-        }`}>
-          <div className="flex items-center justify-between gap-3">
-            <span>{bulkMessage.text}</span>
-            <button type="button" onClick={() => setBulkMessage(null)} className="rounded text-xs font-semibold opacity-75 hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2">
-              Dismiss
-            </button>
-          </div>
-        </div>
-      )}
-
-      <OperationsSummary items={[{label: 'Products', value: totalProducts}, {label: 'Stock value', value: formatProductMoney(totalValue)}, {label: 'Available', value: availableCount}]} />
-
-      {(strainFilterId || batchFilterId) && (
-        <div className="flex flex-col gap-3 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-4 py-3 text-sm text-pf-accent sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            Showing products for <span className="font-semibold">{activeCatalogFilterLabel}</span>.
-          </p>
-          <Button variant="outline" size="sm" asChild className="bg-pf-surface">
-            <Link href="/grower/products">Clear filter</Link>
-          </Button>
-        </div>
-      )}
-
-      <div className="rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
-        <label htmlFor="product-mobile-filter" className="sr-only">Filter products</label>
-        <select id="product-mobile-filter" value={workflowView} onChange={(event) => handleWorkflowViewChange(event.target.value as WorkflowView)} className="min-h-10 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 text-base sm:hidden">
-          {workflowViewOptions.map((view) => <option key={view.key} value={view.key}>{view.label} ({view.count})</option>)}
-        </select>
-        <p className="mb-2 hidden text-xs font-medium text-pf-muted sm:block">Filter</p>
-        <div className="hidden flex-wrap gap-2 sm:flex">
-          {workflowViewOptions.map((view) => (
-            <button
-              key={view.key}
-              type="button"
-              onClick={() => handleWorkflowViewChange(view.key)}
-              aria-pressed={workflowView === view.key}
-              aria-label={`${view.label}: ${view.count} products`}
-              className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition ${
-                workflowView === view.key
-                  ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
-                  : 'bg-pf-canvas text-pf-secondary hover:bg-pf-surface'
-              } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2`}
-            >
-              <span>{view.label}</span>
-              <span className={`rounded-full px-2 py-0.5 text-xs ${
-                workflowView === view.key ? 'bg-pf-accent/15 text-pf-accent' : 'bg-pf-surface text-pf-muted ring-1 ring-pf-line'
-              }`}>
-                {view.count}
-              </span>
-            </button>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-[1fr_auto_auto]">
+        <label className="sr-only" htmlFor="products-search">
+          Search products
+        </label>
+        <input
+          id="products-search"
+          type="search"
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+          placeholder="Search products, strains or types"
+          className={`${control} col-span-2 sm:col-span-1`}
+        />
+        <label className="sr-only" htmlFor="products-status">
+          Status
+        </label>
+        <select
+          id="products-status"
+          value={view}
+          onChange={(event) =>
+            updateQuery({ view: event.target.value, page: '1' })
+          }
+          className={control}
+        >
+          {views.map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+              {!deleted &&
+              page?.counts[value] !== undefined &&
+              value !== 'deleted'
+                ? ` (${page.counts[value]})`
+                : ''}
+            </option>
           ))}
-        </div>
+        </select>
+        <label className="sr-only" htmlFor="products-sort">
+          Sort products
+        </label>
+        <select
+          id="products-sort"
+          value={`${params?.get('sortBy') || 'createdAt'}:${params?.get('sortOrder') || 'desc'}`}
+          onChange={(event) => {
+            const [sortBy, sortOrder] = event.target.value.split(':');
+            updateQuery({ sortBy, sortOrder, page: '1' });
+          }}
+          className={control}
+        >
+          <option value="createdAt:desc">Newest</option>
+          <option value="name:asc">Name</option>
+          <option value="price:asc">Price: low to high</option>
+          <option value="price:desc">Price: high to low</option>
+          <option value="inventoryQty:asc">Stock: low to high</option>
+        </select>
       </div>
-
-      {/* Filter Tabs & Display Controls */}
-      <div className="bg-pf-surface p-2 sm:p-3 rounded-xl shadow-sm border border-pf-line">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          {/* Filter Tabs */}
-          <div className="flex flex-wrap gap-1">
-            {filterTabs.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setActiveFilter(tab.key as FilterType)}
-                aria-pressed={activeFilter === tab.key}
-                aria-label={tab.key === 'all' ? 'Show all products' : `Group products by ${tab.label}`}
-                className={`flex items-center gap-1.5 px-2.5 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all duration-200 ${
-                  activeFilter === tab.key
-                    ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
-                    : 'text-pf-muted hover:bg-pf-surface hover:text-pf-text'
-                } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2`}
+      {(params?.get('strainId') || params?.get('batchId')) && (
+        <button
+          onClick={() => updateQuery({ strainId: '', batchId: '', page: '1' })}
+          className={`${control} text-pf-accent`}
+        >
+          Clear strain / batch filter
+        </button>
+      )}
+      {error ? (
+        <ErrorState
+          title="Could not load products"
+          description={error}
+          onRetry={() => setRefresh((value) => value + 1)}
+        />
+      ) : loading && !page ? (
+        <LoadingState title="Loading products" />
+      ) : (
+        page && (
+          <>
+            {page.products.length === 0 ? (
+              <EmptyState
+                title={
+                  deleted
+                    ? 'No deleted products'
+                    : search
+                      ? 'No matching products'
+                      : 'No products in this view'
+                }
+                actionButton={
+                  <button
+                    className={`${control} mt-3`}
+                    onClick={() =>
+                      search || view !== 'all'
+                        ? updateQuery({ search: '', view: 'all' })
+                        : setQuick(true)
+                    }
+                  >
+                    {search || view !== 'all' ? 'Clear filters' : 'Add product'}
+                  </button>
+                }
+              />
+            ) : (
+              <div
+                aria-busy={loading}
+                className="rounded-xl border border-pf-line bg-pf-surface"
               >
-                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={tab.icon} />
-                </svg>
-                <span className="hidden sm:inline">{tab.label}</span>
-                <span className="sm:hidden">
-                  {tab.key === 'all' ? 'All' :
-                   tab.key === 'byProductType' ? 'Type' :
-                   tab.key === 'byStrain' ? 'Strain' : 'Batch'}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          <div className="relative hidden sm:block">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowDisplayMenu((prev) => !prev)}
-              aria-expanded={showDisplayMenu}
-              aria-haspopup="menu"
-              className="w-full justify-between gap-3 sm:w-auto"
-            >
-              <span>Display</span>
-              <span className="text-xs font-normal text-pf-muted">
-                {viewMode === 'card' ? 'Cards' : 'List'} · {compactMode ? 'Compact' : 'Comfortable'}
-              </span>
-            </Button>
-            {showDisplayMenu && (
-              <>
-                <button
-                  type="button"
-                  className="fixed inset-0 z-10 cursor-default"
-                  aria-label="Close display settings"
-                  onClick={() => setShowDisplayMenu(false)}
-                />
-                <div className="absolute right-0 top-full z-20 mt-2 w-full rounded-xl border border-pf-line bg-pf-surface p-3 shadow-lg sm:w-72">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-pf-muted">Row spacing</p>
-                      <TableDensityControl value={tableDensity} onChange={handleDensityChange} label="Rows" />
-                    </div>
-                    <div>
-                      <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-pf-muted">View</p>
-                      <div className="grid grid-cols-2 gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            handleViewModeChange('card');
-                            setShowDisplayMenu(false);
-                          }}
-                          aria-pressed={viewMode === 'card'}
-                          className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                            viewMode === 'card'
-                              ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
-                              : 'border border-pf-line text-pf-muted hover:bg-pf-canvas hover:text-pf-text'
-                          } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2`}
-                          title="Card view"
+                {!deleted && (
+                  <label className="flex min-h-11 items-center gap-3 border-b border-pf-line px-3 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={
+                        page.products.length > 0 &&
+                        page.products.every((product) =>
+                          selected.includes(product.id)
+                        )
+                      }
+                      onChange={(event) =>
+                        setSelected(
+                          event.target.checked
+                            ? page.products.map((product) => product.id)
+                            : []
+                        )
+                      }
+                      className="h-5 w-5"
+                    />
+                    Select page
+                  </label>
+                )}
+                {page.products.map((product) => (
+                  <article
+                    id={`product-${product.id}`}
+                    key={product.id}
+                    className="grid scroll-mt-24 grid-cols-1 gap-3 border-b border-pf-line p-3 last:border-b-0 lg:grid-cols-[minmax(12rem,1.5fr)_minmax(10rem,1fr)_minmax(13rem,1fr)_8rem]"
+                  >
+                    <div className="flex gap-3">
+                      {!deleted && (
+                        <label className="flex min-h-11 min-w-11 items-start pt-2">
+                          <input
+                            aria-label={`Select ${product.name}`}
+                            type="checkbox"
+                            checked={selected.includes(product.id)}
+                            onChange={(event) =>
+                              setSelected((current) =>
+                                event.target.checked
+                                  ? [...current, product.id]
+                                  : current.filter((id) => id !== product.id)
+                              )
+                            }
+                            className="h-5 w-5"
+                          />
+                        </label>
+                      )}
+                      <div className="min-w-0">
+                        <Link
+                          className="inline-flex min-h-11 items-center font-semibold text-pf-text hover:underline"
+                          href={`/grower/products/${product.id}/edit?returnTo=${encodeURIComponent(`${returnTo}#product-${product.id}`)}`}
                         >
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                          </svg>
-                          Cards
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            handleViewModeChange('list');
-                            setShowDisplayMenu(false);
-                          }}
-                          aria-pressed={viewMode === 'list'}
-                          className={`flex items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200 ${
-                            viewMode === 'list'
-                              ? 'bg-pf-accent-bg text-pf-accent ring-1 ring-inset ring-pf-accent-line'
-                              : 'border border-pf-line text-pf-muted hover:bg-pf-canvas hover:text-pf-text'
-                          } focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2`}
-                          title="List view"
-                        >
-                          <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M3 14h18M3 6h18M3 18h18" />
-                          </svg>
-                          List
-                        </button>
+                          {product.name}
+                        </Link>
+                        <p className="text-sm text-pf-muted">
+                          {[
+                            product.productType,
+                            product.subType,
+                            product.strain?.name,
+                            product.batch?.batchNumber,
+                          ]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
                       </div>
                     </div>
-                  </div>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {workflowProducts.length > 0 && selectedCount > 0 && (
-        <div className="rounded-xl border border-pf-line bg-pf-surface p-3 shadow-sm">
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                type="button"
-                onClick={toggleVisibleSelection}
-                className="rounded-lg border border-pf-line-strong px-3 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
-              >
-                {allVisibleSelected ? 'Clear all' : 'Select all'}
-              </button>
-              <span className="text-sm text-pf-muted">
-                {selectedCount} selected
-              </span>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {selectedCount > 0 && (
-        <div className="fixed inset-x-0 z-40 px-4 pointer-events-none" style={{ bottom: 'calc(1rem + env(safe-area-inset-bottom))' }}>
-          <div className="mx-auto flex max-w-5xl flex-col gap-3 rounded-2xl border border-pf-line bg-pf-surface p-3 shadow-xl pointer-events-auto sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-sm font-semibold text-pf-text">
-                {selectedCount} product{selectedCount === 1 ? '' : 's'} selected
-              </p>
-              <p className="text-xs text-pf-muted">
-                {bulkUpdating ? 'Updating...' : 'Choose an action for the selected listings.'}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              <Button type="button" variant="secondary" size="sm" disabled={bulkUpdating} onClick={() => runBulkUpdate({ isAvailable: false }, 'Hidden')}>
-                Hide
-              </Button>
-              <Button type="button" variant="secondary" size="sm" disabled={bulkUpdating} onClick={() => runBulkUpdate({ isAvailable: true }, 'Made available')}>
-                Make available
-              </Button>
-              <Button type="button" variant="destructive" size="sm" disabled={bulkUpdating} onClick={() => setBulkDeleteOpen(true)}>
-                Delete
-              </Button>
-              <Button type="button" variant="ghost" size="sm" disabled={bulkUpdating} onClick={() => setSelectedProductIds(new Set())}>
-                Clear selection
-              </Button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {!loading && <Pagination page={pagination.page} pageSize={pagination.pageSize} total={catalogStats.counts[workflowView] || 0} basePath="/grower/products" label="products" query={Object.fromEntries(searchParams?.entries() || [])} />}
-      {/* Products Display */}
-      {loading ? (
-        <LoadingState
-          title="Loading your products"
-          description="Getting the latest product details and stock levels."
-        />
-      ) : error ? (
-        <ErrorState
-          title="Couldn&apos;t load products"
-          description={error}
-          onRetry={fetchProducts}
-        />
-      ) : workflowProducts.length > 0 ? (
-        <div className="space-y-6 sm:space-y-8">
-          {groupOrder.map((groupName) => (
-            <div key={groupName} className="space-y-3 sm:space-y-4">
-              {/* Group Header */}
-              {activeFilter !== 'all' && <div className="flex items-center gap-4">
-                <div className="h-px flex-1 bg-pf-raised"></div>
-                <div className="flex items-center gap-2 bg-pf-canvas px-4 py-2 rounded-full">
-                  <span className="text-sm font-semibold text-pf-secondary">{groupName}</span>
-                  <span className="text-xs text-pf-muted bg-pf-surface px-2 py-0.5 rounded-full border border-pf-line">
-                    {groups[groupName]?.length || 0}
-                  </span>
-                </div>
-                <div className="h-px flex-1 bg-pf-raised"></div>
-              </div>}
-
-              <div className="space-y-3 sm:hidden">{groups[groupName]?.map(product => <MobileProduct key={product.id} product={product} controls={productControls} />)}</div>
-              <div className="hidden sm:block">
-                {viewMode === 'card' ? <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">{groups[groupName]?.map(product => <ProductCard {...productControls} key={product.id} product={product} />)}</div> : <ProductTable {...productControls} products={groups[groupName] || []} />}
+                    {deleted ? (
+                      <p className="self-center text-sm">
+                        {formatProductMoney(product.price)} /{' '}
+                        {formatProductUnit(product.unit)}
+                      </p>
+                    ) : (
+                      <InlinePrice
+                        product={product}
+                        onSaved={(price) => patch(product.id, { price })}
+                      />
+                    )}
+                    {!deleted && (
+                      <div>
+                        <InlineStock
+                          id={product.id}
+                          name={product.name}
+                          quantity={product.inventoryQty}
+                          unit={product.unit}
+                          onSaved={(inventoryQty, isAvailable) =>
+                            patch(product.id, { inventoryQty, isAvailable })
+                          }
+                        />
+                        {product.status !== 'DRAFT' &&
+                          isLowStock(product.inventoryQty, product.unit) && (
+                            <p className="mt-1 text-sm text-pf-warning">
+                              Low stock
+                            </p>
+                          )}
+                      </div>
+                    )}
+                    <div className="flex flex-wrap items-center gap-2 lg:block">
+                      {deleted ? (
+                        <button
+                          className={`${control} text-pf-accent`}
+                          onClick={() => restore(product)}
+                        >
+                          Restore
+                        </button>
+                      ) : (
+                        <>
+                          <button
+                            role="switch"
+                            aria-checked={
+                              product.isAvailable && product.status !== 'DRAFT'
+                            }
+                            aria-label={`${product.name} visibility: ${productVisibility(product)}`}
+                            onClick={() => toggle(product)}
+                            className={`${control} ${productVisibility(product) === 'Live' ? 'border-pf-accent-line text-pf-accent' : 'text-pf-secondary'}`}
+                          >
+                            {productVisibility(product)}
+                          </button>
+                          <details className="relative">
+                            <summary className="flex min-h-11 cursor-pointer items-center rounded-lg px-3 text-sm">
+                              Actions
+                            </summary>
+                            <div className="absolute right-0 z-20 min-w-44 rounded-xl border border-pf-line-strong bg-pf-surface p-1 shadow-xl">
+                              <Link
+                                className="flex min-h-11 items-center px-3 text-sm"
+                                href={`/grower/products/${product.id}/preview`}
+                              >
+                                Preview as buyer
+                              </Link>
+                              <Link
+                                className="flex min-h-11 items-center px-3 text-sm"
+                                href={`/grower/products/add?duplicate=${product.id}&returnTo=${encodeURIComponent(returnTo)}`}
+                              >
+                                Duplicate
+                              </Link>
+                              <button
+                                className="flex min-h-11 w-full items-center px-3 text-sm"
+                                onClick={() => soldOut(product)}
+                              >
+                                Mark sold out
+                              </button>
+                              <button
+                                className="flex min-h-11 w-full items-center px-3 text-sm"
+                                onClick={() => {
+                                  void change(product, {
+                                    isPriceVisible: !product.isPriceVisible,
+                                  }).catch((error) =>
+                                    toast.error(error.message)
+                                  );
+                                }}
+                              >
+                                {product.isPriceVisible
+                                  ? 'Price on request'
+                                  : 'Show price'}
+                              </button>
+                              <button
+                                className="flex min-h-11 w-full items-center px-3 text-sm text-pf-danger"
+                                onClick={() => remove(product)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </details>
+                        </>
+                      )}
+                    </div>
+                  </article>
+                ))}
               </div>
+            )}
+            <Pagination
+              page={page.page}
+              pageSize={page.pageSize}
+              total={page.total}
+              basePath="/grower/products"
+              query={pageQuery}
+              label="products"
+            />
+          </>
+        )
+      )}
+      {(selected.length > 0 || result) && (
+        <div className="sticky bottom-20 z-20 rounded-xl border border-pf-line-strong bg-pf-surface p-3 shadow-lg lg:bottom-4">
+          {selected.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm">{selected.length} selected</span>
+              <select
+                aria-label="Bulk action"
+                value={bulkAction}
+                onChange={(event) => setBulkAction(event.target.value)}
+                className={`${control} max-w-full`}
+              >
+                <option value="isAvailable:true">Make live</option>
+                <option value="isAvailable:false">Hide</option>
+                <option value="soldOut:true">Mark sold out</option>
+                <option value="price:value">Set price</option>
+                <option value="pricePercent:value">Change price by %</option>
+                <option value="isPriceVisible:true">Show price</option>
+                <option value="isPriceVisible:false">Price on request</option>
+              </select>
+              {bulkAction.startsWith('price') && (
+                <input
+                  aria-label={
+                    bulkAction.startsWith('pricePercent')
+                      ? 'Price change percent'
+                      : 'New price'
+                  }
+                  inputMode="decimal"
+                  value={bulkValue}
+                  onChange={(event) => setBulkValue(event.target.value)}
+                  className={`${control} w-28`}
+                />
+              )}
+              <button
+                disabled={busy}
+                onClick={bulkSave}
+                className="min-h-11 rounded-lg bg-pf-accent px-4 text-sm font-semibold text-pf-canvas"
+              >
+                {busy ? 'Saving…' : 'Apply'}
+              </button>
+              <button className={control} onClick={() => setSelected([])}>
+                Clear
+              </button>
             </div>
-          ))}
-        </div>
-      ) : totalProducts > 0 ? (
-        <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
-          <h3 className="text-lg font-semibold text-pf-text mb-2">No products in this view</h3>
-          <p className="text-pf-muted mb-5 max-w-sm mx-auto">
-            Clear filters to see all products.
-          </p>
-          <Button type="button" variant="secondary" onClick={() => handleWorkflowViewChange('all')}>
-            Show all products
-          </Button>
-        </div>
-      ) : (
-        <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pf-surface flex items-center justify-center">
-            <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-pf-text mb-2">No products yet</h3>
-          <p className="text-sm text-pf-muted mb-4 max-w-sm mx-auto">
-            Add a product to start your buyer catalog.
-          </p>
-          <div className="flex flex-col justify-center gap-2 sm:flex-row">
-            <Button
-              type="button"
-              variant="secondary"
-              className="shrink-0"
-              onClick={() => {
-                applyQuickDefaults(catalogDefaults);
-                setShowQuickCreate(true);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-            >
-              Quick add
-            </Button>
-            <Button variant="primary" asChild className="shrink-0">
-              <Link href="/grower/products/add">
-                <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Add product
-              </Link>
-            </Button>
-          </div>
+          )}
+          {result && (
+            <p role="status" className="text-sm">
+              {result}{' '}
+              <button
+                className="min-h-11 px-2 underline"
+                onClick={() => setResult('')}
+              >
+                Dismiss
+              </button>
+            </p>
+          )}
         </div>
       )}
-
-      <ConfirmDialog
-        loading={Boolean(deleteCandidate && pendingProductIds.has(deleteCandidate.id))}
-        open={Boolean(deleteCandidate)}
-        title="Delete product?"
-        description={`Delete ${deleteCandidate?.name || 'this product'} from your catalog. This removes it from buyer browsing and cannot be undone from this screen.`}
-        confirmLabel="Delete product"
-        intent="danger"
-        onCancel={() => setDeleteCandidate(null)}
-        onConfirm={() => {
-          if (deleteCandidate) {
-            deleteProduct(deleteCandidate.id);
-          }
-        }}
-      />
-      <ConfirmDialog
-        loading={bulkUpdating}
-        open={bulkDeleteOpen}
-        title="Delete selected products?"
-        description={`Delete ${selectedCount} selected product${selectedCount === 1 ? '' : 's'} from your catalog. This removes them from buyer browsing and cannot be undone from this screen.`}
-        confirmLabel="Delete selected"
-        intent="danger"
-        onCancel={() => setBulkDeleteOpen(false)}
-        onConfirm={runBulkDelete}
-      />
     </div>
   );
 }

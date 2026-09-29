@@ -20,29 +20,40 @@ export function StickyMobileActionBar({
   helperText,
 }: StickyMobileActionBarProps) {
   useEffect(() => {
-    const currentCount = Number(document.body.dataset.phenofarmStickyMobileActionBarCount || '0');
+    const currentCount = Number(
+      document.body.dataset.phenofarmStickyMobileActionBarCount || '0'
+    );
     const nextCount = currentCount + 1;
 
-    document.body.dataset.phenofarmStickyMobileActionBarCount = String(nextCount);
+    document.body.dataset.phenofarmStickyMobileActionBarCount =
+      String(nextCount);
     document.body.classList.add('phenofarm-has-sticky-mobile-action-bar');
 
     return () => {
       const updatedCount = Math.max(
         0,
-        Number(document.body.dataset.phenofarmStickyMobileActionBarCount || '1') - 1
+        Number(
+          document.body.dataset.phenofarmStickyMobileActionBarCount || '1'
+        ) - 1
       );
 
       if (updatedCount === 0) {
         delete document.body.dataset.phenofarmStickyMobileActionBarCount;
-        document.body.classList.remove('phenofarm-has-sticky-mobile-action-bar');
+        document.body.classList.remove(
+          'phenofarm-has-sticky-mobile-action-bar'
+        );
       } else {
-        document.body.dataset.phenofarmStickyMobileActionBarCount = String(updatedCount);
+        document.body.dataset.phenofarmStickyMobileActionBarCount =
+          String(updatedCount);
       }
     };
   }, []);
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-pf-line bg-pf-surface/95 px-4 py-3 shadow-[0_-10px_25px_rgba(15,23,42,0.08)] backdrop-blur sm:hidden">
+    <div
+      data-sticky-action-bar
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-pf-line bg-pf-surface/95 px-4 py-3 shadow-[0_-10px_25px_rgba(15,23,42,0.08)] backdrop-blur sm:hidden"
+    >
       {helperText && <p className="mb-2 text-xs text-pf-muted">{helperText}</p>}
       <div className={secondary ? 'grid grid-cols-2 gap-2' : 'flex'}>
         {secondary}

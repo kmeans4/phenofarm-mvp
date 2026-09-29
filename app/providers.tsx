@@ -3,7 +3,8 @@
 import { SessionProvider } from 'next-auth/react';
 import type { Session } from 'next-auth';
 import { Toaster } from 'sonner';
-import { ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
+import { UnsavedChangesDialog } from '@/app/components/ui/UnsavedChangesDialog';
 
 export function Providers({
   children,
@@ -12,11 +13,22 @@ export function Providers({
   children: ReactNode;
   session?: Session | null;
 }) {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const query = window.matchMedia('(max-width: 767px)');
+    const update = () => setMobile(query.matches);
+    update();
+    query.addEventListener('change', update);
+    return () => query.removeEventListener('change', update);
+  }, []);
   return (
     <SessionProvider session={session}>
       {children}
-      <Toaster 
-        position="bottom-right"
+      <UnsavedChangesDialog />
+      <Toaster
+        position={mobile ? 'top-center' : 'bottom-right'}
+        closeButton
+        duration={8000}
         theme="dark"
         toastOptions={{
           style: {

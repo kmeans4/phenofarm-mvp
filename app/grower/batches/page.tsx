@@ -1,301 +1,165 @@
 'use client';
-
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Button } from '@/app/components/ui/Button';
+import { useSearchParams } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+import { EmptyState } from '@/app/components/ui/EmptyState';
+import { LoadingState, ErrorState } from '@/app/components/ui/FetchState';
 import { PageHeader } from '@/app/components/ui/PageHeader';
-import { OperationsSummary } from '@/app/grower/components/OperationsSummary';
-import { RecordActions } from '@/app/grower/components/RecordActions';
-import { deleteRecord } from '@/app/components/ui/deleteRecord';
-import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
-import { toast } from '@/app/hooks/useToast';
-import { pluralize } from '@/lib/utils';
-import { formatBatchMetric, formatHarvestDate, parseOptionalBatchMetric } from '@/lib/batch-utils';
-
-interface Strain {
-  id: string;
-  name: string;
-}
-
-interface Batch {
+import { formatBatchMetric, formatHarvestDate } from '@/lib/batch-utils';
+import { deleteUnusedRecord } from '../components/deleteUnusedRecord';
+type Batch = {
   id: string;
   batchNumber: string;
   lotNumber: string | null;
-  harvestDate: string;
   strainId: string;
-  strain: Strain;
-  thc: number | null;
-  cbd: number | null;
-  totalCannabinoids: number | null;
-  coaDocumentUrl: string | null;
+  strain: { name: string };
+  harvestDate: string;
+  thc: string | null;
+  cbd: string | null;
   labDocumentCount: number;
-  _count: {
-    products: number;
-  };
-}
-
+  hasFullCoa?: boolean;
+  _count: { products: number };
+};
+const link =
+  'inline-flex min-h-11 items-center rounded-lg border border-pf-line-strong px-3 text-sm';
 export default function BatchesPage() {
-  const searchParams = useSearchParams();
-  const strainFilterParam = searchParams?.get('strain') || searchParams?.get('strainId') || '';
-  const [batches, setBatches] = useState<Batch[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const filterStrain = strainFilterParam;
-  const [deleteCandidate, setDeleteCandidate] = useState<Batch | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const deleteRef = useRef(false);
-
-  const fetchBatches = useCallback(async (strainId = '') => {
+  const params = useSearchParams(),
+    strainId = params?.get('strainId'),
+    [batches, setBatches] = useState<Batch[]>([]),
+    [search, setSearch] = useState(''),
+    [error, setError] = useState(''),
+    [loading, setLoading] = useState(true);
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError('');
     try {
-      setLoading(true);
-      setError(null);
-      const url = strainId ? `/api/batches?strainId=${encodeURIComponent(strainId)}` : '/api/batches';
-      const response = await fetch(url);
-      if (response.ok) {
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setBatches(data.map((batch: Batch) => ({
-            ...batch,
-            thc: parseOptionalBatchMetric(batch.thc),
-            cbd: parseOptionalBatchMetric(batch.cbd),
-            totalCannabinoids: parseOptionalBatchMetric(batch.totalCannabinoids),
-          })));
-        }
-      } else {
-        const errData = await response.json().catch(() => ({}));
-        setError(errData.error || 'We could not load batches. Please try again.');
-      }
-    } catch {
-      setError('Check your connection, then try again.');
+      const response = await fetch(
+        `/api/batches${strainId ? `?strainId=${encodeURIComponent(strainId)}` : ''}`
+      );
+      if (!response.ok) throw new Error('Could not load batches.');
+      setBatches(await response.json());
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Connection lost.');
     } finally {
       setLoading(false);
     }
-  }, []);
-
+  }, [strainId]);
   useEffect(() => {
-    fetchBatches(strainFilterParam);
-  }, [strainFilterParam, fetchBatches]);
-
-  const deleteBatch = async (batchId: string) => {
-    if (deleteRef.current) return;
-    deleteRef.current = true;
-    setDeleting(true);
-    try {
-      await deleteRecord('/api/batches/' + batchId, 'We could not delete batch. Please try again.');
-      setBatches((current) => current.filter(item => item.id !== batchId));
-      toast.success('Batch deleted');
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Network error deleting batch');
-    } finally {
-      deleteRef.current = false;
-      setDeleting(false);
-      setDeleteCandidate(null);
-    }
-  };
-
-  const activeStrainFilterName = filterStrain ? batches[0]?.strain?.name || 'selected strain' : '';
-  const batchesWithThc = batches.filter((batch) => typeof batch.thc === 'number' && Number.isFinite(batch.thc));
-  const productsHref = (batchId: string) => `/grower/products?batch=${encodeURIComponent(batchId)}`;
-  const labDocumentSummary = (batch: Batch) => `${(batch.labDocumentCount || 0)}/3 lab docs`;
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pf-accent mx-auto mb-4"></div>
-          <p className="text-pf-muted">Loading batches...</p>
-        </div>
-      </div>
-    );
-  }
-
+    void load();
+  }, [load]);
+  const shown = batches.filter((batch) =>
+    `${batch.batchNumber} ${batch.lotNumber || ''} ${batch.strain.name}`
+      .toLowerCase()
+      .includes(search.toLowerCase())
+  );
   return (
-    <div className="space-y-3 sm:space-y-6">
+    <div className="space-y-4">
       <PageHeader
-        mobileInlineActions
         title="Batches"
         actions={
-          <Button variant="primary" asChild className="shrink-0">
-            <Link href="/grower/batches/add" className="inline-flex w-full sm:w-auto justify-center">Add batch</Link>
-          </Button>
+          <Link
+            href={`/grower/batches/add${strainId ? `?strainId=${encodeURIComponent(strainId)}` : ''}`}
+            className="inline-flex min-h-11 items-center rounded-lg bg-pf-accent px-4 text-sm font-semibold text-pf-canvas"
+          >
+            Add batch
+          </Link>
         }
       />
-
-      {error && (
-        <div className="p-4 bg-pf-danger-bg border border-pf-danger-line rounded-lg">
-          <p className="text-pf-danger">{error}</p>
-          <Button variant="secondary" onClick={() => fetchBatches(filterStrain)} className="mt-2">Retry</Button>
-        </div>
-      )}
-
-      <OperationsSummary items={[
-        { label: 'Batches', value: batches.length },
-        { label: 'Products', value: batches.reduce((sum, batch) => sum + batch._count.products, 0) },
-        { label: 'Avg. THC', value: batchesWithThc.length
-          ? formatBatchMetric(batchesWithThc.reduce((sum, batch) => sum + (batch.thc ?? 0), 0) / batchesWithThc.length)
-          : '—' },
-      ]} />
-
-      {filterStrain && (
-        <div className="flex flex-col gap-3 rounded-lg border border-pf-accent-line bg-pf-accent-bg px-4 py-3 text-sm text-pf-accent sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            Showing batches for <span className="font-semibold">{activeStrainFilterName}</span>.
-          </p>
-          <Button variant="outline" size="sm" asChild className="bg-pf-surface">
-            <Link href="/grower/batches">Clear strain filter</Link>
-          </Button>
-        </div>
-      )}
-
-      {/* Batches Display */}
-      {batches.length > 0 ? (
-        <>
-          <div className="sm:hidden space-y-3">
-            {batches.map((batch) => (
-              <div key={batch.id} className="bg-pf-surface rounded-xl shadow-sm border border-pf-line p-3 sm:p-4 space-y-2.5 sm:space-y-3">
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-sm font-semibold text-pf-text">{batch.batchNumber}</p>
-                    {batch.lotNumber && <p className="text-xs text-pf-muted">Lot {batch.lotNumber}</p>}
-                  </div>
-                  <span className="text-xs text-pf-muted">{formatHarvestDate(batch.harvestDate)}</span>
-                </div>
-
-                <p className="text-sm text-pf-muted">{batch.strain?.name || 'No strain'}</p>
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-                  <p className="text-pf-accent">THC <span className="font-semibold">{formatBatchMetric(batch.thc)}</span></p>
-                  <p className="text-pf-info">CBD <span className="font-semibold">{formatBatchMetric(batch.cbd)}</span></p>
-                </div>
-                <div className="flex flex-wrap items-center gap-3 text-sm">
-                    <Link
-                      href={productsHref(batch.id)}
-                      className="inline-flex min-h-10 items-center text-pf-text underline-offset-4 hover:text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
-                    >
-                      {pluralize(batch._count.products, 'product')}
-                    </Link>
-                <p className={`inline-flex w-fit rounded-full border px-2.5 py-1 text-xs font-semibold ${
-                  (batch.labDocumentCount || 0) === 3
-                    ? 'border-pf-accent-line bg-pf-accent-bg text-pf-accent'
-                    : 'border-pf-warning-line bg-pf-warning-bg text-pf-warning'
-                }`}>
-                  {labDocumentSummary(batch)}
-                </p>
-                </div>
-
-                <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-pf-line">
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={'/grower/batches/' + batch.id + '/edit'}>Edit</Link>
-                  </Button>
-                  <Button variant="outline" size="sm" asChild>
-                    <Link href={'/grower/products/add?strainId=' + batch.strainId + '&batchId=' + batch.id}>
-                      Add product
-                    </Link>
-                  </Button>
-                  <RecordActions name={batch.batchNumber} actions={[{ label: 'Delete batch', destructive: true, onSelect: () => setDeleteCandidate(batch) }]} />
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <div className="hidden sm:block bg-pf-surface rounded-xl shadow-sm border border-pf-line overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-pf-canvas border-b border-pf-line">
-                  <tr>
-                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-muted">Batch #</th>
-                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-muted">Strain</th>
-                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-muted">Harvest Date</th>
-                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-muted">THC</th>
-                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-muted">CBD</th>
-                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-muted">Products</th>
-                    <th className="text-left px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm font-medium text-pf-muted">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-pf-line">
-                  {batches.map((batch) => (
-                    <tr key={batch.id} className="hover:bg-pf-canvas">
-                      <td className="px-3 sm:px-4 py-2 sm:py-3">
-                        <span className="font-medium text-sm sm:text-base text-pf-text">{batch.batchNumber}</span>
-                      </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-pf-muted">{batch.strain?.name || 'N/A'}</td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-pf-muted">{formatHarvestDate(batch.harvestDate)}</td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
-                        <span className="text-pf-accent font-medium">{formatBatchMetric(batch.thc)}</span>
-                      </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm">
-                        <span className="text-pf-info font-medium">{formatBatchMetric(batch.cbd)}</span>
-                      </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-pf-muted">
-                        <Link
-                          href={productsHref(batch.id)}
-                          className="underline-offset-4 hover:text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pf-accent focus-visible:ring-offset-2"
-                        >
-                          {pluralize(batch._count.products, 'product')}
-                        </Link>
-                        <div className={`mt-1 inline-flex rounded-full border px-2 py-0.5 text-xs font-semibold ${
-                          (batch.labDocumentCount || 0) === 3
-                            ? 'border-pf-accent-line bg-pf-accent-bg text-pf-accent'
-                            : 'border-pf-warning-line bg-pf-warning-bg text-pf-warning'
-                        }`}>
-                          {labDocumentSummary(batch)}
-                        </div>
-                      </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3">
-                        <div className="flex gap-2">
-                          <Button variant="outline" size="sm" asChild>
-                            <Link href={'/grower/batches/' + batch.id + '/edit'}>Edit</Link>
-                          </Button>
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            asChild
-                          >
-                            <Link href={'/grower/products/add?strainId=' + batch.strainId + '&batchId=' + batch.id}>
-                              Add product
-                            </Link>
-                          </Button>
-                          <RecordActions name={batch.batchNumber} actions={[{ label: 'Delete batch', destructive: true, onSelect: () => setDeleteCandidate(batch) }]} />
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </>
-      ) : (
-        <div className="text-center px-4 py-8 sm:py-12 border border-pf-line rounded-xl bg-pf-surface">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-pf-surface flex items-center justify-center">
-            <svg className="w-8 h-8 text-pf-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-          <h3 className="text-lg font-semibold text-pf-text mb-2">No batches yet</h3>
-          <p className="text-sm text-pf-muted mb-4 max-w-sm mx-auto">
-            Track harvests and lab results for your products.
-          </p>
-          <Button variant="primary" asChild>
-            <Link href="/grower/batches/add">Create your first batch</Link>
-          </Button>
-        </div>
-      )}
-
-      <ConfirmDialog
-        loading={deleting}
-        open={Boolean(deleteCandidate)}
-        title="Delete batch?"
-        description={`Delete ${deleteCandidate?.batchNumber || 'this batch'}. Products attached to this batch should be reviewed before removing it.`}
-        confirmLabel="Delete batch"
-        intent="danger"
-        onCancel={() => setDeleteCandidate(null)}
-        onConfirm={() => {
-          if (deleteCandidate) {
-            deleteBatch(deleteCandidate.id);
-          }
-        }}
+      <label htmlFor="batches-search" className="sr-only">
+        Search batches
+      </label>
+      <input
+        id="batches-search"
+        type="search"
+        placeholder="Search batch, lot or strain"
+        value={search}
+        onChange={(event) => setSearch(event.target.value)}
+        className="min-h-11 w-full rounded-lg border border-pf-line-strong bg-pf-raised px-3 text-sm"
       />
+      {strainId && (
+        <Link href="/grower/batches" className={link}>
+          Show all strains
+        </Link>
+      )}
+      {error ? (
+        <ErrorState description={error} onRetry={load} />
+      ) : loading ? (
+        <LoadingState title="Loading batches" />
+      ) : !shown.length ? (
+        <EmptyState
+          title={search ? 'No matching batches' : 'No batches yet'}
+          action={{
+            href: `/grower/batches/add${strainId ? `?strainId=${strainId}` : ''}`,
+            label: 'Add batch',
+          }}
+        />
+      ) : (
+        <div className="divide-y divide-pf-line rounded-xl border border-pf-line bg-pf-surface">
+          {shown.map((batch) => (
+            <article
+              key={batch.id}
+              className="flex flex-wrap items-center justify-between gap-3 p-3"
+            >
+              <div>
+                <h2 className="font-semibold">
+                  <Link
+                    href={`/grower/batches/${batch.id}/edit`}
+                    className="inline-flex min-h-11 items-center hover:underline"
+                  >
+                    {batch.batchNumber}
+                  </Link>
+                </h2>
+                <p className="text-sm text-pf-secondary">
+                  {batch.strain.name} · {formatHarvestDate(batch.harvestDate)}
+                </p>
+                <p className="mt-1 text-sm text-pf-muted">
+                  THC {formatBatchMetric(batch.thc)} · CBD{' '}
+                  {formatBatchMetric(batch.cbd)} ·{' '}
+                  {batch.hasFullCoa
+                    ? 'Full COA'
+                    : batch.labDocumentCount
+                      ? `${batch.labDocumentCount} lab ${batch.labDocumentCount === 1 ? 'report' : 'reports'}`
+                      : 'No lab reports'}
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <Link
+                  href={`/grower/products/add?batchId=${batch.id}&strainId=${batch.strainId}`}
+                  className={link}
+                >
+                  Add product
+                </Link>
+                <Link
+                  href={`/grower/batches/${batch.id}/edit`}
+                  className={link}
+                >
+                  Edit / labs
+                </Link>
+                {batch._count.products > 0 ? (
+                  <Link
+                    href={`/grower/products?batchId=${batch.id}`}
+                    className={link}
+                  >
+                    Used by {batch._count.products}{' '}
+                    {batch._count.products === 1 ? 'product' : 'products'} ·
+                    View
+                  </Link>
+                ) : (
+                  <button
+                    type="button"
+                    className={`${link} text-pf-danger`}
+                    onClick={() =>
+                      deleteUnusedRecord('batches', batch.id, () => void load())
+                    }
+                  >
+                    Delete
+                  </button>
+                )}
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

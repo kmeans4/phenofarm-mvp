@@ -1,3 +1,4 @@
+import { startOfLicenseDay } from '@/lib/license';
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat('en-US', {
     month: 'short',
@@ -11,11 +12,7 @@ function formatDateTime(date: Date) {
 }
 
 function getDaysUntil(date: Date) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const target = new Date(date);
-  target.setHours(0, 0, 0, 0);
-  return Math.ceil((target.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  return Math.ceil((date.getTime() - startOfLicenseDay().getTime()) / 86400000);
 }
 
 interface LicenseExpiryBadgeProps {
@@ -57,7 +54,11 @@ export function LicenseExpiryBadge({ expiresAt }: LicenseExpiryBadgeProps) {
   }
 
   return (
-    <time dateTime={formatDateTime(expiresAt)} className="text-sm text-pf-secondary" title="License expiration is current">
+    <time
+      dateTime={formatDateTime(expiresAt)}
+      className="text-sm text-pf-secondary"
+      title="License expiration is current"
+    >
       {formattedDate}
     </time>
   );

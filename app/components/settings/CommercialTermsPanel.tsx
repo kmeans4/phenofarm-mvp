@@ -1,199 +1,146 @@
 'use client';
-
-import { useEffect, useState } from 'react';
-import { Button } from '@/app/components/ui/Button';
-import {
-  DEFAULT_COMMERCIAL_TERMS,
-  type CommercialTermsDefaults,
-} from '@/lib/ux-workflow';
-
-const FIELD_CLASS = 'mt-1 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 py-2 text-base sm:text-sm focus:border-green-500 focus:outline-none focus:ring-1 focus:ring-emerald-400';
-
-export function CommercialTermsPanel({ initialData }: { initialData?: { terms: CommercialTermsDefaults; savedAt: string | null } }) {
-  const [terms, setTerms] = useState<CommercialTermsDefaults>(initialData?.terms || DEFAULT_COMMERCIAL_TERMS);
-  const [savedTerms, setSavedTerms] = useState<CommercialTermsDefaults>(initialData?.terms || DEFAULT_COMMERCIAL_TERMS);
-  const termsDirty = JSON.stringify(terms) !== JSON.stringify(savedTerms);
-  const [savedAt, setSavedAt] = useState<string | null>(initialData?.savedAt || null);
-  const [statusMessage, setStatusMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isLoading, setIsLoading] = useState(!initialData);
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (initialData) return;
-    let active = true;
-
-    async function loadTerms() {
-      try {
-        setIsLoading(true);
-        const response = await fetch('/api/grower/commercial-terms');
-        const data = await response.json().catch(() => ({}));
-
-        if (!active) return;
-
-        if (!response.ok) {
-          throw new Error(data.error || 'Unable to load order terms');
-        }
-
-        setTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || {}) });
-        setSavedTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || {}) });
-        setSavedAt(data.savedAt || null);
-      } catch (error) {
-        if (!active) return;
-        setErrorMessage(error instanceof Error ? error.message : 'Unable to load order terms');
-      } finally {
-        if (active) setIsLoading(false);
-      }
-    }
-
-    loadTerms();
-
-    return () => {
-      active = false;
-    };
-  }, [initialData]);
-
-  const updateTerm = (field: keyof CommercialTermsDefaults, value: string) => {
-    setStatusMessage('');
-    setErrorMessage('');
-    setTerms((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const saveTerms = async (nextTerms = terms) => {
-    try {
-      setIsSaving(true);
-      setStatusMessage('');
-      setErrorMessage('');
-
-      const response = await fetch('/api/grower/commercial-terms', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ terms: nextTerms }),
-      });
-      const data = await response.json().catch(() => ({}));
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Unable to save order terms');
-      }
-
-      setTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || nextTerms) });
-      setSavedTerms({ ...DEFAULT_COMMERCIAL_TERMS, ...(data.terms || nextTerms) });
-      setSavedAt(data.savedAt || new Date().toISOString());
-      setStatusMessage('Terms saved.');
-    } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : 'Unable to save order terms');
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const resetDefaults = async () => {
-    setTerms(DEFAULT_COMMERCIAL_TERMS);
-    await saveTerms(DEFAULT_COMMERCIAL_TERMS);
-  };
-
+import { PAYMENT_TERMS_OPTIONS } from '@/lib/order-workflow';
+import type { CommercialTermsDefaults } from '@/lib/ux-workflow';
+const field =
+  'mt-1 min-h-11 w-full rounded-lg border border-pf-line-strong bg-pf-raised px-3 text-base sm:text-sm';
+export const EMPTY_COMMERCIAL_TERMS: CommercialTermsDefaults = {
+  minimumOrder: '',
+  fulfillmentMethods: '',
+  fulfillmentRegion: '',
+  paymentTerms: '',
+  responseWindow: '',
+  contactNote: '',
+};
+export function CommercialTermsPanel({
+  value,
+  onChange,
+  disabled = false,
+}: {
+  value: CommercialTermsDefaults;
+  onChange: (next: CommercialTermsDefaults) => void;
+  disabled?: boolean;
+}) {
+  const update = (key: keyof CommercialTermsDefaults, next: string) =>
+    onChange({ ...value, [key]: next });
   return (
-    <section className="rounded-xl border border-pf-line bg-pf-surface p-4 shadow-sm">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <h2 className="text-base sm:text-lg font-semibold text-pf-text">Order terms</h2>
-          <p className="mt-1 text-sm text-pf-muted">
-            Buyers see these details in your shop. Choose Save terms to save changes to this section.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={resetDefaults} disabled={isLoading || isSaving}>
-            Reset defaults
-          </Button>
-          <Button type="button" variant="primary" size="sm" onClick={() => saveTerms()} disabled={isLoading || isSaving}>
-            {isSaving ? 'Saving...' : 'Save terms'}
-          </Button>
-        </div>
-      </div>
-
-      <div className="mt-4 space-y-3">
-        {!isLoading && <p role="status" className="text-sm text-pf-muted">{termsDirty ? 'Unsaved order terms' : savedAt ? 'Order terms saved' : 'Default terms — choose Save terms to confirm'}</p>}
-        {savedAt && (
-          <p className="rounded-lg bg-pf-canvas px-3 py-2 text-sm text-pf-muted">
-            Last saved {new Date(savedAt).toLocaleString()}
-          </p>
-        )}
-        {statusMessage && <p className="rounded-lg bg-pf-accent-bg px-3 py-2 text-sm text-pf-accent">{statusMessage}</p>}
-        {errorMessage && <p className="rounded-lg bg-pf-danger-bg px-3 py-2 text-sm text-pf-danger">{errorMessage}</p>}
-      </div>
-
-      <div className={`mt-3 grid gap-3 sm:mt-4 sm:gap-4 md:grid-cols-2 ${isLoading ? 'opacity-60' : ''}`}>
-        <label className="block text-sm font-medium text-pf-secondary">
-          Minimum order
+    <section
+      id="terms"
+      className="scroll-mt-36 rounded-xl border border-pf-line bg-pf-surface p-4 sm:p-6"
+    >
+      <span id="commercial-terms" className="scroll-mt-36" />
+      <h2 className="mb-4 font-semibold">Order terms</h2>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <label className="text-sm">
+          Minimum order ($, optional)
           <input
-            value={terms.minimumOrder}
-            onChange={(event) => updateTerm('minimumOrder', event.target.value)}
-            disabled={isLoading || isSaving}
-            className={FIELD_CLASS}
-            placeholder="Example: 10 units or $500 minimum"
+            inputMode="decimal"
+            value={value.minimumOrder}
+            disabled={disabled}
+            onChange={(e) => update('minimumOrder', e.target.value)}
+            onBlur={() => {
+              const n = value.minimumOrder.replace(/[$,]/g, '').trim();
+              if (n && Number.isFinite(Number(n))) update('minimumOrder', n);
+            }}
+            className={field}
+            placeholder="No minimum"
           />
         </label>
-
-        <label className="block text-sm font-medium text-pf-secondary">
-          Pickup or delivery
+        <fieldset>
+          <legend className="text-sm">Fulfillment</legend>
+          <div className="mt-1 flex flex-wrap gap-3">
+            {['Pickup', 'Delivery'].map((method) => (
+              <label
+                key={method}
+                className="flex min-h-11 items-center gap-2 text-sm"
+              >
+                <input
+                  type="checkbox"
+                  className="h-5 w-5 accent-emerald-500"
+                  disabled={disabled}
+                  checked={value.fulfillmentMethods
+                    .toLowerCase()
+                    .includes(method.toLowerCase())}
+                  onChange={(e) => {
+                    const current = ['Pickup', 'Delivery'].filter(
+                      (m) =>
+                        value.fulfillmentMethods
+                          .toLowerCase()
+                          .includes(m.toLowerCase()) && m !== method
+                    );
+                    update(
+                      'fulfillmentMethods',
+                      [...current, ...(e.target.checked ? [method] : [])].join(
+                        ', '
+                      )
+                    );
+                  }}
+                />
+                {method}
+              </label>
+            ))}
+          </div>
+        </fieldset>
+        <label className="text-sm">
+          Delivery area (optional)
           <input
-            value={terms.fulfillmentMethods}
-            onChange={(event) => updateTerm('fulfillmentMethods', event.target.value)}
-            disabled={isLoading || isSaving}
-            className={FIELD_CLASS}
-            placeholder="Pickup, delivery, or coordinated route"
+            value={value.fulfillmentRegion}
+            disabled={disabled}
+            onChange={(e) => update('fulfillmentRegion', e.target.value)}
+            className={field}
           />
         </label>
-
-        <label className="block text-sm font-medium text-pf-secondary">
-          Delivery area
-          <input
-            value={terms.fulfillmentRegion}
-            onChange={(event) => updateTerm('fulfillmentRegion', event.target.value)}
-            disabled={isLoading || isSaving}
-            className={FIELD_CLASS}
-            placeholder="Example: Vermont buyers"
-          />
-        </label>
-
-        <label className="block text-sm font-medium text-pf-secondary">
+        <label className="text-sm">
           Payment terms
-          <input
-            value={terms.paymentTerms}
-            onChange={(event) => updateTerm('paymentTerms', event.target.value)}
-            disabled={isLoading || isSaving}
-            className={FIELD_CLASS}
-            placeholder="Example: Net 15, ACH, check"
-          />
+          <select
+            value={value.paymentTerms}
+            disabled={disabled}
+            onChange={(e) => update('paymentTerms', e.target.value)}
+            className={field}
+          >
+            <option value="">Choose terms</option>
+            {[
+              ...new Set([
+                ...PAYMENT_TERMS_OPTIONS,
+                ...(value.paymentTerms ? [value.paymentTerms] : []),
+              ]),
+            ].map((x) => (
+              <option key={x}>{x}</option>
+            ))}
+          </select>
         </label>
-
-        <label className="block text-sm font-medium text-pf-secondary">
-          Response time
-          <input
-            value={terms.responseWindow}
-            onChange={(event) => updateTerm('responseWindow', event.target.value)}
-            disabled={isLoading || isSaving}
-            className={FIELD_CLASS}
-            placeholder="Example: within 1 business day"
-          />
+        <label className="text-sm">
+          Response time (optional)
+          <select
+            value={value.responseWindow}
+            disabled={disabled}
+            onChange={(e) => update('responseWindow', e.target.value)}
+            className={field}
+          >
+            <option value="">Choose response time</option>
+            {[
+              ...new Set([
+                'Same business day',
+                'Within 1 business day',
+                'Within 2 business days',
+                ...(value.responseWindow ? [value.responseWindow] : []),
+              ]),
+            ].map((x) => (
+              <option key={x}>{x}</option>
+            ))}
+          </select>
         </label>
-
-        <label className="block text-sm font-medium text-pf-secondary">
-          Contact note
+        <label className="text-sm">
+          Contact note (optional)
           <textarea
             rows={2}
-            value={terms.contactNote}
-            onChange={(event) => updateTerm('contactNote', event.target.value)}
-            disabled={isLoading || isSaving}
-            className={FIELD_CLASS}
-            placeholder="Message before pickup or delivery"
+            maxLength={500}
+            value={value.contactNote}
+            disabled={disabled}
+            onChange={(e) => update('contactNote', e.target.value)}
+            className={`${field} py-2`}
           />
         </label>
       </div>
-
-      <p className="mt-4 rounded-lg bg-pf-info-bg px-3 py-2 text-xs text-pf-info">
-        These are your usual terms. Confirm the details with each buyer.
-      </p>
     </section>
   );
 }

@@ -3,6 +3,27 @@ import { db } from '@/lib/db';
 
 type NotificationClient = Prisma.TransactionClient | typeof db;
 
+export async function notifyAdmins(
+  client: NotificationClient,
+  body: string,
+  href = '/admin/review'
+) {
+  const admins = await client.user.findMany({
+    where: { role: 'ADMIN', suspendedAt: null },
+    select: { id: true },
+  });
+  if (admins.length)
+    await client.notification.createMany({
+      data: admins.map((admin) => ({
+        userId: admin.id,
+        type: 'LICENSE_REVIEW',
+        title: 'License review needed',
+        body,
+        href,
+      })),
+    });
+}
+
 export interface NotificationInput {
   userId?: string | null;
   type: string;
@@ -13,18 +34,39 @@ export interface NotificationInput {
   productId?: string | null;
 }
 
-export async function createNotification(client: NotificationClient, input: NotificationInput) {
+export async function createNotification(
+  client: NotificationClient,
+  input: NotificationInput
+) {
   if (!input.userId) return null;
   let body = input.body;
   if (input.conversationId) {
     const conversation = await client.conversation.findUnique({
       where: { id: input.conversationId },
-      select: { growerId: true, productId: true, grower: { select: { businessName: true, userId: true } }, dispensary: { select: { businessName: true, userId: true } } },
+      select: {
+        growerId: true,
+        productId: true,
+        grower: { select: { businessName: true, userId: true } },
+        dispensary: { select: { businessName: true, userId: true } },
+      },
     });
-    if (conversation && [conversation.grower.userId, conversation.dispensary.userId].includes(input.userId)) {
-      const counterpart = conversation.grower.userId === input.userId ? conversation.dispensary : conversation.grower;
+    if (
+      conversation &&
+      [conversation.grower.userId, conversation.dispensary.userId].includes(
+        input.userId
+      )
+    ) {
+      const counterpart =
+        conversation.grower.userId === input.userId
+          ? conversation.dispensary
+          : conversation.grower;
       const productId = input.productId || conversation.productId;
-      const product = productId ? await client.product.findFirst({ where: { id: productId, growerId: conversation.growerId }, select: { name: true } }) : null;
+      const product = productId
+        ? await client.product.findFirst({
+            where: { id: productId, growerId: conversation.growerId },
+            select: { name: true },
+          })
+        : null;
       body = `${counterpart.businessName}${product ? ` · ${product.name}` : ''}`;
     }
   }
@@ -68,9 +110,10 @@ export async function ensureWeeklyLicenseExpiryNotification({
     userId,
     type: 'LICENSE_EXPIRY',
     title: remaining < 0 ? 'License expired' : 'License expires soon',
-    body: remaining < 0
-      ? 'Update your license details to restore marketplace access.'
-      : 'Your license expires within 30 days. Update it before access is interrupted.',
+    body:
+      remaining < 0
+        ? 'Update your license details to restore marketplace access.'
+        : 'Your license expires within 30 days. Update it before access is interrupted.',
     href: settingsHref,
   });
 }

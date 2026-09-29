@@ -1,9 +1,10 @@
-import { getAuthSession } from "@/lib/auth-helpers";
-import { customerSelect, customerWhere } from "@/lib/customers";
-import { redirect, notFound } from "next/navigation";
-import { db } from "@/lib/db";
-import { ExtendedUser } from "@/types";
-import EditCustomerForm from "./components/EditCustomerForm";
+import { signInDestination } from '@/lib/auth-navigation';
+import { getAuthSession } from '@/lib/auth-helpers';
+import { customerSelect, customerWhere } from '@/lib/customers';
+import { redirect, notFound } from 'next/navigation';
+import { db } from '@/lib/db';
+import { ExtendedUser } from '@/types';
+import EditCustomerForm from './components/EditCustomerForm';
 
 interface CustomerData {
   id: string;
@@ -21,14 +22,17 @@ interface CustomerData {
   isPlatformManaged: boolean;
 }
 
-async function fetchCustomer(id: string, growerId: string): Promise<CustomerData | null> {
+async function fetchCustomer(
+  id: string,
+  growerId: string
+): Promise<CustomerData | null> {
   const dispensary = await db.dispensary.findFirst({
     where: { id, ...customerWhere(growerId) },
     select: customerSelect,
   });
-  
+
   if (!dispensary) return null;
-  
+
   return {
     id: dispensary.id,
     businessName: dispensary.businessName,
@@ -42,7 +46,8 @@ async function fetchCustomer(id: string, growerId: string): Promise<CustomerData
     description: dispensary.description,
     email: dispensary.user?.email || dispensary.offPlatformEmail || undefined,
     contactName: dispensary.user?.name || dispensary.contactName || undefined,
-    isPlatformManaged: Boolean(dispensary.userId) || dispensary.createdByGrowerId !== growerId,
+    isPlatformManaged:
+      Boolean(dispensary.userId) || dispensary.createdByGrowerId !== growerId,
   };
 }
 
@@ -54,7 +59,7 @@ export default async function EditCustomerPage({ params }: PageProps) {
   const session = await getAuthSession();
 
   if (!session) {
-    redirect('/auth/sign_in');
+    redirect(await signInDestination());
   }
 
   const user = session.user as ExtendedUser;

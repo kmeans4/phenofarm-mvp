@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { readCart, writeCart, mergeCartItems } from '@/lib/cart';
+import { BuyAgainButton } from '../../components/BuyAgainButton';
 import { useRouter } from 'next/navigation';
 import { ConfirmDialog } from '@/app/components/ui/ConfirmDialog';
 import { getOrderStatusLabel } from '@/lib/order-workflow';
@@ -29,16 +29,35 @@ interface OrderDetailActionsProps {
   isOffPlatform: boolean;
 }
 
-export function OrderDetailActions({ orderDbId, orderId, status, growerId, growerName, items, createdBy, buyerAcknowledgedAt, isOffPlatform }: OrderDetailActionsProps) {
+export function OrderDetailActions({
+  orderDbId,
+  orderId,
+  status,
+  growerId,
+  growerName,
+  items,
+  createdBy,
+  buyerAcknowledgedAt,
+  isOffPlatform,
+}: OrderDetailActionsProps) {
   const router = useRouter();
   const [messageStatus, setMessageStatus] = useState('');
-  const [sendingAction, setSendingAction] = useState<'update' | 'cancel' | 'message' | 'withdraw' | null>(null);
+  const [sendingAction, setSendingAction] = useState<
+    'update' | 'cancel' | 'message' | 'withdraw' | null
+  >(null);
   const [showWithdrawConfirm, setShowWithdrawConfirm] = useState(false);
   const canWithdraw = status === 'PENDING';
-  const needsAcknowledgment = createdBy === 'GROWER' && status === 'PENDING' && !buyerAcknowledgedAt && !isOffPlatform;
-  const canRequestCancellation = ['CONFIRMED', 'PROCESSING', 'SHIPPED'].includes(status);
+  const needsAcknowledgment =
+    createdBy === 'GROWER' &&
+    status === 'PENDING' &&
+    !buyerAcknowledgedAt &&
+    !isOffPlatform;
+  const canRequestCancellation = [
+    'CONFIRMED',
+    'PROCESSING',
+    'SHIPPED',
+  ].includes(status);
   const canRequestUpdate = !['DELIVERED', 'CANCELLED'].includes(status);
-  const canReorder = status === 'DELIVERED' && items.some((item) => item.isAvailable && item.inventoryQty > 0 && item.price != null);
 
   const sendGrowerMessage = async (kind: 'update' | 'cancel' | 'message') => {
     const bodyByKind = {
@@ -61,7 +80,9 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
 
       const data = await response.json().catch(() => ({}));
       if (!response.ok) {
-        throw new Error(data.error || 'We could not open grower chat. Please try again.');
+        throw new Error(
+          data.error || 'We could not open grower chat. Please try again.'
+        );
       }
 
       setMessageStatus('Message ready. Review it in Messages, then send.');
@@ -80,7 +101,9 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
         })
       );
     } catch (error) {
-      setMessageStatus(error instanceof Error ? error.message : 'Failed to open grower chat.');
+      setMessageStatus(
+        error instanceof Error ? error.message : 'Failed to open grower chat.'
+      );
     } finally {
       setSendingAction(null);
     }
@@ -101,66 +124,82 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Unable to withdraw this request.');
+        throw new Error(data.error || 'Unable to withdraw this order.');
       }
 
       setShowWithdrawConfirm(false);
-      setMessageStatus('Request withdrawn. Reserved inventory has been returned.');
+      setMessageStatus('Order withdrawn.');
       router.refresh();
     } catch (error) {
-      setMessageStatus(error instanceof Error ? error.message : 'Unable to withdraw this request.');
+      setMessageStatus(
+        error instanceof Error
+          ? error.message
+          : 'Unable to withdraw this order.'
+      );
     } finally {
       setSendingAction(null);
     }
   };
 
-  const reorder = () => {
-    const reorderItems = items
-      .filter((item) => item.isAvailable && item.inventoryQty > 0 && item.price != null)
-      .map((item) => ({
-        id: item.productId,
-        name: item.name,
-        price: item.price ?? 0,
-        grower: growerName,
-        growerId,
-        quantity: Math.min(item.quantity, item.inventoryQty),
-        maxQty: item.inventoryQty,
-        strain: item.strain || undefined,
-        unit: item.unit || undefined,
-      }));
-
-    if (!writeCart(mergeCartItems(readCart(), reorderItems))) {
-      setMessageStatus('Unable to save the cart. Please free up browser storage and try again.'); return;
-    }
-    router.push('/dispensary/cart');
-  };
-
   const confirmRecordedRequest = async () => {
-    setSendingAction('update'); setMessageStatus('');
-    const response = await fetch(`/api/orders/${orderDbId}/acknowledge`, { method: 'PATCH' });
-    const data = await response.json().catch(() => ({})); setSendingAction(null);
-    if (!response.ok) return setMessageStatus(data.error || 'Unable to confirm request.');
-    setMessageStatus('Request confirmed. The grower has been notified.'); router.refresh();
+    setSendingAction('update');
+    setMessageStatus('');
+    try {
+      const response = await fetch(`/api/orders/${orderDbId}/acknowledge`, {
+        method: 'PATCH',
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok)
+        throw new Error(data.error || 'Unable to confirm order.');
+      setMessageStatus('Order confirmed. The grower has been notified.');
+      router.refresh();
+    } catch (error) {
+      setMessageStatus(
+        error instanceof Error
+          ? error.message
+          : 'Could not confirm. Check your connection and retry.'
+      );
+    } finally {
+      setSendingAction(null);
+    }
   };
 
   return (
     <div className="rounded-xl border border-pf-line bg-pf-surface p-4 shadow-sm">
-      <h2 className="sr-only">Buyer actions</h2>
-      {createdBy === 'GROWER' ? <p className="mt-2 inline-flex rounded-full bg-pf-info-bg px-3 py-1 text-xs font-semibold text-pf-info">{isOffPlatform ? 'Recorded outside PhenoShop' : buyerAcknowledgedAt ? 'Recorded by grower · Confirmed' : 'Recorded by grower'}</p> : null}
-
+      <h2 className="sr-only">Order actions</h2>
+      {createdBy === 'GROWER' ? (
+        <p className="mt-2 inline-flex rounded-full bg-pf-info-bg px-3 py-1 text-xs font-semibold text-pf-info">
+          {isOffPlatform
+            ? 'Recorded outside PhenoShop'
+            : buyerAcknowledgedAt
+              ? 'Recorded by grower · Confirmed'
+              : 'Recorded by grower'}
+        </p>
+      ) : null}
 
       <div className="flex flex-wrap gap-2 [&>button]:min-h-10">
-        {needsAcknowledgment ? <button type="button" onClick={confirmRecordedRequest} disabled={sendingAction !== null} className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#032116] hover:bg-emerald-400 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-emerald-400">Confirm request</button> : null}
+        {needsAcknowledgment ? (
+          <button
+            type="button"
+            onClick={confirmRecordedRequest}
+            disabled={sendingAction !== null}
+            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-[#032116] hover:bg-emerald-400 disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-emerald-400"
+          >
+            Confirm order
+          </button>
+        ) : null}
         <button
           type="button"
-          onClick={() => sendGrowerMessage(canRequestUpdate ? 'update' : 'message')}
+          onClick={() =>
+            sendGrowerMessage(canRequestUpdate ? 'update' : 'message')
+          }
           disabled={sendingAction !== null}
           className="rounded-lg border border-pf-line-strong px-4 py-2 text-sm font-medium text-pf-secondary hover:bg-pf-canvas disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
         >
-          {sendingAction === 'message' || sendingAction === 'update' ? 'Opening...' : 'Message grower'}
+          {sendingAction === 'message' || sendingAction === 'update'
+            ? 'Opening...'
+            : 'Message grower'}
         </button>
-
-
 
         {canWithdraw && (
           <button
@@ -169,7 +208,7 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
             disabled={sendingAction !== null}
             className="rounded-lg border border-pf-danger-line bg-pf-danger-bg px-4 py-2 text-sm font-semibold text-pf-danger hover:bg-pf-danger-bg disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           >
-            {sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw request'}
+            {sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw order'}
           </button>
         )}
 
@@ -184,27 +223,27 @@ export function OrderDetailActions({ orderDbId, orderId, status, growerId, growe
           </button>
         )}
 
-        {status === 'DELIVERED' && (
-          <button
-            type="button"
-            onClick={reorder}
-            disabled={!canReorder}
-            className="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-medium text-[#032116] hover:bg-emerald-400 disabled:cursor-not-allowed disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-          >
-            Reorder available items
-          </button>
-        )}
+        <BuyAgainButton
+          items={items.map((item) => ({
+            productId: item.productId,
+            quantity: item.quantity,
+          }))}
+        />
       </div>
 
       {messageStatus && (
-        <p className="mt-3 rounded-lg bg-pf-canvas px-3 py-2 text-sm text-pf-secondary">{messageStatus}</p>
+        <p className="mt-3 rounded-lg bg-pf-canvas px-3 py-2 text-sm text-pf-secondary">
+          {messageStatus}
+        </p>
       )}
 
       <ConfirmDialog
         open={showWithdrawConfirm}
-        title="Withdraw this request?"
-        description="The grower has not accepted this request yet. Withdrawing it cancels the request and releases the reserved stock."
-        confirmLabel={sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw request'}
+        title="Withdraw this order?"
+        description="The grower has not accepted this order yet. Withdraw it now?"
+        confirmLabel={
+          sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw order'
+        }
         intent="danger"
         onConfirm={withdrawRequest}
         onCancel={() => {

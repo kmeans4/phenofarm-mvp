@@ -1,27 +1,18 @@
 'use client';
-
-import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useSession } from 'next-auth/react';
-import { refreshSessionPriceAlerts } from '../refresh-price-alerts';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { RefreshCw, Trash2 } from 'lucide-react';
 import { useBuyerCollection } from '../hooks/useBuyerCollection';
-import Link from "next/link";
-import {
-  Bell,
-  Trash2,
-  TrendingDown,
-  Package,
-  Loader2,
-  Check,
-  RefreshCw,
-  BellOff
-} from "lucide-react";
-import { PageHeader } from "@/app/components/ui/PageHeader";
-import { Modal } from "@/app/components/ui/Modal";
-import AddToCartButton from "../catalog/components/AddToCartButton";
+import { refreshSessionPriceAlerts } from '../refresh-price-alerts';
+import { PageHeader } from '@/app/components/ui/PageHeader';
 import { ProductImage } from '@/app/components/ui/ProductImage';
-
-interface PriceAlert {
+import { Modal } from '@/app/components/ui/Modal';
+import { toast } from '@/app/hooks/useToast';
+import { formatMoney } from '@/lib/format';
+import { formatProductUnit } from '@/lib/product-display';
+import AddToCartButton from '../catalog/components/AddToCartButton';
+interface Alert {
   id: string;
   productId: string;
   productName: string;
@@ -30,9 +21,7 @@ interface PriceAlert {
   growerId: string;
   targetPrice: number;
   currentPrice: number | null;
-  originalPrice?: number;
   inventoryQty?: number;
-  discountPercent?: number;
   thc?: number | null;
   productType?: string | null;
   unit?: string | null;
@@ -40,387 +29,295 @@ interface PriceAlert {
   isTriggered: boolean;
   triggeredAt?: string;
 }
-
-type AlertTab = 'active' | 'triggered' | 'history';
-
-function normalizeAlerts(value: unknown): PriceAlert[] {
-  if (!Array.isArray(value)) return [];
-  return value.filter(item => item && typeof item === 'object' && typeof item.productId === 'string' && Number.isFinite(Number(item.targetPrice)) && Number(item.targetPrice) > 0)
-    .map(item => ({ ...item, id: item.id || item.productId, productName: item.productName || 'Saved product', growerName: item.growerName || 'Grower', growerId: item.growerId || '',
-      targetPrice: Number(item.targetPrice), currentPrice: item.currentPrice == null ? null : Number(item.currentPrice), createdAt: item.createdAt || new Date(0).toISOString(), isTriggered: item.isTriggered === true })).slice(0, 20);
+function normalizeAlerts(value: unknown): Alert[] {
+  return Array.isArray(value)
+    ? value
+        .filter(
+          (item) =>
+            item &&
+            typeof item.productId === 'string' &&
+            Number(item.targetPrice) > 0
+        )
+        .map((item) => ({
+          ...item,
+          id: item.id || item.productId,
+          targetPrice: Number(item.targetPrice),
+          currentPrice:
+            item.currentPrice == null ? null : Number(item.currentPrice),
+          isTriggered: item.isTriggered === true,
+        }))
+    : [];
 }
-
-interface PriceAlertsContentProps {
-  embedded?: boolean;
-}
-
-export default function PriceAlertsContent({ embedded = false }: PriceAlertsContentProps) {
-  const router = useRouter();
-  const userId = useSession().data?.user?.id;
-  const { items: alerts, setItems: setAlerts, ready, error: syncError, mergeRefresh } = useBuyerCollection('price-alerts', normalizeAlerts);
-  const [refreshError, setRefreshError] = useState('');
-  const [activeTab, setActiveTab] = useState<AlertTab>('active');
-  const isLoading = !ready && !syncError && alerts.length === 0;
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
-  const refreshingRef = useRef(false);
-  const refreshPrices = useCallback(async (force = false) => {
-    if (refreshingRef.current || !userId) return;
-    refreshingRef.current = true; setRefreshing(true); setRefreshError('');
-    try {
-      const data = await refreshSessionPriceAlerts(userId, force);
-      if (data) mergeRefresh(normalizeAlerts(data));
-    } catch (error) { setRefreshError(error instanceof Error ? error.message : 'Could not refresh prices.'); }
-    finally { refreshingRef.current = false; setRefreshing(false); }
-  }, [mergeRefresh, userId]);
-  useEffect(() => { if (ready) void refreshPrices(); }, [ready, refreshPrices]);
-
-  // Remove single alert
-  const removeAlert = useCallback((alertId: string) => {
-    setAlerts(prev => {
-      const updated = prev.filter(a => a.id !== alertId);
-      return updated;
-    });
-  }, [setAlerts]);
-
-  // Clear all alerts for current tab
-  const clearAllAlerts = useCallback(() => {
-    setAlerts(prev => {
-      const updated = prev.filter(a => {
-        if (activeTab === 'active') return a.isTriggered;
-        if (activeTab === 'triggered') return !a.isTriggered;
-        return false;
-      });
-      return updated;
-    });
-    setShowClearConfirm(false);
-  }, [activeTab, setAlerts]);
-
-  // Mark triggered alert as seen
-  const markAsSeen = useCallback((alertId: string) => {
-    setAlerts(prev => {
-      const updated = prev.map(a =>
-        a.id === alertId ? { ...a, isTriggered: false, triggeredAt: undefined } : a
-      );
-      return updated;
-    });
-  }, [setAlerts]);
-
-  // Filter alerts by tab
-  const filteredAlerts = useMemo(() => alerts.filter(alert => {
-    if (activeTab === 'active') return !alert.isTriggered;
-    if (activeTab === 'triggered') return alert.isTriggered;
-    return true;
-  }).sort((a, b) => {
-    if (a.isTriggered !== b.isTriggered) return a.isTriggered ? -1 : 1;
-    const aDate = new Date(a.triggeredAt || a.createdAt).getTime();
-    const bDate = new Date(b.triggeredAt || b.createdAt).getTime();
-    return bDate - aDate;
-  }), [activeTab, alerts]);
-
-  const activeCount = alerts.filter(a => !a.isTriggered).length;
-  const triggeredCount = alerts.filter(a => a.isTriggered).length;
-
-  // Calculate savings stats
-  const totalSavings = alerts
-    .filter(a => a.isTriggered && a.originalPrice)
-    .reduce((sum, a) => sum + ((a.originalPrice || 0) - (a.currentPrice ?? a.originalPrice ?? 0)), 0);
-  const explainerText = 'Prices are checked when you open this page or choose Refresh.';
-
-  if (isLoading) {
-    return (
-      <div className={`${embedded ? 'min-h-48 rounded-xl border border-pf-line bg-pf-surface' : 'min-h-48 rounded-xl border border-pf-line bg-pf-surface'} flex items-center justify-center`}>
-        <div className="flex items-center gap-3 text-pf-accent">
-          <Loader2 className="animate-spin" size={24} />
-          <span className="text-sm">Loading alerts…</span>
-        </div>
-      </div>
-    );
-  }
-
-  const clearAllButton = alerts.length > 0 ? (
-    <button
-      aria-label="Clear alerts"
-      onClick={() => setShowClearConfirm(true)}
-      className="inline-flex w-full items-center justify-center gap-2 rounded-lg px-4 py-2 text-pf-danger transition-colors hover:bg-pf-danger-bg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas sm:w-auto"
-    >
-      <Trash2 size={18} />
-      <span>Clear alerts</span>
-    </button>
-  ) : undefined;
-
-  const tabs = (
-    <div className="flex gap-1 overflow-x-auto">
-      {(['active', 'triggered', 'history'] as AlertTab[]).map((tab) => (
-        <button
-          key={tab}
-          onClick={() => setActiveTab(tab)}
-          className={`relative px-4 py-3 text-sm font-medium border-b-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas ${
-            activeTab === tab
-              ? 'border-emerald-500 text-pf-accent'
-              : 'border-transparent text-pf-muted hover:text-pf-secondary'
-          }`}
-        >
-          {tab === 'history' ? 'All' : tab === 'active' ? `Active (${activeCount})` : `Triggered (${triggeredCount})`}
-        </button>
-      ))}
-    </div>
-  );
-
-  const alertToolbar = (
-    <div className="rounded-xl border border-pf-line bg-pf-surface p-3">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-xs text-pf-muted">{explainerText}</p>
-        <div className="flex items-center gap-2">
-          <button type="button" aria-label="Refresh prices" onClick={() => void refreshPrices(true)} disabled={refreshing} className="inline-flex min-h-10 items-center gap-1.5 rounded-lg px-2 text-sm font-medium text-pf-accent disabled:opacity-50"><RefreshCw size={16} className={refreshing ? 'animate-spin' : ''} />{refreshing ? 'Refreshing…' : 'Refresh'}</button>
-          {alerts.length > 0 && <details className="relative"><summary className="flex min-h-10 cursor-pointer items-center px-2 text-sm text-pf-muted">More</summary><div className="absolute right-0 z-20 mt-1 w-44 rounded-lg border border-pf-line bg-pf-surface p-1 shadow-lg">{clearAllButton}</div></details>}
-        </div>
-      </div>
-      {tabs}
-      {totalSavings > 0 && <p className="mt-2 text-xs text-pf-accent">Price drop since saved: ${totalSavings.toFixed(2)}</p>}
-    </div>
-  );
-
-  return (
-    <div className={embedded ? "pb-4" : "space-y-4"}>
-      {(syncError || refreshError) && <p role="alert" className="rounded-lg bg-pf-danger-bg p-3 text-pf-danger">{syncError || refreshError}</p>}
-      {!embedded && <PageHeader title="Price alerts" actions={<Link href="/dispensary/catalog" className="text-sm text-pf-accent">Browse catalog</Link>} />}
-      {alertToolbar}
-
-      {/* Content */}
-      <div className={embedded ? "py-4" : ""}>
-        {filteredAlerts.length === 0 ? (
-          <EmptyState
-            type={activeTab}
-            onBrowse={() => activeTab === 'triggered' ? setActiveTab('active') : router.push('/dispensary/catalog')}
-          />
-        ) : (
-          <div className="space-y-4">
-            {filteredAlerts.map((alert) => (
-              <AlertCard
-                key={alert.id}
-                alert={alert}
-                onRemove={() => removeAlert(alert.id)}
-                onMarkSeen={() => markAsSeen(alert.id)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Clear Confirmation Modal */}
-      {showClearConfirm && (
-        <Modal open onClose={() => setShowClearConfirm(false)} title="Clear alerts?">
-            <p className="text-pf-muted mb-6">
-              This will remove all {activeTab === 'active' ? 'active' : activeTab === 'triggered' ? 'triggered' : ''} price alerts.
-              This action cannot be undone.
-            </p>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowClearConfirm(false)}
-                className="flex-1 px-4 py-2 border border-pf-line-strong rounded-lg text-pf-secondary hover:bg-pf-canvas focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={clearAllAlerts}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-              >
-                Clear alerts
-              </button>
-            </div>
-        </Modal>
-      )}
-    </div>
-  );
-}
-
-// Alert Card Component
-function AlertCard({
-  alert,
-  onRemove,
-  onMarkSeen
+export default function PriceAlertsContent({
+  embedded = false,
 }: {
-  alert: PriceAlert;
-  onRemove: () => void;
-  onMarkSeen: () => void;
+  embedded?: boolean;
 }) {
-  const priceDrop = alert.originalPrice ? alert.originalPrice - (alert.currentPrice ?? alert.originalPrice) : 0;
-  const discountPercent = alert.discountPercent ||
-    (alert.originalPrice ? Math.round((priceDrop / alert.originalPrice) * 100) : 0);
-  const unitLabel = alert.unit?.toLowerCase() === 'gram' ? 'g' : alert.unit || 'unit';
-  const inventoryQty = alert.inventoryQty ?? 0;
-
+  const userId = useSession().data?.user?.id;
+  const {
+    items: alerts,
+    setItems,
+    ready,
+    error,
+    retry,
+    mergeRefresh,
+  } = useBuyerCollection('price-alerts', normalizeAlerts);
+  const [refreshing, setRefreshing] = useState(false);
+  const busy = useRef(false);
+  const [refreshError, setRefreshError] = useState('');
+  const [editing, setEditing] = useState<Alert | null>(null);
+  const [target, setTarget] = useState('');
+  const [targetError, setTargetError] = useState('');
+  const refresh = useCallback(
+    async (force = false) => {
+      if (!userId || busy.current) return;
+      busy.current = true;
+      setRefreshing(true);
+      setRefreshError('');
+      try {
+        const data = await refreshSessionPriceAlerts(userId, force);
+        if (data) mergeRefresh(data);
+      } catch {
+        setRefreshError(
+          'Could not refresh prices. Retry when your connection is back.'
+        );
+      } finally {
+        setRefreshing(false);
+        busy.current = false;
+      }
+    },
+    [mergeRefresh, userId]
+  );
+  useEffect(() => {
+    if (ready) void refresh();
+  }, [ready, refresh]);
+  function remove(values: Alert[]) {
+    const ids = new Set(values.map((value) => value.id));
+    setItems((current) => current.filter((value) => !ids.has(value.id)));
+    toast.success(values.length === 1 ? 'Alert removed' : 'Alerts cleared', {
+      action: {
+        label: 'Undo',
+        onClick: () =>
+          setItems((current) => [
+            ...current,
+            ...values.filter(
+              (value) =>
+                !current.some((item) => item.productId === value.productId)
+            ),
+          ]),
+      },
+    });
+  }
+  if (!ready && !error)
+    return (
+      <p role="status" className="p-4 text-sm">
+        Loading alerts…
+      </p>
+    );
   return (
-    <div className={`overflow-hidden rounded-xl border bg-pf-surface transition-colors hover:border-pf-line-strong ${
-      alert.isTriggered ? 'border-pf-accent-line ring-1 ring-pf-accent-line' : 'border-pf-line'
-    }`}>
-      {alert.isTriggered && (
-        <div className="flex flex-wrap items-center gap-x-2 gap-y-1 border-b border-pf-accent-line bg-pf-accent-bg px-4 py-2 text-pf-accent">
-          <TrendingDown size={18} />
-          <span className="text-sm font-semibold">Price dropped</span>
-          <span className="text-sm text-pf-accent">
-            At or below your ${alert.targetPrice.toFixed(2)} target.
-          </span>
-        </div>
+    <div className="space-y-3">
+      {!embedded && <PageHeader title="Price alerts" />}
+      {(error || refreshError) && (
+        <p
+          role="alert"
+          className="rounded-lg bg-pf-danger-bg p-3 text-sm text-pf-danger"
+        >
+          {error || refreshError}
+          <button
+            onClick={() => {
+              retry();
+              void refresh(true);
+            }}
+            className="ml-3 min-h-11 underline"
+          >
+            Retry
+          </button>
+        </p>
       )}
-      <div className="p-3 sm:p-4">
-        <div className="grid grid-cols-[3.5rem_minmax(0,1fr)] gap-3 sm:flex sm:gap-4">
-          {/* Product Image */}
-          <Link href={`/dispensary/grower/${alert.growerId}`} className="flex-shrink-0 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-            <ProductImage src={alert.productImage} alt={alert.productName} productType={alert.productType} className="h-14 w-14 rounded-lg sm:h-16 sm:w-16" />
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-sm text-pf-muted">
+          {alerts.length} {alerts.length === 1 ? 'alert' : 'alerts'}
+        </p>
+        <div className="flex gap-2">
+          <button
+            aria-label="Refresh prices"
+            onClick={() => void refresh(true)}
+            disabled={refreshing}
+            className="flex min-h-11 items-center gap-2 px-3 text-sm text-pf-accent"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`}
+            />
+            Refresh
+          </button>
+          {alerts.length > 0 && (
+            <button
+              onClick={() => remove(alerts)}
+              className="min-h-11 px-3 text-sm text-pf-danger"
+            >
+              Clear alerts
+            </button>
+          )}
+        </div>
+      </div>
+      {!alerts.length && !error ? (
+        <section className="rounded-xl border border-pf-line bg-pf-surface p-6 text-center">
+          <h2 className="font-semibold">No price alerts</h2>
+          <Link
+            href="/dispensary/catalog"
+            className="inline-flex min-h-11 items-center text-pf-accent"
+          >
+            Browse catalog
           </Link>
-
-          {/* Product Info */}
-          <div className="contents sm:block sm:flex-1 sm:min-w-0">
-            <div className="contents sm:flex sm:items-start sm:justify-between sm:gap-2">
-              <div>
-                <h3 className="break-words text-sm font-semibold text-pf-text sm:text-base">{alert.productName}</h3>
-                <p className="text-sm text-pf-muted">
-                  by <Link href={`/dispensary/grower/${alert.growerId}`} className="inline-flex min-h-10 items-center rounded-sm text-pf-accent hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas">
-                    {alert.growerName}
+        </section>
+      ) : (
+        [...alerts]
+          .sort(
+            (a, b) =>
+              Number(b.isTriggered) - Number(a.isTriggered) ||
+              Date.parse(b.createdAt) - Date.parse(a.createdAt)
+          )
+          .map((alert) => (
+            <article
+              key={alert.id}
+              className={`space-y-3 rounded-xl border bg-pf-surface p-3 sm:p-4 ${alert.isTriggered ? 'border-pf-accent-line' : 'border-pf-line'}`}
+            >
+              {alert.isTriggered && (
+                <p className="font-semibold text-pf-accent">Price dropped</p>
+              )}
+              <div className="flex gap-3">
+                <Link href={`/dispensary/catalog?product=${alert.productId}`}>
+                  <ProductImage
+                    src={alert.productImage}
+                    alt={alert.productName}
+                    productType={alert.productType}
+                    className="h-16 w-16 shrink-0 rounded-lg"
+                  />
+                </Link>
+                <div className="min-w-0 flex-1">
+                  <Link
+                    href={`/dispensary/catalog?product=${alert.productId}`}
+                    className="break-words font-semibold hover:underline"
+                  >
+                    {alert.productName}
                   </Link>
-                </p>
-
-                <div className="flex flex-wrap gap-2 mt-2">
-                  {alert.thc != null && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pf-accent-bg text-pf-accent">
-                      THC {alert.thc}%
+                  <p className="text-sm text-pf-muted">{alert.growerName}</p>
+                  <p className="mt-1 text-sm">
+                    {alert.currentPrice == null
+                      ? 'Price on request'
+                      : `${formatMoney(alert.currentPrice)} / ${formatProductUnit(alert.unit)}`}
+                    <span className="ml-2 text-pf-muted">
+                      Target {formatMoney(alert.targetPrice)}
                     </span>
-                  )}
-                  {alert.productType && (
-                    <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-pf-raised text-pf-secondary">
-                      {alert.productType}
-                    </span>
-                  )}
-
-                </div>
-              </div>
-
-              {/* Price Info */}
-              <div className="col-span-2 grid min-w-0 grid-cols-2 gap-2 text-left sm:min-w-[220px] sm:text-right">
-                <div className={`rounded-lg border px-3 py-2 ${
-                  alert.isTriggered ? 'border-pf-accent-line bg-pf-accent-bg' : 'border-pf-line bg-pf-canvas'
-                }`}>
-                  <p className="text-xs font-medium uppercase tracking-wide text-pf-muted">Current</p>
-                  <p className={`text-lg font-semibold ${alert.isTriggered ? 'text-pf-accent' : 'text-pf-text'}`}>
-                    {alert.currentPrice == null ? 'Request pricing' : <>${alert.currentPrice.toFixed(2)}<span className="text-xs font-normal text-pf-muted">/{unitLabel}</span></>}
                   </p>
                 </div>
-                <div className="rounded-lg border border-pf-line bg-pf-surface px-3 py-2">
-                  <p className="text-xs font-medium uppercase tracking-wide text-pf-muted">Target</p>
-                  <p className="text-lg font-semibold text-pf-text">${alert.targetPrice.toFixed(2)}<span className="text-xs font-normal text-pf-muted">/{unitLabel}</span></p>
-                </div>
+                <button
+                  aria-label={`Remove alert for ${alert.productName}`}
+                  onClick={() => remove([alert])}
+                  className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-pf-danger"
+                >
+                  <Trash2 className="h-5 w-5" />
+                </button>
               </div>
-            </div>
-
-            {alert.isTriggered && discountPercent > 0 && (
-              <div className="col-span-2 mt-1 inline-flex items-center gap-1 rounded-full bg-pf-warning-bg px-2.5 py-1 text-pf-warning">
-                <TrendingDown size={14} />
-                <span className="text-sm font-semibold">{discountPercent}% below original price</span>
-              </div>
-            )}
-
-            {/* Alert Status */}
-            <div className="col-span-2 flex flex-wrap items-center gap-3 sm:mt-4">
-              {/* Actions */}
-              <div className="ml-auto flex items-center gap-2">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <button
+                  className="min-h-11 rounded-lg border border-pf-line-strong px-3 text-sm"
+                  onClick={() => {
+                    setEditing(alert);
+                    setTarget(String(alert.targetPrice));
+                    setTargetError('');
+                  }}
+                >
+                  Edit target
+                </button>
                 {alert.isTriggered && (
+                  <button
+                    className="min-h-11 px-3 text-sm text-pf-accent"
+                    onClick={() =>
+                      setItems((current) =>
+                        current.map((value) =>
+                          value.id === alert.id
+                            ? {
+                                ...value,
+                                isTriggered: false,
+                                triggeredAt: undefined,
+                              }
+                            : value
+                        )
+                      )
+                    }
+                  >
+                    Dismiss
+                  </button>
+                )}
+                {alert.currentPrice != null && (
                   <AddToCartButton
                     product={{
                       id: alert.productId,
                       name: alert.productName,
                       price: alert.currentPrice,
+                      inventoryQty: alert.inventoryQty || 0,
                       strain: null,
                       unit: alert.unit || null,
                       thc: alert.thc ?? null,
-                      inventoryQty,
+                      images: alert.productImage ? [alert.productImage] : [],
+                      productType: alert.productType,
                     }}
                     growerName={alert.growerName}
                     growerId={alert.growerId}
                     compact
-                    compactLabel="Add to cart"
                   />
                 )}
-
-                {alert.isTriggered && (
-                  <button
-                    onClick={onMarkSeen}
-                    className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-muted hover:text-pf-accent hover:bg-pf-accent-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-                    title="Mark as seen" aria-label="Mark alert as seen"
-                  >
-                    <Check size={18} />
-                  </button>
-                )}
-
-                <button
-                  onClick={onRemove}
-                  className="flex h-10 w-10 items-center justify-center rounded-lg text-pf-muted hover:text-pf-danger hover:bg-pf-danger-bg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
-                  title="Remove alert" aria-label="Remove alert"
-                >
-                  <Trash2 size={18} />
-                </button>
               </div>
-            </div>
-
-            {/* Triggered Info */}
-            {alert.isTriggered && alert.triggeredAt && (
-              <p className="col-span-2 mt-2 text-xs text-pf-muted">
-                Price drop detected on {new Date(alert.triggeredAt).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// Empty State Component
-function EmptyState({ type, onBrowse }: { type: AlertTab; onBrowse: () => void }) {
-  const configs = {
-    active: {
-      icon: BellOff,
-      title: 'No active alerts',
-      description: 'Track a target price from the catalog.',
-      action: 'Browse catalog'
-    },
-    triggered: {
-      icon: Bell,
-      title: 'No price drops yet',
-      description: 'Check back here or choose Refresh to update prices.',
-      action: 'View active alerts'
-    },
-    history: {
-      icon: TrendingDown,
-      title: 'No saved alerts',
-      description: 'Track a target price from the catalog.',
-      action: 'Browse catalog'
-    }
-  };
-
-  const config = configs[type];
-  const Icon = config.icon;
-
-  return (
-    <div className="text-center py-8">
-      <div className="w-12 h-12 bg-pf-surface rounded-full flex items-center justify-center mx-auto mb-3">
-        <Icon className="text-pf-muted" size={32} />
-      </div>
-      <h3 className="text-base font-semibold text-pf-text mb-2">{config.title}</h3>
-      <p className="mx-auto mb-3 max-w-sm text-sm text-pf-muted">{config.description}</p>
-      <button
-        onClick={onBrowse}
-        className="inline-flex items-center gap-2 min-h-10 px-4 py-2 bg-emerald-500 text-[#032116] rounded-lg hover:bg-emerald-400 transition-colors font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
+            </article>
+          ))
+      )}
+      <Modal
+        open={!!editing}
+        onClose={() => setEditing(null)}
+        title="Edit price alert"
       >
-        <Package size={18} />
-        {config.action}
-      </button>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            const price = Number(target.replace(/[$,\s]/g, ''));
+            if (!Number.isFinite(price) || price <= 0) {
+              setTargetError('Enter a price above zero.');
+              return;
+            }
+            setItems((current) =>
+              current.map((alert) =>
+                alert.productId === editing?.productId
+                  ? { ...alert, targetPrice: price, isTriggered: false }
+                  : alert
+              )
+            );
+            setEditing(null);
+          }}
+          className="space-y-3"
+        >
+          <label className="block text-sm">
+            Target price
+            <input
+              type="text"
+              inputMode="decimal"
+              value={target}
+              onChange={(event) => setTarget(event.target.value)}
+              aria-invalid={!!targetError}
+              className="mt-1 min-h-11 w-full rounded-lg border border-pf-line-strong bg-pf-surface px-3 text-base"
+              autoFocus
+            />
+          </label>
+          {targetError && (
+            <p role="alert" className="text-sm text-pf-danger">
+              {targetError}
+            </p>
+          )}
+          <button className="min-h-11 rounded-lg bg-emerald-500 px-4 font-semibold text-[#032116]">
+            Save alert
+          </button>
+        </form>
+      </Modal>
     </div>
   );
 }

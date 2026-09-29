@@ -1,3 +1,4 @@
+import { LegalContents } from './LegalContents';
 
 import { BrandLogo } from '@/app/components/ui/BrandLogo';
 import Link from 'next/link';
@@ -23,7 +24,11 @@ const POLICIES = [
   { href: '/legal/cookies', title: 'Cookie Notice' },
 ];
 
-export function LegalDocument({ title, description, sections }: LegalDocumentProps) {
+export function LegalDocument({
+  title,
+  description,
+  sections,
+}: LegalDocumentProps) {
   return (
     <main className="min-h-screen bg-[#070908] px-4 py-10 text-white sm:px-6 lg:px-8">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -33,22 +38,44 @@ export function LegalDocument({ title, description, sections }: LegalDocumentPro
 
       <div className="relative mx-auto max-w-5xl">
         <nav className="mb-10 flex items-center justify-between gap-4">
-          <Link href="/" className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]"
+          >
             <BrandLogo className="w-40" />
           </Link>
-          <Link href="/help" className="rounded-full border border-white/[0.10] px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-emerald-300/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
+          <Link
+            href="/help"
+            className="rounded-full border border-white/[0.10] px-4 py-2 text-sm font-medium text-gray-200 transition-colors hover:border-emerald-300/50 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]"
+          >
             Help
           </Link>
         </nav>
 
         <header className="rounded-3xl border border-white/[0.06] bg-white/[0.04] p-6 shadow-[0_24px_80px_rgba(0,0,0,0.25)] sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-400">Legal</p>
-          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">{title}</h1>
-          <p className="mt-4 text-sm font-medium text-gray-300">Effective: {EFFECTIVE_DATE}</p>
-          <p className="mt-6 max-w-3xl text-base leading-7 text-gray-400">{description}</p>
-          <nav aria-label="Legal policies" className="mt-5 flex flex-wrap gap-x-5 gap-y-1">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-emerald-400">
+            Legal
+          </p>
+          <h1 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+            {title}
+          </h1>
+          <p className="mt-4 text-sm font-medium text-gray-300">
+            Effective: {EFFECTIVE_DATE}
+          </p>
+          <p className="mt-6 max-w-3xl text-base leading-7 text-gray-400">
+            {description}
+          </p>
+          <nav
+            aria-label="Legal policies"
+            className="mt-5 flex flex-wrap gap-x-5 gap-y-1"
+          >
             {POLICIES.map((policy) => (
-              <Link key={policy.href} href={policy.href} aria-current={policy.title === title ? 'page' : undefined} className="inline-flex min-h-11 items-center rounded text-sm text-emerald-300 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 aria-[current=page]:font-semibold aria-[current=page]:text-white">
+              <Link
+                key={policy.href}
+                href={policy.href}
+                aria-current={policy.title === title ? 'page' : undefined}
+                className="inline-flex min-h-11 items-center rounded text-sm text-emerald-300 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 aria-[current=page]:font-semibold aria-[current=page]:text-white"
+              >
                 {policy.title}
               </Link>
             ))}
@@ -57,24 +84,21 @@ export function LegalDocument({ title, description, sections }: LegalDocumentPro
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[16rem_1fr]">
           <aside className="lg:sticky lg:top-6 lg:self-start">
-            <div className="rounded-2xl border border-white/[0.06] bg-white/[0.035] p-5">
-              <p className="text-sm font-semibold text-white">Contents</p>
-              <ol className="mt-4 space-y-3">
-                {sections.map((section) => (
-                  <li key={section.id}>
-                    <a href={`#${section.id}`} className="inline-flex min-h-10 items-center text-sm leading-5 text-gray-400 transition-colors hover:text-emerald-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
-                      {section.title}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </div>
+            <LegalContents
+              sections={sections.map(({ id, title }) => ({ id, title }))}
+            />
           </aside>
 
           <article className="space-y-5">
             {sections.map((section) => (
-              <section key={section.id} id={section.id} className="scroll-mt-8 rounded-2xl border border-white/[0.06] bg-white/[0.035] p-5 sm:p-6">
-                <h2 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">{section.title}</h2>
+              <section
+                key={section.id}
+                id={section.id}
+                className="scroll-mt-8 rounded-2xl border border-white/[0.06] bg-white/[0.035] p-5 sm:p-6"
+              >
+                <h2 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
+                  {section.title}
+                </h2>
                 <div className="mt-4 space-y-4 break-words text-sm leading-7 text-gray-300">
                   {section.paragraphs?.map((paragraph) => (
                     <p key={paragraph}>{paragraph}</p>
@@ -96,14 +120,19 @@ export function LegalDocument({ title, description, sections }: LegalDocumentPro
               <p className="font-semibold">Questions or requests?</p>
               <p className="mt-1 text-emerald-100/80">
                 Contact{' '}
-                <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex min-h-10 items-center font-medium text-emerald-200 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]">
+                <a
+                  href={`mailto:${SUPPORT_EMAIL}`}
+                  className="inline-flex min-h-10 items-center font-medium text-emerald-200 underline-offset-2 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#070908]"
+                >
                   {SUPPORT_EMAIL}
                 </a>
                 .
               </p>
               <address className="mt-2 not-italic text-emerald-100/80">
-                PhenoShop<br />
-                166 Skeet Road<br />
+                PhenoShop
+                <br />
+                166 Skeet Road
+                <br />
                 Medford, NJ 08055
               </address>
             </div>

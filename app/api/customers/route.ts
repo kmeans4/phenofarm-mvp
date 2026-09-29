@@ -3,18 +3,23 @@ import { db } from '@/lib/db';
 import { customerSelect, customerWhere } from '@/lib/customers';
 import { getAuthSession } from '@/lib/auth-helpers';
 
-
 // Only owned contacts and established trading relationships are visible.
 export async function GET() {
   try {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     if (session.user.role !== 'GROWER' || !session.user.growerId) {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const dispensaries = await db.dispensary.findMany({
@@ -25,7 +30,10 @@ export async function GET() {
     return NextResponse.json(dispensaries, { status: 200 });
   } catch (error) {
     console.error('Error fetching customers:', error);
-    return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Something went wrong. Please try again.' },
+      { status: 500 }
+    );
   }
 }
 
@@ -35,19 +43,64 @@ export async function POST(request: NextRequest) {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     if (session.user.role !== 'GROWER' || !session.user.growerId) {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const body = await request.json().catch(() => null);
-    if (!body || typeof body !== 'object' || Array.isArray(body) || Object.values(body).some(value => value !== undefined && value !== null && (typeof value !== 'string' || value.length > 500))) return NextResponse.json({ error: 'Invalid customer fields' }, { status: 400 });
-    const { businessName, contactName, email, phone, address, city, state, zipCode, licenseNumber } = body;
+    if (
+      !body ||
+      typeof body !== 'object' ||
+      Array.isArray(body) ||
+      Object.values(body).some(
+        (value) =>
+          value !== undefined &&
+          value !== null &&
+          (typeof value !== 'string' || value.length > 500)
+      )
+    )
+      return NextResponse.json(
+        { error: 'Invalid customer fields' },
+        { status: 400 }
+      );
+    const {
+      businessName,
+      contactName,
+      email,
+      phone,
+      address,
+      city,
+      state,
+      zipCode,
+      licenseNumber,
+    } = body;
 
-    if (typeof businessName !== 'string' || !businessName.trim() || businessName.length > 200 || typeof email !== 'string' || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || email.length > 254) {
-      return NextResponse.json({ error: 'Business name and email are required' }, { status: 400 });
+    if (
+      typeof businessName !== 'string' ||
+      !businessName.trim() ||
+      businessName.length > 200 ||
+      (!email?.trim() && !phone?.trim()) ||
+      (email?.trim() &&
+        (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) ||
+          email.length > 254)) ||
+      (phone?.trim() && phone.replace(/\D/g, '').length < 7)
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Enter a business name and either a valid phone number or email.',
+        },
+        { status: 400 }
+      );
     }
 
     const dispensary = await db.dispensary.create({
@@ -59,17 +112,23 @@ export async function POST(request: NextRequest) {
         phone: phone?.trim() || null,
         address: address?.trim() || null,
         city: city?.trim() || null,
-        state: state?.trim() || 'VT',
+        state: state?.trim() || null,
         zip: zipCode?.trim() || null,
-        offPlatformEmail: email.trim().toLowerCase(),
+        offPlatformEmail: email?.trim().toLowerCase() || null,
         isOffPlatform: true,
       },
       select: customerSelect,
     });
 
-    return NextResponse.json({ ...dispensary, email: email.trim().toLowerCase() }, { status: 201 });
+    return NextResponse.json(
+      { ...dispensary, email: email?.trim().toLowerCase() || null },
+      { status: 201 }
+    );
   } catch (error) {
     console.error('Error creating customer:', error);
-    return NextResponse.json({ error: 'Failed to create customer' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to create customer' },
+      { status: 500 }
+    );
   }
 }

@@ -1,8 +1,8 @@
 export const ORDER_STATUS_LABELS: Record<string, string> = {
-  PENDING: 'Submitted',
+  PENDING: 'New',
   CONFIRMED: 'Accepted',
   PROCESSING: 'Preparing',
-  SHIPPED: 'Ready / In transit',
+  SHIPPED: 'On the way',
   DELIVERED: 'Delivered',
   CANCELLED: 'Cancelled',
 };
@@ -18,7 +18,10 @@ export const ORDER_STATUS_VALUES = [
 
 export type OrderStatusValue = (typeof ORDER_STATUS_VALUES)[number];
 
-export const ORDER_STATUS_TRANSITIONS: Record<OrderStatusValue, OrderStatusValue[]> = {
+export const ORDER_STATUS_TRANSITIONS: Record<
+  OrderStatusValue,
+  OrderStatusValue[]
+> = {
   PENDING: ['CONFIRMED', 'CANCELLED'],
   CONFIRMED: ['PROCESSING', 'CANCELLED'],
   PROCESSING: ['SHIPPED', 'CANCELLED'],
@@ -29,18 +32,18 @@ export const ORDER_STATUS_TRANSITIONS: Record<OrderStatusValue, OrderStatusValue
 
 export const ORDER_STATUS_HELP: Record<string, string> = {
   PENDING: 'Waiting for grower review',
-  CONFIRMED: 'Grower accepted the request',
+  CONFIRMED: 'Grower accepted the order',
   PROCESSING: 'Grower is preparing the order',
   SHIPPED: 'Ready, picked up, or in transit',
   DELIVERED: 'Order delivered',
-  CANCELLED: 'Request was cancelled',
+  CANCELLED: 'Order was cancelled',
 };
 
 export const ORDER_STATUS_STEPS = [
-  { status: 'PENDING', label: 'Submitted' },
+  { status: 'PENDING', label: 'New' },
   { status: 'CONFIRMED', label: 'Accepted' },
   { status: 'PROCESSING', label: 'Preparing' },
-  { status: 'SHIPPED', label: 'Ready / In transit' },
+  { status: 'SHIPPED', label: 'On the way' },
   { status: 'DELIVERED', label: 'Delivered' },
 ];
 
@@ -60,6 +63,7 @@ export interface OrderRequestNoteFields {
   requestedWindow: string;
   paymentTerms: string;
   buyerNotes: string;
+  deliveryAddress?: string;
 }
 
 export function getOrderStatusLabel(status: string) {
@@ -67,32 +71,47 @@ export function getOrderStatusLabel(status: string) {
 }
 
 export function getOrderStatusHelp(status: string) {
-  return ORDER_STATUS_HELP[status] || 'Review the order request details';
+  return ORDER_STATUS_HELP[status] || 'Review the order details';
 }
 
 export function isOrderStatus(value: unknown): value is OrderStatusValue {
-  return typeof value === 'string' && ORDER_STATUS_VALUES.includes(value as OrderStatusValue);
+  return (
+    typeof value === 'string' &&
+    ORDER_STATUS_VALUES.includes(value as OrderStatusValue)
+  );
 }
 
-export function getAllowedOrderStatusTransitions(status: string): OrderStatusValue[] {
+export function getAllowedOrderStatusTransitions(
+  status: string
+): OrderStatusValue[] {
   return isOrderStatus(status) ? ORDER_STATUS_TRANSITIONS[status] : [];
 }
 
-export function canTransitionOrderStatus(currentStatus: string, nextStatus: string) {
+export function canTransitionOrderStatus(
+  currentStatus: string,
+  nextStatus: string
+) {
   if (currentStatus === nextStatus) return true;
-  return getAllowedOrderStatusTransitions(currentStatus).includes(nextStatus as OrderStatusValue);
+  return getAllowedOrderStatusTransitions(currentStatus).includes(
+    nextStatus as OrderStatusValue
+  );
 }
 
 export function canEditOrderItems(status: string) {
-  return status === 'PENDING' || status === 'CONFIRMED' || status === 'PROCESSING';
+  return (
+    status === 'PENDING' || status === 'CONFIRMED' || status === 'PROCESSING'
+  );
 }
 
-export function getInvalidOrderStatusTransitionMessage(currentStatus: string, nextStatus: string) {
+export function getInvalidOrderStatusTransitionMessage(
+  currentStatus: string,
+  nextStatus: string
+) {
   const allowed = getAllowedOrderStatusTransitions(currentStatus);
   const allowedLabels = allowed.map(getOrderStatusLabel).join(', ');
   return allowed.length > 0
-    ? `Cannot move request from ${getOrderStatusLabel(currentStatus)} to ${getOrderStatusLabel(nextStatus)}. Allowed next steps: ${allowedLabels}.`
-    : `Cannot move request from ${getOrderStatusLabel(currentStatus)} to ${getOrderStatusLabel(nextStatus)}.`;
+    ? `Cannot move order from ${getOrderStatusLabel(currentStatus)} to ${getOrderStatusLabel(nextStatus)}. Allowed next steps: ${allowedLabels}.`
+    : `Cannot move order from ${getOrderStatusLabel(currentStatus)} to ${getOrderStatusLabel(nextStatus)}.`;
 }
 
 export function buildOrderRequestNotes(fields: OrderRequestNoteFields) {
@@ -100,6 +119,11 @@ export function buildOrderRequestNotes(fields: OrderRequestNoteFields) {
     `Fulfillment method: ${fields.fulfillmentMethod || 'Flexible'}`,
     `Requested window: ${fields.requestedWindow || 'Coordinate with grower'}`,
     `Payment terms: ${fields.paymentTerms || 'Handled directly'}`,
+    ...(fields.deliveryAddress?.trim()
+      ? [
+          `Delivery address: ${fields.deliveryAddress.trim().replace(/\n/g, ', ')}`,
+        ]
+      : []),
   ];
 
   if (fields.buyerNotes.trim()) {
@@ -130,9 +154,29 @@ export function parseOrderRequestNotes(notes: string | null) {
 
     // Only the initial structured header is metadata. Everything after buyer
     // notes (including later settlement records) is free text and must survive.
-    if (!freeText && rest.length && key === 'fulfillment method' && !parsed.fulfillmentMethod) parsed.fulfillmentMethod = value;
-    else if (!freeText && rest.length && key === 'requested window' && !parsed.requestedWindow) parsed.requestedWindow = value;
-    else if (!freeText && rest.length && key === 'payment terms' && !parsed.paymentTerms) parsed.paymentTerms = value;
+    if (
+      !freeText &&
+      rest.length &&
+      key === 'fulfillment method' &&
+      !parsed.fulfillmentMethod
+    )
+      parsed.fulfillmentMethod = value;
+    else if (
+      !freeText &&
+      rest.length &&
+      key === 'requested window' &&
+      !parsed.requestedWindow
+    )
+      parsed.requestedWindow = value;
+    else if (
+      !freeText &&
+      rest.length &&
+      key === 'payment terms' &&
+      !parsed.paymentTerms
+    )
+      parsed.paymentTerms = value;
+    else if (!freeText && rest.length && key === 'delivery address')
+      parsed.deliveryAddress = value;
     else if (!freeText && rest.length && key === 'buyer notes') {
       parsed.buyerNotes = value;
       visibleLines.push(value);
@@ -144,5 +188,9 @@ export function parseOrderRequestNotes(notes: string | null) {
     }
   }
 
-  return { details: parsed, legacyNotes: legacyLines.join('\n').trim(), notesText: visibleLines.join('\n').trim() };
+  return {
+    details: parsed,
+    legacyNotes: legacyLines.join('\n').trim(),
+    notesText: visibleLines.join('\n').trim(),
+  };
 }
