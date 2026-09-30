@@ -9,7 +9,8 @@ import {
 } from '@/lib/order-workflow';
 import {
   claimOrder,
-  restoreInventory,
+  syncOrderInventory,
+  OrderInventoryError,
   OrderConflictError,
 } from '@/lib/order-mutations';
 import { orderUndoToken, readOrderUndoToken } from '@/lib/order-undo';
@@ -147,38 +148,16 @@ export async function PATCH(
     if (undoEventId && order.status === 'SHIPPED') update.shippedAt = null;
     const result = await db.$transaction(async (tx) => {
       await claimOrder(tx, order);
-      if (
-        newStatus === 'CANCELLED' ||
-        (undoEventId && order.status === 'CANCELLED')
-      ) {
-        const items = await tx.orderItem.findMany({
-          where: { orderId },
-          orderBy: { productId: 'asc' },
-        });
-        for (const item of items) {
-          if (newStatus === 'CANCELLED')
-            await restoreInventory(tx, item.productId, item.quantity);
-          else {
-            const reserved = await tx.product.updateMany({
-              where: {
-                id: item.productId,
-                growerId: order.growerId,
-                isDeleted: false,
-                inventoryQty: { gte: item.quantity },
-              },
-              data: { inventoryQty: { decrement: item.quantity } },
-            });
-            if (!reserved.count) throw new OrderConflictError();
-            await tx.product.updateMany({
-              where: { id: item.productId, inventoryQty: 0 },
-              data: { isAvailable: false },
-            });
-          }
-        }
-      }
+      const items = await tx.orderItem.findMany({ where: { orderId } });
+      await syncOrderInventory(tx, order, items, items, newStatus);
       const updated = await tx.order.update({
         where: { id: orderId },
-        data: update,
+        data: {
+          ...update,
+          updatedAt: new Date(
+            Math.max(Date.now(), order.updatedAt.getTime() + 1)
+          ),
+        },
       });
       const event = await tx.orderStatusEvent.create({
         data: {
@@ -214,6 +193,11 @@ export async function PATCH(
         : orderUndoToken(result.event.id, result.updated.updatedAt),
     });
   } catch (error) {
+    if (error instanceof OrderInventoryError)
+      return NextResponse.json(
+        { error: error.message, code: error.code, issues: error.issues },
+        { status: 409 }
+      );
     if (error instanceof OrderConflictError)
       return NextResponse.json(
         {

@@ -225,7 +225,7 @@ async function quote(
   });
 }
 
-test('request receipts deduplicate concurrent retries and preserve consumed quotes after sellout', async ({
+test('request receipts deduplicate concurrent retries without reserving stock and preserve consumed quotes', async ({
   page,
 }) => {
   const grower = await account(),
@@ -261,7 +261,7 @@ test('request receipts deduplicate concurrent retries and preserve consumed quot
   expect(
     (await db.product.findUniqueOrThrow({ where: { id: item.id } }))
       .inventoryQty
-  ).toBe(0);
+  ).toBe(2);
   expect(
     (await db.acceptedQuote.findUniqueOrThrow({ where: { id: accepted.id } }))
       .consumedByOrderId
@@ -326,7 +326,7 @@ test('partial requests resume failed growers without repeating successful orders
   ).toBe(2);
   expect(
     (await db.product.findUniqueOrThrow({ where: { id: a.id } })).inventoryQty
-  ).toBe(9);
+  ).toBe(10);
   const context = await browser.newContext(),
     otherPage = await context.newPage();
   try {
@@ -363,9 +363,9 @@ for (const width of [1440, 390])
     await page.setViewportSize({ width, height: 1000 });
     await login(page, buyer);
     await page.evaluate(
-      ({ item, accepted }) =>
+      ({ item, accepted, buyerId }) =>
         localStorage.setItem(
-          'phenofarm-cart',
+          `phenoshop:${buyerId}:cart`,
           JSON.stringify({
             items: [
               {
@@ -381,7 +381,11 @@ for (const width of [1440, 390])
             ],
           })
         ),
-      { item: checkoutItem(item, 2), accepted: { id: accepted.id } }
+      {
+        item: checkoutItem(item, 2),
+        accepted: { id: accepted.id },
+        buyerId: buyer.id,
+      }
     );
     let responseDropped = false;
     await page.route(
@@ -439,7 +443,7 @@ for (const width of [1440, 390])
     expect(
       (await db.product.findUniqueOrThrow({ where: { id: item.id } }))
         .inventoryQty
-    ).toBe(0);
+    ).toBe(2);
     expect(
       await page.evaluate(
         (id) => localStorage.getItem(`phenofarm:pending-request:${id}`),
@@ -480,7 +484,7 @@ test('server failure after a partial commit recovers with the same receipt and r
     ).toBe(1);
     expect(
       (await db.product.findUniqueOrThrow({ where: { id: a.id } })).inventoryQty
-    ).toBe(8);
+    ).toBe(10);
     expect(
       (await db.product.findUniqueOrThrow({ where: { id: b.id } })).inventoryQty
     ).toBe(10);
@@ -503,10 +507,10 @@ test('server failure after a partial commit recovers with the same receipt and r
   ).toBe(2);
   expect(
     (await db.product.findUniqueOrThrow({ where: { id: a.id } })).inventoryQty
-  ).toBe(8);
+  ).toBe(10);
   expect(
     (await db.product.findUniqueOrThrow({ where: { id: b.id } })).inventoryQty
-  ).toBe(7);
+  ).toBe(10);
 });
 
 async function recordedOrder(
@@ -521,6 +525,9 @@ async function recordedOrder(
       growerId: grower.grower!.id,
       dispensaryId: buyer.dispensary!.id,
       status,
+      inventoryState: ['PENDING', 'CANCELLED'].includes(status)
+        ? 'NOT_DEDUCTED'
+        : 'DEDUCTED',
       totalAmount: 24,
       subtotal: 24,
       notes:
@@ -700,7 +707,7 @@ for (const width of [1440, 390]) {
       expect(
         (await db.product.findUniqueOrThrow({ where: { id: line.productId } }))
           .inventoryQty
-      ).toBe(9);
+      ).toBe(status === 'PENDING' ? 10 : 9);
     });
   }
 }

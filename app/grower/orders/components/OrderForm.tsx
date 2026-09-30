@@ -39,6 +39,7 @@ export type EditableOrder = {
   id: string;
   orderId: string;
   status: string;
+  inventoryState?: string;
   notes: string | null;
   shippingFee: number;
   tax: number;
@@ -253,11 +254,15 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
       (requestedByProduct.get(line.productId) || 0) +
         (Number(line.quantity) || 0)
     );
-  const shortage = lines.filter(
-    (line, index) =>
-      lines.findIndex((item) => item.productId === line.productId) === index &&
-      (requestedByProduct.get(line.productId) || 0) > line.stock
-  );
+  const shortage =
+    order?.status === 'PENDING'
+      ? []
+      : lines.filter(
+          (line, index) =>
+            lines.findIndex((item) => item.productId === line.productId) ===
+              index &&
+            (requestedByProduct.get(line.productId) || 0) > line.stock
+        );
   const subtotal = lines.reduce(
     (n, l) => n + (Number(l.quantity) || 0) * (parseAmount(l.price) || 0),
     0
@@ -366,8 +371,23 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
   return (
     <div className="space-y-4">
       <PageHeader
-        title={order ? `Edit order #${order.orderId}` : 'Record order'}
+        title={
+          order
+            ? `${order.status === 'PENDING' ? 'Edit request' : 'Edit order'} #${order.orderId}`
+            : 'Record order'
+        }
       />
+      {order?.inventoryState === 'LEGACY_UNREVIEWED' ? (
+        <p className="rounded-lg border border-pf-info-line bg-pf-info-bg p-3 text-sm text-pf-info">
+          This older order needs an inventory review. Contact support before
+          changing its items or status.
+        </p>
+      ) : order?.status === 'PENDING' ? (
+        <p className="rounded-lg border border-pf-info-line bg-pf-info-bg p-3 text-sm text-pf-info">
+          Agree on quantities and pricing before accepting. Saving this request
+          does not reserve stock; availability is checked when you accept.
+        </p>
+      ) : null}
       <form
         noValidate
         onSubmit={(e) => {
@@ -607,7 +627,9 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                   <div>
                     <h3 className="font-medium">{l.name}</h3>
                     <p className="text-sm text-pf-muted">
-                      {formatQuantity(l.stock, l.unit)} available
+                      {order?.status === 'PENDING'
+                        ? 'Stock checked on acceptance'
+                        : `${formatQuantity(l.stock, l.unit)} available`}
                       {l.acceptedQuoteId ? ' · Accepted quote' : ''}
                     </p>
                   </div>
@@ -731,7 +753,7 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                 />
                 <span>
                   I confirm this stock was received. Add the missing quantity,
-                  reserve it for this order, and record the correction.
+                  deduct it for this accepted order, and record the correction.
                 </span>
               </label>
             </div>
@@ -879,7 +901,13 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
               Cancel
             </Button>
             <Button disabled={busy} type="submit">
-              {busy ? 'Saving…' : order ? 'Save order' : 'Record order'}
+              {busy
+                ? 'Saving…'
+                : order
+                  ? order?.status === 'PENDING'
+                    ? 'Save request'
+                    : 'Save order'
+                  : 'Record order'}
             </Button>
           </div>
         </div>

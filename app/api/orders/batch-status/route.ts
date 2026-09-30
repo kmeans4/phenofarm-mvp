@@ -3,7 +3,9 @@ import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
 import {
   claimOrder,
-  restoreInventory,
+  syncOrderInventory,
+  lockInventoryProducts,
+  OrderInventoryError,
   OrderConflictError,
 } from '@/lib/order-mutations';
 import {
@@ -87,6 +89,9 @@ export async function PATCH(req: NextRequest) {
         orderId: true,
         status: true,
         updatedAt: true,
+        growerId: true,
+        inventoryState: true,
+        items: { select: { productId: true, quantity: true } },
         shippedAt: true,
         deliveredAt: true,
         dispensary: { select: { userId: true } },
@@ -144,22 +149,29 @@ export async function PATCH(req: NextRequest) {
     const transitionableIds = transitionableOrders.map((order) => order.id);
 
     const result = await db.$transaction(async (tx) => {
-      // Stable locking order prevents opposing batch requests from deadlocking.
-      for (const order of [...transitionableOrders].sort((a, b) =>
+      // Claim all orders first, then lock all products in a single global order.
+      const sorted = [...transitionableOrders].sort((a, b) =>
         a.id.localeCompare(b.id)
-      )) {
-        await claimOrder(tx, order);
-        if (targetStatus === 'CANCELLED') {
-          const items = await tx.orderItem.findMany({
-            where: { orderId: order.id },
-            select: { productId: true, quantity: true },
-          });
-          for (const item of items)
-            await restoreInventory(tx, item.productId, item.quantity);
-        }
+      );
+      for (const order of sorted) await claimOrder(tx, order);
+      await lockInventoryProducts(
+        tx,
+        sorted.flatMap((order) => order.items.map((item) => item.productId))
+      );
+      for (const order of sorted) {
+        await syncOrderInventory(
+          tx,
+          order,
+          order.items,
+          order.items,
+          targetStatus
+        );
         await tx.order.update({
           where: { id: order.id },
           data: {
+            updatedAt: new Date(
+              Math.max(Date.now(), order.updatedAt.getTime() + 1)
+            ),
             status: targetStatus,
             ...(targetStatus === 'SHIPPED' && !order.shippedAt
               ? { shippedAt: new Date() }
@@ -199,6 +211,11 @@ export async function PATCH(req: NextRequest) {
       status: status,
     });
   } catch (error) {
+    if (error instanceof OrderInventoryError)
+      return NextResponse.json(
+        { error: error.message, code: error.code, issues: error.issues },
+        { status: 409 }
+      );
     if (error instanceof OrderConflictError)
       return NextResponse.json({ error: error.message }, { status: 409 });
     console.error('Batch status update error:', error);

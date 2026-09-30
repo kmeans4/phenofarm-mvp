@@ -9,9 +9,9 @@ const target = new URL(process.env.DATABASE_URL || '');
 if (
   new URL(base).hostname !== '127.0.0.1' ||
   target.hostname !== 'localhost' ||
-  target.pathname !== '/phenofarm_auth_ux_20260929'
+  !target.pathname.startsWith('/phenofarm_auth_')
 )
-  throw new Error('Use the dedicated local UX database and app.');
+  throw new Error('Use an isolated local phenofarm_auth_ database and app.');
 const db = new PrismaClient();
 const prefix = `ux-grower-${Date.now()}`;
 const password = `QA-${randomUUID()}`;
@@ -739,7 +739,7 @@ test('plan lookup failure retries without claiming Free; checkout confirmation w
   await expect(page.getByText(/Trial — ends/)).toBeVisible();
 });
 
-test('opposing order edits lock stock consistently and preserve both reservations', async ({
+test('opposing order edits lock stock consistently and preserve both accepted deductions', async ({
   page,
 }) => {
   await login(page);

@@ -1,3 +1,4 @@
+import { beginOrderMutation } from '@/lib/order-mutations';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -86,7 +87,7 @@ class CheckoutConflictError extends Error {
  * Business Logic:
  * - Items are automatically grouped by growerId
  * - One order is created per unique grower in the cart
- * - Inventory is reserved atomically during request creation to avoid overselling
+ * - Inventory is checked for the request but deducted only on grower acceptance
  * - Orders with insufficient inventory are skipped and reported as errors
  * - Tax is not calculated or collected by PhenoShop
  * - Order IDs are auto-generated as 'ORD-{timestamp}-{sequence}'
@@ -361,7 +362,8 @@ export async function POST(request: NextRequest) {
         const result = await createWithOrderIdRetry((orderId) =>
           db.$transaction(
             async (tx) => {
-              // Serialize repeats of this intent. The order, inventory, notifications and
+              await beginOrderMutation(tx);
+              // Serialize repeats of this intent. The order, notifications and
               // receipt commit together, so a dropped response cannot submit it twice.
               await tx.$queryRaw`SELECT id FROM order_request_submissions WHERE id = ${submission.id} FOR UPDATE`;
               const saved = await tx.orderRequestSubmission.findUniqueOrThrow({
@@ -431,51 +433,8 @@ export async function POST(request: NextRequest) {
               for (const item of [...growerItems].sort((a, b) =>
                 a.id.localeCompare(b.id)
               )) {
-                const updateResult = await tx.product.updateMany({
-                  where: {
-                    id: item.id,
-                    growerId,
-                    isDeleted: false,
-                    status: 'PUBLISHED',
-                    grower: marketplaceGrowerWhere(),
-                    isAvailable: true,
-                    inventoryQty: { gte: item.quantity },
-                  },
-                  data: { inventoryQty: { decrement: item.quantity } },
-                });
-
-                if (updateResult.count === 0) {
-                  const latest = await tx.product.findUnique({
-                    where: { id: item.id },
-                    select: { id: true, name: true, inventoryQty: true },
-                  });
-
-                  throw new CheckoutConflictError([
-                    {
-                      productId: item.id,
-                      productName:
-                        latest?.name ||
-                        productById.get(item.id)?.name ||
-                        'Unknown product',
-                      requested: item.quantity,
-                      available: Number(latest?.inventoryQty || 0),
-                    },
-                  ]);
-                }
-
-                const currentProduct = await tx.product.findUniqueOrThrow({
-                  where: { id: item.id },
-                  select: {
-                    price: true,
-                    isPriceVisible: true,
-                    inventoryQty: true,
-                  },
-                });
-                if (currentProduct.inventoryQty === 0)
-                  await tx.product.update({
-                    where: { id: item.id },
-                    data: { isAvailable: false },
-                  });
+                // Requests snapshot pricing but neither deduct nor reserve stock.
+                const currentProduct = productById.get(item.id)!;
                 const serverPrice = Number(currentProduct.price);
                 const acceptedQuote = await tx.acceptedQuote.findFirst({
                   where: {
@@ -552,6 +511,7 @@ export async function POST(request: NextRequest) {
                   dispensaryId,
                   orderId,
                   status: 'PENDING',
+                  inventoryState: 'NOT_DEDUCTED',
                   totalAmount: Math.round(subtotal * 100) / 100,
                   subtotal: Math.round(subtotal * 100) / 100,
                   tax,

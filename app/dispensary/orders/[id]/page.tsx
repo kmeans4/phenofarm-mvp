@@ -31,6 +31,7 @@ interface OrderDetail {
   id: string;
   orderId: string;
   status: string;
+  inventoryState: string;
   totalAmount: number;
   subtotal: number;
   tax: number;
@@ -75,6 +76,7 @@ async function fetchOrder(
       id: true,
       orderId: true,
       status: true,
+      inventoryState: true,
       totalAmount: true,
       subtotal: true,
       tax: true,
@@ -129,6 +131,7 @@ async function fetchOrder(
     id: order.id,
     orderId: order.orderId,
     status: order.status,
+    inventoryState: order.inventoryState,
     totalAmount: Number(order.totalAmount),
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
@@ -258,7 +261,7 @@ export default async function DispensaryOrderDetailPage({
             </span>
           </span>
         }
-        description={getOrderStatusHelp(order.status)}
+        description={getOrderStatusHelp(order.status, order.inventoryState)}
         actions={
           <>
             <StatusBadge status={order.status} />

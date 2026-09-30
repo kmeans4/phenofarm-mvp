@@ -42,6 +42,7 @@ async function fetchOrder(id: string, growerId: string) {
     id: order.id,
     orderId: order.orderId,
     status: order.status,
+    inventoryState: order.inventoryState,
     totalAmount: Number(order.totalAmount),
     subtotal: Number(order.subtotal),
     tax: Number(order.tax),
@@ -63,10 +64,12 @@ async function fetchOrder(id: string, growerId: string) {
       acceptedQuoteId: item.acceptedQuoteId,
       totalPrice: Number(item.totalPrice),
       maxQuantity:
-        order.items
-          .filter((other) => other.productId === item.productId)
-          .reduce((sum, other) => sum + other.quantity, 0) +
-        Number(item.product.inventoryQty || 0),
+        order.status === 'PENDING'
+          ? 9999
+          : order.items
+              .filter((other) => other.productId === item.productId)
+              .reduce((sum, other) => sum + other.quantity, 0) +
+            Number(item.product.inventoryQty || 0),
       product: {
         id: item.product.id,
         name: item.product.name,

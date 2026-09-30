@@ -459,7 +459,7 @@ test('order edits reconcile inventory for quantity changes, added lines, removal
           dispensaryId: account.dispensary.id,
           items: [{ productId: productA.id, quantity: 4, unitPrice: 10 }],
           shippingFee: 1,
-          notes: 'initial reservation',
+          notes: 'initial accepted deduction',
         },
       });
       expect(createResponse.status()).toBe(201);
@@ -471,7 +471,7 @@ test('order edits reconcile inventory for quantity changes, added lines, removal
 
       const reduceResponse = await api.put(`/api/orders/${createdOrder.id}`, {
         data: {
-          items: [{ id: productAItem.id, quantity: 2, unitPrice: 0 }],
+          items: [{ id: productAItem.id, quantity: 2 }],
           shippingFee: 1,
           tax: 0,
           notes: 'reduced quantity',
@@ -498,7 +498,7 @@ test('order edits reconcile inventory for quantity changes, added lines, removal
         data: {
           items: [
             { id: reducedProductAItem.id, quantity: 2, unitPrice: 10 },
-            { productId: productB.id, quantity: 3, unitPrice: 0 },
+            { productId: productB.id, quantity: 3 },
           ],
           shippingFee: 1,
           tax: 0,
@@ -722,7 +722,7 @@ test('grower can accept, prepare, mark ready, deliver, and batch-update valid re
       const validBatchResponse = await api.patch('/api/orders/batch-status', {
         data: {
           orderIds: [secondOrder.id],
-          status: 'CONFIRMED',
+          status: 'PROCESSING',
         },
       });
       expect(validBatchResponse.status()).toBe(200);
@@ -738,7 +738,7 @@ test('grower can accept, prepare, mark ready, deliver, and batch-update valid re
           select: { status: true },
         });
         return updated.status;
-      }).toBe('CONFIRMED');
+      }).toBe('PROCESSING');
     } finally {
       await api.dispose();
     }
@@ -835,9 +835,9 @@ test('order edits close zero stock and snapshot a new line price after its inven
       }, { timeout: 15000 });
       try {
         await ready;
-        const adding = api.put(`/api/orders/${order.id}`, { data: { items: [{ id: order.items[0].id, quantity: 2 }, { productId: added.id, quantity: 1, unitPrice: 0 }] } });
+        const adding = api.put(`/api/orders/${order.id}`, { data: { items: [{ id: order.items[0].id, quantity: 2 }, { productId: added.id, quantity: 1 }] } });
         await expect.poll(async () => {
-          const rows = await db.$queryRaw<{ count: number }[]>`SELECT COUNT(*)::int AS count FROM pg_stat_activity WHERE datname = current_database() AND state = 'active' AND wait_event_type = 'Lock' AND query ILIKE '%UPDATE%products%'`;
+          const rows = await db.$queryRaw<{ count: number }[]>`SELECT COUNT(*)::int AS count FROM pg_stat_activity WHERE datname = current_database() AND state = 'active' AND wait_event_type = 'Lock' AND (query ILIKE '%UPDATE%products%' OR query ILIKE '%products%FOR UPDATE%')`;
           return rows[0].count;
         }).toBeGreaterThan(0);
         release(); await priceUpdate;

@@ -1,3 +1,4 @@
+import { beginOrderMutation } from '@/lib/order-mutations';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { customerWhere } from '@/lib/customers';
@@ -294,6 +295,7 @@ export async function POST(request: NextRequest) {
 
     const order = await createWithOrderIdRetry((orderId) =>
       db.$transaction(async (tx) => {
+        await beginOrderMutation(tx);
         const stockCorrections: string[] = [];
         for (const [productId, requested] of [
           ...requestedByProduct.entries(),
@@ -318,7 +320,7 @@ export async function POST(request: NextRequest) {
             const added = Math.max(0, requested - Number(current.inventoryQty));
             if (added > 0)
               stockCorrections.push(
-                `${current.name}: added ${added} units before reservation`
+                `${current.name}: added ${added} units before acceptance`
               );
             await tx.product.update({
               where: { id: productId },
@@ -435,6 +437,7 @@ export async function POST(request: NextRequest) {
             dispensaryId,
             orderId,
             status: 'CONFIRMED',
+            inventoryState: 'DEDUCTED',
             totalAmount:
               Math.round((subtotal + tax + safeShippingFee) * 100) / 100,
             subtotal,

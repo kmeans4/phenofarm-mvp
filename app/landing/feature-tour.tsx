@@ -147,8 +147,8 @@ function TimelineVignette() {
         </div>
       </div>
       <p className="text-xs text-gray-400">
-        Both sides can see the request status. If a buyer withdraws before
-        acceptance, reserved stock returns to inventory.
+        Both sides can see the request status. Stock is deducted only when the
+        grower accepts. Sending or withdrawing a request does not reserve stock.
       </p>
     </div>
   );

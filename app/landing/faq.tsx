@@ -12,7 +12,7 @@ const FAQS = [
   },
   {
     q: 'What happens if I withdraw a request?',
-    a: "A buyer can withdraw a request before the grower accepts it. The reserved products return to the grower's available stock, and the request stays in order history.",
+    a: "A buyer can withdraw a request before the grower accepts it. Requests do not reserve stock. Withdrawing a request leaves inventory unchanged, and the request stays in order history.",
   },
   {
     q: 'Can I reorder something I bought before?',

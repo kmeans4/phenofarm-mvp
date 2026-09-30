@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { Prisma } from '@prisma/client';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
 import {
@@ -11,7 +10,10 @@ import {
 } from '@/lib/order-workflow';
 import {
   claimOrder,
-  restoreInventory,
+  syncOrderInventory,
+  lockInventoryProducts,
+  assertInventoryReviewed,
+  OrderInventoryError,
   OrderConflictError,
 } from '@/lib/order-mutations';
 import { PATCH as changeStatus } from './status/route';
@@ -22,13 +24,6 @@ interface OrderItemUpdateInput {
   productId?: string;
   quantity: number;
   unitPrice?: number;
-}
-
-interface InventoryIssue {
-  productId: string;
-  productName: string;
-  requested: number;
-  available: number;
 }
 
 class OrderEditError extends Error {
@@ -43,15 +38,6 @@ class OrderEditError extends Error {
     super(message);
     this.status = status;
     this.details = details;
-  }
-}
-
-class InventoryConflictError extends Error {
-  issues: InventoryIssue[];
-
-  constructor(issues: InventoryIssue[]) {
-    super('Insufficient inventory for one or more edited items');
-    this.issues = issues;
   }
 }
 
@@ -302,7 +288,6 @@ export async function PUT(
         'Use the order status action to change status.',
         400
       );
-    const isCancellation = false;
     const existingItemsById = new Map(
       existingOrder.items.map((item) => [item.id, item])
     );
@@ -387,42 +372,16 @@ export async function PUT(
       );
     }
 
-    if (isCancellation && (hasLineChanges || hasPricingChanges)) {
-      throw new OrderEditError(
-        'Cancel the request separately before making item or pricing edits.',
-        409
-      );
-    }
-
     const updatedOrder = await db.$transaction(async (tx) => {
       await claimOrder(tx, existingOrder);
       if (requestedItems) {
-        // Match create/cancel lock order even if the two editors arrange their lines differently.
-        const productIds = [
-          ...new Set([
-            ...existingOrder.items.map((item) => item.productId),
-            ...requestedItems
-              .map((item) => item.productId)
-              .filter((id): id is string => Boolean(id)),
-          ]),
-        ].sort();
-        if (productIds.length)
-          await tx.$queryRaw(Prisma.sql`
-          SELECT id FROM products
-          WHERE "growerId" = ${user.growerId} AND id IN (${Prisma.join(productIds)})
-          ORDER BY id FOR UPDATE
-        `);
-      }
-      if (isCancellation) {
-        // Return the inventory that was reserved when the request was created
-        const items = await tx.orderItem.findMany({
-          where: { orderId },
-          select: { productId: true, quantity: true },
-        });
-
-        for (const item of items) {
-          await restoreInventory(tx, item.productId, item.quantity);
-        }
+        assertInventoryReviewed(existingOrder);
+        await lockInventoryProducts(tx, [
+          ...existingOrder.items.map((item) => item.productId),
+          ...requestedItems.flatMap((item) =>
+            item.productId ? [item.productId] : []
+          ),
+        ]);
       }
 
       let subtotal = existingOrder.items.reduce(
@@ -430,9 +389,8 @@ export async function PUT(
         0
       );
 
-      if (requestedItems && !isCancellation) {
+      if (requestedItems) {
         for (const item of removedItems) {
-          await restoreInventory(tx, item.productId, item.quantity);
           await tx.orderItem.delete({ where: { id: item.id } });
         }
 
@@ -449,56 +407,6 @@ export async function PUT(
                 'An accepted quote price cannot be changed. Send a new quote instead.',
                 409
               );
-            const quantityDelta = item.quantity - existingItem.quantity;
-
-            if (quantityDelta > 0) {
-              const updateResult = await tx.product.updateMany({
-                where: {
-                  id: existingItem.productId,
-                  growerId: user.growerId,
-                  isDeleted: false,
-                  isAvailable: true,
-                  inventoryQty: { gte: quantityDelta },
-                },
-                data: { inventoryQty: { decrement: quantityDelta } },
-              });
-
-              if (updateResult.count === 0) {
-                const latest = await tx.product.findFirst({
-                  where: {
-                    id: existingItem.productId,
-                    growerId: user.growerId,
-                  },
-                  select: { id: true, name: true, inventoryQty: true },
-                });
-                throw new InventoryConflictError([
-                  {
-                    productId: existingItem.productId,
-                    productName:
-                      latest?.name ||
-                      existingItem.product?.name ||
-                      'Unknown product',
-                    requested: quantityDelta,
-                    available: Number(latest?.inventoryQty || 0),
-                  },
-                ]);
-              }
-              await tx.product.updateMany({
-                where: {
-                  id: existingItem.productId,
-                  growerId: user.growerId,
-                  inventoryQty: 0,
-                },
-                data: { isAvailable: false },
-              });
-            } else if (quantityDelta < 0) {
-              await restoreInventory(
-                tx,
-                existingItem.productId,
-                Math.abs(quantityDelta)
-              );
-            }
-
             await tx.orderItem.update({
               where: { id: item.id },
               data: {
@@ -530,56 +438,13 @@ export async function PUT(
               },
             });
 
-            if (
-              !product ||
-              !product.isAvailable ||
-              product.inventoryQty < item.quantity
-            ) {
-              throw new InventoryConflictError([
-                {
-                  productId,
-                  productName: product?.name || 'Unknown product',
-                  requested: item.quantity,
-                  available: Number(product?.inventoryQty || 0),
-                },
-              ]);
-            }
+            if (!product)
+              throw new OrderEditError(
+                'This product is no longer available.',
+                409
+              );
 
-            const updateResult = await tx.product.updateMany({
-              where: {
-                id: productId,
-                growerId: user.growerId,
-                isDeleted: false,
-                isAvailable: true,
-                inventoryQty: { gte: item.quantity },
-              },
-              data: { inventoryQty: { decrement: item.quantity } },
-            });
-
-            if (updateResult.count === 0) {
-              const latest = await tx.product.findFirst({
-                where: { id: productId, growerId: user.growerId },
-                select: { id: true, name: true, inventoryQty: true },
-              });
-              throw new InventoryConflictError([
-                {
-                  productId,
-                  productName: latest?.name || product.name,
-                  requested: item.quantity,
-                  available: Number(latest?.inventoryQty || 0),
-                },
-              ]);
-            }
-
-            await tx.product.updateMany({
-              where: {
-                id: productId,
-                growerId: user.growerId,
-                inventoryQty: 0,
-              },
-              data: { isAvailable: false },
-            });
-            // Read the price after acquiring the inventory row lock.
+            // Price is an agreed snapshot. Stock accounting follows all item edits atomically.
             const pricedProduct = await tx.product.findUniqueOrThrow({
               where: { id: productId },
               select: { price: true },
@@ -605,8 +470,15 @@ export async function PUT(
 
         const refreshedItems = await tx.orderItem.findMany({
           where: { orderId },
-          select: { quantity: true, unitPrice: true },
+          select: { productId: true, quantity: true, unitPrice: true },
         });
+        await syncOrderInventory(
+          tx,
+          existingOrder,
+          existingOrder.items,
+          refreshedItems,
+          existingOrder.status
+        );
         subtotal = refreshedItems.reduce((sum, item) => {
           return (
             sum + Math.round(item.quantity * Number(item.unitPrice) * 100) / 100
@@ -633,6 +505,9 @@ export async function PUT(
       const updated = await tx.order.update({
         where: { id: orderId },
         data: {
+          updatedAt: new Date(
+            Math.max(Date.now(), existingOrder.updatedAt.getTime() + 1)
+          ),
           status: status || existingOrder.status,
           notes: notes !== undefined ? notes : existingOrder.notes,
           shippedAt: shippedAtValue,
@@ -705,9 +580,9 @@ export async function PUT(
       return buildEditResponse(error);
     }
 
-    if (error instanceof InventoryConflictError) {
+    if (error instanceof OrderInventoryError) {
       return NextResponse.json(
-        { error: error.message, issues: error.issues },
+        { error: error.message, code: error.code, issues: error.issues },
         { status: 409 }
       );
     }

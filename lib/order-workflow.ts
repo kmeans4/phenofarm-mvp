@@ -1,5 +1,5 @@
 export const ORDER_STATUS_LABELS: Record<string, string> = {
-  PENDING: 'New',
+  PENDING: 'Pending request',
   CONFIRMED: 'Accepted',
   PROCESSING: 'Preparing',
   SHIPPED: 'On the way',
@@ -31,8 +31,8 @@ export const ORDER_STATUS_TRANSITIONS: Record<
 };
 
 export const ORDER_STATUS_HELP: Record<string, string> = {
-  PENDING: 'Waiting for grower review',
-  CONFIRMED: 'Grower accepted the order',
+  PENDING: 'Awaiting grower acceptance. Stock is not reserved.',
+  CONFIRMED: 'Grower accepted the order and stock was deducted.',
   PROCESSING: 'Grower is preparing the order',
   SHIPPED: 'Picked up or in transit',
   DELIVERED: 'Order delivered',
@@ -40,7 +40,7 @@ export const ORDER_STATUS_HELP: Record<string, string> = {
 };
 
 export const ORDER_STATUS_STEPS = [
-  { status: 'PENDING', label: 'New' },
+  { status: 'PENDING', label: 'Pending request' },
   { status: 'CONFIRMED', label: 'Accepted' },
   { status: 'PROCESSING', label: 'Preparing' },
   { status: 'SHIPPED', label: 'On the way' },
@@ -70,7 +70,9 @@ export function getOrderStatusLabel(status: string) {
   return ORDER_STATUS_LABELS[status] || status;
 }
 
-export function getOrderStatusHelp(status: string) {
+export function getOrderStatusHelp(status: string, inventoryState?: string) {
+  if (inventoryState === 'LEGACY_UNREVIEWED')
+    return 'This older order needs an inventory review. Contact support before changing it.';
   return ORDER_STATUS_HELP[status] || 'Review the order details';
 }
 

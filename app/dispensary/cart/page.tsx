@@ -565,9 +565,11 @@ export default function DispensaryCartPage() {
   if (pending || storageError)
     return (
       <div className="mx-auto max-w-2xl space-y-4">
-        <PageHeader title={sending ? 'Sending order…' : 'Confirm your order'} />
+        <PageHeader
+          title={sending ? 'Sending request…' : 'Check your request'}
+        />
         <p>
-          Check whether your order was received. This will not create a
+          Check whether your request was received. This will not create a
           duplicate.
         </p>
         {(error || storageError) && (
@@ -580,7 +582,7 @@ export default function DispensaryCartPage() {
           onClick={send}
           className="min-h-11 rounded-lg bg-emerald-500 px-4 font-semibold text-[#032116]"
         >
-          {sending ? 'Checking…' : 'Check order'}
+          {sending ? 'Checking…' : 'Check request'}
         </button>
         <Link
           href="/dispensary/orders"
@@ -611,7 +613,7 @@ export default function DispensaryCartPage() {
         >
           <h2 className="flex items-center gap-2 font-semibold">
             <CheckCircle2 className="h-5 w-5" />
-            {receipts.length === 1 ? 'Order sent' : 'Orders sent'}
+            {receipts.length === 1 ? 'Request submitted' : 'Requests submitted'}
           </h2>
           <ul>
             {receipts.map((order) => (
@@ -1036,7 +1038,7 @@ export default function DispensaryCartPage() {
                 disabled={sending || refreshing}
                 className="min-h-11 w-full rounded-lg bg-emerald-500 px-4 text-sm font-semibold text-[#032116] disabled:opacity-50"
               >
-                Review order
+                Review request
               </button>
               <button
                 onClick={refresh}
@@ -1056,7 +1058,7 @@ export default function DispensaryCartPage() {
             {refreshing ? 'Refreshing…' : 'Refresh stock'}
           </button>
           <StickyMobileActionBar
-            primaryLabel="Review order"
+            primaryLabel="Review request"
             onPrimary={reviewOrder}
             disabled={sending || refreshing}
             helperText={`${cart.items.length} ${cart.items.length === 1 ? 'item' : 'items'} · ${formatMoney(cart.total)}`}
@@ -1074,7 +1076,7 @@ export default function DispensaryCartPage() {
       <Modal
         open={review}
         onClose={() => setReview(false)}
-        title="Review order"
+        title="Review request"
         className="max-w-2xl"
       >
         <div className="space-y-4">
@@ -1117,7 +1119,9 @@ export default function DispensaryCartPage() {
             <p className="whitespace-pre-wrap text-sm">{details.orderNotes}</p>
           )}
           <p className="text-sm text-pf-muted">
-            Payment is arranged directly with each grower.
+            Sending a request does not reserve stock. The grower checks
+            availability and deducts stock when accepting. Payment is arranged
+            directly with each grower.
           </p>
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-pf-line pt-3">
             <strong>Total {formatMoney(cart.total)}</strong>
@@ -1130,7 +1134,7 @@ export default function DispensaryCartPage() {
                 ? 'Sending…'
                 : license === 'loading'
                   ? 'Checking license…'
-                  : 'Send order'}
+                  : 'Send order request'}
             </button>
           </div>
         </div>

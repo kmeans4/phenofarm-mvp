@@ -1,3 +1,4 @@
+import { beginOrderMutation } from '@/lib/order-mutations';
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
@@ -51,6 +52,7 @@ export async function PATCH(
 
   const acknowledgedAt = new Date();
   await db.$transaction(async (tx) => {
+    await beginOrderMutation(tx);
     await tx.order.update({
       where: { id: order.id },
       data: { buyerAcknowledgedAt: acknowledgedAt },

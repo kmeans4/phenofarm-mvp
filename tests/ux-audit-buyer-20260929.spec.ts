@@ -288,11 +288,11 @@ test('license state is visible before ordering and definitive rejection clears r
     page.getByText(/You can send orders once your license is approved/)
   ).toBeVisible();
   await page
-    .getByRole('button', { name: 'Review order', exact: true })
+    .getByRole('button', { name: 'Review request', exact: true })
     .first()
     .click();
   await expect(
-    page.getByRole('button', { name: 'Send order', exact: true })
+    page.getByRole('button', { name: 'Send order request', exact: true })
   ).toBeDisabled();
   await page.keyboard.press('Escape');
   await page.evaluate(
@@ -314,9 +314,11 @@ test('license state is visible before ordering and definitive rejection clears r
     }
   );
   await page.reload();
-  await page.getByRole('button', { name: 'Check order', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Check request', exact: true })
+    .click();
   await expect(
-    page.getByRole('heading', { name: 'Confirm your order' })
+    page.getByRole('heading', { name: 'Check your request' })
   ).toHaveCount(0);
   await expect(page.locator(`#cart-${product.id}`)).toBeVisible();
   expect(
@@ -375,16 +377,20 @@ test('cart flags price-only lines, removes with undo, sends address and grower t
     { times: 1 }
   );
   await page
-    .getByRole('button', { name: 'Review order', exact: true })
+    .getByRole('button', { name: 'Review request', exact: true })
     .first()
     .click();
-  await page.getByRole('button', { name: 'Send order', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Send order request', exact: true })
+    .click();
   await expect(
-    page.getByRole('button', { name: 'Check order', exact: true })
+    page.getByRole('button', { name: 'Check request', exact: true })
   ).toBeVisible();
-  await page.getByRole('button', { name: 'Check order', exact: true }).click();
+  await page
+    .getByRole('button', { name: 'Check request', exact: true })
+    .click();
   await expect(
-    page.getByRole('heading', { name: 'Order sent', exact: true })
+    page.getByRole('heading', { name: 'Request submitted', exact: true })
   ).toBeVisible();
   const orders = await db.order.findMany({ where: { dispensaryId: buyer.id } });
   expect(orders).toHaveLength(1);
