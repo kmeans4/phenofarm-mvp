@@ -208,7 +208,7 @@ export function OrderDetailActions({
             disabled={sendingAction !== null}
             className="rounded-lg border border-pf-danger-line bg-pf-danger-bg px-4 py-2 text-sm font-semibold text-pf-danger hover:bg-pf-danger-bg disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           >
-            {sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw order'}
+            {sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw request'}
           </button>
         )}
 
@@ -239,10 +239,10 @@ export function OrderDetailActions({
 
       <ConfirmDialog
         open={showWithdrawConfirm}
-        title="Withdraw this order?"
-        description="The grower has not accepted this order yet. Withdraw it now?"
+        title="Withdraw this request?"
+        description="The grower has not accepted this request yet. Withdraw it now?"
         confirmLabel={
-          sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw order'
+          sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw request'
         }
         intent="danger"
         onConfirm={withdrawRequest}

@@ -18,7 +18,7 @@ const STATUS_FLOW = [
   'Submitted',
   'Accepted',
   'Preparing',
-  'Ready',
+  'On the way',
   'Delivered',
 ] as const;
 type Status = (typeof STATUS_FLOW)[number];
@@ -27,7 +27,7 @@ const STATUS_STYLES: Record<Status, string> = {
   Submitted: 'bg-amber-400/10 text-amber-300 ring-amber-400/20',
   Accepted: 'bg-emerald-400/10 text-emerald-300 ring-emerald-400/20',
   Preparing: 'bg-sky-400/10 text-sky-300 ring-sky-400/20',
-  Ready: 'bg-violet-400/10 text-violet-300 ring-violet-400/20',
+  'On the way': 'bg-violet-400/10 text-violet-300 ring-violet-400/20',
   Delivered: 'bg-white/[0.06] text-gray-300 ring-white/10',
 };
 

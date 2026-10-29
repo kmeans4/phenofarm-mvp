@@ -597,15 +597,15 @@ test('dirty batch dialog ignores backdrop and used records offer a useful View a
     .getByRole('button', { name: '+ New', exact: true })
     .click();
   const modal = page.getByRole('dialog', { name: 'New batch', exact: true });
-  await modal.locator('#batchNumber').fill('UNSAVED-BATCH');
+  await modal.getByLabel('Batch number', { exact: true }).fill('UNSAVED-BATCH');
   await page.mouse.click(1, 1);
   await expect(modal).toBeVisible();
-  await expect(modal.locator('#batchNumber')).toHaveValue('UNSAVED-BATCH');
+  await expect(modal.getByLabel('Batch number', { exact: true })).toHaveValue('UNSAVED-BATCH');
   await page.keyboard.press('Escape');
   await expect(modal).toBeVisible();
   await modal.getByRole('button', { name: 'Close New batch' }).click();
   await expect(
-    page.getByRole('dialog', { name: 'Leave without saving?' })
+    page.getByRole('alertdialog', { name: 'Leave without saving?' })
   ).toBeVisible();
   await page.getByRole('button', { name: 'Discard changes' }).click();
   await page.goto('/grower/batches');

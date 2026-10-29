@@ -5,6 +5,7 @@ node_modules
 .next
 .codex/tmp
 docs/reviews
+docs/audit-2026-10-29
 public/uploads
 test-results
 playwright-report

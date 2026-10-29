@@ -660,7 +660,7 @@ test('direct grower-created orders are accepted and accounted immediately', asyn
   expect(await stock(p)).toBe(5);
 });
 
-for (const width of [1440, 390])
+for (const width of [1440, 834, 390])
   test(`grower and buyer see request inventory wording and useful acceptance errors at ${width}px`, async ({
     page,
     context,

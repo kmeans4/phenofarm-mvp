@@ -1022,7 +1022,7 @@ export default function DispensaryCartPage() {
                 </label>
               </section>
             </div>
-            <aside className="hidden h-fit space-y-3 lg:block rounded-xl border border-pf-line bg-pf-surface p-4">
+            <aside className="hidden h-fit space-y-3 sm:block rounded-xl border border-pf-line bg-pf-surface p-4">
               <h2 className="font-semibold">Summary</h2>
               <p>
                 {cart.items.length} {cart.items.length === 1 ? 'item' : 'items'}{' '}
@@ -1053,7 +1053,7 @@ export default function DispensaryCartPage() {
             type="button"
             onClick={refresh}
             disabled={refreshing}
-            className="min-h-11 text-sm text-pf-accent lg:hidden"
+            className="min-h-11 text-sm text-pf-accent sm:hidden"
           >
             {refreshing ? 'Refreshing…' : 'Refresh stock'}
           </button>

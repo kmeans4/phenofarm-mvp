@@ -598,7 +598,7 @@ export default async function OrderDetailPage({
                       >
                         <td className="px-3 sm:px-6 py-2.5 sm:py-4">
                           <div>
-                            <p className="font-medium text-sm sm:text-base text-pf-text">
+                            <p className="font-medium text-sm sm:text-base text-pf-text [overflow-wrap:anywhere]">
                               {item.product?.name || 'Unknown Product'}
                             </p>
                             {item.quoted && (
@@ -650,7 +650,7 @@ export default async function OrderDetailPage({
                   <div key={item.id} className="p-3">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1 min-w-0 mr-3">
-                        <p className="font-medium text-sm text-pf-text">
+                        <p className="font-medium text-sm text-pf-text break-words">
                           {item.product?.name || 'Unknown Product'}
                         </p>
                         {item.product?.strain && (

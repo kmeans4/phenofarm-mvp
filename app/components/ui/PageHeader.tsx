@@ -40,7 +40,7 @@ export function PageHeader({
         ) : null}
         <h1
           className={cn(
-            'font-semibold leading-none text-pf-text sm:text-[2rem]',
+            'break-words font-semibold leading-none text-pf-text sm:text-[2rem]',
             compact ? 'text-[1.75rem]' : 'text-[2rem]'
           )}
         >

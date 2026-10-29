@@ -33,8 +33,12 @@ export function OrderFilters({
     router.replace(`${pathname}?${next}`);
   };
   return (
-    <div className="flex flex-wrap gap-3">
-      <label className="min-w-0 flex-1 text-sm">
+    <div
+      className={`grid grid-cols-2 gap-3 ${history ? 'lg:grid-cols-[minmax(16rem,1fr)_auto_auto]' : ''}`}
+    >
+      <label
+        className={`col-span-2 min-w-0 text-sm ${history ? 'lg:col-span-1' : ''}`}
+      >
         Search orders
         <input
           type="search"
@@ -46,19 +50,19 @@ export function OrderFilters({
       </label>
       {history && (
         <>
-          <label className="text-sm">
+          <label className="min-w-0 text-sm">
             From
             <input
-              className="mt-1 block min-h-11 rounded-lg border border-pf-line-strong bg-pf-raised p-2"
+              className="mt-1 block min-h-11 w-full min-w-0 rounded-lg border border-pf-line-strong bg-pf-raised p-2"
               type="date"
               defaultValue={params.get('from') || ''}
               onChange={(e) => changeDate('from', e.target.value)}
             />
           </label>
-          <label className="text-sm">
+          <label className="min-w-0 text-sm">
             To
             <input
-              className="mt-1 block min-h-11 rounded-lg border border-pf-line-strong bg-pf-raised p-2"
+              className="mt-1 block min-h-11 w-full min-w-0 rounded-lg border border-pf-line-strong bg-pf-raised p-2"
               type="date"
               defaultValue={params.get('to') || ''}
               onChange={(e) => changeDate('to', e.target.value)}

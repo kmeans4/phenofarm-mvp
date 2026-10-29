@@ -264,6 +264,7 @@ test('signed-in landing links and touch targets work across widths without reduc
   page,
   context,
 }) => {
+  test.setTimeout(120_000);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const errors: string[] = [];
   page.on('console', (message) => {

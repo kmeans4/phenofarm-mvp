@@ -10,6 +10,7 @@ import { MobileNav } from '@/app/components/ui/MobileNav';
 import { ClientNav } from '@/app/grower/components/ClientNav';
 import { PortalAccount, PortalBrand } from '@/app/components/ui/PortalBrand';
 import { NotificationBell } from '@/app/components/notifications/NotificationBell';
+import { SearchTrigger } from '@/app/components/SearchDialog';
 
 export default async function AdminLayout({
   children,
@@ -67,8 +68,9 @@ export default async function AdminLayout({
         <div className="fixed inset-x-0 top-0 z-40 border-b border-white/[0.07] bg-pf-canvas md:hidden">
           <div className="px-4 py-3">
             <div className="flex justify-between items-center">
-              <PortalBrand portalLabel="Admin" />
-              <div className="flex items-center gap-2">
+              <PortalBrand portalLabel="Admin" compactOnMobile />
+              <div className="flex items-center gap-1 sm:gap-2">
+                <SearchTrigger variant="icon" />
                 <NotificationBell compact />
                 <MobileNav
                   links={navLinks}

@@ -375,7 +375,7 @@ export default async function GrowerMarketplacePage({
           type="search"
           defaultValue={search}
           placeholder="Search products or strains"
-          className="min-h-11 min-w-0 flex-1 rounded-lg border border-pf-line-strong bg-pf-raised px-3 text-sm"
+          className="min-h-11 min-w-0 basis-full flex-1 rounded-lg border border-pf-line-strong bg-pf-raised px-3 text-sm lg:basis-64"
         />
         <label className="sr-only" htmlFor="preview-sort">
           Sort preview

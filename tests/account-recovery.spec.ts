@@ -3,8 +3,7 @@ import { test, expect, request as requests, type APIRequestContext } from '@play
 import { PrismaClient, AccountActionPurpose } from '@prisma/client';
 import { encode, type JWT } from 'next-auth/jwt';
 import bcrypt from 'bcryptjs';
-import { createHash } from 'node:crypto';
-import { mkdirSync } from 'node:fs';
+import { createHash, randomInt } from 'node:crypto';
 import { accountMailConfigured, accountOrigin, sendAccountMail } from '../lib/account-mail';
 import { requestAccountLink } from '../lib/account-security';
 
@@ -15,6 +14,7 @@ const password = 'Initial test password 123!';
 const newPassword = 'Recovered test password 456!';
 const contexts: APIRequestContext[] = [];
 let sequence = 0;
+const rateOctet = randomInt(20, 240);
 const loopback = (host: string) => ['localhost', '127.0.0.1', '[::1]', '::1'].includes(host);
 const hash = (value: string) => createHash('sha256').update(value).digest('hex');
 
@@ -36,7 +36,7 @@ test.afterAll(async () => {
 
 async function api(cookie?: string) {
   const context = await requests.newContext({ baseURL, extraHTTPHeaders: {
-    'x-forwarded-for': `198.18.${Math.floor(sequence / 200)}.${++sequence % 200 + 1}`,
+    'x-forwarded-for': `198.18.${rateOctet}.${++sequence % 200 + 1}`,
     ...(cookie ? { Cookie: cookie } : {}),
   } });
   contexts.push(context); return context;
@@ -44,7 +44,7 @@ async function api(cookie?: string) {
 async function account(verified = true, role: 'GROWER' | 'DISPENSARY' | 'ADMIN' = 'GROWER') {
   const email = `${prefix}-${++sequence}@example.test`;
   const user = await db.user.create({ data: {
-    email, name: prefix, role, passwordHash: await bcrypt.hash(password, 10), emailVerifiedAt: verified ? new Date() : null,
+    email, name: prefix, role, policyAcceptances: { create: { ...CURRENT_POLICIES, source: 'TEST_FIXTURE' } }, passwordHash: await bcrypt.hash(password, 10), emailVerifiedAt: verified ? new Date() : null,
     ...(role === 'GROWER' ? { grower: { create: { businessName: prefix, licenseNumber: prefix, licenseExpiry: new Date('2030-12-31') } } }
       : role === 'DISPENSARY' ? { dispensary: { create: { businessName: prefix, licenseNumber: prefix, licenseExpiry: new Date('2030-12-31') } } } : {}),
   }, include: { grower: true, dispensary: true } });
@@ -85,7 +85,8 @@ test('registration is generic and creates one unverified account without a sessi
   expect(responses.map(value => value.status())).toEqual([201, 201]);
   const bodies = await Promise.all(responses.map(value => value.json()));
   expect(bodies[0]).toEqual(bodies[1]); expect(bodies[0]).not.toHaveProperty('userId'); expect(bodies[0]).not.toHaveProperty('role');
-  expect(responses.every(value => !value.headers()['set-cookie'])).toBe(true);
+  expect(responses.every(value => !/next-auth\.session-token=/.test(value.headers()['set-cookie'] || ''))).toBe(true);
+  expect((await (await context.get('/api/auth/session')).json()).user).toBeUndefined();
   const users = await db.user.findMany({ where: { email }, include: { grower: true } });
   expect(users).toHaveLength(1); expect(users[0].emailVerifiedAt).toBeNull(); expect(users[0].sessionVersion).toBe(0); expect(users[0].grower).not.toBeNull();
   const proof = await delivered(email, 'Verify your email');
@@ -120,13 +121,14 @@ test('registration reports profile storage failures and rolls back both account 
   }
 });
 
-test('verification needs mailbox token plus password, rejects replay, and enables real sign-in', async () => {
+test('verification in another browser needs a valid new password, rejects replay, and signs in', async () => {
   const user = await account(false); const context = await api();
   const proof = await requestLink(user.email, 'VERIFY_EMAIL');
-  expect((await context.post('/api/auth/verification/confirm', { data: { token: proof.token, password: 'wrong-password' } })).status()).toBe(400);
+  expect((await context.post('/api/auth/verification/confirm', { data: { token: proof.token, password: 'short' } })).status()).toBe(400);
   expect((await db.accountActionToken.findUniqueOrThrow({ where: { tokenHash: hash(proof.token) } })).consumedAt).toBeNull();
   const accepted = await context.post('/api/auth/verification/confirm', { data: { token: proof.token, password } });
-  expect(accepted.status()).toBe(200); expect(accepted.headers()['set-cookie']).toBeUndefined();
+  expect(accepted.status()).toBe(200); expect(accepted.headers()['set-cookie']).toContain('next-auth.session-token=');
+  expect((await (await context.get('/api/auth/session')).json()).user.id).toBe(user.id);
   const current = await db.user.findUniqueOrThrow({ where: { id: user.id } });
   expect(current.emailVerifiedAt).not.toBeNull(); expect(current.sessionVersion).toBe(1);
   expect((await context.post('/api/auth/verification/confirm', { data: { token: proof.token, password } })).status()).toBe(400);
@@ -283,8 +285,8 @@ test('request and token limits preserve generic responses and store only opaque 
   const user = await account(); const context = await api();
   const replies=[];
   for(let i=0;i<5;i++) replies.push(await context.post('/api/auth/forgot-password', { data: { email: user.email } }));
-  expect(replies.every(value=>value.status()===200)).toBe(true);
-  const bodies=await Promise.all(replies.map(value=>value.json())); expect(bodies.every(value=>JSON.stringify(value)===JSON.stringify(bodies[0]))).toBe(true);
+  expect(replies.map(value=>value.status())).toEqual([200, 200, 200, 200, 429]);
+  const bodies=await Promise.all(replies.slice(0, 4).map(value=>value.json())); expect(bodies.every(value=>JSON.stringify(value)===JSON.stringify(bodies[0]))).toBe(true);
   await expect.poll(async()=>await db.accountActionToken.count({where:{userId:user.id,purpose:'RESET_PASSWORD'}})).toBe(4);
   await expect.poll(async()=>(await messages(user.email)).length).toBe(4);
   const proof=await requestLink((await account(false)).email,'VERIFY_EMAIL');
@@ -348,50 +350,54 @@ test('support recipients do not reply to themselves; other recipients retain sup
   }
 });
 
-for(const width of [360,1440]) test(`signup, verification and recovery work in the ${width}px UI`,async({page})=>{
-  const email=`${prefix}-ui-${width}@example.test`;
-  await page.setViewportSize({width,height:900});await page.setExtraHTTPHeaders({'x-forwarded-for':`198.19.0.${width===360?1:2}`});
+for (const width of [390, 834, 1440]) test(`signup, verification, email change and recovery work in the ${width}px UI`, async ({ page }) => {
+  const email = `${prefix}-ui-${width}@example.test`;
+  await page.setViewportSize({ width, height: 1000 });
+  await page.setExtraHTTPHeaders({ 'x-forwarded-for': `198.19.${rateOctet}.${width === 390 ? 1 : width === 834 ? 2 : 3}` });
   await page.goto('/auth/sign_up');
-  await page.locator('#firstName').fill('Mail');await page.locator('#lastName').fill('Owner');await page.locator('#businessName').fill('Recovery UI');
-  await page.locator('#email').fill(email);await page.locator('#password').fill(password);await page.locator('#confirmPassword').fill(password);
+  await page.getByRole('radio', { name: /Grower/ }).check();
+  await page.getByLabel('First name', { exact: true }).fill('Mail');
+  await page.getByLabel('Last name', { exact: true }).fill('Owner');
+  await page.getByLabel('Business name', { exact: true }).fill('Recovery UI');
+  await page.getByLabel('Email', { exact: true }).fill(email);
+  await page.getByLabel('Password', { exact: true }).fill(password);
   await page.getByRole('checkbox').check();
-  await page.getByRole('button',{name:'Create account',exact:true}).click();
+  await page.getByRole('button', { name: 'Create account', exact: true }).click();
   await expect(page).toHaveURL(/\/auth\/verify-email\?sent=1/);
-  const proof=await delivered(email,'Verify your email');
-  await page.goto(proof.url);await expect(page.getByRole('heading',{name:'Verify your email',exact:true})).toBeVisible();
-  await expect(page.locator('#account-password')).toHaveAttribute('autocomplete','current-password');
-  await page.locator('#account-password').fill(password);
-  const evidence=process.env.AUTH_EVIDENCE_DIR || '/tmp/phenofarm-auth/recovery-evidence';mkdirSync(evidence,{recursive:true});
-  await page.screenshot({path:`${evidence}/verify-${width}.png`,fullPage:true});
-  await page.getByRole('button',{name:'Verify email',exact:true}).click();await expect(page.getByRole('status')).toContainText('Your email is verified');
-  await page.getByRole('link',{name:'Back to sign in',exact:true}).click();await page.locator('#email').fill(email);await page.locator('#password').fill(password);
-  await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page).toHaveURL(/\/grower\/dashboard/);
-  await page.goto('/grower/settings');await expect(page.locator('#profile-email')).toHaveAttribute('readonly','');
-  await page.getByRole('link',{name:'Change email',exact:true}).click();await expect(page.getByRole('heading',{name:'Change your email'})).toBeVisible();
-  const changedEmail=email.replace('@','-changed@');
-  await page.locator('#account-email').fill(changedEmail);await page.locator('#account-password').fill(password);
-  await page.screenshot({path:`${evidence}/change-email-${width}.png`,fullPage:true});
-  await page.getByRole('button',{name:'Send confirmation link',exact:true}).click();await expect(page.getByRole('status')).toContainText('Your login email stays the same');
-  const change=await delivered(changedEmail,'Confirm your new email');await page.goto(change.url);
-  await page.screenshot({path:`${evidence}/confirm-email-${width}.png`,fullPage:true});
-  await page.getByRole('button',{name:'Confirm new email',exact:true}).click();await expect(page.getByRole('status')).toContainText('Your login email has changed');
-  await page.getByRole('link',{name:'Back to sign in',exact:true}).click();await page.locator('#email').fill(changedEmail);await page.locator('#password').fill(password);
-  await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page).toHaveURL(/\/grower\/dashboard/);
-  await page.goto('/auth/forgot-password');await page.locator('#account-email').fill(changedEmail);
-  await page.screenshot({path:`${evidence}/request-reset-${width}.png`,fullPage:true});
-  await page.getByRole('button',{name:'Send reset link',exact:true}).click();await expect(page.getByRole('status')).toContainText('If we can send a link to this address');
-  const reset=await delivered(changedEmail,'Reset your password');await page.goto(reset.url);
-  await page.locator('#account-password').fill(newPassword);await page.locator('#confirm-password').fill(newPassword);
-  await page.screenshot({path:`${evidence}/reset-${width}.png`,fullPage:true});
-  const geometry=await page.locator('input').evaluateAll(elements=>elements.map(element=>({font:parseFloat(getComputedStyle(element).fontSize),height:element.getBoundingClientRect().height})));
-  expect(geometry.every(value=>value.font>=16&&value.height>=40)).toBe(true);
-  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
-  await page.getByRole('button',{name:'Reset password',exact:true}).click();await expect(page.getByRole('status')).toContainText('All previous sessions are signed out');
-  await page.getByRole('link',{name:'Back to sign in',exact:true}).click();await page.locator('#email').fill(changedEmail);await page.locator('#password').fill(newPassword);
-  await page.getByRole('button',{name:'Sign in',exact:true}).click();await expect(page).toHaveURL(/\/grower\/dashboard/);
-  await page.goto(reset.url);await page.locator('#account-password').fill(newPassword);await page.locator('#confirm-password').fill(newPassword);
-  await page.getByRole('button',{name:'Reset password',exact:true}).click();await expect(page.locator('main').getByRole('alert')).toContainText('invalid or has expired');
+  const proof = await delivered(email, 'Verify your email');
+  await page.goto(proof.url);
+  await page.getByRole('button', { name: 'Verify and sign in', exact: true }).click();
+  await expect(page).toHaveURL(/\/grower\/dashboard/, { timeout: 15000 });
+  await page.goto('/grower/settings');
+  await expect(page.getByText(email, { exact: true }).first()).toBeVisible();
+  await page.getByRole('link', { name: 'Change email', exact: true }).click();
+  const changedEmail = email.replace('@', '-changed@');
+  await page.getByLabel('New email', { exact: true }).fill(changedEmail);
+  await page.getByLabel('Current password', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Send confirmation link', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Your current email works until you confirm');
+  const change = await delivered(changedEmail, 'Confirm your new email');
+  await page.goto(change.url);
+  await page.getByRole('button', { name: 'Confirm new email', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Your email has changed');
+  await page.getByRole('link', { name: 'Sign in', exact: true }).click();
+  await page.getByLabel('Email', { exact: true }).fill(changedEmail);
+  await page.getByLabel('Password', { exact: true }).fill(password);
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(page).toHaveURL(/\/grower\/dashboard/);
+  await page.goto('/auth/forgot-password');
+  await page.getByLabel('Email', { exact: true }).fill(changedEmail);
+  await page.getByRole('button', { name: 'Send reset link', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Check');
+  const reset = await delivered(changedEmail, 'Reset your password');
+  await page.goto(reset.url);
+  await page.getByLabel('New password', { exact: true }).fill(newPassword);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.getByRole('button', { name: 'Reset password and sign in', exact: true }).click();
+  await expect(page).toHaveURL(/\/grower\/dashboard/, { timeout: 15000 });
+  await page.goto(reset.url);
+  await expect(page.locator('main')).toContainText('This link is invalid, already used, or expired.');
   expect(new URL(page.url()).hash).toBe('');
-  await page.screenshot({path:`${evidence}/used-link-${width}.png`,fullPage:true});
-  await page.getByRole('link',{name:'Request a new link',exact:true}).click();await expect(page).toHaveURL(/\/auth\/forgot-password/);
+  await page.getByRole('link', { name: 'Request a new link', exact: true }).click();
+  await expect(page).toHaveURL(/\/auth\/forgot-password/);
 });

@@ -68,6 +68,7 @@ function normalizeFilters(value: unknown): Prisma.InputJsonValue {
     priceUnit:
       typeof record.priceUnit === 'string' ? record.priceUnit.slice(0, 20) : '',
     inStock: record.inStock === true,
+    favoritesOnly: record.favoritesOnly === true,
     hasLabs: record.hasLabs === true,
     recentlyAdded: record.recentlyAdded === true,
     trending: record.trending === true,

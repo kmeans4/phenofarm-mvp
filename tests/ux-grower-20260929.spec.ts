@@ -282,7 +282,7 @@ test('explicit shortage correction is audited and concurrent ordinary orders nev
     (await db.product.findUniqueOrThrow({ where: { id: low.id } })).inventoryQty
   ).toBe(0);
 });
-for (const width of [1440, 390])
+for (const width of [1440, 834, 390])
   test(`manual order inline customer, editable quantities, saved detail and repeat at ${width}px`, async ({
     page,
   }) => {
@@ -461,6 +461,7 @@ test('order counts cover all pages; bulk updates undo and cancellations preserve
       dispensaryId: customerId,
       orderId: `${prefix}-bulk-${index}`,
       status: 'PENDING' as const,
+      inventoryState: 'NOT_DEDUCTED' as const,
       totalAmount: 0,
       subtotal: 0,
     })),
@@ -469,7 +470,7 @@ test('order counts cover all pages; bulk updates undo and cancellations preserve
   await expect(
     page
       .getByRole('navigation', { name: 'Order status' })
-      .getByRole('link', { name: /^New\s+52$/ })
+      .getByRole('link', { name: /^Pending request\s+52$/ })
   ).toBeVisible();
   await expect(page.locator('article')).toHaveCount(50);
   await page.goto('/grower/orders?status=PENDING&page=2');
@@ -515,7 +516,7 @@ test('order counts cover all pages; bulk updates undo and cancellations preserve
     page.getByRole('heading', { name: 'No matching orders', exact: true })
   ).toBeVisible();
 });
-for (const width of [1440, 390])
+for (const width of [1440, 834, 390])
   test(`grower pages, license warning and atomic profile/terms save at ${width}px`, async ({
     page,
   }) => {

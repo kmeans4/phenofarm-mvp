@@ -1,3 +1,4 @@
+import { CURRENT_POLICIES } from '../lib/policies/current';
 import { test, expect, request as requests, type APIRequestContext, type Page } from '@playwright/test';
 import { PrismaClient, type UserRole } from '@prisma/client';
 import { encode } from 'next-auth/jwt';
@@ -44,6 +45,7 @@ async function account(role: UserRole, profile = true, keyPrefix = prefix) {
   const user = await db.user.create({
     data: {
       emailVerifiedAt: new Date(),
+      policyAcceptances: { create: { ...CURRENT_POLICIES, source: 'TEST_FIXTURE' } },
       sessionVersion: 0,
       email: `${key}@example.test`,
       name: key,
@@ -177,13 +179,14 @@ test('product, strain, and batch APIs validate boundaries, races, and list paylo
   expect(listedBatch).toBeTruthy();
   expect(listedBatch).not.toHaveProperty('testResults');
   expect(listedBatch).not.toHaveProperty('terpenes');
-  expect(listedBatch.labDocumentCount).toBe(1);
+  expect(listedBatch.hasFullCoa).toBe(true);
+  expect(listedBatch.labDocumentCount).toBe(3); // A full COA covers all three report categories.
 
   const batchDetailResponse = await grower.api.get(`/api/batches/${createdBatch.id}`);
   expect(batchDetailResponse.status()).toBe(200);
   const batchDetail = await batchDetailResponse.json();
   expect(batchDetail.testResults.labDocuments.coa.dataUrl).toBe(persistedDataUrl);
-  for (const [labDocuments, expected] of [[null, 0], [[], 0], [{ coa: { dataUrl: 'x'.repeat(1000000) }, bad: 'text', invalid: [] }, 1]] as const) {
+  for (const [labDocuments, expected] of [[null, 0], [[], 0], [{ coa: { dataUrl: 'x'.repeat(1000000) }, bad: 'text', invalid: [] }, 3]] as const) {
     await db.batch.update({ where: { id: createdBatch.id }, data: { testResults: { labDocuments }, terpenes: { legacy: 'x'.repeat(1000000) } } });
     const summary = await grower.api.get('/api/batches');
     expect(summary.status()).toBe(200);
@@ -216,19 +219,19 @@ test('admin access, pagination, mobile navigation, seed method guard, and verifi
   expect(denied.status()).toBe(307);
   expect(denied.headers().location).toContain('/auth/sign_in');
   expect((await grower.api.get('/api/admin/seed')).status()).toBe(405);
-  expect((await grower.api.post('/api/admin/seed')).status()).toBe(403);
+  expect((await grower.api.post('/api/admin/seed')).status()).toBe(process.env.ENABLE_DEMO_SEED === 'true' ? 403 : 404);
 
   const growerDecision = { verified: true, expectedUpdatedAt: grower.grower!.updatedAt.toISOString() };
   const dispensaryDecision = { verified: true, expectedUpdatedAt: dispensary.dispensary!.updatedAt.toISOString() };
   const growerRedirect = await admin.api.post(`/admin/growers/${grower.grower!.id}/verify`, { data: growerDecision, maxRedirects: 0 });
-  expect(growerRedirect.status()).toBe(303);
-  expect(growerRedirect.headers().location).toContain('/admin/growers');
+  expect(growerRedirect.status()).toBe(200);
+  expect((await growerRedirect.json()).success).toBe(true);
   expect((await db.grower.findUniqueOrThrow({ where: { id: grower.grower!.id } })).isVerified).toBe(true);
   expect((await admin.api.post(`/admin/growers/${grower.grower!.id}/verify`, { data: growerDecision, headers: { accept: 'application/json' } })).status()).toBe(200);
 
   const dispensaryRedirect = await admin.api.post(`/admin/dispensaries/${dispensary.dispensary!.id}/verify`, { data: dispensaryDecision, maxRedirects: 0 });
-  expect(dispensaryRedirect.status()).toBe(303);
-  expect(dispensaryRedirect.headers().location).toContain('/admin/dispensaries');
+  expect(dispensaryRedirect.status()).toBe(200);
+  expect((await dispensaryRedirect.json()).success).toBe(true);
   expect((await db.dispensary.findUniqueOrThrow({ where: { id: dispensary.dispensary!.id } })).isVerified).toBe(true);
   expect((await admin.api.post(`/admin/dispensaries/${dispensary.dispensary!.id}/verify`, { data: dispensaryDecision, headers: { accept: 'application/json' } })).status()).toBe(200);
 
@@ -236,19 +239,18 @@ test('admin access, pagination, mobile navigation, seed method guard, and verifi
   await addAdminCookie(page, admin.token);
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto(`/admin/users?q=${q}`);
-  await expect(page.getByText('26 matches', { exact: true })).toBeVisible();
-  await expect(page.locator('table tbody tr')).toHaveCount(25);
-  await expect(page.getByRole('navigation', { name: 'User pages' })).toBeVisible();
+  await expect(page.getByText('26 users', { exact: true }).filter({ visible: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'User accounts' }).locator('li')).toHaveCount(25);
+  await expect(page.getByRole('navigation', { name: 'Pagination' })).toBeVisible();
   await page.getByRole('link', { name: 'Next' }).click();
   await expect(page).toHaveURL(new RegExp(`/admin/users\\?q=${q}&page=2$`));
-  await expect(page.getByText('26 matches', { exact: true })).toBeVisible();
-  await expect(page.locator('table tbody tr')).toHaveCount(1);
+  await expect(page.getByText('26 users', { exact: true }).filter({ visible: true })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'User accounts' }).locator('li')).toHaveCount(1);
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`/admin/users?q=${q}`);
   await expect(page.getByRole('button', { name: 'Open Admin Panel navigation menu' })).toBeVisible();
-  await expect(page.locator('table')).toBeHidden();
-  await expect(page.locator('article').first()).toBeVisible();
+  await expect(page.getByRole('region', { name: 'User accounts' }).locator('li').first()).toBeVisible();
   await page.getByRole('button', { name: 'Open Admin Panel navigation menu' }).click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByRole('navigation', { name: 'Admin Panel navigation' })).toBeVisible();

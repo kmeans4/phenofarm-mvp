@@ -68,7 +68,7 @@ export function ConfirmDialog({
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        className="pf-dialog-panel-in w-full max-w-md rounded-lg bg-pf-surface shadow-2xl"
+        className="pf-dialog-panel-in max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-lg bg-pf-surface shadow-2xl"
       >
         <div className="flex items-start justify-between gap-4 border-b border-pf-line p-5">
           <div className="flex min-w-0 items-start gap-3">
@@ -81,7 +81,7 @@ export function ConfirmDialog({
                 <Check className="h-5 w-5" />
               )}
             </span>
-            <div>
+            <div className="min-w-0 break-words">
               <h2 id={titleId} className="text-lg font-semibold text-pf-text">
                 {title}
               </h2>

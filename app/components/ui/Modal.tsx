@@ -70,14 +70,17 @@ export function Modal({
         )}
       >
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 id={titleId} className="text-lg font-semibold text-pf-text">
+          <h2
+            id={titleId}
+            className="min-w-0 break-words text-lg font-semibold text-pf-text"
+          >
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label={`Close ${title}`}
-            className="rounded-lg p-2 text-pf-muted hover:bg-pf-surface"
+            className="flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-lg p-2 text-pf-muted hover:bg-pf-surface"
           >
             <X className="h-5 w-5" />
           </button>

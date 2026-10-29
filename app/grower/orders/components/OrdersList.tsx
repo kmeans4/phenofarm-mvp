@@ -99,7 +99,7 @@ export default function OrdersList({
         {initialOrders.map((order) => (
           <article
             key={order.id}
-            className="flex flex-wrap items-center gap-3 p-3 sm:p-4"
+            className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 p-3 sm:flex sm:flex-wrap sm:items-center sm:p-4"
           >
             {!history && (
               <label className="flex h-11 w-11 shrink-0 items-center justify-center">
@@ -120,7 +120,7 @@ export default function OrdersList({
             )}
             <Link
               href={`/grower/orders/${order.id}`}
-              className="min-w-0 flex-1 rounded-lg py-1 text-sm"
+              className={`min-w-0 rounded-lg py-1 text-sm sm:flex-1 ${history ? 'col-span-2' : ''}`}
             >
               <span className="font-semibold text-pf-accent break-words">
                 #{order.orderId} · {order.dispensary.businessName}
@@ -130,26 +130,35 @@ export default function OrdersList({
                 {getOrderStatusLabel(order.status)}
               </span>
             </Link>
-            <strong className="text-sm tabular-nums">
-              {formatMoney(order.totalAmount)}
-            </strong>
-            {history ? (
-              <Button asChild variant="outline">
-                <Link href={`/grower/orders/add?from=${order.id}`}>Repeat</Link>
-              </Button>
-            ) : (
-              NEXT_ORDER_ACTION[order.status] && (
-                <Button
-                  disabled={busy}
-                  className="ml-auto"
-                  onClick={() =>
-                    void update([order], NEXT_ORDER_ACTION[order.status].status)
-                  }
-                >
-                  {NEXT_ORDER_ACTION[order.status].label}
+            <div
+              className={`flex items-center justify-between gap-3 sm:shrink-0 ${history ? 'col-span-2' : 'col-start-2'}`}
+            >
+              <strong className="text-sm tabular-nums">
+                {formatMoney(order.totalAmount)}
+              </strong>
+              {history ? (
+                <Button asChild variant="outline">
+                  <Link href={`/grower/orders/add?from=${order.id}`}>
+                    Repeat
+                  </Link>
                 </Button>
-              )
-            )}
+              ) : (
+                NEXT_ORDER_ACTION[order.status] && (
+                  <Button
+                    disabled={busy}
+                    className="ml-auto"
+                    onClick={() =>
+                      void update(
+                        [order],
+                        NEXT_ORDER_ACTION[order.status].status
+                      )
+                    }
+                  >
+                    {NEXT_ORDER_ACTION[order.status].label}
+                  </Button>
+                )
+              )}
+            </div>
           </article>
         ))}
       </div>

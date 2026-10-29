@@ -12,6 +12,7 @@ import { toast } from '@/app/hooks/useToast';
 import { ProductCsvImportDialog } from './ProductCsvImportDialog';
 import { ProductTypeSelector } from '../components/ProductTypeSelector';
 import { InlineStock } from './components/InlineStock';
+import { ProductActions } from './components/ProductActions';
 import { defaultUnitForProductType } from '@/lib/product-types';
 import { parseInventoryQty, parsePrice } from '@/lib/product-payload';
 import {
@@ -778,51 +779,44 @@ export default function ProductsPage() {
                           >
                             {productVisibility(product)}
                           </button>
-                          <details className="relative">
-                            <summary className="flex min-h-11 cursor-pointer items-center rounded-lg px-3 text-sm">
-                              Actions
-                            </summary>
-                            <div className="absolute right-0 z-20 min-w-44 rounded-xl border border-pf-line-strong bg-pf-surface p-1 shadow-xl">
-                              <Link
-                                className="flex min-h-11 items-center px-3 text-sm"
-                                href={`/grower/products/${product.id}/preview`}
-                              >
-                                Preview as buyer
-                              </Link>
-                              <Link
-                                className="flex min-h-11 items-center px-3 text-sm"
-                                href={`/grower/products/add?duplicate=${product.id}&returnTo=${encodeURIComponent(returnTo)}`}
-                              >
-                                Duplicate
-                              </Link>
-                              <button
-                                className="flex min-h-11 w-full items-center px-3 text-sm"
-                                onClick={() => soldOut(product)}
-                              >
-                                Mark sold out
-                              </button>
-                              <button
-                                className="flex min-h-11 w-full items-center px-3 text-sm"
-                                onClick={() => {
-                                  void change(product, {
-                                    isPriceVisible: !product.isPriceVisible,
-                                  }).catch((error) =>
-                                    toast.error(error.message)
-                                  );
-                                }}
-                              >
-                                {product.isPriceVisible
-                                  ? 'Price on request'
-                                  : 'Show price'}
-                              </button>
-                              <button
-                                className="flex min-h-11 w-full items-center px-3 text-sm text-pf-danger"
-                                onClick={() => remove(product)}
-                              >
-                                Delete
-                              </button>
-                            </div>
-                          </details>
+                          <ProductActions name={product.name}>
+                            <Link
+                              className="flex min-h-11 items-center px-3 text-sm"
+                              href={`/grower/products/${product.id}/preview`}
+                            >
+                              Preview as buyer
+                            </Link>
+                            <Link
+                              className="flex min-h-11 items-center px-3 text-sm"
+                              href={`/grower/products/add?duplicate=${product.id}&returnTo=${encodeURIComponent(returnTo)}`}
+                            >
+                              Duplicate
+                            </Link>
+                            <button
+                              className="flex min-h-11 w-full items-center px-3 text-sm"
+                              onClick={() => soldOut(product)}
+                            >
+                              Mark sold out
+                            </button>
+                            <button
+                              className="flex min-h-11 w-full items-center px-3 text-sm"
+                              onClick={() => {
+                                void change(product, {
+                                  isPriceVisible: !product.isPriceVisible,
+                                }).catch((error) => toast.error(error.message));
+                              }}
+                            >
+                              {product.isPriceVisible
+                                ? 'Price on request'
+                                : 'Show price'}
+                            </button>
+                            <button
+                              className="flex min-h-11 w-full items-center px-3 text-sm text-pf-danger"
+                              onClick={() => remove(product)}
+                            >
+                              Delete
+                            </button>
+                          </ProductActions>
                         </>
                       )}
                     </div>

@@ -12,6 +12,7 @@ import { formatHarvestDate } from '@/lib/batch-utils';
 import { ProductImage } from '@/app/components/ui/ProductImage';
 import { LabReportDownloads } from '@/app/dispensary/components/LabReportDownloads';
 import { productLabReportsById } from '@/lib/buyer-lab-reports';
+import { STRAIN_TYPE_LABELS } from '@/lib/strain-types';
 export default async function ProductPreview({
   params,
 }: {
@@ -69,7 +70,9 @@ export default async function ProductPreview({
               product.productType,
               product.subType,
               product.strain?.name,
-              product.strain?.strainType,
+              product.strain?.strainType
+                ? STRAIN_TYPE_LABELS[product.strain.strainType]
+                : null,
             ]
               .filter(Boolean)
               .join(' · ')}

@@ -6,6 +6,7 @@ type ConfirmationOptions = {
   title?: string;
   confirmLabel?: string;
   cancelLabel?: string;
+  intent?: 'default' | 'danger';
 };
 type NavigationRequest = ConfirmationOptions & {
   message: string;
@@ -39,6 +40,7 @@ export function UnsavedChangesDialog() {
   };
   return (
     <ConfirmDialog
+      intent={request?.intent || 'danger'}
       open={Boolean(request)}
       title={request?.title || 'Leave without saving?'}
       description={request?.message || ''}

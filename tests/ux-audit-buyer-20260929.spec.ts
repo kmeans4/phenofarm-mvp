@@ -278,7 +278,9 @@ test('license state is visible before ordering and definitive rejection clears r
   await login(page, pending);
   await page.goto('/dispensary/dashboard');
   await expect(
-    page.getByText('Submitted — under review (usually 1–2 business days).')
+    page
+      .getByText('Submitted — under review (usually 1–2 business days).')
+      .filter({ visible: true })
   ).toBeVisible();
   await page.request.patch('/api/dispensary/cart', {
     data: { changed: [item()], removed: [] },

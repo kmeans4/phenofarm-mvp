@@ -98,7 +98,7 @@ interface Product {
 interface SavedFilter {
   id: string;
   name: string;
-  filters: FilterState;
+  filters: FilterState & { favoritesOnly?: boolean };
   searchQuery: string;
   sortBy: SortOption;
   createdAt: string;
@@ -282,6 +282,7 @@ function normalizeSaved(value: unknown): SavedFilter[] {
         inStock: item.filters.inStock === true,
         hasLabs: item.filters.hasLabs === true,
         priceUnit: item.filters.priceUnit || '',
+        favoritesOnly: item.filters.favoritesOnly === true,
       },
       searchQuery: typeof item.searchQuery === 'string' ? item.searchQuery : '',
       sortBy: SORT_OPTIONS.some((option) => option.value === item.sortBy)
@@ -777,6 +778,7 @@ export default function CatalogContent({
     if (!newFilterName.trim()) return;
 
     const hasActiveFilters =
+      showFavoritesOnly ||
       filters.productTypes.length > 0 ||
       filters.thcRanges.length > 0 ||
       filters.priceRanges.length > 0 ||
@@ -800,7 +802,7 @@ export default function CatalogContent({
     const newFilter: SavedFilter = {
       id: Date.now().toString(),
       name: newFilterName.trim(),
-      filters: { ...filters },
+      filters: { ...filters, favoritesOnly: showFavoritesOnly },
       searchQuery,
       sortBy,
       createdAt: new Date().toISOString(),
@@ -814,11 +816,19 @@ export default function CatalogContent({
     setNewFilterName('');
     setSavedFilterError('');
     setShowSaveFilterModal(false);
-  }, [filters, searchQuery, sortBy, newFilterName, setSavedFilters]);
+  }, [
+    filters,
+    showFavoritesOnly,
+    searchQuery,
+    sortBy,
+    newFilterName,
+    setSavedFilters,
+  ]);
 
   // Apply a saved filter
   const applySavedFilter = useCallback((savedFilter: SavedFilter) => {
     setFilters(savedFilter.filters);
+    setShowFavoritesOnly(savedFilter.filters.favoritesOnly === true);
     setSearchQuery(savedFilter.searchQuery);
     setSortBy(savedFilter.sortBy);
   }, []);
@@ -2233,9 +2243,9 @@ export default function CatalogContent({
                       <Link
                         key={item.id}
                         href={`${pathname}?product=${item.id}`}
-                        className="inline-flex min-h-11 items-center rounded-lg border border-pf-line-strong px-3 text-sm text-pf-accent"
+                        className="inline-flex min-h-11 max-w-full items-center rounded-lg border border-pf-line-strong px-3 py-2 text-sm text-pf-accent"
                       >
-                        {item.name}
+                        <span className="min-w-0 break-words">{item.name}</span>
                       </Link>
                     ))}
                   </div>
@@ -2388,43 +2398,19 @@ export default function CatalogContent({
                   Includes
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {filters.productTypes.map((type) => (
+                  {filterChips.map((chip) => (
                     <span
-                      key={type}
+                      key={`${chip.category}-${chip.value}`}
                       className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line"
                     >
-                      {type}
+                      {chip.label}
                     </span>
                   ))}
-                  {filters.thcRanges.map((rangeId) => {
-                    const range = THC_RANGES.find((r) => r.id === rangeId);
-                    return range ? (
-                      <span
-                        key={rangeId}
-                        className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line"
-                      >
-                        THC {range.label}
-                      </span>
-                    ) : null;
-                  })}
-                  {filters.priceRanges.map((rangeId) => {
-                    const range = priceRangesForUnit(filters.priceUnit).find(
-                      (r) => r.id === rangeId
-                    );
-                    return range ? (
-                      <span
-                        key={rangeId}
-                        className="px-2 py-1 bg-pf-surface text-pf-secondary text-xs rounded border border-pf-line"
-                      >
-                        Price {range.label}
-                      </span>
-                    ) : null;
-                  })}
-                  {filters.recentlyAdded && (
-                    <span className="px-2 py-1 text-xs">Recently added</span>
-                  )}
-                  {filters.trending && (
-                    <span className="px-2 py-1 text-xs">Trending</span>
+                  {!hasActiveCatalogState && (
+                    <p className="text-sm text-pf-muted">
+                      No filters selected. Choose a filter, search term, or sort
+                      option first.
+                    </p>
                   )}
                   {searchQuery && (
                     <span className="px-2 py-1 bg-pf-info-bg text-pf-info text-xs rounded border border-pf-info-line">

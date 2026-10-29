@@ -1220,6 +1220,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
             `Replace the ${existing.quantity} ${existing.unit || 'units'} of ${existing.name} in your cart with this agreed quote?`,
             {
               title: 'Replace cart item?',
+              intent: 'default',
               confirmLabel: 'Use agreed quote',
               cancelLabel: 'Keep current item',
             }

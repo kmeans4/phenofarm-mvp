@@ -17,6 +17,8 @@ export default function QuickStatusUpdate({
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const pending = useRef(false);
+  const reasonField = useRef<HTMLSelectElement>(null);
+  const noteField = useRef<HTMLTextAreaElement>(null);
   const [error, setError] = useState('');
   const [declining, setDeclining] = useState(false);
   const [reason, setReason] = useState('');
@@ -25,11 +27,14 @@ export default function QuickStatusUpdate({
   if (!action) return null;
   async function update(status: string) {
     if (pending.current) return;
-    if (
-      status === 'CANCELLED' &&
-      (!reason || (reason === 'Other' && !note.trim()))
-    ) {
-      setError('Choose a reason and add a note for Other.');
+    if (status === 'CANCELLED' && !reason) {
+      setError('Choose a reason to continue.');
+      reasonField.current?.focus();
+      return;
+    }
+    if (status === 'CANCELLED' && reason === 'Other' && !note.trim()) {
+      setError('Add a short note to explain the reason.');
+      noteField.current?.focus();
       return;
     }
     pending.current = true;
@@ -73,7 +78,10 @@ export default function QuickStatusUpdate({
           <Button
             variant="outline"
             disabled={busy}
-            onClick={() => setDeclining(!declining)}
+            onClick={() => {
+              setError('');
+              setDeclining(!declining);
+            }}
           >
             {currentStatus === 'PENDING' ? 'Decline' : 'Cancel order'}
           </Button>
@@ -84,9 +92,13 @@ export default function QuickStatusUpdate({
           <label className="block text-sm">
             Reason
             <select
+              ref={reasonField}
               autoFocus
               value={reason}
-              onChange={(e) => setReason(e.target.value)}
+              onChange={(e) => {
+                setReason(e.target.value);
+                setError('');
+              }}
               className="mt-1 min-h-11 w-full rounded-lg border border-pf-line-strong bg-pf-raised p-2"
             >
               <option value="">Choose a reason</option>
@@ -100,13 +112,17 @@ export default function QuickStatusUpdate({
           <label className="block text-sm">
             Note {reason !== 'Other' && '(optional)'}
             <textarea
+              ref={noteField}
               value={note}
               maxLength={400}
-              onChange={(e) => setNote(e.target.value)}
+              onChange={(e) => {
+                setNote(e.target.value);
+                setError('');
+              }}
               className="mt-1 w-full rounded-lg border border-pf-line-strong bg-pf-raised p-2"
             />
           </label>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               variant="destructive"
               disabled={busy}
@@ -117,9 +133,12 @@ export default function QuickStatusUpdate({
             <Button
               variant="outline"
               disabled={busy}
-              onClick={() => setDeclining(false)}
+              onClick={() => {
+                setError('');
+                setDeclining(false);
+              }}
             >
-              Keep order
+              {currentStatus === 'PENDING' ? 'Keep request' : 'Keep order'}
             </Button>
           </div>
         </div>

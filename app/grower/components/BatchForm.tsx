@@ -69,7 +69,8 @@ export function BatchForm({
   onDirtyChange?: (dirty: boolean) => void;
   guarded?: boolean;
 }) {
-  const strainInputId = guarded ? 'strainId' : 'new-batch-strainId';
+  const fieldId = (key: string) => (guarded ? key : `new-batch-${key}`);
+  const strainInputId = fieldId('strainId');
   const initialValue: FormData = {
     batchNumber:
       initial?.batchNumber || suggestBatchNumber([], getTodayDateInputValue()),
@@ -165,9 +166,7 @@ export function BatchForm({
     setErrors(next);
     if (Object.keys(next).length) {
       formRef.current
-        ?.querySelector<HTMLElement>(
-          `[id="${Object.keys(next)[0] === 'strainId' ? strainInputId : Object.keys(next)[0]}"]`
-        )
+        ?.querySelector<HTMLElement>(`[id="${fieldId(Object.keys(next)[0])}"]`)
         ?.focus();
       return;
     }
@@ -205,9 +204,7 @@ export function BatchForm({
               : 'form';
         setErrors({ [field]: message });
         formRef.current
-          ?.querySelector<HTMLElement>(
-            `[id="${field === 'strainId' ? strainInputId : field}"]`
-          )
+          ?.querySelector<HTMLElement>(`[id="${fieldId(field)}"]`)
           ?.focus();
         return;
       }
@@ -227,7 +224,7 @@ export function BatchForm({
     <form ref={formRef} onSubmit={submit} noValidate className="space-y-4">
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {(['batchNumber', 'lotNumber', 'harvestDate'] as const).map((key) => (
-          <label key={key} htmlFor={key} className="block text-sm">
+          <label key={key} htmlFor={fieldId(key)} className="block text-sm">
             {
               {
                 batchNumber: 'Batch number',
@@ -236,18 +233,20 @@ export function BatchForm({
               }[key]
             }
             <input
-              id={key}
+              id={fieldId(key)}
               value={form[key]}
               type={key === 'harvestDate' ? 'date' : 'text'}
               max={key === 'harvestDate' ? getTodayDateInputValue() : undefined}
               maxLength={key === 'harvestDate' ? undefined : 120}
               onChange={(event) => change(key, event.target.value)}
               aria-invalid={Boolean(errors[key])}
-              aria-describedby={errors[key] ? `${key}-error` : undefined}
+              aria-describedby={
+                errors[key] ? `${fieldId(key)}-error` : undefined
+              }
               className={input}
             />
             {errors[key] && (
-              <span id={`${key}-error`} className="text-pf-danger">
+              <span id={`${fieldId(key)}-error`} className="text-pf-danger">
                 {errors[key]}
               </span>
             )}
@@ -271,7 +270,7 @@ export function BatchForm({
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {(['thc', 'cbd', 'totalCannabinoids'] as const).map((key) => (
-          <label htmlFor={key} key={key} className="text-sm">
+          <label htmlFor={fieldId(key)} key={key} className="text-sm">
             {
               {
                 thc: 'THC (%)',
@@ -280,7 +279,7 @@ export function BatchForm({
               }[key]
             }
             <input
-              id={key}
+              id={fieldId(key)}
               inputMode="decimal"
               value={form[key]}
               onChange={(event) => change(key, event.target.value)}
@@ -306,7 +305,7 @@ export function BatchForm({
               <label className="text-sm">
                 Name
                 <input
-                  id={`terpene-${index}`}
+                  id={fieldId(`terpene-${index}`)}
                   value={terpene.name}
                   onChange={(event) => {
                     setTerpenes((current) =>
@@ -383,10 +382,10 @@ export function BatchForm({
         onUploadingChange={setUploading}
         disabled={busy}
       />
-      <label htmlFor="notes" className="block text-sm">
+      <label htmlFor={fieldId('notes')} className="block text-sm">
         Notes
         <textarea
-          id="notes"
+          id={fieldId('notes')}
           rows={3}
           maxLength={2000}
           value={form.notes}
