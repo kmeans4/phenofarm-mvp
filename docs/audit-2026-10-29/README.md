@@ -1,6 +1,6 @@
 # PhenoShop workflow and responsive audit — October 29, 2026
 
-Local review and verification are complete. Publication and live release verification are recorded below when complete.
+The desktop, tablet, and mobile review is complete. Fixes were implemented, rechecked, and published. Release verification and the remaining external testing boundaries are recorded below.
 
 ## Scope and coverage
 
@@ -32,7 +32,7 @@ See the [page-by-page and overlay matrix](coverage.md) and [machine-readable cov
 | Admin search was unavailable in the mobile header. | Add the existing search control and fit the header at narrow widths. | Search opened/dismissed at 320 pixels; all primary admin widths reviewed; [evidence](evidence/admin-320.png). |
 | Marketplace-preview search was cramped on mobile. | Let the input occupy its available row. | Three-width layout and search checks. |
 | Product preview displayed internal strain-type values. | Use the existing human-readable strain labels. | Product previews rechecked at all primary widths. |
-| Pending-request withdrawal and the landing demonstration used inconsistent status wording. | Use Withdraw request before acceptance and On the way for the shipping step. | Buyer confirmation reviewed at three widths and public workflows passed; [evidence](evidence/popup-buyer-withdraw-request-390.jpg). |
+| Pending-request withdrawal and the landing demonstration used inconsistent status wording. | Use Withdraw request before acceptance and On the way for the shipping step. Widen the demo status pill so the longer label stays on one line. | Buyer confirmation reviewed at three widths and public workflows passed. The live visual pass found a [wrapping status pill](evidence/before-live-status-wrap-390.png); its follow-up fix was rechecked at all three widths; [evidence](evidence/popup-buyer-withdraw-request-390.jpg). |
 | Decline/cancel errors remained after correction or closing the form, and did not focus the missing field. | Clear stale errors, focus the missing reason/note, use Keep request for pending requests, and wrap actions on narrow screens. | Missing reason, Other without a note, correction, closing, unchanged status, and layout tested at 1440, 834, 390, and 320 pixels; [evidence](evidence/inline-fixed-CONFIRMED-390.png). |
 | Webpack could include Node-only monitoring imports in the Edge bundle. | Put those imports inside an explicit Node runtime branch. | Webpack development startup and HTTP 200, followed by the production build. |
 
@@ -67,8 +67,15 @@ The Webpack fallback check returned HTTP 200. A Node `module.register()` depreca
 - Production seeds, user accounts, inventory, orders, and database schema were not changed by the audit. No migration is required by these fixes.
 - The historical migration chain cannot bootstrap an empty database because its first migration assumes existing tables. The isolated audit database was initialized from the current Prisma schema plus the required `pg_trgm` extension. This does not validate replaying that historical migration chain from an empty database.
 - No real subscription purchase, external payment settlement, production email delivery, or physical-device Safari test was performed. Vercel's current production environment has no payment-processor keys; processor approval/integration remains a separate launch dependency.
-- Authenticated grower, buyer, and admin mutation workflows were tested locally. Existing production test-account passwords were unavailable, so the live release check will cover public/account-entry rendering, redirects, and deployment identity rather than claim signed-in production mutation coverage.
+- Authenticated grower, buyer, and admin mutation workflows were tested locally. Existing production test-account passwords were unavailable, so live release verification covers public/account-entry rendering, redirects, and deployment identity; it does not establish signed-in production mutation coverage.
 
 ## Release record
 
-Pending publication and live smoke checks.
+- Application changes were published to GitHub `main` as `0022da648cbb1c9433ad6420de7ff1d38e84e0f6`.
+- Vercel production deployment `dpl_5eU7UFarXBYzzi5GB6Coiu4Uqk7o` reached **Ready**, with `phenoshop.app` assigned and no alias error. The follow-up status-pill refinement is included in the commit containing this release report.
+- **39 live page checks**: all 13 mapped public/account routes at desktop, tablet, and mobile sizes returned HTTP 200 with no horizontal overflow or uncaught browser exceptions. [Results](live-checks.json).
+- Live interactions passed for grower/dispensary signup-role selection, blank signup validation, native sign-in validation, landing role tabs, mobile navigation, and protected-route sign-in redirects.
+- The repository's live smoke suite passed **2/2** checks.
+- `www.phenoshop.app` and `phenofarm-mvp.vercel.app` returned HTTP 308 to the canonical domain.
+- The last label refinement passed local single-line and page-width checks at all three widths; [results](status-label-checks.json), [mobile rendering](evidence/status-label-fixed-390.png). Its final deployment and live readback are also reported in the task completion message.
+- No production business data or schema was changed.

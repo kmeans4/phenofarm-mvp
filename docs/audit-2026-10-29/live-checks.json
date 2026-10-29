@@ -1,0 +1,391 @@
+{
+  "checks": [
+    {
+      "width": 1440,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Cannabis wholesale, easier to manageCannabis wholesale, easier to manage"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/contact",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Contact support"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/auth/confirm-email-change",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Confirm your new email"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/auth/error",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Could not sign in"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/auth/forgot-password",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Reset your password"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/auth/reset-password",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Choose a new password"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/auth/sign_in",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Sign in"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/auth/sign_up",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Create your account"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/auth/verify-email",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Check your email"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/help",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Help"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/legal/cookies",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Cookie Notice"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/legal/privacy",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Privacy Policy"
+      ]
+    },
+    {
+      "width": 1440,
+      "route": "/legal/terms",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Terms of Service"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Cannabis wholesale, easier to manageCannabis wholesale, easier to manage"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/auth/confirm-email-change",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Confirm your new email"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/auth/error",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Could not sign in"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/auth/forgot-password",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Reset your password"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/auth/reset-password",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Choose a new password"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/auth/sign_in",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Sign in"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/auth/sign_up",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Create your account"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/auth/verify-email",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Check your email"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/contact",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Contact support"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/help",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Help"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/legal/cookies",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Cookie Notice"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/legal/privacy",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Privacy Policy"
+      ]
+    },
+    {
+      "width": 834,
+      "route": "/legal/terms",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Terms of Service"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Cannabis wholesale, easier to manageCannabis wholesale, easier to manage"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/auth/confirm-email-change",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Confirm your new email"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/auth/error",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Could not sign in"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/auth/forgot-password",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Reset your password"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/auth/reset-password",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Choose a new password"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/auth/sign_in",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Sign in"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/auth/sign_up",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Create your account"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/auth/verify-email",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Check your email"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/contact",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Contact support"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/help",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Help"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/legal/cookies",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Cookie Notice"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/legal/privacy",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Privacy Policy"
+      ]
+    },
+    {
+      "width": 390,
+      "route": "/legal/terms",
+      "status": 200,
+      "overflow": false,
+      "headings": [
+        "Terms of Service"
+      ]
+    }
+  ],
+  "interactions": [
+    {
+      "width": 1440,
+      "roleSelection": true,
+      "signupValidation": true,
+      "signinNativeValidation": true,
+      "mobileMenu": null
+    },
+    {
+      "width": 834,
+      "roleSelection": true,
+      "signupValidation": true,
+      "signinNativeValidation": true,
+      "mobileMenu": null
+    },
+    {
+      "width": 390,
+      "roleSelection": true,
+      "signupValidation": true,
+      "signinNativeValidation": true,
+      "mobileMenu": true
+    },
+    {
+      "route": "/grower/dashboard",
+      "authRedirect": true
+    },
+    {
+      "route": "/dispensary/catalog",
+      "authRedirect": true
+    },
+    {
+      "route": "/admin/dashboard",
+      "authRedirect": true
+    }
+  ],
+  "errors": []
+}
