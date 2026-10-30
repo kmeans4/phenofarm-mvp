@@ -2,7 +2,8 @@ import { signInDestination } from '@/lib/auth-navigation';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { db } from '@/lib/db';
-import { formatCalendarMonth } from '@/lib/calendar-month';
+import { ValueChart } from '@/app/components/charts/ValueChart';
+import { monthlyDeliveredValues } from '@/lib/chart-values';
 import Link from 'next/link';
 import { Prisma } from '@prisma/client';
 import { AuthSession } from '@/types';
@@ -12,7 +13,7 @@ import { reportRange, reportOrderDateWhere } from '@/lib/report-range';
 import { getOrderStatusLabel } from '@/lib/order-workflow';
 import { PageHeader } from '@/app/components/ui/PageHeader';
 import { StatCard } from '@/app/components/ui/StatCard';
-import { formatMoney, formatDate } from '@/lib/format';
+import { formatMoney, formatDate, formatQuantity } from '@/lib/format';
 
 const REPORT_RANGE_OPTIONS = [
   { key: '30d', label: 'Last 30 days' },
@@ -106,12 +107,17 @@ export default async function GrowerReportsPage({
       FROM orders o WHERE o."growerId" = ${user.growerId} AND o.status = 'DELIVERED' ${sqlRange}
       GROUP BY 1 ORDER BY 1`),
     db.$queryRaw<
-      Array<{ productName: string; quantity: number; revenue: number }>
+      Array<{
+        productName: string;
+        unit: string;
+        quantity: number;
+        revenue: number;
+      }>
     >(Prisma.sql`
-      SELECT p.name AS "productName", SUM(i.quantity)::float AS quantity, SUM(i."totalPrice")::float AS revenue
+      SELECT p.name AS "productName", p.unit, SUM(i.quantity)::float AS quantity, SUM(i."totalPrice")::float AS revenue
       FROM order_items i JOIN orders o ON o.id = i."orderId" JOIN products p ON p.id = i."productId"
       WHERE o."growerId" = ${user.growerId} AND o.status = 'DELIVERED' ${sqlRange}
-      GROUP BY p.id, p.name ORDER BY revenue DESC`),
+      GROUP BY p.id, p.name, p.unit ORDER BY revenue DESC`),
     db.$queryRaw<
       Array<{ dispensaryName: string; orderCount: number; revenue: number }>
     >(Prisma.sql`
@@ -141,7 +147,12 @@ export default async function GrowerReportsPage({
       statusGroups.find((group) => group.status === status)?._count._all || 0,
     ])
   );
-  const monthlyRevenue = monthlyRows;
+  const monthlySeries = monthlyDeliveredValues(
+    monthlyRows,
+    selectedDates.from,
+    selectedDates.to
+  );
+  const monthlyRevenue = monthlySeries.points;
   const topProducts = productRows;
   const topCustomers = customerRows;
   const exportOrders = recentOrders.map((order) => ({
@@ -152,12 +163,13 @@ export default async function GrowerReportsPage({
     totalAmount: Number(order.totalAmount),
   }));
   const exportMonthlyRevenue = monthlyRevenue.map((month) => ({
-    month: month.month,
-    revenue: Number(month.revenue),
+    month: month.date,
+    revenue: month.value,
   }));
   const exportTopProducts = topProducts.map((product) => ({
     productName: product.productName,
     quantity: Number(product.quantity),
+    unit: product.unit,
     revenue: Number(product.revenue),
   }));
   const exportTopCustomers = topCustomers.map((customer) => ({
@@ -314,135 +326,25 @@ export default async function GrowerReportsPage({
       <div className="grid grid-cols-1 items-start lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Monthly delivered value chart */}
         <div className="bg-pf-surface rounded-lg shadow-sm border border-pf-line p-3 sm:p-6">
-          <div className="flex items-center justify-between mb-3 sm:mb-4">
-            <h2 className="text-base sm:text-lg font-semibold">
-              Delivered value by month
-            </h2>
-          </div>
-          {monthlyRevenue.length > 0 ? (
-            <div className="relative">
-              {monthlyRevenue.length <= 3 && (
-                <div className="space-y-3 sm:hidden">
-                  {monthlyRevenue.map((month) => {
-                    const revenue = Number(month.revenue);
-                    const maxRevenue = Math.max(
-                      ...monthlyRevenue.map((row) => Number(row.revenue))
-                    );
-                    return (
-                      <div key={month.month}>
-                        <div className="mb-1 flex items-center justify-between gap-2 text-sm">
-                          <span className="text-pf-muted">
-                            {formatCalendarMonth(month.month)}
-                          </span>
-                          <span className="font-semibold text-pf-accent">
-                            $
-                            {revenue.toLocaleString(undefined, {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })}
-                          </span>
-                        </div>
-                        <div
-                          className="h-2 overflow-hidden rounded-full bg-pf-surface"
-                          aria-hidden="true"
-                        >
-                          <div
-                            className="h-full rounded-full bg-pf-accent"
-                            style={{
-                              width: `${maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0}%`,
-                            }}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-              {/* Mobile scroll hint - enhanced */}
-              {monthlyRevenue.length > 6 && (
-                <div className="sm:hidden absolute right-0 top-1/2 -translate-y-1/2 z-10 pointer-events-none bg-gradient-to-l from-pf-surface via-pf-surface/80 to-transparent pl-4 pr-1">
-                  <div className="bg-pf-surface rounded-full p-1.5 shadow-sm">
-                    <svg
-                      className="w-4 h-4 text-pf-muted"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              )}
-              <div
-                className={`h-40 ${monthlyRevenue.length <= 3 ? 'hidden sm:flex' : 'flex'} items-end justify-start gap-1 sm:gap-2 overflow-x-auto pb-2 -mx-3 sm:-mx-0 px-3 sm:px-2 scrollbar-hide snap-x snap-mandatory`}
-                style={{ WebkitOverflowScrolling: 'touch' }}
-              >
-                {monthlyRevenue.map((month, idx) => {
-                  const maxRevenue = Math.max(
-                    ...monthlyRevenue.map((m) => Number(m.revenue))
-                  );
-                  const revenue = Number(month.revenue);
-                  const height =
-                    maxRevenue > 0 ? (revenue / maxRevenue) * 100 : 0;
-                  const monthLabel = formatCalendarMonth(month.month);
-                  const monthTitle = formatCalendarMonth(month.month, true);
-                  if (!monthLabel) return null;
-                  return (
-                    <div
-                      key={idx}
-                      className="flex-1 flex flex-col items-center gap-1 sm:gap-2 min-w-[44px] max-w-[88px] sm:min-w-[52px] snap-center"
-                    >
-                      <div className="w-full flex flex-col items-center justify-end h-24 group cursor-pointer">
-                        {/* Tooltip */}
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity mb-1 px-2 py-1 bg-pf-raised text-pf-text text-sm rounded whitespace-nowrap z-20 hidden sm:block">
-                          ${revenue.toLocaleString()}
-                        </div>
-                        <div
-                          className="w-full bg-pf-accent rounded-t hover:bg-pf-accent/80 transition-colors"
-                          title={`${monthTitle}: $${revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
-                          style={{
-                            height: `${Math.max(height, 4)}%`,
-                            minHeight: '4px',
-                          }}
-                        />
-                      </div>
-                      <span className="text-sm text-pf-muted whitespace-nowrap font-medium">
-                        {monthLabel}
-                      </span>
-                      {revenue > 0 && (
-                        <span className="text-sm font-medium text-pf-muted whitespace-nowrap">
-                          {revenue >= 1000
-                            ? `$${(revenue / 1000).toFixed(0)}k`
-                            : `$${revenue}`}
-                        </span>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <div className="h-36 sm:h-48 flex flex-col items-center justify-center px-4 text-center text-sm">
-              <p className="font-medium text-pf-text">
-                {totalOrders > 0
-                  ? 'No delivered order value in this range'
-                  : 'No order value yet'}
-              </p>
-
-              <Link
-                href={
-                  totalOrders > 0 ? '/grower/orders' : '/grower/products/add'
-                }
-                className="mt-3 text-sm font-medium text-pf-accent hover:text-pf-accent"
-              >
-                {totalOrders > 0 ? 'Review orders' : 'Add product'}
-              </Link>
-            </div>
+          <ValueChart
+            title="Delivered value by month"
+            points={monthlyRevenue}
+            bucket="month"
+            periodLabel={selectedDates.label}
+            description={
+              monthlySeries.activeMonthsOnly
+                ? 'Months with deliveries, by delivery date (Eastern time).'
+                : 'Delivered orders, by delivery date (Eastern time). Months without deliveries show $0.'
+            }
+            emptyMessage="No delivered orders in this range."
+          />
+          {totalRevenue === 0 && (
+            <Link
+              href={totalOrders > 0 ? '/grower/orders' : '/grower/products/add'}
+              className="mt-3 inline-flex min-h-11 items-center text-sm font-medium text-pf-accent"
+            >
+              {totalOrders > 0 ? 'Review orders' : 'Add product'}
+            </Link>
           )}
         </div>
 
@@ -521,18 +423,20 @@ export default async function GrowerReportsPage({
       <div className="grid items-start gap-4 lg:grid-cols-2">
         <ReportRanking
           title="Top products"
+          description="Ranked by delivered item value."
           items={topProducts.map((p) => ({
             name: p.productName,
             value: Number(p.revenue),
-            detail: `${p.quantity} units`,
+            detail: formatQuantity(p.quantity, p.unit),
           }))}
         />
         <ReportRanking
           title="Top customers"
+          description="Ranked by delivered order value."
           items={topCustomers.map((c) => ({
             name: c.dispensaryName,
             value: Number(c.revenue),
-            detail: `${c.orderCount} orders`,
+            detail: `${c.orderCount} ${c.orderCount === 1 ? 'order' : 'orders'}`,
           }))}
         />
       </div>

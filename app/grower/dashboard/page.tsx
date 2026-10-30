@@ -214,9 +214,6 @@ export default async function GrowerDashboardPage() {
       <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
         <section className="pf-panel p-4 sm:p-5">
           <DeliveredValueChart days={chart} />
-          <p className="mt-2 text-sm text-pf-muted">
-            Last 30 days, by delivery date.
-          </p>
         </section>
         <section className="pf-panel p-4 sm:p-5">
           <h2 className="font-semibold">Low stock</h2>

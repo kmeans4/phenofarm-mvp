@@ -10,7 +10,13 @@ import { EmptyState } from '@/app/components/ui/EmptyState';
 import { PageHeader } from '@/app/components/ui/PageHeader';
 import { StatCard } from '@/app/components/ui/StatCard';
 import Link from 'next/link';
-import { format, subDays, startOfDay } from 'date-fns';
+import { ValueChart } from '@/app/components/charts/ValueChart';
+import { dailyOrderValues, type ValuePoint } from '@/lib/chart-values';
+import {
+  marketplaceDateKey,
+  marketplaceDayStart,
+  shiftDateKey,
+} from '@/lib/report-range';
 import { OrdersTable } from '../components/OrdersTable';
 import { CheckCircle2, CircleAlert, Store } from 'lucide-react';
 import { LicenseVerificationCard } from './LicenseVerificationCard';
@@ -166,7 +172,7 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     phone: string | null;
     address: string | null;
   } | null;
-  last7Days: { day: string; revenue: number }[];
+  last7Days: ValuePoint[];
   featuredProducts: {
     productId: string;
     name: string;
@@ -176,7 +182,9 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     grower: string;
   }[];
 }> {
-  const since = startOfDay(subDays(new Date(), 6));
+  const today = marketplaceDateKey();
+  const since = marketplaceDayStart(shiftDateKey(today, -6));
+  const until = marketplaceDayStart(shiftDateKey(today, 1));
   const [
     orders,
     profile,
@@ -228,7 +236,7 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     db.order.findMany({
       where: {
         dispensaryId,
-        createdAt: { gte: since },
+        createdAt: { gte: since, lt: until },
         status: { not: 'CANCELLED' },
       },
       select: { createdAt: true, totalAmount: true },
@@ -258,19 +266,7 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     .filter((row) => !['DELIVERED', 'CANCELLED'].includes(row.status))
     .reduce((sum, row) => sum + row._count._all, 0);
 
-  const last7Days = Array.from({ length: 7 }, (_, i) => {
-    const date = subDays(new Date(), 6 - i);
-    const dayStart = startOfDay(date);
-    const dayEnd = new Date(dayStart);
-    dayEnd.setHours(23, 59, 59, 999);
-    const dayRevenue = weekOrders
-      .filter((o) => {
-        const orderDate = new Date(o.createdAt);
-        return orderDate >= dayStart && orderDate <= dayEnd;
-      })
-      .reduce((sum, o) => sum + Number(o.totalAmount), 0);
-    return { day: format(date, 'MMM d'), revenue: dayRevenue };
-  });
+  const last7Days = dailyOrderValues(weekOrders, today);
 
   const featuredProducts = featuredItems.map((item) => ({
     productId: item.productId,
@@ -312,13 +308,11 @@ export default async function DispensaryDashboardPage() {
     settingsHref: '/dispensary/settings#license-verification',
   });
   const hasOrders = data.orders.length > 0;
-  const hasSpending = data.last7Days.some((d) => d.revenue > 0);
-  const maxDailySpend = Math.max(...data.last7Days.map((d) => d.revenue), 1);
   const hasProfile = Boolean(data.profile?.businessName);
   const hasLicense = Boolean(
     data.profile?.licenseNumber &&
-      data.profile.licenseStatus === 'verified' &&
-      !isLicenseExpired(data.profile.licenseExpiry)
+    data.profile.licenseStatus === 'verified' &&
+    !isLicenseExpired(data.profile.licenseExpiry)
   );
   const hasSavedProducts =
     data.favoriteCount > 0 ||
@@ -595,37 +589,14 @@ export default async function DispensaryDashboardPage() {
         </Card>
 
         <Card className="bg-pf-surface shadow-sm border border-pf-line">
-          <CardHeader>
-            <h3 className="text-lg font-semibold text-pf-text">
-              7-day order value
-            </h3>
-          </CardHeader>
-          <CardContent>
-            {!hasSpending ? (
-              <p className="text-sm text-pf-muted">No orders this week.</p>
-            ) : (
-              <div className="h-40 sm:h-48 flex items-end justify-between gap-1 sm:gap-2 px-2 sm:px-0 overflow-x-auto pb-1">
-                {data.last7Days.map((day, index) => (
-                  <div
-                    key={index}
-                    className="flex h-full flex-1 flex-col items-center gap-1 sm:gap-2 min-w-[36px]"
-                  >
-                    <div className="flex min-h-0 w-full flex-1 items-end">
-                      <div
-                        className="w-full bg-emerald-500 rounded-t-sm"
-                        style={{
-                          height: `${Math.min((day.revenue / maxDailySpend) * 100, 100)}%`,
-                        }}
-                      />
-                    </div>
-                    <span className="text-xs text-pf-muted">{day.day}</span>
-                    <span className="text-xs font-medium text-pf-accent">
-                      ${Math.round(day.revenue)}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
+          <CardContent className="p-4 sm:p-5">
+            <ValueChart
+              title="7-day order value"
+              points={data.last7Days}
+              periodLabel="Last 7 days"
+              description="Requests and orders by request date (Eastern time). Canceled orders excluded."
+              emptyMessage="No requests or orders in the last 7 days."
+            />
           </CardContent>
         </Card>
       </div>

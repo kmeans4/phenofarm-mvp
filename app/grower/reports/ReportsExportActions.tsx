@@ -1,5 +1,6 @@
 'use client';
 import { parse } from 'csv-parse/browser/esm/sync';
+import { formatQuantity } from '@/lib/format';
 
 interface ReportSummary {
   totalRevenue: number;
@@ -17,6 +18,7 @@ interface MonthlyRevenueRow {
 interface TopProductRow {
   productName: string;
   quantity: number;
+  unit: string;
   revenue: number;
 }
 
@@ -199,10 +201,11 @@ export function ReportsExportActions({
       ...monthlyRevenue.map((row) => [row.month, row.revenue.toFixed(2)]),
       [],
       ['Top Products'],
-      ['Product', 'Quantity', 'Estimated Value'],
+      ['Product', 'Quantity', 'Unit', 'Estimated Value'],
       ...topProducts.map((row) => [
         row.productName,
         row.quantity,
+        row.unit,
         row.revenue.toFixed(2),
       ]),
       [],
@@ -276,7 +279,7 @@ export function ReportsExportActions({
       ...(topProducts.length > 0
         ? topProducts.map(
             (row, index) =>
-              `${index + 1}. ${row.productName} - ${row.quantity} units - $${row.revenue.toFixed(2)}`
+              `${index + 1}. ${row.productName} - ${formatQuantity(row.quantity, row.unit)} - $${row.revenue.toFixed(2)}`
           )
         : ['No delivered product value in this range.']),
       '',
