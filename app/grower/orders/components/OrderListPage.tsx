@@ -7,7 +7,11 @@ import Link from 'next/link';
 import { PageHeader } from '@/app/components/ui/PageHeader';
 import { Button } from '@/app/components/ui/Button';
 import { Pagination } from '@/app/components/ui/Pagination';
-import { marketplaceDayStart, shiftDateKey } from '@/lib/report-range';
+import {
+  marketplaceDayStart,
+  shiftDateKey,
+  reportOrderDateWhere,
+} from '@/lib/report-range';
 import { getOrderStatusLabel } from '@/lib/order-workflow';
 import OrdersList from './OrdersList';
 import { OrderFilters } from './OrderFilters';
@@ -19,6 +23,7 @@ export type OrderListParams = {
   q?: string;
   from?: string;
   to?: string;
+  dateBasis?: string;
 };
 export async function OrderListPage({
   params,
@@ -63,16 +68,27 @@ export async function OrderListPage({
         }
       : {}),
     ...(history && (params.from || params.to)
-      ? {
-          updatedAt: {
-            ...(params.from && marketplaceDayStart(params.from)
-              ? { gte: marketplaceDayStart(params.from) }
-              : {}),
-            ...(params.to && marketplaceDayStart(params.to)
-              ? { lt: marketplaceDayStart(shiftDateKey(params.to, 1)) }
-              : {}),
-          },
-        }
+      ? params.dateBasis === 'delivered'
+        ? {
+            AND: [
+              reportOrderDateWhere(
+                params.from ? marketplaceDayStart(params.from) : undefined,
+                params.to
+                  ? marketplaceDayStart(shiftDateKey(params.to, 1))
+                  : undefined
+              ),
+            ],
+          }
+        : {
+            updatedAt: {
+              ...(params.from && marketplaceDayStart(params.from)
+                ? { gte: marketplaceDayStart(params.from) }
+                : {}),
+              ...(params.to && marketplaceDayStart(params.to)
+                ? { lt: marketplaceDayStart(shiftDateKey(params.to, 1)) }
+                : {}),
+            },
+          }
       : {}),
   };
   const groups = await db.order.groupBy({
@@ -94,6 +110,7 @@ export async function OrderListPage({
       id: true,
       orderId: true,
       status: true,
+      notes: true,
       createdAt: true,
       totalAmount: true,
       dispensary: { select: { businessName: true } },
@@ -108,6 +125,7 @@ export async function OrderListPage({
       q,
       dispensary: params.dispensary,
       from: params.from,
+      dateBasis: params.dateBasis,
       to: params.to,
       status: status || undefined,
     }).filter(([, v]) => Boolean(v))
@@ -135,6 +153,12 @@ export async function OrderListPage({
           </>
         }
       />
+      {params.dateBasis === 'delivered' && (
+        <p className="text-sm text-pf-muted">
+          Filtered by the delivery or collection date, matching Reports. Older
+          completed orders without a completion date use their last update.
+        </p>
+      )}
       <OrderFilters history={history} initialSearch={q} />
       <nav aria-label="Order status" className="flex flex-wrap gap-2">
         {[null, ...statuses].map((key) => (

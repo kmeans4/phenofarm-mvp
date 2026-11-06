@@ -1,3 +1,4 @@
+import { sellerVisibility, sellerAccessSelect } from '@/lib/seller-access';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -27,7 +28,7 @@ export default async function ProductPreview({
     include: {
       strain: true,
       batch: true,
-      grower: { select: { businessName: true } },
+      grower: { select: { businessName: true, ...sellerAccessSelect } },
     },
   });
   if (!product) notFound();
@@ -41,8 +42,13 @@ export default async function ProductPreview({
         ← Edit product
       </Link>
       <p className="rounded-lg border border-pf-line p-3 text-sm">
-        Buyer preview · {productVisibility(product)}. This page is visible only
-        to you.
+        Buyer preview ·{' '}
+        {productVisibility({
+          ...product,
+          sellerVisibility: sellerVisibility(product.grower),
+          inventoryQty: Number(product.inventoryQty),
+        })}
+        . This page is visible only to you.
       </p>
       <article
         className={`grid gap-5 rounded-xl border border-pf-line bg-pf-surface p-4 ${product.images.length ? 'sm:grid-cols-2' : ''}`}
@@ -83,7 +89,8 @@ export default async function ProductPreview({
               : 'Price on request'}
           </p>
           <p>
-            {formatProductStock(product.inventoryQty, product.unit)} available
+            {formatProductStock(Number(product.inventoryQty), product.unit)}{' '}
+            available
           </p>
           {(product.thcMin !== null || product.cbdMin !== null) && (
             <p>

@@ -319,6 +319,7 @@ export default async function GrowerMarketplacePage({
   // Match buyer cards: batch lab values take precedence over product ranges.
   const products: MarketplaceProduct[] = rawProducts.map((p) => ({
     ...p,
+    inventoryQty: Number(p.inventoryQty),
     images: productImages.get(p.id) || [],
     labReports: labReports.get(p.id) || [],
     price: Number(p.price) || 0,

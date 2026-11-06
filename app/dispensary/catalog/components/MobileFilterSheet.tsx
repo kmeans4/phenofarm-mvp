@@ -62,7 +62,7 @@ function MobileFilterSheetContent({
     Number(localFilters.recentlyAdded) +
     Number(localFilters.trending) +
     Number(localFavorites) +
-    Number(!!localFilters.inStock) +
+    Number(localFilters.inStock === false) +
     Number(!!localFilters.hasLabs) +
     Number(!!localFilters.strainType) +
     Number(!!localFilters.growerId) +

@@ -93,6 +93,7 @@ export default async function GrowerReportsPage({
         id: true,
         orderId: true,
         status: true,
+        notes: true,
         createdAt: true,
         deliveredAt: true,
         updatedAt: true,
@@ -108,20 +109,26 @@ export default async function GrowerReportsPage({
       GROUP BY 1 ORDER BY 1`),
     db.$queryRaw<
       Array<{
+        id: string;
         productName: string;
         unit: string;
         quantity: number;
         revenue: number;
       }>
     >(Prisma.sql`
-      SELECT p.name AS "productName", p.unit, SUM(i.quantity)::float AS quantity, SUM(i."totalPrice")::float AS revenue
+      SELECT p.id, p.name AS "productName", p.unit, SUM(i.quantity)::float AS quantity, SUM(i."totalPrice")::float AS revenue
       FROM order_items i JOIN orders o ON o.id = i."orderId" JOIN products p ON p.id = i."productId"
       WHERE o."growerId" = ${user.growerId} AND o.status = 'DELIVERED' ${sqlRange}
       GROUP BY p.id, p.name, p.unit ORDER BY revenue DESC`),
     db.$queryRaw<
-      Array<{ dispensaryName: string; orderCount: number; revenue: number }>
+      Array<{
+        id: string;
+        dispensaryName: string;
+        orderCount: number;
+        revenue: number;
+      }>
     >(Prisma.sql`
-      SELECT d."businessName" AS "dispensaryName", COUNT(*)::int AS "orderCount", SUM(o."totalAmount")::float AS revenue
+      SELECT d.id, d."businessName" AS "dispensaryName", COUNT(*)::int AS "orderCount", SUM(o."totalAmount")::float AS revenue
       FROM orders o JOIN dispensaries d ON d.id = o."dispensaryId"
       WHERE o."growerId" = ${user.growerId} AND o.status = 'DELIVERED' ${sqlRange}
       GROUP BY d.id, d."businessName" ORDER BY revenue DESC`),
@@ -152,13 +159,28 @@ export default async function GrowerReportsPage({
     selectedDates.from,
     selectedDates.to
   );
-  const monthlyRevenue = monthlySeries.points;
+  const monthlyRevenue = monthlySeries.points.map((point) => {
+    const [year, month] = point.date.split('-').map(Number);
+    const monthStart = `${point.date}-01`;
+    const monthEnd = new Date(Date.UTC(year, month, 0))
+      .toISOString()
+      .slice(0, 10);
+    const from =
+      selectedDates.from && selectedDates.from > monthStart
+        ? selectedDates.from
+        : monthStart;
+    const to = selectedDates.to < monthEnd ? selectedDates.to : monthEnd;
+    return {
+      ...point,
+      href: `/grower/orders/history?${new URLSearchParams({ status: 'delivered', dateBasis: 'delivered', from, to })}`,
+    };
+  });
   const topProducts = productRows;
   const topCustomers = customerRows;
   const exportOrders = recentOrders.map((order) => ({
     orderId: order.orderId,
     customer: order.dispensary?.businessName || 'Unknown',
-    status: getOrderStatusLabel(order.status),
+    status: getOrderStatusLabel(order.status, order.notes),
     date: order.createdAt.toISOString(),
     totalAmount: Number(order.totalAmount),
   }));
@@ -428,6 +450,7 @@ export default async function GrowerReportsPage({
             name: p.productName,
             value: Number(p.revenue),
             detail: formatQuantity(p.quantity, p.unit),
+            href: `/grower/products/${p.id}/preview`,
           }))}
         />
         <ReportRanking
@@ -436,6 +459,7 @@ export default async function GrowerReportsPage({
           items={topCustomers.map((c) => ({
             name: c.dispensaryName,
             value: Number(c.revenue),
+            href: `/grower/customers/${c.id}`,
             detail: `${c.orderCount} ${c.orderCount === 1 ? 'order' : 'orders'}`,
           }))}
         />
@@ -524,7 +548,7 @@ export default async function GrowerReportsPage({
                                 : 'bg-pf-surface text-pf-secondary'
                         }`}
                       >
-                        {getOrderStatusLabel(order.status)}
+                        {getOrderStatusLabel(order.status, order.notes)}
                       </span>
                     </td>
                     <td className="px-3 sm:px-6 py-2 sm:py-4 whitespace-nowrap text-sm sm:text-sm text-pf-muted hidden md:table-cell">

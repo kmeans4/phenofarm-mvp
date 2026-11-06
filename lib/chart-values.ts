@@ -1,7 +1,7 @@
 import { marketplaceDateKey, shiftDateKey } from './report-range';
 import { formatCalendarMonth } from './calendar-month';
 
-export type ValuePoint = { date: string; value: number };
+export type ValuePoint = { date: string; value: number; href?: string };
 export type ValueBucket = 'day' | 'month';
 
 export function valueDateLabel(

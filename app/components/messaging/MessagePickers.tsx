@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 export type QuoteProduct = {
   id: string;
   name: string;
+  productType?: string | null;
   unit: string | null;
   price: number | null;
   inventoryQty: number;
@@ -10,10 +11,12 @@ export type QuoteProduct = {
 export function QuoteProductPicker({
   conversationId,
   value,
+  selectedProduct,
   onChange,
 }: {
   conversationId: string;
   value: string;
+  selectedProduct?: QuoteProduct | null;
   onChange: (product: QuoteProduct) => void;
 }) {
   const [search, setSearch] = useState('');
@@ -63,6 +66,7 @@ export function QuoteProductPicker({
         className="w-full rounded-lg border px-3 py-2 text-base"
       >
         <option value="">Choose product</option>
+        {selectedProduct?.id === value && !products.some(p => p.id === value) && <option value={value}>{selectedProduct.name}</option>}
         {products.map((p) => (
           <option key={p.id} value={p.id}>
             {p.name} · {p.inventoryQty} {p.unit || 'unit'}

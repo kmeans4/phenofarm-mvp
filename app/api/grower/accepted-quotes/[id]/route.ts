@@ -1,3 +1,4 @@
+import { plainData } from '@/lib/serialize';
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
@@ -37,5 +38,5 @@ export async function GET(
       { error: 'This quote has expired or is already used.' },
       { status: 404 }
     );
-  return NextResponse.json(quote);
+  return NextResponse.json(plainData(quote));
 }

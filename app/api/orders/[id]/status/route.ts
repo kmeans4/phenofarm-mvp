@@ -1,3 +1,5 @@
+import { plainData } from '@/lib/serialize';
+import { sellerCanTrade, SELLER_ACCESS_MESSAGE, SellerAccessError } from '@/lib/seller-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
@@ -81,10 +83,10 @@ export async function PATCH(
         order.updatedAt.toISOString() !== undo?.version)
     ) {
       return NextResponse.json(
-        {
+        plainData({
           error:
             'This order has changed or the undo window ended. Refresh to see its current status.',
-        },
+        }),
         { status: 409 }
       );
     }
@@ -99,10 +101,10 @@ export async function PATCH(
       (newStatus !== 'CANCELLED' || order.status !== 'PENDING')
     )
       return NextResponse.json(
-        {
+        plainData({
           error:
             'This order was already accepted. Message the grower to arrange cancellation.',
-        },
+        }),
         { status: 409 }
       );
     if (
@@ -111,21 +113,26 @@ export async function PATCH(
       body.expectedStatus !== order.status
     )
       return NextResponse.json(
-        {
-          error: `This order was already moved to ${getOrderStatusLabel(order.status)} — refresh to see it.`,
-        },
+        plainData({
+          error: `This order was already moved to ${getOrderStatusLabel(order.status, order.notes)} — refresh to see it.`,
+        }),
         { status: 409 }
       );
     if (!undoEventId && order.status === newStatus)
-      return NextResponse.json({
-        success: true,
-        order: { id: order.id, status: order.status },
-      });
-    if (!undoEventId && !canTransitionOrderStatus(order.status, newStatus))
       return NextResponse.json(
-        {
-          error: `This order is ${getOrderStatusLabel(order.status)} — refresh to see its next step.`,
-        },
+        plainData({
+          success: true,
+          order: { id: order.id, status: order.status },
+        })
+      );
+    if (
+      !undoEventId &&
+      !canTransitionOrderStatus(order.status, newStatus, order.notes)
+    )
+      return NextResponse.json(
+        plainData({
+          error: `This order is ${getOrderStatusLabel(order.status, order.notes)} — refresh to see its next step.`,
+        }),
         { status: 409 }
       );
     const reason = typeof body.reason === 'string' ? body.reason.trim() : '';
@@ -139,6 +146,16 @@ export async function PATCH(
         { error: 'Choose a cancellation reason (up to 500 characters).' },
         { status: 400 }
       );
+    if (
+      order.status === 'PENDING' &&
+      newStatus !== 'PENDING' &&
+      newStatus !== 'CANCELLED' &&
+      !(await sellerCanTrade(order.growerId))
+    )
+      return NextResponse.json(
+        { error: SELLER_ACCESS_MESSAGE },
+        { status: 403 }
+      );
     const update: Partial<Order> = { status: newStatus };
     if (newStatus === 'SHIPPED' && !order.shippedAt)
       update.shippedAt = new Date();
@@ -148,6 +165,13 @@ export async function PATCH(
     if (undoEventId && order.status === 'SHIPPED') update.shippedAt = null;
     const result = await db.$transaction(async (tx) => {
       await claimOrder(tx, order);
+      if (
+        order.status === 'PENDING' &&
+        newStatus !== 'PENDING' &&
+        newStatus !== 'CANCELLED' &&
+        !(await sellerCanTrade(order.growerId, tx))
+      )
+        throw new SellerAccessError();
       const items = await tx.orderItem.findMany({ where: { orderId } });
       await syncOrderInventory(tx, order, items, items, newStatus);
       const updated = await tx.order.update({
@@ -176,8 +200,8 @@ export async function PATCH(
             ? order.dispensary.userId
             : order.grower.userId,
         type: 'ORDER_STATUS_CHANGED',
-        title: `Order ${getOrderStatusLabel(newStatus).toLowerCase()}`,
-        body: `Order #${order.orderId} is now ${getOrderStatusLabel(newStatus)}.${reason ? ` Reason: ${reason}` : ''}${undoEventId ? ' The previous update was undone.' : ''}`,
+        title: `Order ${getOrderStatusLabel(newStatus, order.notes).toLowerCase()}`,
+        body: `Order #${order.orderId} is now ${getOrderStatusLabel(newStatus, order.notes)}.${reason ? ` Reason: ${reason}` : ''}${undoEventId ? ' The previous update was undone.' : ''}`,
         href:
           user.role === 'GROWER'
             ? `/dispensary/orders/${order.id}`
@@ -185,14 +209,17 @@ export async function PATCH(
       });
       return { updated, event };
     });
-    return NextResponse.json({
-      success: true,
-      order: { id: result.updated.id, status: result.updated.status },
-      undoEventId: undoEventId
-        ? null
-        : orderUndoToken(result.event.id, result.updated.updatedAt),
-    });
+    return NextResponse.json(
+      plainData({
+        success: true,
+        order: { id: result.updated.id, status: result.updated.status },
+        undoEventId: undoEventId
+          ? null
+          : orderUndoToken(result.event.id, result.updated.updatedAt),
+      })
+    );
   } catch (error) {
+    if (error instanceof SellerAccessError) return NextResponse.json({ error: error.message }, { status: 403 });
     if (error instanceof OrderInventoryError)
       return NextResponse.json(
         { error: error.message, code: error.code, issues: error.issues },
@@ -200,10 +227,10 @@ export async function PATCH(
       );
     if (error instanceof OrderConflictError)
       return NextResponse.json(
-        {
+        plainData({
           error:
             'This order or its stock changed. Refresh before trying again.',
-        },
+        }),
         { status: 409 }
       );
     console.error('Status update error:', error);

@@ -1,4 +1,5 @@
 'use client';
+import { QUANTITY_MESSAGE } from '@/lib/quantity';
 
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
@@ -144,11 +145,14 @@ const validatePrice = (price: string): string | undefined => {
   return undefined;
 };
 
-const validateInventoryQty = (qty: string): string | undefined => {
+const validateInventoryQty = (
+  qty: string,
+  unit?: string,
+  productType?: string
+): string | undefined => {
   if (!qty) return 'Inventory quantity is required';
-  const numQty = parseInventoryQty(qty);
-  if (numQty === null)
-    return 'Stock counts whole units. Use 8 oz instead of 0.5 lb, for example.';
+  const numQty = parseInventoryQty(qty, unit, productType);
+  if (numQty === null) return QUANTITY_MESSAGE;
   if (numQty < 0) return 'Quantity cannot be negative';
   if (numQty > 999999) return 'Quantity exceeds maximum allowed';
   return undefined;
@@ -414,7 +418,11 @@ export function ProductForm({
     const newErrors: FieldErrors = {
       name: validateName(formData.name),
       price: validatePrice(formData.price),
-      inventoryQty: validateInventoryQty(formData.inventoryQty),
+      inventoryQty: validateInventoryQty(
+        formData.inventoryQty,
+        formData.unit,
+        formData.productType
+      ),
       productType: validateProductType(formData.productType),
       unit: validateUnit(formData.unit),
       sku: validateSku(formData.sku),
@@ -487,7 +495,7 @@ export function ProductForm({
       case 'price':
         return validatePrice(value);
       case 'inventoryQty':
-        return validateInventoryQty(value);
+        return validateInventoryQty(value, formData.unit, formData.productType);
       case 'productType':
         return validateProductType(value);
       case 'unit':
@@ -1307,7 +1315,7 @@ export function ProductForm({
                   id="product-visibility-label"
                   className="text-sm font-medium text-pf-secondary"
                 >
-                  Visible to buyers
+                  Available for sale
                 </span>
               </div>
               <button
@@ -1332,8 +1340,8 @@ export function ProductForm({
               </button>
             </div>
             <p className="text-sm text-pf-muted">
-              Stock counts whole selling units. For partial pounds, choose oz or
-              g and price that unit.{' '}
+              Weights support up to 3 decimal places. Packs and pieces use whole
+              quantities.{' '}
               {formData.inventoryQty === '0'
                 ? 'Zero stock saves hidden from buyers.'
                 : ''}

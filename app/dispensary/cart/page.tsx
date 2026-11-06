@@ -1,4 +1,11 @@
 'use client';
+import {
+  validQuantity,
+  quantityMinimum,
+  quantityIncrement,
+  roundQuantity,
+  QUANTITY_MESSAGE,
+} from '@/lib/quantity';
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
@@ -105,6 +112,10 @@ export default function DispensaryCartPage() {
     'loading' | 'approved' | 'pending' | 'error'
   >('loading');
   const [terms, setTerms] = useState<Record<string, Terms>>({});
+  const [fulfillmentOverrides, setFulfillmentOverrides] = useState<
+    Record<string, Details>
+  >({});
+  const effectiveDetails = (id: string) => fulfillmentOverrides[id] || details;
   const [termChoices, setTermChoices] = useState<Record<string, string>>({});
   const [termsError, setTermsError] = useState('');
   const [changes, setChanges] = useState<Record<string, string>>({});
@@ -121,8 +132,8 @@ export default function DispensaryCartPage() {
     setCart(readCart());
   }, []);
   const draftValue = useMemo(
-    () => ({ details, termChoices }),
-    [details, termChoices]
+    () => ({ details, termChoices, fulfillmentOverrides }),
+    [details, termChoices, fulfillmentOverrides]
   );
   const draft = useLocalDraft({
     key: 'cart-details-v2',
@@ -137,6 +148,27 @@ export default function DispensaryCartPage() {
             ? value.details.deliveryAddress.slice(0, 500)
             : '',
       });
+      if (
+        value?.fulfillmentOverrides &&
+        typeof value.fulfillmentOverrides === 'object'
+      ) {
+        setFulfillmentOverrides(
+          Object.fromEntries(
+            Object.entries(value.fulfillmentOverrides)
+              .slice(0, 100)
+              .map(([id, saved]) => [
+                id,
+                {
+                  ...normalizeOrderDefaults(saved),
+                  deliveryAddress:
+                    typeof saved?.deliveryAddress === 'string'
+                      ? saved.deliveryAddress.slice(0, 500)
+                      : '',
+                },
+              ])
+          )
+        );
+      }
       if (value?.termChoices && typeof value.termChoices === 'object')
         setTermChoices(
           Object.fromEntries(
@@ -200,9 +232,7 @@ export default function DispensaryCartPage() {
           ),
           deliveryAddress:
             current.deliveryAddress ||
-            [data.address, data.city, data.state, data.zip]
-              .filter(Boolean)
-              .join(', '),
+            (data.address ? [data.address, data.city, data.state, data.zip].filter(Boolean).join(', ') : ''),
         }));
       })
       .catch(() => {
@@ -350,8 +380,14 @@ export default function DispensaryCartPage() {
   }
   function quantity(item: CartItem, value: string) {
     const number = Number(value.replace(/[,\s]/g, ''));
-    if (!Number.isSafeInteger(number) || number < 1) {
-      setError(`Enter a whole number of 1 or more for ${item.name}.`);
+    if (
+      !validQuantity(number, {
+        unit: item.unit,
+        productType: item.productType,
+        max: 9999,
+      })
+    ) {
+      setError(`${item.name}: ${QUANTITY_MESSAGE}`);
       return;
     }
     persist(
@@ -370,7 +406,7 @@ export default function DispensaryCartPage() {
     });
   }
   function problematic(item: CartItem) {
-    return item.unavailable || item.maxQty < 1
+    return item.unavailable || item.maxQty <= 0
       ? 'Sold out'
       : item.requiresQuote
         ? 'Price on request'
@@ -380,11 +416,16 @@ export default function DispensaryCartPage() {
   }
   function reviewOrder() {
     setError('');
-    const edited = Object.entries(quantityEdits).find(
-      ([, value]) => !Number.isSafeInteger(Number(value)) || Number(value) < 1
-    );
+    const edited = Object.entries(quantityEdits).find(([id, value]) => {
+      const item = cart.items.find((row) => row.id === id);
+      return !validQuantity(value, {
+        unit: item?.unit,
+        productType: item?.productType,
+        max: 9999,
+      });
+    });
     if (edited) {
-      setError('Enter a whole number of 1 or more.');
+      setError(QUANTITY_MESSAGE);
       document.getElementById(`qty-${edited[0]}`)?.focus();
       return;
     }
@@ -396,13 +437,22 @@ export default function DispensaryCartPage() {
         ?.scrollIntoView({ block: 'center', behavior: 'smooth' });
       return;
     }
-    if (
-      details.fulfillmentMethod === 'Delivery requested' &&
-      !details.deliveryAddress.trim()
-    ) {
-      setError('Add a delivery address.');
-      document.getElementById('delivery-address')?.focus();
-      return;
+    for (const id of Object.keys(groups)) {
+      const choice = effectiveDetails(id);
+      if (
+        choice.fulfillmentMethod === 'Delivery requested' &&
+        !choice.deliveryAddress.trim()
+      ) {
+        setError(`Add a delivery address for ${groups[id].grower}.`);
+        document
+          .getElementById(
+            fulfillmentOverrides[id]
+              ? `delivery-address-${id}`
+              : 'delivery-address'
+          )
+          ?.focus();
+        return;
+      }
     }
     setReview(true);
   }
@@ -428,7 +478,7 @@ export default function DispensaryCartPage() {
           [...new Set(current.items.map((item) => item.growerId))].map((id) => [
             id,
             buildOrderRequestNotes({
-              ...details,
+              ...effectiveDetails(id),
               paymentTerms:
                 termChoices[id] ||
                 terms[id]?.paymentTerms ||
@@ -845,9 +895,29 @@ export default function DispensaryCartPage() {
                               <div className="flex rounded-lg border border-pf-line-strong">
                                 <button
                                   aria-label={`Decrease quantity for ${item.name}`}
-                                  disabled={item.quantity <= 1}
+                                  disabled={
+                                    item.quantity <=
+                                    quantityMinimum(item.unit, item.productType)
+                                  }
                                   onClick={() =>
-                                    quantity(item, String(item.quantity - 1))
+                                    quantity(
+                                      item,
+                                      String(
+                                        Math.max(
+                                          quantityMinimum(
+                                            item.unit,
+                                            item.productType
+                                          ),
+                                          roundQuantity(
+                                            item.quantity -
+                                              quantityIncrement(
+                                                item.unit,
+                                                item.productType
+                                              )
+                                          )
+                                        )
+                                      )
+                                    )
                                   }
                                   className="h-11 w-11 disabled:opacity-40"
                                 >
@@ -857,7 +927,7 @@ export default function DispensaryCartPage() {
                                   id={`qty-${item.id}`}
                                   aria-label={`Quantity for ${item.name}`}
                                   type="text"
-                                  inputMode="numeric"
+                                  inputMode="decimal"
                                   value={
                                     quantityEdits[item.id] ??
                                     String(item.quantity)
@@ -877,7 +947,21 @@ export default function DispensaryCartPage() {
                                   aria-label={`Increase quantity for ${item.name}`}
                                   disabled={item.quantity >= item.maxQty}
                                   onClick={() =>
-                                    quantity(item, String(item.quantity + 1))
+                                    quantity(
+                                      item,
+                                      String(
+                                        Math.min(
+                                          item.maxQty,
+                                          roundQuantity(
+                                            item.quantity +
+                                              quantityIncrement(
+                                                item.unit,
+                                                item.productType
+                                              )
+                                          )
+                                        )
+                                      )
+                                    )
                                   }
                                   className="h-11 w-11 disabled:opacity-40"
                                 >
@@ -926,6 +1010,100 @@ export default function DispensaryCartPage() {
                         ))}
                       </select>
                     </label>
+                    {Object.keys(groups).length > 1 && (
+                      <fieldset
+                        className="mt-4 space-y-3 border-t border-pf-line pt-3"
+                        aria-label={`Fulfillment for ${group.grower}`}
+                      >
+                        <label className="flex min-h-11 items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            checked={Boolean(fulfillmentOverrides[id])}
+                            onChange={(event) =>
+                              setFulfillmentOverrides((previous) => {
+                                const next = { ...previous };
+                                if (event.target.checked)
+                                  next[id] = { ...details };
+                                else delete next[id];
+                                return next;
+                              })
+                            }
+                          />
+                          Use different pickup or delivery details
+                        </label>
+                        {fulfillmentOverrides[id] ? (
+                          <div className="grid gap-3 sm:grid-cols-2">
+                            <label className="text-sm">
+                              Method
+                              <select
+                                aria-label="Method"
+                                className={inputClass}
+                                value={effectiveDetails(id).fulfillmentMethod}
+                                onChange={(event) =>
+                                  setFulfillmentOverrides((previous) => ({
+                                    ...previous,
+                                    [id]: {
+                                      ...effectiveDetails(id),
+                                      fulfillmentMethod: event.target.value,
+                                    },
+                                  }))
+                                }
+                              >
+                                {[
+                                  'Coordinate with grower',
+                                  'Pickup',
+                                  'Delivery requested',
+                                ].map((method) => (
+                                  <option key={method}>{method}</option>
+                                ))}
+                              </select>
+                            </label>
+                            <label className="text-sm">
+                              Preferred date or time
+                              <input
+                                className={inputClass}
+                                maxLength={120}
+                                value={effectiveDetails(id).requestedWindow}
+                                onChange={(event) =>
+                                  setFulfillmentOverrides((previous) => ({
+                                    ...previous,
+                                    [id]: {
+                                      ...effectiveDetails(id),
+                                      requestedWindow: event.target.value,
+                                    },
+                                  }))
+                                }
+                              />
+                            </label>
+                            {effectiveDetails(id).fulfillmentMethod ===
+                              'Delivery requested' && (
+                              <label className="text-sm sm:col-span-2">
+                                Delivery address
+                                <input
+                                  id={`delivery-address-${id}`}
+                                  className={inputClass}
+                                  maxLength={500}
+                                  value={effectiveDetails(id).deliveryAddress}
+                                  onChange={(event) =>
+                                    setFulfillmentOverrides((previous) => ({
+                                      ...previous,
+                                      [id]: {
+                                        ...effectiveDetails(id),
+                                        deliveryAddress: event.target.value,
+                                      },
+                                    }))
+                                  }
+                                />
+                              </label>
+                            )}
+                          </div>
+                        ) : (
+                          <p className="text-sm text-pf-muted">
+                            Using the shared pickup and delivery details below.
+                          </p>
+                        )}
+                      </fieldset>
+                    )}
                     {termChoices[id] &&
                       termChoices[id] !== term?.paymentTerms && (
                         <p className="text-sm text-pf-warning">
@@ -953,6 +1131,7 @@ export default function DispensaryCartPage() {
                   <label className="text-sm">
                     Pickup or delivery
                     <select
+                      aria-label="Pickup or delivery"
                       className={inputClass}
                       value={details.fulfillmentMethod}
                       onChange={(event) =>
@@ -1081,15 +1260,6 @@ export default function DispensaryCartPage() {
       >
         <div className="space-y-4">
           {notice}
-          <p className="text-sm">
-            {details.fulfillmentMethod}
-            {details.requestedWindow ? ` · ${details.requestedWindow}` : ''}
-          </p>
-          {details.fulfillmentMethod === 'Delivery requested' && (
-            <p className="text-sm">
-              <strong>Deliver to:</strong> {details.deliveryAddress}
-            </p>
-          )}
           {Object.entries(groups).map(([id, group]) => (
             <section key={id} className="rounded-lg border border-pf-line p-3">
               <div className="flex justify-between gap-3">
@@ -1102,6 +1272,19 @@ export default function DispensaryCartPage() {
                   details.paymentTerms ||
                   'Coordinate with grower'}
               </p>
+              <p className="my-2 text-sm">
+                {effectiveDetails(id).fulfillmentMethod}
+                {effectiveDetails(id).requestedWindow
+                  ? ` · ${effectiveDetails(id).requestedWindow}`
+                  : ''}
+              </p>
+              {effectiveDetails(id).fulfillmentMethod ===
+                'Delivery requested' && (
+                <p className="mb-3 text-sm">
+                  <strong>Deliver to:</strong>{' '}
+                  {effectiveDetails(id).deliveryAddress}
+                </p>
+              )}
               <ul className="space-y-2 text-sm">
                 {group.items.map((item) => (
                   <li className="flex justify-between gap-3" key={item.id}>
@@ -1134,7 +1317,9 @@ export default function DispensaryCartPage() {
                 ? 'Sending…'
                 : license === 'loading'
                   ? 'Checking license…'
-                  : 'Send order request'}
+                  : Object.keys(groups).length > 1
+                    ? 'Send order requests'
+                    : 'Send order request'}
             </button>
           </div>
         </div>

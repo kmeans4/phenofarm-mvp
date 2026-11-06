@@ -1,18 +1,22 @@
 'use client';
 import { useState, useRef } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { isPickupOrder } from '@/lib/order-workflow';
 import { Button } from '@/app/components/ui/Button';
 import {
-  NEXT_ORDER_ACTION,
+  getNextOrderAction,
   changeOrderStatus,
   offerOrderUndo,
 } from '../../components/order-actions';
 export default function QuickStatusUpdate({
   orderId,
   currentStatus,
+  notes,
 }: {
   orderId: string;
   currentStatus: string;
+  notes?: string | null;
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -23,7 +27,7 @@ export default function QuickStatusUpdate({
   const [declining, setDeclining] = useState(false);
   const [reason, setReason] = useState('');
   const [note, setNote] = useState('');
-  const action = NEXT_ORDER_ACTION[currentStatus];
+  const action = getNextOrderAction(currentStatus, notes);
   if (!action) return null;
   async function update(status: string) {
     if (pending.current) return;
@@ -71,10 +75,16 @@ export default function QuickStatusUpdate({
         </p>
       )}
       <div className="flex flex-wrap gap-2">
-        <Button disabled={busy} onClick={() => void update(action.status)}>
-          {busy ? 'Saving…' : action.label}
-        </Button>
-        {currentStatus !== 'SHIPPED' && (
+        {currentStatus === 'PENDING' ? (
+          <Button asChild>
+            <Link href={`/grower/orders/${orderId}/edit`}>Review request</Link>
+          </Button>
+        ) : (
+          <Button disabled={busy} onClick={() => void update(action.status)}>
+            {busy ? 'Saving…' : action.label}
+          </Button>
+        )}
+        {(currentStatus !== 'SHIPPED' || isPickupOrder(notes)) && (
           <Button
             variant="outline"
             disabled={busy}

@@ -1,3 +1,7 @@
+import { quantityPrice } from '@/lib/quantity';
+import { sellerCanTrade, SELLER_ACCESS_MESSAGE } from '@/lib/seller-access';
+import { plainData } from '@/lib/serialize';
+import { validQuantity, QUANTITY_MESSAGE } from '@/lib/quantity';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -51,10 +55,8 @@ function parseMoney(value: unknown, field: string) {
 
 function parsePositiveQuantity(value: unknown) {
   const quantity = Number(value);
-  if (!Number.isInteger(quantity) || quantity < 1 || quantity > 9999) {
-    throw new OrderEditError(
-      'Each item quantity must be a whole number between 1 and 9999'
-    );
+  if (!validQuantity(quantity, { allowUnknownUnit: true, max: 9999 })) {
+    throw new OrderEditError(QUANTITY_MESSAGE);
   }
   return quantity;
 }
@@ -182,7 +184,7 @@ export async function GET(
       return NextResponse.json({ error: 'Order not found' }, { status: 404 });
     }
 
-    return NextResponse.json(order, { status: 200 });
+    return NextResponse.json(plainData(order), { status: 200 });
   } catch (error) {
     if (error instanceof OrderConflictError)
       return NextResponse.json({ error: error.message }, { status: 409 });
@@ -235,6 +237,8 @@ export async function PUT(
                 id: true,
                 name: true,
                 inventoryQty: true,
+                unit: true,
+                productType: true,
                 isAvailable: true,
                 isDeleted: true,
               },
@@ -249,8 +253,24 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { status, notes, shippedAt } = body;
+    const accepting = body.accept === true;
+    if (accepting && existingOrder.status !== 'PENDING')
+      throw new OrderEditError(
+        'This request was already updated. Refresh to view the order.',
+        409
+      );
+    if (
+      body.expectedUpdatedAt &&
+      body.expectedUpdatedAt !== existingOrder.updatedAt.toISOString()
+    )
+      throw new OrderConflictError();
+    if (accepting && !(await sellerCanTrade(user.growerId)))
+      throw new OrderEditError(SELLER_ACCESS_MESSAGE, 403);
+    const { notes, shippedAt } = body;
+    const status = accepting ? 'CONFIRMED' : body.status;
     const requestedItems = normalizeItems(body.items);
+    if (accepting && !requestedItems)
+      throw new OrderEditError('Review the items before accepting.');
     const requestedShippingFee =
       body.shippingFee !== undefined
         ? parseMoney(body.shippingFee, 'shippingFee')
@@ -273,17 +293,17 @@ export async function PUT(
 
     if (status && !canTransitionOrderStatus(existingOrder.status, status)) {
       return NextResponse.json(
-        {
+        plainData({
           error: getInvalidOrderStatusTransitionMessage(
             existingOrder.status,
             status
           ),
-        },
+        }),
         { status: 400 }
       );
     }
 
-    if (status && status !== existingOrder.status)
+    if (!accepting && status && status !== existingOrder.status)
       throw new OrderEditError(
         'Use the order status action to change status.',
         400
@@ -315,12 +335,21 @@ export async function PUT(
         }
 
         const existingItem = item.id ? existingItemsById.get(item.id) : null;
+        if (
+          existingItem &&
+          !validQuantity(item.quantity, {
+            unit: existingItem.product.unit,
+            productType: existingItem.product.productType,
+            max: 9999,
+          })
+        )
+          throw new OrderEditError(QUANTITY_MESSAGE);
         if (existingItem?.acceptedQuote) {
           const quote = existingItem.acceptedQuote;
           quotedQuantities.set(quote.id, {
             quantity:
               (quotedQuantities.get(quote.id)?.quantity || 0) + item.quantity,
-            cap: quote.quantity,
+            cap: quote.quantity === null ? null : Number(quote.quantity),
           });
         }
         if (
@@ -350,7 +379,7 @@ export async function PUT(
           const existingItem = existingItemsById.get(item.id);
           return (
             !existingItem ||
-            existingItem.quantity !== item.quantity ||
+            Number(existingItem.quantity) !== item.quantity ||
             (item.unitPrice !== undefined &&
               item.unitPrice !== Number(existingItem.unitPrice))
           );
@@ -374,6 +403,8 @@ export async function PUT(
 
     const updatedOrder = await db.$transaction(async (tx) => {
       await claimOrder(tx, existingOrder);
+      if (accepting && !(await sellerCanTrade(user.growerId!, tx)))
+        throw new OrderEditError(SELLER_ACCESS_MESSAGE, 403);
       if (requestedItems) {
         assertInventoryReviewed(existingOrder);
         await lockInventoryProducts(tx, [
@@ -419,7 +450,7 @@ export async function PUT(
                       priceOverrideReason: 'Agreed price updated by grower',
                     }
                   : {}),
-                totalPrice: Math.round(item.quantity * unitPrice * 100) / 100,
+                totalPrice: quantityPrice(item.quantity, unitPrice),
               },
             });
           } else {
@@ -434,6 +465,8 @@ export async function PUT(
                 id: true,
                 name: true,
                 inventoryQty: true,
+                unit: true,
+                productType: true,
                 isAvailable: true,
               },
             });
@@ -444,6 +477,14 @@ export async function PUT(
                 409
               );
 
+            if (
+              !validQuantity(item.quantity, {
+                unit: product.unit,
+                productType: product.productType,
+                max: 9999,
+              })
+            )
+              throw new OrderEditError(QUANTITY_MESSAGE);
             // Price is an agreed snapshot. Stock accounting follows all item edits atomically.
             const pricedProduct = await tx.product.findUniqueOrThrow({
               where: { id: productId },
@@ -462,7 +503,7 @@ export async function PUT(
                   unitPrice !== Number(pricedProduct.price)
                     ? 'Agreed price set by grower'
                     : null,
-                totalPrice: Math.round(item.quantity * unitPrice * 100) / 100,
+                totalPrice: quantityPrice(item.quantity, unitPrice),
               },
             });
           }
@@ -477,11 +518,11 @@ export async function PUT(
           existingOrder,
           existingOrder.items,
           refreshedItems,
-          existingOrder.status
+          accepting ? 'CONFIRMED' : existingOrder.status
         );
         subtotal = refreshedItems.reduce((sum, item) => {
           return (
-            sum + Math.round(item.quantity * Number(item.unitPrice) * 100) / 100
+            sum + quantityPrice(Number(item.quantity), Number(item.unitPrice))
           );
         }, 0);
       }
@@ -572,7 +613,7 @@ export async function PUT(
       return updated;
     });
 
-    return NextResponse.json(updatedOrder, { status: 200 });
+    return NextResponse.json(plainData(updatedOrder), { status: 200 });
   } catch (error) {
     if (error instanceof OrderConflictError)
       return NextResponse.json({ error: error.message }, { status: 409 });

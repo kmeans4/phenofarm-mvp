@@ -66,7 +66,7 @@
 - Production auth is configured around `NEXTAUTH_URL`; the current production env points to `https://phenoshop.app`.
 - This repo mixes local-only and production env files. Confirm the target before changing database or auth behavior.
 - Stripe secrets exist outside version control and must stay external.
-- Payment model note: `.codex/payment-model.md`. PhenoShop processes cultivator subscriptions only; wholesale settlement stays direct between businesses.
+- Payment model note: `.codex/payment-model.md`. Software subscriptions control buyer visibility, but online billing is disabled pending an approved processor. Wholesale settlement stays direct between businesses.
 
 ## Default validation order
 1. Run `npm run lint` for broad app/UI changes.

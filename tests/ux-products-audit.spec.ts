@@ -365,7 +365,7 @@ test('inline stock coalesces taps and product list works on desktop and mobile',
         (await db.product.findUniqueOrThrow({ where: { id: current.id } }))
           .inventoryQty
     )
-    .toBe(current.inventoryQty + 3);
+    .toBe(Number(current.inventoryQty) + 3);
   expect(writes).toBe(1);
   await page
     .getByRole('textbox', { name: 'Alpha renamed price', exact: true })

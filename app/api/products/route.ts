@@ -1,3 +1,4 @@
+import { getSellerVisibility } from '@/lib/seller-access';
 import { getGrowerProductPage, serializeProduct } from '@/lib/grower-products';
 import { persistMediaReference } from '@/lib/blob-storage';
 import { NextRequest, NextResponse } from 'next/server';
@@ -160,7 +161,13 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json(serializeProduct(product), { status: 201 });
+    return NextResponse.json(
+      {
+        ...serializeProduct(product),
+        sellerVisibility: await getSellerVisibility(user.growerId),
+      },
+      { status: 201 }
+    );
   } catch (error) {
     logApiError('products.POST', error, { route: '/api/products' });
     return apiError(

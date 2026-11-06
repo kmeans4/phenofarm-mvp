@@ -1,3 +1,8 @@
+import { plainData } from '@/lib/serialize';
+import {
+  canSendSellerMessage,
+  SELLER_ACCESS_MESSAGE,
+} from '@/lib/seller-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -46,11 +51,11 @@ function requireMessagingUser(
 }
 
 function buildOfferSummary(message: {
-  offerQuantity: number | null;
+  offerQuantity: Prisma.Decimal | number | null;
   offerUnitPrice: Prisma.Decimal | string | number | null;
 }) {
   const unitPrice = Number(message.offerUnitPrice || 0);
-  const qty = message.offerQuantity || 0;
+  const qty = Number(message.offerQuantity || 0);
   if (qty > 0 && unitPrice > 0)
     return `Quote: ${qty} @ $${unitPrice.toFixed(2)}`;
   if (unitPrice > 0) return `Quote: $${unitPrice.toFixed(2)}`;
@@ -170,7 +175,9 @@ export async function GET() {
       };
     });
 
-    return NextResponse.json({ conversations: payload }, { status: 200 });
+    return NextResponse.json(plainData({ conversations: payload }), {
+      status: 200,
+    });
   } catch (error) {
     console.error('Error fetching conversations:', error);
     return NextResponse.json(
@@ -227,6 +234,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!(await canSendSellerMessage(growerId, dispensaryId, messageType)))
+      return NextResponse.json(
+        { error: SELLER_ACCESS_MESSAGE },
+        { status: 403 }
+      );
     const [grower, dispensary] = await Promise.all([
       db.grower.findUnique({ where: { id: growerId }, select: { id: true } }),
       db.dispensary.findFirst({
@@ -337,10 +349,10 @@ export async function POST(request: NextRequest) {
       };
     });
     return NextResponse.json(
-      {
+      plainData({
         conversationId: result.conversationId,
         messageId: result.messageId,
-      },
+      }),
       { status: result.existed ? 200 : 201 }
     );
   } catch (error) {

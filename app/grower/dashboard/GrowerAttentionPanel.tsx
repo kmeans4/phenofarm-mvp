@@ -2,20 +2,11 @@
 import Link from 'next/link';
 import type { GrowerAttentionSummary } from '@/lib/grower-attention';
 import { Button } from '@/app/components/ui/Button';
-import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import {
-  changeOrderStatus,
-  offerOrderUndo,
-} from '../orders/components/order-actions';
-import { toast } from '@/app/hooks/useToast';
 export function GrowerAttentionPanel({
   summary,
 }: {
   summary: GrowerAttentionSummary;
 }) {
-  const router = useRouter();
-  const [busy, setBusy] = useState('');
   return (
     <section
       className="pf-panel p-4 sm:p-5"
@@ -71,34 +62,8 @@ export function GrowerAttentionPanel({
                     <Link href={item.href}>Details</Link>
                   </Button>
                   {item.type === 'request' && (
-                    <Button
-                      disabled={!!busy}
-                      onClick={async () => {
-                        const id = item.href.split('/').pop()!;
-                        setBusy(id);
-                        try {
-                          const eventId = await changeOrderStatus(
-                            id,
-                            'CONFIRMED',
-                            'PENDING'
-                          );
-                          if (eventId)
-                            offerOrderUndo([{ id, eventId }], 'CONFIRMED', () =>
-                              router.refresh()
-                            );
-                          router.refresh();
-                        } catch (e) {
-                          toast.error(
-                            e instanceof Error
-                              ? e.message
-                              : 'Could not accept order.'
-                          );
-                        } finally {
-                          setBusy('');
-                        }
-                      }}
-                    >
-                      Accept
+                    <Button asChild>
+                      <Link href={`${item.href}/edit`}>Review request</Link>
                     </Button>
                   )}
                 </>

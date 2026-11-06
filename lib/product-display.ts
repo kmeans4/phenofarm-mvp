@@ -55,8 +55,16 @@ export function productVisibility(product: {
   status?: string;
   inventoryQty: number;
   isAvailable: boolean;
+  sellerVisibility?: string;
 }): string {
   if (product.status === 'DRAFT') return 'Draft';
   if (product.inventoryQty <= 0) return 'Sold out';
-  return product.isAvailable ? 'Live' : 'Hidden';
+  if (!product.isAvailable) return 'Hidden';
+  if (product.sellerVisibility === 'verification')
+    return 'Hidden — verify license';
+  if (product.sellerVisibility === 'subscription')
+    return 'Ready — activate subscription';
+  return product.sellerVisibility === 'visible'
+    ? 'Visible to buyers'
+    : 'Published';
 }

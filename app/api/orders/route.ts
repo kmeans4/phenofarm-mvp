@@ -1,3 +1,7 @@
+import { quantityPrice } from '@/lib/quantity';
+import { plainData } from '@/lib/serialize';
+import { sellerCanTrade, SELLER_ACCESS_MESSAGE } from '@/lib/seller-access';
+import { validQuantity, QUANTITY_MESSAGE, roundQuantity } from '@/lib/quantity';
 import { beginOrderMutation } from '@/lib/order-mutations';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -91,6 +95,11 @@ export async function POST(request: NextRequest) {
     }
 
     const growerId = user.growerId;
+    if (!(await sellerCanTrade(growerId)))
+      return NextResponse.json(
+        { error: SELLER_ACCESS_MESSAGE },
+        { status: 403 }
+      );
 
     const body = await request.json().catch(() => null);
     if (!body || typeof body !== 'object' || Array.isArray(body))
@@ -156,23 +165,23 @@ export async function POST(request: NextRequest) {
         data: { licenseStatus: 'expired', isVerified: false },
       });
       return NextResponse.json(
-        {
+        plainData({
           error: `License expired ${formatLicenseExpiry(dispensary.licenseExpiry!)} - update the customer record before continuing`,
           code: 'LICENSE_EXPIRED',
           licenseStatus: 'expired',
-        },
+        }),
         { status: 403 }
       );
     }
 
     if (!dispensary.isOffPlatform && dispensary.licenseStatus !== 'verified') {
       return NextResponse.json(
-        {
+        plainData({
           error:
             'License verification required. This dispensary must have a verified license before direct order records can be created.',
           code: 'LICENSE_NOT_VERIFIED',
           licenseStatus: dispensary.licenseStatus,
-        },
+        }),
         { status: 403 }
       );
     }
@@ -202,7 +211,7 @@ export async function POST(request: NextRequest) {
     const invalidItem = normalizedItems.some(
       (item) =>
         !item.productId ||
-        !Number.isInteger(item.quantity) ||
+        !validQuantity(item.quantity, { allowUnknownUnit: true, max: 9999 }) ||
         item.quantity <= 0 ||
         item.quantity > 9999 ||
         (item.priceOverride !== undefined &&
@@ -219,10 +228,10 @@ export async function POST(request: NextRequest) {
 
     if (invalidItem) {
       return NextResponse.json(
-        {
+        plainData({
           error:
-            'Enter whole item quantities and prices with at most two decimal places. Price notes can be up to 240 characters.',
-        },
+            'Use valid quantities and prices with at most two decimal places. Price notes can be up to 240 characters.',
+        }),
         { status: 400 }
       );
     }
@@ -231,7 +240,9 @@ export async function POST(request: NextRequest) {
     for (const item of normalizedItems) {
       requestedByProduct.set(
         item.productId,
-        (requestedByProduct.get(item.productId) || 0) + item.quantity
+        roundQuantity(
+          (requestedByProduct.get(item.productId) || 0) + item.quantity
+        )
       );
     }
 
@@ -247,6 +258,8 @@ export async function POST(request: NextRequest) {
         id: true,
         name: true,
         inventoryQty: true,
+        unit: true,
+        productType: true,
         isAvailable: true,
         status: true,
       },
@@ -267,6 +280,16 @@ export async function POST(request: NextRequest) {
     for (const [productId, requested] of requestedByProduct.entries()) {
       const product = productById.get(productId);
       const available = Number(product?.inventoryQty || 0);
+      if (
+        product &&
+        !validQuantity(requested, {
+          unit: product.unit,
+          productType: product.productType,
+          max: 9999,
+        })
+      ) {
+        return NextResponse.json({ error: QUANTITY_MESSAGE }, { status: 400 });
+      }
       const isAvailable = Boolean(product?.isAvailable);
 
       if (
@@ -285,10 +308,10 @@ export async function POST(request: NextRequest) {
 
     if (initialIssues.length > 0) {
       return NextResponse.json(
-        {
+        plainData({
           error: 'Insufficient inventory for one or more items',
           issues: initialIssues,
-        },
+        }),
         { status: 409 }
       );
     }
@@ -393,7 +416,8 @@ export async function POST(request: NextRequest) {
           (!quote ||
             !requestedByProduct.has(quote.productId) ||
             (quote.quantity != null &&
-              requestedByProduct.get(quote.productId)! > quote.quantity))
+              requestedByProduct.get(quote.productId)! >
+                Number(quote.quantity)))
         )
           throw new OrderValidationError(
             'This quote is expired, used, or does not cover this quantity.'
@@ -422,7 +446,8 @@ export async function POST(request: NextRequest) {
         const subtotal =
           pricedItems.reduce(
             (sum, item) =>
-              sum + Math.round(item.quantity * item.unitPrice * 100),
+              sum +
+              Math.round(quantityPrice(item.quantity, item.unitPrice) * 100),
             0
           ) / 100;
         const tax = 0;
@@ -456,8 +481,7 @@ export async function POST(request: NextRequest) {
                 ...(item.acceptedQuoteId
                   ? { acceptedQuote: { connect: { id: item.acceptedQuoteId } } }
                   : {}),
-                totalPrice:
-                  Math.round(item.quantity * item.unitPrice * 100) / 100,
+                totalPrice: quantityPrice(item.quantity, item.unitPrice),
               })),
             },
           },
@@ -500,16 +524,16 @@ export async function POST(request: NextRequest) {
       })
     );
 
-    return NextResponse.json(order, { status: 201 });
+    return NextResponse.json(plainData(order), { status: 201 });
   } catch (error) {
     if (error instanceof OrderValidationError)
       return NextResponse.json({ error: error.message }, { status: 400 });
     if (error instanceof InventoryConflictError) {
       return NextResponse.json(
-        {
+        plainData({
           error: error.message,
           issues: error.issues,
-        },
+        }),
         { status: 409 }
       );
     }
@@ -610,10 +634,12 @@ export async function GET(request: NextRequest) {
 
     const hasMore = rows.length > take;
     const orders = hasMore ? rows.slice(0, take) : rows;
-    return NextResponse.json({
-      orders,
-      nextCursor: hasMore ? orders[orders.length - 1]?.id || null : null,
-    });
+    return NextResponse.json(
+      plainData({
+        orders,
+        nextCursor: hasMore ? orders[orders.length - 1]?.id || null : null,
+      })
+    );
   } catch (error) {
     console.error('Error fetching orders:', error);
     return NextResponse.json(

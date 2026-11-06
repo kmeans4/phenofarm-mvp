@@ -1,4 +1,5 @@
 'use client';
+import { QUANTITY_MESSAGE } from '@/lib/quantity';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -25,6 +26,7 @@ import {
 import { useUnsavedChanges } from '@/app/hooks/useUnsavedChanges';
 
 type Product = {
+  sellerVisibility?: string;
   id: string;
   name: string;
   productType: string | null;
@@ -47,7 +49,7 @@ type Page = {
 };
 const views = [
   ['all', 'All'],
-  ['active', 'Live'],
+  ['active', 'Published & stocked'],
   ['drafts', 'Drafts'],
   ['unavailable', 'Hidden'],
   ['low-stock', 'Low stock'],
@@ -55,7 +57,7 @@ const views = [
   ['quote-only', 'Price on request'],
   ['missing-images', 'Missing photos'],
   ['missing-type', 'Missing type'],
-  ['hidden', 'Not live'],
+  ['hidden', 'Not ready to sell'],
   ['deleted', 'Recently deleted'],
 ];
 const control =
@@ -161,6 +163,7 @@ export default function ProductsPage() {
     [selected, setSelected] = useState<string[]>([]),
     [busy, setBusy] = useState(false),
     [result, setResult] = useState('');
+  const [addAnother, setAddAnother] = useState(false);
   const [quick, setQuick] = useState(false),
     [quickError, setQuickError] = useState<Record<string, string>>({});
   const [draft, setDraft] = useState({
@@ -323,11 +326,11 @@ export default function ProductsPage() {
       });
       toast.success(
         updated.isAvailable
-          ? 'Product is live'
+          ? productVisibility(updated)
           : product.status === 'DRAFT'
-            ? 'Publish the draft to make it live'
+            ? 'Publish this draft when it is ready'
             : product.inventoryQty === 0
-              ? 'Add stock to make it live'
+              ? 'Add stock to make this listing available'
               : 'Product hidden'
       );
     } catch (error) {
@@ -336,16 +339,22 @@ export default function ProductsPage() {
       );
     }
   }
-  async function quickSave(event: React.FormEvent) {
+  async function quickSave(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    const isDraft =
+      (event.nativeEvent as SubmitEvent).submitter?.getAttribute('value') ===
+      'DRAFT';
     const errors: Record<string, string> = {};
-    if (!draft.name.trim()) errors.name = 'Enter a product name.';
-    if (!draft.productType) errors.productType = 'Choose a type.';
-    if (parsePrice(draft.price) === null)
+    if (!isDraft && !draft.name.trim()) errors.name = 'Enter a product name.';
+    if (!isDraft && !draft.productType) errors.productType = 'Choose a type.';
+    if ((!isDraft || draft.price.trim()) && parsePrice(draft.price) === null)
       errors.price = 'Enter a price, such as 45.00.';
-    if (parseInventoryQty(draft.inventoryQty) === null)
-      errors.inventoryQty =
-        'Enter whole units. For partial weights, use a smaller unit.';
+    if (
+      (!isDraft || draft.inventoryQty.trim()) &&
+      parseInventoryQty(draft.inventoryQty, draft.unit, draft.productType) ===
+        null
+    )
+      errors.inventoryQty = QUANTITY_MESSAGE;
     setQuickError(errors);
     if (Object.keys(errors).length) {
       formRef.current
@@ -360,8 +369,14 @@ export default function ProductsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...draft,
-          price: parsePrice(draft.price),
-          inventoryQty: parseInventoryQty(draft.inventoryQty),
+          status: isDraft ? 'DRAFT' : 'PUBLISHED',
+          price: parsePrice(draft.price) ?? 0,
+          inventoryQty:
+            parseInventoryQty(
+              draft.inventoryQty,
+              draft.unit,
+              draft.productType
+            ) ?? 0,
         }),
       });
       const data = await response.json();
@@ -374,11 +389,9 @@ export default function ProductsPage() {
             draft.unit
           );
       } catch {}
-      toast.success(
-        data.isAvailable ? 'Product is live' : 'Saved but hidden: no stock'
-      );
+      toast.success(productVisibility(data));
       setDraft((current) => ({ ...current, name: '', inventoryQty: '' }));
-      setQuick(false);
+      setQuick(addAnother);
       setRefresh((value) => value + 1);
     } catch (error) {
       setQuickError({
@@ -509,7 +522,7 @@ export default function ProductsPage() {
                 {key === 'price' ? 'Price ($)' : 'Stock'}
                 <input
                   name={key}
-                  inputMode={key === 'price' ? 'decimal' : 'numeric'}
+                  inputMode="decimal"
                   value={draft[key]}
                   onChange={(event) =>
                     setDraft({ ...draft, [key]: event.target.value })
@@ -525,6 +538,7 @@ export default function ProductsPage() {
             <label className="text-sm">
               Unit
               <select
+                aria-label="Unit"
                 value={draft.unit}
                 onChange={(event) =>
                   setDraft({ ...draft, unit: event.target.value })
@@ -540,7 +554,8 @@ export default function ProductsPage() {
             </label>
           </div>
           <p className="text-sm text-pf-muted">
-            Stock counts whole selling units. Use oz or g for partial pounds.
+            Weights support up to 3 decimal places. Packs and pieces use whole
+            quantities.
             {draft.inventoryQty === '0' ? ' Zero stock saves hidden.' : ''}
           </p>
           {quickError.form && (
@@ -548,12 +563,30 @@ export default function ProductsPage() {
               {quickError.form}
             </p>
           )}
-          <div className="flex items-center gap-3">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={addAnother}
+              onChange={(event) => setAddAnother(event.target.checked)}
+            />
+            Add another after saving
+          </label>
+          <div className="flex flex-wrap items-center gap-3">
             <button
+              type="submit"
+              value="PUBLISHED"
               disabled={busy}
               className="min-h-11 rounded-lg bg-pf-accent px-4 text-sm font-semibold text-pf-canvas"
             >
-              {busy ? 'Saving…' : 'Save'}
+              {busy ? 'Saving…' : 'Publish product'}
+            </button>
+            <button
+              type="submit"
+              value="DRAFT"
+              disabled={busy}
+              className="min-h-11 rounded-lg border border-pf-line px-4 text-sm"
+            >
+              Save draft
             </button>
             <Link
               href={`/grower/products/add?${new URLSearchParams({ returnTo, name: draft.name, productType: draft.productType, subType: draft.subType, price: draft.price, inventoryQty: draft.inventoryQty, unit: draft.unit })}`}
@@ -742,6 +775,7 @@ export default function ProductsPage() {
                     {!deleted && (
                       <div>
                         <InlineStock
+                          productType={product.productType}
                           id={product.id}
                           name={product.name}
                           quantity={product.inventoryQty}
@@ -775,7 +809,7 @@ export default function ProductsPage() {
                             }
                             aria-label={`${product.name} visibility: ${productVisibility(product)}`}
                             onClick={() => toggle(product)}
-                            className={`${control} ${productVisibility(product) === 'Live' ? 'border-pf-accent-line text-pf-accent' : 'text-pf-secondary'}`}
+                            className={`${control} ${productVisibility(product) === 'Visible to buyers' ? 'border-pf-accent-line text-pf-accent' : 'text-pf-secondary'}`}
                           >
                             {productVisibility(product)}
                           </button>

@@ -1,100 +1,81 @@
-export type GrowerPlanId = 'free' | 'pro' | 'business';
-
+export type GrowerPlanId = 'free' | 'seller';
+export const SELLER_PLAN = {
+  monthlyCents: 16500,
+  annualCents: 120000,
+} as const;
+export interface GrowerPlanSource {
+  subscriptionPlan?: string | null;
+  subscriptionStatus?: string | null;
+  subscriptionCurrentPeriodEnd?: Date | string | null;
+}
+export function hasActiveSubscription(
+  grower: GrowerPlanSource | null | undefined,
+  now = new Date()
+) {
+  if (
+    !grower ||
+    !['seller', 'pro', 'business'].includes(
+      grower.subscriptionPlan?.toLowerCase() || ''
+    ) ||
+    !['active', 'trialing'].includes(
+      grower.subscriptionStatus?.toLowerCase() || ''
+    )
+  )
+    return false;
+  if (!grower.subscriptionCurrentPeriodEnd) return true;
+  const end = new Date(grower.subscriptionCurrentPeriodEnd).getTime();
+  return Number.isFinite(end) && end > now.getTime();
+}
+export function getGrowerPlan(grower?: GrowerPlanSource | null): GrowerPlanId {
+  return hasActiveSubscription(grower) ? 'seller' : 'free';
+}
 export const PLAN_LIMITS = {
-  free: {
-    maxActiveListings: 50,
-    csvImport: false,
-    advancedAnalytics: false,
-  },
-  pro: {
-    maxActiveListings: null,
-    csvImport: true,
-    advancedAnalytics: false,
-  },
-  business: {
+  free: { maxActiveListings: null, csvImport: true, advancedAnalytics: false },
+  seller: {
     maxActiveListings: null,
     csvImport: true,
     advancedAnalytics: false,
   },
 } as const;
-
-interface GrowerPlanSource {
-  subscriptionPlan?: string | null;
-  subscriptionStatus?: string | null;
-}
-
-export function getGrowerPlan(
-  grower: GrowerPlanSource | null | undefined
-): GrowerPlanId {
-  const plan = grower?.subscriptionPlan?.toLowerCase();
-  const status = grower?.subscriptionStatus?.toLowerCase();
-
-  if (status !== 'active' && status !== 'trialing') {
-    return 'free';
-  }
-
-  if (plan === 'pro' || plan === 'business') return plan;
-  return 'free';
-}
-
-export function getGrowerPlanLimits(
-  grower: GrowerPlanSource | null | undefined
-) {
+export function getGrowerPlanLimits(grower?: GrowerPlanSource | null) {
   const plan = getGrowerPlan(grower);
   return { plan, ...PLAN_LIMITS[plan] };
 }
-
 export const FREE_LISTING_LIMIT_MESSAGE =
-  'Free plan includes 50 listings - upgrade to Pro';
-
+  'Catalog access is unavailable. Contact support.';
 export function canCreateListings(
-  grower: GrowerPlanSource | null | undefined,
-  currentListingCount: number,
-  requestedCount = 1
+  _grower: GrowerPlanSource | null | undefined,
+  _currentListingCount: number,
+  _requestedCount = 1
 ) {
-  const limits = getGrowerPlanLimits(grower);
-  return (
-    limits.maxActiveListings === null ||
-    currentListingCount + requestedCount <= limits.maxActiveListings
-  );
+  void _grower;
+  void _currentListingCount;
+  void _requestedCount;
+  return true;
 }
-
-/** Public plan descriptions cover the features actually available in this app. */
 export const PLAN_PRESENTATION = [
   {
     id: 'free',
-    name: 'Free',
+    name: 'Prepare your catalog',
     price: '$0',
-    priceDetail: '/month',
-    description: 'List products and manage orders.',
-    features: [
-      'Up to 50 listings',
-      'Orders, messages and delivered-value reports',
-      'Import up to 25 rows at a time',
-    ],
-  },
-  {
-    id: 'pro',
-    name: 'Pro',
-    price: '$249',
-    priceDetail: '/month',
-    description: 'For larger catalogs.',
-    features: [
-      'Unlimited listings',
-      'Orders, messages and delivered-value reports',
-      'Larger spreadsheet imports',
-    ],
-  },
-  {
-    id: 'business',
-    name: 'Business',
-    price: 'Custom',
     priceDetail: '',
-    description: 'Discuss your team’s requirements.',
+    description: 'Set up your business and products for free.',
     features: [
-      'Unlimited listings',
-      'Orders, messages and delivered-value reports',
-      'Larger spreadsheet imports',
+      'Unlimited drafts and product listings',
+      'Spreadsheet imports and stock management',
+      'Products stay hidden until your subscription is active',
+    ],
+  },
+  {
+    id: 'seller',
+    name: 'Seller subscription',
+    price: '$165',
+    priceDetail: 'per month, or $1,200 per year paid upfront',
+    description: 'Make your products available to verified dispensaries.',
+    features: [
+      'Buyer visibility with an active subscription and approved license',
+      'Price requests, quotes and wholesale orders',
+      'Customer history and delivered-order reports',
     ],
   },
 ] as const;

@@ -8,6 +8,7 @@ interface Order {
   id: string;
   orderId: string;
   status: string;
+  notes?: string | null;
   createdAt: string | Date;
   totalAmount: number;
   hasUnreadMessages?: boolean;
@@ -55,7 +56,7 @@ export function OrdersTable({
                       : 'info'
                 }
               >
-                {getOrderStatusLabel(order.status)}
+                {getOrderStatusLabel(order.status, order.notes)}
               </Badge>
               {order.hasUnreadMessages && (
                 <span className="inline-flex items-center gap-1 text-sm text-pf-accent">
@@ -83,13 +84,23 @@ export function OrdersTable({
             <strong className="text-sm">
               {formatMoney(order.totalAmount)}
             </strong>
-            {!compact && order.items?.length ? (
+            {!compact && order.status === 'DELIVERED' && order.items?.length ? (
               <BuyAgainButton
                 items={order.items.map((item) => ({
                   productId: item.productId,
                   quantity: item.quantity,
                 }))}
               />
+            ) : !compact &&
+              !['DELIVERED', 'CANCELLED'].includes(order.status) ? (
+              <Link
+                className="inline-flex min-h-11 items-center rounded-lg border border-pf-line px-3 text-sm text-pf-accent"
+                href={`/dispensary/orders/${order.id}`}
+              >
+                {order.status === 'PENDING'
+                  ? 'View request'
+                  : 'View fulfillment'}
+              </Link>
             ) : null}
           </div>
         </article>

@@ -21,6 +21,7 @@ interface OrderDetailActionsProps {
   orderDbId: string;
   orderId: string;
   status: string;
+  notes?: string | null;
   growerId: string;
   growerName: string;
   items: ReorderItem[];
@@ -33,6 +34,7 @@ export function OrderDetailActions({
   orderDbId,
   orderId,
   status,
+  notes,
   growerId,
   growerName,
   items,
@@ -93,7 +95,7 @@ export function OrderDetailActions({
             draft: bodyByKind[kind],
             context: [
               { label: 'Order', value: `#${orderId}` },
-              { label: 'Status', value: getOrderStatusLabel(status) },
+              { label: 'Status', value: getOrderStatusLabel(status, notes) },
               { label: 'Grower', value: growerName },
             ],
             flash: true,
@@ -208,7 +210,9 @@ export function OrderDetailActions({
             disabled={sendingAction !== null}
             className="rounded-lg border border-pf-danger-line bg-pf-danger-bg px-4 py-2 text-sm font-semibold text-pf-danger hover:bg-pf-danger-bg disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-600 focus-visible:ring-offset-2 focus-visible:ring-offset-pf-canvas"
           >
-            {sendingAction === 'withdraw' ? 'Withdrawing...' : 'Withdraw request'}
+            {sendingAction === 'withdraw'
+              ? 'Withdrawing...'
+              : 'Withdraw request'}
           </button>
         )}
 
@@ -223,12 +227,14 @@ export function OrderDetailActions({
           </button>
         )}
 
-        <BuyAgainButton
-          items={items.map((item) => ({
-            productId: item.productId,
-            quantity: item.quantity,
-          }))}
-        />
+        {status === 'DELIVERED' && (
+          <BuyAgainButton
+            items={items.map((item) => ({
+              productId: item.productId,
+              quantity: item.quantity,
+            }))}
+          />
+        )}
       </div>
 
       {messageStatus && (

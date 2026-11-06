@@ -8,7 +8,7 @@ export class OrderConflictError extends Error {
 
 // Transaction-local marker lets the database reject writers from older deployments.
 export async function beginOrderMutation(tx: Prisma.TransactionClient) {
-  await tx.$queryRaw`SELECT set_config('phenoshop.inventory_writer', 'acceptance-v1', true)`;
+  await tx.$queryRaw`SELECT set_config('phenoshop.inventory_writer', 'acceptance-v2', true)`;
 }
 
 export async function claimOrder(
@@ -28,7 +28,7 @@ export async function claimOrder(
 export async function restoreInventory(
   tx: Prisma.TransactionClient,
   productId: string,
-  quantity: number
+  quantity: Prisma.Decimal.Value
 ) {
   // Restore visibility only for an exhausted published listing; preserve manual hiding of stocked items.
   await tx.product.updateMany({
@@ -66,7 +66,7 @@ type InventoryOrder = {
   growerId: string;
   inventoryState: import('@prisma/client').OrderInventoryState;
 };
-type InventoryLine = { productId: string; quantity: number };
+type InventoryLine = { productId: string; quantity: Prisma.Decimal.Value };
 
 export function assertInventoryReviewed(order: InventoryOrder) {
   if (order.inventoryState === 'LEGACY_UNREVIEWED') {
@@ -89,11 +89,11 @@ export async function lockInventoryProducts(
 }
 
 function quantities(items: InventoryLine[]) {
-  const result = new Map<string, number>();
+  const result = new Map<string, Prisma.Decimal>();
   for (const item of items) {
     result.set(
       item.productId,
-      (result.get(item.productId) || 0) + item.quantity
+      (result.get(item.productId) || new Prisma.Decimal(0)).plus(item.quantity)
     );
   }
   return result;
@@ -117,8 +117,10 @@ export async function syncOrderInventory(
   const ids = [...new Set([...before.keys(), ...after.keys()])].sort();
   await lockInventoryProducts(tx, ids);
   for (const productId of ids) {
-    const delta = (after.get(productId) || 0) - (before.get(productId) || 0);
-    if (delta > 0) {
+    const delta = new Prisma.Decimal(after.get(productId) || 0).minus(
+      before.get(productId) || 0
+    );
+    if (delta.greaterThan(0)) {
       // The guarded decrement is the final authority even after the row lock.
       const result = await tx.product.updateMany({
         where: {
@@ -141,8 +143,8 @@ export async function syncOrderInventory(
             {
               productId,
               productName: product?.name || 'Unavailable product',
-              requested: delta,
-              available: product?.inventoryQty || 0,
+              requested: delta.toNumber(),
+              available: Number(product?.inventoryQty || 0),
             },
           ]
         );
@@ -151,8 +153,8 @@ export async function syncOrderInventory(
         where: { id: productId, inventoryQty: 0 },
         data: { isAvailable: false },
       });
-    } else if (delta < 0) {
-      await restoreInventory(tx, productId, -delta);
+    } else if (delta.lessThan(0)) {
+      await restoreInventory(tx, productId, delta.negated());
     }
   }
   await tx.order.update({

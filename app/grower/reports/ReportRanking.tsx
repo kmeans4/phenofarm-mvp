@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import { useId, useState } from 'react';
 import { Button } from '@/app/components/ui/Button';
 import { formatMoney } from '@/lib/format';
@@ -9,7 +10,7 @@ export function ReportRanking({
 }: {
   title: string;
   description: string;
-  items: { name: string; value: number; detail: string }[];
+  items: { name: string; value: number; detail: string; href?: string }[];
 }) {
   const [expanded, setExpanded] = useState(false);
   const id = useId();
@@ -29,11 +30,23 @@ export function ReportRanking({
         <>
           <ol className="divide-y divide-pf-line">
             {(expanded ? items : items.slice(0, 5)).map((item, index) => (
-              <li key={`${item.name}-${index}`} className="p-4 text-sm">
+              <li
+                key={`${item.href || item.name}-${index}`}
+                className="p-4 text-sm"
+              >
                 <div className="flex flex-wrap items-start justify-between gap-x-3 gap-y-1">
                   <span className="min-w-0 flex-1 basis-36 break-words">
                     <span className="mr-2 text-pf-muted">{index + 1}.</span>
-                    {item.name}
+                    {item.href ? (
+                      <Link
+                        href={item.href}
+                        className="text-pf-accent underline underline-offset-4"
+                      >
+                        {item.name}
+                      </Link>
+                    ) : (
+                      item.name
+                    )}
                   </span>
                   <span className="ml-auto max-w-full text-right">
                     <strong className="block break-words tabular-nums text-pf-accent">

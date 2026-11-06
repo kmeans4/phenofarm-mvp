@@ -8,16 +8,26 @@ export async function GET() {
     const session = await getAuthSession();
 
     if (!session) {
-      return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Please sign in to continue.' },
+        { status: 401 }
+      );
     }
 
     const user = session.user;
     if (user.role !== 'DISPENSARY' || !user.dispensaryId) {
-      return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Your account does not have access to this action.' },
+        { status: 403 }
+      );
     }
 
     const orders = await db.order.findMany({
-      where: { dispensaryId: user.dispensaryId, grower: marketplaceGrowerWhere() },
+      where: {
+        dispensaryId: user.dispensaryId,
+        status: 'DELIVERED',
+        grower: marketplaceGrowerWhere(),
+      },
       orderBy: { createdAt: 'desc' },
       take: 50,
       include: {
@@ -65,31 +75,40 @@ export async function GET() {
       },
     });
 
-    const recentProducts = new Map<string, {
-      id: string;
-      name: string;
-      price: number | null;
-      isPriceVisible: boolean;
-      strain: string | null;
-      unit: string | null;
-      thc: number | null;
-      inventoryQty: number;
-      grower: {
+    const recentProducts = new Map<
+      string,
+      {
         id: string;
-        businessName: string;
-      };
-      orderCount: number;
-      lastOrderedAt: string;
-    }>();
+        name: string;
+        price: number | null;
+        isPriceVisible: boolean;
+        strain: string | null;
+        unit: string | null;
+        thc: number | null;
+        inventoryQty: number;
+        grower: {
+          id: string;
+          businessName: string;
+        };
+        orderCount: number;
+        lastOrderedAt: string;
+      }
+    >();
 
     for (const order of orders) {
       const seenProducts = new Set<string>();
-    for (const item of order.items) {
-      if (seenProducts.has(item.productId)) continue;
-      seenProducts.add(item.productId);
+      for (const item of order.items) {
+        if (seenProducts.has(item.productId)) continue;
+        seenProducts.add(item.productId);
         const product = item.product;
 
-        if (!product || product.isDeleted || product.status !== 'PUBLISHED' || !product.isAvailable || product.inventoryQty < 1) {
+        if (
+          !product ||
+          product.isDeleted ||
+          product.status !== 'PUBLISHED' ||
+          !product.isAvailable ||
+          Number(product.inventoryQty) <= 0
+        ) {
           continue;
         }
 
@@ -106,17 +125,21 @@ export async function GET() {
           isPriceVisible: product.isPriceVisible,
           strain: product.strain?.name || null,
           unit: product.unit,
-          thc: product.batch?.thc != null
-            ? Number(product.batch.thc)
-            : product.thcMax != null
-              ? Number(product.thcMax)
-              : product.thcMin != null
-                ? Number(product.thcMin)
-                : null,
-          inventoryQty: product.inventoryQty,
+          thc:
+            product.batch?.thc != null
+              ? Number(product.batch.thc)
+              : product.thcMax != null
+                ? Number(product.thcMax)
+                : product.thcMin != null
+                  ? Number(product.thcMin)
+                  : null,
+          inventoryQty: Number(product.inventoryQty),
           grower: {
             id: product.grower?.id || order.grower?.id || item.growerId,
-            businessName: product.grower?.businessName || order.grower?.businessName || 'Unknown grower',
+            businessName:
+              product.grower?.businessName ||
+              order.grower?.businessName ||
+              'Unknown grower',
           },
           orderCount: 1,
           lastOrderedAt: order.createdAt.toISOString(),
@@ -124,9 +147,14 @@ export async function GET() {
       }
     }
 
-    return NextResponse.json({ products: Array.from(recentProducts.values()).slice(0, 8) });
+    return NextResponse.json({
+      products: Array.from(recentProducts.values()).slice(0, 8),
+    });
   } catch (error) {
     console.error('Error loading recent request products:', error);
-    return NextResponse.json({ error: 'Failed to load recent request products' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to load recent request products' },
+      { status: 500 }
+    );
   }
 }

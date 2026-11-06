@@ -22,6 +22,7 @@ export default async function DispensaryOrdersPage({
     search?: string;
     status?: string;
     sort?: string;
+    view?: string;
   }>;
 }) {
   const session = await getAuthSession();
@@ -44,10 +45,24 @@ export default async function DispensaryOrdersPage({
   const params = await searchParams;
   const page = parsePage(params.page ?? null);
   const pageSize = 25;
-  const status =
+  const requestedStatus =
     params.status &&
     Object.values(OrderStatus).includes(params.status as OrderStatus)
       ? (params.status as OrderStatus)
+      : undefined;
+  const view =
+    params.view === 'past' ||
+    (params.view !== 'active' &&
+      ['DELIVERED', 'CANCELLED'].includes(requestedStatus || ''))
+      ? 'past'
+      : 'active';
+  const allowedStatuses: OrderStatus[] =
+    view === 'past'
+      ? ['DELIVERED', 'CANCELLED']
+      : ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'];
+  const status =
+    requestedStatus && allowedStatuses.includes(requestedStatus)
+      ? requestedStatus
       : undefined;
   const sort = ['oldest', 'total-desc', 'total-asc', 'status'].includes(
     params.sort || ''
@@ -68,7 +83,21 @@ export default async function DispensaryOrdersPage({
   const search = params.search?.trim().slice(0, 160) || '';
   const where: Prisma.OrderWhereInput = {
     dispensaryId: user.dispensaryId,
-    ...(status ? { status } : {}),
+    ...(status
+      ? { status }
+      : {
+          status: {
+            in:
+              view === 'past'
+                ? (['DELIVERED', 'CANCELLED'] as OrderStatus[])
+                : ([
+                    'PENDING',
+                    'CONFIRMED',
+                    'PROCESSING',
+                    'SHIPPED',
+                  ] as OrderStatus[]),
+          },
+        }),
     ...(search
       ? {
           OR: [
@@ -91,6 +120,7 @@ export default async function DispensaryOrdersPage({
         growerId: true,
         createdAt: true,
         status: true,
+        notes: true,
         totalAmount: true,
         createdBy: true,
         buyerAcknowledgedAt: true,
@@ -146,13 +176,17 @@ export default async function DispensaryOrdersPage({
     id: order.id,
     orderId: order.orderId,
     status: order.status,
+    notes: order.notes,
     createdAt: order.createdAt.toISOString(),
     totalAmount: Number(order.totalAmount),
     grower: order.grower,
     createdBy: order.createdBy,
     buyerAcknowledgedAt: order.buyerAcknowledgedAt?.toISOString() ?? null,
     hasUnreadMessages: unreadGrowerIds.has(order.growerId),
-    items: order.items,
+    items: order.items.map((item) => ({
+      ...item,
+      quantity: Number(item.quantity),
+    })),
   }));
   return (
     <div className="space-y-4">
@@ -166,10 +200,34 @@ export default async function DispensaryOrdersPage({
         }
       />
 
+      <nav className="flex gap-2" aria-label="Order views">
+        <Button asChild variant={view === 'active' ? 'primary' : 'outline'}>
+          <Link
+            href="/dispensary/orders?view=active"
+            aria-current={view === 'active' ? 'page' : undefined}
+          >
+            In progress
+          </Link>
+        </Button>
+        <Button asChild variant={view === 'past' ? 'primary' : 'outline'}>
+          <Link
+            href="/dispensary/orders?view=past"
+            aria-current={view === 'past' ? 'page' : undefined}
+          >
+            Past orders
+          </Link>
+        </Button>
+      </nav>
       {/* Orders List */}
       <Card className="bg-pf-surface shadow-sm border border-pf-line">
         <CardContent className="p-3 sm:p-4">
-          <OrderFilters search={search} status={status || ''} sort={sort} />
+          <OrderFilters
+            view={view}
+            key={view}
+            search={search}
+            status={status || ''}
+            sort={sort}
+          />
           {orders.length === 0 ? (
             <EmptyState
               title="No orders found"
@@ -207,6 +265,7 @@ export default async function DispensaryOrdersPage({
             basePath="/dispensary/orders"
             query={{
               sort,
+              view,
               ...(search ? { search } : {}),
               ...(status ? { status } : {}),
             }}

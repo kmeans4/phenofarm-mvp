@@ -1,4 +1,11 @@
 'use client';
+import {
+  validQuantity,
+  quantityMinimum,
+  quantityIncrement,
+  roundQuantity,
+  QUANTITY_MESSAGE,
+} from '@/lib/quantity';
 
 import { formatProductUnit } from '@/lib/product-display';
 import { useState } from 'react';
@@ -38,14 +45,16 @@ export default function AddToCartButton({
   compactLabel?: string;
 }) {
   const router = useRouter();
-  const [quantity, setQuantity] = useState('1');
+  const [quantity, setQuantity] = useState(
+    String(Math.min(1, product.inventoryQty) || 1)
+  );
   const [error, setError] = useState('');
   const [added, setAdded] = useState(false);
   const [availableQuantity, setAvailableQuantity] = useState(
     product.inventoryQty
   );
   const numeric = Number(quantity.replace(/[,\s]/g, ''));
-  const soldOut = product.inventoryQty < 1;
+  const soldOut = product.inventoryQty <= 0;
   async function add() {
     await waitForCartSync();
     const before = readCart();
@@ -55,8 +64,14 @@ export default function AddToCartButton({
       product.inventoryQty - (existing?.quantity ?? 0)
     );
     setAvailableQuantity(remaining);
-    if (!Number.isSafeInteger(numeric) || numeric < 1) {
-      setError('Enter a whole number of 1 or more.');
+    if (
+      !validQuantity(numeric, {
+        unit: product.unit,
+        productType: product.productType,
+        max: 9999,
+      })
+    ) {
+      setError(QUANTITY_MESSAGE);
       return;
     }
     if (numeric > remaining) {
@@ -105,7 +120,12 @@ export default function AddToCartButton({
                 item.id !== product.id
                   ? [item]
                   : item.quantity > numeric
-                    ? [{ ...item, quantity: item.quantity - numeric }]
+                    ? [
+                        {
+                          ...item,
+                          quantity: roundQuantity(item.quantity - numeric),
+                        },
+                      ]
                     : []
               ),
             })
@@ -114,6 +134,12 @@ export default function AddToCartButton({
       },
     });
   }
+  if (soldOut)
+    return (
+      <p className="rounded-lg border border-pf-line px-3 py-2 text-sm text-pf-muted">
+        Sold out · save an alert for updates
+      </p>
+    );
   return (
     <div className={compact ? 'min-w-0 space-y-1' : 'space-y-2'}>
       <div
@@ -123,9 +149,23 @@ export default function AddToCartButton({
           <button
             type="button"
             aria-label={`Decrease quantity for ${product.name}`}
-            disabled={soldOut || !Number.isSafeInteger(numeric) || numeric <= 1}
+            disabled={
+              soldOut ||
+              !Number.isFinite(numeric) ||
+              numeric <= quantityMinimum(product.unit, product.productType)
+            }
             onClick={() => {
-              setQuantity(String(numeric - 1));
+              setQuantity(
+                String(
+                  Math.max(
+                    quantityMinimum(product.unit, product.productType),
+                    roundQuantity(
+                      numeric -
+                        quantityIncrement(product.unit, product.productType)
+                    )
+                  )
+                )
+              );
               setAdded(false);
             }}
             className="h-11 w-11 disabled:opacity-40"
@@ -136,7 +176,7 @@ export default function AddToCartButton({
             aria-label={`Quantity for ${product.name}`}
             aria-invalid={!!error}
             type="text"
-            inputMode="numeric"
+            inputMode="decimal"
             value={quantity}
             disabled={soldOut}
             onChange={(event) => {
@@ -144,18 +184,28 @@ export default function AddToCartButton({
               setAdded(false);
               setError('');
             }}
-            className="h-11 w-12 min-w-0 border-x border-pf-line-strong bg-transparent text-center text-base"
+            className="h-11 w-16 min-w-0 border-x border-pf-line-strong bg-transparent text-center text-base"
           />
           <button
             type="button"
             aria-label={`Increase quantity for ${product.name}`}
             disabled={
               soldOut ||
-              !Number.isSafeInteger(numeric) ||
+              !Number.isFinite(numeric) ||
               numeric >= product.inventoryQty
             }
             onClick={() => {
-              setQuantity(String(Math.max(1, numeric + 1)));
+              setQuantity(
+                String(
+                  Math.min(
+                    product.inventoryQty,
+                    roundQuantity(
+                      numeric +
+                        quantityIncrement(product.unit, product.productType)
+                    )
+                  )
+                )
+              );
               setAdded(false);
             }}
             className="h-11 w-11 disabled:opacity-40"

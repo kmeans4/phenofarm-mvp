@@ -9,7 +9,7 @@ import {
 } from '@/lib/order-workflow';
 import { formatMoney, formatDate } from '@/lib/format';
 import {
-  NEXT_ORDER_ACTION,
+  getNextOrderAction,
   changeOrderStatus,
   offerOrderUndo,
 } from './order-actions';
@@ -18,6 +18,7 @@ export type ListedOrder = {
   id: string;
   orderId: string;
   status: string;
+  notes?: string | null;
   createdAt: string;
   totalAmount: number;
   dispensary: { businessName: string };
@@ -127,7 +128,7 @@ export default function OrdersList({
               </span>
               <span className="mt-1 block text-pf-muted">
                 {formatDate(order.createdAt)} ·{' '}
-                {getOrderStatusLabel(order.status)}
+                {getOrderStatusLabel(order.status, order.notes)}
               </span>
             </Link>
             <div
@@ -142,19 +143,25 @@ export default function OrdersList({
                     Repeat
                   </Link>
                 </Button>
+              ) : order.status === 'PENDING' ? (
+                <Button asChild>
+                  <Link href={`/grower/orders/${order.id}/edit`}>
+                    Review request
+                  </Link>
+                </Button>
               ) : (
-                NEXT_ORDER_ACTION[order.status] && (
+                getNextOrderAction(order.status, order.notes) && (
                   <Button
                     disabled={busy}
                     className="ml-auto"
                     onClick={() =>
                       void update(
                         [order],
-                        NEXT_ORDER_ACTION[order.status].status
+                        getNextOrderAction(order.status, order.notes)!.status
                       )
                     }
                   >
-                    {NEXT_ORDER_ACTION[order.status].label}
+                    {getNextOrderAction(order.status, order.notes)!.label}
                   </Button>
                 )
               )}
@@ -184,7 +191,11 @@ export default function OrdersList({
               'CANCELLED',
             ].map((x) => (
               <option key={x} value={x}>
-                {getOrderStatusLabel(x)}
+                {x === 'SHIPPED'
+                  ? 'Ready for pickup / on the way'
+                  : x === 'DELIVERED'
+                    ? 'Collected / delivered'
+                    : getOrderStatusLabel(x)}
               </option>
             ))}
           </select>
@@ -225,7 +236,7 @@ export default function OrdersList({
                 (x) =>
                   selected.includes(x.id) &&
                   x.status !== target &&
-                  canTransitionOrderStatus(x.status, target)
+                  canTransitionOrderStatus(x.status, target, x.notes)
               );
               if (!rows.length)
                 toast.error('Selected orders cannot move to that status.');

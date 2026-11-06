@@ -1,4 +1,9 @@
 'use client';
+import {
+  QUANTITY_MESSAGE,
+  quantityIncrement,
+  roundQuantity,
+} from '@/lib/quantity';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from '@/app/hooks/useToast';
 import { formatProductUnit } from '@/lib/product-display';
@@ -9,12 +14,14 @@ export function InlineStock({
   name,
   quantity,
   unit,
+  productType,
   onSaved,
 }: {
   id: string;
   name: string;
   quantity: number;
   unit: string;
+  productType?: string | null;
   onSaved: (quantity: number, available: boolean) => void;
 }) {
   const [value, setValue] = useState(String(quantity)),
@@ -100,7 +107,7 @@ export function InlineStock({
     setError('');
     setConflict(false);
     if (timer.current) clearTimeout(timer.current);
-    const parsed = parseInventoryQty(next);
+    const parsed = parseInventoryQty(next, unit);
     if (parsed === null) return;
     timer.current = setTimeout(() => {
       timer.current = null;
@@ -116,7 +123,7 @@ export function InlineStock({
         if (timer.current) {
           clearTimeout(timer.current);
           timer.current = null;
-          const next = parseInventoryQty(value);
+          const next = parseInventoryQty(value, unit, productType);
           if (next !== null) void save(next);
         }
       }}
@@ -129,7 +136,13 @@ export function InlineStock({
           onClick={() =>
             change(
               String(
-                Math.max(0, (parseInventoryQty(value) ?? current.current) - 1)
+                Math.max(
+                  0,
+                  roundQuantity(
+                    (parseInventoryQty(value, unit, productType) ??
+                      current.current) - quantityIncrement(unit, productType)
+                  )
+                )
               )
             )
           }
@@ -139,15 +152,12 @@ export function InlineStock({
         <input
           aria-label={`${name} stock in ${formatProductUnit(unit)}`}
           aria-invalid={Boolean(error)}
-          inputMode="numeric"
+          inputMode="decimal"
           value={value}
           onChange={(event) => change(event.target.value)}
           onBlur={() => {
-            const next = parseInventoryQty(value);
-            if (next === null)
-              setError(
-                'Enter whole units. Use a smaller unit for partial weights.'
-              );
+            const next = parseInventoryQty(value, unit, productType);
+            if (next === null) setError(QUANTITY_MESSAGE);
             else setValue(String(next));
           }}
           className="h-11 w-16 min-w-0 rounded-lg border border-pf-line-strong bg-pf-raised px-1 text-center text-sm"
@@ -161,7 +171,10 @@ export function InlineStock({
               String(
                 Math.min(
                   999999,
-                  (parseInventoryQty(value) ?? current.current) + 1
+                  roundQuantity(
+                    (parseInventoryQty(value, unit, productType) ??
+                      current.current) + quantityIncrement(unit, productType)
+                  )
                 )
               )
             )
@@ -183,7 +196,7 @@ export function InlineStock({
             <button
               type="button"
               onClick={() => {
-                const next = parseInventoryQty(value);
+                const next = parseInventoryQty(value, unit, productType);
                 if (next !== null) void save(next);
               }}
               className="underline"

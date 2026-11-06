@@ -6,16 +6,19 @@ export function OrderFilters({
   search,
   status,
   sort,
+  view = 'active',
 }: {
   search: string;
   status: string;
   sort: string;
+  view?: 'active' | 'past';
 }) {
   const router = useRouter();
   const [query, setQuery] = useState(search);
   const first = useRef(true);
   function update(value: { search?: string; status?: string; sort?: string }) {
     const params = new URLSearchParams({
+      view,
       search: value.search ?? query,
       status: value.status ?? status,
       sort: value.sort ?? sort,
@@ -28,11 +31,11 @@ export function OrderFilters({
       return;
     }
     const timer = setTimeout(() => {
-      const params = new URLSearchParams({ search: query, status, sort });
+      const params = new URLSearchParams({ search: query, status, sort, view });
       router.replace(`/dispensary/orders?${params}`, { scroll: false });
     }, 350);
     return () => clearTimeout(timer);
-  }, [query, router, status, sort]);
+  }, [query, router, status, sort, view]);
   return (
     <div className="mb-4 grid grid-cols-2 gap-2 sm:flex">
       <input
@@ -49,14 +52,10 @@ export function OrderFilters({
         className="min-h-11 rounded-lg border border-pf-line-strong bg-pf-surface px-3 text-sm"
       >
         <option value="">All statuses</option>
-        {[
-          'PENDING',
-          'CONFIRMED',
-          'PROCESSING',
-          'SHIPPED',
-          'DELIVERED',
-          'CANCELLED',
-        ].map((value) => (
+        {(view === 'past'
+          ? ['DELIVERED', 'CANCELLED']
+          : ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED']
+        ).map((value) => (
           <option key={value} value={value}>
             {getOrderStatusLabel(value)}
           </option>

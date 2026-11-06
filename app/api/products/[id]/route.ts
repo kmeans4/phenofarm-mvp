@@ -1,3 +1,5 @@
+import { getSellerVisibility } from '@/lib/seller-access';
+import { validQuantity, QUANTITY_MESSAGE } from '@/lib/quantity';
 import { canCreateListings, FREE_LISTING_LIMIT_MESSAGE } from '@/lib/plans';
 import { refreshProductPriceAlerts } from '@/lib/buyer-alerts';
 import { persistMediaReference } from '@/lib/blob-storage';
@@ -9,7 +11,6 @@ import { Prisma } from '@prisma/client';
 import {
   toSafeAvailability,
   toSafeBoolean,
-  toSafeNonNegativeInteger,
   toSafeNonNegativeNumber,
   toSafeOptionalString,
   toSafeProductName,
@@ -35,7 +36,7 @@ type ProductLike = {
   productType?: string | null;
   subType?: string | null;
   price: Prisma.Decimal | number | null;
-  inventoryQty?: number | null;
+  inventoryQty?: Prisma.Decimal | number | null;
   unit?: string | null;
   isAvailable?: boolean | null;
   isPriceVisible?: boolean | null;
@@ -45,7 +46,7 @@ type ProductLike = {
 function serializeProduct<T extends ProductLike>(product: T | null) {
   if (!product) return product;
 
-  const inventoryQty = toSafeNonNegativeInteger(product.inventoryQty, 0);
+  const inventoryQty = toSafeNonNegativeNumber(product.inventoryQty, 0);
 
   return {
     ...product,
@@ -91,7 +92,13 @@ export async function GET(
 
     if (!product)
       return NextResponse.json({ error: 'Product not found' }, { status: 404 });
-    return NextResponse.json(serializeProduct(product), { status: 200 });
+    return NextResponse.json(
+      {
+        ...serializeProduct(product),
+        sellerVisibility: await getSellerVisibility(user.growerId),
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error fetching product:', error);
     return NextResponse.json(
@@ -132,7 +139,10 @@ export async function PUT(
       return NextResponse.json({ error: 'Invalid product' }, { status: 400 });
     if (body.restore === true) {
       if (!existingProduct.isDeleted)
-        return NextResponse.json(serializeProduct(existingProduct));
+        return NextResponse.json({
+          ...serializeProduct(existingProduct),
+          sellerVisibility: await getSellerVisibility(user.growerId),
+        });
       const [plan, count] = await Promise.all([
         db.grower.findUnique({
           where: { id: user.growerId },
@@ -151,13 +161,24 @@ export async function PUT(
         where: { id: productId },
         data: { isDeleted: false, deletedAt: null, isAvailable: false },
       });
-      return NextResponse.json(serializeProduct(restored));
+      return NextResponse.json({
+        ...serializeProduct(restored),
+        sellerVisibility: await getSellerVisibility(user.growerId),
+      });
     }
     if (existingProduct.isDeleted)
       return NextResponse.json(
         { error: 'Restore this product before editing.' },
         { status: 409 }
       );
+    if (
+      !validQuantity(body.inventoryQty ?? existingProduct.inventoryQty, {
+        unit: body.unit ?? existingProduct.unit,
+        productType: body.productType ?? existingProduct.productType,
+        allowZero: true,
+      })
+    )
+      return NextResponse.json({ error: QUANTITY_MESSAGE }, { status: 400 });
     const parsed = parseProductPayload(body, {
       partial: true,
       defaultStatus: PRODUCT_STATUS.PUBLISHED,
@@ -174,6 +195,29 @@ export async function PUT(
     }
 
     const data = parsed.data;
+    if (
+      (data.unit && data.unit !== existingProduct.unit) ||
+      (data.productType && data.productType !== existingProduct.productType)
+    ) {
+      const used = await db.product.count({
+        where: {
+          id: productId,
+          OR: [
+            { orderItems: { some: {} } },
+            { acceptedQuotes: { some: {} } },
+            { conversationMessages: { some: {} } },
+          ],
+        },
+      });
+      if (used)
+        return NextResponse.json(
+          {
+            error:
+              'Create a new listing to change the selling unit or type of a product already used in an order or quote.',
+          },
+          { status: 409 }
+        );
+    }
     if (data.images)
       data.images = await Promise.all(
         data.images.map(
@@ -254,7 +298,7 @@ export async function PUT(
         : null;
 
     const effectiveInventory =
-      requestedInventory ?? existingProduct.inventoryQty;
+      requestedInventory ?? Number(existingProduct.inventoryQty);
     const effectiveStatus =
       body.status !== undefined ? data.status : existingProduct.status;
 
@@ -264,7 +308,8 @@ export async function PUT(
     } else if (requestedInventory !== null) {
       updateData.isAvailable =
         effectiveInventory > 0 && effectiveStatus === 'PUBLISHED'
-          ? existingProduct.inventoryQty === 0 || existingProduct.isAvailable
+          ? Number(existingProduct.inventoryQty) === 0 ||
+            existingProduct.isAvailable
           : false;
     }
 
@@ -290,7 +335,13 @@ export async function PUT(
       await refreshProductPriceAlerts(productId).catch((error) =>
         console.error('Price alert refresh failed:', error)
       );
-    return NextResponse.json(serializeProduct(updatedProduct), { status: 200 });
+    return NextResponse.json(
+      {
+        ...serializeProduct(updatedProduct),
+        sellerVisibility: await getSellerVisibility(user.growerId),
+      },
+      { status: 200 }
+    );
   } catch (error) {
     console.error('Error updating product:', error);
     return NextResponse.json(

@@ -1,9 +1,9 @@
+import { getSellerVisibility } from '@/lib/seller-access';
 import { db } from '@/lib/db';
 import { Prisma } from '@prisma/client';
 import {
   toSafeAvailability,
   toSafeBoolean,
-  toSafeNonNegativeInteger,
   toSafeNonNegativeNumber,
   toSafeOptionalNumber,
   toSafeOptionalString,
@@ -18,7 +18,7 @@ type ProductLike = {
   productType?: string | null;
   subType?: string | null;
   price: Prisma.Decimal | number | null;
-  inventoryQty?: number | null;
+  inventoryQty?: Prisma.Decimal | number | null;
   unit?: string | null;
   isAvailable?: boolean | null;
   isPriceVisible?: boolean | null;
@@ -31,7 +31,7 @@ type ProductLike = {
 };
 
 export function serializeProduct<T extends ProductLike>(product: T) {
-  const inventoryQty = toSafeNonNegativeInteger(product.inventoryQty, 0);
+  const inventoryQty = toSafeNonNegativeNumber(product.inventoryQty, 0);
 
   return {
     ...product,
@@ -194,8 +194,10 @@ export async function getGrowerProductPage(
   const imagesById = new Map(
     imageCounts.map((row) => [row.id, row.imageCount])
   );
+  const sellerVisibility = await getSellerVisibility(growerId);
   const summaries = products.map((product) => ({
     ...serializeProduct(product),
+    sellerVisibility,
     imageCount: imagesById.get(product.id) || 0,
   }));
   return {

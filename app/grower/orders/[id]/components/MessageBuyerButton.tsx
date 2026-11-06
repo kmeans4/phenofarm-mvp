@@ -10,6 +10,14 @@ interface MessageBuyerButtonProps {
   orderId?: string;
   statusLabel?: string;
   quoteProductId?: string;
+  quoteLines?: {
+    id: string;
+    name: string;
+    unit: string;
+    productType?: string | null;
+    quantity: number;
+    price: number;
+  }[];
 }
 
 export default function MessageBuyerButton({
@@ -18,6 +26,7 @@ export default function MessageBuyerButton({
   orderId,
   statusLabel,
   quoteProductId,
+  quoteLines,
 }: MessageBuyerButtonProps) {
   const [isOpening, setIsOpening] = useState(false);
 
@@ -43,6 +52,7 @@ export default function MessageBuyerButton({
           detail: {
             conversationId: data.conversationId,
             quoteProductId,
+            quoteLines,
             draft: orderId
               ? `Hi ${buyerName}, I have a question about order #${orderId}.`
               : `Hi ${buyerName}, `,

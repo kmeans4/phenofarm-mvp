@@ -58,10 +58,10 @@ export async function serializeBuyerAlerts(
 
 /** Run after a grower price edit; row locks make repeated/concurrent checks idempotent. */
 export async function refreshProductPriceAlerts(productId: string) {
-  const [{ db }, { Prisma }, { startOfLicenseDay }] = await Promise.all([
+  const [{ db }, { Prisma }, { marketplaceGrowerSql }] = await Promise.all([
     import('@/lib/db'),
     import('@prisma/client'),
-    import('@/lib/license'),
+    import('@/lib/marketplace-query'),
   ]);
   await db.$transaction(async (tx) => {
     const changed = await tx.$queryRaw<
@@ -73,7 +73,7 @@ export async function refreshProductPriceAlerts(productId: string) {
         FROM dispensary_price_alerts a JOIN dispensaries d ON d.id = a."dispensaryId"
         JOIN products p ON p.id = a."productId" JOIN growers g ON g.id = p."growerId"
         WHERE p.id = ${productId} AND NOT p."isDeleted" AND p.status = 'PUBLISHED'
-          AND p."isPriceVisible" AND g."isVerified" AND (g."licenseExpiry" IS NULL OR g."licenseExpiry" >= ${startOfLicenseDay()})
+          AND p."isPriceVisible" AND ${marketplaceGrowerSql()}
           AND a."currentPrice" IS DISTINCT FROM p.price
         ORDER BY a.id FOR UPDATE OF a
       ) UPDATE dispensary_price_alerts a SET "currentPrice" = c.price,

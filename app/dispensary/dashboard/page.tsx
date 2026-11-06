@@ -26,6 +26,7 @@ interface DashboardOrder {
   id: string;
   orderId: string;
   status: string;
+  notes?: string | null;
   createdAt: Date;
   totalAmount: unknown;
   growerId: string;
@@ -196,11 +197,15 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     featuredItems,
   ] = await Promise.all([
     db.order.findMany({
-      where: { dispensaryId },
+      where: {
+        dispensaryId,
+        status: { in: ['PENDING', 'CONFIRMED', 'PROCESSING', 'SHIPPED'] },
+      },
       select: {
         id: true,
         orderId: true,
         status: true,
+        notes: true,
         createdAt: true,
         totalAmount: true,
         growerId: true,
@@ -242,7 +247,7 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
       select: { createdAt: true, totalAmount: true },
     }),
     db.orderItem.findMany({
-      where: { order: { dispensaryId, status: { not: 'CANCELLED' } } },
+      where: { order: { dispensaryId, status: 'DELIVERED' } },
       distinct: ['productId'],
       orderBy: { createdAt: 'desc' },
       take: 3,
@@ -273,7 +278,7 @@ async function fetchDispensaryDashboardData(dispensaryId: string): Promise<{
     name: item.product.name,
     category: item.product.productType || 'N/A',
     pricePerUnit: Number(item.unitPrice),
-    quantity: item.quantity,
+    quantity: Number(item.quantity),
     grower: item.grower.businessName,
   }));
 
@@ -311,8 +316,8 @@ export default async function DispensaryDashboardPage() {
   const hasProfile = Boolean(data.profile?.businessName);
   const hasLicense = Boolean(
     data.profile?.licenseNumber &&
-    data.profile.licenseStatus === 'verified' &&
-    !isLicenseExpired(data.profile.licenseExpiry)
+      data.profile.licenseStatus === 'verified' &&
+      !isLicenseExpired(data.profile.licenseExpiry)
   );
   const hasSavedProducts =
     data.favoriteCount > 0 ||
@@ -393,6 +398,7 @@ export default async function DispensaryDashboardPage() {
     id: order.id,
     orderId: order.orderId,
     status: order.status,
+    notes: order.notes,
     createdAt: order.createdAt.toISOString(),
     totalAmount: Number(order.totalAmount),
     growerId: order.growerId,
@@ -479,13 +485,13 @@ export default async function DispensaryDashboardPage() {
         </span>
       </Link>
 
-      {/* Recent orders with date filter */}
+      {/* Orders in progress with date filter */}
       <Card className="bg-pf-surface shadow-sm border border-pf-line">
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between gap-2">
             <div>
               <h3 className="text-base font-semibold text-pf-text sm:text-lg">
-                Recent orders
+                Orders in progress
               </h3>
             </div>
             <Link

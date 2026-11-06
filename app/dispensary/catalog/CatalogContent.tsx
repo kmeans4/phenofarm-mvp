@@ -317,7 +317,7 @@ function normalizeCatalogProduct(raw: unknown): Product | null {
   const id = toSafeOptionalString(record.id);
   if (!id) return null;
 
-  const inventoryQty = toSafeNonNegativeInteger(record.inventoryQty, 0);
+  const inventoryQty = toSafeNonNegativeNumber(record.inventoryQty, 0);
   const isAvailable = toSafeAvailability(record.isAvailable, inventoryQty);
   void isAvailable;
 
@@ -412,7 +412,7 @@ export default function CatalogContent({
     trending: searchParams.get('trending') === 'true',
     strainType: searchParams.get('strainType') || '',
     growerId: searchParams.get('growerId') || '',
-    inStock: searchParams.get('inStock') === 'true',
+    inStock: searchParams.get('inStock') !== 'false',
     hasLabs: searchParams.get('hasLabs') === 'true',
     priceUnit: searchParams.get('priceUnit') || '',
   });
@@ -589,7 +589,7 @@ export default function CatalogContent({
         trending: searchParams.get('trending') === 'true',
         strainType: searchParams.get('strainType') || '',
         growerId: searchParams.get('growerId') || '',
-        inStock: searchParams.get('inStock') === 'true',
+        inStock: searchParams.get('inStock') !== 'false',
         hasLabs: searchParams.get('hasLabs') === 'true',
         priceUnit: searchParams.get('priceUnit') || '',
       };
@@ -621,7 +621,7 @@ export default function CatalogContent({
       priceRanges: filters.priceRanges.join(','),
       strainType: filters.strainType || '',
       growerId: filters.growerId || '',
-      inStock: filters.inStock ? 'true' : '',
+      inStock: filters.inStock === false ? 'false' : '',
       hasLabs: filters.hasLabs ? 'true' : '',
       priceUnit: filters.priceUnit || '',
       recentlyAdded: filters.recentlyAdded ? 'true' : '',
@@ -786,7 +786,7 @@ export default function CatalogContent({
       sortBy !== 'default' ||
       filters.recentlyAdded ||
       filters.trending ||
-      filters.inStock ||
+      filters.inStock === false ||
       filters.hasLabs ||
       filters.strainType ||
       filters.growerId ||
@@ -1081,7 +1081,7 @@ export default function CatalogContent({
         for (const key of ['strainType', 'growerId', 'priceUnit'] as const)
           if (filters[key]) params.set(key, filters[key]!);
         if (fixedGrowerId) params.set('growerId', fixedGrowerId);
-        if (filters.inStock) params.set('inStock', 'true');
+        params.set('inStock', filters.inStock === false ? 'false' : 'true');
         if (filters.hasLabs) params.set('hasLabs', 'true');
 
         const response = await fetch(
@@ -1270,7 +1270,7 @@ export default function CatalogContent({
       (filters.recentlyAdded ? 1 : 0) +
       (filters.trending ? 1 : 0) +
       (showFavoritesOnly ? 1 : 0) +
-      Number(!!filters.inStock) +
+      Number(filters.inStock === false) +
       Number(!!filters.hasLabs) +
       Number(!!filters.strainType) +
       Number(!!filters.growerId) +
@@ -1351,8 +1351,12 @@ export default function CatalogContent({
         });
     });
 
-    if (filters.inStock)
-      chips.push({ label: 'In stock', category: 'inStock', value: 'true' });
+    if (filters.inStock === false)
+      chips.push({
+        label: 'Including sold out',
+        category: 'inStock',
+        value: 'false',
+      });
     if (filters.hasLabs)
       chips.push({
         label: 'Has lab results',
@@ -1833,7 +1837,8 @@ export default function CatalogContent({
                   ) {
                     setFilters((previous) => ({
                       ...previous,
-                      [chip.category]: false,
+                      [chip.category]:
+                        chip.category === 'inStock' ? true : false,
                     }));
                   } else if (
                     chip.category === 'strainType' ||

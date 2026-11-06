@@ -34,7 +34,8 @@ export async function GET(request: NextRequest) {
       { error: 'Choose valid report dates.' },
       { status: 400 }
     );
-  const report = p.get('report') === 'true';
+  const report =
+    p.get('report') === 'true' || p.get('dateBasis') === 'delivered';
   const q = p.get('q')?.trim().slice(0, 160) || '';
   const range = reportRange({
     range: p.get('range') || 'all',
@@ -48,6 +49,9 @@ export async function GET(request: NextRequest) {
       : ['DELIVERED', 'CANCELLED'];
   const where: Prisma.OrderWhereInput = {
     growerId: session.user.growerId,
+    ...(p.get('dateBasis') === 'delivered'
+      ? { status: 'DELIVERED' as const }
+      : {}),
     ...(p.get('dispensary') ? { dispensaryId: p.get('dispensary')! } : {}),
     ...(report
       ? reportOrderDateWhere(range.since, range.until)
@@ -167,7 +171,7 @@ export async function GET(request: NextRequest) {
           o.items.map((i) => [
             o.orderId,
             o.dispensary.businessName,
-            getOrderStatusLabel(o.status),
+            getOrderStatusLabel(o.status, o.notes),
             o.createdAt.toISOString(),
             o.deliveredAt?.toISOString() || '',
             i.product.name,

@@ -1,4 +1,5 @@
 'use client';
+import { roundQuantity } from '@/lib/quantity';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from '@/app/hooks/useToast';
@@ -49,10 +50,10 @@ export function BuyAgainButton({
             if (
               !product?.isAvailable ||
               product.price == null ||
-              product.inventoryQty < 1
+              product.inventoryQty <= 0
             )
               continue;
-            const quantity = Math.min(
+            const quantity = roundQuantity(Math.min(
               requested.quantity,
               Math.max(
                 0,
@@ -60,8 +61,8 @@ export function BuyAgainButton({
                   (before.items.find((item) => item.id === product.id)
                     ?.quantity || 0)
               )
-            );
-            if (quantity < 1) continue;
+            ));
+            if (quantity <= 0) continue;
             if (quantity < requested.quantity) adjusted++;
             additions.push({
               id: product.id,

@@ -226,7 +226,7 @@ export default async function GrowerDashboardPage() {
               >
                 <span>{p.name}</span>
                 <span className="text-pf-warning">
-                  {formatQuantity(p.inventoryQty, p.unit)}
+                  {formatQuantity(Number(p.inventoryQty), p.unit)}
                 </span>
               </Link>
             ))

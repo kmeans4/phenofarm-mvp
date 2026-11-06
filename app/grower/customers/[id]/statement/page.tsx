@@ -89,7 +89,7 @@ export default async function CustomerStatementPage({
       o.items.map((i) => [
         o.orderId,
         formatDate(o.deliveredAt || o.createdAt),
-        getOrderStatusLabel(o.status),
+        getOrderStatusLabel(o.status, o.notes),
         i.product.name,
         String(i.quantity),
         i.product.unit,
@@ -128,7 +128,7 @@ export default async function CustomerStatementPage({
               </div>
               <p className="text-pf-muted">
                 {formatDate(o.deliveredAt || o.createdAt)} ·{' '}
-                {getOrderStatusLabel(o.status)}
+                {getOrderStatusLabel(o.status, o.notes)}
               </p>
               <p className="mt-2">
                 {o.items

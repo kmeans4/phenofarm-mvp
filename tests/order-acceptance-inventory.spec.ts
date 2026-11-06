@@ -1,3 +1,4 @@
+import { plainData } from '../lib/serialize';
 import {
   test,
   expect,
@@ -16,7 +17,6 @@ import {
   mkdtempSync,
   writeFileSync,
   rmSync,
-  readFileSync,
 } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { execFile } from 'node:child_process';
@@ -64,6 +64,8 @@ async function account(role: 'GROWER' | 'DISPENSARY') {
             grower: {
               create: {
                 businessName: 'Inventory QA Grower',
+                subscriptionPlan: 'seller',
+                subscriptionStatus: 'active',
                 licenseNumber: 'TEST-ONLY',
                 licenseStatus: 'verified',
                 isVerified: true,
@@ -125,10 +127,16 @@ test.afterAll(async () => {
   for (const context of [seller, customer, competitor])
     await context?.dispose();
   if (grower) {
-    await db.order.deleteMany({ where: { growerId: grower.grower!.id } });
+    await db.$transaction(async (tx) => {
+      await beginOrderMutation(tx);
+      await tx.order.deleteMany({ where: { growerId: grower.grower!.id } });
+    });
     await db.product.deleteMany({ where: { growerId: grower.grower!.id } });
   }
-  await db.user.deleteMany({ where: { email: { startsWith: prefix } } });
+  await db.$transaction(async (tx) => {
+    await beginOrderMutation(tx);
+    await tx.user.deleteMany({ where: { email: { startsWith: prefix } } });
+  });
   await db.$disconnect();
 });
 async function product(stock = 10) {
@@ -164,13 +172,17 @@ async function submit(items: ReturnType<typeof item>[], client = customer) {
   expect(body.orders).toHaveLength(1);
   return order(body.orders[0].id);
 }
-const order = (id: string) =>
-  db.order.findUniqueOrThrow({
-    where: { id },
-    include: { items: true, statusEvents: true },
-  });
+const order = async (id: string) =>
+  plainData(
+    await db.order.findUniqueOrThrow({
+      where: { id },
+      include: { items: true, statusEvents: true },
+    })
+  );
 const stock = async (p: Product) =>
-  (await db.product.findUniqueOrThrow({ where: { id: p.id } })).inventoryQty;
+  Number(
+    (await db.product.findUniqueOrThrow({ where: { id: p.id } })).inventoryQty
+  );
 const change = (id: string, status: OrderStatus, client = seller) =>
   client.patch(`/api/orders/${id}/status`, {
     data: {
@@ -364,7 +376,7 @@ test('accepted edits deduct only deltas, aggregate split lines and restore exact
     o.id,
     current.items.map((i) => ({
       id: i.id,
-      quantity: i.productId === q.id ? 10 : i.quantity,
+      quantity: i.productId === q.id ? 10 : Number(i.quantity),
     }))
   );
   expect(response.status()).toBe(409);
@@ -466,9 +478,9 @@ test('acceptance racing a negotiated edit uses one coherent final quantity and p
   const current = await order(o.id);
   if (current.status === 'PENDING') await accept(o.id);
   const final = await order(o.id);
-  expect(await stock(p)).toBe(10 - final.items[0].quantity);
+  expect(await stock(p)).toBe(10 - Number(final.items[0].quantity));
   expect(Number(final.subtotal)).toBe(
-    final.items[0].quantity * Number(final.items[0].unitPrice)
+    Number(final.items[0].quantity) * Number(final.items[0].unitPrice)
   );
   const race = await Promise.all([
     change(o.id, 'CANCELLED'),
@@ -484,26 +496,29 @@ async function legacy(
   status: OrderStatus = 'PENDING',
   inventoryState?: OrderInventoryState
 ) {
-  return db.order.create({
-    data: {
-      growerId: grower.grower!.id,
-      dispensaryId: buyer.dispensary!.id,
-      orderId: `LEGACY-${randomUUID()}`,
-      status,
-      ...(inventoryState ? { inventoryState } : {}),
-      subtotal: 60,
-      totalAmount: 60,
-      items: {
-        create: {
-          growerId: grower.grower!.id,
-          productId: p.id,
-          quantity: 6,
-          unitPrice: 10,
-          totalPrice: 60,
+  return db.$transaction(async (tx) => {
+    await beginOrderMutation(tx);
+    return tx.order.create({
+      data: {
+        growerId: grower.grower!.id,
+        dispensaryId: buyer.dispensary!.id,
+        orderId: `LEGACY-${randomUUID()}`,
+        status,
+        ...(inventoryState ? { inventoryState } : {}),
+        subtotal: 60,
+        totalAmount: 60,
+        items: {
+          create: {
+            growerId: grower.grower!.id,
+            productId: p.id,
+            quantity: 6,
+            unitPrice: 10,
+            totalPrice: 60,
+          },
         },
       },
-    },
-    include: { items: true },
+      include: { items: true },
+    });
   });
 }
 test('legacy pending deductions require review, are released once, and cannot double-deduct or over-restore', async () => {
@@ -705,7 +720,7 @@ for (const width of [1440, 834, 390])
         r.request().method() === 'PUT'
     );
     await page
-      .getByRole('button', { name: 'Save request', exact: true })
+      .getByRole('button', { name: 'Save changes', exact: true })
       .filter({ visible: true })
       .click();
     expect((await saving).status()).toBe(200);
@@ -713,7 +728,7 @@ for (const width of [1440, 834, 390])
     expect((await order(o.id)).items[0].quantity).toBe(3);
     expect(Number((await order(o.id)).subtotal)).toBe(25.5);
     await db.product.update({ where: { id: p.id }, data: { inventoryQty: 1 } });
-    await page.goto(`/grower/orders/${o.id}`);
+    await page.goto(`/grower/orders/${o.id}/edit`);
     await page
       .getByRole('button', { name: /^Accept/ })
       .first()
@@ -796,90 +811,64 @@ for (const width of [1440, 834, 390])
 test('cutover guard rejects old writers atomically while current creation, edit, batch, cancellation and review work', async () => {
   const p = await product(10),
     old = await legacy(p);
-  const sql = readFileSync(
-    'prisma/migrations/20260930121000_order_inventory_writer_guard/migration.sql',
-    'utf8'
-  );
-  const functionSQL = sql.match(/CREATE FUNCTION[\s\S]*?\$\$;/)![0];
-  try {
-    await db.$transaction(async (tx) => {
-      await tx.$executeRawUnsafe(functionSQL);
-      await tx.$executeRawUnsafe(
-        'CREATE TRIGGER orders_inventory_writer_guard BEFORE INSERT OR UPDATE OR DELETE ON orders FOR EACH STATEMENT EXECUTE FUNCTION phenoshop_require_inventory_writer()'
-      );
-      await tx.$executeRawUnsafe(
-        'CREATE TRIGGER order_items_inventory_writer_guard BEFORE INSERT OR UPDATE OR DELETE ON order_items FOR EACH STATEMENT EXECUTE FUNCTION phenoshop_require_inventory_writer()'
-      );
-    });
-    await expect(
-      db.$transaction(async (tx) => {
-        await tx.product.update({
-          where: { id: p.id },
-          data: { inventoryQty: { increment: 6 } },
-        });
-        await tx.order.update({
-          where: { id: old.id },
-          data: { status: 'CANCELLED' },
-        });
-      })
-    ).rejects.toThrow();
-    expect(await stock(p)).toBe(10);
-    await expect(
-      db.orderItem.update({
-        where: { id: old.items[0].id },
-        data: { quantity: 2 },
-      })
-    ).rejects.toThrow();
-    const first = await submit([item(p, 3)]);
-    expect(
-      (await edit(first.id, [{ id: first.items[0].id, quantity: 4 }])).status()
-    ).toBe(200);
-    expect((await batch([first.id], 'CONFIRMED')).status()).toBe(200);
-    expect(await stock(p)).toBe(6);
-    expect((await change(first.id, 'CANCELLED')).status()).toBe(200);
-    expect(await stock(p)).toBe(10);
-    const direct = await seller.post('/api/orders', {
-      data: {
-        dispensaryId: buyer.dispensary!.id,
-        items: [{ productId: p.id, quantity: 2 }],
-      },
-    });
-    expect(direct.status(), await direct.text()).toBe(201);
-    expect(await stock(p)).toBe(8);
-    expect(
-      (await seller.delete(`/api/orders/${(await direct.json()).id}`)).status()
-    ).toBe(200);
-    await db.$transaction((tx) =>
-      reconcileLegacyOrder(tx, {
-        id: old.id,
-        expectedUpdatedAt: old.updatedAt.toISOString(),
-        stockWasDeducted: false,
-      })
-    );
-    expect(await stock(p)).toBe(10);
-    await db.$transaction(async (tx) => {
-      await beginOrderMutation(tx);
+  await expect(
+    db.$transaction(async (tx) => {
+      await tx.product.update({
+        where: { id: p.id },
+        data: { inventoryQty: { increment: 6 } },
+      });
       await tx.order.update({
         where: { id: old.id },
-        data: { createdBy: 'GROWER' },
+        data: { status: 'CANCELLED' },
       });
+    })
+  ).rejects.toThrow();
+  expect(await stock(p)).toBe(10);
+  await expect(
+    db.orderItem.update({
+      where: { id: old.items[0].id },
+      data: { quantity: 2 },
+    })
+  ).rejects.toThrow();
+  const first = await submit([item(p, 3)]);
+  expect(
+    (await edit(first.id, [{ id: first.items[0].id, quantity: 4 }])).status()
+  ).toBe(200);
+  expect((await batch([first.id], 'CONFIRMED')).status()).toBe(200);
+  expect(await stock(p)).toBe(6);
+  expect((await change(first.id, 'CANCELLED')).status()).toBe(200);
+  expect(await stock(p)).toBe(10);
+  const direct = await seller.post('/api/orders', {
+    data: {
+      dispensaryId: buyer.dispensary!.id,
+      items: [{ productId: p.id, quantity: 2 }],
+    },
+  });
+  expect(direct.status(), await direct.text()).toBe(201);
+  expect(await stock(p)).toBe(8);
+  expect(
+    (await seller.delete(`/api/orders/${(await direct.json()).id}`)).status()
+  ).toBe(200);
+  await db.$transaction((tx) =>
+    reconcileLegacyOrder(tx, {
+      id: old.id,
+      expectedUpdatedAt: old.updatedAt.toISOString(),
+      stockWasDeducted: false,
+    })
+  );
+  expect(await stock(p)).toBe(10);
+  await db.$transaction(async (tx) => {
+    await beginOrderMutation(tx);
+    await tx.order.update({
+      where: { id: old.id },
+      data: { createdBy: 'GROWER' },
     });
-    expect(
-      (await customer.patch(`/api/orders/${old.id}/acknowledge`)).status()
-    ).toBe(200);
-    // The marker must not leak beyond a transaction through pooled sessions.
-    await expect(
-      db.order.update({ where: { id: old.id }, data: { status: 'CONFIRMED' } })
-    ).rejects.toThrow();
-  } finally {
-    await db.$executeRawUnsafe(
-      'DROP TRIGGER IF EXISTS orders_inventory_writer_guard ON orders'
-    );
-    await db.$executeRawUnsafe(
-      'DROP TRIGGER IF EXISTS order_items_inventory_writer_guard ON order_items'
-    );
-    await db.$executeRawUnsafe(
-      'DROP FUNCTION IF EXISTS phenoshop_require_inventory_writer()'
-    );
-  }
+  });
+  expect(
+    (await customer.patch(`/api/orders/${old.id}/acknowledge`)).status()
+  ).toBe(200);
+  // The marker must not leak beyond a transaction through pooled sessions.
+  await expect(
+    db.order.update({ where: { id: old.id }, data: { status: 'CONFIRMED' } })
+  ).rejects.toThrow();
 });

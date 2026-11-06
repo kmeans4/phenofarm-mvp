@@ -202,7 +202,7 @@ test('manual orders are accepted; status undo is single-use and preserves stock,
   expect(
     (await db.product.findUniqueOrThrow({ where: { id: productId } }))
       .inventoryQty
-  ).toBe(initial - 1);
+  ).toBe(Number(initial) - 1);
   await page.goto(`/grower/orders/${order.id}`);
   await expect(
     page.getByRole('heading', { name: 'History', exact: true })
@@ -784,12 +784,12 @@ test('opposing order edits lock stock consistently and preserve both accepted de
   for (const product of await db.product.findMany({
     where: { id: { in: [productId, secondProductId] } },
   }))
-    expect(product.inventoryQty).toBe(stockBefore.get(product.id)! - 12);
+    expect(product.inventoryQty).toBe(Number(stockBefore.get(product.id)!) - 12);
   expect(
     (
       await db.orderItem.findMany({
         where: { orderId: { in: [first.id, second.id] } },
       })
-    ).every((item) => item.quantity === 6)
+    ).every((item) => Number(item.quantity) === 6)
   ).toBe(true);
 });

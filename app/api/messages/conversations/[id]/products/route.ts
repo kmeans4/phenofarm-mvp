@@ -1,3 +1,5 @@
+import { plainData } from '@/lib/serialize';
+import { buyerProductWhere } from '@/lib/buyer-products';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
@@ -31,14 +33,13 @@ export async function GET(
   const where: Prisma.ProductWhereInput = {
     growerId: conversation.growerId,
     isDeleted: false,
-    ...(user.role === 'DISPENSARY'
-      ? { status: 'PUBLISHED', isAvailable: true }
-      : {}),
+    ...(user.role === 'DISPENSARY' ? buyerProductWhere() : {}),
   };
   const select = {
     id: true,
     name: true,
     unit: true,
+    productType: true,
     price: true,
     isPriceVisible: true,
     inventoryQty: true,
@@ -58,13 +59,15 @@ export async function GET(
     selected && !products.some((product) => product.id === selected.id)
       ? [selected, ...products]
       : products;
-  return NextResponse.json({
-    products: result.map((product) => ({
-      ...product,
-      price:
-        user.role === 'GROWER' || product.isPriceVisible
-          ? Number(product.price)
-          : null,
-    })),
-  });
+  return NextResponse.json(
+    plainData({
+      products: result.map((product) => ({
+        ...product,
+        price:
+          user.role === 'GROWER' || product.isPriceVisible
+            ? Number(product.price)
+            : null,
+      })),
+    })
+  );
 }

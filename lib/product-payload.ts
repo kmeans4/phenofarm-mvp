@@ -1,3 +1,4 @@
+import { validQuantity, QUANTITY_MESSAGE } from '@/lib/quantity';
 import {
   canonicalizeProductType,
   getSubTypesForProductType,
@@ -110,12 +111,19 @@ export function parsePrice(value: unknown): number | null {
   const parsed = parseProductNumber(value);
   return parsed !== null && parsed >= 0 && parsed <= 999999.99 ? parsed : null;
 }
-export function parseInventoryQty(value: unknown): number | null {
+export function parseInventoryQty(
+  value: unknown,
+  unit?: unknown,
+  productType?: unknown
+): number | null {
   const parsed = parseProductNumber(value);
   return parsed !== null &&
-    Number.isInteger(parsed) &&
-    parsed >= 0 &&
-    parsed <= 999999
+    validQuantity(parsed, {
+      unit,
+      productType,
+      allowZero: true,
+      allowUnknownUnit: true,
+    })
     ? parsed
     : null;
 }
@@ -176,7 +184,7 @@ export function parseProductPayload(
   const subType = normalizeSubtype(productType, body.subType);
   const unit = normalizeUnit(body.unit);
   const price = parsePrice(body.price);
-  const inventoryQty = parseInventoryQty(body.inventoryQty);
+  const inventoryQty = parseInventoryQty(body.inventoryQty, unit, productType);
 
   const errors: string[] = [];
 
@@ -216,9 +224,7 @@ export function parseProductPayload(
           body.inventoryQty !== null &&
           body.inventoryQty !== ''))
     )
-      errors.push(
-        'Stock must be a whole number of units. For partial weights, choose a smaller unit (for example, 8 oz instead of 0.5 lb).'
-      );
+      errors.push(QUANTITY_MESSAGE);
   }
 
   // Validate THC/CBD ranges if provided
@@ -375,7 +381,11 @@ export function buildProductRequestPayload(
     strainId: normalizeOptionalString(formData.strainId),
     batchId: normalizeOptionalString(formData.batchId),
     price: parsePrice(formData.price),
-    inventoryQty: parseInventoryQty(formData.inventoryQty),
+    inventoryQty: parseInventoryQty(
+      formData.inventoryQty,
+      formData.unit,
+      formData.productType
+    ),
     unit: normalizeUnit(formData.unit),
     description: normalizeOptionalString(formData.description),
     images: Array.isArray(formData.images) ? formData.images : [],

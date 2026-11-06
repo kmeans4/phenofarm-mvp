@@ -1,6 +1,6 @@
 'use client';
 import { toast } from '@/app/hooks/useToast';
-import { getOrderStatusLabel } from '@/lib/order-workflow';
+import { isPickupOrder } from '@/lib/order-workflow';
 export const NEXT_ORDER_ACTION: Record<
   string,
   { status: string; label: string }
@@ -10,6 +10,17 @@ export const NEXT_ORDER_ACTION: Record<
   PROCESSING: { status: 'SHIPPED', label: 'Mark on the way' },
   SHIPPED: { status: 'DELIVERED', label: 'Mark delivered' },
 };
+export function getNextOrderAction(
+  status: string,
+  fulfillmentOrNotes?: string | null
+) {
+  const action = NEXT_ORDER_ACTION[status];
+  if (!action || !isPickupOrder(fulfillmentOrNotes)) return action;
+  if (status === 'PROCESSING')
+    return { ...action, label: 'Mark ready for pickup' };
+  if (status === 'SHIPPED') return { ...action, label: 'Mark collected' };
+  return action;
+}
 export async function changeOrderStatus(
   id: string,
   status: string,
@@ -31,8 +42,9 @@ export function offerOrderUndo(
   status: string,
   refresh: () => void
 ) {
+  void status;
   toast.success(
-    `${changes.length > 1 ? `${changes.length} orders` : 'Order'} ${getOrderStatusLabel(status).toLowerCase()}`,
+    `${changes.length > 1 ? `${changes.length} orders` : 'Order'} updated`,
     {
       duration: 8000,
       action: {

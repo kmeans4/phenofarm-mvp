@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 
 import { useId, useState, type KeyboardEvent, type PointerEvent } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -331,6 +332,14 @@ export function ValueChart({
               </button>
             </div>
           </div>
+          {selected.href && (
+            <Link
+              href={selected.href}
+              className="mt-2 inline-flex min-h-11 items-center text-sm font-semibold text-pf-accent"
+            >
+              View orders for this period
+            </Link>
+          )}
           <p id={`${id}-hint`} className="mt-2 text-xs text-pf-muted">
             Hover or tap to inspect. Use arrow keys to move between{' '}
             {bucket === 'day' ? 'days' : 'months'}.

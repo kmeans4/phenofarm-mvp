@@ -1,3 +1,4 @@
+import { plainData } from '@/lib/serialize';
 import { beginOrderMutation } from '@/lib/order-mutations';
 import { NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
@@ -44,10 +45,12 @@ export async function PATCH(
     );
   }
   if (order.buyerAcknowledgedAt) {
-    return NextResponse.json({
-      success: true,
-      buyerAcknowledgedAt: order.buyerAcknowledgedAt,
-    });
+    return NextResponse.json(
+      plainData({
+        success: true,
+        buyerAcknowledgedAt: order.buyerAcknowledgedAt,
+      })
+    );
   }
 
   const acknowledgedAt = new Date();
@@ -66,8 +69,10 @@ export async function PATCH(
     });
   });
 
-  return NextResponse.json({
-    success: true,
-    buyerAcknowledgedAt: acknowledgedAt,
-  });
+  return NextResponse.json(
+    plainData({
+      success: true,
+      buyerAcknowledgedAt: acknowledgedAt,
+    })
+  );
 }

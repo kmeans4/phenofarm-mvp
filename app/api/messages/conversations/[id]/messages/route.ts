@@ -1,3 +1,9 @@
+import { plainData } from '@/lib/serialize';
+import {
+  canSendSellerMessage,
+  SELLER_ACCESS_MESSAGE,
+} from '@/lib/seller-access';
+import { validQuantity, QUANTITY_MESSAGE } from '@/lib/quantity';
 import { NextRequest, NextResponse } from 'next/server';
 import { ConversationMessageType, OfferStatus } from '@prisma/client';
 import { db } from '@/lib/db';
@@ -187,10 +193,9 @@ export async function GET(
           },
         })
       : [];
-    return NextResponse.json(
-      { messages: payload, offerUpdates },
-      { status: 200 }
-    );
+    return NextResponse.json(plainData({ messages: payload, offerUpdates }), {
+      status: 200,
+    });
   } catch (error) {
     console.error('Error fetching messages:', error);
     return NextResponse.json(
@@ -233,17 +238,17 @@ export async function POST(
         ? body.productId
         : conversation.productId;
 
-    if (
-      requestedProductId &&
-      !(await db.product.findFirst({
-        where: {
-          id: requestedProductId,
-          growerId: conversation.growerId,
-          isDeleted: false,
-        },
-        select: { id: true },
-      }))
-    )
+    const requestedProduct = requestedProductId
+      ? await db.product.findFirst({
+          where: {
+            id: requestedProductId,
+            growerId: conversation.growerId,
+            isDeleted: false,
+          },
+          select: { id: true, unit: true, productType: true },
+        })
+      : null;
+    if (requestedProductId && !requestedProduct)
       return NextResponse.json(
         { error: 'Product does not belong to this grower' },
         { status: 400 }
@@ -255,6 +260,18 @@ export async function POST(
         : requestedType === ConversationMessageType.OFFER
           ? ConversationMessageType.OFFER
           : ConversationMessageType.TEXT;
+
+    if (
+      !(await canSendSellerMessage(
+        conversation.growerId,
+        conversation.dispensaryId,
+        messageType
+      ))
+    )
+      return NextResponse.json(
+        { error: SELLER_ACCESS_MESSAGE },
+        { status: 403 }
+      );
 
     let offerQuantity: number | null = null;
     let offerUnitPrice: number | null = null;
@@ -291,11 +308,17 @@ export async function POST(
       }
 
       if (offer.quantity !== undefined && offer.quantity !== null) {
-        if (!Number.isInteger(quantity) || quantity < 1 || quantity > 9999)
+        if (
+          !validQuantity(quantity, {
+            unit: requestedProduct?.unit,
+            productType: requestedProduct?.productType,
+            max: 9999,
+          })
+        )
           return NextResponse.json(
-            {
-              error: 'Quote quantity must be a whole number between 1 and 9999',
-            },
+            plainData({
+              error: QUANTITY_MESSAGE,
+            }),
             { status: 400 }
           );
         offerQuantity = quantity;
@@ -374,7 +397,7 @@ export async function POST(
     });
 
     return NextResponse.json(
-      {
+      plainData({
         id: message.id,
         conversationId: message.conversationId,
         senderUserId: message.senderUserId,
@@ -389,7 +412,7 @@ export async function POST(
         offerNote: message.offerNote,
         offerStatus: message.offerStatus,
         createdAt: message.createdAt,
-      },
+      }),
       { status: 201 }
     );
   } catch (error) {

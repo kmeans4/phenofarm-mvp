@@ -66,13 +66,36 @@ export interface OrderRequestNoteFields {
   deliveryAddress?: string;
 }
 
-export function getOrderStatusLabel(status: string) {
+export function isPickupOrder(fulfillmentOrNotes?: string | null) {
+  return (
+    fulfillmentOrNotes?.trim().toLowerCase() === 'pickup' ||
+    parseOrderRequestNotes(
+      fulfillmentOrNotes || null
+    ).details.fulfillmentMethod.toLowerCase() === 'pickup'
+  );
+}
+export function getOrderStatusLabel(
+  status: string,
+  fulfillmentOrNotes?: string | null
+) {
+  if (isPickupOrder(fulfillmentOrNotes)) {
+    if (status === 'SHIPPED') return 'Ready for pickup';
+    if (status === 'DELIVERED') return 'Collected';
+  }
   return ORDER_STATUS_LABELS[status] || status;
 }
 
-export function getOrderStatusHelp(status: string, inventoryState?: string) {
+export function getOrderStatusHelp(
+  status: string,
+  inventoryState?: string,
+  fulfillmentOrNotes?: string | null
+) {
   if (inventoryState === 'LEGACY_UNREVIEWED')
     return 'This older order needs an inventory review. Contact support before changing it.';
+  if (isPickupOrder(fulfillmentOrNotes) && status === 'SHIPPED')
+    return 'Your order is ready to collect from the grower.';
+  if (isPickupOrder(fulfillmentOrNotes) && status === 'DELIVERED')
+    return 'Order collected by the buyer.';
   return ORDER_STATUS_HELP[status] || 'Review the order details';
 }
 
@@ -91,8 +114,15 @@ export function getAllowedOrderStatusTransitions(
 
 export function canTransitionOrderStatus(
   currentStatus: string,
-  nextStatus: string
+  nextStatus: string,
+  fulfillmentOrNotes?: string | null
 ) {
+  if (
+    currentStatus === 'SHIPPED' &&
+    nextStatus === 'CANCELLED' &&
+    isPickupOrder(fulfillmentOrNotes)
+  )
+    return true;
   if (currentStatus === nextStatus) return true;
   return getAllowedOrderStatusTransitions(currentStatus).includes(
     nextStatus as OrderStatusValue
@@ -107,13 +137,16 @@ export function canEditOrderItems(status: string) {
 
 export function getInvalidOrderStatusTransitionMessage(
   currentStatus: string,
-  nextStatus: string
+  nextStatus: string,
+  fulfillmentOrNotes?: string | null
 ) {
-  const allowed = getAllowedOrderStatusTransitions(currentStatus);
-  const allowedLabels = allowed.map(getOrderStatusLabel).join(', ');
+  const allowed = currentStatus === 'SHIPPED' && isPickupOrder(fulfillmentOrNotes) ? ['DELIVERED', 'CANCELLED'] : getAllowedOrderStatusTransitions(currentStatus);
+  const allowedLabels = allowed
+    .map((status) => getOrderStatusLabel(status, fulfillmentOrNotes))
+    .join(', ');
   return allowed.length > 0
-    ? `Cannot move order from ${getOrderStatusLabel(currentStatus)} to ${getOrderStatusLabel(nextStatus)}. Allowed next steps: ${allowedLabels}.`
-    : `Cannot move order from ${getOrderStatusLabel(currentStatus)} to ${getOrderStatusLabel(nextStatus)}.`;
+    ? `Cannot move order from ${getOrderStatusLabel(currentStatus, fulfillmentOrNotes)} to ${getOrderStatusLabel(nextStatus, fulfillmentOrNotes)}. Allowed next steps: ${allowedLabels}.`
+    : `Cannot move order from ${getOrderStatusLabel(currentStatus, fulfillmentOrNotes)} to ${getOrderStatusLabel(nextStatus, fulfillmentOrNotes)}.`;
 }
 
 export function buildOrderRequestNotes(fields: OrderRequestNoteFields) {

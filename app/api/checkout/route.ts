@@ -1,3 +1,5 @@
+import { quantityPrice } from '@/lib/quantity';
+import { validQuantity, QUANTITY_MESSAGE, roundQuantity } from '@/lib/quantity';
 import { beginOrderMutation } from '@/lib/order-mutations';
 import { NextRequest, NextResponse } from 'next/server';
 import { createHash } from 'node:crypto';
@@ -222,7 +224,7 @@ export async function POST(request: NextRequest) {
         !item.growerId ||
         !Number.isFinite(item.price) ||
         item.price < 0 ||
-        !Number.isInteger(item.quantity) ||
+        !validQuantity(item.quantity, { allowUnknownUnit: true, max: 9999 }) ||
         item.quantity <= 0 ||
         item.quantity > 9999 ||
         item.id.length > 100 ||
@@ -244,7 +246,10 @@ export async function POST(request: NextRequest) {
       consolidated.set(
         key,
         existing
-          ? { ...existing, quantity: existing.quantity + item.quantity }
+          ? {
+              ...existing,
+              quantity: roundQuantity(existing.quantity + item.quantity),
+            }
           : item
       );
     }
@@ -354,7 +359,9 @@ export async function POST(request: NextRequest) {
         for (const item of growerItems) {
           requestedByProduct.set(
             item.id,
-            (requestedByProduct.get(item.id) || 0) + item.quantity
+            roundQuantity(
+              (requestedByProduct.get(item.id) || 0) + item.quantity
+            )
           );
         }
 
@@ -394,6 +401,8 @@ export async function POST(request: NextRequest) {
                   name: true,
                   price: true,
                   inventoryQty: true,
+                  unit: true,
+                  productType: true,
                   isAvailable: true,
                   isPriceVisible: true,
                   grower: { select: { userId: true, businessName: true } },
@@ -411,6 +420,24 @@ export async function POST(request: NextRequest) {
               ] of requestedByProduct.entries()) {
                 const product = productById.get(productId);
                 const available = Number(product?.inventoryQty || 0);
+                if (
+                  product &&
+                  !validQuantity(requested, {
+                    unit: product.unit,
+                    productType: product.productType,
+                    max: 9999,
+                  })
+                ) {
+                  throw new CheckoutConflictError([
+                    {
+                      productId,
+                      productName: product.name,
+                      requested,
+                      available,
+                      reason: QUANTITY_MESSAGE,
+                    },
+                  ]);
+                }
 
                 if (!product || !product.isAvailable || requested > available) {
                   growerIssues.push({
@@ -449,7 +476,7 @@ export async function POST(request: NextRequest) {
                 const quotedQuantity = acceptedQuote
                   ? Math.min(
                       item.quantity,
-                      acceptedQuote.quantity ?? item.quantity
+                      Number(acceptedQuote.quantity ?? item.quantity)
                     )
                   : 0;
 
@@ -470,8 +497,7 @@ export async function POST(request: NextRequest) {
                 }
                 if (acceptedQuote && quotedQuantity > 0) {
                   const quotePrice = Number(acceptedQuote.unitPrice);
-                  const quoteTotal =
-                    Math.round(quotedQuantity * quotePrice * 100) / 100;
+                  const quoteTotal = quantityPrice(quotedQuantity, quotePrice);
                   subtotal += quoteTotal;
                   orderItems.push({
                     productId: item.id,
@@ -489,10 +515,11 @@ export async function POST(request: NextRequest) {
                   });
                 }
 
-                const listQuantity = item.quantity - quotedQuantity;
+                const listQuantity = roundQuantity(
+                  item.quantity - quotedQuantity
+                );
                 if (listQuantity > 0) {
-                  const listTotal =
-                    Math.round(listQuantity * serverPrice * 100) / 100;
+                  const listTotal = quantityPrice(listQuantity, serverPrice);
                   subtotal += listTotal;
                   orderItems.push({
                     productId: item.id,

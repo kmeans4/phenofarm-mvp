@@ -1,48 +1,11 @@
 import { NextResponse } from 'next/server';
-import { getAuthSession } from '@/lib/auth-helpers';
-import { db } from '@/lib/db';
-import { STRIPE_CONFIG, getStripe } from '@/lib/stripe';
-
+import { requireGrower } from '@/lib/auth-helpers';
+import { BILLING_DISABLED_MESSAGE } from '@/lib/seller-access';
 export async function POST() {
-  const session = await getAuthSession();
-
-  if (!session) {
-    return NextResponse.json({ error: 'Please sign in to continue.' }, { status: 401 });
-  }
-
-  const user = session.user;
-  if (user.role !== 'GROWER' || !user.growerId) {
-    return NextResponse.json({ error: 'Your account does not have access to this action.' }, { status: 403 });
-  }
-
-  if (!process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_TEST_SECRET_KEY) {
-    return NextResponse.json({ error: 'Stripe Billing is not configured for this environment' }, { status: 503 });
-  }
-
-  const grower = await db.grower.findUnique({
-    where: { id: user.growerId },
-    select: {
-      stripeCustomerId: true,
-      stripeSubscriptionId: true,
-    },
-  });
-
-  if (!grower?.stripeCustomerId || !grower.stripeSubscriptionId) {
-    return NextResponse.json({ error: 'No active cultivator subscription is connected yet' }, { status: 400 });
-  }
-
-  try {
-  const portalSession = await getStripe().billingPortal.sessions.create({
-    customer: grower.stripeCustomerId,
-    return_url: STRIPE_CONFIG.getPortalReturnUrl(),
-  }) as { url?: string | null };
-
-  if (!portalSession.url) {
-    return NextResponse.json({ error: 'Stripe did not return a portal URL' }, { status: 502 });
-  }
-
-  return NextResponse.json({ url: portalSession.url });
-  } catch {
-    return NextResponse.json({ error: 'Billing is temporarily unavailable. Please try again.' }, { status: 503 });
-  }
+  const auth = await requireGrower();
+  if ('error' in auth) return auth.error;
+  return NextResponse.json(
+    { error: BILLING_DISABLED_MESSAGE },
+    { status: 503 }
+  );
 }

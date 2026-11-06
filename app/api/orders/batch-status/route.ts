@@ -1,3 +1,5 @@
+import { plainData } from '@/lib/serialize';
+import { sellerCanTrade, SELLER_ACCESS_MESSAGE, SellerAccessError } from '@/lib/seller-access';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
@@ -63,9 +65,9 @@ export async function PATCH(req: NextRequest) {
 
     if (!isOrderStatus(status)) {
       return NextResponse.json(
-        {
+        plainData({
           error: `Invalid status. Must be one of: ${ORDER_STATUS_VALUES.join(', ')}`,
-        },
+        }),
         { status: 400 }
       );
     }
@@ -88,6 +90,7 @@ export async function PATCH(req: NextRequest) {
         id: true,
         orderId: true,
         status: true,
+        notes: true,
         updatedAt: true,
         growerId: true,
         inventoryState: true,
@@ -106,10 +109,15 @@ export async function PATCH(req: NextRequest) {
     }
 
     const targetStatus = status;
+    if (targetStatus === 'CONFIRMED' && !(await sellerCanTrade(growerId)))
+      return NextResponse.json(
+        { error: SELLER_ACCESS_MESSAGE },
+        { status: 403 }
+      );
     const transitionableOrders = orders.filter(
       (order) =>
         order.status !== targetStatus &&
-        canTransitionOrderStatus(order.status, targetStatus)
+        canTransitionOrderStatus(order.status, targetStatus, order.notes)
     );
     const noOpCount = orders.filter(
       (order) => order.status === targetStatus
@@ -118,12 +126,12 @@ export async function PATCH(req: NextRequest) {
       .filter(
         (order) =>
           order.status !== targetStatus &&
-          !canTransitionOrderStatus(order.status, targetStatus)
+          !canTransitionOrderStatus(order.status, targetStatus, order.notes)
       )
       .map((order) => ({
         id: order.id,
         status: order.status,
-        statusLabel: getOrderStatusLabel(order.status),
+        statusLabel: getOrderStatusLabel(order.status, order.notes),
         reason: getInvalidOrderStatusTransitionMessage(
           order.status,
           targetStatus
@@ -132,7 +140,7 @@ export async function PATCH(req: NextRequest) {
 
     if (transitionableOrders.length === 0) {
       return NextResponse.json(
-        {
+        plainData({
           error:
             skippedOrders.length > 0
               ? `No selected requests can move to ${getOrderStatusLabel(targetStatus)}.`
@@ -141,7 +149,7 @@ export async function PATCH(req: NextRequest) {
           skippedCount: skippedOrders.length,
           noOpCount,
           skippedOrders,
-        },
+        }),
         { status: skippedOrders.length > 0 ? 409 : 200 }
       );
     }
@@ -154,6 +162,8 @@ export async function PATCH(req: NextRequest) {
         a.id.localeCompare(b.id)
       );
       for (const order of sorted) await claimOrder(tx, order);
+      if (targetStatus === 'CONFIRMED' && !(await sellerCanTrade(growerId, tx)))
+        throw new SellerAccessError();
       await lockInventoryProducts(
         tx,
         sorted.flatMap((order) => order.items.map((item) => item.productId))
@@ -193,24 +203,27 @@ export async function PATCH(req: NextRequest) {
         await createNotification(tx, {
           userId: order.dispensary.userId,
           type: 'ORDER_STATUS_CHANGED',
-          title: `Request ${getOrderStatusLabel(targetStatus).toLowerCase()}`,
-          body: `Request #${order.orderId} is now ${getOrderStatusLabel(targetStatus)}.`,
+          title: `Request ${getOrderStatusLabel(targetStatus, order.notes).toLowerCase()}`,
+          body: `Request #${order.orderId} is now ${getOrderStatusLabel(targetStatus, order.notes)}.`,
           href: `/dispensary/orders/${order.id}`,
         });
       }
       return { count: transitionableOrders.length };
     });
 
-    return NextResponse.json({
-      success: true,
-      updatedCount: result.count,
-      updatedOrderIds: transitionableIds,
-      skippedCount: skippedOrders.length,
-      noOpCount,
-      skippedOrders,
-      status: status,
-    });
+    return NextResponse.json(
+      plainData({
+        success: true,
+        updatedCount: result.count,
+        updatedOrderIds: transitionableIds,
+        skippedCount: skippedOrders.length,
+        noOpCount,
+        skippedOrders,
+        status: status,
+      })
+    );
   } catch (error) {
+    if (error instanceof SellerAccessError) return NextResponse.json({ error: error.message }, { status: 403 });
     if (error instanceof OrderInventoryError)
       return NextResponse.json(
         { error: error.message, code: error.code, issues: error.issues },

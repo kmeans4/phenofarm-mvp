@@ -1,4 +1,12 @@
 'use client';
+import { quantityPrice } from '@/lib/quantity';
+import {
+  validQuantity,
+  quantityMinimum,
+  quantityIncrement,
+  roundQuantity,
+  QUANTITY_MESSAGE,
+} from '@/lib/quantity';
 import { useEffect, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/app/components/ui/Button';
@@ -20,6 +28,7 @@ type ProductOption = {
   price: number | string;
   inventoryQty: number;
   unit: string;
+  productType?: string | null;
   strain?: { name: string } | null;
   status?: string;
   isAvailable?: boolean;
@@ -29,6 +38,7 @@ type Line = {
   productId: string;
   name: string;
   unit: string;
+  productType?: string | null;
   stock: number;
   quantity: string;
   price: string;
@@ -40,6 +50,7 @@ export type EditableOrder = {
   orderId: string;
   status: string;
   inventoryState?: string;
+  updatedAt?: string;
   notes: string | null;
   shippingFee: number;
   tax: number;
@@ -51,7 +62,13 @@ export type EditableOrder = {
     unitPrice: number;
     maxQuantity: number;
     acceptedQuoteId?: string | null;
-    product: { id: string; name: string; unit: string; strain: string | null };
+    product: {
+      id: string;
+      name: string;
+      unit: string;
+      productType?: string | null;
+      strain: string | null;
+    };
   }[];
 };
 const field =
@@ -87,6 +104,7 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
       productId: i.productId,
       name: i.product.name,
       unit: i.product.unit,
+      productType: i.product.productType,
       stock: i.maxQuantity,
       quantity: String(i.quantity),
       price: String(i.unitPrice),
@@ -174,6 +192,7 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                   productId: i.productId,
                   name: i.product.name,
                   unit: i.product.unit,
+                  productType: i.product.productType,
                   stock: i.product.inventoryQty,
                   quantity: String(i.quantity),
                   price: String(i.unitPrice),
@@ -234,8 +253,9 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
         productId: p.id,
         name: p.name,
         unit: p.unit,
+        productType: p.productType,
         stock: Number(p.inventoryQty),
-        quantity: '1',
+        quantity: String(Math.min(1, Number(p.inventoryQty)) || 1),
         price: String(p.price),
         catalogPrice: Number(p.price),
       },
@@ -264,10 +284,11 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
             (requestedByProduct.get(line.productId) || 0) > line.stock
         );
   const subtotal = lines.reduce(
-    (n, l) => n + (Number(l.quantity) || 0) * (parseAmount(l.price) || 0),
+    (n, l) =>
+      n + quantityPrice(Number(l.quantity) || 0, parseAmount(l.price) || 0),
     0
   );
-  async function save() {
+  async function save(accept = false) {
     if (pending.current) return;
     const next: Record<string, string> = {};
     if (!order && !buyer) next.buyer = 'Choose a customer.';
@@ -275,11 +296,13 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
     lines.forEach((l, i) => {
       if (
         !l.quantity.trim() ||
-        !Number.isInteger(Number(l.quantity)) ||
-        Number(l.quantity) < 1 ||
-        Number(l.quantity) > 9999
+        !validQuantity(l.quantity, {
+          unit: l.unit,
+          productType: l.productType,
+          max: 9999,
+        })
       )
-        next[`quantity-${i}`] = 'Enter a whole quantity from 1 to 9999.';
+        next[`quantity-${i}`] = QUANTITY_MESSAGE;
       if (
         !l.price.trim() ||
         !Number.isFinite(parseAmount(l.price)) ||
@@ -319,6 +342,8 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             dispensaryId: buyer,
+            accept,
+            expectedUpdatedAt: order?.updatedAt,
             items: lines.map((l) => ({
               ...(order
                 ? { id: l.id, unitPrice: parseAmount(l.price) }
@@ -346,7 +371,15 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || 'Could not save order.');
       resetDirtyState();
-      toast.success(order ? 'Order saved' : 'Order recorded');
+      toast.success(
+        accept
+          ? 'Order accepted — stock updated'
+          : order?.status === 'PENDING'
+            ? 'Request saved — stock unchanged'
+            : order
+              ? 'Order saved'
+              : 'Order recorded'
+      );
       router.push(`/grower/orders/${d.id}`);
       router.refresh();
     } catch (e) {
@@ -373,7 +406,7 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
       <PageHeader
         title={
           order
-            ? `${order.status === 'PENDING' ? 'Edit request' : 'Edit order'} #${order.orderId}`
+            ? `${order.status === 'PENDING' ? 'Review request' : 'Edit order'} #${order.orderId}`
             : 'Record order'
         }
       />
@@ -628,7 +661,7 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                     <h3 className="font-medium">{l.name}</h3>
                     <p className="text-sm text-pf-muted">
                       {order?.status === 'PENDING'
-                        ? 'Stock checked on acceptance'
+                        ? `${formatQuantity(l.stock, l.unit)} available · checked again on acceptance`
                         : `${formatQuantity(l.stock, l.unit)} available`}
                       {l.acceptedQuoteId ? ' · Accepted quote' : ''}
                     </p>
@@ -668,7 +701,13 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                         onClick={() =>
                           updateLine(i, {
                             quantity: String(
-                              Math.max(1, (Number(l.quantity) || 1) - 1)
+                              Math.max(
+                                quantityMinimum(l.unit, l.productType),
+                                roundQuantity(
+                                  (Number(l.quantity) || 0) -
+                                    quantityIncrement(l.unit, l.productType)
+                                )
+                              )
                             ),
                           })
                         }
@@ -677,7 +716,7 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                       </Button>
                       <input
                         id={`order-quantity-${i}`}
-                        inputMode="numeric"
+                        inputMode="decimal"
                         value={l.quantity}
                         onChange={(e) =>
                           updateLine(i, { quantity: e.target.value })
@@ -691,7 +730,12 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                         aria-label={`Increase ${l.name}`}
                         onClick={() =>
                           updateLine(i, {
-                            quantity: String((Number(l.quantity) || 0) + 1),
+                            quantity: String(
+                              roundQuantity(
+                                (Number(l.quantity) || 0) +
+                                  quantityIncrement(l.unit, l.productType)
+                              )
+                            ),
                           })
                         }
                       >
@@ -773,21 +817,20 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                 }}
               >
                 <option value="">Choose method</option>
+                <option>Coordinate with grower</option>
                 <option>Pickup</option>
+                <option>Delivery requested</option>
                 <option>Delivery</option>
                 <option>Flexible</option>
               </select>
             </label>
             <label className="text-sm">
-              Requested date (optional)
+              Preferred date or time (optional)
               <input
-                type="date"
+                type="text"
+                maxLength={120}
                 className={field}
-                value={
-                  /^\d{4}-\d{2}-\d{2}$/.test(details.requestedWindow)
-                    ? details.requestedWindow
-                    : ''
-                }
+                value={details.requestedWindow}
                 onChange={(e) => {
                   triggerDirty();
                   setDetails({ ...details, requestedWindow: e.target.value });
@@ -887,7 +930,7 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
                 (order ? parseAmount(tax) || 0 : 0)
             )}
           </strong>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               type="button"
               variant="outline"
@@ -900,15 +943,24 @@ export function OrderForm({ order }: { order?: EditableOrder }) {
             >
               Cancel
             </Button>
-            <Button disabled={busy} type="submit">
+            <Button variant={order?.status === 'PENDING' ? 'outline' : 'primary'} disabled={busy} type="submit">
               {busy
                 ? 'Saving…'
                 : order
                   ? order?.status === 'PENDING'
-                    ? 'Save request'
+                    ? 'Save changes'
                     : 'Save order'
                   : 'Record order'}
             </Button>
+            {order?.status === 'PENDING' && (
+              <Button
+                type="button"
+                disabled={busy || order.inventoryState === 'LEGACY_UNREVIEWED'}
+                onClick={() => void save(true)}
+              >
+                Accept order
+              </Button>
+            )}
           </div>
         </div>
       </form>

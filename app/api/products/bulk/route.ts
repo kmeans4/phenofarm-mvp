@@ -139,6 +139,8 @@ export async function POST(request: NextRequest) {
               sku: true,
               name: true,
               inventoryQty: true,
+              unit: true, productType: true,
+              _count: { select: { orderItems: true, acceptedQuotes: true, conversationMessages: true } },
               status: true,
               isAvailable: true,
             },
@@ -204,6 +206,11 @@ export async function POST(request: NextRequest) {
               message:
                 'Batch not found. Add it under Batches, then import this row again.',
             });
+            continue;
+          }
+          const matched = matches[0];
+          if (matched && Object.values(matched._count).some(count => count > 0) && ((record.fields.includes('unit') && record.unit !== matched.unit) || (record.fields.includes('productType') && record.productType !== matched.productType))) {
+            validation.errors.push({ row: record.row, field: 'Unit / Type', message: 'Create a new listing to change the selling unit or type of a product already used in an order or quote.' });
             continue;
           }
           if (matches[0]) matchedIds.add(matches[0].id);
@@ -309,7 +316,7 @@ export async function POST(request: NextRequest) {
                 : current.status;
             if (fields.includes('isAvailable') || fields.includes('status'))
               update.isAvailable = requestedAvailability;
-            if (quantity === 0 || status === 'DRAFT')
+            if (Number(quantity) === 0 || status === 'DRAFT')
               update.isAvailable = false;
             await tx.product.update({
               where: { id },

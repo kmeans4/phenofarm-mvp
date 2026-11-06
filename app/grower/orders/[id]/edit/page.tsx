@@ -28,6 +28,7 @@ async function fetchOrder(id: string, growerId: string) {
               name: true,
               unit: true,
               inventoryQty: true,
+              productType: true,
               strain: { select: { name: true } },
             },
           },
@@ -42,6 +43,7 @@ async function fetchOrder(id: string, growerId: string) {
     id: order.id,
     orderId: order.orderId,
     status: order.status,
+    updatedAt: order.updatedAt.toISOString(),
     inventoryState: order.inventoryState,
     totalAmount: Number(order.totalAmount),
     subtotal: Number(order.subtotal),
@@ -59,21 +61,22 @@ async function fetchOrder(id: string, growerId: string) {
     items: order.items.map((item) => ({
       id: item.id,
       productId: item.productId,
-      quantity: item.quantity,
+      quantity: Number(item.quantity),
       unitPrice: Number(item.unitPrice),
       acceptedQuoteId: item.acceptedQuoteId,
       totalPrice: Number(item.totalPrice),
       maxQuantity:
         order.status === 'PENDING'
-          ? 9999
+          ? Number(item.product.inventoryQty)
           : order.items
               .filter((other) => other.productId === item.productId)
-              .reduce((sum, other) => sum + other.quantity, 0) +
+              .reduce((sum, other) => sum + Number(other.quantity), 0) +
             Number(item.product.inventoryQty || 0),
       product: {
         id: item.product.id,
         name: item.product.name,
         unit: item.product.unit,
+        productType: item.product.productType,
         strain: item.product.strain?.name || null,
       },
     })),

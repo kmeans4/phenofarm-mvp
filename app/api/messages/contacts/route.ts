@@ -1,3 +1,4 @@
+import { plainData } from '@/lib/serialize';
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { db } from '@/lib/db';
@@ -32,5 +33,5 @@ export async function GET(request: NextRequest) {
           orderBy: { businessName: 'asc' },
           take: 30,
         });
-  return NextResponse.json({ contacts });
+  return NextResponse.json(plainData({ contacts }));
 }

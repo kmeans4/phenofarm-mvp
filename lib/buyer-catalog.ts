@@ -1,8 +1,9 @@
+import { marketplaceGrowerSql } from '@/lib/marketplace-query';
 import { priceRangesForUnit } from '@/lib/catalog-filters';
 import { db } from '@/lib/db';
 import { expandProductTypeFilters } from '@/lib/product-types';
 import { Prisma } from '@prisma/client';
-import { startOfLicenseDay } from '@/lib/license';
+
 import {
   buyerProductSelect,
   buyerProductWhere,
@@ -31,8 +32,8 @@ export async function getBuyerCatalog(
   const search = params.get('search')?.trim().slice(0, 160);
   const now = new Date();
   const conditions = [
-    Prisma.sql`p."isAvailable" AND NOT p."isDeleted" AND p.status = 'PUBLISHED' `,
-    Prisma.sql`g."isVerified" AND (g."licenseExpiry" IS NULL OR g."licenseExpiry" >= ${startOfLicenseDay(now)})`,
+    Prisma.sql`(p."isAvailable" OR p."inventoryQty" = 0) AND NOT p."isDeleted" AND p.status = 'PUBLISHED' `,
+    marketplaceGrowerSql(now),
   ];
   if (growerId) conditions.push(Prisma.sql`p."growerId" = ${growerId}`);
   if (recentlyAdded)
@@ -65,7 +66,7 @@ export async function getBuyerCatalog(
       Prisma.sql`(${haystack} ILIKE ${pattern} OR word_similarity(${word}, ${haystack}) >= 0.42)`
     );
   }
-  if (params.get('inStock') === 'true')
+  if (params.get('inStock') !== 'false')
     conditions.push(Prisma.sql`p."inventoryQty" > 0`);
   if (params.get('hasLabs') === 'true')
     conditions.push(Prisma.sql`(NULLIF(b."coaDocumentUrl", '') IS NOT NULL OR EXISTS (
@@ -144,7 +145,7 @@ export async function getBuyerCatalog(
           ' + '
         )})`
       : Prisma.sql`0`
-  } AS relevance, p."productType", p."createdAt", g."businessName",
+  } AS relevance, (p."inventoryQty" > 0) AS "inStock", p."productType", p."createdAt", g."businessName",
     CASE WHEN p."isPriceVisible" THEN p.price END AS "visiblePrice",
     COALESCE(b.thc, p."thcMax", p."thcMin") AS thc, ${trending ? Prisma.sql`sales.volume` : Prisma.sql`0`} AS volume
     FROM products p JOIN growers g ON g.id = p."growerId"
@@ -181,6 +182,7 @@ export async function getBuyerCatalog(
       break;
   }
   if (trending) order = Prisma.sql`volume DESC, id ASC`;
+  order = Prisma.sql`"inStock" DESC, ${order}`;
   const offset = cursor
     ? Prisma.sql`COALESCE((SELECT position FROM ranked WHERE id = ${cursor}), 9223372036854775807)`
     : Prisma.sql`${(page - 1) * limit}`;
@@ -197,7 +199,7 @@ export async function getBuyerCatalog(
       SELECT id, ROW_NUMBER() OVER (ORDER BY ${order}) AS position FROM eligible WHERE ${typeFilter}
     ) SELECT id FROM ranked WHERE position > ${offset} ORDER BY position LIMIT ${limit + 1}`),
     db.$queryRaw<{ id: string; name: string }[]>(
-      Prisma.sql`SELECT id, "businessName" AS name FROM growers WHERE "isVerified" AND ("licenseExpiry" IS NULL OR "licenseExpiry" >= ${startOfLicenseDay(now)}) ORDER BY "businessName" LIMIT 500`
+      Prisma.sql`SELECT g.id, g."businessName" AS name FROM growers g WHERE ${marketplaceGrowerSql(now)} ORDER BY "businessName" LIMIT 500`
     ),
   ]);
   const pageIds = ids.slice(0, limit).map((row) => row.id);

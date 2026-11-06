@@ -139,6 +139,7 @@ async function fetchOrder(
       shippingFee: Number(order.shippingFee),
       items: order.items.map((item) => ({
         ...item,
+        quantity: Number(item.quantity),
         unitPrice: Number(item.unitPrice),
         catalogUnitPrice:
           item.catalogUnitPrice == null ? null : Number(item.catalogUnitPrice),
@@ -169,7 +170,13 @@ function formatCurrency(amount: number) {
   }).format(amount);
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({
+  status,
+  notes,
+}: {
+  status: string;
+  notes?: string | null;
+}) {
   const statusColors: Record<string, string> = {
     PENDING: 'bg-pf-warning-bg text-pf-warning border-pf-warning-line',
     CONFIRMED: 'bg-pf-info-bg text-pf-info border-pf-info-line',
@@ -183,7 +190,7 @@ function StatusBadge({ status }: { status: string }) {
     <Badge
       className={`${statusColors[status] || 'bg-pf-surface text-pf-secondary'} border`}
     >
-      {getOrderStatusLabel(status)}
+      {getOrderStatusLabel(status, notes)}
     </Badge>
   );
 }
@@ -316,7 +323,7 @@ export default async function OrderDetailPage({
   }
 
   const requestNotes = parseOrderRequestNotes(order.notes);
-  const statusLabel = getOrderStatusLabel(order.status);
+  const statusLabel = getOrderStatusLabel(order.status, order.notes);
   const hasRequestDetails =
     requestNotes.details.fulfillmentMethod ||
     requestNotes.details.requestedWindow ||
@@ -453,7 +460,7 @@ export default async function OrderDetailPage({
         actions={
           <>
             <span className="hidden sm:inline-flex">
-              <StatusBadge status={order.status} />
+              <StatusBadge notes={order.notes} status={order.status} />
             </span>
             {canEditOrderItems(order.status) && (
               <>
@@ -485,7 +492,7 @@ export default async function OrderDetailPage({
                 orderId: order.orderId,
                 notes: order.notes,
                 createdAt: order.createdAt.toISOString(),
-                status: getOrderStatusLabel(order.status),
+                status: getOrderStatusLabel(order.status, order.notes),
                 grower: order.grower.businessName,
                 buyer: order.dispensary.businessName,
                 subtotal: order.subtotal,
@@ -509,7 +516,7 @@ export default async function OrderDetailPage({
       <div className="space-y-1 text-sm text-pf-muted">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <span className="sm:hidden">
-            <StatusBadge status={order.status} />
+            <StatusBadge notes={order.notes} status={order.status} />
           </span>
         </div>
         <p>Submitted {formatMarketplaceDateTime(order.createdAt)}</p>
@@ -522,6 +529,14 @@ export default async function OrderDetailPage({
             orderId={order.orderId}
             statusLabel={statusLabel}
             quoteProductId={order.items[0]?.productId}
+            quoteLines={order.items.map((item) => ({
+              id: item.productId,
+              name: item.product?.name || 'Product',
+              unit: item.product?.unit || 'Unit',
+              productType: item.product?.productType,
+              quantity: item.quantity,
+              price: item.unitPrice,
+            }))}
           />
         )}
         {order.dispensary.phone && (
@@ -542,7 +557,11 @@ export default async function OrderDetailPage({
           </a>
         )}
       </div>
-      <QuickStatusUpdate orderId={order.id} currentStatus={order.status} />
+      <QuickStatusUpdate
+        orderId={order.id}
+        notes={order.notes}
+        currentStatus={order.status}
+      />
       <div className="grid grid-cols-1 gap-3 sm:gap-6 lg:grid-cols-3">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-3 sm:space-y-6">

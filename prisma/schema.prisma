@@ -212,7 +212,7 @@ model Product {
   growerId               String
   name                   String
   price                  Decimal                     @db.Decimal(10, 2)
-  inventoryQty           Int                         @default(0)
+  inventoryQty           Decimal                     @default(0) @db.Decimal(16, 3)
   unit                   String                      @default("gram")
   isAvailable            Boolean                     @default(true)
   description            String?
@@ -303,7 +303,7 @@ model OrderItem {
   orderId         String
   productId       String
   growerId        String
-  quantity        Int            @default(1)
+  quantity        Decimal        @default(1) @db.Decimal(16, 3)
   unitPrice       Decimal        @db.Decimal(10, 2)
   catalogUnitPrice Decimal?       @db.Decimal(10, 2)
   priceOverrideReason String?     @db.VarChar(240)
@@ -402,7 +402,7 @@ model ConversationMessage {
   messageType          ConversationMessageType @default(TEXT)
   body                 String
   productId            String?
-  offerQuantity        Int?
+  offerQuantity        Decimal? @db.Decimal(16, 3)
   offerUnitPrice       Decimal?                @db.Decimal(10, 2)
   offerNote            String?
   offerStatus          OfferStatus?
@@ -429,7 +429,7 @@ model AcceptedQuote {
   growerId          String
   dispensaryId      String
   productId         String
-  quantity          Int?
+  quantity          Decimal? @db.Decimal(16, 3)
   unitPrice         Decimal             @db.Decimal(10, 2)
   note              String?
   acceptedAt        DateTime            @default(now())

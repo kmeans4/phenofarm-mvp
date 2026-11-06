@@ -7,7 +7,7 @@
 - NextAuth owns app authentication.
 - Resend delivers account verification and password-reset emails from `accounts@phenoshop.app` through a Vercel Marketplace integration.
 - Porkbun hosts the human support mailbox `support@phenoshop.app`. Keep its root MX/SPF and `default._domainkey` separate from Resend's `send` MX/SPF and `resend._domainkey`; both senders use the same domain.
-- Stripe is intended for cultivator software subscriptions; wholesale orders and settlement remain direct between businesses. Follow `.codex/payment-model.md` before billing changes.
+- Online software-subscription billing is disabled pending an approved processor. Legacy Stripe checkout, portal, and webhook routes cannot grant access or collect payment. Wholesale orders and settlement remain direct between businesses. Follow `.codex/payment-model.md` before billing changes.
 
 ## Expected Env Vars
 - `DATABASE_URL`

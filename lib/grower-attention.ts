@@ -143,6 +143,7 @@ const readGrowerAttentionSummary = cache(
           id: true,
           orderId: true,
           status: true,
+          notes: true,
           updatedAt: true,
           dispensary: { select: { businessName: true } },
         },
@@ -223,7 +224,7 @@ const readGrowerAttentionSummary = cache(
       (order) => ({
         id: `request-${order.id}`,
         type: 'request',
-        title: 'New order',
+        title: 'New request',
         detail: `${order.dispensary.businessName} submitted ${order.orderId} for $${Number(order.totalAmount).toFixed(2)}.`,
         href: `/grower/orders/${order.id}`,
         createdAt: toIso(order.createdAt),
@@ -251,13 +252,13 @@ const readGrowerAttentionSummary = cache(
       (order) => ({
         id: `status-${order.id}`,
         type: 'status',
-        title: `Recently ${getOrderStatusLabel(order.status).toLowerCase()}`,
-        detail: `${order.orderId} for ${order.dispensary.businessName} moved to ${getOrderStatusLabel(order.status)}.`,
+        title: `Recently ${getOrderStatusLabel(order.status, order.notes).toLowerCase()}`,
+        detail: `${order.orderId} for ${order.dispensary.businessName} moved to ${getOrderStatusLabel(order.status, order.notes)}.`,
         href: `/grower/orders/${order.id}`,
         createdAt: toIso(order.updatedAt),
         priority: 3,
         tone: order.status === 'DELIVERED' ? 'green' : 'blue',
-        badge: getOrderStatusLabel(order.status),
+        badge: getOrderStatusLabel(order.status, order.notes),
       })
     );
 

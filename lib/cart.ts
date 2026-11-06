@@ -1,3 +1,5 @@
+import { quantityPrice } from '@/lib/quantity';
+import { validQuantity, roundQuantity } from '@/lib/quantity';
 export const CART_STORAGE_KEY = 'phenofarm-cart';
 export interface CartItem {
   id: string;
@@ -29,8 +31,13 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   Boolean(value && typeof value === 'object' && !Array.isArray(value));
 const price = (value: unknown) =>
   typeof value === 'number' && Number.isFinite(value) && value >= 0 ? value : 0;
-const positiveInteger = (value: unknown) =>
-  typeof value === 'number' && Number.isSafeInteger(value) && value > 0;
+const positiveQuantity = (
+  value: unknown,
+  unit: unknown,
+  productType?: unknown
+) =>
+  typeof value === 'number' &&
+  validQuantity(value, { unit, productType, max: 9999 });
 const safeImage = (value: unknown) =>
   typeof value === 'string' &&
   value.length <= 2048 &&
@@ -41,10 +48,15 @@ export function getLineTotal(item: CartItem) {
   return item.acceptedQuoteId &&
     item.quotedQuantity &&
     item.quotedUnitPrice != null
-    ? Math.min(item.quantity, item.quotedQuantity) * item.quotedUnitPrice +
-        Math.max(0, item.quantity - item.quotedQuantity) *
-          (item.listPrice ?? item.price)
-    : item.price * item.quantity;
+    ? quantityPrice(
+        Math.min(item.quantity, item.quotedQuantity),
+        item.quotedUnitPrice
+      ) +
+        quantityPrice(
+          roundQuantity(Math.max(0, item.quantity - item.quotedQuantity)),
+          item.listPrice ?? item.price
+        )
+    : quantityPrice(item.quantity, item.price);
 }
 export function calculateTotals(items: CartItem[]) {
   const subtotal =
@@ -64,7 +76,7 @@ export function normalizeCart(value: unknown): Cart {
       !raw.id ||
       typeof raw.growerId !== 'string' ||
       !raw.growerId ||
-      !positiveInteger(raw.quantity) ||
+      !positiveQuantity(raw.quantity, raw.unit, raw.productType) ||
       seen.has(raw.id)
     )
       continue;
@@ -74,8 +86,8 @@ export function normalizeCart(value: unknown): Cart {
       growerId: raw.growerId,
       name: typeof raw.name === 'string' ? raw.name : 'Product',
       grower: typeof raw.grower === 'string' ? raw.grower : 'Grower',
-      quantity: Math.min(Number(raw.quantity), 100000),
-      maxQty: Math.max(0, Math.trunc(price(raw.maxQty))),
+      quantity: Math.min(Number(raw.quantity), 9999),
+      maxQty: roundQuantity(Math.max(0, price(raw.maxQty))),
       price: price(raw.price),
       unit: typeof raw.unit === 'string' && raw.unit ? raw.unit : 'unit',
       strain: typeof raw.strain === 'string' ? raw.strain : undefined,
@@ -83,7 +95,7 @@ export function normalizeCart(value: unknown): Cart {
         typeof raw.productType === 'string' ? raw.productType : undefined,
       image: safeImage(raw.image),
       ...(typeof raw.acceptedQuoteId === 'string' &&
-      positiveInteger(raw.quotedQuantity) &&
+      positiveQuantity(raw.quotedQuantity, raw.unit, raw.productType) &&
       typeof raw.quotedUnitPrice === 'number' &&
       raw.quotedUnitPrice >= 0
         ? {
@@ -281,7 +293,9 @@ export function mergeCartItems(cart: Cart, additions: CartItem[]): Cart {
         ? {
             ...existing,
             ...item,
-            quantity: Math.min(existing.quantity + item.quantity, item.maxQty),
+            quantity: roundQuantity(
+              Math.min(existing.quantity + item.quantity, item.maxQty)
+            ),
             ...(existing.acceptedQuoteId
               ? {
                   acceptedQuoteId: existing.acceptedQuoteId,

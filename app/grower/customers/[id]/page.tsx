@@ -33,6 +33,7 @@ export default async function CustomerPage({
       id: true,
       orderId: true,
       status: true,
+      notes: true,
       totalAmount: true,
       createdAt: true,
     },
@@ -129,7 +130,8 @@ export default async function CustomerPage({
                 <span>
                   #{o.orderId}
                   <span className="mt-1 block text-pf-muted">
-                    {formatDate(o.createdAt)} · {getOrderStatusLabel(o.status)}
+                    {formatDate(o.createdAt)} ·{' '}
+                    {getOrderStatusLabel(o.status, o.notes)}
                   </span>
                 </span>
                 <strong>{formatMoney(Number(o.totalAmount))}</strong>

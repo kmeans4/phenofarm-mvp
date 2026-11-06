@@ -150,7 +150,7 @@ async function fetchOrder(
     },
     items: order.items.map((item) => ({
       id: item.id,
-      quantity: item.quantity,
+      quantity: Number(item.quantity),
       unitPrice: Number(item.unitPrice),
       totalPrice: Number(item.totalPrice),
       quoted: Boolean(item.acceptedQuoteId),
@@ -160,19 +160,25 @@ async function fetchOrder(
         strain: item.product.strain?.name ?? null,
         unit: item.product.unit,
         price: item.product.isPriceVisible ? Number(item.product.price) : null,
-        inventoryQty: item.product.inventoryQty,
+        inventoryQty: Number(item.product.inventoryQty),
         isAvailable:
           item.product.status === 'PUBLISHED' &&
           !item.product.isDeleted &&
           item.product.isAvailable &&
-          item.product.inventoryQty > 0 &&
+          Number(item.product.inventoryQty) > 0 &&
           item.product.isPriceVisible,
       },
     })),
   };
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({
+  status,
+  notes,
+}: {
+  status: string;
+  notes?: string | null;
+}) {
   const statusColors: Record<string, string> = {
     PENDING: 'bg-pf-warning-bg text-pf-warning',
     CONFIRMED: 'bg-pf-info-bg text-pf-info',
@@ -186,7 +192,7 @@ function StatusBadge({ status }: { status: string }) {
     <span
       className={`px-3 py-1 rounded-full text-sm font-medium ${statusColors[status] || 'bg-pf-surface text-pf-secondary'}`}
     >
-      {getOrderStatusLabel(status)}
+      {getOrderStatusLabel(status, notes)}
     </span>
   );
 }
@@ -261,16 +267,20 @@ export default async function DispensaryOrderDetailPage({
             </span>
           </span>
         }
-        description={getOrderStatusHelp(order.status, order.inventoryState)}
+        description={getOrderStatusHelp(
+          order.status,
+          order.inventoryState,
+          order.notes
+        )}
         actions={
           <>
-            <StatusBadge status={order.status} />
+            <StatusBadge notes={order.notes} status={order.status} />
             <OrderRecordExport
               order={{
                 orderId: order.orderId,
                 notes: order.notes,
                 createdAt: order.createdAt.toISOString(),
-                status: getOrderStatusLabel(order.status),
+                status: getOrderStatusLabel(order.status, order.notes),
                 grower: order.grower.businessName,
                 buyer: order.dispensary.businessName,
                 subtotal: order.subtotal,
@@ -279,7 +289,7 @@ export default async function DispensaryOrderDetailPage({
                 total: order.totalAmount,
                 items: order.items.map((item) => ({
                   name: item.product?.name || 'Unknown product',
-                  quantity: item.quantity,
+                  quantity: Number(item.quantity),
                   unit: item.product?.unit || 'unit',
                   unitPrice: item.unitPrice,
                   totalPrice: item.totalPrice,
@@ -319,6 +329,7 @@ export default async function DispensaryOrderDetailPage({
         className="mb-2 rounded-lg border border-pf-line bg-pf-surface p-3"
       >
         <OrderTimeline
+          notes={order.notes}
           currentStatus={order.status}
           createdAt={order.createdAt}
           shippedAt={order.shippedAt}
@@ -341,6 +352,7 @@ export default async function DispensaryOrderDetailPage({
 
       <div id="buyer-actions" className="mb-4 scroll-mt-24 sm:scroll-mt-4">
         <OrderDetailActions
+          notes={order.notes}
           orderDbId={order.id}
           orderId={order.orderId}
           status={order.status}
@@ -353,7 +365,7 @@ export default async function DispensaryOrderDetailPage({
               name: item.product!.name,
               unit: item.product!.unit,
               strain: item.product!.strain,
-              quantity: item.quantity,
+              quantity: Number(item.quantity),
               price: item.product!.price,
               inventoryQty: item.product!.inventoryQty,
               isAvailable: item.product!.isAvailable,
@@ -408,13 +420,13 @@ export default async function DispensaryOrderDetailPage({
                           ({item.product.strain})
                         </span>
                       )}
-                      {item.product && (
+                      {item.product && order.status === 'DELIVERED' && (
                         <div className="mt-2">
                           <BuyAgainButton
                             items={[
                               {
                                 productId: item.product.id,
-                                quantity: item.quantity,
+                                quantity: Number(item.quantity),
                               },
                             ]}
                             label="Buy again"
@@ -458,7 +470,7 @@ export default async function DispensaryOrderDetailPage({
                     </span>
                   ) : null}
                 </p>
-                {item.product && (
+                {item.product && order.status === 'DELIVERED' && (
                   <BuyAgainButton
                     items={[
                       { productId: item.product.id, quantity: item.quantity },

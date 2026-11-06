@@ -1,3 +1,4 @@
+import { beginOrderMutation } from '../lib/order-mutations';
 import { test, expect, type Page, type BrowserContext } from '@playwright/test';
 import { PrismaClient, type OrderStatus } from '@prisma/client';
 import { encode } from 'next-auth/jwt';
@@ -30,7 +31,7 @@ if (
 const db = new PrismaClient();
 const prefix = `chart-review-${randomUUID()}`;
 const today = marketplaceDateKey();
-const shots = 'docs/chart-review-2026-10-29/screens';
+const shots = '.codex/tmp/workflow-improvements-2026-11-06/chart-screens';
 mkdirSync(shots, { recursive: true });
 let growerId: string, buyerId: string, token: string, buyerToken: string;
 const users: string[] = [],
@@ -67,7 +68,7 @@ async function order(
   deliveredAt?: Date,
   index = 0
 ) {
-  return db.order.create({
+  return db.$transaction(async tx => { await beginOrderMutation(tx); return tx.order.create({
     data: {
       orderId: `QA-${randomUUID().slice(0, 8)}`,
       growerId,
@@ -92,7 +93,7 @@ async function order(
         },
       },
     },
-  });
+  }); });
 }
 async function auth(context: BrowserContext, value = token) {
   await context.addCookies([
@@ -284,11 +285,11 @@ test.beforeAll(async () => {
 });
 test.afterAll(async () => {
   if (growerId) {
-    await db.order.deleteMany({ where: { growerId } });
+    await db.$transaction(async tx => { await beginOrderMutation(tx); await tx.order.deleteMany({ where: { growerId } }); });
     await db.product.deleteMany({ where: { growerId } });
-    await db.dispensary.deleteMany({ where: { createdByGrowerId: growerId } });
+    await db.$transaction(async tx => { await beginOrderMutation(tx); await tx.dispensary.deleteMany({ where: { createdByGrowerId: growerId } }); });
   }
-  await db.user.deleteMany({ where: { id: { in: users } } });
+  await db.$transaction(async tx => { await beginOrderMutation(tx); await tx.user.deleteMany({ where: { id: { in: users } } }); });
   await db.$disconnect();
 });
 
@@ -433,6 +434,11 @@ for (const width of [1440, 834, 390]) {
     expect(
       rows.map((v) => Number(v.replace(/[$,]/g, ''))).reduce((a, b) => a + b, 0)
     ).toBeCloseTo(historicalTotal, 2);
+    // Center the disclosure after inspecting its scrollable table. Chrome's
+    // automatic smooth scroll can otherwise stop beneath the fixed mobile nav.
+    await monthly.getByText('Monthly values', { exact: true }).evaluate((element) =>
+      element.scrollIntoView({ block: 'center', behavior: 'instant' })
+    );
     await monthly.getByText('Monthly values', { exact: true }).click();
     const productRanking = page.getByRole('region', {
       name: 'Top products',
@@ -566,7 +572,7 @@ test('large values, single month, empty history and all-zero periods remain usab
     chart.getByRole('button', { name: 'Next month' })
   ).toBeDisabled();
   await capture(page, 'large-single-month-mobile');
-  await db.order.deleteMany({ where: { growerId } });
+  await db.$transaction(async tx => { await beginOrderMutation(tx); await tx.order.deleteMany({ where: { growerId } }); });
   await page.goto('/grower/reports?range=all');
   await expect(
     chart.getByText('No delivered orders in this range.', { exact: true })

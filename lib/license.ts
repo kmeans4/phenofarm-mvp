@@ -43,6 +43,17 @@ export function marketplaceGrowerWhere(
 ): Prisma.GrowerWhereInput {
   return {
     isVerified: true,
+    licenseStatus: 'verified',
+    subscriptionPlan: { in: ['seller', 'pro', 'business'] },
+    subscriptionStatus: { in: ['active', 'trialing'] },
+    AND: [
+      {
+        OR: [
+          { subscriptionCurrentPeriodEnd: null },
+          { subscriptionCurrentPeriodEnd: { gt: now } },
+        ],
+      },
+    ],
     OR: [
       { licenseExpiry: null },
       { licenseExpiry: { gte: startOfLicenseDay(now) } },

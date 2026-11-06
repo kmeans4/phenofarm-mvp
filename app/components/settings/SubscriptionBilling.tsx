@@ -1,21 +1,11 @@
 'use client';
-
-import { useState, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
-import { PLAN_PRESENTATION } from '@/lib/plans';
-import { toast } from '@/app/hooks/useToast';
-import { Check, Minus } from 'lucide-react';
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '@/app/components/ui/Card';
 import { Button } from '@/app/components/ui/Button';
-
 export interface SubscriptionData {
   plan: string;
   status: string;
+  visibility?: 'visible' | 'subscription' | 'verification';
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   checkoutConfigured: boolean;
@@ -23,412 +13,84 @@ export interface SubscriptionData {
   businessCheckoutConfigured: boolean;
   portalAvailable: boolean;
 }
-
 export function SubscriptionBilling({
   initialData,
 }: {
   initialData?: SubscriptionData | null;
 }) {
-  const [subscription, setSubscription] = useState<SubscriptionData | null>(
-    initialData || null
-  );
-  const [loading, setLoading] = useState(initialData === undefined);
-  const [loadError, setLoadError] = useState(
-    initialData === null ? 'Subscription details could not be loaded.' : ''
-  );
-  const pendingRef = useRef(false);
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [activating, setActivating] = useState(false);
-  const [activationMessage, setActivationMessage] = useState('');
-  const [actionError, setActionError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (initialData === undefined) void fetchSubscription();
-  }, [initialData]);
-  useEffect(() => {
-    const result = new URLSearchParams(window.location.search).get(
-      'subscription'
-    );
-    if (result === 'cancelled') {
-      toast.info('Checkout cancelled — no charge made');
-      return;
+  const [data, setData] = useState(initialData);
+  const [error, setError] = useState('');
+  const load = useCallback(async () => {
+    setError('');
+    try {
+      const r = await fetch('/api/grower/subscription');
+      if (!r.ok) throw new Error();
+      setData(await r.json());
+    } catch {
+      setError('Could not load your subscription. Please try again.');
     }
-    if (result !== 'success') return;
-    toast.info('Checking your subscription…');
-    setActivating(true);
-    let active = true,
-      attempts = 0;
-    const poll = async () => {
-      try {
-        const response = await fetch('/api/grower/subscription');
-        if (!response.ok)
-          throw new Error('Plan activation could not be checked.');
-        const data = await response.json();
-        if (!active) return;
-        setSubscription(data);
-        if (
-          data.plan !== 'free' &&
-          ['active', 'trialing'].includes(data.status)
-        ) {
-          setActivating(false);
-          setActivationMessage('Your plan is active.');
-          toast.success('Your plan is active');
-          return;
-        }
-        if (++attempts >= 20) {
-          setActivating(false);
-          setActivationMessage(
-            'Activation is taking longer than usual. Refresh your plan or contact support.'
-          );
-          return;
-        }
-        timer = setTimeout(poll, 3000);
-      } catch {
-        if (active) {
-          setActivating(false);
-          setActivationMessage(
-            'Could not confirm activation. Refresh your plan to check again.'
-          );
-        }
-      }
-    };
-    let timer: ReturnType<typeof setTimeout>;
-    void poll();
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
   }, []);
-
-  const fetchSubscription = async () => {
-    setLoading(true);
-    setLoadError('');
-    try {
-      const res = await fetch('/api/grower/subscription');
-      if (!res.ok)
-        throw new Error(
-          'Subscription details could not be loaded. Your plan has not changed.'
-        );
-      const data = await res.json();
-      if (
-        !data ||
-        typeof data.plan !== 'string' ||
-        typeof data.status !== 'string'
-      )
-        throw new Error('Invalid subscription response.');
-      setSubscription(data);
-    } catch (error) {
-      setLoadError(
-        error instanceof Error
-          ? error.message
-          : 'Subscription details could not be loaded.'
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const navigateToStripe = (value: unknown) => {
-    if (typeof value !== 'string')
-      throw new Error('Billing returned an invalid link.');
-    const url = new URL(value);
-    if (
-      url.protocol !== 'https:' ||
-      !['checkout.stripe.com', 'billing.stripe.com'].includes(url.hostname) ||
-      url.username ||
-      url.password
-    )
-      throw new Error('Billing returned an invalid link.');
-    window.location.assign(url.href);
-  };
-
-  const startCheckout = async (plan: 'pro' | 'business') => {
-    if (pendingRef.current) return;
-    pendingRef.current = true;
-    setActionLoading(plan);
-    setActionError(null);
-
-    try {
-      const res = await fetch('/api/grower/subscription/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ plan }),
-      });
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok || !data.url) {
-        throw new Error(
-          data.error || 'We could not open checkout. Please try again.'
-        );
-      }
-
-      navigateToStripe(data.url);
-    } catch (err) {
-      setActionError(
-        err instanceof Error
-          ? err.message
-          : 'We could not open checkout. Please try again.'
-      );
-      pendingRef.current = false;
-      setActionLoading(null);
-    }
-  };
-
-  const openPortal = async () => {
-    if (pendingRef.current) return;
-    pendingRef.current = true;
-    setActionLoading('portal');
-    setActionError(null);
-
-    try {
-      const res = await fetch('/api/grower/subscription/portal', {
-        method: 'POST',
-      });
-      const data = await res.json().catch(() => ({}));
-
-      if (!res.ok || !data.url) {
-        throw new Error(
-          data.error || 'We could not open billing. Please try again.'
-        );
-      }
-
-      navigateToStripe(data.url);
-    } catch (err) {
-      setActionError(
-        err instanceof Error
-          ? err.message
-          : 'We could not open billing. Please try again.'
-      );
-      pendingRef.current = false;
-      setActionLoading(null);
-    }
-  };
-
-  const formatDate = (dateStr: string | null) => {
-    if (!dateStr) return 'N/A';
-    return new Date(dateStr).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-    });
-  };
-
-  const getPlanBadge = (plan: string) => {
-    switch (plan) {
-      case 'pro':
-        return (
-          <span className="px-2 py-1 bg-pf-purple-bg text-pf-purple text-sm font-medium rounded-full">
-            PRO
-          </span>
-        );
-      case 'business':
-        return (
-          <span className="px-2 py-1 bg-pf-warning-bg text-pf-warning text-sm font-medium rounded-full">
-            BUSINESS
-          </span>
-        );
-      default:
-        return (
-          <span className="px-2 py-1 bg-pf-surface text-pf-secondary text-sm font-medium rounded-full">
-            FREE
-          </span>
-        );
-    }
-  };
-
-  if (loading) {
-    return (
-      <Card>
-        <CardContent className="p-6 text-center text-pf-muted">
-          Loading subscription details...
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (loadError || !subscription) {
-    return (
-      <Card>
-        <CardContent className="space-y-3 p-6">
-          <p role="alert" className="text-sm text-pf-danger">
-            {loadError || 'Subscription details are unavailable.'}
-          </p>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => void fetchSubscription()}
-          >
-            Retry
-          </Button>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const presentation =
-    PLAN_PRESENTATION.find((p) => p.id === subscription.plan) ||
-    PLAN_PRESENTATION[0];
-  const planFeatureRows = presentation.features.map((label) => ({
-    label,
-    included: true,
-  }));
-
+  useEffect(() => {
+    if (initialData) setData(initialData);
+    else void load();
+  }, [initialData, load]);
+  const visible = data?.visibility === 'visible';
   return (
-    <Card className="border-pf-accent-line">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
-          <span>Subscription</span>
-          {getPlanBadge(subscription?.plan || 'free')}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4">
-        {activating && (
-          <p role="status" className="text-sm text-pf-accent">
-            Activating your plan…
+    <section
+      className="rounded-xl border border-pf-line bg-pf-surface p-5"
+      aria-label="Subscription and buyer visibility"
+    >
+      <h2 className="text-lg font-semibold">Subscription & buyer visibility</h2>
+      {error ? (
+        <div className="mt-3">
+          <p role="alert">{error}</p>
+          <Button onClick={() => void load()}>Retry</Button>
+        </div>
+      ) : !data ? (
+        <p className="mt-3 text-pf-muted">Loading subscription…</p>
+      ) : (
+        <>
+          <p className="mt-3 font-semibold text-pf-accent">
+            {visible
+              ? 'Your published, available products are visible to buyers'
+              : data.visibility === 'verification'
+                ? 'Your products are hidden — license verification needed'
+                : 'Your products are hidden — activate a subscription to sell'}
           </p>
-        )}
-        {activationMessage && (
-          <div className="text-sm">
-            <p role="status">{activationMessage}</p>
-            <Button variant="outline" onClick={() => void fetchSubscription()}>
-              Refresh plan
-            </Button>
-          </div>
-        )}
-
-        {actionError && (
-          <div className="rounded-lg border border-pf-danger-line bg-pf-danger-bg p-3 text-sm text-pf-danger">
-            {actionError}
-          </div>
-        )}
-
-        {/* Current Plan */}
-        <div className="bg-pf-canvas rounded-lg p-4">
-          <div className="flex items-center justify-between mb-2">
-            <div>
-              <h4 className="font-medium text-pf-text">
-                {subscription?.plan === 'pro'
-                  ? 'Pro Plan'
-                  : subscription?.plan === 'business'
-                    ? 'Business Plan'
-                    : 'Free Plan'}
-              </h4>
-              <p className="text-sm text-pf-muted">
-                {subscription.status === 'trialing'
-                  ? `Trial — ends ${formatDate(subscription.currentPeriodEnd)}`
-                  : subscription.status === 'past_due'
-                    ? 'Payment failed — update card'
-                    : subscription.cancelAtPeriodEnd
-                      ? `Ends ${formatDate(subscription.currentPeriodEnd)}`
-                      : subscription.plan === 'free'
-                        ? ''
-                        : subscription.status === 'active'
-                          ? 'Active'
-                          : 'Inactive'}
-              </p>
-            </div>
-            <div className="text-right">
-              <p className="text-2xl font-bold text-pf-text">
-                {subscription?.plan === 'free'
-                  ? '$0'
-                  : subscription?.plan === 'pro'
-                    ? '$249'
-                    : 'Custom'}
-                {subscription?.plan !== 'business' && (
-                  <span className="text-sm font-normal text-pf-muted">/mo</span>
-                )}
-              </p>
-            </div>
-          </div>
-
-          {subscription?.currentPeriodEnd && (
-            <p className="text-sm text-pf-muted mt-2">
-              {subscription.cancelAtPeriodEnd
-                ? `Cancels on ${formatDate(subscription.currentPeriodEnd)}`
-                : `Renews on ${formatDate(subscription.currentPeriodEnd)}`}
+          <p className="mt-2 text-sm text-pf-muted">
+            You can create listings, import products and manage stock for free.
+            Buyer visibility requires an active subscription and an approved,
+            current license.
+          </p>
+          {data.currentPeriodEnd && (
+            <p className="mt-2 text-sm">
+              Current access {data.cancelAtPeriodEnd ? 'ends' : 'through'}{' '}
+              {new Date(data.currentPeriodEnd).toLocaleDateString('en-US', {
+                timeZone: 'America/New_York',
+              })}
+              .
             </p>
           )}
-        </div>
-
-        {/* Plan Features */}
-        <div className="border-t border-pf-line pt-3">
-          <h3 className="py-2 text-sm font-medium text-pf-secondary">
-            Plan features
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-            {planFeatureRows.map((feature) => (
-              <div key={feature.label} className="flex items-center gap-2">
-                <span
-                  aria-label={feature.included ? 'Included' : 'Not included'}
-                  className={`flex h-5 w-5 flex-none items-center justify-center rounded-full ${
-                    feature.included
-                      ? 'bg-pf-accent-bg text-pf-accent'
-                      : 'bg-pf-surface text-pf-muted'
-                  }`}
-                >
-                  {feature.included ? (
-                    <Check className="h-3.5 w-3.5" aria-hidden="true" />
-                  ) : (
-                    <Minus className="h-3.5 w-3.5" aria-hidden="true" />
-                  )}
-                </span>
-                <span
-                  className={
-                    feature.included ? 'text-pf-secondary' : 'text-pf-muted'
-                  }
-                >
-                  {feature.label}
-                </span>
-              </div>
-            ))}
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Button variant="outline" asChild>
+              <Link
+                href={
+                  data.visibility === 'verification'
+                    ? '/grower/settings#license'
+                    : '/contact'
+                }
+              >
+                {data.visibility === 'verification'
+                  ? 'Review license'
+                  : 'Contact support'}
+              </Link>
+            </Button>
+            <Button variant="ghost" onClick={() => void load()}>
+              Refresh status
+            </Button>
           </div>
-        </div>
-
-        <div className="flex flex-wrap gap-3 border-t border-pf-line pt-4">
-          <Button variant="outline" asChild>
-            <Link href="/grower/pricing">Change plan</Link>
-          </Button>
-          {subscription.plan === 'free' && !subscription.portalAvailable && (
-            <Button
-              disabled={
-                !subscription.proCheckoutConfigured || actionLoading !== null
-              }
-              onClick={() => startCheckout('pro')}
-            >
-              {actionLoading === 'pro'
-                ? 'Opening checkout...'
-                : 'Upgrade to Pro'}
-            </Button>
-          )}
-          {subscription.portalAvailable && (
-            <Button
-              variant="outline"
-              disabled={actionLoading !== null}
-              onClick={openPortal}
-            >
-              {actionLoading === 'portal'
-                ? 'Opening billing...'
-                : subscription.status === 'past_due'
-                  ? 'Update payment card'
-                  : 'Manage billing'}
-            </Button>
-          )}
-          {subscription.portalAvailable && subscription.plan !== 'free' && (
-            <Button
-              variant="outline"
-              disabled={actionLoading !== null}
-              onClick={openPortal}
-            >
-              Cancel subscription
-            </Button>
-          )}
-        </div>
-        {!subscription.checkoutConfigured && (
-          <p className="text-sm text-pf-muted">
-            Online subscription checkout is currently unavailable.
-          </p>
-        )}
-      </CardContent>
-    </Card>
+        </>
+      )}
+    </section>
   );
 }

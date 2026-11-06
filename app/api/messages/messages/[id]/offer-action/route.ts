@@ -1,3 +1,6 @@
+import { plainData } from '@/lib/serialize';
+import { sellerCanTrade, SELLER_ACCESS_MESSAGE } from '@/lib/seller-access';
+import { validQuantity, QUANTITY_MESSAGE } from '@/lib/quantity';
 import { NextRequest, NextResponse } from 'next/server';
 import { ConversationMessageType, OfferStatus } from '@prisma/client';
 import { db } from '@/lib/db';
@@ -81,6 +84,11 @@ export async function POST(
       }
     }
 
+    if (action !== 'REJECT' && !(await sellerCanTrade(conversation.growerId)))
+      return NextResponse.json(
+        { error: SELLER_ACCESS_MESSAGE },
+        { status: 403 }
+      );
     const now = new Date();
     const quoteCutoff = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
     if (
@@ -179,7 +187,7 @@ export async function POST(
       });
 
       return NextResponse.json(
-        {
+        plainData({
           ok: true,
           action,
           messageId: updatedOffer.id,
@@ -196,7 +204,7 @@ export async function POST(
                   },
                 })
               : null,
-        },
+        }),
         { status: 200 }
       );
     }
@@ -215,10 +223,26 @@ export async function POST(
       );
     }
 
+    const quotedProduct = message.productId
+      ? await db.product.findUnique({
+          where: { id: message.productId },
+          select: { unit: true, productType: true },
+        })
+      : null;
+    if (
+      counter.quantity !== undefined &&
+      counter.quantity !== null &&
+      !validQuantity(counterQuantity, {
+        unit: quotedProduct?.unit,
+        productType: quotedProduct?.productType,
+        max: 9999,
+      })
+    )
+      return NextResponse.json({ error: QUANTITY_MESSAGE }, { status: 400 });
     const normalizedQuantity =
-      Number.isFinite(counterQuantity) && counterQuantity > 0
-        ? Math.floor(counterQuantity)
-        : message.offerQuantity || null;
+      counter.quantity !== undefined && counter.quantity !== null
+        ? counterQuantity
+        : message.offerQuantity;
 
     const counterMessageBody = counterNote || 'Counter quote';
 
@@ -275,13 +299,13 @@ export async function POST(
     });
 
     return NextResponse.json(
-      {
+      plainData({
         ok: true,
         action,
         updatedMessageId: result.updatedOriginal.id,
         counterOfferId: result.newOffer.id,
         counterOfferStatus: result.newOffer.offerStatus,
-      },
+      }),
       { status: 200 }
     );
   } catch (error) {

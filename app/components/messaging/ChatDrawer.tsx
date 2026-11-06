@@ -1,4 +1,6 @@
 'use client';
+import { quantityPrice } from '@/lib/quantity';
+import { validQuantity, QUANTITY_MESSAGE } from '@/lib/quantity';
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -93,6 +95,14 @@ type OpenChatEventDetail = {
   /** Briefly highlight the drawer when another surface sends users here. */
   flash?: boolean;
   quoteProductId?: string;
+  quoteLines?: {
+    id: string;
+    name: string;
+    unit: string;
+    productType?: string | null;
+    quantity: number;
+    price: number;
+  }[];
 };
 
 interface MessageDraft {
@@ -226,6 +236,10 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
   const [offerProduct, setOfferProduct] = useState<QuoteProduct | null>(null);
   const composerRef = useRef<HTMLTextAreaElement>(null);
   const [showOfferComposer, setShowOfferComposer] = useState(false);
+  const [quoteContexts, setQuoteContexts] = useState<
+    Record<string, NonNullable<OpenChatEventDetail['quoteLines']>>
+  >({});
+  const [quoteLineIndex, setQuoteLineIndex] = useState('0');
   const [offerPrice, setOfferPrice] = useState('');
   const [offerQty, setOfferQty] = useState('');
   const [offerNote, setOfferNote] = useState('');
@@ -650,6 +664,11 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
           detail.conversationId,
           typeof detail.draft === 'string' ? detail.draft : undefined
         );
+        setQuoteContexts((previous) => ({
+          ...previous,
+          [detail.conversationId!]: detail.quoteLines || [],
+        }));
+        setQuoteLineIndex('0');
         if (detail.quoteProductId)
           setOfferProduct({
             id: detail.quoteProductId,
@@ -956,9 +975,13 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     const quantity = offerQty.trim() ? Number(offerQty) : undefined;
     if (
       quantity !== undefined &&
-      (!Number.isInteger(quantity) || quantity < 1 || quantity > 9999)
+      !validQuantity(quantity, {
+        unit: offerProduct?.unit || activeConversation?.product?.unit,
+        productType: offerProduct?.productType,
+        max: 9999,
+      })
     ) {
-      setError('Quote quantity must be a whole number between 1 and 9999.');
+      setError(QUANTITY_MESSAGE);
       return;
     }
     await postMessage(
@@ -977,6 +1000,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
     postMessage,
     offerProduct,
     activeConversation?.productId,
+    activeConversation?.product?.unit,
   ]);
 
   const sendPricingRequest = useCallback(async () => {
@@ -1090,9 +1114,12 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
       }
       if (
         quantity !== undefined &&
-        (!Number.isInteger(quantity) || quantity < 1 || quantity > 9999)
+        !validQuantity(quantity, {
+          unit: messages.find((m) => m.id === messageId)?.product?.unit,
+          max: 9999,
+        })
       ) {
-        setError('Quote quantity must be a whole number between 1 and 9999.');
+        setError(QUANTITY_MESSAGE);
         return;
       }
       if (
@@ -1111,7 +1138,7 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
         setCounterNote('');
       }
     },
-    [counterPrice, counterQty, counterNote, offerAction]
+    [counterPrice, counterQty, counterNote, offerAction, messages]
   );
 
   const renderOfferStatus = (status: ConversationMessage['offerStatus']) => {
@@ -1863,7 +1890,44 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                               ? 'Send quote'
                               : 'Make an offer'}
                           </h3>
+                          {(quoteContexts[activeConversationId]?.length || 0) >
+                            1 && (
+                            <label className="block text-sm">
+                              Request item
+                              <select
+                                aria-label="Request item"
+                                className="mt-1 min-h-11 w-full rounded-lg border border-pf-line bg-pf-surface px-2"
+                                value={quoteLineIndex}
+                                onChange={(event) => {
+                                  setQuoteLineIndex(event.target.value);
+                                  const line =
+                                    quoteContexts[activeConversationId][
+                                      Number(event.target.value)
+                                    ];
+                                  setOfferProduct({
+                                    id: line.id,
+                                    name: line.name,
+                                    unit: line.unit,
+                                    productType: line.productType,
+                                    price: line.price,
+                                    inventoryQty: 0,
+                                  });
+                                  setOfferPrice(String(line.price));
+                                  setOfferQty(String(line.quantity));
+                                }}
+                              >
+                                {quoteContexts[activeConversationId].map(
+                                  (line, index) => (
+                                    <option key={index} value={index}>
+                                      {line.name} · {line.quantity} {line.unit}
+                                    </option>
+                                  )
+                                )}
+                              </select>
+                            </label>
+                          )}
                           <QuoteProductPicker
+                            selectedProduct={offerProduct}
                             conversationId={activeConversationId}
                             value={
                               offerProduct?.id ||
@@ -1891,13 +1955,24 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                               Quantity (optional)
                               <input
                                 type="text"
-                                inputMode="numeric"
+                                inputMode="decimal"
                                 value={offerQty}
                                 onChange={(e) => setOfferQty(e.target.value)}
                                 className="mt-1 w-full rounded-lg border px-2 py-2 text-base"
                               />
                             </label>
                           </div>
+                          {Number(offerPrice) > 0 && Number(offerQty) > 0 && (
+                            <p className="font-semibold" aria-live="polite">
+                              Quote total:{' '}
+                              {formatMoney(
+                                quantityPrice(
+                                  Number(offerQty),
+                                  Number(offerPrice)
+                                )
+                              )}
+                            </p>
+                          )}
                           <label className="block text-sm">
                             Note (optional)
                             <textarea
@@ -1992,7 +2067,23 @@ export function ChatDrawer({ currentUserId, currentRole }: ChatDrawerProps) {
                             </select>
                             <button
                               type="button"
-                              onClick={() => setShowOfferComposer(true)}
+                              onClick={() => {
+                                const line =
+                                  quoteContexts[activeConversationId]?.[0];
+                                if (line && !offerPrice && !offerQty) {
+                                  setOfferProduct({
+                                    id: line.id,
+                                    name: line.name,
+                                    unit: line.unit,
+                                    productType: line.productType,
+                                    price: line.price,
+                                    inventoryQty: 0,
+                                  });
+                                  setOfferPrice(String(line.price));
+                                  setOfferQty(String(line.quantity));
+                                }
+                                setShowOfferComposer(true);
+                              }}
                               className="inline-flex min-h-11 items-center gap-1 rounded-lg bg-emerald-500 px-3 text-sm font-semibold text-pf-canvas"
                               data-testid="toggle-offer-composer"
                             >

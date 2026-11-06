@@ -117,7 +117,7 @@ export default async function SavedPage({ searchParams }: SavedPageProps) {
         growerId: order.grower?.id || order.growerId,
         unit: item.product?.unit || null,
         price: Number(item.unitPrice),
-        quantity: item.quantity,
+        quantity: Number(item.quantity),
         lastOrderedAt: order.createdAt.toISOString(),
         orderCount: 1,
       });

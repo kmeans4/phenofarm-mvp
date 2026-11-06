@@ -1,3 +1,4 @@
+import { validQuantity, QUANTITY_MESSAGE } from '@/lib/quantity';
 import { refreshProductPriceAlerts } from '@/lib/buyer-alerts';
 import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
@@ -96,10 +97,50 @@ export async function PATCH(request: NextRequest) {
     const skipped: Array<{ id: string; reason: string }> = ids
       .filter((id) => !products.some((product) => product.id === id))
       .map((id) => ({ id, reason: 'not found' }));
+    const used =
+      updates.unit !== undefined || updates.productType !== undefined
+        ? await db.product.findMany({
+            where: {
+              id: { in: ids },
+              OR: [
+                { orderItems: { some: {} } },
+                { acceptedQuotes: { some: {} } },
+                { conversationMessages: { some: {} } },
+              ],
+            },
+            select: { id: true },
+          })
+        : [];
     const changed = products.filter((product) => {
       if (
+        !validQuantity(updates.soldOut ? 0 : product.inventoryQty, {
+          unit: updates.unit ?? product.unit,
+          productType: updates.productType ?? product.productType,
+          allowZero: true,
+        })
+      ) {
+        skipped.push({ id: product.id, reason: QUANTITY_MESSAGE });
+        return false;
+      }
+      if (
+        used.some((p) => p.id === product.id) &&
+        ((updates.unit !== undefined &&
+          normalizeUnit(updates.unit) !== product.unit) ||
+          (updates.productType !== undefined &&
+            canonicalizeProductType(updates.productType) !==
+              product.productType))
+      ) {
+        skipped.push({
+          id: product.id,
+          reason:
+            'Create a new listing to change the selling unit or type of a product already used in an order or quote.',
+        });
+        return false;
+      }
+
+      if (
         updates.isAvailable === true &&
-        (product.inventoryQty <= 0 || product.status === 'DRAFT')
+        (Number(product.inventoryQty) <= 0 || product.status === 'DRAFT')
       ) {
         skipped.push({
           id: product.id,
@@ -158,6 +199,7 @@ export async function PATCH(request: NextRequest) {
       previous: changed.map((product) => ({
         ...product,
         price: Number(product.price),
+        inventoryQty: Number(product.inventoryQty),
       })),
     });
   } catch (error) {
