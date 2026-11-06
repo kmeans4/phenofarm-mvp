@@ -47,4 +47,12 @@ All five current production growers were free/inactive at preflight. Their statu
 
 ## Release record
 
-Publication, migration, deployment and live verification are recorded here after completion. End-to-end business transactions are tested locally; production smoke checks do not submit requests, alter inventory or send messages.
+- Application commit: `bf532ad11ba3bd64dbb121e4f4af19df84f7b267`, built from the clean task worktree. Release documentation is a subsequent documentation-only commit.
+- Vercel deployment: `dpl_54PgRW8iT3RpAwcxkUjuUfLMBcPk`, READY. Built with production settings before migration, then promoted on November 6, 2026. Canonical `phenoshop.app` and the existing aliases were verified against this deployment. Immutable build: `https://phenofarm-pym3rkual-kevin-means-projects.vercel.app`.
+- Fresh backup: Neon snapshot `snap-polished-lake-aijm22vl`, created at 19:32:59 UTC and retained through December 11, 2026. Existing daily backups and recovery history remain configured.
+- Production migration completed at approximately 19:33 UTC. All 28 repository migrations are applied. All four quantity columns are `NUMERIC(16,3)` and the v2 writer guard is active. There are no invalid stock, item, offer or quote quantities.
+- Business-data fingerprints matched before migration, immediately after migration, and after live smoke checks. Retained: 12 products with total stock 2,962 selling units, 7 orders, 10 order items, 21 conversation messages, 1 accepted quote, and unchanged grower/buyer profiles. The stock sum is an integrity check across differing selling units, not a business metric.
+- 42 read-only live page checks passed: four public pages plus five grower and five buyer screens at each of the three widths. Thirty signed-in screenshots were captured and representative live layouts visually reviewed. No browser exceptions or HTTP 5xx responses were observed; Vercel returned no error/fatal runtime log groups for the checked deployment/window.
+- Live authentication used temporary ten-minute sessions for existing verified `support+` seed accounts. Password sign-in, email delivery, billing and live business transactions were not retested. Browser mutations were blocked, including automatic price-alert refresh requests; price-alert refresh itself passed the isolated local regression test.
+
+End-to-end business transactions were tested locally. Production checks did not submit requests, change inventory, send messages, activate subscriptions or delete seed records.
