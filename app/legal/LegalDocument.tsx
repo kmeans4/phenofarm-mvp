@@ -1,3 +1,4 @@
+import { PublicTraffic } from '@/app/components/PublicTraffic';
 import { LegalContents } from './LegalContents';
 
 import { BrandLogo } from '@/app/components/ui/BrandLogo';
@@ -14,6 +15,7 @@ interface LegalDocumentProps {
   title: string;
   description: string;
   sections: LegalSection[];
+  effectiveDate?: string;
 }
 
 const EFFECTIVE_DATE = 'September 24, 2026';
@@ -28,9 +30,11 @@ export function LegalDocument({
   title,
   description,
   sections,
+  effectiveDate = EFFECTIVE_DATE,
 }: LegalDocumentProps) {
   return (
     <main className="min-h-screen bg-[#070908] px-4 py-10 text-white sm:px-6 lg:px-8">
+      <PublicTraffic />
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-[-20rem] h-[42rem] w-[58rem] -translate-x-1/2 rounded-full bg-emerald-500/[0.09] blur-[140px]" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent" />
@@ -60,7 +64,7 @@ export function LegalDocument({
             {title}
           </h1>
           <p className="mt-4 text-sm font-medium text-gray-300">
-            Effective: {EFFECTIVE_DATE}
+            Effective: {effectiveDate}
           </p>
           <p className="mt-6 max-w-3xl text-base leading-7 text-gray-400">
             {description}

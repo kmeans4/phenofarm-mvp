@@ -1,3 +1,4 @@
+import { PublicTraffic } from '@/app/components/PublicTraffic';
 import Link from 'next/link';
 import { getAuthSession } from '@/lib/auth-helpers';
 export const metadata = { title: 'Help | PhenoShop' };
@@ -51,6 +52,7 @@ export default async function Help() {
           ] as const);
   return (
     <main className="mx-auto min-h-dvh max-w-3xl space-y-6 px-4 py-8 text-pf-text">
+      {!session && <PublicTraffic />}
       <nav className="flex justify-between">
         <Link
           className="inline-flex min-h-11 items-center text-pf-accent"

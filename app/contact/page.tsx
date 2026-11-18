@@ -1,3 +1,4 @@
+import { PublicTraffic } from '@/app/components/PublicTraffic';
 import Link from 'next/link';
 import { getAuthSession } from '@/lib/auth-helpers';
 import { ContactForm } from './ContactForm';
@@ -6,6 +7,7 @@ export default async function ContactPage() {
   const session = await getAuthSession();
   return (
     <main className="mx-auto min-h-dvh max-w-xl space-y-5 px-4 py-8 text-pf-text">
+      {!session && <PublicTraffic />}
       <Link
         className="inline-flex min-h-11 items-center text-sm text-pf-accent"
         href={session ? '/dashboard' : '/'}

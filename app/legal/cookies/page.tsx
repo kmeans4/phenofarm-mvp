@@ -29,6 +29,13 @@ const sections: LegalSection[] = [
     ]
   },
   {
+    "id": "public-traffic",
+    "title": "Public website traffic",
+    "paragraphs": [
+      "We use cookie-free Cloudflare Web Analytics to count visits to our public landing, help, contact and legal pages. The report includes the public page path and referring website. We exclude form entries, URL parameters, accounts and marketplace activity. To opt out, enable Global Privacy Control or Do Not Track in your browser."
+    ]
+  },
+  {
     "id": "your-controls",
     "title": "Your controls",
     "paragraphs": [
@@ -41,6 +48,7 @@ export default function CookiesPage() {
   return (
     <LegalDocument
       title="Cookie Notice"
+      effectiveDate="November 18, 2026"
       description="How cookies and browser storage support sign-in, preferences, and work in progress."
       sections={sections}
     />

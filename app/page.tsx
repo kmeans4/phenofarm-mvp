@@ -1,3 +1,4 @@
+import { PublicTraffic } from '@/app/components/PublicTraffic';
 import { getAuthSession } from '@/lib/auth-helpers';
 import type { Metadata } from 'next';
 import {
@@ -29,6 +30,7 @@ export default async function LandingPage() {
   const signedIn = Boolean(await getAuthSession());
   return (
     <div className="min-h-screen bg-[#070908]">
+      {!signedIn && <PublicTraffic />}
       <a className="pf-skip-link" href="#main-content">
         Skip to content
       </a>
